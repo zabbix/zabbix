@@ -3,7 +3,9 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of Zookeeper monitoring by Zabbix via HTTP and doesn't require any external scripts.
+This template is designed for the effortless deployment of Apache Zookeeper monitoring by Zabbix via HTTP and doesn't require any external scripts.
+
+This template works with standalone and cluster instances. Metrics are collected from each Zookeeper node by requests to AdminServer.
 
 ## Requirements
 
@@ -20,16 +22,15 @@ This template has been tested on:
 
 ## Setup
 
-This template works with standalone and cluster instances. Metrics are collected from each Zookeeper node by requests to [AdminServer](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver).
-By default AdminServer is enabled and listens on port 8080.
-You can enable or configure AdminServer parameters according [official documentations](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).
-Don't forget to change macros {$ZOOKEEPER.COMMAND_URL}, {$ZOOKEEPER.PORT}, {$ZOOKEEPER.SCHEME}.
+1. Enable the AdminServer and configure the parameters according to the [`official documentation`](https://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_adminserver_config).
 
+2. Set the hostname or IP address of the Apache Zookeeper host in the `{$ZOOKEEPER.HOST}` macro. You can also change the `{$ZOOKEEPER.COMMAND_URL}`, `{$ZOOKEEPER.PORT}` and `{$ZOOKEEPER.SCHEME}` macros if necessary.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$ZOOKEEPER.HOST}|<p>The hostname or IP address of the Apache Zookeeper host.</p>|`<SET ZOOKEEPER HOST>`|
 |{$ZOOKEEPER.PORT}|<p>The port the embedded Jetty server listens on (admin.serverPort).</p>|`8080`|
 |{$ZOOKEEPER.COMMAND_URL}|<p>The URL for listing and issuing commands relative to the root URL (admin.commandURL).</p>|`commands`|
 |{$ZOOKEEPER.SCHEME}|<p>Request scheme which may be http or https</p>|`http`|

@@ -7,9 +7,6 @@ SUBDIRS = \
 	logfiles \
 	metrics
 
-EXTRA_DIST = \
-	eventlog
-
 sbin_PROGRAMS = zabbix_agentd
 
 zabbix_agentd_SOURCES = zabbix_agentd.c

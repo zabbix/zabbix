@@ -765,7 +765,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:address' => ''
 					],
-					'error' => 'Incorrect value for field "Address": cannot be empty.'
+					'error' => 'Incorrect value for field "Interface: Address": cannot be empty.'
 				]
 			],
 			[
@@ -776,7 +776,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:port' => ''
 					],
-					'error' => 'Incorrect value for field "Port": cannot be empty.'
+					'error' => 'Incorrect value for field "Interface: Port": cannot be empty.'
 				]
 			],
 			[

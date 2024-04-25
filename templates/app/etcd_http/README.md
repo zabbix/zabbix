@@ -8,11 +8,11 @@ Most of the metrics are collected in one go, thanks to Zabbix bulk data collecti
 
 The template `Etcd by HTTP` — collects metrics by help of the HTTP agent from `/metrics` endpoint.
 
-> Refer to the [vendor documentation](https://etcd.io/docs/v3.5/op-guide/monitoring/#metrics-endpoint).
+> Refer to the [`vendor documentation`](https://etcd.io/docs/v3.5/op-guide/monitoring/#metrics-endpoint).
 
 **For the users of `etcd version <= 3.4` !**
 
-> In `etcd v3.5` some metrics have been deprecated. See more details on [Upgrade etcd from 3.4 to 3.5](https://etcd.io/docs/v3.4/upgrades/upgrade_3_5/).
+> In `etcd v3.5` some metrics have been deprecated. See more details on [`Upgrade etcd from 3.4 to 3.5`](https://etcd.io/docs/v3.4/upgrades/upgrade_3_5/).
 Please upgrade your `etcd` instance, or use older `Etcd by HTTP` template version.
 
 ## Requirements
@@ -30,27 +30,28 @@ This template has been tested on:
 
 ## Setup
 
-Follow these instructions:
+1. Make sure that `etcd` allows the collection of metrics. You can test it by running: `curl -L http://localhost:2379/metrics`.
 
-1. Import the template into Zabbix.
-2. After importing the template, make sure that `etcd` allows the collection of metrics. You can test it by running: `curl -L http://localhost:2379/metrics`.
-3. Check if `etcd` is accessible from Zabbix proxy or Zabbix server depending on where you are planning to do the monitoring. To verify it,  run `curl -L  http://<etcd_node_address>:2379/metrics`.
-4. Add the template to each `etcd node`. By default, the template uses a client's port.
-You can configure metrics endpoint location by adding `--listen-metrics-urls flag`.
-(For more details, see [etcd documentation](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring)).
+2. Check if `etcd` is accessible from Zabbix proxy or Zabbix server depending on where you are planning to do the monitoring. To verify it, run `curl -L  http://<etcd_node_address>:2379/metrics`.
+
+3. Add the template to the `etcd` node. Set the hostname or IP address of the `etcd` host in the `{$ETCD.HOST}` macro. By default, the template uses a client's port.
+You can configure metrics endpoint location by adding `--listen-metrics-urls` flag.
+
+For more details, see the [`etcd documentation`](https://etcd.io/docs/v3.5/op-guide/configuration/#profiling-and-monitoring).
 
 Additional points to consider:
 
--  If you have specified a non-standard port for `etcd`, don't forget to change macros: `{$ETCD.SCHEME}` and `{$ETCD.PORT}`.
--  You can set `{$ETCD.USERNAME}` and `{$ETCD.PASSWORD}` macros in the template to use on a host level if necessary.
--  To test availability, run : `zabbix_get -s etcd-host -k etcd.health`.
--  See the macros section, as it will set the trigger values.
+- If you have specified a non-standard port for `etcd`, don't forget to change macros: `{$ETCD.SCHEME}` and `{$ETCD.PORT}`.
+- You can set `{$ETCD.USERNAME}` and `{$ETCD.PASSWORD}` macros in the template to use on a host level if necessary.
+- To test availability, run: `zabbix_get -s etcd-host -k etcd.health`.
+- See the macros section, as it will set the trigger values.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ETCD.PORT}|<p>The port of `etcd` API endpoint.</p>|`2379`|
+|{$ETCD.HOST}|<p>The hostname or IP address of the `etcd` API endpoint.</p>|`<SET ETCD HOST>`|
+|{$ETCD.PORT}|<p>The port of the `etcd` API endpoint.</p>|`2379`|
 |{$ETCD.SCHEME}|<p>The request scheme which may be `http` or `https`.</p>|`http`|
 |{$ETCD.USER}|||
 |{$ETCD.PASSWORD}|||
@@ -68,7 +69,7 @@ Additional points to consider:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Etcd: Service's TCP port state||Simple check|net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Etcd: Service's TCP port state||Simple check|net.tcp.service["{$ETCD.SCHEME}","{$ETCD.HOST}","{$ETCD.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Etcd: Get node metrics||HTTP agent|etcd.get_metrics|
 |Etcd: Node health||HTTP agent|etcd.health<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health`</p></li><li><p>Boolean to decimal</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Etcd: Server is a leader|<p>It defines - whether or not this member is a leader:</p><p>1 - it is;</p><p>0 - otherwise.</p>|Dependent item|etcd.is.leader<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(etcd_server_is_leader)`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
@@ -111,7 +112,7 @@ Additional points to consider:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Etcd: Service is unavailable||`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0`|Average|**Manual close**: Yes|
+|Etcd: Service is unavailable||`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{$ETCD.HOST}","{$ETCD.PORT}"])=0`|Average|**Manual close**: Yes|
 |Etcd: Node healthcheck failed|<p>See more details on https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check.</p>|`last(/Etcd by HTTP/etcd.health)=0`|Average|**Depends on**:<br><ul><li>Etcd: Service is unavailable</li></ul>|
 |Etcd: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Etcd: Service is unavailable</li></ul>|
 |Etcd: Member has no leader|<p>If a member does not have a leader, it is totally unavailable.</p>|`last(/Etcd by HTTP/etcd.has.leader)=0`|Average||

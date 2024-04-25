@@ -58,6 +58,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	cachehistory/libzbxcachehistory_proxy.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
@@ -73,6 +74,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
 	$(top_builddir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
+	$(top_builddir)/src/libs/zbxescalations/libzbxescalations.a \
 	$(top_builddir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
@@ -138,7 +140,7 @@ zabbix_proxy_LDFLAGS = $(PROXY_LDFLAGS)
 
 zabbix_proxy_CFLAGS = \
 	-DDEFAULT_SSL_CERT_LOCATION="\"$(CURL_SSL_CERT_LOCATION)\"" \
-	-DDEFAULT_SSL_KEY_LOCATION="\"$(URL_SSL_KEY_LOCATION)\"" \
+	-DDEFAULT_SSL_KEY_LOCATION="\"$(CURL_SSL_KEY_LOCATION)\"" \
 	-DDEFAULT_CONFIG_FILE="\"$(PROXY_CONFIG_FILE)\"" \
 	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"$(EXTERNAL_SCRIPTS_PATH)\"" \
 	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \

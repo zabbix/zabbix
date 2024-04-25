@@ -53,6 +53,8 @@ require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
 require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
 require_once dirname(__FILE__).'/testPermissions.php';
+require_once dirname(__FILE__).'/testFunctionChangeCount.php';
+require_once dirname(__FILE__).'/testProxyHa.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -97,6 +99,8 @@ class IntegrationTests {
 		$suite->addTestSuite('testAgentJsonProtocol');
 		$suite->addTestSuite('testSnmpTrapsInHa');
 		$suite->addTestSuite('testPermissions');
+		$suite->addTestSuite('testFunctionChangeCount');
+		$suite->addTestSuite('testProxyHa');
 
 		return $suite;
 	}

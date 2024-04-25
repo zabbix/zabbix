@@ -169,9 +169,7 @@ class CSettingsHelper {
 			self::$params_private = CSettings::getPrivate();
 		}
 
-		$supported_params = array_intersect_key(
-			self::$params_private, array_flip([self::SESSION_KEY, self::SERVER_STATUS])
-		);
+		$supported_params = array_intersect_key(self::$params_private, array_flip([self::SESSION_KEY]));
 
 		return $supported_params[$field];
 	}
@@ -182,5 +180,17 @@ class CSettingsHelper {
 		}
 
 		return self::$params_private[self::DBVERSION_STATUS];
+	}
+
+	public static function getServerStatus(): array {
+		if (!self::$params_private) {
+			self::$params_private = CSettings::getPrivate();
+		}
+
+		return self::$params_private[self::SERVER_STATUS];
+	}
+
+	public static function isGlobalScriptsEnabled(): bool {
+		return self::getServerStatus()['configuration']['enable_global_scripts'];
 	}
 }

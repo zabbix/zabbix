@@ -116,8 +116,12 @@ typedef struct
 	unsigned char		content_type;
 	int			status;
 	int			retries;
+	char			*expression;
+	char			*recovery_expression;
 
-	int			objectid;
+	zbx_uint64_t		objectid;
+	int			object;
+	int			source;
 }
 zbx_am_alert_t;
 
@@ -201,6 +205,7 @@ typedef struct
 	zbx_es_t			es;
 
 	zbx_ipc_service_t		ipc;
+	zbx_ipc_client_t		*syncer_client;
 }
 zbx_am_t;
 
@@ -774,6 +779,9 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	alert->objectid = db_alert->objectid;
 	alert->eventid = db_alert->eventid;
 	alert->p_eventid = db_alert->p_eventid;
+	alert->objectid = db_alert->objectid;
+	alert->object = db_alert->object;
+	alert->source = db_alert->source;
 	alert->content_type = ZBX_MEDIA_CONTENT_TYPE_DEFAULT;
 
 	alert->sendto = db_alert->sendto;
@@ -783,6 +791,8 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	zbx_free(db_alert->message);
 
 	alert->params = db_alert->params;
+	alert->expression = db_alert->expression;
+	alert->recovery_expression = db_alert->recovery_expression;
 
 	alert->status = db_alert->status;
 	alert->retries = db_alert->retries;
@@ -806,6 +816,8 @@ static void	am_alert_free(zbx_am_alert_t *alert)
 	zbx_free(alert->subject);
 	shared_str_release(alert->message);
 	zbx_free(alert->params);
+	zbx_free(alert->expression);
+	zbx_free(alert->recovery_expression);
 	zbx_free(alert);
 }
 
@@ -977,6 +989,25 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 		zbx_hashset_insert(&manager->alerters_client, &alerter, sizeof(zbx_am_alerter_t *));
 		zbx_queue_ptr_push(&manager->free_alerters, alerter);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	am_register_alert_syncer(zbx_am_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+{
+	pid_t	ppid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	memcpy(&ppid, message->data, sizeof(ppid));
+
+	if (ppid != getppid())
+	{
+		zbx_ipc_client_close(client);
+		zabbix_log(LOG_LEVEL_DEBUG, "refusing connection from foreign process");
+	}
+	else
+		manager->syncer_client = client;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1155,6 +1186,7 @@ static int	am_init(zbx_am_t *manager, zbx_get_config_forks_f get_forks_cb, char 
 	zbx_binary_heap_create(&manager->queue, am_mediatype_queue_compare, ZBX_BINARY_HEAP_OPTION_DIRECT);
 
 	zbx_es_init(&manager->es);
+	manager->syncer_client = NULL;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -1473,11 +1505,12 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 				content_type = mediatype->content_type;
 
 			data_len = zbx_alerter_serialize_email(&data, alert->alertid, alert->mediatypeid,
-					p_eventid, alert->sendto, alert->subject, alert->message,
-					mediatype->smtp_server, mediatype->smtp_port, mediatype->smtp_helo,
-					mediatype->smtp_email, mediatype->smtp_security, mediatype->smtp_verify_peer,
-					mediatype->smtp_verify_host, mediatype->smtp_authentication,
-					mediatype->username, mediatype->passwd, content_type);
+					p_eventid, alert->source, alert->object, alert->objectid, alert->sendto,
+					alert->subject, alert->message, mediatype->smtp_server, mediatype->smtp_port,
+					mediatype->smtp_helo, mediatype->smtp_email, mediatype->smtp_security,
+					mediatype->smtp_verify_peer, mediatype->smtp_verify_host,
+					mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
+					content_type, alert->expression, alert->recovery_expression);
 			break;
 		case MEDIA_TYPE_SMS:
 			command = ZBX_IPC_ALERTER_SMS;
@@ -2370,6 +2403,16 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 			{
 				case ZBX_IPC_ALERTER_REGISTER:
 					am_register_alerter(&manager, client, message);
+					break;
+				case ZBX_IPC_ALERT_SYNCER_REGISTER:
+					am_register_alert_syncer(&manager, client, message);
+					break;
+				case ZBX_IPC_ALERTER_SYNC_ALERTS:
+					if (FAIL == zbx_ipc_client_send(manager.syncer_client,
+							ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0))
+					{
+						zabbix_log(LOG_LEVEL_ERR, "failed to send message to sync alerts");
+					}
 					break;
 				case ZBX_IPC_ALERTER_RESULT:
 					if (SUCCEED == am_process_result(&manager, client, message))

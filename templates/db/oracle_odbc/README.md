@@ -130,8 +130,10 @@ This template has been tested on:
 
 5. Set the username and password in the host macros ({$ORACLE.USER} and {$ORACLE.PASSWORD}).
 
-6. Set the {$ORACLE.DRIVER} and {$ORACLE.SERVICE} in the host macros.
-  
+6. Set the {$ORACLE.HOST}, {$ORACLE.DRIVER} and {$ORACLE.SERVICE} in the host macros.
+
+    * ```{$ORACLE.HOST}``` is a hostname or IP address of the Oracle DB instance.
+
     * ```{$ORACLE.DRIVER}``` is a path to the driver location in OS. The ODBC driver file should be found in __Instant Client__ directory and named ```libsqora.so.XX.Y```.
     
     * ```{$ORACLE.SERVICE}``` is a service name to which the host will connect to. The value in this macro is important as it determines if the connection is established to a non-CDB, CDB or PDB. If you wish to monitor tablespaces of all PDBs, you will need to set a service name that points to the CDB.
@@ -139,7 +141,7 @@ This template has been tested on:
       
     **Note! Make sure that the user created in step #1 is present on the specified service.**
 
-    The "Service's TCP port state" item uses ```{HOST.CONN}``` and ```{$ORACLE.PORT}``` macros to check the availability of the listener.
+    The "Service's TCP port state" item uses ```{$ORACLE.HOST}``` and ```{$ORACLE.PORT}``` macros to check the availability of the listener.
 
 ### Macros used
 
@@ -149,6 +151,7 @@ This template has been tested on:
 |{$ORACLE.SERVICE}|<p>Oracle Service Name.</p>|`<Put oracle service name here>`|
 |{$ORACLE.USER}|<p>Oracle username.</p>|`<Put your username here>`|
 |{$ORACLE.PASSWORD}|<p>The Oracle user's password.</p>|`<Put your password here>`|
+|{$ORACLE.HOST}|<p>The hostname or IP address of the Oracle DB instance.</p>|`<Put oracle host here>`|
 |{$ORACLE.PORT}|<p>Oracle DB TCP port.</p>|`1521`|
 |{$ORACLE.DBNAME.MATCHES}|<p>This macro is used in database discovery. It can be overridden on host level or its linked template level.</p>|`.*`|
 |{$ORACLE.DBNAME.NOT_MATCHES}|<p>This macro is used in database discovery. It can be overridden on host level or its linked template level.</p>|`PDB\$SEED`|
@@ -180,14 +183,14 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Oracle: Service's TCP port state|<p>It checks the availability of Oracle on the TCP port.</p>|Zabbix agent|net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Oracle: Service's TCP port state|<p>It checks the availability of Oracle on the TCP port.</p>|Zabbix agent|net.tcp.service[tcp,{$ORACLE.HOST},{$ORACLE.PORT}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Oracle: Number of LISTENER processes|<p>The number of running LISTENER processes.</p>|Zabbix agent|proc.num[,,,"tnslsnr LISTENER"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|Oracle: Get instance state|<p>The item gets its state of the current instance.</p>|Database monitor|db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get archive log|<p>Gets the destinations of the log archive.</p>|Database monitor|db.odbc.get[get_archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get ASM disk groups|<p>Gets the ASM disk groups.</p>|Database monitor|db.odbc.get[get_asm,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get database|<p>Gets the databases in the database management system (DBMS).</p>|Database monitor|db.odbc.get[get_db,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get PDB|<p>Gets the pluggable database (PDB) in DBMS.</p>|Database monitor|db.odbc.get[get_pdb,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
-|Oracle: Get tablespace|<p>Gets tablespaces in DBMS.</p>|Database monitor|db.odbc.get[get_tablespace,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get instance state|<p>The item gets its state of the current instance.</p>|Database monitor|db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get archive log|<p>Gets the destinations of the log archive.</p>|Database monitor|db.odbc.get[get_archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get ASM disk groups|<p>Gets the ASM disk groups.</p>|Database monitor|db.odbc.get[get_asm,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get database|<p>Gets the databases in the database management system (DBMS).</p>|Database monitor|db.odbc.get[get_db,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get PDB|<p>Gets the pluggable database (PDB) in DBMS.</p>|Database monitor|db.odbc.get[get_pdb,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get tablespace|<p>Gets tablespaces in DBMS.</p>|Database monitor|db.odbc.get[get_tablespace,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
 |Oracle: Version|<p>The Oracle Server version.</p>|Dependent item|oracle.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..VERSION.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Oracle: Uptime|<p>The Oracle instance uptime expressed in seconds.</p>|Dependent item|oracle.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..UPTIME.first()`</p></li></ul>|
 |Oracle: Instance status|<p>The status of the instance.</p>|Dependent item|oracle.instance_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..STATUS.first()`</p></li></ul>|
@@ -195,7 +198,7 @@ This template has been tested on:
 |Oracle: Instance name|<p>The name of an instance.</p>|Dependent item|oracle.instance_name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..INSTANCE_NAME.first()`</p></li></ul>|
 |Oracle: Instance hostname|<p>The name of the host machine.</p>|Dependent item|oracle.instance_hostname<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..HOST_NAME.first()`</p></li></ul>|
 |Oracle: Instance role|<p>It indicates whether the instance is an active instance or an inactive secondary instance.</p>|Dependent item|oracle.instance.role<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..INSTANCE_ROLE.first()`</p></li></ul>|
-|Oracle: Get system metrics|<p>The item gets the values of the system metrics.</p>|Database monitor|db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
+|Oracle: Get system metrics|<p>The item gets the values of the system metrics.</p>|Database monitor|db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]|
 |Oracle: Sessions limit|<p>The user and system sessions.</p>|Dependent item|oracle.session_limit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.METRIC=='SYSPARAM::Sessions')].VALUE.first()`</p></li></ul>|
 |Oracle: Datafiles limit|<p>The maximum allowable number of datafiles.</p>|Dependent item|oracle.db_files_limit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.METRIC=='SYSPARAM::Db_Files')].VALUE.first()`</p></li></ul>|
 |Oracle: Processes limit|<p>The maximum number of user processes.</p>|Dependent item|oracle.processes_limit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.METRIC=='SYSPARAM::Processes')].VALUE.first()`</p></li></ul>|
@@ -258,7 +261,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Oracle: Port {$ORACLE.PORT} is unavailable|<p>The TCP port of the Oracle Server service is currently unavailable.</p>|`max(/Oracle by ODBC/net.tcp.service[tcp,{HOST.CONN},{$ORACLE.PORT}],#3)=0  and max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)>0`|Disaster||
+|Oracle: Port {$ORACLE.PORT} is unavailable|<p>The TCP port of the Oracle Server service is currently unavailable.</p>|`max(/Oracle by ODBC/net.tcp.service[tcp,{$ORACLE.HOST},{$ORACLE.PORT}],#3)=0  and max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)>0`|Disaster||
 |Oracle: LISTENER process is not running||`max(/Oracle by ODBC/proc.num[,,,"tnslsnr LISTENER"],#3)=0`|Disaster||
 |Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by ODBC/oracle.version,#1)<>last(/Oracle by ODBC/oracle.version,#2) and length(last(/Oracle by ODBC/oracle.version))>0`|Info|**Manual close**: Yes|
 |Oracle: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Oracle by ODBC/oracle.uptime)<10m`|Info|**Manual close**: Yes|
@@ -286,7 +289,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Oracle Database '{#DBNAME}': Get CDB and No-CDB info|<p>It gets the information about the container database (CDB) and non-CDB database on an instance.</p>|Database monitor|db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Oracle Database '{#DBNAME}': Get CDB and No-CDB info|<p>It gets the information about the container database (CDB) and non-CDB database on an instance.</p>|Database monitor|db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Oracle Database '{#DBNAME}': Open status|<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</p>|Dependent item|oracle.db_open_mode["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OPEN_MODE`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
 |Oracle Database '{#DBNAME}': Role|<p>The current role of the database where:</p><p>1 - 'SNAPSHOT STANDBY';</p><p>2 - 'LOGICAL STANDBY';</p><p>3 - 'PHYSICAL STANDBY';</p><p>4 - 'PRIMARY ';</p><p>5 - 'FAR SYNC'.</p>|Dependent item|oracle.db_role["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ROLE`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
 |Oracle Database '{#DBNAME}': Log mode|<p>The archive log mode where:</p><p>0 - 'NOARCHIVELOG';</p><p>1 - 'ARCHIVELOG';</p><p>2 - 'MANUAL'.</p>|Dependent item|oracle.db_log_mode["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LOG_MODE`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
@@ -311,7 +314,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Oracle Database '{#DBNAME}': Get PDB info|<p>It gets the information about the PDB database on an instance.</p>|Database monitor|db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Oracle Database '{#DBNAME}': Get PDB info|<p>It gets the information about the PDB database on an instance.</p>|Database monitor|db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Oracle Database '{#DBNAME}': Open status|<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</p>|Dependent item|oracle.pdb_open_mode["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OPEN_MODE`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
 
 ### Trigger prototypes for PDB discovery
@@ -331,7 +334,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Get tablespaces stats|<p>It gets the statistics of the tablespace.</p>|Database monitor|db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Get tablespaces stats|<p>It gets the statistics of the tablespace.</p>|Database monitor|db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace allocated, bytes|<p>Currently allocated bytes for the tablespace (sum of the current size of datafiles).</p>|Dependent item|oracle.tbs_alloc_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FILE_BYTES`</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace MAX size, bytes|<p>The maximum size of the tablespace.</p>|Dependent item|oracle.tbs_max_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MAX_BYTES`</p></li></ul>|
 |Oracle '{#CON_NAME}' TBS '{#TABLESPACE}': Tablespace used, bytes|<p>Currently used bytes for the tablespace (current size of datafiles - the free space).</p>|Dependent item|oracle.tbs_used_bytes["{#CON_NAME}","{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_BYTES`</p></li></ul>|
@@ -364,7 +367,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Archivelog '{#DEST_NAME}': Get archive log info|<p>It gets the archivelog statistics.</p>|Database monitor|db.odbc.get[get_archivelog_{#DEST_NAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Archivelog '{#DEST_NAME}': Get archive log info|<p>It gets the archivelog statistics.</p>|Database monitor|db.odbc.get[get_archivelog_{#DEST_NAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Archivelog '{#DEST_NAME}': Error|<p>It displays the error message.</p>|Dependent item|oracle.archivelog_error["{#DEST_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ERROR`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Archivelog '{#DEST_NAME}': Last sequence|<p>It identifies the sequence number of the last archived redo log to be archived.</p>|Dependent item|oracle.archivelog_log_sequence["{#DEST_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LOG_SEQUENCE`</p></li></ul>|
 |Archivelog '{#DEST_NAME}': Status|<p>It identifies the current status of the destination where:</p><p>1 - 'VALID';</p><p>2 - 'DEFERRED';</p><p>3 - 'ERROR';</p><p>0 - 'UNKNOWN'.</p>|Dependent item|oracle.archivelog_log_status["{#DEST_NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.STATUS`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -385,7 +388,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ASM '{#DGNAME}': Get ASM stats|<p>It gets the ASM disk group statistics.</p>|Database monitor|db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{HOST.CONN}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|ASM '{#DGNAME}': Get ASM stats|<p>It gets the ASM disk group statistics.</p>|Database monitor|db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |ASM '{#DGNAME}': Total size|<p>The total size of the ASM disk group.</p>|Dependent item|oracle.asm_total_size["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.SIZE_BYTE`</p></li></ul>|
 |ASM '{#DGNAME}': Free size|<p>The free size of the ASM disk group.</p>|Dependent item|oracle.asm_free_size["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.FREE_SIZE_BYTE`</p></li></ul>|
 |ASM '{#DGNAME}': Used size, percent|<p>Usage of the ASM disk group expressed in %.</p>|Dependent item|oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.USED_PERCENT`</p></li></ul>|

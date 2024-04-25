@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0beta3');
+define('ZABBIX_VERSION',		'7.0.0rc1');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050253);
+define('ZABBIX_DB_VERSION',		6050283);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -120,6 +120,15 @@ define('TOTP_CODE_LENGTH_8',	8);
 define('TOTP_VERIFICATION_DELAY_WINDOW', 1);
 define('TOTP_SECRET_LENGTH_32', 32);
 
+/**
+ * The number of TOTP used codes stored in database. Depends on TOTP_VERIFICATION_DELAY_WINDOW. If it is 1, it means
+ * that current, previous and future codes are valid and they should be stored if entered correctly.
+ */
+define('TOTP_MAX_USED_CODES', 3);
+
+define('TOTP_SECRET_CONFIRMATION_REQUIRED', 0);
+define('TOTP_SECRET_CONFIRMED', 1);
+
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
@@ -155,6 +164,16 @@ define('ZBX_PROXY_VERSION_UNSUPPORTED', 3);
 
 define('ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED',	0);
 define('ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED',		1);
+
+define('ZBX_PROXY_STATE_UNKNOWN',	0);
+define('ZBX_PROXY_STATE_OFFLINE',	1);
+define('ZBX_PROXY_STATE_ONLINE',	2);
+
+define('ZBX_PROXYGROUP_STATE_UNKNOWN',		0);
+define('ZBX_PROXYGROUP_STATE_OFFLINE',		1);
+define('ZBX_PROXYGROUP_STATE_RECOVERING',	2);
+define('ZBX_PROXYGROUP_STATE_ONLINE',		3);
+define('ZBX_PROXYGROUP_STATE_DEGRADING',	4);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
@@ -1030,6 +1049,9 @@ define('SERVICE_TIME_TYPE_UPTIME',				0);
 define('SERVICE_TIME_TYPE_DOWNTIME',			1);
 define('SERVICE_TIME_TYPE_ONETIME_DOWNTIME',	2);
 
+define('ZBX_DISCOVERY_BY_SERVER',	0);
+define('ZBX_DISCOVERY_BY_PROXY',	1);
+
 define('ZBX_DISCOVERY_UNSPEC',	0);
 define('ZBX_DISCOVERY_DNS',		1);
 define('ZBX_DISCOVERY_IP',		2);
@@ -1485,7 +1507,8 @@ define('VALUEMAP_MAPPING_TYPE_IN_RANGE',		3);
 define('VALUEMAP_MAPPING_TYPE_REGEXP',			4);
 define('VALUEMAP_MAPPING_TYPE_DEFAULT',			5);
 
-define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 32); // socket response size limit
+// Socket response size limit.
+define('ZBX_SOCKET_BYTES_LIMIT', ZBX_MEBIBYTE * 16);
 
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
@@ -1586,6 +1609,7 @@ define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);
 define('API_HOST_ADDRESS',			69);
 define('API_ESCAPED_STRING_UTF8',	70);
+define('API_NUMBER',				71);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1799,9 +1823,10 @@ define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
 // monitoring modes
-define('ZBX_MONITORED_BY_ANY', 0);
-define('ZBX_MONITORED_BY_SERVER', 1);
-define('ZBX_MONITORED_BY_PROXY', 2);
+define('ZBX_MONITORED_BY_ANY',			-1);
+define('ZBX_MONITORED_BY_SERVER',		0);
+define('ZBX_MONITORED_BY_PROXY',		1);
+define('ZBX_MONITORED_BY_PROXY_GROUP',	2);
 
 // queue modes
 define('QUEUE_OVERVIEW', 0);
@@ -2037,6 +2062,7 @@ define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
 define('ZBX_STYLE_LEFT', 'left');
+define('ZBX_STYLE_LINK', 'link');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
@@ -2055,6 +2081,8 @@ define('ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED', 'list-accordion-item-closed');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD', 'list-accordion-item-head');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_BODY', 'list-accordion-item-body');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE', 'list-accordion-item-toggle');
+define('ZBX_STYLE_LIST_NUMBERED', 'list-numbered');
+define('ZBX_STYLE_LIST_NUMBERED_ITEM', 'list-numbered-item');
 define('ZBX_STYLE_LOCAL_CLOCK', 'local-clock');
 define('ZBX_STYLE_LOG_NA_BG', 'log-na-bg');
 define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');

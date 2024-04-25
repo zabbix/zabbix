@@ -3,11 +3,10 @@
 
 ## Overview
 
-This template is developed to monitor the messaging broker RabbitMQ by Zabbix that works without any external scripts.
+This template is developed to monitor the messaging broker RabbitMQ cluster by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-The template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with HTTP agent remotely.
-
+The template collects metrics by polling RabbitMQ management plugin with HTTP agent remotely.
 
 ## Requirements
 
@@ -24,9 +23,9 @@ This template has been tested on:
 
 ## Setup
 
-Enable the RabbitMQ management plugin. See [RabbitMQ documentation](https://www.rabbitmq.com/management.html) for the instructions.
+1. Enable the RabbitMQ management plugin. See the [`RabbitMQ documentation`](https://www.rabbitmq.com/management.html) for the instructions.
 
-Create a user to monitor the service:
+2. Create a user to monitor the service:
 
 ```bash
 rabbitmqctl add_user zbx_monitor <PASSWORD>
@@ -34,11 +33,9 @@ rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
 rabbitmqctl set_user_tags zbx_monitor monitoring
 ```
 
-A login name and password are also supported in macros functions:
+3. Set the hostname or IP address of the the RabbitMQ cluster host in the `{$RABBITMQ.API.CLUSTER_HOST}` macro. You can also change the port in the `{$RABBITMQ.API.PORT}` macro and the scheme in the `{$RABBITMQ.API.SCHEME}` macro if necessary.
 
-- {$RABBITMQ.API.USER}
-- {$RABBITMQ.API.PASSWORD}
-
+4. Set the user name and password in the macros `{$RABBITMQ.API.USER}` and `{$RABBITMQ.API.PASSWORD}`.
 
 ### Macros used
 
@@ -46,6 +43,7 @@ A login name and password are also supported in macros functions:
 |----|-----------|-------|
 |{$RABBITMQ.API.USER}||`zbx_monitor`|
 |{$RABBITMQ.API.PASSWORD}||`zabbix`|
+|{$RABBITMQ.API.CLUSTER_HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ cluster.</p>|`<SET CLUSTER API HOST>`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
 |{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}|<p>This macro is used in the discovery of exchanges. It can be overridden at host level or its linked template level.</p>|`.*`|
@@ -104,7 +102,7 @@ A login name and password are also supported in macros functions:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|RabbitMQ: There are active alarms in the cluster|<p>This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ cluster by HTTP/rabbitmq.healthcheck.alarms[{#SINGLETON}])=0`|Average||
+|RabbitMQ: There are active alarms in the cluster|<p>This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ cluster by HTTP/rabbitmq.healthcheck.alarms[{#SINGLETON}])=0`|Average||
 
 ### LLD rule Exchanges discovery
 
@@ -138,12 +136,10 @@ A login name and password are also supported in macros functions:
 
 ## Overview
 
-This template is developed to monitor RabbitMQ by Zabbix that works without any external scripts.
-
+This template is developed to monitor the messaging broker RabbitMQ node by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-  The template `RabbitMQ Node` — (Zabbix version >= 4.2) collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with HTTP agent remotely.
-
+The template collects metrics by polling RabbitMQ management plugin with HTTP agent remotely.
 
 ## Requirements
 
@@ -160,9 +156,9 @@ This template has been tested on:
 
 ## Setup
 
-Enable the RabbitMQ management plugin. See [RabbitMQ documentation](https://www.rabbitmq.com/management.html) for the instructions.
+1. Enable the RabbitMQ management plugin. See the [`RabbitMQ documentation`](https://www.rabbitmq.com/management.html) for the instructions.
 
-Create a user to monitor the service:
+2. Create a user to monitor the service:
 
 ```bash
 rabbitmqctl add_user zbx_monitor <PASSWORD>
@@ -170,11 +166,9 @@ rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
 rabbitmqctl set_user_tags zbx_monitor monitoring
 ```
 
-A login name and password are also supported in macros functions:
+3. Set the hostname or IP address of the the RabbitMQ node host in the `{$RABBITMQ.API.HOST}` macro. You can also change the port in the `{$RABBITMQ.API.PORT}` macro and the scheme in the `{$RABBITMQ.API.SCHEME}` macro if necessary.
 
-- {$RABBITMQ.API.USER}
-- {$RABBITMQ.API.PASSWORD}
-
+4. Set the user name and password in the macros `{$RABBITMQ.API.USER}` and `{$RABBITMQ.API.PASSWORD}`.
 
 ### Macros used
 
@@ -185,6 +179,7 @@ A login name and password are also supported in macros functions:
 |{$RABBITMQ.CLUSTER.NAME}|<p>The name of the RabbitMQ cluster.</p>|`rabbit`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
+|{$RABBITMQ.API.HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ.</p>|`<SET NODE API HOST>`|
 |{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}|<p>This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.</p>|`.*`|
 |{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}|<p>This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$RABBITMQ.RESPONSE_TIME.MAX.WARN}|<p>The maximum response time by the RabbitMQ expressed in seconds for a trigger expression.</p>|`10`|
@@ -194,7 +189,7 @@ A login name and password are also supported in macros functions:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|RabbitMQ: Service ping||Simple check|net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|RabbitMQ: Service ping||Simple check|net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |RabbitMQ: Get node overview|<p>The HTTP API endpoint that returns cluster-wide metrics.</p>|HTTP agent|rabbitmq.get_node_overview|
 |RabbitMQ: Get nodes|<p>The HTTP API endpoint that returns metrics of the nodes.</p>|HTTP agent|rabbitmq.get_nodes|
 |RabbitMQ: Get queues|<p>The HTTP API endpoint that returns metrics of the queues metrics.</p>|HTTP agent|rabbitmq.get_queues|
@@ -213,13 +208,13 @@ A login name and password are also supported in macros functions:
 |RabbitMQ: Memory alarm|<p>It checks whether the host has a memory alarm or not.</p>|Dependent item|rabbitmq.node.mem_alarm<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_alarm`</p></li><li>Boolean to decimal</li></ul>|
 |RabbitMQ: Disk free alarm|<p>It checks whether the node has a disk alarm or not.</p>|Dependent item|rabbitmq.node.disk_free_alarm<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disk_free_alarm`</p></li><li>Boolean to decimal</li></ul>|
 |RabbitMQ: Uptime|<p>Uptime expressed in milliseconds.</p>|Dependent item|rabbitmq.node.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
-|RabbitMQ: Service response time||Simple check|net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]|
+|RabbitMQ: Service response time||Simple check|net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|RabbitMQ: Service is down||`last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0`|Average|**Manual close**: Yes|
+|RabbitMQ: Service is down||`last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0`|Average|**Manual close**: Yes|
 |RabbitMQ: Failed to fetch nodes data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ node by HTTP/rabbitmq.get_nodes,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ: Service is down</li></ul>|
 |RabbitMQ: Version has changed|<p>RabbitMQ version has changed. Acknowledge to close the problem manually.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version))>0`|Info|**Manual close**: Yes|
 |RabbitMQ: Number of network partitions is too high|<p>For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).</p>|`min(/RabbitMQ node by HTTP/rabbitmq.node.partitions,5m)>0`|Warning||
@@ -227,7 +222,7 @@ A login name and password are also supported in macros functions:
 |RabbitMQ: Memory alarm|<p>For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.mem_alarm)=1`|Average||
 |RabbitMQ: Free disk space alarm|<p>For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.disk_free_alarm)=1`|Average||
 |RabbitMQ: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.uptime)<10m`|Info|**Manual close**: Yes|
-|RabbitMQ: Service response time is too high||`min(/RabbitMQ node by HTTP/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ: Service is down</li></ul>|
+|RabbitMQ: Service response time is too high||`min(/RabbitMQ node by HTTP/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ: Service is down</li></ul>|
 
 ### LLD rule Health Check 3.8.10+ discovery
 
@@ -249,11 +244,11 @@ A login name and password are also supported in macros functions:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|RabbitMQ: There are active alarms in the node|<p>This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.local_alarms[{#SINGLETON}])=0`|Average||
-|RabbitMQ: There are valid TLS certificates expiring in the next month|<p>This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}])=0`|Average||
-|RabbitMQ: There are not running virtual hosts|<p>This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}])=0`|Average||
-|RabbitMQ: There are queues that could potentially lose data if this node goes offline.|<p>This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.mirror_sync[{#SINGLETON}])=0`|Average||
-|RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.|<p>This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.quorum[{#SINGLETON}])=0`|Average||
+|RabbitMQ: There are active alarms in the node|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.local_alarms[{#SINGLETON}])=0`|Average||
+|RabbitMQ: There are valid TLS certificates expiring in the next month|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}])=0`|Average||
+|RabbitMQ: There are not running virtual hosts|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}])=0`|Average||
+|RabbitMQ: There are queues that could potentially lose data if this node goes offline.|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.mirror_sync[{#SINGLETON}])=0`|Average||
+|RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.quorum[{#SINGLETON}])=0`|Average||
 
 ### LLD rule Health Check 3.8.9- discovery
 

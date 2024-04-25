@@ -473,9 +473,9 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	if (0 != strcmp(tmp, ZBX_PROTO_VALUE_SUCCESS))
 	{
 		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, tmp, sizeof(tmp), NULL))
-			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server [%s:%hu]: %s", host, port, tmp);
+			zabbix_log(LOG_LEVEL_ERR, "no active checks on server [%s:%hu]: %s", host, port, tmp);
 		else
-			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server");
+			zabbix_log(LOG_LEVEL_ERR, "no active checks on server");
 
 		goto out;
 	}
@@ -843,8 +843,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
-	zbx_socket_t			s;
 	struct zbx_json			json;
+	char				*data = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __func__, ((zbx_addr_t *)addrs->values[0])->ip,
 			((zbx_addr_t *)addrs->values[0])->port);
@@ -900,50 +900,33 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
-	if (SUCCEED == (ret = zbx_connect_to_server(&s, config_source_ip, addrs, config_timeout, config_timeout,
-			0, level, config_tls)))
+	ret = zbx_comms_exchange_with_redirect(config_source_ip, addrs, config_timeout, config_timeout, 0, level,
+			config_tls, json.buffer, NULL, NULL, &data, NULL);
+
+	if (SUCCEED == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
-
-		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
+		if (SUCCEED != last_ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "before read");
-
-			if (SUCCEED == (ret = zbx_tcp_recv(&s)))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "got [%s]", s.buffer);
-
-				if (SUCCEED != last_ret)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
-							" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
-							((zbx_addr_t *)addrs->values[0])->port);
-				}
-
-				parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, config_revision_local,
-						config_timeout, config_hostname, addrs, config_tls, config_source_ip,
-						config_buffer_send, config_buffer_size);
-
-				parse_list_of_commands(s.buffer);
-			}
-			else
-			{
-				/* server is unaware if configuration is actually delivered and saves session */
-				*config_revision_local = 0;
-				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
-						((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
-			}
-		}
-		else
-		{
-			zabbix_log(level, "Unable to send to [%s]:%d [%s]",
-					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
-					zbx_socket_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
+					" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
+					((zbx_addr_t *)addrs->values[0])->port);
 		}
 
-		zbx_tcp_close(&s);
+		parse_list_of_checks(data, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+				config_revision_local, config_timeout, config_hostname, addrs, config_tls,
+				config_source_ip, config_buffer_send, config_buffer_size);
+
+		parse_list_of_commands(data);
+
+		zbx_free(data);
+	}
+	else
+	{
+		if (RECV_ERROR == ret)
+		{
+			/* server is unaware if configuration is actually delivered and saves session */
+			*config_revision_local = 0;
+		}
 	}
 
 	if (SUCCEED != ret && SUCCEED == last_ret)
@@ -1156,6 +1139,20 @@ static void	clear_metric_results(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_pe
 	}
 }
 
+static char	*connect_callback(void *data)
+{
+	zbx_json_t	*json = (zbx_json_t *)data;
+
+	zbx_timespec_t	ts;
+
+	zbx_timespec(&ts);
+
+	zbx_json_addint64(json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+	zbx_json_addint64(json, ZBX_PROTO_TAG_NS, ts.ns);
+
+	return json->buffer;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sends value stored in buffer to Zabbix server                     *
@@ -1183,7 +1180,7 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		const char *config_hostname, int config_buffer_send, int config_buffer_size)
 {
 	int			ret = SUCCEED, ret_metrics, ret_commands, now, level;
-	zbx_socket_t		s;
+	char			*data = NULL;
 	struct zbx_json		json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
@@ -1207,41 +1204,20 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 
 	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
-	if (SUCCEED == (ret = zbx_connect_to_server(&s, config_source_ip, addrs, MIN(buffer.count * config_timeout, 60),
-			config_timeout, 0, level, config_tls)))
+	ret = zbx_comms_exchange_with_redirect(config_source_ip, addrs, MIN(buffer.count * config_timeout, 60),
+			config_timeout, 0, level, config_tls, json.buffer, connect_callback, &json, &data, NULL);
+
+	if (SUCCEED == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
-
-		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
+		if (NULL == data || SUCCEED != check_response(data))
 		{
-			if (SUCCEED == (ret = zbx_tcp_recv(&s)))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]", s.buffer);
-
-				if (NULL == s.buffer || SUCCEED != check_response(s.buffer))
-				{
-					ret = FAIL;
-					zabbix_log(LOG_LEVEL_DEBUG, "NOT OK");
-				}
-				else
-					zabbix_log(LOG_LEVEL_DEBUG, "OK");
-			}
-			else
-			{
-				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
-						((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port,
-						zbx_socket_strerror());
-			}
+			ret = FAIL;
+			zabbix_log(LOG_LEVEL_DEBUG, "NOT OK");
 		}
 		else
-		{
-			zabbix_log(level, "Unable to send to [%s]:%d [%s]",
-					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
-					zbx_socket_strerror());
-		}
+			zabbix_log(LOG_LEVEL_DEBUG, "OK");
 
-		zbx_tcp_close(&s);
+		zbx_free(data);
 	}
 
 	if (SUCCEED == ret_metrics)
@@ -1837,8 +1813,8 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
-	zbx_socket_t			s;
 	struct zbx_json			json;
+	char				*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1852,35 +1828,28 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
-	if (SUCCEED == (ret = zbx_connect_to_server(&s, config_source_ip, addrs, config_timeout, config_timeout,
-			0, level, config_tls)))
+	ret = zbx_comms_exchange_with_redirect(config_source_ip, addrs, config_timeout, config_timeout, 0, level,
+			config_tls, json.buffer, NULL, NULL, NULL, &error);
+
+	if (SUCCEED == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
-
-		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
+		if (last_ret == FAIL)
 		{
-			(void)zbx_tcp_recv(&s);	/* allow Zabbix server or Zabbix proxy to close connection */
-
-			if (last_ret == FAIL)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Successfully sent heartbeat message to [%s]:%d",
-						((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port);
-			}
+			zabbix_log(LOG_LEVEL_WARNING, "Successfully sent heartbeat message to [%s]:%d",
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port);
 		}
 	}
-
-	if (SUCCEED != ret)
+	else
 	{
 		zabbix_log(level, "Unable to send heartbeat message to [%s]:%d [%s]",
-				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
-				zbx_socket_strerror());
+				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, error);
+
+		zbx_free(error);
 	}
 
-	zbx_tcp_close(&s);
 	last_ret = ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Out %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 ZBX_THREAD_ENTRY(active_checks_thread, args)

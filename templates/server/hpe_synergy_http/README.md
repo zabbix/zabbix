@@ -22,7 +22,8 @@ This template has been tested on:
 ## Setup
 
 1. Link template to the host.
-2. Configure macros {$HPE.SYNERGY.API.USERNAME} and {$HPE.SYNERGY.API.PASSWORD}.
+2. Set the hostname or IP address of the host in the {$HPE.SYNERGY.API.HOST} macro and configure the username and password in the {$HPE.SYNERGY.API.USERNAME} and {$HPE.SYNERGY.API.PASSWORD} macros.
+3. Change the {$HPE.SYNERGY.API.SCHEME} and {$HPE.SYNERGY.API.PORT} macros if needed.
 
 ### Macros used
 
@@ -32,6 +33,7 @@ This template has been tested on:
 |{$HPE.SYNERGY.API.USERNAME}|<p>Specify user name for API.</p>|`zabbix`|
 |{$HPE.SYNERGY.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|
 |{$HPE.SYNERGY.API.SCHEME}|<p>The API scheme (http/https).</p>|`https`|
+|{$HPE.SYNERGY.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
 |{$HPE.SYNERGY.API.PORT}|<p>The API port.</p>|`443`|
 
 ### Items
@@ -54,14 +56,14 @@ This template has been tested on:
 |HPE Synergy: Get storage systems data|<p>Data of the storage systems.</p>|Dependent item|hpe.synergy.get.storage_systems<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["storage-systems"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |HPE Synergy: Get storage volumes data|<p>Data of the storage volumes.</p>|Dependent item|hpe.synergy.get.storage_volumes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["storage-volumes"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |HPE Synergy: Get uplink sets data|<p>Data of the uplink sets.</p>|Dependent item|hpe.synergy.get.uplink_sets<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["uplink-sets"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Service ping|<p>Checks if the service is running and accepting the TCP connections.</p>|Simple check|net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|HPE Synergy: Service ping|<p>Checks if the service is running and accepting the TCP connections.</p>|Simple check|net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |HPE Synergy: There are errors in requests to API|<p>Zabbix has received errors from API.</p>|`length(last(/HPE Synergy by HTTP/hpe.synergy.get.errors))>0`|Average|**Depends on**:<br><ul><li>HPE Synergy: Service is unavailable</li></ul>|
-|HPE Synergy: Service is unavailable||`max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
+|HPE Synergy: Service is unavailable||`max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
 
 ### LLD rule Appliance bays discovery
 

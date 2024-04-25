@@ -64,6 +64,24 @@
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
+ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
+
+ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
+
+void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
+{
+	zbx_free(item_diff);
+}
+
+int	zbx_item_diff_compare_func(const void *d1, const void *d2)
+{
+	const zbx_item_diff_t    *id_1 = *(const zbx_item_diff_t **)d1;
+	const zbx_item_diff_t    *id_2 = *(const zbx_item_diff_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(id_1->itemid, id_2->itemid);
+
+	return 0;
+}
 
 static int	connection_failure;
 
@@ -824,7 +842,8 @@ zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "trigger_queue") ||
 			0 == strcmp(tablename, "proxy_history") ||
 			0 == strcmp(tablename, "proxy_dhistory") ||
-			0 == strcmp(tablename, "proxy_autoreg_host"))
+			0 == strcmp(tablename, "proxy_autoreg_host") ||
+			0 == strcmp(tablename, "host_proxy"))
 		return zbx_cb_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
