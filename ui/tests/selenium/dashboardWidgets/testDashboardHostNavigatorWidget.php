@@ -815,4 +815,146 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
 		}
 	}
+
+	public static function getCancelData() {
+		return [
+			// Cancel update widget.
+			[
+				[
+					'update' => true,
+					'save_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'update' => true,
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel create widget.
+			[
+				[
+					'save_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testDashboardHostNavigatorWidget_Cancel($data) {
+		$old_hash = CDBHelper::getHash(self::SQL);
+		$new_name = 'Widget to be cancelled';
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		// Start updating or creating a widget.
+		if (CTestArrayHelper::get($data, 'update', false)) {
+			$form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
+		}
+		else {
+			$form = $dashboard->addWidget()->asForm();
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host navigator')]);
+		}
+
+		$form->fill([
+			'Name' => $new_name,
+			'Refresh interval' => '15 minutes',
+			'Host status' => 'Enabled',
+			'Host tags' => 'Or',
+			'id:host_tags_0_tag' => 'trigger',
+			'id:host_tags_0_operator' => 'Does not contain',
+			'id:host_tags_0_value' => 'cancel',
+			'id:severities_5' => true,
+			'Show hosts in maintenance' => true,
+			'Show problems' => 'All',
+			'Host limit' => '50'
+		]);
+		$this->getGroupByTable()->fill(['attribute' => 'Tag value', 'tag' => 'windows']);
+
+		// Save or cancel widget.
+		if (CTestArrayHelper::get($data, 'save_widget', false)) {
+			$form->submit();
+
+			// Check that changes took place on the unsaved dashboard.
+			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
+		}
+		else {
+			$dialog = COverlayDialogElement::find()->one();
+			$dialog->query('button:Cancel')->one()->click();
+			$dialog->ensureNotPresent();
+
+			if (CTestArrayHelper::get($data, 'update', false)) {
+				foreach ([self::DEFAULT_WIDGET => true, $new_name => false] as $name => $valid) {
+					$dashboard->getWidget($name, false)->isValid($valid);
+				}
+			}
+
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		}
+
+		// Save or cancel dashboard update.
+		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
+			$dashboard->save();
+		}
+		else {
+			$dashboard->cancelEditing();
+		}
+
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	public function testDashboardHostNavigatorWidget_Delete() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$widget = $dashboard->getWidget(self::DELETE_WIDGET);
+		$dashboard->deleteWidget(self::DELETE_WIDGET);
+		$widget->waitUntilNotPresent();
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Check that widget is not present on dashboard.
+		$this->assertFalse($dashboard->getWidget(self::DELETE_WIDGET, false)->isValid());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
+				' LEFT JOIN widget w'.
+					' ON w.widgetid=wf.widgetid'.
+					' WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET)
+		));
+	}
+
+	/**
+	 * Maintenance icon hintbox check.
+	 */
+	public function testDashboardHostNavigatorWidget_MaintenanceIconHintbox() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$widget = $dashboard->getWidget(self::DEFAULT_WIDGET);
+		$form = $widget->edit()->asForm();
+		$form->fill(['Hosts' => 'Available host in maintenance', 'Show hosts in maintenance' => true]);
+		$form->submit();
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		$widget->query('xpath://button['.CXPathHelper::fromClass('zi-wrench-alt-small').']')->waitUntilClickable()->one()->click();
+		$hint = $widget->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
+		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
+				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
+		$this->assertEquals($hint_text, $hint);
+	}
 }
