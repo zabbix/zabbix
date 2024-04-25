@@ -1455,7 +1455,7 @@ class CConfigurationExport {
 	protected function gatherMediaTypes(array $mediatypeids) {
 		$this->data['mediaTypes'] = API::MediaType()->get([
 			'output' => ['name', 'type', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-				'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type',
+				'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'message_format',
 				'exec_path', 'gsm_modem', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'script',
 				'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
 				'parameters', 'provider'

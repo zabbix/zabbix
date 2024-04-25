@@ -59,7 +59,7 @@ window.mediatype_message_popup = new class {
 	#getDefaultMessageTemplate(message_type) {
 		const message_templates = this.message_templates;
 		const media_type = this.form.querySelector('#type').value;
-		const message_format = this.form.querySelector('#content_type').value;
+		const message_format = this.form.querySelector('#message_format').value;
 
 		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
 			return {

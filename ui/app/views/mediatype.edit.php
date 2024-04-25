@@ -268,13 +268,13 @@ $mediatype_form_grid
 		(new CFormField($passwd_field))->setId('passwd_field')
 	])
 	->addItem([
-		(new CLabel(_('Message format'), 'content_type'))->setId('content_type_label'),
+		(new CLabel(_('Message format'), 'message_format'))->setId('message_format_label'),
 		(new CFormField(
-			(new CRadioButtonList('content_type', (int) $data['content_type']))
+			(new CRadioButtonList('message_format', (int) $data['message_format']))
 				->addValue(_('HTML'), ZBX_MEDIA_MESSAGE_FORMAT_HTML)
 				->addValue(_('Plain text'), ZBX_MEDIA_MESSAGE_FORMAT_TEXT)
 				->setModern()
-		))->setId('content_type_field')
+		))->setId('message_format_field')
 	])
 	->addItem([
 		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('webhook_parameters_label'),

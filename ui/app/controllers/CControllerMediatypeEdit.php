@@ -60,7 +60,7 @@ class CControllerMediatypeEdit extends CController {
 				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
 					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
-					'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
+					'message_format', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 					'event_menu_name', 'parameters', 'description', 'provider'
 				],
 				'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
@@ -119,7 +119,7 @@ class CControllerMediatypeEdit extends CController {
 				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
 			],
 			'description' => '',
-			'content_type' => $email_defaults['content_type'],
+			'message_format' => $email_defaults['message_format'],
 			'message_templates' => [],
 			'providers' => CMediatypeHelper::getEmailProviders()
 		];
