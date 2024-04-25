@@ -248,6 +248,9 @@ zbx_log_value_t;
 #define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
 
+#define ZBX_PROGRAM_VARIANT_AGENT	1
+#define ZBX_PROGRAM_VARIANT_AGENT2	2
+
 /* process type */
 #define ZBX_PROCESS_TYPE_POLLER			0
 #define ZBX_PROCESS_TYPE_UNREACHABLE		1
@@ -776,7 +779,5 @@ zbx_log_component_t;
 void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
 void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
 #endif
-
-#define ZBX_AGENT_VARIANT	1
 
 #endif

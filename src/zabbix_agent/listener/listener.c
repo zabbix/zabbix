@@ -50,7 +50,7 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&j, ZBX_PROTO_TAG_VARIANT, ZBX_AGENT_VARIANT);
+	zbx_json_addint64(&j, ZBX_PROTO_TAG_VARIANT, ZBX_PROGRAM_VARIANT_AGENT);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_REQUEST, tmp, sizeof(tmp), NULL))
 	{

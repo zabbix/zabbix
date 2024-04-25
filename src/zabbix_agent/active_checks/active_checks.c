@@ -896,7 +896,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_SESSION, session_token, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&json, ZBX_PROTO_TAG_VARIANT, ZBX_AGENT_VARIANT);
+	zbx_json_addint64(&json, ZBX_PROTO_TAG_VARIANT, ZBX_PROGRAM_VARIANT_AGENT);
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
@@ -1196,7 +1196,7 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AGENT_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_SESSION, session_token, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&json, ZBX_PROTO_TAG_VARIANT, ZBX_AGENT_VARIANT);
+	zbx_json_addint64(&json, ZBX_PROTO_TAG_VARIANT, ZBX_PROGRAM_VARIANT_AGENT);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 
 	ret_metrics = format_metric_results(&json, now, config_buffer_send, config_buffer_size);
@@ -1848,7 +1848,7 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(&json, ZBX_PROTO_TAG_HEARTBEAT_FREQ, config_heartbeat_frequency);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&json, ZBX_PROTO_TAG_VARIANT, ZBX_AGENT_VARIANT);
+	zbx_json_addint64(&json, ZBX_PROTO_TAG_VARIANT, ZBX_PROGRAM_VARIANT_AGENT);
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
