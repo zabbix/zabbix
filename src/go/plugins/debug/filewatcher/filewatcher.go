@@ -23,9 +23,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
 	"github.com/fsnotify/fsnotify"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/watch"
 )

@@ -26,6 +26,7 @@ import (
 	"reflect"
 	"regexp"
 	"testing"
+
 	"zabbix.com/pkg/zbxregexp"
 )
 

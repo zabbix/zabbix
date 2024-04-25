@@ -30,10 +30,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/zbxflag"
-	"git.zabbix.com/ap/plugin-support/zbxnet"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/zbxflag"
+	"golang.zabbix.com/sdk/zbxnet"
 	"zabbix.com/pkg/version"
 )
 

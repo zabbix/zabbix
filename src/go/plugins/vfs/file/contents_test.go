@@ -22,9 +22,10 @@
 package file
 
 import (
-	"git.zabbix.com/ap/plugin-support/std"
 	"reflect"
 	"testing"
+
+	"golang.zabbix.com/sdk/std"
 )
 
 func TestFileContentsEncoding(t *testing.T) {

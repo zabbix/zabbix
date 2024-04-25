@@ -29,8 +29,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/agent/scheduler"
