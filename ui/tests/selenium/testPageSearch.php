@@ -651,7 +651,6 @@ class testPageSearch extends CWebTest {
 					'expected_suggestions' => [
 						'Simple form test host',
 						'Template inheritance test host',
-						'Visible host for template linkage',
 						'ЗАББИКС Сервер'
 					]
 				]

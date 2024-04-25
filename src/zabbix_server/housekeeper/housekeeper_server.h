@@ -33,4 +33,13 @@ zbx_thread_housekeeper_args;
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args);
 
+typedef struct
+{
+	int	config_timeout;
+	int	config_problemhousekeeping_frequency;
+}
+zbx_thread_server_trigger_housekeeper_args;
+
+ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args);
+
 #endif
