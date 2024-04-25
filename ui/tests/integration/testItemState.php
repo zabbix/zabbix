@@ -292,11 +292,11 @@ class testItemState extends CIntegrationTest {
 	protected function checkItemStateActive($scenario, $state, &$refresh) {
 		$wait = max($scenario['delay_s'], self::REFRESH_ACT_CHKS_INTERVAL) + self::PROCESS_ACT_CHKS_DELAY
 			+ self::LOG_LINE_WAIT_TIME;
-		$key = self::$items[$scenario['name']]['key'];
+		$itemid = self::$items[$scenario['name']]['itemid'];
 
 		// Wait for item to be checked
 		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
-				[',"data":[{"host":"test_host","key":"'.$key.'","value":"'], $wait
+				[',"data":[{"itemid":'.$itemid.',"value":"'], $wait
 		);
 
 		// Update last refresh timestamp
@@ -318,7 +318,7 @@ class testItemState extends CIntegrationTest {
 
 		// Verify item checks intervals
 		$next_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
-				[',"data":[{"host":"test_host","key":"'.$key.'","value":"'], $wait
+				[',"data":[{"itemid":'.$itemid.',"value":"'], $wait
 		);
 
 		while ($next_check > $refresh + self::REFRESH_ACT_CHKS_INTERVAL) {
