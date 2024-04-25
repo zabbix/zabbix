@@ -395,8 +395,17 @@ do				\
 }				\
 while (0)
 
-#define THIS_SHOULD_NEVER_HAPPEN zbx_this_should_never_happen()
-void	zbx_this_should_never_happen(void);
+void	zbx_this_should_never_happen_backtrace(void);
+
+#define THIS_SHOULD_NEVER_HAPPEN										\
+														\
+do														\
+{														\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
+			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+	zbx_this_should_never_happen_backtrace();								\
+}														\
+while (0)
 
 /* to avoid dependency on libzbxnix.a */
 #define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
@@ -407,7 +416,7 @@ void	zbx_this_should_never_happen(void);
 
 void	zbx_print_version(const char *title_message);
 
-const char	*get_program_name(const char *path);
+const char		*get_program_name(const char *path);
 typedef unsigned char	(*zbx_get_program_type_f)(void);
 typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);

@@ -43,10 +43,8 @@ void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_pro
 	backtrace_cb = backtrace;
 }
 
-void	zbx_this_should_never_happen(void)
+void	zbx_this_should_never_happen_backtrace(void)
 {
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);
 	backtrace_cb();
 }
 
