@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-04-04 13:04+0000\n"
+"PO-Revision-Date: 2024-04-16 12:16+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -537,7 +537,7 @@ msgstr "Potwierdzenie"
 
 #: include/classes/helpers/CRoleHelper.php:464
 msgid "Acknowledge problems"
-msgstr "Potwierdź problemy"
+msgstr "Potwierdzanie problemów"
 
 #: app/views/popup.condition.common.php:733 include/actions.inc.php:2083
 #: include/events.inc.php:196
@@ -936,7 +936,7 @@ msgstr "Dodaj usługi nadrzędne"
 
 #: include/classes/helpers/CRoleHelper.php:462
 msgid "Add problem comments"
-msgstr "Dodaj komentarz do problemu"
+msgstr "Dodawanie komentarza do problemu"
 
 #: app/views/popup.massupdate.trigger.php:95
 #: include/views/configuration.graph.edit.php:448
@@ -1446,7 +1446,7 @@ msgstr "Próby"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr "Atrybucja tekstu"
+msgstr "Tekst atrybucji"
 
 #: app/views/administration.housekeeping.edit.php:250
 #: include/classes/helpers/CMenuHelper.php:148
@@ -3520,7 +3520,7 @@ msgstr "Zmiana na sekundę"
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Change severity"
-msgstr "Stopień zmian"
+msgstr "Zmiana poziomu problemu"
 
 #: include/classes/html/CMacroValue.php:164
 msgid "Change type"
@@ -3783,7 +3783,7 @@ msgstr "Zakończ problem"
 
 #: include/classes/helpers/CRoleHelper.php:465
 msgid "Close problems"
-msgstr "Zakończ problemy"
+msgstr "Możliwość zakończenia problemów"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
 #: include/classes/widgets/CWidgetHelper.php:1171 jsLoader.php:312
@@ -4407,7 +4407,7 @@ msgstr "Tworzenie i edycja pulpitów"
 
 #: include/classes/helpers/CRoleHelper.php:458
 msgid "Create and edit maintenance"
-msgstr "Tworzenie i edycja wsparcia"
+msgstr "Tworzenie i edycja okresów utrzymania"
 
 #: include/classes/helpers/CRoleHelper.php:454
 msgid "Create and edit maps"
@@ -6740,7 +6740,7 @@ msgstr "Wykonaj na"
 
 #: include/classes/helpers/CRoleHelper.php:466
 msgid "Execute scripts"
-msgstr "Wykonaj skrypty"
+msgstr "Możliwość wykonania skryptów"
 
 #: include/actions.inc.php:2135
 #: include/views/administration.auditacts.list.php:80
@@ -8596,13 +8596,13 @@ msgstr[2] "Jeśli mniej niż %2$s usług podrzędnych ma status %1$s lub niższy
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
 msgid "If less than %2$s child services have %1$s status or below"
-msgstr "Jeśli mniej niż %2$s usługa podrzędna ma status %1$s lub niższy"
+msgstr "Jeśli mniej niż %2$s usług podrzędnych ma status %1$s lub niższy"
 
 #: include/classes/helpers/CServiceHelper.php:50
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
-msgstr "Jeśli mniej niż %2$s usługa podrzędna ma status %1$s lub niższy"
+msgstr "Jeśli mniej niż %2$s usług podrzędnych ma status %1$s lub niższy"
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -13248,7 +13248,7 @@ msgstr "Paź"
 
 #: include/items.inc.php:1990
 msgid "Octal to decimal"
-msgstr "System ósekmowy do dziesiętnego"
+msgstr "System ósemkowy do dziesiętnego"
 
 #: include/func.inc.php:109 include/func.inc.php:262 jsLoader.php:246
 msgid "October"
@@ -14487,7 +14487,7 @@ msgstr "Wykorzystanie CPU przez proces. Zwraca liczbę zmiennoprzecinkową"
 
 #: app/views/administration.mediatype.edit.php:235
 msgid "Process tags"
-msgstr "Znaczniki procesu"
+msgstr "Przetwarzanie znaczników"
 
 #: include/classes/helpers/CMenuHelper.php:395
 msgid "Profile"
@@ -17085,7 +17085,7 @@ msgstr "Temat"
 #: include/views/configuration.host.prototype.edit.php:426
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr "Temat"
+msgstr "Podmiot"
 
 #: jsLoader.php:387
 msgid "Submap"

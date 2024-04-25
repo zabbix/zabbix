@@ -459,11 +459,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Type' => 'Database monitor',
 						'Update interval' => '1h',
-						'Name'=> 'PDB'
+						'Name'=> 'Database'
 					],
 					'context' => 'template',
 					'expected' => [
-						'PDB discovery'
+						'Database discovery'
 					]
 				]
 			],
