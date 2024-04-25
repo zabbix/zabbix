@@ -29,8 +29,8 @@
 
 #include "zbx_vc_common.h"
 
-void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_ptr_t *history, int *err, const char **data,
-		int *ret_flush, int config_history_storage_pipelines)
+void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_dc_history_ptr_t *history, int *err,
+		const char **data, int *ret_flush, int config_history_storage_pipelines)
 {
 	/* execute request */
 
@@ -39,15 +39,15 @@ void	zbx_vc_test_add_values_setup(zbx_mock_handle_t *handle, zbx_vector_ptr_t *h
 	zbx_vcmock_set_mode(*handle, "cache mode");
 	zbx_vcmock_set_cache_size(*handle, "cache size");
 
-	zbx_vector_ptr_create(history);
+	zbx_vector_dc_history_ptr_create(history);
 	zbx_vcmock_get_dc_history(zbx_mock_get_object_member_handle(*handle, "values"), history);
 
 	*err = zbx_vc_add_values(history, ret_flush, config_history_storage_pipelines);
 	*data = zbx_mock_get_parameter_string("out.return");
 	zbx_mock_assert_int_eq("zbx_vc_add_values()", zbx_mock_str_to_return_code(*data), *err);
 
-	zbx_vector_ptr_clear_ext(history, zbx_vcmock_free_dc_history);
-	zbx_vector_ptr_destroy(history);
+	zbx_vector_dc_history_ptr_clear_ext(history, zbx_vcmock_free_dc_history);
+	zbx_vector_dc_history_ptr_destroy(history);
 }
 
 void	zbx_mock_test_entry(void **state)

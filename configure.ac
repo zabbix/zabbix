@@ -2044,6 +2044,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxmedia/Makefile
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxmutexs/Makefile
+	src/libs/zbxpgservice/Makefile
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
@@ -2137,6 +2138,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/lld/Makefile
+	src/zabbix_server/pgmanager/Makefile
 	src/zabbix_server/operations/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile

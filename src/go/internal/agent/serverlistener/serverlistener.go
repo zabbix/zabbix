@@ -27,8 +27,8 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/zbxnet"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/zbxnet"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"

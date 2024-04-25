@@ -78,7 +78,7 @@ void	log_init(void)
 import "C"
 
 import (
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 func SetLogLevel(level int) {

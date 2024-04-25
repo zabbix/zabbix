@@ -1447,7 +1447,7 @@ zabbix_export:
               key: 'jmx["{#JMXOBJ}",CorePoolSize]'
               history: 7d
               units: '!msg'
-              username: '{$IGNITE.USER}'
+              username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
               description: 'The core number of threads.'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
@@ -1460,7 +1460,7 @@ zabbix_export:
               key: 'jmx["{#JMXOBJ}",MaximumPoolSize]'
               history: 7d
               units: '!msg'
-              username: '{$IGNITE.USER}'
+              username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
               description: 'The maximum allowed number of threads.'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
@@ -1473,7 +1473,7 @@ zabbix_export:
               key: 'jmx["{#JMXOBJ}",PoolSize]'
               history: 7d
               units: '!msg'
-              username: '{$IGNITE.USER}'
+              username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
               description: 'Current number of threads in the pool.'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
@@ -1486,7 +1486,7 @@ zabbix_export:
               key: 'jmx["{#JMXOBJ}",QueueSize]'
               history: 7d
               units: '!msg'
-              username: '{$IGNITE.USER}'
+              username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
               description: 'Current size of the execution queue.'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'

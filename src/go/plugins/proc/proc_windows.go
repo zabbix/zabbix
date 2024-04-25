@@ -27,8 +27,8 @@ import (
 	"syscall"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/win32"
 )

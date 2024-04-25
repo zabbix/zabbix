@@ -85,9 +85,12 @@
 #include "zbxstats.h"
 #include "zbxscripts.h"
 #include "zbxsnmptrapper.h"
+
 #ifdef HAVE_OPENIPMI
-#include "zbxipmi.h"
+#	include "zbxipmi.h"
 #endif
+
+#include "pgmanager/pg_manager.h"
 #include "zbxavailability.h"
 #include "zbxdbwrap.h"
 #include "zbxip.h"
@@ -159,8 +162,8 @@ static const char	*help_message[] = {
 	"                                  discovery manager, escalator, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
-	"                                  self-monitoring, service manager, snmp trapper,",
+	"                                  http agent poller, snmp poller, preprocessing manager, proxy group manager",
+	"                                  proxy poller,self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
 	"        pid                       Process identifier",
@@ -172,7 +175,8 @@ static const char	*help_message[] = {
 	"                                  discovery manager, escalator, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
 	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
+	"                                  http agent poller, snmp poller, preprocessing manager, proxy group manager",
+	"                                  proxy poller,self-monitoring, service manager, snmp trapper,",
 	"                                  self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., history syncer,1)",
@@ -273,7 +277,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 	1, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
-	1 /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
+	1, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
+	1  /* ZBX_PROCESS_TYPE_PG_MANAGER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -600,6 +605,11 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		*local_process_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
 	}
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_PG_MANAGER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_PG_MANAGER;
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_PG_MANAGER];
+	}
 	else
 		return FAIL;
 
@@ -613,7 +623,7 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
-	config_startup_time = time(NULL);
+	config_startup_time = (int)time(NULL);
 
 	if (NULL == zbx_config_dbhigh->config_dbhost)
 		zbx_config_dbhigh->config_dbhost = zbx_strdup(zbx_config_dbhigh->config_dbhost, "localhost");
@@ -1269,7 +1279,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, NULL, NULL, NULL, NULL, NULL);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_server, get_zbx_progname);
+	zbx_init_library_preproc(preproc_prepare_value_server, preproc_flush_value_server, get_zbx_progname);
 	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	/* parse the command-line */
@@ -1599,7 +1609,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	}
 
 	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
-			&error))
+			NULL, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1903,6 +1913,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				poller_args.poller_type = ZBX_POLLER_TYPE_INTERNAL;
 				thread_args.args = &poller_args;
 				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_PG_MANAGER:
+				poller_args.poller_type = ZBX_PROCESS_TYPE_PG_MANAGER;
+				thread_args.args = &poller_args;
+				zbx_thread_start(pg_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 		}
 	}

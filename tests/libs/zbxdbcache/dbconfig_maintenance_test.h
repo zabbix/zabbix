@@ -20,7 +20,7 @@
 #ifndef DBCONFIG_MAINTENANCE_TEST_H
 #define DBCONFIG_MAINTENANCE_TEST_H
 
-int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags);
+int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_ptr_t *tags);
 int	dc_check_maintenance_period_test(const zbx_dc_maintenance_t *maintenance,
 		const zbx_dc_maintenance_period_t *period, time_t now, time_t *running_since, time_t *running_until);
 

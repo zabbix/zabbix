@@ -213,6 +213,12 @@
 #define ZBX_PROTO_TAG_PREPROCESSING		"preprocessing"
 #define ZBX_PROTO_TAG_OPTIONS			"options"
 #define ZBX_PROTO_TAG_EOL			"eol"
+#define ZBX_PROTO_TAG_REDIRECT			"redirect"
+#define ZBX_PROTO_TAG_REVISION			"revision"
+#define ZBX_PROTO_TAG_HOSTMAP_REVISION		"hostmap_revision"
+#define ZBX_PROTO_TAG_PROXY_GROUP		"proxy_group"
+#define ZBX_PROTO_TAG_DEL_HOSTPROXYIDS		"del_hostproxyids"
+#define ZBX_PROTO_TAG_RESET			"reset"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -256,6 +262,8 @@
 #define ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS	"suppress"
 #define ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS	"unsuppress"
 
+#define ZBX_PROTO_VALUE_TRUE			"true"
+
 typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,
@@ -291,11 +299,15 @@ struct zbx_json
 	int			level;
 };
 
+typedef struct zbx_json zbx_json_t;
+
 struct zbx_json_parse
 {
 	const char		*start;
 	const char		*end;
 };
+
+typedef struct zbx_json_parse zbx_json_parse_t;
 
 const char	*zbx_json_strerror(void);
 
@@ -337,6 +349,7 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 void		zbx_json_escape(char **string);
 int		zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out);
 zbx_json_type_t	zbx_json_valuetype(const char *p);
+struct zbx_json	*zbx_json_clone(const struct zbx_json *src);
 
 /* jsonpath support */
 

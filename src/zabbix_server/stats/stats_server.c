@@ -129,16 +129,9 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zbx_free(error);
 	}
 
-	if (SUCCEED == zbx_proxy_discovery_get(&value, &error))
-	{
-		zbx_json_addraw(json, "proxy", value);
-		zbx_free(value);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy data: %s", error);
-		zbx_free(error);
-	}
+	zbx_proxy_discovery_get(&value);
+	zbx_json_addraw(json, "proxy", value);
+	zbx_free(value);
 
 	zbx_vps_monitor_stats_t	vps_stats;
 
