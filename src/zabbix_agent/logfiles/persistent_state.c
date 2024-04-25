@@ -52,6 +52,7 @@ static int	zbx_persistent_inactive_compare_func(const void *d1, const void *d2)
 	const zbx_persistent_inactive_t	*p2 = (const zbx_persistent_inactive_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->itemid, p2->itemid);
+
 	return 0;
 }
 
@@ -635,6 +636,7 @@ static int	zbx_pre_persistent_compare_func(const void *d1, const void *d2)
 	const zbx_pre_persistent_t	*p2 = (const zbx_pre_persistent_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->itemid, p2->itemid);
+
 	return 0;
 }
 
@@ -646,7 +648,7 @@ static int	zbx_pre_persistent_compare_func(const void *d1, const void *d2)
  * Parameters:                                                                *
  *    prep_vec             - [IN/OUT] preparation vector for persistent data  *
  *                                files                                       *
- *    itemid                  - [IN] log*[]                                   *
+ *    itemid               - [IN] log*[]                                      *
  *    persistent_file_name - [IN] file name for copying into new element      *
  *                                                                            *
  ******************************************************************************/
