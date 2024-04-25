@@ -25,8 +25,8 @@ import (
 	"reflect"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/zbxlib"

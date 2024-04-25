@@ -31,10 +31,10 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
 	"github.com/go-ldap/ldap"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/pkg/web"
 )
 

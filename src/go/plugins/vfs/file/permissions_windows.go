@@ -23,7 +23,7 @@
 package file
 
 import (
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 // exportPermissions - returns 4-digit string containing octal number with Unix permissions

@@ -23,11 +23,11 @@
 // specified output interface in json format when requested or cache is full.
 // The cache limits are specified by configuration file (BufferSize). If cache
 // limits are reached the following logic is applied to new results:
-// * non persistent results replaces either oldest result of the same item, or
-//   oldest non persistent result if item was not yet cached.
-// * persistent results replaces oldest non persistent result if the total number
-//   of persistent results is less than half maximum cache size. Otherwise the result
-//   is appended, extending cache beyond configured limit.
+//   - non persistent results replaces either oldest result of the same item, or
+//     oldest non persistent result if item was not yet cached.
+//   - persistent results replaces oldest non persistent result if the total number
+//     of persistent results is less than half maximum cache size. Otherwise the result
+//     is appended, extending cache beyond configured limit.
 //
 // Because of asynchronous nature of the communications it's not possible for
 // result cache to return error if it cannot accept new persistent result. So
@@ -36,7 +36,6 @@
 // can lead to more results written than cache limits allow. However it's not a
 // big problem because cache buffer is not static and will be extended as required.
 // The cache limit (BufferSize) is treated more like recommendation than hard limit.
-//
 package resultcache
 
 import (
@@ -49,8 +48,8 @@ import (
 	"os"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/internal/agent"
 )
 
