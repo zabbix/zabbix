@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:16:14Z'
+  date: '2024-04-24T16:18:14Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -925,6 +925,13 @@ zabbix_export:
               path: $.type
             - lld_macro: '{#VHOST}'
               path: $.vhost
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(JSON.parse(value),[''name'',''type'',''vhost'']);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 8655f85b65cc4eb0a0470db45ca1c963
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -989,6 +996,9 @@ zabbix_export:
                       parseInt(value.split('.')[1]) * 100 +
                       parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
@@ -1176,6 +1186,10 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns cluster-wide metrics.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/overview'
           tags:
             - tag: component
@@ -1597,6 +1611,9 @@ zabbix_export:
                       parseInt(value.split('.')[1]) * 100 +
                       parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version < 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: ab89d103c015400fbbeecaaf9bf01400
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -1707,7 +1724,7 @@ zabbix_export:
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
                 It checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down).
-                It responds with a status code `200 OK` if there are no such classic mirrored queues. 
+                It responds with a status code `200 OK` if there are no such classic mirrored queues.
                 Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1753,8 +1770,8 @@ zabbix_export:
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
-                It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). 
-                It responds with a status code `200 OK` if there are no such quorum queues. 
+                It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down).
+                It responds with a status code `200 OK` if there are no such quorum queues.
                 Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1800,7 +1817,7 @@ zabbix_export:
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
-                It responds with It responds with a status code `200 OK` if all virtual hosts are running on the target node. 
+                It responds with It responds with a status code `200 OK` if all virtual hosts are running on the target node.
                 Otherwise it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1850,6 +1867,9 @@ zabbix_export:
                       parseInt(value.split('.')[1]) * 100 +
                       parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: cc1d85b6045b44b38f588cd9a4c6c62d
           name: 'Queues discovery'
           type: DEPENDENT
@@ -2176,7 +2196,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 171e5dbff18f47c98da2c1a3b7120622
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages'
+              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages total'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2381,6 +2401,13 @@ zabbix_export:
               path: $.name
             - lld_macro: '{#VHOST}'
               path: $.vhost
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(JSON.parse(value),[''node'',''name'',''vhost'']);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
