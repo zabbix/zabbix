@@ -1518,23 +1518,20 @@ class CAction extends CApiService {
 						? $action_conditions[$action['actionid']]
 						: [];
 
-					if ($conditions) {
-						if ($action['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-							CConditionHelper::sortConditionsByFormula($conditions, $action['formula']);
+					if ($action['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $action['formula']);
 
-							$eval_formula = $action['formula'];
-						}
-						else {
-							CConditionHelper::sortActionConditions($conditions, (int) $action['eventsource']);
-
-							$eval_formula = CConditionHelper::getEvalFormula($conditions, 'conditiontype',
-								(int) $action['evaltype']
-							);
-						}
-
-						CConditionHelper::addFormulaIds($conditions, $eval_formula);
-						CConditionHelper::replaceConditionIds($eval_formula, $conditions);
+						$eval_formula = $action['formula'];
 					}
+					else {
+						CConditionHelper::sortActionConditions($conditions, (int) $action['eventsource']);
+
+						$eval_formula =
+							CConditionHelper::getEvalFormula($conditions, 'conditiontype', (int) $action['evaltype']);
+					}
+
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
 
 					if ($has_formula) {
 						$action['filter']['formula'] = $action['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION

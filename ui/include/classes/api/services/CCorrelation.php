@@ -799,18 +799,18 @@ class CCorrelation extends CApiService {
 
 						case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 							$db_condition['operator'] = $db_condition['cg_operator'];
-							$fields = array_merge($fields, ['operator', 'groupid']);
+							array_push($fields, 'operator', 'groupid');
 							break;
 
 						case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-							$fields = array_merge($fields, ['oldtag', 'newtag']);
+							array_push($fields, 'oldtag', 'newtag');
 							break;
 
 						case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 						case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 							$db_condition['tag'] = $db_condition['ctv_tag'];
 							$db_condition['operator'] = $db_condition['ctv_operator'];
-							$fields = array_merge($fields, ['tag', 'operator', 'value']);
+							array_push($fields, 'tag', 'operator', 'value');
 							break;
 					}
 
@@ -824,22 +824,20 @@ class CCorrelation extends CApiService {
 						? $correlation_conditions[$correlation['correlationid']]
 						: [];
 
-					if ($conditions) {
-						if ($correlation['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-							CConditionHelper::sortConditionsByFormula($conditions, $correlation['formula']);
+					if ($correlation['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $correlation['formula']);
 
-							$eval_formula = $correlation['formula'];
-						}
-						else {
-							CConditionHelper::sortCorrelationConditions($conditions);
-
-							$eval_formula =
-								CConditionHelper::getEvalFormula($conditions, 'type', (int) $correlation['evaltype']);
-						}
-
-						CConditionHelper::addFormulaIds($conditions, $eval_formula);
-						CConditionHelper::replaceConditionIds($eval_formula, $conditions);
+						$eval_formula = $correlation['formula'];
 					}
+					else {
+						CConditionHelper::sortCorrelationConditions($conditions);
+
+						$eval_formula =
+							CConditionHelper::getEvalFormula($conditions, 'type', (int) $correlation['evaltype']);
+					}
+
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
 
 					if ($has_formula) {
 						$correlation['filter']['formula'] = $correlation['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION

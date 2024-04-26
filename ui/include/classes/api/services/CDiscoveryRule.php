@@ -572,22 +572,19 @@ class CDiscoveryRule extends CItemGeneral {
 						? $item_conditions[$item['itemid']]
 						: [];
 
-					if ($conditions) {
-						if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-							CConditionHelper::sortConditionsByFormula($conditions, $item['formula']);
+					if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $item['formula']);
 
-							$eval_formula = $item['formula'];
-						}
-						else {
-							CConditionHelper::sortLldRuleConditions($conditions);
-
-							$eval_formula =
-								CConditionHelper::getEvalFormula($conditions, 'macro', (int) $item['evaltype']);
-						}
-
-						CConditionHelper::addFormulaIds($conditions, $eval_formula);
-						CConditionHelper::replaceConditionIds($eval_formula, $conditions);
+						$eval_formula = $item['formula'];
 					}
+					else {
+						CConditionHelper::sortLldRuleConditions($conditions);
+
+						$eval_formula = CConditionHelper::getEvalFormula($conditions, 'macro', (int) $item['evaltype']);
+					}
+
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
 
 					if ($has_formula) {
 						$item['filter']['formula'] = $item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
@@ -664,22 +661,20 @@ class CDiscoveryRule extends CItemGeneral {
 						? $override_conditions[$override['lld_overrideid']]
 						: [];
 
-					if ($conditions) {
-						if ($override['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-							CConditionHelper::sortConditionsByFormula($conditions, $override['formula']);
+					if ($override['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $override['formula']);
 
-							$eval_formula = $override['formula'];
-						}
-						else {
-							CConditionHelper::sortLldRuleConditions($conditions);
-
-							$eval_formula =
-								CConditionHelper::getEvalFormula($conditions, 'macro', (int) $override['evaltype']);
-						}
-
-						CConditionHelper::addFormulaIds($conditions, $eval_formula);
-						CConditionHelper::replaceConditionIds($eval_formula, $conditions);
+						$eval_formula = $override['formula'];
 					}
+					else {
+						CConditionHelper::sortLldRuleConditions($conditions);
+
+						$eval_formula =
+							CConditionHelper::getEvalFormula($conditions, 'macro', (int) $override['evaltype']);
+					}
+
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
 
 					$override['filter'] = [
 						'evaltype' => $override['evaltype'],
