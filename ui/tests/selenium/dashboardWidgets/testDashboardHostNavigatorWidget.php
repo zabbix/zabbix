@@ -724,7 +724,6 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 		}
 
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		// Trim leading and trailing spaces from expected results if necessary.
 		if (array_key_exists('trim', $data)) {
@@ -744,15 +743,20 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 			}
 
 			COverlayDialogElement::ensureNotPresent();
-			$widget = $dashboard->getWidget($header);
+			$widget = $dashboard->getWidget($header)->waitUntilReady();
 
 			// Save Dashboard to ensure that widget is correctly saved.
-			$dashboard->save();
-			$this->page->waitUntilReady();
+			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check widgets count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+			// Check new widget update interval.
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
+				? '1 minute'
+				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
+			$this->assertEquals($refresh, $widget->getRefreshInterval());
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -763,17 +767,9 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				$this->assertTags($data['tags']);
 			}
 
-			$saved_form->submit();
-			COverlayDialogElement::ensureNotPresent();
-			$dashboard->waitUntilReady()->save();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
-				? '1 minute'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
-			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			// Close widget window and cancel editing the dashboard.
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->cancelEditing();
 		}
 	}
 
@@ -901,21 +897,59 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	 * Maintenance icon hintbox check.
 	 */
 	public function testDashboardHostNavigatorWidget_MaintenanceIconHintbox() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->edit();
-		$widget = $dashboard->getWidget(self::DEFAULT_WIDGET);
-		$form = $widget->edit()->asForm();
-		$form->fill(['Hosts' => 'Available host in maintenance', 'Show hosts in maintenance' => true]);
-		$form->submit();
+		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
+				['Hosts' => 'Available host in maintenance', 'Show hosts in maintenance' => true]);
+		$dashboard = CDashboardElement::find()->one();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
+		$widget = $dashboard->getWidget(self::DEFAULT_WIDGET);
 		$widget->query('xpath://button['.CXPathHelper::fromClass('zi-wrench-alt-small').']')->waitUntilClickable()->one()->click();
 		$hint = $widget->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
 				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
 		$this->assertEquals($hint_text, $hint);
+	}
+
+	/**
+	 * Row highlight check.
+	 */
+	public function testDashboardHostNavigatorWidget_RowHighlight() {
+		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
+				['Hosts' => 'Second host for host navigator widget']);
+		$this->checkRowHighlight(self::DEFAULT_WIDGET);
+		CDashboardElement::find()->one()->save();
+		$this->checkRowHighlight(self::DEFAULT_WIDGET);
+	}
+
+	/**
+	 * Check if row with host is highlighted on click.
+	 *
+	 * @param string		$widget_name		widget name
+	 */
+	protected function checkRowHighlight($widget_name) {
+		$widget = CDashboardElement::find()->one()->edit()->getWidget($widget_name);
+		$widget->waitUntilReady();
+		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
+		$this->assertFalse($widget->query($locator)->one(false)->isValid());
+		$widget->query('xpath://span[@title="Second host for host navigator widget"]')->waitUntilReady()->one()->click();
+		$this->assertTrue($widget->query($locator)->one()->isVisible());
+	}
+
+	/**
+	 * Opens widget edit form and fills in data.
+	 *
+	 * @param string		$dashboardid		dashboard id
+	 * @param string		$widget_name		widget name
+	 * @param array			$configuration    	widget parameter(s)
+	 */
+	protected function setWidgetConfiguration($dashboardid, $widget_name, $configuration) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$widget = $dashboard->getWidget($widget_name);
+		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
+		$form->fill($configuration);
+		$form->submit();
 	}
 }
