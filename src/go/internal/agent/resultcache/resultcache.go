@@ -46,9 +46,9 @@ import (
 	"sync"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/internal/agent"
 )
 
 const (

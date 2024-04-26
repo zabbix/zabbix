@@ -27,12 +27,12 @@ import (
 	"path/filepath"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/plugins/external"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
-	"zabbix.com/internal/agent"
-	"zabbix.com/plugins/external"
 )
 
 type pluginOptions struct {
