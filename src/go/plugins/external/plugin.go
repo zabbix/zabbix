@@ -25,109 +25,313 @@ import (
 	"net"
 	"os/exec"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
 )
 
-var startLock sync.Mutex
+var (
+	_ plugin.Runner       = (*Plugin)(nil)
+	_ plugin.Configurator = (*Plugin)(nil)
+	_ plugin.Exporter     = (*Plugin)(nil)
+)
 
-// Plugin -
+// startLock is used to ensure that only one plugin is started at a time.
+// view startPlugin method for more details.
+var startLock sync.Mutex //nolint:gochecknoglobals
+
+// Plugin represents an external plugin.
 type Plugin struct {
 	plugin.Base
-	Path       string
-	Socket     string
-	Params     []string
-	Interfaces uint32
-	Initial    bool
-	Listener   net.Listener
-	Timeout    time.Duration
-	cmd        *exec.Cmd
-	broker     *pluginBroker
+	Path string
+
+	name          string // name of plugin
+	socket        string
+	interfaces    uint32
+	listener      net.Listener
+	timeout       time.Duration
+	cmd           *exec.Cmd
+	cmdWait       chan error    // cmd.Wait() result
+	pluginStopped chan struct{} // triggered by plugin.Stop() request
+	broker        *pluginBroker
 }
 
-func (p *Plugin) SetBrokerName(name string) {
-	p.broker.pluginName = name
+// NewPlugin created a new external plugin accessor instance.
+func NewPlugin(
+	name, path, socket string,
+	timeout time.Duration,
+	listener net.Listener,
+) *Plugin {
+	base := plugin.Base{
+		Logger: log.New(name),
+	}
+	base.SetExternal(true)
+
+	return &Plugin{
+		Base:          base,
+		name:          name,
+		Path:          path,
+		socket:        socket,
+		listener:      listener,
+		timeout:       timeout,
+		cmdWait:       make(chan error),
+		pluginStopped: make(chan struct{}),
+	}
 }
 
-func (p *Plugin) Register() (response *comms.RegisterResponse, err error) {
-	return p.broker.register()
+// RegisterMetrics starts the plugin process, sends register and validate
+// (if supported by plugin) requests and stops plugin.
+func (p *Plugin) RegisterMetrics(config any) error {
+	pluginExit, err := p.startPlugin(true)
+	if err != nil {
+		return errs.Wrap(err, "failed to start plugin")
+	}
+
+	jErr := errors.Join(
+		func() error {
+			err = p.register()
+			if err != nil {
+				return errs.Wrap(err, "failed to register plugin")
+			}
+
+			defer p.Stop()
+
+			if comms.ImplementsConfigurator(p.interfaces) {
+				err := p.Validate(config)
+				if err != nil {
+					return errs.Wrap(err, "failed to validate plugin")
+				}
+			}
+
+			return nil
+		}(),
+		<-pluginExit, // wait for plugin to exit
+	)
+	if jErr != nil {
+		return errs.Wrap(jErr, "failed plugin registration")
+	}
+
+	return nil
 }
 
-func (p *Plugin) ExecutePlugin() {
+// register sends a register request to the plugin and processes the response.
+func (p *Plugin) register() error {
+	p.Debugf("sending register request to plugin %q", p.name)
+
+	resp, err := p.broker.register()
+	if err != nil {
+		return errs.Wrap(err, "failed to send register request to plugin")
+	}
+
+	if resp.Error != "" {
+		return errs.New(resp.Error)
+	}
+
+	if resp.Name != p.name {
+		return errs.Errorf(
+			"mismatch plugin names %s and %s, with plugin path %s",
+			p.name, resp.Name, p.Path,
+		)
+	}
+
+	p.interfaces = resp.Interfaces
+
+	p.Debugf(
+		"plugin implements configurator: %t, exporter: %t, runner: %t",
+		comms.ImplementsConfigurator(p.interfaces),
+		comms.ImplementsExporter(p.interfaces),
+		comms.ImplementsRunner(p.interfaces),
+	)
+
+	err = plugin.RegisterMetrics(p, p.name, resp.Metrics...)
+	if err != nil {
+		return errs.Wrap(err, "failed to register metrics")
+	}
+
+	return nil
+}
+
+// startPlugin starts the plugin process for operation stage and creates a
+// request broker.
+func (p *Plugin) startPlugin(initial bool) (<-chan error, error) {
+	// if multiple plugins are started simultaneously, it would be impossible
+	// to determine which connection belongs to which plugin, hence a lock is
+	// needed to ensure that at a single moment in time only one plugin gets
+	// started and the connection created belongs to that one plugin.
 	startLock.Lock()
 	defer startLock.Unlock()
 
-	p.cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
+	p.Debugf(
+		"starting process %q",
+		strings.Join(
+			[]string{p.Path, p.socket, strconv.FormatBool(initial)}, " ",
+		),
+	)
+
+	p.cmd = exec.Command(p.Path, p.socket, strconv.FormatBool(initial)) //nolint:gosec
 
 	err := p.cmd.Start()
 	if err != nil {
-		panic(fmt.Sprintf("failed to start plugin %s, %s", p.Path, err.Error()))
+		return nil, errs.Wrapf(err, "failed to start plugin process %q", p.Path)
 	}
 
-	conn, err := getConnection(p.Listener, p.Timeout)
+	go func() {
+		p.Base.Debugf("plugin process exited")
+		p.cmdWait <- p.cmd.Wait()
+	}()
+
+	conn, err := getConnection(p.listener, p.timeout)
 	if err != nil {
-		panic(fmt.Sprintf("failed to create connection with plugin %s, %s", p.Path, err.Error()))
+		killErr := p.killPlugin()
+		if killErr != nil {
+			p.Errf("failed to kill plugin %s: %s", p.Path, killErr.Error())
+		}
+
+		return nil, errs.Wrapf(
+			err, "failed to create connection with plugin %s", p.Path,
+		)
 	}
 
-	p.broker = New(conn, p.Timeout, p.Socket)
+	p.broker = newBroker(p.name, conn, p.timeout, p.socket)
 
-	p.broker.run()
+	pluginExit := make(chan error)
+
+	go func() {
+		defer func() {
+			p.Debugf("stoping communications broker")
+			p.broker.stop()
+		}()
+
+		select {
+		case err := <-p.cmdWait:
+			if err != nil {
+				pluginExit <- errs.Wrap(err, "plugin exited unexpectedly")
+
+				return
+			}
+
+			pluginExit <- errs.New("plugin exited unexpectedly")
+		case <-p.pluginStopped:
+			t := time.NewTimer(p.timeout)
+			defer t.Stop()
+
+			select {
+			case <-t.C:
+				err := p.killPlugin()
+				if err != nil {
+					p.Errf("failed to kill plugin %s: %s", p.Path, err.Error())
+				}
+
+				pluginExit <- errs.New("timeout while waiting for plugin process to exit, killed process")
+			case <-p.cmdWait:
+				p.Infof("plugin %q process exited", p.Path)
+
+				pluginExit <- nil
+			}
+		}
+	}()
+
+	return pluginExit, nil
 }
 
+func (p *Plugin) killPlugin() error {
+	if p.cmd == nil || p.cmd.Process == nil {
+		return nil
+	}
+
+	err := p.cmd.Process.Kill()
+	if err != nil {
+		return errs.Wrapf(err, "failed to kill plugin %q process", p.Path)
+	}
+
+	err = <-p.cmdWait
+	if err != nil {
+		return errs.Wrapf(err, "plugin %q process exited with error", p.Path)
+	}
+
+	return nil
+}
+
+// Start implements the Runner interface for this external plugin wrapper.
+// `start` request is only sent if the plugin also implements the Runner
+// interface.
 func (p *Plugin) Start() {
-	if comms.ImplementsRunner(p.Interfaces) {
+	if comms.ImplementsRunner(p.interfaces) {
 		p.broker.start()
 	}
 }
 
+// Stop sends a `terminate` request to the plugin process.
 func (p *Plugin) Stop() {
-	if p.cmd == nil {
-		return
-	}
-	p.cmd = nil
+	p.Debugf("sending terminate request")
+
+	p.pluginStopped <- struct{}{}
 
 	err := comms.Write(
 		p.broker.conn,
 		comms.TerminateRequest{
 			Common: comms.Common{
 				Id:   comms.NonRequiredID,
-				Type: comms.TerminateRequestType},
+				Type: comms.TerminateRequestType,
+			},
 		},
 	)
-
 	if err != nil {
-		panic(fmt.Sprintf("failed to send stop request to plugin %s, %s", p.Path, err.Error()))
+		panic(fmt.Sprintf(
+			"failed to send stop request to plugin %s, %s", p.Path, err.Error(),
+		))
 	}
-
-	p.broker.stop()
 }
 
-func (p *Plugin) Configure(globalOptions *plugin.GlobalOptions, privateOptions interface{}) {
-	p.ExecutePlugin()
-	p.SetBrokerName(p.Name())
+// Configure starts the plugin process for operation stage. Sends a register
+// request if the plugin implements the Configurator interface.
+func (p *Plugin) Configure(
+	globalOptions *plugin.GlobalOptions, privateOptions any,
+) {
+	pluginExit, err := p.startPlugin(false)
+	if err != nil {
+		panic(err)
+	}
 
-	if comms.ImplementsConfigurator(p.Interfaces) {
+	go func() {
+		if err := <-pluginExit; err != nil {
+			// TODO: handle this better. Need to notify the ower of Plugin
+			// struct that the plugin has failed. Then it can futher notify
+			// the run func from main.
+			panic(err)
+		}
+	}()
+
+	p.broker.pluginName = p.Name()
+
+	if comms.ImplementsConfigurator(p.interfaces) {
 		p.broker.configure(globalOptions, privateOptions)
 	}
 }
 
-func (p *Plugin) Validate(privateOptions interface{}) error {
+// Validate sends a `validate` request to the plugin.
+func (p *Plugin) Validate(privateOptions any) error {
+	p.Debugf("sending validate request")
+
 	resp, err := p.broker.validate(privateOptions)
 	if err != nil {
-		return err
+		return errs.Wrap(err, "failed to send validate request to plugin")
 	}
 
-	if resp.Error == "" {
-		return nil
+	if resp.Error != "" {
+		return errs.New(resp.Error)
 	}
 
-	return errors.New(resp.Error)
+	return nil
 }
 
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+// Export sends an `export` request to the plugin.
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	resp, err := p.broker.export(key, params)
 	if err != nil {
 		return nil, err
@@ -137,39 +341,41 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return resp.Value, nil
 	}
 
-	return nil, errors.New(resp.Error)
+	return nil, errs.New(resp.Error)
 }
 
-func (p *Plugin) CheckPid(pid int) bool {
-	return p.cmd != nil && p.cmd.Process.Pid == pid
-}
+func getConnection(
+	listener net.Listener, timeout time.Duration,
+) (net.Conn, error) {
+	var (
+		connC = make(chan net.Conn)
+		errC  = make(chan error)
+		t     = time.NewTimer(timeout)
+	)
 
-func (p *Plugin) Cleanup() {
-	p.broker.stop()
-	p.cmd = nil
-}
+	defer func() {
+		close(connC)
+		close(errC)
+		t.Stop()
+	}()
 
-func getConnection(listener net.Listener, timeout time.Duration) (conn net.Conn, err error) {
-	connChan := make(chan net.Conn)
-	errChan := make(chan error)
+	go func() {
+		conn, err := listener.Accept()
+		if err != nil {
+			errC <- err
+		}
 
-	go listen(listener, connChan, errChan)
+		connC <- conn
+	}()
 
 	select {
-	case conn = <-connChan:
-	case err = <-errChan:
-	case <-time.After(timeout):
-		err = fmt.Errorf("failed to get connection within the time limit %d", timeout)
+	case conn := <-connC:
+		return conn, nil
+	case err := <-errC:
+		return nil, err
+	case <-t.C:
+		return nil, errs.Errorf(
+			"failed to get connection within the time limit %d", timeout,
+		)
 	}
-
-	return
-}
-
-func listen(listener net.Listener, ch chan<- net.Conn, errCh chan<- error) {
-	conn, err := listener.Accept()
-	if err != nil {
-		errCh <- err
-	}
-
-	ch <- conn
 }

@@ -23,14 +23,11 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"syscall"
 
-	"golang.zabbix.com/agent2/plugins/external"
 	"golang.zabbix.com/sdk/log"
-	"golang.zabbix.com/sdk/plugin"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {
@@ -52,55 +49,5 @@ func cleanUpExternal() {
 		if err != nil {
 			log.Critf("failed to clean up after plugins, %s", err)
 		}
-	}
-}
-
-func checkExternalExits() error {
-	var status syscall.WaitStatus
-	pid, err := syscall.Wait4(-1, &status, syscall.WNOHANG, nil)
-	if err != nil {
-		log.Tracef("failed to obtain PID of dead child process: %s", err)
-		return nil
-	}
-
-	for _, p := range plugin.Plugins {
-		if p.IsExternal() {
-			if ep, ok := p.(*external.Plugin); ok {
-				return checkExternalExit(pid, ep, ep.Name())
-			}
-		}
-	}
-
-	return nil
-}
-
-func checkExternalExit(pid int, p *external.Plugin, name string) error {
-	if p.CheckPid(pid) {
-		p.Cleanup()
-		return fmt.Errorf("plugin %s died", name)
-	}
-
-	return nil
-}
-
-func listenOnPluginFail(p *external.Plugin, name string) {
-	var pid int
-	var err error
-
-	for {
-		pid, err = syscall.Wait4(-1, nil, 0, nil)
-		if err != nil {
-			if errors.Is(err, syscall.EINTR) {
-				continue
-			}
-
-			panic(fmt.Errorf("failed to obtain PID of dead child process: %w", err))
-		}
-
-		break
-	}
-
-	if err := checkExternalExit(pid, p, name); err != nil {
-		panic(err)
 	}
 }

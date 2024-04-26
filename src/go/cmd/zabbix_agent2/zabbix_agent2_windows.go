@@ -21,22 +21,12 @@ package main
 
 import (
 	"os"
-	"os/signal"
 	"path/filepath"
 	"strings"
-	"syscall"
 
 	"golang.zabbix.com/agent2/pkg/pdh"
-	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/errs"
 )
-
-func loadOSDependentItems() error {
-	if err := pdh.LocateObjectsAndDefaultCounters(true); err != nil {
-		log.Warningf("cannot load objects and default counters: %s", err.Error())
-	}
-
-	return nil
-}
 
 func init() {
 	if path, err := os.Executable(); err == nil {
@@ -45,21 +35,11 @@ func init() {
 	}
 }
 
-func createSigsChan() chan os.Signal {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-	return sigs
-}
-
-// handleSig() checks received signal and returns true if the signal is handled
-// and can be ignored, false if the program should stop.
-// Needed for consistency with Unix.
-func handleSig(sig os.Signal) bool {
-	switch sig {
-	case syscall.SIGINT, syscall.SIGTERM:
-		sendServiceStop()
+func loadOSDependentItems() error {
+	err := pdh.LocateObjectsAndDefaultCounters(true)
+	if err != nil {
+		return errs.Wrap(err, "failed to load objects and default counters")
 	}
 
-	return false
+	return nil
 }

@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
@@ -55,29 +56,28 @@ type RequestWrapper struct {
 
 type request struct {
 	id   uint32
-	data interface{}
-	out  chan interface{}
+	data any
+	out  chan any
 }
 
-// p.socket = fmt.Sprintf("%s%d", socketBasePath, time.Now().UnixNano())
-
-func (b *pluginBroker) SetPluginName(name string) {
-
-}
-
-func New(conn net.Conn, timeout time.Duration, socket string) *pluginBroker {
-	broker := pluginBroker{
-		socket:   socket,
-		timeout:  timeout,
-		conn:     conn,
-		requests: make(map[uint32]chan interface{}),
-		errx:     make(chan error, queSize),
-		log:      make(chan interface{}),
-		tx:       make(chan *request, queSize),
-		rx:       make(chan *request, queSize),
+func newBroker(pluginName string, conn net.Conn, timeout time.Duration, socket string) *pluginBroker {
+	pb := &pluginBroker{
+		pluginName: pluginName,
+		socket:     socket,
+		timeout:    timeout,
+		conn:       conn,
+		requests:   make(map[uint32]chan any),
+		errx:       make(chan error, queSize),
+		log:        make(chan any),
+		tx:         make(chan *request, queSize),
+		rx:         make(chan *request, queSize),
 	}
 
-	return &broker
+	go pb.handleLogs()
+	go pb.handleConnection()
+	go pb.runBackground()
+
+	return pb
 }
 
 func (b *pluginBroker) handleConnection() {
@@ -278,12 +278,6 @@ func (b *pluginBroker) handleLog(l comms.LogRequest) {
 	}
 }
 
-func (b *pluginBroker) run() {
-	go b.handleLogs()
-	go b.handleConnection()
-	go b.runBackground()
-}
-
 func (b *pluginBroker) start() {
 	r := request{
 		data: &comms.StartRequest{
@@ -297,8 +291,7 @@ func (b *pluginBroker) start() {
 }
 
 func (b *pluginBroker) stop() {
-	r := request{data: nil}
-	b.tx <- &r
+	b.tx <- &request{data: nil}
 }
 
 func (b *pluginBroker) export(key string, params []string) (*comms.ExportResponse, error) {
@@ -325,7 +318,7 @@ func (b *pluginBroker) export(key string, params []string) (*comms.ExportRespons
 		return nil, v
 	}
 
-	return nil, errors.New("unknown response")
+	return nil, errs.New("unknown response")
 }
 
 func (b *pluginBroker) register() (*comms.RegisterResponse, error) {

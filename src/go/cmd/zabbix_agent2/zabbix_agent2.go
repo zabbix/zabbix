@@ -25,8 +25,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
@@ -221,7 +223,8 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 var pidFile *pidfile.File
 
 func run() error {
-	sigs := createSigsChan()
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
 	if err != nil {
@@ -235,10 +238,10 @@ func run() error {
 
 	for {
 		select {
-		case sig := <-sigs:
-			if !handleSig(sig) {
-				return nil
-			}
+		case <-sigs:
+			sendServiceStop()
+
+			return nil
 		case client := <-control.Client():
 			err := processRemoteCommand(client)
 			if err != nil {
@@ -270,6 +273,11 @@ var (
 )
 
 func main() {
+	err := log.Open(log.Console, log.Debug, "", 0)
+	if err != nil {
+		fatalExit("cannot initialize default logger", err)
+	}
+
 	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
 
 	flagsUsage, fs, args, err := parseArgs()
@@ -350,10 +358,6 @@ func main() {
 		fatalExit("", err)
 	}
 
-	if err = log.Open(log.Console, log.Warning, "", 0); err != nil {
-		fatalExit("cannot initialize logger", err)
-	}
-
 	if args.runtimeCommand != "" {
 		if agent.Options.ControlSocket == "" {
 			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
@@ -372,9 +376,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
+	pluginsocket, err = initExternalPlugins(&agent.Options)
+	if err != nil {
 		fatalExit("cannot register plugins", err)
 	}
+
 	defer cleanUpExternal()
 
 	if argTest || argPrint {
