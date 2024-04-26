@@ -21,5 +21,9 @@ div.dashboard-widget-hostnavigator {
 			padding: 9px 8px;
 			color: $font-alt-color;
 		}
+
+		&.no-data {
+			height: 100%;
+		}
 	}
 }

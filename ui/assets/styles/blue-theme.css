@@ -4286,6 +4286,8 @@ div.dashboard-widget-hostnavigator .host-navigator .host-navigator-limit {
   height: 18px;
   padding: 9px 8px;
   color: #768d99; }
+div.dashboard-widget-hostnavigator .host-navigator.no-data {
+  height: 100%; }
 
 .dashboard-widget-inaccessible {
   display: grid;
