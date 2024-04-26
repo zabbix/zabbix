@@ -3619,14 +3619,11 @@ int	zbx_db_check_instanceid(void)
 	return ret;
 }
 
-int	zbx_db_update_software_update_checkid(int config_allow_software_update_check)
+int	zbx_db_update_software_update_checkid(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		ret = SUCCEED;
-
-	if (0 == config_allow_software_update_check)
-		return SUCCEED;
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
