@@ -167,14 +167,14 @@ class testSla extends CAPITest {
 					]).'.'
 			],
 
-			'Slo missing' => [
+			'SLO missing' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "slo" is missing.'
 			],
-			'Slo null' => [
+			'SLO null' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -529,7 +529,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags": an array is expected.'
 			],
-			'Service tags, not multiarray' => [
+			'Service tags, not multi-array' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -652,7 +652,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/1/operator": an integer is expected.'
 			],
-			'Service tags, tag bool' => [
+			'Service tags, operator bool' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -668,7 +668,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/1/operator": an integer is expected.'
 			],
-			'Service tags, tag empty array' => [
+			'Service tags, operator empty array' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -684,7 +684,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/1/operator": an integer is expected.'
 			],
-			'Service tags, tag empty string' => [
+			'Service tags, operator empty string' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -700,7 +700,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/1/operator": an integer is expected.'
 			],
-			'Service tags, tag int' => [
+			'Service tags, operator string' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -716,7 +716,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/1/operator": an integer is expected.'
 			],
-			'Service tags, tag too long' => [
+			'Service tags, operator not in range' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -936,7 +936,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/schedule": an array is expected.'
 			],
-			'Schedule, not multiarray' => [
+			'Schedule, not multi-array' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -1404,7 +1404,7 @@ class testSla extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/excluded_downtimes": an array is expected.'
 			],
 
-			'Schedule excluded_downtimes non-multiarray' => [
+			'Schedule excluded_downtimes non-multi-array' => [
 				'sla' => [
 					'name' => 'foo',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -1514,34 +1514,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/excluded_downtimes/1/name": cannot be empty.'
 			],
-			'Schedule excluded_downtimes name null' => [
-				'sla' => [
-					'name' => 'foo',
-					'period' => ZBX_SLA_PERIOD_ANNUALLY,
-					'slo' => 99.5,
-					'effective_date' => ZBX_MAX_DATE - 10,
-					'timezone' => 'Europe/Riga',
-					'service_tags' => [
-						[
-							'tag' => 'tag',
-							'operator' => ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE,
-							'value' => 'value'
-						]
-					],
-					'schedule' => [
-						[
-							'period_from' => SEC_PER_DAY,
-							'period_to' => SEC_PER_WEEK
-						]
-					],
-					'excluded_downtimes' => [
-						[
-							'name' => null
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/excluded_downtimes/1/name": a character string is expected.'
-			],
 			'Schedule excluded_downtimes name empty array' => [
 				'sla' => [
 					'name' => 'foo',
@@ -1649,7 +1621,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade'
+							'name' => 'Mail Server upgrade'
 						]
 					]
 				],
@@ -1677,7 +1649,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => true
 						]
 					]
@@ -1706,7 +1678,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => ''
 						]
 					]
@@ -1735,7 +1707,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => []
 						]
 					]
@@ -1764,7 +1736,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => -1
 						]
 					]
@@ -1794,7 +1766,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => ZBX_MAX_DATE + 1
 						]
 					]
@@ -1824,7 +1796,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY
 						]
 					]
@@ -1854,7 +1826,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => null
 						]
@@ -1884,7 +1856,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => true
 						]
@@ -1914,7 +1886,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => ''
 						]
@@ -1944,7 +1916,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => []
 						]
@@ -1974,7 +1946,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => -1
 						]
@@ -2005,7 +1977,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => ZBX_MAX_DATE + 1
 						]
@@ -2035,13 +2007,13 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => ZBX_MAX_DATE,
 							'period_to' => SEC_PER_DAY
 						]
 					]
 				],
-				'expected_error' => 'Start time must be less than end time for excluded downtime "Mail Serever upgrade" of SLA "foo".'
+				'expected_error' => 'Start time must be less than end time for excluded downtime "Mail Server upgrade" of SLA "foo".'
 			],
 			'Schedule excluded_downtimes duplicate' => [
 				'sla' => [
@@ -2065,12 +2037,12 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => ZBX_MAX_DATE
 						],
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => ZBX_MAX_DATE
 						]
@@ -2079,7 +2051,7 @@ class testSla extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/excluded_downtimes/2": value (period_from, period_to)=('.
 					SEC_PER_DAY.', '.ZBX_MAX_DATE.') already exists.'
 			],
-			'Duplicate slas' => [
+			'Duplicate SLAs' => [
 				'sla' => [
 					[
 						'name' => 'foo',
@@ -2102,7 +2074,7 @@ class testSla extends CAPITest {
 						],
 						'excluded_downtimes' => [
 							[
-								'name' => 'Mail Serever upgrade',
+								'name' => 'Mail Server upgrade',
 								'period_from' => SEC_PER_DAY,
 								'period_to' => ZBX_MAX_DATE
 							]
@@ -2129,7 +2101,7 @@ class testSla extends CAPITest {
 						],
 						'excluded_downtimes' => [
 							[
-								'name' => 'Mail Serever upgrade',
+								'name' => 'Mail Server upgrade',
 								'period_from' => SEC_PER_DAY,
 								'period_to' => ZBX_MAX_DATE
 							]
@@ -2161,7 +2133,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => ZBX_MAX_DATE
 						]
@@ -2176,7 +2148,7 @@ class testSla extends CAPITest {
 		$name_increment = 0;
 
 		return [
-			'Minimal sla' => [
+			'Minimal SLA' => [
 				'sla' => [
 					'name' => 'foo'.++$name_increment,
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
@@ -2193,7 +2165,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Multiple minimal slas' => [
+			'Multiple minimal SLAs' => [
 				'sla' => [
 					[
 						'name' => 'foo'.++$name_increment,
@@ -2250,7 +2222,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Server upgrade',
 							'period_from' => SEC_PER_DAY,
 							'period_to' => ZBX_MAX_DATE
 						]
@@ -2258,7 +2230,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Multiple full slas' => [
+			'Multiple full SLAs' => [
 				'sla' => [
 					[
 						'name' => 'foo'.++$name_increment,
@@ -2283,7 +2255,7 @@ class testSla extends CAPITest {
 						],
 						'excluded_downtimes' => [
 							[
-								'name' => 'Mail Serever upgrade',
+								'name' => 'Mail Server upgrade',
 								'period_from' => SEC_PER_DAY,
 								'period_to' => ZBX_MAX_DATE
 							]
@@ -2312,7 +2284,7 @@ class testSla extends CAPITest {
 						],
 						'excluded_downtimes' => [
 							[
-								'name' => 'Mail Serever upgrade',
+								'name' => 'Mail Server upgrade',
 								'period_from' => SEC_PER_DAY,
 								'period_to' => ZBX_MAX_DATE
 							]
@@ -2321,7 +2293,7 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Multiple mixed slas' => [
+			'Multiple mixed SLAs' => [
 				'sla' => [
 					[
 						'name' => 'foo'.++$name_increment,
@@ -2364,17 +2336,17 @@ class testSla extends CAPITest {
 						],
 						'excluded_downtimes' => [
 							[
-								'name' => 'Mail Serever upgrade',
+								'name' => 'Mail Server upgrade',
 								'period_from' => SEC_PER_DAY,
 								'period_to' => SEC_PER_WEEK
 							],
 							[
-								'name' => 'Mail Serever upgrade',
+								'name' => 'Mail Server upgrade',
 								'period_from' => SEC_PER_DAY - 30,
 								'period_to' => SEC_PER_WEEK
 							],
 							[
-								'name' => 'Mail Serever upgrade',
+								'name' => 'Mail Server upgrade',
 								'period_from' => SEC_PER_DAY * 4,
 								'period_to' => ZBX_MAX_DATE
 							]
@@ -2403,7 +2375,7 @@ class testSla extends CAPITest {
 						],
 						'excluded_downtimes' => [
 							[
-								'name' => 'Mail Serever upgrade',
+								'name' => 'Mail Server upgrade',
 								'period_from' => SEC_PER_DAY,
 								'period_to' => ZBX_MAX_DATE
 							]
@@ -2450,7 +2422,7 @@ class testSla extends CAPITest {
 			],
 			'Schedule excluded_downtimes empty array' => [
 				'sla' => [
-					'name' => 'foobuzz',
+					'name' => 'foo-buzz',
 					'period' => ZBX_SLA_PERIOD_ANNUALLY,
 					'slo' => 99.5,
 					'effective_date' => ZBX_MAX_DATE - 10,
@@ -2606,7 +2578,7 @@ class testSla extends CAPITest {
 				'sla' => [
 					[
 						'slaid' => 50038,
-						'name' => 'fooslo',
+						'name' => 'foo-slo',
 						'slo' => 50.12345
 					]
 				],
@@ -2694,7 +2666,7 @@ class testSla extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/service_tags/2": value (tag, value)=(foo, bar) already exists.'
 			],
 
-			'Schedule not multiarray' => [
+			'Schedule not multi-array' => [
 				'sla' => [
 					'slaid' => 50038,
 					'schedule' => [
@@ -2726,7 +2698,7 @@ class testSla extends CAPITest {
 			'Schedule period_from greater than period_to' => [
 				'sla' => [
 					'slaid' => 50038,
-					'name' => 'foofgt',
+					'name' => 'foo-abc',
 					'schedule' => [
 						[
 							'period_from' => 10,
@@ -2780,7 +2752,7 @@ class testSla extends CAPITest {
 					SEC_PER_WEEK.') already exists.'
 			],
 
-			'Excluded downtimes not multiarray' => [
+			'Excluded downtimes not multi-array' => [
 				'sla' => [
 					'slaid' => 50038,
 					'excluded_downtimes' => [
@@ -2817,7 +2789,7 @@ class testSla extends CAPITest {
 			'Excluded downtime period_from greater than period_to' => [
 				'sla' => [
 					'slaid' => 50038,
-					'name' => 'foofgt',
+					'name' => 'foo-abc',
 					'excluded_downtimes' => [
 						[
 							'name' => 'bar',
@@ -3325,7 +3297,7 @@ class testSla extends CAPITest {
 				]
 			],
 
-			'Filter slo bool' => [
+			'Filter SLO bool' => [
 				'request' => [
 					'output' => [],
 					'filter' => [
@@ -3541,7 +3513,7 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/output": an array or a character string is expected.'
 				]
 			],
-			'SLA output float' => [
+			'SLA output invalid parameter' => [
 				'request' => [
 					'output' => ['foo']
 				],
@@ -3551,7 +3523,7 @@ class testSla extends CAPITest {
 					]).'".'
 				]
 			],
-			'SLA output multiaray' => [
+			'SLA output multi-array' => [
 				'request' => [
 					'output' => [[]]
 				],
@@ -4074,7 +4046,7 @@ class testSla extends CAPITest {
 				]
 			],
 
-			'Filter slo null' => [
+			'Filter SLO null' => [
 				'request' => [
 					'output' => [],
 					'filter' => [
@@ -4085,7 +4057,7 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-			'Filter slo empty array' => [
+			'Filter SLO empty array' => [
 				'request' => [
 					'output' => [],
 					'filter' => [
@@ -4840,7 +4812,7 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/periods": value must be one of 1-100.'
 				]
 			],
-			'periods zerot' => [
+			'periods zero' => [
 				'request' => [
 					'slaid' => 50999,
 					'periods' => 0
@@ -4949,7 +4921,7 @@ class testSla extends CAPITest {
 					]
 				]
 			],
-			'SLA with nonexist serviceid' => [
+			'SLA with non-existing serviceid' => [
 				'request' => [
 					'slaid' => 50041,
 					'serviceids' => [50999]
