@@ -3,6 +3,7 @@ Changes for 5.0.43rc1
 New features:
 
 Bug fixes:
+.....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42
