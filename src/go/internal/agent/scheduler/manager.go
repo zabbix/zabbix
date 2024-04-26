@@ -125,6 +125,11 @@ type Scheduler interface {
 	QueryUserParams() (status string)
 }
 
+type systemOptions struct {
+	ForceActiveChecksOnStart *int `conf:"optional"`
+	Capacity                 int  `conf:"optional"`
+}
+
 // cleanupClient performs deactivation of plugins the client is not using anymore.
 // It's called after client update and once per hour for the client associated to
 // single passive checks.
@@ -671,13 +676,6 @@ run:
 	monitor.Unregister(monitor.Scheduler)
 }
 
-type pluginOptions struct {
-	System struct {
-		ForceActiveChecksOnStart *int `conf:"optional"`
-		Capacity                 int  `conf:"optional"`
-	} `conf:"optional"`
-}
-
 func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
 	m.pluginQueue = make(pluginHeap, 0, len(plugin.Metrics))
@@ -934,7 +932,9 @@ func peekTask(tasks performerHeap) performer {
 }
 
 func getPluginOptions(optsRaw any, pluginName string) (int, int) {
-	var opt pluginOptions
+	var opt struct {
+		System systemOptions `conf:"optional"`
+	}
 
 	capacity := plugin.DefaultCapacity
 
