@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Setup
 
-You must set {$VELOCLOUD.TOKEN} and {$VELOCLOUD.URL} macros. 
+You must set {$VELOCLOUD.TOKEN} and {$VELOCLOUD.URL} macros.
 
 You have to create API token in Orchestrator and use it in {$VELOCLOUD.TOKEN} macros. Read detailed instructions how to create token in VMWare documentation [documentation](https://docs.vmware.com/en/VMware-SD-WAN/4.0/vmware-sd-wan-operator-guide/GUID-C150D536-A75F-47C1-8AFF-17C417F40C1D.html)
 
@@ -47,9 +47,11 @@ Set Orchestrator URl for {$VELOCLOUD.URL}. e.g. example.com (where you replace e
 |Velocloud: Get data|<p>The JSON with result of Velocloud API requests.</p>|Script|velocloud.get|
 |Velocloud: Clear data|<p>Clear metrics for data without errors.</p>|Dependent item|velocloud.get.clear_metrics<p>**Preprocessing**</p><ul><li><p>Check for error in JSON: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Velocloud: Orchestrator API version|<p>Version of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.api_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.apiVersion`</p></li></ul>|
+|Velocloud: Get edges|<p>The JSON with result of Velocloud edge SD Wan.</p>|Dependent item|velocloud.get.edges<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Velocloud: Orchestrator build|<p>Build of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.build<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.build`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Velocloud: Orchestrator version|<p>Version of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Velocloud: Get data collection errors|<p>Errors of aggregate script item.</p>|Dependent item|velocloud.get.error<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Velocloud: Get edges data collection errors|<p>Errors of aggregate script item.</p>|Dependent item|velocloud.get.edges.error<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Velocloud: System properties|<p>System properties of VMware SD-WAN.</p>|HTTP agent|velocloud.system.properties<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Triggers
@@ -60,6 +62,7 @@ Set Orchestrator URl for {$VELOCLOUD.URL}. e.g. example.com (where you replace e
 |Velocloud: Orchestrator build has been changed|<p>Velocloud Orchestrator build has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build))>0`|Info|**Manual close**: Yes|
 |Velocloud: Orchestrator version has been changed|<p>Velocloud Orchestrator version has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version))>0`|Info|**Manual close**: Yes|
 |Velocloud: There are errors in aggregate script item|<p>There are errors in aggregate script item.</p>|`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0`|Warning||
+|Velocloud: There are errors in edges item preprocessing script|<p>There are errors in aggregate script item.</p>|`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.edges.error))>0`|Warning||
 |Velocloud: System properties have changed|<p>System properties have changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)`|Info|**Manual close**: Yes|
 
 ### LLD rule Edges metrics discovery
