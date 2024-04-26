@@ -2400,8 +2400,21 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.30rc1
 
 New features:
+........S. [ZBXNEXT-7930] added user macros support for username and password fields in email media type (asestakovs)
+.........T [ZBXCTR-22] refactored JavaScript filter functions for Kubernetes templates (ebbex)
+.........T [ZBXNEXT-9098] added AWS ELB Network Load Balancer by HTTP template (egordymov)
+.........T [ZBXNEXT-6864] replaced {HOST.CONN} with user macros in templates (drasikhov)
 
 Bug fixes:
+.....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
+.........T [ZBX-19990] separated LLD filter macros in Apache Tomcat by JMX template (drasikhov)
+.........T [ZBX-24364] added preprocessing steps for LLD rules in RabbitMQ templates (egordymov)
+.........T [ZBX-24368] Improved PostgreSQL autovacuum's count query (abrosimovs)
+.......PS. [ZBX-24282] fixed Zabbix proxy to report error for not supported items (sboidenko)
+........S. [ZBX-19507] fixed vmware.eventlog item to recover after event keys are reset (asestakovs)
+........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
+.........T [ZBX-24275] fixed item prototypes JSONPath preprocessing, added missing volumes health metric and triggers in HPE MSA templates (drasikhov)
+.........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.29
