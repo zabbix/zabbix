@@ -1116,6 +1116,14 @@ msgstr "Додаткові правила"
 msgid "Address"
 msgstr "Адреса"
 
+#: app/controllers/CControllerProxyCreate.php:72
+#: app/controllers/CControllerProxyCreate.php:80
+#: app/controllers/CControllerProxyUpdate.php:67
+#: app/controllers/CControllerProxyUpdate.php:75
+#: app/views/popup.proxy.edit.php:90
+msgid "Address for active agents"
+msgstr ""
+
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
 msgstr "Адміністратор"
@@ -1578,6 +1586,10 @@ msgstr "Твердження"
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "Етикетка власника"
+
+#: app/partials/configuration.host.edit.html.php:331
+msgid "Assigned proxy"
+msgstr ""
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -2326,6 +2338,11 @@ msgstr "Не вдалося додати карту мережі"
 msgid "Cannot add proxy"
 msgstr "Не вдалося додати проксі"
 
+#: app/controllers/CControllerProxyGroupCreate.php:42
+#: app/controllers/CControllerProxyGroupCreate.php:74
+msgid "Cannot add proxy group"
+msgstr ""
+
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
 msgid "Cannot add regular expression"
@@ -2809,6 +2826,17 @@ msgid_plural "Cannot delete proxies"
 msgstr[0] "Не вдалося видалити проксі"
 msgstr[1] "Не вдалося видалити проксі"
 msgstr[2] "Не вдалося видалити проксі"
+
+#: app/controllers/CControllerProxyGroupDelete.php:78
+msgid "Cannot delete proxy group"
+msgid_plural "Cannot delete proxy groups"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerProxyGroupDelete.php:39
+msgid "Cannot delete proxy groups"
+msgstr ""
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -4129,6 +4157,11 @@ msgstr "Не вдалося оновити проксі"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Не вдалося оновити проксі для виявленого вузла мережі \"%1$s\"."
 
+#: app/controllers/CControllerProxyGroupUpdate.php:43
+#: app/controllers/CControllerProxyGroupUpdate.php:82
+msgid "Cannot update proxy group"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:768
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
@@ -4871,6 +4904,10 @@ msgstr "Налаштування карт мереж"
 msgid "Configuration of proxies"
 msgstr "Налаштування проксі"
 
+#: app/controllers/CControllerProxyGroupList.php:131
+msgid "Configuration of proxy groups"
+msgstr ""
+
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
 msgid "Configuration of regular expressions"
@@ -5484,6 +5521,10 @@ msgstr "Створити нові"
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
 msgstr "Створити проксі"
+
+#: app/views/administration.proxygroup.list.php:168
+msgid "Create proxy group"
+msgstr ""
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
@@ -6150,6 +6191,11 @@ msgstr "Тема по замовчуванню"
 msgid "Default time zone"
 msgstr "Часовий пояс за умовчанням"
 
+#: app/views/administration.proxygroup.list.php:55
+#: app/views/administration.proxygroup.list.php:111
+msgid "Degrading"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:160 app/views/popup.massupdate.item.php:276
 msgid "Delay"
 msgstr "Затримка"
@@ -6468,6 +6514,15 @@ msgstr "Видалити вибрані методи повідомлень?"
 #: app/views/js/administration.proxy.list.js.php:143
 msgid "Delete selected proxies?"
 msgstr "Видалити вибрані проксі?"
+
+#: app/views/js/administration.proxygroup.list.js.php:88
+#: app/views/popup.proxygroup.edit.php:147
+msgid "Delete selected proxy group?"
+msgstr ""
+
+#: app/views/js/administration.proxygroup.list.js.php:87
+msgid "Delete selected proxy groups?"
+msgstr ""
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -7057,6 +7112,10 @@ msgstr "Виявлення"
 #: include/classes/helpers/CRoleHelper.php:472
 msgid "Discovery actions"
 msgstr "Дії виявлення"
+
+#: app/views/configuration.discovery.edit.php:52
+msgid "Discovery by"
+msgstr ""
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -8357,6 +8416,11 @@ msgstr ""
 msgid "Failed to update widget properties."
 msgstr "Помилка при оновленні властивостей віджета."
 
+#: app/views/administration.proxygroup.list.php:79
+#: app/views/popup.proxygroup.edit.php:51
+msgid "Failover period"
+msgstr ""
+
 #: include/items.inc.php:37
 msgid "Failure Audit"
 msgstr "Аудит відмов"
@@ -9454,6 +9518,11 @@ msgstr "Вузел мережі \"%1$s\" не може бути без груп�
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy \"%2$s\"."
 msgstr "Вузол мережі \"%1$s\" моніториться проксі \"%2$s\"."
+
+#: include/classes/api/services/CProxyGroup.php:456
+#, c-format
+msgid "Host \"%1$s\" is monitored by proxy group \"%2$s\"."
+msgstr ""
 
 #: include/actions.inc.php:57
 msgid "Host IP"
@@ -12503,6 +12572,14 @@ msgstr ""
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:2877
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2905
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -13431,8 +13508,16 @@ msgstr "Посередині"
 msgid "Min"
 msgstr "Мін"
 
+#: app/views/popup.proxygroup.edit.php:59
+msgid "Minimum number of proxies"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
+msgstr ""
+
+#: app/views/administration.proxygroup.list.php:81
+msgid "Minimum proxies"
 msgstr ""
 
 #: app/partials/administration.system.info.php:142
@@ -14123,6 +14208,11 @@ msgstr ""
 
 #: app/views/popup.proxy.edit.php:347 app/views/popup.proxy.edit.php:376
 msgid "New proxy"
+msgstr ""
+
+#: app/views/popup.proxygroup.edit.php:127
+#: app/views/popup.proxygroup.edit.php:156
+msgid "New proxy group"
 msgstr ""
 
 #: app/views/administration.regex.list.php:37
@@ -14912,6 +15002,10 @@ msgstr "Кількість елементів даних в черзі, які �
 msgid "Number of monitored hosts"
 msgstr "Кількість вузлів мережі під спостереженням"
 
+#: include/classes/data/CItemData.php:2891
+msgid "Number of online proxies. Returns integer."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Кількість колізій out-of-window. Повертає ціле число"
@@ -15092,6 +15186,12 @@ msgstr "Жовтень"
 msgid "Off"
 msgstr "Вимкн"
 
+#: app/views/administration.proxygroup.list.php:56
+#: app/views/administration.proxygroup.list.php:99
+#: app/views/administration.proxy.list.php:166
+msgid "Offline"
+msgstr ""
+
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
 #: app/views/js/mediatype.test.edit.js.php:103
@@ -15146,6 +15246,16 @@ msgstr "Одна"
 #: include/classes/helpers/CMaintenanceHelper.php:29
 msgid "One time only"
 msgstr "Одноразово"
+
+#: app/views/administration.proxygroup.list.php:54
+#: app/views/administration.proxygroup.list.php:107
+#: app/views/administration.proxy.list.php:170
+msgid "Online"
+msgstr ""
+
+#: app/views/administration.proxygroup.list.php:80
+msgid "Online proxies"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15931,6 +16041,10 @@ msgstr "Відсотки"
 msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2898
+msgid "Percentage of online proxies. Returns float."
+msgstr ""
+
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr ""
@@ -16554,6 +16668,57 @@ msgstr[0] "Проксі видалено"
 msgstr[1] "Проксі видалено"
 msgstr[2] "Проксі видалено"
 
+#: app/controllers/CControllerAuditLogList.php:239
+#: app/partials/configuration.host.edit.html.php:266
+#: app/views/configuration.host.list.php:153
+#: app/views/popup.massupdate.host.php:114 app/views/popup.proxy.edit.php:70
+#: app/views/popup.proxygroup.edit.php:112
+#: include/views/configuration.host.prototype.edit.php:303
+msgid "Proxy group"
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:369
+#, c-format
+msgid "Proxy group \"%1$s\" already exists."
+msgstr ""
+
+#: include/classes/import/importers/CHostImporter.php:348
+#, c-format
+msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:437
+#, c-format
+msgid "Proxy group \"%1$s\" is used by proxy \"%2$s\"."
+msgstr ""
+
+#: app/controllers/CControllerProxyGroupCreate.php:66
+msgid "Proxy group added"
+msgstr ""
+
+#: app/controllers/CControllerProxyGroupDelete.php:70
+msgid "Proxy group deleted"
+msgid_plural "Proxy groups deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerProxyGroupUpdate.php:74
+msgid "Proxy group updated"
+msgstr ""
+
+#: app/controllers/CControllerPopupGeneric.php:227
+#: app/views/administration.proxygroup.list.php:163
+#: app/views/configuration.host.list.php:177
+#: include/classes/helpers/CMenuHelper.php:378
+#: include/classes/helpers/CRoleHelper.php:512
+msgid "Proxy groups"
+msgstr ""
+
+#: app/partials/configuration.host.edit.html.php:334
+msgid "Proxy is not assigned yet."
+msgstr ""
+
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
 msgstr "Режим проксі"
@@ -16785,6 +16950,11 @@ msgstr ""
 #: app/views/reports.auditlog.list.php:95
 #: app/views/reports.auditlog.list.php:109
 msgid "Recordset ID"
+msgstr ""
+
+#: app/views/administration.proxygroup.list.php:57
+#: app/views/administration.proxygroup.list.php:103
+msgid "Recovering"
 msgstr ""
 
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
@@ -19117,6 +19287,10 @@ msgstr "Час запуску Zabbix сервера, Unix timestamp."
 msgid "State"
 msgstr "Стан"
 
+#: include/classes/data/CItemData.php:2912
+msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
+msgstr ""
+
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
 msgstr ""
@@ -19963,6 +20137,12 @@ msgstr "Тема тесту"
 
 #: app/views/administration.script.edit.php:345
 msgid "Test user input"
+msgstr ""
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:152
+#: app/controllers/CControllerPopupItemTestSend.php:256
+#: app/views/popup.itemtestedit.view.php:256
+msgid "Test with"
 msgstr ""
 
 #: app/partials/configuration.filter.items.php:146
