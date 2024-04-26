@@ -47,7 +47,7 @@ endif
 
 all: build
 
-bin/zabbix_agent2:
+bin/zabbix_agent2: FORCE
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
 		$(GO) build \
 		-tags="${AGENT_GOTAGS}" \
@@ -55,7 +55,7 @@ bin/zabbix_agent2:
 		-o bin \
 		zabbix.com/cmd/zabbix_agent2
 
-bin/zabbix_web_service:
+bin/zabbix_web_service: FORCE
 	$(GO) build \
 	-ldflags="${WEBSERVICE_GOLDFLAGS}" \
 	-o bin \
@@ -172,3 +172,18 @@ format:
 	$(GO) fmt ./...
 
 .PHONY: all build check clean clean-go-build clean-sbom format sbom sbom-apps sbom-mod sbom-za2 sbom-zws style
+
+# This is a target to be used as a prerequisite for other targets to force
+# their build. See
+# https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
+#
+# In the case of bin/zabbix_{agent2,web_service} targets, make is unaware of
+# their prerequisites, i.e. source files, as all it does is drive the Go build
+# system.
+#
+# When building either target, and then modifying the source files, any repeat
+# builds of these targets will not execute, as the target already exists.
+# This leads to the subtle issue when iterating in development, where modifying
+# the source and asking to build the `install` target would install the initial
+# executable.
+FORCE:

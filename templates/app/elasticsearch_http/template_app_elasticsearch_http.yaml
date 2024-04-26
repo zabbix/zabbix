@@ -11,10 +11,15 @@ zabbix_export:
         The template to monitor Elasticsearch by Zabbix that work without any external scripts.
         It works with both standalone and cluster instances.
         The metrics are collected in one pass remotely using an HTTP agent.
-        They are getting values from REST API _cluster/health, _cluster/stats, _nodes/stats requests.
-        You can set {$ELASTICSEARCH.USERNAME} and {$ELASTICSEARCH.PASSWORD} macros in the template for using on the host level.
-        If you use an atypical location ES API, don't forget to change the macros {$ELASTICSEARCH.SCHEME},{$ELASTICSEARCH.PORT}.
+        They are getting values from REST API '_cluster/health', '_cluster/stats', '_nodes/stats' requests.
         
+        Setup:
+        
+        1. Set the hostname or IP address of the Elasticsearch host in the '{$ELASTICSEARCH.HOST}' macro.
+        
+        2. Set the login and password in the '{$ELASTICSEARCH.USERNAME}' and '{$ELASTICSEARCH.PASSWORD}' macros.
+        
+        3. If you use an atypical location of ES API, don't forget to change the macros '{$ELASTICSEARCH.SCHEME}','{$ELASTICSEARCH.PORT}'.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch
         
@@ -53,7 +58,7 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns the health status of a cluster.'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s'
           tags:
             - tag: component
               value: raw
@@ -69,7 +74,7 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns cluster statistics.'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/stats'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_cluster/stats'
           tags:
             - tag: component
               value: raw
@@ -476,7 +481,7 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns cluster nodes statistics.'
           timeout: 30s
-          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_nodes/stats'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_nodes/stats'
           tags:
             - tag: component
               value: raw
@@ -515,7 +520,7 @@ zabbix_export:
         - uuid: 671888d47c724e54aca78fbe1b3ecaed
           name: 'ES: Service response time'
           type: SIMPLE
-          key: 'net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]'
+          key: 'net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -525,7 +530,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 2a3f3b96e5dd47de998ccc17f109e149
-              expression: 'min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
               name: 'ES: Service response time is too high'
               event_name: 'ES: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
@@ -533,14 +538,14 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'ES: Service is down'
-                  expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0'
+                  expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: d0d38ce55f844a51a0f2131c86bec1ae
           name: 'ES: Service status'
           type: SIMPLE
-          key: 'net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]'
+          key: 'net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]'
           history: 7d
           description: 'Checks if the service is running and accepting TCP connections.'
           valuemap:
@@ -556,7 +561,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: b4d76f68ce94492f96bbfbb778d1f144
-              expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0'
+              expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"])=0'
               name: 'ES: Service is down'
               priority: AVERAGE
               description: 'The service is unavailable or does not accept TCP connections.'
@@ -1774,7 +1779,7 @@ zabbix_export:
                     host: 'Elasticsearch Cluster by HTTP'
                     key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_nodes/_all/nodes'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_nodes/_all/nodes'
           lld_macro_paths:
             - lld_macro: '{#ES.NODE}'
               path: $..name.first()
@@ -1803,6 +1808,9 @@ zabbix_export:
         - macro: '{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
           value: '85'
           description: 'The maximum percent in the use of JVM heap for warning trigger expression.'
+        - macro: '{$ELASTICSEARCH.HOST}'
+          value: '<SET ELASTICSEARCH HOST>'
+          description: 'The hostname or IP address of the Elasticsearch host.'
         - macro: '{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
           value: '100'
           description: 'Maximum of indexing latency in milliseconds for trigger expression.'

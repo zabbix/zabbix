@@ -20,9 +20,9 @@
 package vmemory
 
 import (
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 	"zabbix.com/pkg/win32"
 )
 

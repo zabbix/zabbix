@@ -25,8 +25,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/itemutil"
@@ -58,7 +58,8 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 		Commands: c.cresults,
 		Session:  u.Session(),
 		Host:     u.Hostname(),
-		Version:  version.Short(),
+		Version:  version.Long(),
+		Variant:  agent.Variant,
 	}
 
 	var data []byte

@@ -25,6 +25,8 @@ class CWidgetFieldPatternSelectItemView extends CWidgetFieldPatternSelectView {
 
 	public function __construct(CWidgetFieldPatternSelectItem $field) {
 		parent::__construct($field);
+
+		$this->setWildcardAllowed();
 	}
 
 	protected function getObjectName(): string {

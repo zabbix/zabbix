@@ -19,7 +19,7 @@
 
 #include "dbconfig_maintenance_test.h"
 
-int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
+int	dc_maintenance_match_tags_test(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_ptr_t *tags)
 {
 	return dc_maintenance_match_tags(maintenance, tags);
 }

@@ -74,14 +74,16 @@ class CVaultCyberArk extends CVault {
 	}
 
 	public function getCredentials(): ?array {
-		$http_context = [
-			'method' => 'GET',
-			'header' => 'Content-Type: application/json',
-			'ignore_errors' => true
+		$context = [
+			'http' => [
+				'method' => 'GET',
+				'header' => 'Content-Type: application/json',
+				'ignore_errors' => true
+			]
 		];
 
 		if ($this->cert_file !== null && $this->key_file !== null) {
-			$http_context['ssl'] = [
+			$context['ssl'] = [
 				'local_cert'		=> $this->cert_file,
 				'local_pk'			=> $this->key_file,
 				'verify_peer'		=> false,
@@ -91,7 +93,7 @@ class CVaultCyberArk extends CVault {
 		}
 
 		$secret = @file_get_contents($this->api_endpoint.'/AIMWebService/api/Accounts?'.$this->db_path, false,
-			stream_context_create(['http' => $http_context])
+			stream_context_create($context)
 		);
 
 		if ($secret === false) {

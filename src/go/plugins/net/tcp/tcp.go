@@ -31,9 +31,9 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"github.com/go-ldap/ldap"
 	"zabbix.com/pkg/web"
 )

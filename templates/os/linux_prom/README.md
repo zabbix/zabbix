@@ -29,7 +29,9 @@ This template has been tested on:
 
 ## Setup
 
-Please refer to the node_exporter docs. Use node_exporter v0.18.0 or above.
+1. Set up the node_exporter according to the [`official documentation`](https://prometheus.io/docs/guides/node-exporter/). Use node_exporter v0.18.0 or above.
+
+2. Set the hostname or IP address of the node_exporter host in the `{$NODE_EXPORTER_HOST}` macro. You can also change the Prometheus endpoint port in the `{$NODE_EXPORTER_PORT}` macro if necessary.
 
 ### Macros used
 
@@ -41,6 +43,7 @@ Please refer to the node_exporter docs. Use node_exporter v0.18.0 or above.
 |{$SYSTEM.FUZZYTIME.MAX}||`60`|
 |{$KERNEL.MAXFILES.MIN}||`256`|
 |{$LOAD_AVG_PER_CPU.MAX.WARN}|<p>Load per CPU considered sustainable. Tune if needed.</p>|`1.5`|
+|{$NODE_EXPORTER_HOST}|<p>The hostname or IP address of the node_exporter host.</p>|`<SET NODE EXPORTER HOST>`|
 |{$NODE_EXPORTER_PORT}|<p>TCP Port node_exporter is listening on.</p>|`9100`|
 |{$SWAP.PFREE.MIN.WARN}||`50`|
 |{$VFS.DEV.READ.AWAIT.WARN}|<p>Disk read average response time (in ms) before the trigger would fire.</p>|`20`|

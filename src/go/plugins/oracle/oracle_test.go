@@ -32,8 +32,8 @@ import (
 	"strings"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 	"github.com/omeid/go-yarn"
 )
 

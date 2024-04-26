@@ -23,7 +23,7 @@
 package netif
 
 import (
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {

@@ -29,7 +29,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/pkg/tls"
 )
 
@@ -40,6 +40,7 @@ const (
 	hostNameListLen  = 2048
 	HostMetadataLen  = 65535 // UTF-8 characters, not bytes
 	HostInterfaceLen = 255   // UTF-8 characters, not bytes
+	Variant          = 2
 )
 
 // CutAfterN returns the whole string s, if it is not longer then n runes (not bytes). Otherwise it returns the

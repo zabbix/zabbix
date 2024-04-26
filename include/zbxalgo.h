@@ -365,7 +365,7 @@ ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)
 ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t)
 ZBX_VECTOR_DECL(dbl, double)
 
-ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
+ZBX_PTR_VECTOR_DECL(tags_ptr, zbx_tag_t*)
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
 
@@ -439,7 +439,7 @@ void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type va
 	if (0 < vector->values_num - before_index)								\
 	{													\
 		memmove(vector->values + before_index + 1, vector->values + before_index,			\
-				(vector->values_num - before_index) * sizeof(__type));				\
+				(size_t)(vector->values_num - before_index) * sizeof(__type));			\
 	}													\
 														\
 	vector->values_num++;											\
