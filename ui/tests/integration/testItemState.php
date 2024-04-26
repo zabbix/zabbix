@@ -294,7 +294,12 @@ class testItemState extends CIntegrationTest {
 			+ self::LOG_LINE_WAIT_TIME;
 		$itemid = self::$items[$scenario['name']]['itemid'];
 
-		// Wait for item to be checked
+		// Wait for first check that happens right after configuration refresh
+		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
+				[',"data":[{"itemid":'.$itemid.',"value":"'], $wait
+		);
+
+		// Wait for first scheduled check
 		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
 				[',"data":[{"itemid":'.$itemid.',"value":"'], $wait
 		);
@@ -316,7 +321,7 @@ class testItemState extends CIntegrationTest {
 				'Unexpected item state='.$response['result'][0]['state'].' (expected='.$state.')'
 		);
 
-		// Verify item checks intervals
+		// Wait for next scheduled check and verify item checks intervals
 		$next_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
 				[',"data":[{"itemid":'.$itemid.',"value":"'], $wait
 		);
