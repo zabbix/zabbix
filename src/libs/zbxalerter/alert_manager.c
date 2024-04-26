@@ -752,6 +752,10 @@ static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediat
 	alert->status = status;
 	alert->retries = retries;
 	alert->nextsend = nextsend;
+	alert->expression = NULL;
+	alert->recovery_expression = NULL;
+	alert->object = object;
+	alert->source = source;
 
 	return alert;
 }

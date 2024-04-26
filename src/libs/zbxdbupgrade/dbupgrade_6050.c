@@ -3845,6 +3845,21 @@ static int	DBpatch_6050283(void)
 
 static int	DBpatch_6050284(void)
 {
+	const zbx_db_field_t	field = {"software_update_checkid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050285(void)
+{
+	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT,
+			ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050286(void)
+{
 	const zbx_db_field_t	field = {"message_format", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("media_type", "content_type", &field);
@@ -4139,5 +4154,7 @@ DBPATCH_ADD(6050281, 0, 1)
 DBPATCH_ADD(6050282, 0, 1)
 DBPATCH_ADD(6050283, 0, 1)
 DBPATCH_ADD(6050284, 0, 1)
+DBPATCH_ADD(6050285, 0, 1)
+DBPATCH_ADD(6050286, 0, 1)
 
 DBPATCH_END()

@@ -58,7 +58,8 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 		Commands: c.cresults,
 		Session:  u.Session(),
 		Host:     u.Hostname(),
-		Version:  version.Short(),
+		Version:  version.Long(),
+		Variant:  agent.Variant,
 	}
 
 	var data []byte
