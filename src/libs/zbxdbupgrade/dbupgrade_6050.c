@@ -3810,7 +3810,6 @@ static int	DBpatch_6050280(void)
 	if (ZBX_DB_OK > zbx_db_execute("update hosts set monitored_by=1 where proxyid is not null"))
 		return FAIL;
 
-
 	return SUCCEED;
 }
 
@@ -3842,6 +3841,21 @@ static int	DBpatch_6050283(void)
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("proxy_group_rtdata", 1, &field);
+}
+
+static int	DBpatch_6050284(void)
+{
+	const zbx_db_field_t	field = {"software_update_checkid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050285(void)
+{
+	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT,
+			ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
 }
 
 #endif
@@ -4132,5 +4146,7 @@ DBPATCH_ADD(6050280, 0, 1)
 DBPATCH_ADD(6050281, 0, 1)
 DBPATCH_ADD(6050282, 0, 1)
 DBPATCH_ADD(6050283, 0, 1)
+DBPATCH_ADD(6050284, 0, 1)
+DBPATCH_ADD(6050285, 0, 1)
 
 DBPATCH_END()
