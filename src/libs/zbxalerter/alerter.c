@@ -162,17 +162,17 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password,
 			*inreplyto, *error = NULL;
 	unsigned short	smtp_port;
-	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
+	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format;
 	int		ret;
 
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &sendto, &subject, &message,
 			&smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer,
-			&smtp_verify_host, &smtp_authentication, &username, &password, &content_type);
+			&smtp_verify_host, &smtp_authentication, &username, &password, &message_format);
 
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
-			content_type, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
+			message_format, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
 
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 

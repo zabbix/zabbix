@@ -341,7 +341,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 		zbx_uint64_t		mediatypeid;
 		unsigned short		smtp_port;
 		unsigned char		smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
-					content_type;
+					message_format;
 		zbx_am_db_mediatype_t	*mediatype;
 
 		if (FAIL == zbx_is_ushort(row[9], &smtp_port))
@@ -358,11 +358,11 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 		ZBX_STR2UCHAR(smtp_authentication, row[13]);
 		maxsessions = atoi(row[14]);
 		maxattempts = atoi(row[15]);
-		ZBX_STR2UCHAR(content_type, row[17]);
+		ZBX_STR2UCHAR(message_format, row[17]);
 
 		mediatype = am_db_update_mediatype(amdb, now, mediatypeid, type,row[2], row[3], row[4], row[5],
 				row[6], row[7], row[8], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-				smtp_authentication, maxsessions, maxattempts, row[16], content_type, row[18], row[19],
+				smtp_authentication, maxsessions, maxattempts, row[16], message_format, row[18], row[19],
 				atoi(row[20]));
 
 		if (NULL != mediatype)
