@@ -48,10 +48,9 @@ type Plugin struct {
 }
 
 type metadata struct {
-	key       string
-	params    []string
-	blob      unsafe.Pointer
-	lastcheck time.Time
+	key    string
+	params []string
+	blob   unsafe.Pointer
 }
 
 func init() {
@@ -91,7 +90,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if meta.Data == nil {
 		data = &metadata{key: key, params: params}
 		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
-		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
+
+		data.blob, err = zbxlib.NewActiveMetric(ctx.ItemID(), key, params, meta.LastLogsize(), meta.Mtime())
+		if err != nil {
 			return nil, err
 		}
 		meta.Data = data
@@ -102,7 +103,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			data.key = key
 			data.params = params
 			// recreate if item key has been changed
-			if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
+			data.blob, err = zbxlib.NewActiveMetric(ctx.ItemID(), key, params, meta.LastLogsize(), meta.Mtime())
+			if err != nil {
 				return nil, err
 			}
 		}
@@ -116,11 +118,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	// with flexible checks there are no guaranteed refresh time,
 	// so using number of seconds elapsed since last check
 	now := time.Now()
-	refresh := zbxlib.GetCheckIntervalSeconds(ctx.ItemID(), ctx.Delay(), now, data.lastcheck)
+	nextcheck := zbxlib.GetNextcheckSeconds(ctx.ItemID(), ctx.Delay(), now)
 	logitem := zbxlib.LogItem{Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
-	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh, grxp.Cblob, ctx.ItemID())
-	data.lastcheck = now
+	zbxlib.ProcessLogCheck(data.blob, &logitem, nextcheck, grxp.Cblob, ctx.ItemID())
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))

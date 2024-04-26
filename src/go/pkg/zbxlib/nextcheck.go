@@ -37,18 +37,14 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
-func GetCheckIntervalSeconds(itemid uint64, delay string, from time.Time, prev time.Time) int {
+func GetNextcheckSeconds(itemid uint64, delay string, from time.Time) int {
 	nextcheck, _, nextcheck_err := GetNextcheck(itemid, delay, from)
 
-	if nextcheck_err == nil {
-		return int((nextcheck.Sub(from) + time.Second/2) / time.Second)
+	if nextcheck_err != nil {
+		return 0
 	}
 
-	if prev.IsZero() {
-		return 1
-	}
-
-	return int((from.Sub(prev) + time.Second/2) / time.Second)
+	return int(nextcheck.Unix())
 }
 
 func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, scheduling bool, err error) {

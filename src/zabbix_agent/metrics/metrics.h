@@ -40,10 +40,10 @@
 
 typedef struct
 {
+	zbx_uint64_t		itemid;
 	char			*key;
-	char			*key_orig;
+	char			*delay;
 	zbx_uint64_t		lastlogsize;
-	int			refresh;
 	int			nextcheck;
 	int			mtime;
 	unsigned char		skip_old_data;	/* for processing [event]log metrics */
