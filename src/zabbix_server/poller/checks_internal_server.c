@@ -28,6 +28,7 @@
 #include "zbxconnector.h"
 #include "zbxproxybuffer.h"
 #include "zbxpgservice.h"
+#include "zbx_host_constants.h"
 
 static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option, AGENT_RESULT *result)
 {
@@ -92,11 +93,11 @@ static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option,
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext_server(const DC_ITEM *item, const char *param1, const AGENT_REQUEST *request,
-	AGENT_RESULT *result)
+int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *param1, const AGENT_REQUEST *request,
+		AGENT_RESULT *result)
 {
 	int		nparams, ret = NOTSUPPORTED;
-	const char	*param2;
+	const char	*param2, *param3;
 
 	nparams = get_rparams_num(request);
 
@@ -143,7 +144,8 @@ int	zbx_get_value_internal_ext_server(const DC_ITEM *item, const char *param1, c
 		else
 		{
 			time_t		value;
-			const char	*param3 = get_rparam(request, 2);
+
+			param3 = get_rparam(request, 2);
 
 			if (0 == strcmp(param3, "lastaccess"))
 			{
@@ -180,7 +182,6 @@ int	zbx_get_value_internal_ext_server(const DC_ITEM *item, const char *param1, c
 	}
 	else if (0 == strcmp(param1, "vcache"))
 	{
-		const char	*param3;
 		zbx_vc_stats_t	stats;
 
 		if (FAIL == zbx_vc_get_statistics(&stats))
@@ -314,8 +315,6 @@ int	zbx_get_value_internal_ext_server(const DC_ITEM *item, const char *param1, c
 	else if (0 == strcmp(param1, "vps"))
 	{
 		zbx_vps_monitor_stats_t	stats;
-		const char		*param3;
-
 		zbx_vps_monitor_get_stats(&stats);
 
 		param2 = get_rparam(request, 1);
@@ -394,7 +393,6 @@ int	zbx_get_value_internal_ext_server(const DC_ITEM *item, const char *param1, c
 	{							/* zabbix["proxy","discovery"]                        */
 		char		*error = NULL;
 		zbx_pg_stats_t	stats;
-		const char	*param3;
 
 		/* this item is always processed by server */
 
@@ -454,7 +452,7 @@ int	zbx_get_value_internal_ext_server(const DC_ITEM *item, const char *param1, c
 				goto out;
 			}
 
-			SET_UI64_RESULT(result, DCget_item_count(item->host.hostid));
+			SET_UI64_RESULT(result, zbx_dc_get_item_count(item->host.hostid));
 		}
 		else if (0 == strcmp(param3, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
 		{
@@ -465,7 +463,7 @@ int	zbx_get_value_internal_ext_server(const DC_ITEM *item, const char *param1, c
 				goto out;
 			}
 
-			SET_UI64_RESULT(result, DCget_item_unsupported_count(item->host.hostid));
+			SET_UI64_RESULT(result, zbx_dc_get_item_unsupported_count(item->host.hostid));
 		}
 		else
 		{
