@@ -649,7 +649,7 @@ void	zbx_dc_set_proxy_failover_delay(const char *failover_delay)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set proxy last online timestmap in configuration cache            *
+ * Purpose: set proxy last online timestamp in configuration cache            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_set_proxy_lastonline(int lastonline)
