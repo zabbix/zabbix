@@ -32,47 +32,47 @@ class CConditionHelperTest extends TestCase {
 			// and
 			[
 				[
-					1 => 'condition1'
+					1 => ['type' => 'type1']
 				],
 				CONDITION_EVAL_TYPE_AND, '{1}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition2',
-					3 => 'condition3'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type2'],
+					3 => ['type' => 'type3']
 				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2} and {3}'
 			],
 			// same conditions shouldn't have parentheses
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1']
 				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1',
-					3 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1'],
+					3 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_AND, '({1} and {2}) and {3}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1',
-					3 => 'condition2',
-					4 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1'],
+					3 => ['type' => 'type2'],
+					4 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_AND, '({1} and {2}) and ({3} and {4})'
 			],
@@ -80,47 +80,47 @@ class CConditionHelperTest extends TestCase {
 			// or
 			[
 				[
-					1 => 'condition1'
+					1 => ['type' => 'type1']
 				],
 				CONDITION_EVAL_TYPE_OR, '{1}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition2',
-					3 => 'condition3'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type2'],
+					3 => ['type' => 'type3']
 				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2} or {3}'
 			],
 			// same conditions shouldn't have parentheses
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1']
 				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1',
-					3 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1'],
+					3 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_OR, '({1} or {2}) or {3}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1',
-					3 => 'condition2',
-					4 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1'],
+					3 => ['type' => 'type2'],
+					4 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_OR, '({1} or {2}) or ({3} or {4})'
 			],
@@ -128,47 +128,47 @@ class CConditionHelperTest extends TestCase {
 			// and/or
 			[
 				[
-					1 => 'condition1'
+					1 => ['type' => 'type1']
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} and {2}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition2',
-					3 => 'condition3'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type2'],
+					3 => ['type' => 'type3']
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} and {2} and {3}'
 			],
 			// same conditions shouldn't have parentheses
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1']
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} or {2}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1',
-					3 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1'],
+					3 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '({1} or {2}) and {3}'
 			],
 			[
 				[
-					1 => 'condition1',
-					2 => 'condition1',
-					3 => 'condition2',
-					4 => 'condition2'
+					1 => ['type' => 'type1'],
+					2 => ['type' => 'type1'],
+					3 => ['type' => 'type2'],
+					4 => ['type' => 'type2']
 				],
 				CONDITION_EVAL_TYPE_AND_OR, '({1} or {2}) and ({3} or {4})'
 			]
@@ -183,31 +183,32 @@ class CConditionHelperTest extends TestCase {
 	 * @param $expectedFormula
 	 */
 	public function testGetFormula(array $conditions, $evaltype, $expectedFormula) {
-		$formula = CConditionHelper::getFormula($conditions, $evaltype);
+		$formula = CConditionHelper::getEvalFormula($conditions, 'type', $evaltype);
 
 		$this->assertSame($expectedFormula, $formula);
 	}
 
-	public function dataProviderGetFormulaIds() {
+	public function dataProviderAddFormulaIds() {
 		return [
 			['', []],
-			['1', [1 => 'A']],
-			['1 and 2', [1 => 'A', 2 => 'B']],
-			['1 and 2 and 1', [1 => 'A', 2 => 'B']],
-			['(1 and 2) and 3', [1 => 'A', 2 => 'B', 3 => 'C']]
+			['1', [1 => ['formulaid' => 'A']]],
+			['1 and 2', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B']]],
+			['1 and 2 and 1', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B']]],
+			['(1 and 2) and 3', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B'], 3 => ['formulaid' => 'C']]]
 		];
 	}
 
 	/**
-	 * @dataProvider dataProviderGetFormulaIds
+	 * @dataProvider dataProviderAddFormulaIds
 	 *
 	 * @param $formula
 	 * @param array $expectedIds
 	 */
-	public function testGetFormulaIds($formula, array $expectedIds) {
-		$ids = CConditionHelper::getFormulaIds($formula);
+	public function testAddFormulaIds($formula, array $expected_conditions) {
+		$conditions = [];
+		CConditionHelper::addFormulaIds($conditions, $formula);
 
-		$this->assertSame($ids, $expectedIds);
+		$this->assertSame($expected_conditions, $conditions);
 	}
 
 	public function dataProviderReplaceNumericIds() {
@@ -216,16 +217,16 @@ class CConditionHelperTest extends TestCase {
 				'', [], ''
 			],
 			[
-				'{1}', [1 => 'A'], 'A'
+				'{1}', [1 => ['formulaid' => 'A']], 'A'
 			],
 			[
-				'{1} and {2}', [1 => 'A', 2 => 'B'], 'A and B'
+				'{1} and {2}', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B']], 'A and B'
 			],
 			[
-				'{1} and {2} or {3}', [1 => 'A', 2 => 'B', '3' => 'C'], 'A and B or C'
+				'{1} and {2} or {3}', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B'], '3' => ['formulaid' => 'C']], 'A and B or C'
 			],
 			[
-				'{1} and {2} or {1}', [1 => 'A', 2 => 'B'], 'A and B or A'
+				'{1} and {2} or {1}', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B']], 'A and B or A'
 			]
 		];
 	}
@@ -233,50 +234,50 @@ class CConditionHelperTest extends TestCase {
 	/**
 	 * @dataProvider dataProviderReplaceNumericIds
 	 *
-	 * @param $formula
-	 * @param array $ids
-	 * @param $expectedFormula
+	 * @param string $formula
+	 * @param array  $conditions
+	 * @param string $expected_formula
 	 */
-	public function testReplaceNumericIds($formula, array $ids, $expectedFormula) {
-		$generatedFormula = CConditionHelper::replaceNumericIds($formula, $ids);
+	public function testReplaceConditionIds(string $formula, array $conditions, string $expected_formula): void {
+		CConditionHelper::replaceConditionIds($formula, $conditions);
 
-		$this->assertSame($expectedFormula, $generatedFormula);
+		$this->assertSame($expected_formula, $formula);
 	}
 
-	public function dataProviderReplaceLetterIds() {
+	public function dataProviderReplaceFormulaIds() {
 		return [
 			[
 				'', [], ''
 			],
 			[
-				'A', ['A' => 1], '{1}'
+				'A', [1 => ['formulaid' => 'A']], '{1}'
 			],
 			[
-				'A and B', ['A' => 1, 'B' => 2], '{1} and {2}'
+				'A and B', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B']], '{1} and {2}'
 			],
 			[
-				'A and B or C', ['A' => 1, 'B' => 2, 'C' => 3], '{1} and {2} or {3}'
+				'A and B or C', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B'], 3 => ['formulaid' => 'C']], '{1} and {2} or {3}'
 			],
 			[
-				'A and B or A', ['A' => 1, 'B' => 2], '{1} and {2} or {1}'
+				'A and B or A', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B']], '{1} and {2} or {1}'
 			],
 			[
-				'A and (B or AA)', ['A' => 1, 'B' => 2, 'AA' => 3], '{1} and ({2} or {3})'
+				'A and (B or AA)', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B'], 3 => ['formulaid' => 'AA']], '{1} and ({2} or {3})'
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider dataProviderReplaceLetterIds
+	 * @dataProvider dataProviderReplaceFormulaIds
 	 *
 	 * @param $formula
-	 * @param array $ids
+	 * @param array $conditions
 	 * @param $expectedFormula
 	 */
-	public function testReplaceLetterIds($formula, array $ids, $expectedFormula) {
-		$generatedFormula = CConditionHelper::replaceLetterIds($formula, $ids);
+	public function testReplaceFormulaIds($formula, array $conditions, $expectedFormula) {
+		CConditionHelper::replaceFormulaIds($formula, $conditions);
 
-		$this->assertSame($expectedFormula, $generatedFormula);
+		$this->assertSame($expectedFormula, $formula);
 	}
 
 	/**
@@ -328,15 +329,14 @@ class CConditionHelperTest extends TestCase {
 	 *
 	 * @dataProvider dataProviderSortConditionsByFormula
 	 *
-	 * @param array $filter
-	 * @param array $expected_conditions
+	 * @param string $formula
+	 * @param array  $condtions
+	 * @param array  $expected_conditions
 	 */
-	public function testSortConditionsByFormula(array $filter, array $expected_conditions): void {
-		$sorted_conditions = CConditionHelper::sortConditionsByFormula($filter['conditions'], $filter['formula'],
-			'conditionid'
-		);
+	public function testSortConditionsByFormula($formula, array $conditions, array $expected_conditions): void {
+		CConditionHelper::sortConditionsByFormula($conditions, $formula);
 
-		$this->assertSame($expected_conditions, $sorted_conditions);
+		$this->assertSame($expected_conditions, $conditions);
 	}
 
 	/**
@@ -347,156 +347,144 @@ class CConditionHelperTest extends TestCase {
 	public function dataProviderSortConditionsByFormula(): array {
 		return [
 			[
+				'{102} or {101}',
 				[
-					'formula' => '{102} or {101}',
-					'conditions' => [
-						['conditionid' => '101'],
-						['conditionid' => '102']
-					]
+					101 => ['type' => '1'],
+					102 => ['type' => '2']
 				],
 				[
-					['conditionid' => '102'],
-					['conditionid' => '101']
+					102 => ['type' => '2'],
+					101 => ['type' => '1']
 				]
 			],
 			[
+				'{101} or {102} or {101}',
 				[
-					'formula' => '{101} or {102} or {101}',
-					'conditions' => [
-						['conditionid' => '102'],
-						['conditionid' => '101']
-					]
+					102 => ['type' => '2'],
+					101 => ['type' => '1']
 				],
 				[
-					['conditionid' => '101'],
-					['conditionid' => '102']
+					101 => ['type' => '1'],
+					102 => ['type' => '2']
 				]
 			],
 			[
+				'{101} and {102} and {103}',
 				[
-					'formula' => '{101} and {102} and {103}',
-					'conditions' => [
-						['conditionid' => '101'],
-						['conditionid' => '102'],
-						['conditionid' => '103']
-					]
+					101 => ['type' => '1'],
+					102 => ['type' => '2'],
+					103 => ['type' => '3']
 				],
 				[
-					['conditionid' => '101'],
-					['conditionid' => '102'],
-					['conditionid' => '103']
+					101 => ['type' => '1'],
+					102 => ['type' => '2'],
+					103 => ['type' => '3']
 				]
 			],
 			[
+				'{103} and {102} and {101}',
 				[
-					'formula' => '{103} and {102} and {101}',
-					'conditions' => [
-						['conditionid' => '101'],
-						['conditionid' => '102'],
-						['conditionid' => '103']
-					]
+					101 => ['type' => '1'],
+					102 => ['type' => '2'],
+					103 => ['type' => '3']
 				],
 				[
-					['conditionid' => '103'],
-					['conditionid' => '102'],
-					['conditionid' => '101']
+					103 => ['type' => '3'],
+					102 => ['type' => '2'],
+					101 => ['type' => '1']
 				]
 			],
 			[
+				'({104} or {105} or {106}) and ({103} or {101} or {102}) and ({107} and {108})',
 				[
-					'formula' => '({104} or {105} or {106}) and ({103} or {101} or {102}) and ({107} and {108})',
-					'conditions' => [
-						['conditionid' => '101'],
-						['conditionid' => '102'],
-						['conditionid' => '103'],
-						['conditionid' => '104'],
-						['conditionid' => '105'],
-						['conditionid' => '106'],
-						['conditionid' => '107'],
-						['conditionid' => '108']
-					]
+					101 => ['type' => '1'],
+					102 => ['type' => '2'],
+					103 => ['type' => '3'],
+					104 => ['type' => '4'],
+					105 => ['type' => '5'],
+					106 => ['type' => '6'],
+					107 => ['type' => '7'],
+					108 => ['type' => '8']
 				],
 				[
-					['conditionid' => '104'],
-					['conditionid' => '105'],
-					['conditionid' => '106'],
-					['conditionid' => '103'],
-					['conditionid' => '101'],
-					['conditionid' => '102'],
-					['conditionid' => '107'],
-					['conditionid' => '108']
+					104 => ['type' => '4'],
+					105 => ['type' => '5'],
+					106 => ['type' => '6'],
+					103 => ['type' => '3'],
+					101 => ['type' => '1'],
+					102 => ['type' => '2'],
+					107 => ['type' => '7'],
+					108 => ['type' => '8']
 				]
 			],
 			[
+				'({107} or {104} or {102} or {105} or {103} or {108} or {101} or {106} or {109} or '.
+					'{110} or {115}) and ({127} or {120} or {123} or {126} or {117} or {113} or {125} or {124} or '.
+					'{111} or {121} or {122} or {119} or {129} or {116} or {118} or {112} or {114}) or ({128} and '.
+					'{130})',
 				[
-					'formula' => '({107} or {104} or {102} or {105} or {103} or {108} or {101} or {106} or {109} or '.
-						'{110} or {115}) and ({127} or {120} or {123} or {126} or {117} or {113} or {125} or {124} or '.
-						'{111} or {121} or {122} or {119} or {129} or {116} or {118} or {112} or {114}) or ({128} and '.
-						'{130})',
-					'conditions' => [
-						['conditionid' => '101'],
-						['conditionid' => '102'],
-						['conditionid' => '103'],
-						['conditionid' => '104'],
-						['conditionid' => '105'],
-						['conditionid' => '106'],
-						['conditionid' => '107'],
-						['conditionid' => '108'],
-						['conditionid' => '109'],
-						['conditionid' => '110'],
-						['conditionid' => '111'],
-						['conditionid' => '112'],
-						['conditionid' => '113'],
-						['conditionid' => '114'],
-						['conditionid' => '115'],
-						['conditionid' => '116'],
-						['conditionid' => '117'],
-						['conditionid' => '118'],
-						['conditionid' => '119'],
-						['conditionid' => '120'],
-						['conditionid' => '121'],
-						['conditionid' => '122'],
-						['conditionid' => '123'],
-						['conditionid' => '124'],
-						['conditionid' => '125'],
-						['conditionid' => '126'],
-						['conditionid' => '127'],
-						['conditionid' => '128'],
-						['conditionid' => '129'],
-						['conditionid' => '130']
-					]
+					101 => ['type' => '1'],
+					102 => ['type' => '2'],
+					103 => ['type' => '3'],
+					104 => ['type' => '4'],
+					105 => ['type' => '5'],
+					106 => ['type' => '6'],
+					107 => ['type' => '7'],
+					108 => ['type' => '8'],
+					109 => ['type' => '9'],
+					110 => ['type' => '10'],
+					111 => ['type' => '11'],
+					112 => ['type' => '12'],
+					113 => ['type' => '13'],
+					114 => ['type' => '14'],
+					115 => ['type' => '15'],
+					116 => ['type' => '16'],
+					117 => ['type' => '17'],
+					118 => ['type' => '18'],
+					119 => ['type' => '19'],
+					120 => ['type' => '20'],
+					121 => ['type' => '21'],
+					122 => ['type' => '22'],
+					123 => ['type' => '23'],
+					124 => ['type' => '24'],
+					125 => ['type' => '25'],
+					126 => ['type' => '26'],
+					127 => ['type' => '27'],
+					128 => ['type' => '28'],
+					129 => ['type' => '29'],
+					130 => ['type' => '30']
 				],
 				[
-					['conditionid' => '107'],
-					['conditionid' => '104'],
-					['conditionid' => '102'],
-					['conditionid' => '105'],
-					['conditionid' => '103'],
-					['conditionid' => '108'],
-					['conditionid' => '101'],
-					['conditionid' => '106'],
-					['conditionid' => '109'],
-					['conditionid' => '110'],
-					['conditionid' => '115'],
-					['conditionid' => '127'],
-					['conditionid' => '120'],
-					['conditionid' => '123'],
-					['conditionid' => '126'],
-					['conditionid' => '117'],
-					['conditionid' => '113'],
-					['conditionid' => '125'],
-					['conditionid' => '124'],
-					['conditionid' => '111'],
-					['conditionid' => '121'],
-					['conditionid' => '122'],
-					['conditionid' => '119'],
-					['conditionid' => '129'],
-					['conditionid' => '116'],
-					['conditionid' => '118'],
-					['conditionid' => '112'],
-					['conditionid' => '114'],
-					['conditionid' => '128'],
-					['conditionid' => '130']
+					107 => ['type' => '7'],
+					104 => ['type' => '4'],
+					102 => ['type' => '2'],
+					105 => ['type' => '5'],
+					103 => ['type' => '3'],
+					108 => ['type' => '8'],
+					101 => ['type' => '1'],
+					106 => ['type' => '6'],
+					109 => ['type' => '9'],
+					110 => ['type' => '10'],
+					115 => ['type' => '15'],
+					127 => ['type' => '27'],
+					120 => ['type' => '20'],
+					123 => ['type' => '23'],
+					126 => ['type' => '26'],
+					117 => ['type' => '17'],
+					113 => ['type' => '13'],
+					125 => ['type' => '25'],
+					124 => ['type' => '24'],
+					111 => ['type' => '11'],
+					121 => ['type' => '21'],
+					122 => ['type' => '22'],
+					119 => ['type' => '19'],
+					129 => ['type' => '29'],
+					116 => ['type' => '16'],
+					118 => ['type' => '18'],
+					112 => ['type' => '12'],
+					114 => ['type' => '14'],
+					128 => ['type' => '28'],
+					130 => ['type' => '30']
 				]
 			]
 		];
