@@ -1564,22 +1564,22 @@ class testFormLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-//			[
-//				[
-//					'fields' => [
-//						'Name' => 'Multiline Script LLD',
-//						'Type' => 'Script',
-//						'Key' => 'script_check[2]',
-//						'Script' => "const = 'Hello World!';".
-//								"\nlet favePhrase = const;".
-//								"\nconsole.log(favePhrase);"
-//					],
-//					'Parameters' => [
-//						['Name' => 'param_1', 'Value' => 'value_1'],
-//						['Name' => 'param_2', 'Value' => 'value_2']
-//					]
-//				]
-//			]
+			[
+				[
+					'fields' => [
+						'Name' => 'Multiline Script LLD',
+						'Type' => 'Script',
+						'Key' => 'script_check[2]',
+						'Script' => "const = 'Hello World!';".
+								"\r\nlet favePhrase = const;".
+								"\r\nnconsole.log(favePhrase);"
+					],
+					'Parameters' => [
+						['Name' => 'param_1', 'Value' => 'value_1'],
+						['Name' => 'param_2', 'Value' => 'value_2']
+					]
+				]
+			]
 		];
 	}
 
