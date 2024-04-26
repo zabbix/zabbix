@@ -492,7 +492,7 @@ class CUserGroup extends CApiService {
 				));
 			}
 
-			if ($db_users[$userid]['userdirectoryid'] != 0) {
+			if ($db_user_groups === null && $db_users[$userid]['userdirectoryid'] != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i1 + 1).'/users/'.($i2 + 1).'/userid',
 					_s('cannot update readonly parameter "%1$s" of provisioned user', 'usrgrps')
