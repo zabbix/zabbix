@@ -643,12 +643,12 @@ static int	zbx_pre_persistent_compare_func(const void *d1, const void *d2)
 /******************************************************************************
  *                                                                            *
  * Purpose: Searches preparation vector to find element with the specified    *
- *          key. If not found then creates the element.                       *
+ *          itemid. If not found then creates the element.                    *
  *                                                                            *
  * Parameters:                                                                *
  *    prep_vec             - [IN/OUT] preparation vector for persistent data  *
  *                                files                                       *
- *    itemid               - [IN] log*[]                                      *
+ *    itemid               - [IN]                                             *
  *    persistent_file_name - [IN] file name for copying into new element      *
  *                                                                            *
  ******************************************************************************/
@@ -669,7 +669,7 @@ int	zbx_find_or_create_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, z
 		zbx_vector_pre_persistent_append(prep_vec, prep_element);
 		prep_vec_idx = prep_vec->values_num - 1;
 
-		/* fill in 'key_orig' and 'persistent_file_name' values - they never change for the specified */
+		/* fill in 'itemid' and 'persistent_file_name' values - they never change for the specified */
 		/* log*[] item (otherwise it is not the same item anymore) */
 		prep_vec->values[prep_vec_idx].itemid = itemid;
 		prep_vec->values[prep_vec_idx].persistent_file_name = zbx_strdup(NULL, persistent_file_name);
@@ -678,8 +678,10 @@ int	zbx_find_or_create_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, z
 				__func__, itemid, prep_vec_idx);
 	}
 	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): itemid:" ZBX_FS_UI64 " found element %d",
 				__func__, itemid, prep_vec_idx);
+	}
 
 	return prep_vec_idx;
 }
