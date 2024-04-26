@@ -882,7 +882,7 @@ out:
  *              history - [IN] the history data vector (may have mixed value types) *
  *                                                                                  *
  ************************************************************************************/
-static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history,
+static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_history_ptr_t *history,
 		int config_history_storage_pipelines)
 {
 	zbx_elastic_data_t	*data = hist->data.elastic_data;
@@ -910,7 +910,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (zbx_dc_history_t *)history->values[i];
+		h = history->values[i];
 
 		if (hist->value_type != h->value_type)
 			continue;

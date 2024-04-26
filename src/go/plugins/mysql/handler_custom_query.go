@@ -23,7 +23,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 // customQueryHandler executes custom user queries

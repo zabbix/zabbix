@@ -20,8 +20,8 @@
 package zabbixasync
 
 import (
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/pkg/zbxlib"
 )
 

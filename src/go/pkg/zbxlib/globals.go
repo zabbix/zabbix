@@ -45,7 +45,7 @@ void	init_globals(void)
 import "C"
 
 import (
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (

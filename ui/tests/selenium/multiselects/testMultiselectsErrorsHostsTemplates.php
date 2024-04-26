@@ -54,7 +54,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 					'checked_multiselects' => [
 						['Host groups' => 'Host groups'],
 						['Templates' => 'Templates', 'Template group' => 'Template groups'],
-						['Proxy' => 'Proxies']
+						['Proxies' => 'Proxies']
 					],
 					// Fill this filter to enable 'Proxy' multiselect.
 					'filter' => ['Monitored by' => 'Proxy'],

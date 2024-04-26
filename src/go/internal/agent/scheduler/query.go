@@ -25,7 +25,7 @@ import (
 	"sort"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/plugins/external"
 )
 

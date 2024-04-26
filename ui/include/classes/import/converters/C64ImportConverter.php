@@ -92,6 +92,10 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertHosts(array $hosts): array {
 		foreach ($hosts as &$host) {
+			if (array_key_exists('proxy', $host)) {
+				$host['monitored_by'] = CXmlConstantName::PROXY;
+			}
+
 			if (array_key_exists('items', $host)) {
 				$host['items'] = self::convertItems($host['items']);
 			}

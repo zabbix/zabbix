@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/uri"
+	"golang.zabbix.com/sdk/uri"
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
 )

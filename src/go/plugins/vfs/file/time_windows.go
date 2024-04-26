@@ -29,7 +29,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 	"golang.org/x/sys/windows"
 )
 

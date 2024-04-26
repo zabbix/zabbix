@@ -22,9 +22,10 @@ package dns
 import (
 	"errors"
 	"fmt"
-	"github.com/miekg/dns"
 	"reflect"
 	"testing"
+
+	"github.com/miekg/dns"
 )
 
 func Test_dnsGetOptions_setFlags(t *testing.T) {

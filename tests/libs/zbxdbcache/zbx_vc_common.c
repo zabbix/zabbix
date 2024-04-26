@@ -92,8 +92,8 @@ void	zbx_vc_common_test_func(
 
 	if (NULL != add_values_cb)
 	{
-		int			ret_flush, config_history_storage_pipelines = 0;
-		zbx_vector_ptr_t	history;
+		int				ret_flush, config_history_storage_pipelines = 0;
+		zbx_vector_dc_history_ptr_t	history;
 
 		add_values_cb(&handle, &history, &err, &data, &ret_flush, config_history_storage_pipelines);
 	}

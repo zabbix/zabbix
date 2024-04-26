@@ -23,6 +23,13 @@
 #include "zbxserialize.h"
 #include "zbxalgo.h"
 
+ZBX_PTR_VECTOR_IMPL(connector_stat_ptr, zbx_connector_stat_t *)
+
+void     connector_stat_free(zbx_connector_stat_t *connector_stat)
+{
+	zbx_free(connector_stat);
+}
+
 static int	connector_initialized;
 
 #define CONNECTOR_INITIALIZED_YES	1
@@ -208,7 +215,7 @@ void	zbx_connector_unpack_top_request(int *limit, const unsigned char *data)
  *             data            - [IN] memory buffer for packed data           *
  *                                                                            *
  ******************************************************************************/
-static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const unsigned char *data)
+static void	connector_unpack_top_result(zbx_vector_connector_stat_ptr_t *connector_stats, const unsigned char *data)
 {
 	int	i, connectors_num;
 
@@ -216,7 +223,7 @@ static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const
 
 	if (0 != connectors_num)
 	{
-		zbx_vector_ptr_reserve(connector_stats, (size_t)connectors_num);
+		zbx_vector_connector_stat_ptr_reserve(connector_stats, (size_t)connectors_num);
 
 		for (i = 0; i < connectors_num; i++)
 		{
@@ -227,7 +234,7 @@ static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const
 			data += zbx_deserialize_value(data, &connector_stat->values_num);
 			data += zbx_deserialize_value(data, &connector_stat->links_num);
 			data += zbx_deserialize_value(data, &connector_stat->queued_links_num);
-			zbx_vector_ptr_append(connector_stats, connector_stat);
+			zbx_vector_connector_stat_ptr_append(connector_stats, connector_stat);
 		}
 	}
 }
@@ -237,7 +244,8 @@ static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const
  * Purpose: get the top N connectors by the number of queued values           *
  *                                                                            *
  ******************************************************************************/
-static int	connector_get_top_items(int limit, zbx_vector_ptr_t *items, char **error, zbx_uint32_t code)
+static int	connector_get_top_items(int limit, zbx_vector_connector_stat_ptr_t *items, char **error,
+		zbx_uint32_t code)
 {
 	int		ret;
 	unsigned char	*data, *result;
@@ -272,7 +280,7 @@ out:
  * Purpose: get the top N connectors by the number of queued values           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_connector_get_top_connectors(int limit, zbx_vector_ptr_t *items, char **error)
+int	zbx_connector_get_top_connectors(int limit, zbx_vector_connector_stat_ptr_t *items, char **error)
 {
 	return connector_get_top_items(limit, items, error, ZBX_IPC_CONNECTOR_TOP_CONNECTORS);
 }

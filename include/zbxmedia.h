@@ -26,6 +26,10 @@
 #define ZBX_MEDIA_MESSAGE_FORMAT_HTML	1
 #define ZBX_MEDIA_MESSAGE_FORMAT_MULTI	2	/* multipart/mixed message with pre-formatted message body */
 
+/* SMTP authentication options */
+#define SMTP_AUTHENTICATION_NONE		0
+#define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
+
 typedef struct
 {
 	char		*addr;
