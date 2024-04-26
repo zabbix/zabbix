@@ -23,10 +23,9 @@
 package swap
 
 import (
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/pkg/win32"
-
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 func init() {

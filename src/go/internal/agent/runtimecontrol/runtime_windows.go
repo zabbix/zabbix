@@ -26,8 +26,8 @@ import (
 	"os"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
 	"github.com/Microsoft/go-winio"
+	"golang.zabbix.com/sdk/log"
 )
 
 func New(path string, timeout time.Duration) (conn *Conn, err error) {

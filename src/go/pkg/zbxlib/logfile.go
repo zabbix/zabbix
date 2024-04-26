@@ -279,7 +279,7 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/tls"

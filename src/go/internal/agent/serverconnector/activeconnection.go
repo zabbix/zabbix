@@ -31,7 +31,7 @@ import (
 )
 
 type activeConnection struct {
-	addresses []string
+	address   zbxcomms.AddressSet
 	hostname  string
 	localAddr net.Addr
 	tlsConfig *tls.Config
@@ -42,8 +42,8 @@ type activeConnection struct {
 func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []error) {
 	upload := true
 
-	b, errs, _ := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, time.Second*time.Duration(c.timeout),
-		data, c.tlsConfig)
+	b, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr, timeout,
+		time.Second*time.Duration(c.timeout), data, c.tlsConfig)
 	if errs != nil {
 		return upload, errs
 	}
@@ -71,7 +71,7 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []er
 }
 
 func (c *activeConnection) Addr() (s string) {
-	return c.addresses[0]
+	return c.address.Get()
 }
 
 func (c *activeConnection) Session() (s string) {

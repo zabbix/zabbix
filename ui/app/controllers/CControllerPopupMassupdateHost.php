@@ -35,7 +35,9 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			'templates' => 'array',
 			'inventories' => 'array',
 			'description' => 'string',
+			'monitored_by' => 'in '.implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]),
 			'proxyid' => 'string',
+			'proxy_groupid' => 'string',
 			'ipmi_username' => 'string',
 			'ipmi_password' => 'string',
 			'tls_issuer' => 'string',
@@ -195,14 +197,23 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 				}
 
-				$properties = ['description', 'proxyid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-					'ipmi_password'
-				];
+				$properties = ['description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'];
 
 				$new_values = [];
 				foreach ($properties as $property) {
 					if (array_key_exists($property, $visible)) {
 						$new_values[$property] = $this->getInput($property);
+					}
+				}
+
+				if (array_key_exists('monitored_by', $visible)) {
+					$new_values['monitored_by'] = $this->getInput('monitored_by', ZBX_MONITORED_BY_SERVER);
+
+					if ($new_values['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+						$new_values['proxyid'] = $this->getInput('proxyid', 0);
+					}
+					elseif ($new_values['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+						$new_values['proxy_groupid'] = $this->getInput('proxy_groupid', 0);
 					}
 				}
 
@@ -542,11 +553,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					->setArgument('page', CPagerHelper::loadPage('host.list'))
 					->getUrl()
 			];
-
-			$data['proxies'] = API::Proxy()->get([
-				'output' => ['proxyid', 'name'],
-				'sortfield' => 'name'
-			]);
 
 			$data['discovered_host'] = !(bool) API::Host()->get([
 				'output' => [],

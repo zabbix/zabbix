@@ -24,7 +24,8 @@
  */
 
 $form = (new CForm())
-	->setId('preprocessing-test-form');
+	->setId('preprocessing-test-form')
+	->setName('preprocessing_test_form');
 
 if ($data['show_prev']) {
 	$form
@@ -48,7 +49,8 @@ foreach ($data['inputs']['host'] as $name => $value) {
 	if ($name === 'proxyid') {
 		continue;
 	}
-	elseif ($name === 'interface') {
+
+	if ($name === 'interface') {
 		// SNMPv3 additional details about interface.
 		if (array_key_exists('useip', $value)) {
 			$form->addVar('interface[useip]', $value['useip']);
@@ -251,20 +253,36 @@ if ($data['is_item_testable']) {
 	}
 
 	$form_grid->addItem([
-		(new CLabel(_('Proxy'), 'label-proxy-hostid'))->addClass('js-proxy-hostid-row'),
-		(new CFormField(
-			(new CSelect('proxyid'))
+		(new CLabel(_('Test with'), 'test_with'))->addClass('js-test-with-row'),
+		(new CFormField([
+			(new CRadioButtonList('test_with', (int) $data['test_with']))
+				->addValue(_('Server'), CControllerPopupItemTest::TEST_WITH_SERVER)
+				->addValue(_('Proxy'), CControllerPopupItemTest::TEST_WITH_PROXY)
 				->setReadonly(!$data['proxies_enabled'])
-				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
-				->setFocusableElementId('label-proxy-hostid')
-				->setValue(
-					array_key_exists('proxyid', $data['inputs']['host']) ? $data['inputs']['host']['proxyid'] : 0
-				)
-				->setId('proxyid')
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		))
+				->setModern(),
+			(new CDiv(
+				(new CMultiSelect([
+					'name' => 'proxyid',
+					'object_name' => 'proxies',
+					'multiple' => false,
+					'data' => $data['ms_proxy'],
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'proxies',
+							'srcfld1' => 'proxyid',
+							'srcfld2' => 'name',
+							'dstfrm' => $form->getName(),
+							'dstfld1' => 'proxyid'
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			))
+				->addClass('js-test-with-proxy')
+				->addStyle($data['test_with'] == CControllerPopupItemTest::TEST_WITH_SERVER ? 'display: none;' : '')
+				->addStyle('margin-top: 5px;')
+		]))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-			->addClass('js-proxy-hostid-row'),
+			->addClass('js-test-with-row'),
 
 		(new CFormField(
 			(new CSimpleButton(_('Get value')))
@@ -433,7 +451,7 @@ $form->addItem([
 		]))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->addClass('item-test-result')
-		),
+	),
 	(new CTemplateTag('preprocessing-step-action-done'))->addItem(
 		(new CDiv([
 			'#{action_name} ',

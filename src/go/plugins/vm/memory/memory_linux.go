@@ -22,7 +22,7 @@ package memory
 import (
 	"errors"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 	"zabbix.com/pkg/procfs"
 )
 

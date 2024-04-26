@@ -27,8 +27,8 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"github.com/google/go-cmp/cmp"
 	"zabbix.com/plugins/smart/mock"
 )

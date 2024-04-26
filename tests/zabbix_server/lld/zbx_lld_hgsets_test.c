@@ -105,6 +105,7 @@ void	zbx_mock_test_entry(void **state)
 		host = (zbx_lld_host_t *)zbx_malloc(NULL, sizeof(zbx_lld_host_t));
 
 		host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
+		host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_IDLE;
 		zbx_vector_uint64_create(&host->old_groupids);
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->groupids);
