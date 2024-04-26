@@ -130,7 +130,13 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 
 	zbx_hashset_create(&cache->hostmap_updates, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	pthread_mutex_init(&cache->lock, NULL);
+	int	err;
+
+	if (0 != (err = pthread_mutex_init(&cache->lock, NULL)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize proxy group manager cache mutext: %s", zbx_strerror(err));
+		exit(EXIT_FAILURE);
+	}
 
 	cache->startup_time = (int)time(NULL);
 	cache->hostmap_revision = map_revision;
