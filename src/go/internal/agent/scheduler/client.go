@@ -27,8 +27,8 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/zbxlib"
@@ -51,8 +51,9 @@ type pluginInfo struct {
 // client represents source of items (metrics) to be queried.
 // Each server for active checks is represented by a separate client.
 // There is a predefined clients to handle:
-//    all single passive checks (client id 1)
-//    all internal checks (resolving HostnameItem, HostMetadataItem, HostInterfaceItem) (client id 0)
+//
+//	all single passive checks (client id 1)
+//	all internal checks (resolving HostnameItem, HostMetadataItem, HostInterfaceItem) (client id 0)
 type client struct {
 	// Client id. Predefined clients have ids < 100, while clients active checks servers (ServerActive)
 	// have auto incrementing id starting with 100.

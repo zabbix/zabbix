@@ -29,7 +29,7 @@ import (
 	"net"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 	"zabbix.com/pkg/tls"
 )
 
