@@ -392,8 +392,8 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 	*data = zbx_malloc(0, data_alloc);
 	alerter_serialize_mediatype(data, &data_alloc, &data_offset, mediatypeid, type, smtp_server, smtp_helo,
 			smtp_email, exec_path, gsm_modem, username, passwd, smtp_port, smtp_security, smtp_verify_peer,
-			smtp_verify_host, smtp_authentication, maxsessions, maxattempts, attempt_interval, message_format,
-			script, timeout);
+			smtp_verify_host, smtp_authentication, maxsessions, maxattempts, attempt_interval,
+			message_format, script, timeout);
 
 	zbx_serialize_prepare_str(data_len, sendto);
 	zbx_serialize_prepare_str(data_len, subject);
@@ -427,7 +427,8 @@ void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t 
 
 	data += alerter_deserialize_mediatype(data, mediatypeid, type, smtp_server, smtp_helo, smtp_email, exec_path,
 			gsm_modem, username, passwd, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-			smtp_authentication, maxsessions, maxattempts, attempt_interval, message_format, script, timeout);
+			smtp_authentication, maxsessions, maxattempts, attempt_interval, message_format, script,
+			timeout);
 
 	data += zbx_deserialize_str(data, sendto, len);
 	data += zbx_deserialize_str(data, subject, len);
@@ -1115,14 +1116,14 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, zbx_db_med
  *                                                                            *
  * Purpose: begin data dispatch                                               *
  *                                                                            *
- * Parameters: dispatch       - [IN]                                          *
- *             subject        - [IN]                                          *
- *             message        - [IN]                                          *
- *             content_name   - [IN]                                          *
- *             content_type - [IN]                                          *
- *             content        - [IN] additional content to dispatch           *
- *             content_size   - [IN] additional content size                  *
- *             error          - [OUT]                                         *
+ * Parameters: dispatch     - [IN]                                            *
+ *             subject      - [IN]                                            *
+ *             message      - [IN]                                            *
+ *             content_name - [IN]                                            *
+ *             content_type - [IN]                                            *
+ *             content      - [IN] additional content to dispatch             *
+ *             content_size - [IN] additional content size                    *
+ *             error          [OUT]                                           *
  *                                                                            *
  * Return value: SUCCEED - the dispatch was started successfully              *
  *               FAIL    - otherwise                                          *
