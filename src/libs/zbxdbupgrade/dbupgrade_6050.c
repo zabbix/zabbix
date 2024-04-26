@@ -3810,7 +3810,6 @@ static int	DBpatch_6050280(void)
 	if (ZBX_DB_OK > zbx_db_execute("update hosts set monitored_by=1 where proxyid is not null"))
 		return FAIL;
 
-
 	return SUCCEED;
 }
 
