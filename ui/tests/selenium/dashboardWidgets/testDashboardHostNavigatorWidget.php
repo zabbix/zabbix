@@ -143,10 +143,10 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 		]);
 		self::$groupids = CDataHelper::getIds('name');
 
-		// Create hosts and trapper items for host navigator form and data test.
+		// Create hosts.
 		CDataHelper::createHosts([
 			[
-				'host' => 'Host with host navigator trapper item',
+				'host' => 'First host for host navigator widget',
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -159,18 +159,10 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				],
 				'groups' => [
 					'groupid' => self::$groupids['First Group for Host navigator check']
-				],
-				'items' => [
-					[
-						'name' => 'Host navigator trapper',
-						'key_' => 'navigatortrap',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					]
 				]
 			],
 			[
-				'host' => 'Host with host navigator trapper item2',
+				'host' => 'Second host for host navigator widget',
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -183,38 +175,6 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				],
 				'groups' => [
 					'groupid' => self::$groupids['Second Group for Host navigator check']
-				],
-				'items' => [
-					[
-						'name' => 'Host navigator trapper2',
-						'key_' => 'navigatortrap',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					]
-				]
-			],
-			[
-				'host' => 'Host navigator',
-				'interfaces' => [
-					[
-						'type' => INTERFACE_TYPE_AGENT,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.7.3',
-						'dns' => '',
-						'port' => '10099'
-					]
-				],
-				'groups' => [
-					'groupid' => self::$groupids['First Group for Host navigator check']
-				],
-				'items' => [
-					[
-						'name' => 'Host navigator trapper3',
-						'key_' => 'navigatortrap',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					]
 				]
 			]
 		]);
@@ -500,7 +460,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					'fields' => [
 						'Hosts' => [
 							'ЗАББИКС Сервер',
-							'Host with host navigator trapper'
+							'First host for host navigator widget'
 						],
 						'Refresh interval' => '1 minute'
 					]
@@ -614,8 +574,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 							'First Group for Host navigator check'
 						],
 						'Hosts' => [
-							'ЗАББИКС Сервер',
-							'Host with host navigator trapper'
+							'First host for host navigator widget',
+							'Second host for host navigator widget'
 						],
 						'Host status' => 'Enabled',
 						'Host tags' => 'Or',
