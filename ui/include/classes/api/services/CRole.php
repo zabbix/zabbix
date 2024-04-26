@@ -459,10 +459,14 @@ class CRole extends CApiService {
 		}
 
 		$ui_rules = [];
+		$db_ui_rules = ($db_rules === null ? [] : $db_rules) + ['ui' => []];
+		$db_ui_rules = array_column($db_ui_rules['ui'], 'status', 'name');
 
 		foreach (CRoleHelper::getUiElementsByUserType($type) as $ui_element) {
 			$ui_rule_name = substr($ui_element, strlen('ui.'));
-			$ui_rules[$ui_rule_name] = $default_access == ZBX_ROLE_RULE_ENABLED;
+			$ui_rules[$ui_rule_name] = array_key_exists($ui_rule_name, $db_ui_rules)
+				? $db_ui_rules[$ui_rule_name]
+				: $default_access;
 		}
 
 		foreach ($rules['ui'] as $ui_rule) {
@@ -472,10 +476,10 @@ class CRole extends CApiService {
 				);
 			}
 
-			$ui_rules[$ui_rule['name']] = $ui_rule['status'] == ZBX_ROLE_RULE_ENABLED;
+			$ui_rules[$ui_rule['name']] = $ui_rule['status'];
 		}
 
-		if (!in_array(true, $ui_rules)) {
+		if (!in_array(ZBX_ROLE_RULE_ENABLED, $ui_rules)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('At least one UI element must be enabled for user role "%1$s".', $name)
 			);
