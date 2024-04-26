@@ -27,11 +27,11 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/zbxflag"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/zbxflag"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/scheduler"

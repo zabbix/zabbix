@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "service_manager.h"
+#include "service_server.h"
+
 #include "../server_constants.h"
 
 #include "zbxlog.h"
@@ -133,8 +134,8 @@ zbx_service_manager_t;
 
 static void	event_free(zbx_event_t *event)
 {
-	zbx_vector_tags_clear_ext(&event->tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&event->tags);
+	zbx_vector_tags_ptr_clear_ext(&event->tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&event->tags);
 	zbx_free(event);
 }
 
@@ -275,7 +276,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			event->severity = atoi(row[2]);
 			event->mtime = 0;
 			event->suppressed = 0;
-			zbx_vector_tags_create(&event->tags);
+			zbx_vector_tags_ptr_create(&event->tags);
 			zbx_hashset_insert(problem_events, &event, sizeof(zbx_event_t *));
 		}
 
@@ -286,7 +287,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
-			zbx_vector_tags_append(&event->tags, tag);
+			zbx_vector_tags_ptr_append(&event->tags, tag);
 		}
 	}
 	zbx_db_free_result(result);
@@ -2871,7 +2872,7 @@ static void	process_problem_tags(zbx_vector_events_ptr_t *events, zbx_service_ma
 		}
 
 		for (int j = 0; j < event->tags.values_num; j++)
-			zbx_vector_tags_append(&(*ptr)->tags, event->tags.values[j]);
+			zbx_vector_tags_ptr_append(&(*ptr)->tags, event->tags.values[j]);
 
 		event->tags.values_num = 0;
 		event_free(event);

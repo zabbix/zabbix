@@ -27,9 +27,9 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
 	"zabbix.com/internal/agent/resultcache"

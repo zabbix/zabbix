@@ -3643,17 +3643,220 @@ static int	DBpatch_6050256(void)
 
 static int	DBpatch_6050257(void)
 {
+	const zbx_db_table_t	table = {"proxy_group", "proxy_groupid", 0,
+			{
+				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"failover_delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"min_online", "1", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050258(void)
+{
+	return DBcreate_changelog_insert_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050259(void)
+{
+	return DBcreate_changelog_update_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050260(void)
+{
+	return DBcreate_changelog_delete_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050261(void)
+{
+	const zbx_db_table_t	table = {"host_proxy", "hostproxyid", 0,
+			{
+				{"hostproxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"revision", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0},
+				{"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050262(void)
+{
+	return DBcreate_index("host_proxy", "host_proxy_1", "hostid", 1);
+}
+
+static int	DBpatch_6050263(void)
+{
+	return DBcreate_index("host_proxy", "host_proxy_2", "proxyid", 0);
+}
+
+static int	DBpatch_6050264(void)
+{
+	return DBcreate_index("host_proxy", "host_proxy_3", "revision", 0);
+}
+
+static int	DBpatch_6050265(void)
+{
+	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("host_proxy", 1, &field);
+}
+
+static int	DBpatch_6050266(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("host_proxy", 2, &field);
+}
+
+static int	DBpatch_6050267(void)
+{
+	return DBcreate_changelog_insert_trigger("host_proxy", "hostproxyid");
+}
+
+static int	DBpatch_6050268(void)
+{
+	return DBcreate_changelog_update_trigger("host_proxy", "hostproxyid");
+}
+
+static int	DBpatch_6050269(void)
+{
+	return DBcreate_changelog_delete_trigger("host_proxy", "hostproxyid");
+}
+
+static int	DBpatch_6050270(void)
+{
+	const zbx_db_field_t	field = {"local_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050271(void)
+{
+	const zbx_db_field_t	field = {"local_port", "10051", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050272(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050273(void)
+{
+	return DBcreate_index("proxy", "proxy_2", "proxy_groupid", 0);
+}
+
+static int	DBpatch_6050274(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("proxy", 1, &field);
+}
+
+static int	DBpatch_6050275(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6050276(void)
+{
+	return DBcreate_index("hosts", "hosts_8", "proxy_groupid", 0);
+}
+
+static int	DBpatch_6050277(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("hosts", 4, &field);
+}
+
+static int	DBpatch_6050278(void)
+{
+	const zbx_db_field_t	field = {"monitored_by", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6050279(void)
+{
+	const zbx_db_field_t	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_rtdata", &field);
+}
+
+static int	DBpatch_6050280(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update hosts set monitored_by=1 where proxyid is not null"))
+		return FAIL;
+
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050281(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.hosts.filter_monitored_by'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050282(void)
+{
+	const zbx_db_table_t	table = {"proxy_group_rtdata", "proxy_groupid", 0,
+			{
+				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050283(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("proxy_group_rtdata", 1, &field);
+}
+
+static int	DBpatch_6050284(void)
+{
 	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("media", &field);
 }
 
-static int	DBpatch_6050258(void)
+static int	DBpatch_6050285(void)
 {
 	return DBcreate_index("media", "media_3", "userdirectory_mediaid", 0);
 }
 
-static int	DBpatch_6050259(void)
+static int	DBpatch_6050286(void)
 {
 	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, "userdirectory_media", "userdirectory_mediaid",
 			0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -3661,28 +3864,28 @@ static int	DBpatch_6050259(void)
 	return DBadd_foreign_key("media", 3, &field);
 }
 
-static int	DBpatch_6050260(void)
+static int	DBpatch_6050287(void)
 {
 	const zbx_db_field_t	field = {"active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050261(void)
+static int	DBpatch_6050288(void)
 {
 	const zbx_db_field_t	field = {"severity", "63", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050262(void)
+static int	DBpatch_6050289(void)
 {
 	const zbx_db_field_t	field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050263(void)
+static int	DBpatch_6050290(void)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -4039,5 +4242,32 @@ DBPATCH_ADD(6050260, 0, 1)
 DBPATCH_ADD(6050261, 0, 1)
 DBPATCH_ADD(6050262, 0, 1)
 DBPATCH_ADD(6050263, 0, 1)
+DBPATCH_ADD(6050264, 0, 1)
+DBPATCH_ADD(6050265, 0, 1)
+DBPATCH_ADD(6050266, 0, 1)
+DBPATCH_ADD(6050267, 0, 1)
+DBPATCH_ADD(6050268, 0, 1)
+DBPATCH_ADD(6050269, 0, 1)
+DBPATCH_ADD(6050270, 0, 1)
+DBPATCH_ADD(6050271, 0, 1)
+DBPATCH_ADD(6050272, 0, 1)
+DBPATCH_ADD(6050273, 0, 1)
+DBPATCH_ADD(6050274, 0, 1)
+DBPATCH_ADD(6050275, 0, 1)
+DBPATCH_ADD(6050276, 0, 1)
+DBPATCH_ADD(6050277, 0, 1)
+DBPATCH_ADD(6050278, 0, 1)
+DBPATCH_ADD(6050279, 0, 1)
+DBPATCH_ADD(6050280, 0, 1)
+DBPATCH_ADD(6050281, 0, 1)
+DBPATCH_ADD(6050282, 0, 1)
+DBPATCH_ADD(6050283, 0, 1)
+DBPATCH_ADD(6050284, 0, 1)
+DBPATCH_ADD(6050285, 0, 1)
+DBPATCH_ADD(6050286, 0, 1)
+DBPATCH_ADD(6050287, 0, 1)
+DBPATCH_ADD(6050288, 0, 1)
+DBPATCH_ADD(6050289, 0, 1)
+DBPATCH_ADD(6050290, 0, 1)
 
 DBPATCH_END()

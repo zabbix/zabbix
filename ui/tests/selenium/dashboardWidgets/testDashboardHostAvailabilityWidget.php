@@ -108,10 +108,10 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Include hosts in maintenance' => true
 					],
 					'expected_values' => [
-						'Total' => '8',
+						'Total' => '7',
 						'Available' => '2',
 						'Not available' => '2',
-						'Unknown' => '4',
+						'Unknown' => '3',
 						'Mixed' => '0'
 					]
 				]
@@ -127,10 +127,10 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Layout' => 'Vertical'
 					],
 					'expected_values' => [
-						'Total' => '6',
+						'Total' => '5',
 						'Available' => '1',
 						'Not available' => '1',
-						'Unknown' => '4',
+						'Unknown' => '3',
 						'Mixed' => '0'
 					]
 				]
@@ -145,10 +145,10 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Interface type' => 'JMX'
 					],
 					'expected_values' => [
-						'Total' => '7',
+						'Total' => '5',
 						'Available' => '1',
 						'Not available' => '1',
-						'Unknown' => '5',
+						'Unknown' => '3',
 						'Mixed' => '0'
 					]
 				]
@@ -180,29 +180,29 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 							'Available' => '2',
 							'Not available' => '2',
 							'Mixed' => '0',
-							'Unknown' => '5',
-							'Total' => '9'
+							'Unknown' => '3',
+							'Total' => '7'
 						],
 						'SNMP' => [
 							'Available' => '2',
 							'Not available' => '2',
 							'Mixed' => '0',
-							'Unknown' => '4',
-							'Total' => '8'
+							'Unknown' => '3',
+							'Total' => '7'
 						],
 						'JMX' => [
 							'Available' => '2',
 							'Not available' => '2',
 							'Mixed' => '0',
-							'Unknown' => '5',
-							'Total' => '9'
+							'Unknown' => '3',
+							'Total' => '7'
 						],
 						'IPMI' => [
 							'Available' => '2',
 							'Not available' => '2',
 							'Mixed' => '0',
-							'Unknown' => '4',
-							'Total' => '8'
+							'Unknown' => '3',
+							'Total' => '7'
 						]
 					]
 				]
@@ -237,16 +237,16 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 							'IPMI' => '0'
 						],
 						'Unknown' => [
-							'Total Hosts' => '5',
-							'SNMP' => '4',
-							'JMX' => '5',
-							'IPMI' => '4'
+							'Total Hosts' => '3',
+							'SNMP' => '3',
+							'JMX' => '3',
+							'IPMI' => '3'
 						],
 						'Total' => [
-							'Total Hosts' => '7',
-							'SNMP' => '6',
-							'JMX' => '7',
-							'IPMI' => '6'
+							'Total Hosts' => '5',
+							'SNMP' => '5',
+							'JMX' => '5',
+							'IPMI' => '5'
 						]
 					]
 				]
@@ -381,11 +381,11 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 						'Interface type' => 'JMX'
 					],
 					'expected_values' => [
-						'Total' => '7',
+						'Total' => '5',
 						'Available' => '1',
 						'Mixed' => '0',
 						'Not available' => '1',
-						'Unknown' => '5'
+						'Unknown' => '3'
 					]
 				]
 			],

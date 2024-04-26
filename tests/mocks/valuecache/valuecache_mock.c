@@ -418,7 +418,7 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
  *             history - [OUT] the history records                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *history)
+void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_dc_history_ptr_t *history)
 {
 	zbx_mock_handle_t	hitem, hdata;
 	zbx_mock_error_t	err;
@@ -444,7 +444,7 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *histo
 		hdata = zbx_mock_get_object_member_handle(hitem, "data");
 		zbx_vcmock_read_history_value(hdata, data->value_type, &data->value, &data->ts);
 
-		zbx_vector_ptr_append(history, data);
+		zbx_vector_dc_history_ptr_append(history, data);
 	}
 }
 
@@ -453,10 +453,8 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *histo
  * Purpose: frees zbx_dc_history_t structure                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_free_dc_history(void *ptr)
+void	zbx_vcmock_free_dc_history(zbx_dc_history_t *h)
 {
-	zbx_dc_history_t	*h = (zbx_dc_history_t *)ptr;
-
 	switch (h->value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:

@@ -38,9 +38,9 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/pkg/procfs"
 )
 

@@ -706,7 +706,6 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		}
 
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		// Trim leading and trailing spaces from expected results if necessary.
 		if (array_key_exists('trim', $data)) {
@@ -730,12 +729,17 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
-			$dashboard->save();
-			$this->page->waitUntilReady();
+			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check widgets count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+			// Check new widget update interval.
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
+				? 'No refresh'
+				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
+			$this->assertEquals($refresh, $widget->getRefreshInterval());
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -746,17 +750,9 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				$this->assertTags($data['tags']);
 			}
 
-			$saved_form->submit();
-			COverlayDialogElement::ensureNotPresent();
-			$dashboard->save();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
-				? 'No refresh'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
-			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			// Close widget window and cancel editing the dashboard.
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->cancelEditing();
 		}
 	}
 

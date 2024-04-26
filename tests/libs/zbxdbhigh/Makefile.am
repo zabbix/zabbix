@@ -68,7 +68,6 @@ if SERVER
 SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
-	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \

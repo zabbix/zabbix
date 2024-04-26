@@ -49,6 +49,13 @@
  * In low memory mode a warning message is written into log every 5 minutes.
  */
 
+ZBX_PTR_VECTOR_IMPL(vc_item_stats_ptr, zbx_vc_item_stats_t *)
+
+void	zbx_vc_item_stats_free(zbx_vc_item_stats_t * vc_item_stats)
+{
+	zbx_free(vc_item_stats);
+}
+
 /* the period of low memory warning messages */
 #define ZBX_VC_LOW_MEMORY_WARNING_PERIOD	(5 * SEC_PER_MIN)
 
@@ -2511,7 +2518,7 @@ void	zbx_vc_reset(void)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
+int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
 {
 	zbx_vc_item_t		*item;
 	int			i;
@@ -2527,7 +2534,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush, int config_hist
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (zbx_dc_history_t *)history->values[i];
+		h = history->values[i];
 
 		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
 
@@ -2802,7 +2809,7 @@ void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem)
  * Purpose: get statistics of cached items                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
+void	zbx_vc_get_item_stats(zbx_vector_vc_item_stats_ptr_t *stats)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vc_item_t		*item;
@@ -2813,7 +2820,7 @@ void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
 
 	RDLOCK_CACHE;
 
-	zbx_vector_ptr_reserve(stats, (size_t)vc_cache->items.num_data);
+	zbx_vector_vc_item_stats_ptr_reserve(stats, (size_t)vc_cache->items.num_data);
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
@@ -2822,7 +2829,7 @@ void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
 		item_stats->itemid = item->itemid;
 		item_stats->values_num = item->values_total;
 		item_stats->hourly_num = item->last_hourly_num;
-		zbx_vector_ptr_append(stats, item_stats);
+		zbx_vector_vc_item_stats_ptr_append(stats, item_stats);
 	}
 
 	UNLOCK_CACHE;
