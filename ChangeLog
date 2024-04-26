@@ -1,8 +1,29 @@
 Changes for 7.0.0rc1
 
 New features:
+....I...S. [ZBXNEXT-9108] added server side software update check functionality (dgoloscapov)
+........S. [ZBXNEXT-7930] added user macros support for username and password fields in email media type (asestakovs)
+...G...... [ZBXNEXT-9132] updated Zabbix agent to be fully compatibile with Zabix agent 2 active checks protocol (wiper)
+A.FG...PS. [ZBXNEXT-8758] added proxy load balancing and HA (agriscenko, wiper)
+.........T [ZBXNEXT-9098] added AWS ELB Network Load Balancer by HTTP template (egordymov)
+.........T [ZBXNEXT-6864] replaced {HOST.CONN} with user macros in templates (drasikhov)
 
 Bug fixes:
+.....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
+.......PS. [ZBX-24282] fixed Zabbix proxy to report error for not supported items (sboidenko)
+..F....... [ZBX-24376] fixed resolving of macros for item testing (jfreibergs)
+.........T [ZBX-19990] separated LLD filter macros in Apache Tomcat by JMX template (drasikhov)
+.........T [ZBX-24364] added preprocessing steps for LLD rules in RabbitMQ templates (egordymov)
+..F....... [ZBX-24001] fixed SSL certificate usage in CyberArk Vault (vmurzins)
+.........T [ZBX-24368] Improved PostgreSQL autovacuum's count query (abrosimovs)
+........S. [ZBX-19507] fixed vmware.eventlog item to recover after event keys are reset (asestakovs)
+.......PS. [ZBX-24154] fixed building Zabbix with Net-SNMP library in custom location (sboidenko)
+........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
+.........T [ZBX-24275] fixed item prototypes JSONPath preprocessing, added missing volumes health metric and triggers in HPE MSA templates (drasikhov)
+.........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
+..F....... [ZBX-24314] fixed Honeycomb widget item pattern selector to allow wildcard selectors (ddauksa)
+.......PS. [ZBX-24354] fixed item status flapping (vso)
+........S. [ZBX-24363] fixed proxyid being ignored in item test (kprutkovs)
 ....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
 
 --------------------------------------------------------------------------------
