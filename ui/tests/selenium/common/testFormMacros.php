@@ -1927,9 +1927,24 @@ abstract class testFormMacros extends CLegacyWebTest {
 			],
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO3}',
+						'value' => [
+							'text' => 'path:key',
+							'type' => 'Vault secret'
+						],
+						'description' => 'vault description4'
+					],
+					'title' => ucfirst($this->vault_object).' updated',
+					'vault' => 'Hashicorp'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'macro_fields' => [
+						'macro' => '{$VAULT_MACRO4}',
 						'value' => [
 							'text' => 'secret/path:',
 							'type' => 'Vault secret'
@@ -1945,7 +1960,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO4}',
+						'macro' => '{$VAULT_MACRO5}',
 						'value' => [
 							'text' => '/path:key',
 							'type' => 'Vault secret'
@@ -1961,22 +1976,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'macro_fields' => [
-						'macro' => '{$VAULT_MACRO5}',
-						'value' => [
-							'text' => 'path:key',
-							'type' => 'Vault secret'
-						],
-						'description' => 'vault description4'
-					],
-					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path:key".',
-					'vault' => 'Hashicorp'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'macro_fields' => [
 						'macro' => '{$VAULT_MACRO6}',
 						'value' => [
 							'text' => ':key',
@@ -1985,7 +1984,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description5'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":key".',
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "key".',
 					'vault' => 'Hashicorp'
 				]
 			],
@@ -2386,12 +2385,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 				'index' => 0,
 				'macro' => '{$VAULT}',
 				'value' => [
-					'text' => 'AppID=zabbix:key',
+					'text' => 'AppID=zabbix:key/keys',
 					'type' => 'Vault secret'
 				],
 				'description' => 'CyberArk vault description'
 			],
-			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "AppID=zabbix:key".'
+			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "keys".'
 		];
 
 		$hashicorp = [

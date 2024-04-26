@@ -903,12 +903,12 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 				[
 				'macro' => '{$VAULT}',
 				'value' => [
-					'text' => 'AppID=zabbix:key',
+					'text' => 'AppID=zabbix:key/keys',
 					'type' => 'Vault secret'
 				],
 				'description' => 'CyberArk vault description'
 			],
-			'error' => 'Invalid parameter "/1/value": incorrect syntax near "AppID=zabbix:key".'
+			'error' => 'Invalid parameter "/1/value": incorrect syntax near "keys".'
 		];
 		$hashicorp = [
 			'fields' =>
