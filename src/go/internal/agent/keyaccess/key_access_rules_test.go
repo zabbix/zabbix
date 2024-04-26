@@ -24,7 +24,7 @@ package keyaccess
 import (
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/conf"
+	"golang.zabbix.com/sdk/conf"
 	"zabbix.com/pkg/itemutil"
 )
 

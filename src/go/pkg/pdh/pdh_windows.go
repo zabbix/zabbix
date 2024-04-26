@@ -25,10 +25,9 @@ import (
 	"syscall"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/pkg/win32"
-
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/sdk/log"
+	"zabbix.com/pkg/win32"
 )
 
 var ObjectsNames map[string]string

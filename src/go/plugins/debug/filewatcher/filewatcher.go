@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"os"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"github.com/fsnotify/fsnotify"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/watch"

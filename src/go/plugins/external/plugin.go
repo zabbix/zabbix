@@ -28,8 +28,8 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/plugin/comms"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/comms"
 )
 
 var startLock sync.Mutex

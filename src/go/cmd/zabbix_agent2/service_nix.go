@@ -25,7 +25,7 @@ package main
 import (
 	"errors"
 
-	"git.zabbix.com/ap/plugin-support/zbxflag"
+	"golang.zabbix.com/sdk/zbxflag"
 )
 
 const usageMessageExampleConfPath = `/etc/zabbix/zabbix_agent2.conf`

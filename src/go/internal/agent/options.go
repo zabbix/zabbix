@@ -29,7 +29,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/pkg/tls"
 )
 
