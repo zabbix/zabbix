@@ -90,7 +90,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Health Check 3.8.10+ discovery
 
@@ -108,7 +108,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Exchanges discovery|<p>The metrics for an individual exchange.</p>|Dependent item|rabbitmq.exchanges.discovery|
+|Exchanges discovery|<p>The metrics for an individual exchange.</p>|Dependent item|rabbitmq.exchanges.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Exchanges discovery
 
@@ -190,7 +190,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |RabbitMQ: Service ping||Simple check|net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|RabbitMQ: Get node overview|<p>The HTTP API endpoint that returns cluster-wide metrics.</p>|HTTP agent|rabbitmq.get_node_overview|
+|RabbitMQ: Get node overview|<p>The HTTP API endpoint that returns cluster-wide metrics.</p>|HTTP agent|rabbitmq.get_node_overview<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |RabbitMQ: Get nodes|<p>The HTTP API endpoint that returns metrics of the nodes.</p>|HTTP agent|rabbitmq.get_nodes|
 |RabbitMQ: Get queues|<p>The HTTP API endpoint that returns metrics of the queues metrics.</p>|HTTP agent|rabbitmq.get_queues|
 |RabbitMQ: Management plugin version|<p>The version of the management plugin in use.</p>|Dependent item|rabbitmq.node.overview.management_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
@@ -228,7 +228,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Health Check 3.8.10+ discovery|<p>Specific metrics for the versions: up to and including 3.8.10.</p>|Dependent item|rabbitmq.healthcheck.v3810.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Health Check 3.8.10+ discovery
 
@@ -236,9 +236,9 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 |----|-----------|----|-----------------------|
 |RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON}|<p>It responds with a status code `200 OK` if there are no alarms in effect in the cluster.</p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|HTTP agent|rabbitmq.healthcheck.local_alarms[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON}|<p>It checks the expiration date on the certificates for every listener configured to use the Transport Layer Security (TLS).</p><p>It responds with a status code `200 OK` if all the certificates are valid (have not expired).</p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|HTTP agent|rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}|<p>It responds with It responds with a status code `200 OK` if all virtual hosts are running on the target node. </p><p>Otherwise it responds with a status code `503 Service Unavailable`.</p>|HTTP agent|rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}|<p>It checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down).</p><p>It responds with a status code `200 OK` if there are no such classic mirrored queues. </p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|HTTP agent|rabbitmq.healthcheck.mirror_sync[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON}|<p>It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). </p><p>It responds with a status code `200 OK` if there are no such quorum queues. </p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|HTTP agent|rabbitmq.healthcheck.quorum[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}|<p>It responds with It responds with a status code `200 OK` if all virtual hosts are running on the target node.</p><p>Otherwise it responds with a status code `503 Service Unavailable`.</p>|HTTP agent|rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}|<p>It checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down).</p><p>It responds with a status code `200 OK` if there are no such classic mirrored queues.</p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|HTTP agent|rabbitmq.healthcheck.mirror_sync[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON}|<p>It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down).</p><p>It responds with a status code `200 OK` if there are no such quorum queues.</p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|HTTP agent|rabbitmq.healthcheck.quorum[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Health Check 3.8.10+ discovery
 
@@ -254,7 +254,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Health Check 3.8.9- discovery|<p>Specific metrics for the versions: up to and including 3.8.4.</p>|Dependent item|rabbitmq.healthcheck.v389.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Health Check 3.8.9- discovery|<p>Specific metrics for the versions: up to and including 3.8.4.</p>|Dependent item|rabbitmq.healthcheck.v389.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.management_version`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Health Check 3.8.9- discovery
 
@@ -272,14 +272,14 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Queues discovery|<p>The metrics for an individual queue.</p>|Dependent item|rabbitmq.queues.discovery|
+|Queues discovery|<p>The metrics for an individual queue.</p>|Dependent item|rabbitmq.queues.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Queues discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Get data|<p>The HTTP API endpoint that returns [{#VHOST}][{#QUEUE}] queue metrics</p>|Dependent item|rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name == "{#QUEUE}" && @.vhost == "{#VHOST}")].first()`</p></li></ul>|
-|RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages|<p>The count of total messages in the queue.</p>|Dependent item|rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.messages`</p></li></ul>|
+|RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages total|<p>The count of total messages in the queue.</p>|Dependent item|rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.messages`</p></li></ul>|
 |RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages per second|<p>The count of total messages per second in the queue.</p>|Dependent item|rabbitmq.queue.messages.rate["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.messages_details.rate`</p></li></ul>|
 |RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Consumers|<p>The number of consumers.</p>|Dependent item|rabbitmq.queue.consumers["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.consumers`</p></li></ul>|
 |RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Memory|<p>The bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures.</p>|Dependent item|rabbitmq.queue.memory["{#VHOST}/{#QUEUE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.memory`</p></li></ul>|
