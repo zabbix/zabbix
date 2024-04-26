@@ -465,8 +465,11 @@ class CUserGroup extends CApiService {
 			}
 
 			foreach ($user_group['users'] as $i2 => $user) {
-				if ($db_user_groups === null
-						|| !array_key_exists($user['userid'], $db_user_groups[$user_group['usrgrpid']]['users'])) {
+				$db_userids = $db_user_groups !== null
+					? array_column($db_user_groups[$user_group['usrgrpid']]['users'], 'userid')
+					: [];
+
+				if (!in_array($user['userid'], $db_userids)) {
 					$user_indexes[$user['userid']][$i1] = $i2;
 				}
 			}
@@ -492,7 +495,7 @@ class CUserGroup extends CApiService {
 				));
 			}
 
-			if ($db_user_groups === null && $db_users[$userid]['userdirectoryid'] != 0) {
+			if ($db_users[$userid]['userdirectoryid'] != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i1 + 1).'/users/'.($i2 + 1).'/userid',
 					_s('cannot update readonly parameter "%1$s" of provisioned user', 'usrgrps')
