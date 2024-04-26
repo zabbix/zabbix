@@ -1000,7 +1000,7 @@ class CSetupWizard extends CForm {
 			$vault_config['VAULT_CERT_FILE'] = $this->getConfig('DB_VAULT_CERT_FILE');
 			$vault_config['VAULT_KEY_FILE'] = $this->getConfig('DB_VAULT_KEY_FILE');
 
-			$vault_provider = new CVaultCyberArk($vault_config['VAULT_URL'], $vault_config['VAULT_DB_PATH'],
+			$vault_provider = new CVaultCyberArk($vault_config['VAULT_URL'], $vault_config['VAULT_PREFIX'],
 				$vault_config['VAULT_DB_PATH'], $vault_config['VAULT_CERT_FILE'], $vault_config['VAULT_KEY_FILE']
 			);
 
