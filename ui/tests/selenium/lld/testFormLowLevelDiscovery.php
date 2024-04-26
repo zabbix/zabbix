@@ -680,8 +680,14 @@ class testFormLowLevelDiscovery extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
+	/**
+	 * These cases are for LLD form check as well as Macros and Filters tabs.
+	 * Preprocessing and Overrides tabs are checked in separate test files:
+	 * testFormLowLevelDiscoveryOverrides and testFormPreprocessingLowLevelDiscovery.
+	 */
 	public static function getLLDData() {
 		return [
+			// Main Discovery rule tab.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1764,6 +1770,365 @@ class testFormLowLevelDiscovery extends CWebTest {
 						['Name' => 'param_2', 'Value' => 'value_2']
 					]
 				]
+			],
+			// LLD Macros tab.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Macro with empty path',
+						'Key' => 'macro-with-empty-path',
+						'Type' => 'Zabbix agent'
+					],
+					'LLD macros' => [
+						['LLD macro' => '{#MACRO}', 'JSONPath' => '']
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Macro without #',
+						'Key' => 'macro-without-hash',
+						'Type' => 'Zabbix agent'
+					],
+					'LLD macros' => [
+						['LLD macro' => '{MACRO}', 'JSONPath' => '$.path']
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Macro with cyrillic symbols',
+						'Key' => 'macro-with-cyrillic-symbols',
+						'Type' => 'Zabbix agent'
+					],
+					'LLD macros' => [
+						['LLD macro' => '{#МАКРО}', 'JSONPath' => '$.path']
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Macro with special symbols',
+						'Key' => 'macro-with-with-special-symbols',
+						'Type' => 'Zabbix agent'
+					],
+					'LLD macros' => [
+						['LLD macro' => '{#MACRO!@$%^&*()_+|?}', 'JSONPath' => '$.path']
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'LLD with empty macro',
+						'Key' => 'lld-with-empty-macro',
+						'Type' => 'Zabbix agent'
+					],
+					'LLD macros' => [
+						['LLD macro' => '', 'JSONPath' => '$.path']
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'LLD with context macro',
+						'Key' => 'lld-with-context-macro',
+						'Type' => 'Zabbix agent'
+					],
+					'LLD macros' => [
+						['LLD macro' => '{$MACRO:A}', 'JSONPath' => '$.path']
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'LLD with two equal macros',
+						'Key' => 'lld-with-two-equal-macros',
+						'Type' => 'Zabbix agent'
+					],
+					'LLD macros' => [
+						['LLD macro' => '{#MACRO}', 'JSONPath' => '$.path.a'],
+						['LLD macro' => '{#MACRO}', 'JSONPath' => '$.path.2']
+					],
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2": value (lld_macro)=({#MACRO}) already exists.'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'LLD with valid macro and path',
+						'Key' => 'lld-with-valid-macro-and-path',
+						'Type' => 'Zabbix agent'
+					],
+					'LLD macros' => [
+						['LLD macro' => '{#MACRO1}', 'JSONPath' => '$.path.a'],
+						['LLD macro' => '{#MACRO2}', 'JSONPath' => "$['а']['!@#$%^&*()_+'].🙂🙃み け め 𒁥"]
+					]
+				]
+			],
+			// Filters tab.
+			[
+				[
+					'fields' => [
+						'Name' => 'Rule with macro does not match',
+						'Key' => 'macro-doesnt-match-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters' => [
+						'filters' => [
+							['Macro' => '{#TEST_MACRO}', 'Regular expression' => 'Test expression', 'operator' => 'does not match']
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Rule with macro exists',
+						'Key' => 'macro-exists',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters' => [
+						'filters' => [
+							['Macro' => '{#TEST_MACRO}', 'Regular expression' => '', 'operator' => 'exists']
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Rule with two macros And/Or',
+						'Key' => 'two-macros-and-or-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'And/Or',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not match', 'Regular expression' => '🙂🙃み け め 𒁥']
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Rule with two macros And',
+						'Key' => 'two-macros-and-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'And',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not exist' ]
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Rule with two macros Or',
+						'Key' => 'two-macros-or-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Or',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'exists'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not match', 'Regular expression' => 'Test expression 2']
+						]
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Rule with three macros Custom expression',
+						'Key' => 'three-macros-custom-expression-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Custom expression',
+						'formula' => 'not A or not (B and C)',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'exists' ],
+							['Macro' => '{#TEST_MACRO3}', 'operator' => 'does not exist' ]
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Rule with wrong macro',
+						'Key' => 'macro-wrong-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'filters' => [
+							['Macro' => '{TEST_MACRO}', 'operator' => 'does not match', 'Regular expression' => 'Test expression']
+						]
+					],
+					'error_details' => 'Invalid parameter "/1/filter/conditions/1/macro": a low-level discovery macro is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Rule with empty formula',
+						'Key' => 'macro-empty-formula-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Custom expression',
+						'formula' => '',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'exists']
+						]
+					],
+					'error_details' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Rule with extra argument',
+						'Key' => 'macro-extra-argument-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Custom expression',
+						'formula' => 'A and B or F',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not match', 'Regular expression' => 'Test expression 2']
+						]
+					],
+					'error_details' => 'Invalid parameter "/1/filter/formula": missing filter condition "F".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Rule with missing argument',
+						'Key' => 'macro-missing-argument-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Custom expression',
+						'formula' => 'A and B',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not match', 'Regular expression' => 'Test expression 2'],
+							['Macro' => '{#TEST_MACRO3}', 'operator' => 'does not exist']
+						]
+					],
+					'error_details' => 'Invalid parameter "/1/filter/conditions/3/formulaid": an identifier is not '.
+							'defined in the formula.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Rule with wrong formula',
+						'Key' => 'macro-wrong-formula-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Custom expression',
+						'formula' => 'Wrong formula',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'exists'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not match', 'Regular expression' => 'Test expression 2']
+						]
+					],
+					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Wrong formula".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check case sensitive of operator in formula',
+						'Key' => 'macro-not-in-formula-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Custom expression',
+						'formula' => 'A and Not B',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not match', 'Regular expression' => 'Test expression 2']
+						]
+					],
+					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B"'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check case sensitive of first operator in formula',
+						'Key' => 'macro-wrong-operator-key',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Custom expression',
+						'formula' => 'NOT A and not B',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'exists'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not exist']
+						]
+					],
+					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Test create with only NOT in formula',
+						'Key' => 'macro-not-formula',
+						'Type' => 'Zabbix agent'
+					],
+					'Filters'=> [
+						'calculation' => 'Custom expression',
+						'formula' => 'not A not B',
+						'filters' => [
+							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'matches', 'Regular expression' => 'Test expression 2']
+						]
+					],
+					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " not B".'
+				]
 			]
 		];
 	}
@@ -1782,6 +2147,12 @@ class testFormLowLevelDiscovery extends CWebTest {
 		$this->checkLowLevelDiscoveryForm($data, true);
 	}
 
+	/**
+	 * Check LLD edit form fields.
+	 *
+	 * @array   $data      data provider
+	 * @boolean $update    true for update scenario, false for create
+	 */
 	public function checkLowLevelDiscoveryForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
@@ -1827,14 +2198,34 @@ class testFormLowLevelDiscovery extends CWebTest {
 			}
 		}
 
-		// Fill headers.
+		// Fill Headers.
 		if (array_key_exists('Headers', $data)) {
-			$this->fillDraggableFields($data['Headers'], $form, 'Headers');
+			$this->fillComplexFields($data['Headers'], $form, 'Headers', 'input');
 		}
 
-		// Fill parameters.
+		// Fill Parameters.
 		if (array_key_exists('Parameters', $data)) {
-			$this->fillDraggableFields($data['Parameters'], $form, 'Parameters');
+			$this->fillComplexFields($data['Parameters'], $form, 'Parameters', 'input');
+		}
+
+		// Fill LLD macros tab.
+		if (array_key_exists('LLD macros', $data)) {
+			$form->selectTab('LLD macros');
+			$this->fillComplexFields($data['LLD macros'], $form, 'LLD macros', 'textarea');
+		}
+
+		// Fill Filters tab.
+		if (array_key_exists('Filters', $data)) {
+			$form->selectTab('Filters');
+			$this->fillComplexFields($data['Filters']['filters'], $form, 'Filters', 'input');
+
+			if (array_key_exists('calculation', $data['Filters'])) {
+				$form->fill(['id:evaltype' => $data['Filters']['calculation']]);
+
+				if (array_key_exists('formula', $data['Filters'])) {
+					$form->fill(['id:formula' => $data['Filters']['formula']]);
+				}
+			}
 		}
 
 		$form->submit();
@@ -1906,17 +2297,37 @@ class testFormLowLevelDiscovery extends CWebTest {
 				}
 			}
 
-			// Check headers.
+			// Check Headers.
 			if (array_key_exists('Headers', $data)) {
-				$this->checkDraggableFields($data['Headers'], $form, 'headers');
+				$this->checkComplexFields($data['Headers'], $form, 'Headers', 'input');
 			}
 
-			// Check headers.
+			// Check Parameters.
 			if (array_key_exists('Parameters', $data)) {
-				$this->checkDraggableFields($data['Parameters'], $form, 'parameters');
+				$this->checkComplexFields($data['Parameters'], $form, 'Parameters', 'input');
 			}
 
-			// Write new LLD name for the next case.
+			// Check LLD macros.
+			if (array_key_exists('LLD macros', $data)) {
+				$form->selectTab('LLD macros');
+				$this->checkComplexFields($data['LLD macros'], $form, 'LLD macros', 'textarea');
+			}
+
+			// Check LLD Filters.
+			if (array_key_exists('Filters', $data)) {
+				$form->selectTab('Filters');
+				$this->checkComplexFields($data['Filters']['filters'], $form, 'Filters', 'input');
+
+				if (array_key_exists('calculation', $data['Filters'])) {
+					$form->checkValue(['id:evaltype' => $data['Filters']['calculation']]);
+
+					if (array_key_exists('formula', $data['Filters'])) {
+						$form->checkValue(['id:formula' => $data['Filters']['formula']]);
+					}
+				}
+			}
+
+			// Write new LLD name for the next update case.
 			if ($update) {
 				self::$update_lld = $data['fields']['Name'];
 			}
@@ -2070,7 +2481,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 		// Check frontend table.
 		$this->assertFalse($this->query('link', $lld_name)->exists());
 
-		// Check that user redirected on Proxies page.
+		// Check that user redirected on Discovery rules page.
 		$this->page->assertTitle('Configuration of discovery rules');
 	}
 
@@ -2123,38 +2534,58 @@ class testFormLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
-	 * Fill complex draggable fields in the view like name => value.
+	 * Fill complex or draggable fields in the view like name => value.
 	 *
-	 * @param array        $data     given array of fields
-	 * @param CFormElement $form     LLD edit form
-	 * @param string       $label    container's label
+	 * @param array        $data       given array of fields
+	 * @param CFormElement $form       LLD edit form
+	 * @param string       $label      container's label
+	 * @param string       $locator    field's locator input or textarea
 	 */
-	protected function fillDraggableFields($data, $form, $label) {
-		foreach ($data as $i => $field) {
-			if ($i > 0) {
-				$form->getFieldContainer($label)->query('button:Add')->waitUntilClickable()->one()->click();
+	protected function fillComplexFields($data, $form, $label, $locator) {
+		$table = $form->getField($label);
+		$add_button = $table->query('button:Add')->one();
+		$last = count($data) - 1;
+
+		foreach ($data as $i => $data_row) {
+			$table_row = $table->getRows()->get($i);
+
+			foreach ($data_row as $column => $value) {
+				if ($column === 'operator') {
+					$form->fill(['name:conditions['.$i.'][operator]' => $value]);
+				}
+				else {
+					$table_row->getColumn($column)->query('tag', $locator)->one()->fill($value);
+				}
 			}
 
-			$form->fill([
-				'name:'.lcfirst($label).'['.$i.'][name]' => $field['Name'],
-				'name:'.lcfirst($label).'['.$i.'][value]' => $field['Value']
-			]);
+			if ($i !== $last) {
+				$add_button->click();
+			}
 		}
 	}
 
 	/**
-	 * Check complex draggable fields.
+	 * Check complex or draggable fields.
 	 *
 	 * @param array        $data       given array of fields
 	 * @param CFormElement $form       LLD edit form
-	 * @param string       $locator    field's locator
+	 * @param string       $label      container's label
+	 * @param string       $locator    field's locator input or textarea
 	 */
-	protected function checkDraggableFields($data, $form, $locator) {
-		foreach ($data as $i => $field) {
-			$form->checkValue([
-				'name:'.$locator.'['.$i.'][name]' => $field['Name'],
-				'name:'.$locator.'['.$i.'][value]' => $field['Value']
-			]);
+	protected function checkComplexFields($data, $form, $label, $locator) {
+		$table = $form->getField($label);
+
+		foreach ($data as $i => $data_row) {
+			$row = $table->getRows()->get($i);
+
+			foreach ($data_row as $column => $value) {
+				if ($column === 'operator') {
+					$form->checkValue(['name:conditions['.$i.'][operator]' => $value]);
+				}
+				else {
+					$this->assertEquals($value, $row->getColumn($column)->query('tag', $locator)->one()->getValue());
+				}
+			}
 		}
 	}
 }
