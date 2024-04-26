@@ -51,6 +51,14 @@ class testFormLowLevelDiscovery extends CWebTest {
 			[
 				'host' => 'Host for LLD form test with all interfaces',
 				'groups' => ['groupid' => 4], // Zabbix servers.
+				'items' => [
+					[
+						'name' => 'Master item',
+						'key_' => 'master.test',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -1241,16 +1249,108 @@ class testFormLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/posts": (4) Start tag expected, '<' not found [Line: 1 | Column: 1].'
 				]
 			],
-
-
-
-
-
-
-
-
-
-
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'IPMI agent LLD',
+						'Type' => 'IPMI agent',
+						'Key' => 'ipmi_check[]',
+						'IPMI sensor' => ''
+					],
+					'error_details' => 'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SSH agent LLD',
+						'Type' => 'SSH agent',
+						'Key' => 'ssh_check[]',
+						'id:username' => '',
+						'Executed script' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => [
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'TELNET agent LLD',
+						'Type' => 'TELNET agent',
+						'Key' => 'telnet_check[]',
+						'id:username' => '',
+						'Executed script' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => [
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JMX agent LLD empty',
+						'Type' => 'JMX agent',
+						'Key' => 'jmx_check[]',
+						'JMX endpoint' => '',
+						'id:username' => '',
+						'Password' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "jmx_endpoint": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Dependent LLD master empty',
+						'Type' => 'Dependent item',
+						'Key' => 'dependent_check[]',
+						'Master item' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Field "Master item" is mandatory.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JMX agent',
+						'Type' => 'JMX agent',
+						'Key' => 'jmx_check[]',
+						'id:username' => 'Test',
+						'Password' => '',
+						'JMX endpoint' => 'test'
+					],
+					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JMX agent',
+						'Type' => 'JMX agent',
+						'Key' => 'jmx_check[]',
+						'id:username' => '',
+						'Password' => 'Test',
+						'JMX endpoint' => 'test'
+					],
+					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
+				]
+			],
 			[
 				[
 					'fields' => [
@@ -1552,6 +1652,91 @@ class testFormLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Name' => 'IPMI agent LLD',
+						'Type' => 'IPMI agent',
+						'Key' => 'ipmi_check[]',
+						'IPMI sensor' => '     test sensor  🙂🙃み け め 𒁥     '
+					],
+					// TODO: Uncomment after ZBX-24409 is fixed.
+//					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'SSH agent LLD no password',
+						'Type' => 'SSH agent',
+						'Key' => 'ssh_check[]',
+						'id:username' => 'test_username',
+						'Password' => '',
+						'Executed script' => 'test script'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => '      SSH agent LLD 🙂🙃み け め 𒁥      ',
+						'Type' => 'SSH agent',
+						'Key' => 'ssh_check[🙂🙃み け め 𒁥]       ',
+						'id:username' => '         🙂🙃み け め 𒁥        ',
+						'Password' => '       🙂🙃み け め 𒁥       ',
+						'Executed script' => '        🙂🙃み け め 𒁥         '
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'SSH agent LLD {$MACRO}',
+						'Type' => 'SSH agent',
+						'Key' => 'ssh_check[2]',
+						'id:username' => '{$MACRO}',
+						'Password' => '{$MACRO}',
+						'Executed script' => '{$MACRO}'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'TELNET agent LLD {$MACRO}',
+						'Type' => 'TELNET agent',
+						'Key' => 'telnet_check[{$MACRO}]',
+						'id:username' => '  {$MACRO}     ',
+						'Password' => '   {$MACRO}       ',
+						'Executed script' => '      {$MACRO}  🙂🙃み け め 𒁥     '
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'JMX agent LLD {$MACRO}',
+						'Type' => 'JMX agent',
+						'Key' => 'jmx_check[{$MACRO}]',
+						'id:username' => '',
+						'Password' => '',
+						'JMX endpoint' => '      service:jmx:{$MACRO}:///jndi/[🙂🙃み け め 𒁥]://{HOST.CONN}:{HOST.PORT}/jmxrmi          '
+					],
+					'trim' => true
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Name' => 'Dependent LLD',
+						'Type' => 'Dependent item',
+						'Key' => 'dependent_lld',
+						'Master item' => 'Master item'
+					]
+				]
+			],
+			[
+				[
+					'fields' => [
 						'Name' => 'Script LLD',
 						'Type' => 'Script',
 						'Key' => 'script_check[1]',
@@ -1694,6 +1879,10 @@ class testFormLowLevelDiscovery extends CWebTest {
 			// Rewrite complex interface value for SNMP.
 			if (CTestArrayHelper::get($data, 'checked_interface', false)) {
 				$data['fields']['Host interface'] = $data['checked_interface'];
+			}
+
+			if ($data['fields']['Type'] === 'Dependent item') {
+				$data['fields']['Master item'] = 'Host for LLD form test with all interfaces: Master item';
 			}
 
 			$form->checkValue($data['fields']);
