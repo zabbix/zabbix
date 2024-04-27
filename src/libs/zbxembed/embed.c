@@ -627,7 +627,17 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 					*error = zbx_strdup(*error, "could not convert return value to utf8");
 				}
 				else
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
+				{
+					if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%.*s'", __func__, 512,
+								output);
+					}
+				}
 
 				if (SUCCEED == ret && NULL != script_ret)
 					*script_ret = output;
@@ -662,8 +672,9 @@ out:
 	duk_gc(es->env->ctx, 0);
 	duk_gc(es->env->ctx, 0);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated or requested "
-			"memory: " ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%.*256s %s allocated memory: " ZBX_FS_SIZE_T
+			" max allocated or requested memory: " ZBX_FS_SIZE_T " max allowed memory: %d",
+			__func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error), (zbx_fs_size_t)es->env->total_alloc,
 			(zbx_fs_size_t)es->env->max_total_alloc, ZBX_ES_MEMORY_LIMIT);
 	es->env->max_total_alloc = 0;

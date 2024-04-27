@@ -1458,6 +1458,17 @@ void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size)
 }
 #endif
 
+static char	*db_replace_nonprintable_chars(const char *sql, char *sql_printable)
+{
+	if (NULL == sql_printable)
+	{
+		sql_printable = zbx_strdup(NULL, sql);
+		zbx_replace_invalid_utf8_and_nonprintable(sql_printable);
+	}
+
+	return sql_printable;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Execute SQL statement. For non-select statements only.            *
@@ -1468,7 +1479,7 @@ void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size)
  ******************************************************************************/
 int	zbx_db_vexecute(const char *fmt, va_list args)
 {
-	char		*sql = NULL;
+	char		*sql = NULL, *sql_printable = NULL;
 	int		ret = ZBX_DB_OK;
 	double		sec = 0;
 #if defined(HAVE_MYSQL)
@@ -1493,12 +1504,13 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	if (ZBX_DB_OK != txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level,
-				sql);
+				db_replace_nonprintable_chars(sql, sql_printable));
 		ret = ZBX_DB_FAIL;
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level,
+			db_replace_nonprintable_chars(sql, sql_printable));
 
 #if defined(HAVE_MYSQL)
 	if (NULL == conn)
@@ -1635,15 +1647,20 @@ lbl_exec:
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)config_log_slow_queries / 1000.0)
-			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec,
+					db_replace_nonprintable_chars(sql, sql_printable));
+		}
 	}
 
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed",
+				db_replace_nonprintable_chars(sql, sql_printable));
 		txn_error = ZBX_DB_FAIL;
 	}
 clean:
+	zbx_free(sql_printable);
 	zbx_free(sql);
 
 	return ret;

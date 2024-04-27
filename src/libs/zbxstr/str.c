@@ -1446,6 +1446,7 @@ size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen)
 }
 
 #define ZBX_UTF8_REPLACE_CHAR	'?'
+#define ZBX_CTRL_REPLACE_CHAR	'.'
 
 /******************************************************************************
  *                                                                            *
@@ -1545,16 +1546,24 @@ int	zbx_is_utf8(const char *text)
  * Purpose: replaces invalid UTF-8 sequences of bytes with '?' character      *
  *                                                                            *
  * Parameters: text - [IN/OUT] pointer to first char                          *
+ *             replace_nonprintable - [IN] 0 - leave control characters       *
+ *                                         1 - replace control characters     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_replace_invalid_utf8(char *text)
+static void	zbx_replace_invalid_utf8_impl(char *text, int replace_nonprintable)
 {
 	char	*out = text;
 
 	while ('\0' != *text)
 	{
 		if (0 == (*text & 0x80))			/* single ASCII character */
-			*out++ = *text++;
+		{
+			if (0 == replace_nonprintable || 0 == iscntrl((int)*text))
+				*out++ = *text;
+			else
+				*out++ = ZBX_CTRL_REPLACE_CHAR;
+			text++;
+		}
 		else if (0x80 == (*text & 0xc0) ||		/* unexpected continuation byte */
 				0xfe == (*text & 0xfe))		/* invalid UTF-8 bytes '\xfe' & '\xff' */
 		{
@@ -1633,6 +1642,9 @@ void	zbx_replace_invalid_utf8(char *text)
 				 */
 				if (utf32 > 0x10ffff || 0xd800 == (utf32 & 0xf800))
 					ret = FAIL;
+				else if (0 != replace_nonprintable && 0x80 <= utf32 && 0x9f >= utf32)
+					ret = FAIL;
+
 			}
 
 			if (SUCCEED != ret)
@@ -1647,6 +1659,32 @@ void	zbx_replace_invalid_utf8(char *text)
 }
 
 #undef ZBX_UTF8_REPLACE_CHAR
+#undef ZBX_CTRL_REPLACE_CHAR
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replaces invalid UTF-8 sequences of bytes with '?' character      *
+ *                                                                            *
+ * Parameters: text - [IN/OUT] pointer to first char                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_replace_invalid_utf8(char *text)
+{
+	zbx_replace_invalid_utf8_impl(text, 0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replaces invalid UTF-8 sequences of bytes with '?' character and  *
+ *          non-printable control characters with '.'                         *
+ *                                                                            *
+ * Parameters: text - [IN/OUT] pointer to first char                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_replace_invalid_utf8_and_nonprintable(char *text)
+{
+	zbx_replace_invalid_utf8_impl(text, 1);
+}
 
 void	zbx_dos2unix(char *str)
 {
