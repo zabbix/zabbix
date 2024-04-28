@@ -20,19 +20,18 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup hosts
- *
- * @onBefore prepareLLDData
+ * Common class for LLD form testing.
  */
-class testFormLowLevelDiscovery extends CWebTest {
-
+class testLowLevelDiscovery extends CWebTest {
 	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
 
+	protected static $templateid;
 	protected static $hostid;
-	protected static $interfaces_hostid;
+
 	protected static $update_lld = 'LLD for update scenario';
 
 	/**
@@ -46,231 +45,17 @@ class testFormLowLevelDiscovery extends CWebTest {
 		];
 	}
 
-	public function prepareLLDData() {
-		$result = CDataHelper::createHosts([
-			[
-				'host' => 'Host for LLD form test with all interfaces',
-				'groups' => ['groupid' => 4], // Zabbix servers.
-				'items' => [
-					[
-						'name' => 'Master item',
-						'key_' => 'master.test',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					]
-				],
-				'interfaces' => [
-					[
-						'type' => INTERFACE_TYPE_AGENT,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.1',
-						'dns' => '',
-						'port' => '10050'
-					],
-					[
-						'type'=> INTERFACE_TYPE_SNMP,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.2',
-						'dns' => '',
-						'port' => '161',
-						'details' => [
-							'version' => SNMP_V2C,
-							'community' => '{$SNMP_COMMUNITY}',
-							'max_repetitions' => 10
-						]
-					],
-					[
-						'type'=> INTERFACE_TYPE_SNMP,
-						'main' => INTERFACE_SECONDARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.3',
-						'dns' => '',
-						'port' => '161',
-						'details' => [
-							'version' => SNMP_V1,
-							'community' => '{$SNMP_COMMUNITY}'
-						]
-					],
-					[
-						'type' => INTERFACE_TYPE_JMX,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_DNS,
-						'ip' => '',
-						'dns' => 'text.jmx.com',
-						'port' => '12345'
-					],
-					[
-						'type' => INTERFACE_TYPE_IPMI,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.4',
-						'dns' => '',
-						'port' => '12345'
-					]
-				],
-				'discoveryrules' => [
-					[
-						'name' => 'LLD for update scenario',
-						'key_' => 'vfs.fs.discovery2',
-						'type' => ITEM_TYPE_ZABBIX,
-						'delay' => 30
-					]
-				]
-			],
-			[
-				'host' => 'Host for LLD form test',
-				'groups' => ['groupid' => 4], // Zabbix servers.
-				'interfaces' => [
-					[
-						'type' => INTERFACE_TYPE_AGENT,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.1',
-						'dns' => '',
-						'port' => '10050'
-					]
-				],
-				'discoveryrules' => [
-					[
-						'name' => 'LLD for delete scenario',
-						'key_' => 'vfs.fs.discovery2',
-						'type' => ITEM_TYPE_ZABBIX,
-						'delay' => 30
-					],
-					[
-						'name' => 'LLD for clone scenario',
-						'key_' => 'vfs.fs.discovery3',
-						'type' => ITEM_TYPE_ZABBIX,
-						'delay' => 30
-					],
-					[
-						'name' => 'LLD for simple update scenario',
-						'key_' => 'update_key',
-						'type' => ITEM_TYPE_HTTPAGENT,
-						'delay' => "1h;wd1-2h7-14",
-						'url' => 'https://www.test.com/search',
-						'query_fields' => [['name' => 'test_name1', 'value' => 'value1'], ['name' => '2', 'value' => 'value2']],
-						'request_method' => HTTPCHECK_REQUEST_HEAD,
-						'post_type' => ZBX_POSTTYPE_JSON,
-						'posts' => "{\"zabbix_export\": {\"version\": \"6.0\",\"date\": \"2024-03-20T20:05:14Z\"}}",
-						'headers' => [['name' => 'name1', 'value' => 'value']],
-						'status_codes' => '400, 600',
-						'follow_redirects' => 1,
-						'retrieve_mode' => 1,
-						'http_proxy' => '161.1.1.5',
-						'authtype' => ZBX_HTTP_AUTH_NTLM,
-						'username' => 'user',
-						'password' => 'pass',
-						'verify_peer' => ZBX_HTTP_VERIFY_PEER_ON,
-						'verify_host' => ZBX_HTTP_VERIFY_HOST_ON,
-						'ssl_cert_file' => '/home/test/certdb/ca.crt',
-						'ssl_key_file' => '/home/test/certdb/postgresql-server.crt',
-						'ssl_key_password' => '/home/test/certdb/postgresql-server.key',
-						'timeout' => '10s',
-						'lifetime_type' => ZBX_LLD_DELETE_AFTER,
-						'lifetime' => '15d',
-						'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER,
-						'allow_traps' => HTTPCHECK_ALLOW_TRAPS_ON,
-						'trapper_hosts' => '127.0.2.3',
-						'description' => 'LLD for test',
-						'preprocessing' => [['type' => ZBX_PREPROC_STR_REPLACE, 'params' => "a\nb"]],
-						'lld_macro_paths' => ['lld_macro' => '{#MACRO}', 'path' => '$.path'],
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								[
-									'macro' => '{#MACRO}',
-									'value' => 'expression',
-									'operator' => CONDITION_OPERATOR_NOT_REGEXP
-								]
-							]
-						],
-						'overrides' => [
-							'name' => 'Override',
-							'step' => 1,
-							'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
-							'filter' => [
-								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-								'formula' => '',
-								'conditions' => [
-									[
-										'macro' => '{#MACRO}',
-										'value' => '',
-										'operator' => CONDITION_OPERATOR_EXISTS
-									]
-								]
-							],
-							'operations' => [
-								'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
-								'operator' => CONDITION_OPERATOR_EQUAL,
-								'value' => 'test',
-								'opstatus' => ['status' => ZBX_PROTOTYPE_DISCOVER]
-							]
-						]
-					],
-					[
-						'name' => 'LLD for cancel scenario',
-						'key_' => 'ssh.run[test]',
-						'type' => ITEM_TYPE_SSH,
-						'delay' => "3h;20s/1-3,00:02-14:30",
-						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
-						'username' => 'username',
-						'password' => 'passphrase',
-						'publickey' => '/home/test/public-server.key',
-						'privatekey' => '/home/test/private-server.key',
-						'params' => 'test script',
-						'timeout' => '',
-						'lifetime_type' => ZBX_LLD_DELETE_NEVER,
-						'enabled_lifetime_type' => ZBX_LLD_DISABLE_AFTER,
-						'enabled_lifetime' => '20h',
-						'description' => 'Description for cancel scenario',
-						'preprocessing' => [['type' => ZBX_PREPROC_THROTTLE_TIMED_VALUE, 'params' => '30s']],
-						'lld_macro_paths' => ['lld_macro' => '{#LLDMACRO}', 'path' => '$.path.to.node'],
-						'filter' => [
-							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-							'conditions' => [
-								[
-									'macro' => '{#FILTERMACRO}',
-									'operator' => CONDITION_OPERATOR_NOT_EXISTS
-								]
-							]
-						],
-						'overrides' => [
-							'name' => 'Cancel override',
-							'step' => 1,
-							'stop' => ZBX_LLD_OVERRIDE_STOP_YES,
-							'filter' => [
-								'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-								'formula' => '',
-								'conditions' => [
-									[
-										'macro' => '{#OVERRIDE_MACRO}',
-										'operator' => CONDITION_OPERATOR_NOT_REGEXP,
-										'value' => 'expression'
-									]
-								]
-							],
-							'operations' => [
-								'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-								'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-								'value' => 'test',
-								'opstatus' => ['status' => ZBX_PROTOTYPE_DISCOVER],
-								'opseverity' => ['severity' => TRIGGER_SEVERITY_HIGH]
-							]
-						]
-					]
-				]
-			]
-		]);
+	/**
+	 * Test for LLD Form layout check.
+	 *
+	 * @param string $context    is LLD created on Host or on Template
+	 */
+	public function checkFormLayout($context = 'host') {
+		$url = ($context === 'template')
+			? static::$templateid.'&context=template'
+			: static::$hostid.'&context=host';
 
-		self::$hostid = $result['hostids']['Host for LLD form test'];
-		self::$interfaces_hostid = $result['hostids']['Host for LLD form test with all interfaces'];
-	}
-
-	public function testFormLowLevelDiscovery_Layout() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
 		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
 		$this->page->assertHeader('Discovery rules');
@@ -283,10 +68,14 @@ class testFormLowLevelDiscovery extends CWebTest {
 		}
 
 		// Check the whole form required labels.
-		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
-			'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
-			'Delete lost resources', 'Disable lost resources'
-		];
+		$required_labels = ($context === 'template')
+			? ['Name', 'Key', 'URL', 'Script', 'Master item', 'SNMP OID', 'JMX endpoint',
+				'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
+				'Delete lost resources', 'Disable lost resources']
+			: ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
+				'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
+				'Delete lost resources', 'Disable lost resources'];
+
 		$this->assertEquals($required_labels, array_values($form->getLabels(CElementFilter::CLASSES_PRESENT,
 				'form-label-asterisk')->asText())
 		);
@@ -298,9 +87,16 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'Filters' => ['Filters'],
 			'Overrides' => ['Overrides'],
 			'Discovery rule' => ['Name', 'Type', 'Key', 'Host interface', 'Update interval', 'Custom intervals',
-					'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
+				'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
 			]
 		];
+
+		if ($context === 'template') {
+			$visible_fields['Discovery rule'] = ['Name', 'Type', 'Key', 'Update interval', 'Custom intervals',
+				'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
+			];
+		}
+
 		foreach ($visible_fields as $tab => $fields) {
 			$form->selectTab($tab);
 			$this->assertEquals($fields, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
@@ -446,13 +242,17 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'Filters' => ['value' => [['macro' => '', 'operator' => 'matches']]],
 			'id:conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
 			'name:conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
-					'value' => 'matches'
+				'value' => 'matches'
 			],
 			'id:conditions_0_value' => ['placeholder' => 'regular expression', 'maxlength' => 255],
 
 			// Overrides tab.
 			'Overrides' => ['value' => []]
 		];
+
+		if ($context === 'template') {
+			unset($fields['Host interface']);
+		}
 
 		$this->checkFieldsParameters($fields);
 
@@ -484,6 +284,34 @@ class testFormLowLevelDiscovery extends CWebTest {
 			'Dependent item' => ['Master item'],
 			'Script' => ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
 		];
+
+		if ($context === 'template') {
+			$depending_fields =[
+				'Zabbix agent' => ['Update interval', 'Custom intervals', 'Timeout'],
+				'Zabbix agent (active)' => ['Update interval', 'Custom intervals', 'Timeout'],
+				'Simple check' => ['User name', 'Password', 'Update interval', 'Custom intervals', 'Timeout'],
+				'SNMP agent' => ['SNMP OID', 'Update interval', 'Custom intervals'],
+				'Zabbix internal' => ['Update interval', 'Custom intervals'],
+				'Zabbix trapper' => ['Allowed hosts'],
+				'External check' => ['Update interval', 'Custom intervals', 'Timeout'],
+				'Database monitor' => ['User name', 'Password', 'SQL query', 'Update interval', 'Custom intervals', 'Timeout'],
+				'HTTP agent' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
+					'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
+					'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
+					'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
+				],
+				'IPMI agent' => ['IPMI sensor', 'Update interval', 'Custom intervals'],
+				'SSH agent' => ['Authentication method', 'User name', 'Password',
+					'Executed script', 'Update interval', 'Custom intervals', 'Timeout'
+				],
+				'TELNET agent' => ['User name', 'Password', 'Executed script',
+					'Update interval', 'Custom intervals', 'Timeout'
+				],
+				'JMX agent' => ['JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals'],
+				'Dependent item' => ['Master item'],
+				'Script' => ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
+			];
+		}
 
 		$hints = [
 			'SNMP OID' => "Field requirements:".
@@ -522,10 +350,12 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 				case 'JMX agent':
 				case 'IPMI agent':
-					// Check red interface info message.
-					$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')->one()
-							->isVisible()
-					);
+					if ($context === 'host') {
+						// Check red interface info message.
+						$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')
+								->one()->isVisible()
+						);
+					}
 					break;
 
 				case 'HTTP agent':
@@ -670,9 +500,19 @@ class testFormLowLevelDiscovery extends CWebTest {
 		}
 	}
 
-	public function testFormLowLevelDiscovery_SimpleUpdate() {
+	/**
+	 * Test for checking LLD update form without any changes.
+	 *
+	 * @param string $context    is LLD updated on Host or on Template
+	 */
+	public function checkSimpleUpdate($context = 'host') {
 		$old_hash = CDBHelper::getHash(self::SQL);
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+
+		$url = ($context === 'template')
+			? static::$templateid.'&context=template'
+			: static::$hostid.'&context=host';
+
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('link:LLD for simple update scenario')->one()->waitUntilClickable()->click();
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
@@ -683,7 +523,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 	/**
 	 * These cases are for LLD form check as well as Macros and Filters tabs.
 	 * Preprocessing and Overrides tabs are checked in separate test files:
-	 * testFormLowLevelDiscoveryOverrides and testFormPreprocessingLowLevelDiscovery.
+	 * testFormLowLevelDiscoveryHostOverrides and testFormPreprocessingLowLevelDiscovery.
 	 */
 	public static function getLLDData() {
 		return [
@@ -1162,7 +1002,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'id:enabled_lifetime' => '1d',
 					],
 					'error_details' => 'Incorrect value for field "Disable lost resources":'.
-							' cannot be greater than or equal to the value of field "Delete lost resources".'
+						' cannot be greater than or equal to the value of field "Delete lost resources".'
 				]
 			],
 			// #33.
@@ -1733,7 +1573,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'IPMI sensor' => '     test sensor  🙂🙃み け め 𒁥     '
 					],
 					// TODO: Uncomment after ZBX-24409 is fixed.
-//					'trim' => true
+					//'trim' => true
 				]
 			],
 			// #69.
@@ -1799,7 +1639,8 @@ class testFormLowLevelDiscovery extends CWebTest {
 						'Key' => 'jmx_check[{$MACRO}]',
 						'id:username' => '',
 						'Password' => '',
-						'JMX endpoint' => '      service:jmx:{$MACRO}:///jndi/[🙂🙃み け め 𒁥]://{HOST.CONN}:{HOST.PORT}/jmxrmi          '
+						'JMX endpoint' => '      service:jmx:{$MACRO}:///jndi/[🙂🙃み け め 𒁥]'.
+								'://{HOST.CONN}:{HOST.PORT}/jmxrmi          '
 					],
 					'trim' => true
 				]
@@ -2233,26 +2074,13 @@ class testFormLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getLLDData
-	 */
-	public function testFormLowLevelDiscovery_Create($data) {
-		$this->checkLowLevelDiscoveryForm($data);
-	}
-
-	/**
-	 * @dataProvider getLLDData
-	 */
-	public function testFormLowLevelDiscovery_Update($data) {
-		$this->checkLowLevelDiscoveryForm($data, true);
-	}
-
-	/**
 	 * Check LLD edit form fields.
 	 *
-	 * @array   $data      data provider
-	 * @boolean $update    true for update scenario, false for create
+	 * @param array   $data       data provider
+	 * @param boolean $update     true for update scenario, false for create
+	 * @param string  $context    is LLD updated on Host or on Template
 	 */
-	public function checkLowLevelDiscoveryForm($data, $update = false) {
+	public function checkForm($data, $update = false, $context = 'host') {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
@@ -2263,11 +2091,19 @@ class testFormLowLevelDiscovery extends CWebTest {
 			$data['fields']['Key'] = 'upd.'.$data['fields']['Key'];
 		}
 
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.
-				self::$interfaces_hostid.'&context=host');
-		$this->query($update ? 'link:'.self::$update_lld : 'button:Create discovery rule')->one()
+		$url = ($context === 'template')
+			? static::$templateid.'&context=template'
+			: static::$interfaces_hostid.'&context=host';
+
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
+		$this->query($update ? 'link:'.static::$update_lld : 'button:Create discovery rule')->one()
 				->waitUntilClickable()->click();
 		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+
+		if ($context === 'template') {
+			unset($data['fields']['Host interface']);
+		}
+
 		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'parse', false)) {
@@ -2347,8 +2183,8 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 			$this->assertEquals(1, CDBHelper::getCount(
 				'SELECT * FROM items'.
-					' WHERE name='.zbx_dbstr($data['fields']['Name']).
-						'AND flags=1'
+				' WHERE name='.zbx_dbstr($data['fields']['Name']).
+					'AND flags=1'
 			));
 
 			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
@@ -2367,12 +2203,16 @@ class testFormLowLevelDiscovery extends CWebTest {
 			}
 
 			// Rewrite complex interface value for SNMP.
-			if (CTestArrayHelper::get($data, 'checked_interface', false)) {
-				$data['fields']['Host interface'] = $data['checked_interface'];
+			if ($context === 'host') {
+				if (CTestArrayHelper::get($data, 'checked_interface', false)) {
+					$data['fields']['Host interface'] = $data['checked_interface'];
+				}
 			}
 
 			if ($data['fields']['Type'] === 'Dependent item') {
-				$data['fields']['Master item'] = 'Host for LLD form test with all interfaces: Master item';
+				$data['fields']['Master item'] = ($context === 'template')
+					? 'Template with LLD: Master item'
+					: 'Host for LLD form test with all interfaces: Master item';
 			}
 
 			$form->checkValue($data['fields']);
@@ -2428,7 +2268,7 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 			// Write new LLD name for the next update case.
 			if ($update) {
-				self::$update_lld = $data['fields']['Name'];
+				static::$update_lld = $data['fields']['Name'];
 			}
 		}
 	}
@@ -2443,12 +2283,19 @@ class testFormLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getCancelData
+	 * Check cancelling LLD form.
+	 *
+	 * @param array  $data        given data provider
+	 * @param string $context    is LLD updated on Host or on Template
 	 */
-	public function testFormLowLevelDiscovery_Cancel($data) {
+	public function checkCancel($data, $context = 'host') {
+		$url = ($context === 'template')
+			? static::$templateid.'&context=template'
+			: static::$hostid.'&context=host';
+
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$lld_name = 'LLD for cancel scenario';
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 
 		if ($data['action'] === 'Add') {
 			$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
@@ -2561,9 +2408,17 @@ class testFormLowLevelDiscovery extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
-	public function testFormLowLevelDiscovery_Delete() {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host');
+	/**
+	 * Check deleting LLD from Host or Template.
+	 *
+	 * @param string $context    is LLD deleted from Host or from Template
+	 */
+	public function checkDelete($context = 'host') {
+		$url = ($context === 'template')
+			? static::$templateid.'&context=template'
+			: static::$hostid.'&context=host';
 
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$lld_name = 'LLD for delete scenario';
 		$this->query('link', $lld_name)->one()->waitUntilClickable()->click();
 		$this->query('button:Delete')->waitUntilClickable()->one()->click();
@@ -2575,7 +2430,11 @@ class testFormLowLevelDiscovery extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Discovery rule deleted');
 
 		// Check DB.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($lld_name)));
+		$this->assertEquals(0, CDBHelper::getCount(
+			'SELECT * FROM items'.
+			' WHERE name='.zbx_dbstr($lld_name).
+				'AND flags=1'
+		));
 
 		// Check frontend table.
 		$this->assertFalse($this->query('link', $lld_name)->exists());
@@ -2594,15 +2453,15 @@ class testFormLowLevelDiscovery extends CWebTest {
 
 		foreach ($fields_array as $id => $parameters) {
 			$this->assertEquals(CTestArrayHelper::get($parameters, 'value', ''),
-					$form->getField($id)->getValue()
+				$form->getField($id)->getValue()
 			);
 
 			$this->assertEquals(CTestArrayHelper::get($parameters, 'placeholder', null),
-					$form->getField($id)->getAttribute('placeholder')
+				$form->getField($id)->getAttribute('placeholder')
 			);
 
 			$this->assertEquals(CTestArrayHelper::get($parameters, 'maxlength', null),
-					$form->getField($id)->getAttribute('maxlength')
+				$form->getField($id)->getAttribute('maxlength')
 			);
 
 			if (array_key_exists('options', $parameters)){
@@ -2688,4 +2547,3 @@ class testFormLowLevelDiscovery extends CWebTest {
 		}
 	}
 }
-
