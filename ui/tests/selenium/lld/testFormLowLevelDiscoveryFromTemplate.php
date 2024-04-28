@@ -29,6 +29,7 @@ require_once dirname(__FILE__).'/../common/testLowLevelDiscovery.php';
 class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 
 	protected static $templateid;
+	protected static $update_lld = 'LLD for update scenario';
 
 	public function prepareLLDTemplateData() {
 		$templates = CDataHelper::createTemplates([

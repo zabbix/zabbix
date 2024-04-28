@@ -32,7 +32,7 @@ class testLowLevelDiscovery extends CWebTest {
 	protected static $templateid;
 	protected static $hostid;
 
-	protected static $update_lld = 'LLD for update scenario';
+	protected static $update_lld;
 
 	/**
 	 * Attach MessageBehavior to the test.
