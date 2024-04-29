@@ -2252,6 +2252,7 @@ FIELD		|timeout_script		|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|local_address		|t_varchar(255)	|''		|NOT NULL	|ZBX_PROXY
 FIELD		|local_port		|t_varchar(64)	|'10051'	|NOT NULL	|ZBX_PROXY
 FIELD		|proxy_groupid		|t_id		|		|NULL		|0	|1|proxy_group|	|RESTRICT
+FIELD		|timeout_browser	|t_varchar(255)	|''		|NOT NULL	|0
 UNIQUE		|1		|name
 INDEX		|2		|proxy_groupid
 CHANGELOG	|19
