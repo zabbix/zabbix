@@ -1378,7 +1378,27 @@ class CUserGroup extends CApiService {
 			));
 		}
 
+		self::checkProvisionedUsersExist($db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
+	}
+
+	private static function checkProvisionedUsersExist(array $db_user_groups): void {
+		$row = DBfetch(DBselect(
+			'SELECT ug.usrgrpid,u.username'.
+			' FROM users_groups ug,users u'.
+			' WHERE ug.userid=u.userid'.
+				' AND u.userdirectoryid IS NOT NULL'.
+				' AND '.dbConditionId('ug.usrgrpid', array_keys($db_user_groups)),
+			1
+		));
+
+		if ($row) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot delete user group "%1$s", because it is used by provisioned user "%2$s".',
+					$db_user_groups[$row['usrgrpid']]['name'], $row['username']
+				)
+			);
+		}
 	}
 
 	private static function unlinkUsers(array $db_groups): void {
