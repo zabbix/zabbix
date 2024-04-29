@@ -803,6 +803,7 @@ class CPieGraphDraw extends CGraphDraw {
 
 		// Reserve extra 1px for each slice.
 		$space_to_split = 360 - count($visible_values);
+		$sum = array_sum($visible_values);
 
 		// Because angles must be integers angles are rounded and all values summed may take less then 360 degrees.
 		// Calculate how many angles are missed because of rounding.
@@ -815,7 +816,7 @@ class CPieGraphDraw extends CGraphDraw {
 		// Find what is considered a largest slice.
 		$rounding_boundary = 0;
 		if ($rounding_diff != 0) {
-			$values_sorted = $visible_values;// should it be positive?
+			$values_sorted = $visible_values;
 			arsort($values_sorted);
 			$rounding_boundary = array_slice($values_sorted, $rounding_diff - 1, 1)[0];
 		}
