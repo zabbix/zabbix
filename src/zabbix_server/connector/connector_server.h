@@ -17,18 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TRIGGER_HOUSEKEEPER_H
-#define ZABBIX_TRIGGER_HOUSEKEEPER_H
+#ifndef ZABBIX_CONNECTOR_SERVER_H
+#define ZABBIX_CONNECTOR_SERVER_H
 
 #include "zbxthreads.h"
 
 typedef struct
 {
-	int	config_timeout;
-	int	config_problemhousekeeping_frequency;
+	const char	*config_source_ip;
+	const char	*config_ssl_ca_location;
+	const char	*config_ssl_cert_location;
+	const char	*config_ssl_key_location;
 }
-zbx_thread_server_trigger_housekeeper_args;
+zbx_thread_connector_worker_args;
 
-ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args);
+ZBX_THREAD_ENTRY(connector_worker_thread, args);
+
+typedef struct
+{
+	zbx_get_config_forks_f	get_process_forks_cb_arg;
+}
+zbx_thread_connector_manager_args;
+
+ZBX_THREAD_ENTRY(connector_manager_thread, args);
+
 
 #endif

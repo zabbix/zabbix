@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['uncheck']) {
@@ -68,9 +69,10 @@ $table = (new CTableInfo())
 		),
 		'#',
 		_('Users')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
-foreach ($this->data['roles'] as $role) {
+foreach ($data['roles'] as $role) {
 	$users = [];
 
 	foreach ($role['users'] as $user) {
@@ -124,7 +126,6 @@ foreach ($this->data['roles'] as $role) {
 
 $form->addItem([
 	$table,
-	$this->data['paging'],
 	new CActionButtonList('action', 'roleids', [
 		'userrole.delete' => [
 			'name' => _('Delete'),

@@ -248,6 +248,9 @@ zbx_log_value_t;
 #define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
 
+#define ZBX_PROGRAM_VARIANT_AGENT	1
+#define ZBX_PROGRAM_VARIANT_AGENT2	2
+
 /* process type */
 #define ZBX_PROCESS_TYPE_POLLER			0
 #define ZBX_PROCESS_TYPE_UNREACHABLE		1
@@ -294,7 +297,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SNMP_POLLER		42
 #define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
 #define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
-#define ZBX_PROCESS_TYPE_COUNT			45	/* number of process types */
+#define ZBX_PROCESS_TYPE_PG_MANAGER		45
+#define ZBX_PROCESS_TYPE_COUNT			46	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126

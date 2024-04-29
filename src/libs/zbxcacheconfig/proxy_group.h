@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_REPORT_MANAGER_H
-#define ZABBIX_REPORT_MANAGER_H
+#ifndef ZABBIX_PROXY_GROUP_H
+#define ZABBIX_PROXY_GROUP_H
 
-#include "zbxthreads.h"
+#include "dbconfig.h"
+#include "zbxcomms.h"
+#include "zbxtypes.h"
 
-typedef struct
-{
-	zbx_get_config_forks_f	get_process_forks_cb_arg;
-}
-zbx_thread_report_manager_args;
-
-ZBX_THREAD_ENTRY(report_manager_thread, args);
+void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision);
+void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision);
+void	dc_update_host_proxy(const char *host_old, const char *host_new);
+int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_comms_redirect_t *redirect);
+void	dc_update_proxy_failover_delay(void);
 
 #endif

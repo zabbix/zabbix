@@ -263,6 +263,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 			}
 		}
 
+		zbx_dc_set_proxy_lastonline(now);
+
 		zbx_disconnect_from_server(&sock);
 	}
 clean:

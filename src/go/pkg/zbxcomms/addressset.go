@@ -17,17 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CONNECTOR_MANAGER_H
-#define ZABBIX_CONNECTOR_MANAGER_H
+package zbxcomms
 
-#include "zbxthreads.h"
+// AddressSet interface provides address set for connections to Zabbix
+// server/proxy.
+type AddressSet interface {
+	// Get returns current address as string <address>:<port>
+	Get() string
+	// String returns list of all addresses
+	String() string
 
-typedef struct
-{
-	zbx_get_config_forks_f	get_process_forks_cb_arg;
+	// next cycles the address set by selecting next address
+	next()
+	// reset cyckles addresses if the current is redirected
+	reset()
+	// count returns number of addresses in set
+	count() int
+	// addRedirect adds/updates redirected address in set
+	addRedirect(addr string, revision uint64) bool
 }
-zbx_thread_connector_manager_args;
 
-ZBX_THREAD_ENTRY(connector_manager_thread, args);
-
-#endif
+type address struct {
+	addr     string
+	revision uint64
+}

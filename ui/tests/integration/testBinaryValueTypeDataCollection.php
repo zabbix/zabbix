@@ -111,6 +111,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 				'interfaces' => $interfaces,
 				'groups' => $groups,
 				'proxyid' => $proxyids['proxy'],
+				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'status' => HOST_STATUS_MONITORED,
 				'items' => [
 					[

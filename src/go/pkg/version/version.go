@@ -31,7 +31,7 @@ const (
 	ZABBIX_VERSION_MAJOR    = 7
 	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 0
-	ZABBIX_VERSION_RC       = "beta3"
+	ZABBIX_VERSION_RC       = "rc1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2024 Zabbix SIA\n" +

@@ -17,20 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CONNECTOR_WORKER_H
-#define ZABBIX_CONNECTOR_WORKER_H
+#ifndef ZABBIX_PG_MANAGER_H
+#define ZABBIX_PG_MANAGER_H
 
 #include "zbxthreads.h"
 
-typedef struct
-{
-	const char	*config_source_ip;
-	const char	*config_ssl_ca_location;
-	const char	*config_ssl_cert_location;
-	const char	*config_ssl_key_location;
-}
-zbx_thread_connector_worker_args;
-
-ZBX_THREAD_ENTRY(connector_worker_thread, args);
+ZBX_THREAD_ENTRY(pg_manager_thread, args);
 
 #endif

@@ -20,9 +20,9 @@
 package zabbixasync
 
 import (
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/pkg/zbxlib"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 var impl Plugin

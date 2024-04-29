@@ -160,9 +160,9 @@ class testPageAlertsScripts extends CWebTest {
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
 						'Commands' => '/sbin/shutdown -r',
-						'User group' => 'Zabbix administrators',
+						'User group' => 'All',
 						'Host group' => 'Zabbix servers',
-						'Host access' => 'Write'
+						'Host access' => 'Read'
 					],
 					[
 						'Name' => self::HOST_GROUP_SCRIPT,

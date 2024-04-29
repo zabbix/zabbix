@@ -20,8 +20,8 @@
 #ifndef ZBX_EVENTLOG_H
 #define ZBX_EVENTLOG_H
 
-#include "../logfiles/logfiles.h"
-#include "../metrics/metrics.h"
+#include "../../logfiles/logfiles.h"
+#include "../../metrics/metrics.h"
 
 #include "zbxcomms.h"
 #include "zbxalgo.h"

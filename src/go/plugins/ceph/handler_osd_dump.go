@@ -23,7 +23,7 @@ import (
 	"encoding/json"
 	"math"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type cephOsdDump struct {

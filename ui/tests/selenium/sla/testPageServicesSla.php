@@ -725,7 +725,7 @@ class testPageServicesSla extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (!array_key_exists('expected', $data)) {
-			// Check that 'No data found.' string is returned if no results are expected.
+			// Check that 'No data found' string is returned if no results are expected.
 			$this->assertTableData();
 		}
 		else {

@@ -35,10 +35,10 @@ import (
 	"syscall"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"zabbix.com/pkg/zbxcmd"
-	"zabbix.com/util"
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
+	"golang.zabbix.com/agent2/util"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const timeFmt = "Mon Jan _2 15:04:05 2006"

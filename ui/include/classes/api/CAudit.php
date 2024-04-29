@@ -90,6 +90,7 @@ class CAudit {
 	public const RESOURCE_LLD_RULE = 52;
 	public const RESOURCE_HISTORY = 53;
 	public const RESOURCE_MFA = 54;
+	public const RESOURCE_PROXY_GROUP = 55;
 
 	/**
 	 * Audit details actions.
@@ -137,6 +138,7 @@ class CAudit {
 		self::RESOURCE_MFA => 'mfa',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
+		self::RESOURCE_PROXY_GROUP => 'proxy_group',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCENARIO => 'httptest',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
@@ -192,6 +194,7 @@ class CAudit {
 		self::RESOURCE_MFA => 'name',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'name',
+		self::RESOURCE_PROXY_GROUP => 'name',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCENARIO => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
@@ -236,6 +239,7 @@ class CAudit {
 		self::RESOURCE_MFA => 'mfa',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
+		self::RESOURCE_PROXY_GROUP => 'proxygroup',
 		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'script',

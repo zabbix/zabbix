@@ -40,7 +40,8 @@ int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, const c
 		AGENT_RESULT *result);
 #endif
 
-typedef int	(*zbx_get_value_internal_ext_f)(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
+typedef int	(*zbx_get_value_internal_ext_f)(const zbx_dc_item_t *item, const char *param1,
+		const AGENT_REQUEST *request, AGENT_RESULT *result);
 
 typedef struct
 {

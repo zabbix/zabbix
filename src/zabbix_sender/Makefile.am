@@ -3,7 +3,9 @@
 bin_PROGRAMS = zabbix_sender
 
 zabbix_sender_SOURCES = \
-	zabbix_sender.c
+	zabbix_sender.c \
+	send_buffer.c \
+	send_buffer.h
 
 zabbix_sender_LDADD = \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
