@@ -48,6 +48,7 @@ foreach (['hostids', 'tagnames', 'state', 'data'] as $key) {
 	if ($key === 'state'
 			&& (!$subfilters[$key] || (count($subfilters[$key]) == 1 && !current($subfilters[$key])['selected']))) {
 		$subfilter_options[$key] = null;
+
 		continue;
 	}
 
