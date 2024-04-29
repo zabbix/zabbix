@@ -87,8 +87,7 @@ class CMediatype extends CApiService {
 
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (!$options['countOutput'] && is_array($options['output'])
-				&& array_search('content_type', $options['output']) !== false) {
+		if (!$options['countOutput'] && is_array($options['output']) && in_array('content_type', $options['output'])) {
 			self::deprecated('Field "content_type" is deprecated.');
 		}
 
@@ -154,9 +153,9 @@ class CMediatype extends CApiService {
 
 		if (!$options['countOutput']) {
 			$add_content_type = $options['output'] === API_OUTPUT_EXTEND
-				|| array_search('content_type', $options['output']) !== false;
+				|| in_array('content_type', $options['output']);
 			$remove_message_format = $options['output'] !== API_OUTPUT_EXTEND
-				&& array_search('message_format', $options['output']) === false;
+				&& !in_array('message_format', $options['output']);
 		}
 
 		while ($mediatype = DBfetch($res)) {
@@ -903,11 +902,11 @@ class CMediatype extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts): array {
 		if (!$options['countOutput'] && is_array($options['output'])
 				&& ($i = array_search('content_type', $options['output'])) !== false) {
-			if (array_search('message_format', $options['output']) === false) {
-				$options['output'][$i] = 'message_format';
+			if (in_array('message_format', $options['output'])) {
+				unset($options['output'][$i]);
 			}
 			else {
-				unset($options['output'][$i]);
+				$options['output'][$i] = 'message_format';
 			}
 		}
 
