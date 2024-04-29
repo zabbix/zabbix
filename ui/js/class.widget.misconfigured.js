@@ -20,10 +20,46 @@
 
 class CWidgetMisconfigured extends CWidget {
 
+	static MESSAGE_TYPE_EMPTY_REFERENCES = 'empty-references';
+
 	#messages = [];
 
+	#message_type = null;
+
 	onStart() {
-		this._updateMessages(this.#messages);
+		if (this.#messages.length > 0) {
+			this._updateMessages(this.#messages);
+		}
+		else if (this.#message_type !== null) {
+			this.setCoverMessage(CWidgetMisconfigured.#getMessageTypeInfo(this.#message_type));
+		}
+	}
+
+	setMessages(messages) {
+		this.#messages = messages;
+
+		if (this.getState() !== WIDGET_STATE_INITIAL) {
+			this._updateMessages(this.#messages);
+		}
+	}
+
+	setMessageType(message_type) {
+		this.#message_type = message_type;
+
+		if (this.getState() !== WIDGET_STATE_INITIAL) {
+			this.setCoverMessage(CWidgetMisconfigured.#getMessageTypeInfo(message_type));
+		}
+	}
+
+	static #getMessageTypeInfo(message_type) {
+		switch (message_type) {
+			case CWidgetMisconfigured.MESSAGE_TYPE_EMPTY_REFERENCES:
+				return {
+					message: t('Referred widget is unavailable'),
+					description: t('Please update configuration'),
+					icon: 'icon.svg'
+				};
+		}
 	}
 
 	promiseUpdate() {
@@ -44,14 +80,6 @@ class CWidgetMisconfigured extends CWidget {
 		}
 
 		return menu;
-	}
-
-	setMessages(messages) {
-		this.#messages = messages;
-
-		if (this.getState() !== WIDGET_STATE_INITIAL) {
-			this._updateMessages(this.#messages);
-		}
 	}
 
 	hasPadding() {

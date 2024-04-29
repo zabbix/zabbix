@@ -125,6 +125,20 @@ class CWidget extends CWidgetBase {
 	}
 
 	/**
+	 * Check if the referred data is valid for running the next update.
+	 *
+	 * If not, the widget will skip running the update cycle (promiseUpdate). Instead, it will clear the contents
+	 * (clearContents), enter the "Awaiting data" state and broadcast the default data to the listeners.
+	 *
+	 * By default, only the referred fields marked as required are checked for having non-default (non-empty) values.
+	 *
+	 * @returns {boolean}
+	 */
+	isFieldsReferredDataValid() {
+		return this.isFieldsReferredDataRequirementFulfilled();
+	}
+
+	/**
 	 * Promise to update the widget.
 	 *
 	 * Invoked immediately when a dashboard page is displayed, and periodically later on, until the dashboard page is
@@ -280,5 +294,13 @@ class CWidget extends CWidgetBase {
 	 */
 	setContents(response) {
 		this._body.innerHTML = response.body ?? '';
+	}
+
+	/**
+	 * Clear widget messages and contents prior to displaying specific view defined by the framework.
+	 */
+	clearContents() {
+		this._updateMessages();
+		this._body.innerHTML = '';
 	}
 }

@@ -300,62 +300,8 @@ class CDashboardPage {
 		return null;
 	}
 
-	addWidget(widget) {
-		this._doAddWidget(widget);
-
-		if (widget.getWidgetId() === null) {
-			this._is_unsaved = true;
-		}
-	}
-
-	addWidgetFromData({type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id, messages = []}) {
-		let widget;
-
-		if (type in this._widget_defaults) {
-			const widget_data = {
-				type,
-				name,
-				view_mode,
-				fields,
-				defaults: this._widget_defaults[type],
-				widgetid,
-				pos,
-				is_new,
-				rf_rate,
-				unique_id
-			};
-
-			if (messages.length > 0) {
-				widget = this._createWidget(CWidgetMisconfigured, widget_data);
-				widget.setMessages(messages);
-			}
-			else {
-				widget = this._createWidget(eval(this._widget_defaults[type].js_class), widget_data);
-			}
-		}
-		else {
-			widget = this._createInaccessibleWidget({widgetid, pos, unique_id});
-		}
-
-		this._doAddWidget(widget);
-
-		if (widgetid === null) {
-			this._is_unsaved = true;
-		}
-
-		return widget;
-	}
-
-	addPastePlaceholderWidget({type, name, view_mode, pos, unique_id}) {
-		const paste_placeholder_widget = this._createPastePlaceholderWidget({type, name, view_mode, pos, unique_id});
-
-		this._doAddWidget(paste_placeholder_widget);
-
-		return paste_placeholder_widget;
-	}
-
-	_doAddWidget(widget) {
-		this._widgets.set(widget, {is_ready: false});
+	addWidget(widget, {is_helper = false} = {}) {
+		this._widgets.set(widget, {is_ready: false, is_helper});
 
 		if (this._state !== DASHBOARD_PAGE_STATE_INITIAL) {
 			this.#startWidget(widget, {do_start: widget.getState() === WIDGET_STATE_INITIAL});
@@ -368,6 +314,10 @@ class CDashboardPage {
 
 			this._dashboard_grid.appendChild(widget.getView());
 			this._activateWidget(widget);
+		}
+
+		if (widget.getWidgetId() === null && !is_helper) {
+			this._is_unsaved = true;
 		}
 	}
 
@@ -394,76 +344,6 @@ class CDashboardPage {
 		return this.addWidget(new_widget);
 	}
 
-	replaceWidgetFromData(old_widget, new_widget_data) {
-		this.deleteWidget(old_widget, {is_batch_mode: true});
-
-		return this.addWidgetFromData(new_widget_data);
-	}
-
-	_createWidget(widget_class, {type, name, view_mode, fields, defaults, widgetid, pos, is_new, rf_rate, unique_id}) {
-		return new widget_class({
-			type,
-			name,
-			view_mode,
-			fields,
-			defaults,
-			widgetid,
-			pos,
-			is_new,
-			rf_rate,
-			dashboard: {
-				templateid: this._dashboard.templateid,
-				dashboardid: this._dashboard.dashboardid
-			},
-			dashboard_page: {
-				unique_id: this._unique_id
-			},
-			cell_width: this._cell_width,
-			cell_height: this._cell_height,
-			min_rows: this._widget_min_rows,
-			is_editable: this._is_editable,
-			is_edit_mode: this._is_edit_mode,
-			csrf_token: this._csrf_token,
-			unique_id
-		});
-	}
-
-	_createInaccessibleWidget({widgetid, pos, unique_id}) {
-		return this._createWidget(CWidgetInaccessible, {
-			type: 'inaccessible',
-			name: '',
-			view_mode: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
-			fields: {},
-			defaults: {
-				name: t('Inaccessible widget')
-			},
-			widgetid,
-			pos,
-			is_new: false,
-			rf_rate: 0,
-			unique_id
-		});
-	}
-
-	_createPastePlaceholderWidget({type, name, view_mode, pos, unique_id}) {
-		return this._createWidget(CWidgetPastePlaceholder, {
-			type: 'paste-placeholder',
-			name,
-			view_mode,
-			fields: {},
-			defaults: this._widget_defaults[type],
-			widgetid: null,
-			pos,
-			is_new: false,
-			rf_rate: 0,
-			unique_id
-		});
-	}
-
-	_isHelperWidget(widget) {
-		return widget instanceof CWidgetPastePlaceholder;
-	}
-
 	getDataCopy() {
 		const data = {
 			name: this._data.name,
@@ -474,9 +354,9 @@ class CDashboardPage {
 			}
 		};
 
-		for (const widget of this._widgets.keys()) {
-			if (!this._isHelperWidget(widget)) {
-				data.widgets.push(widget.getDataCopy({is_single_copy: false}));
+		for (const [w, w_data] of this._widgets) {
+			if (!w_data.is_helper) {
+				data.widgets.push(w.getDataCopy({is_single_copy: false}));
 			}
 		}
 
@@ -491,9 +371,9 @@ class CDashboardPage {
 			widgets: []
 		};
 
-		for (const widget of this._widgets.keys()) {
-			if (!this._isHelperWidget(widget)) {
-				data.widgets.push(widget.save());
+		for (const [w, w_data] of this._widgets) {
+			if (!w_data.is_helper) {
+				data.widgets.push(w.save());
 			}
 		}
 
@@ -692,12 +572,12 @@ class CDashboardPage {
 	}
 
 	_isDataPosFree(pos, {except_widgets = null} = {}) {
-		for (const [widget, data] of this._widgets) {
-			if (except_widgets !== null && except_widgets.has(widget)) {
+		for (const [w, w_data] of this._widgets) {
+			if (except_widgets !== null && except_widgets.has(w)) {
 				continue;
 			}
 
-			if (this._isPosOverlapping(data.pos, pos)) {
+			if (this._isPosOverlapping(w_data.pos, pos)) {
 				return false;
 			}
 		}
@@ -1175,19 +1055,19 @@ class CDashboardPage {
 				return false;
 			}
 
-			for (const [w, data] of this._widgets) {
+			for (const [w, w_data] of this._widgets) {
 				if (w === widget || w === drag_widget) {
 					continue;
 				}
 
-				if (this._isPosOverlapping(data.pos, pos)) {
-					const test_pos = {...data.pos, y: pos.y + pos.height};
+				if (this._isPosOverlapping(w_data.pos, pos)) {
+					const test_pos = {...w_data.pos, y: pos.y + pos.height};
 
 					if (!relocateWidget(w, test_pos)) {
 						return false;
 					}
 
-					data.pos = test_pos;
+					w_data.pos = test_pos;
 				}
 			}
 
@@ -1195,8 +1075,8 @@ class CDashboardPage {
 		};
 
 		const allocatePos = (widget, pos) => {
-			for (const [w, w_data] of this._widgets) {
-				w_data.pos = w_data.original_pos;
+			for (const data of this._widgets.values()) {
+				data.pos = data.original_pos;
 			}
 
 			const data = this._widgets.get(widget);
@@ -1290,8 +1170,8 @@ class CDashboardPage {
 				this.blockInteraction();
 				this._deactivateWidgetPlaceholder();
 
-				for (const [widget, data] of this._widgets) {
-					data.original_pos = widget.getPos();
+				for (const [w, w_data] of this._widgets) {
+					w_data.original_pos = w.getPos();
 				}
 
 				drag_widget.setDragging(true);
@@ -1820,8 +1700,8 @@ class CDashboardPage {
 				this.blockInteraction();
 				this._deactivateWidgetPlaceholder();
 
-				for (const [widget, data] of this._widgets) {
-					data.original_pos = widget.getPos();
+				for (const [w, w_data] of this._widgets) {
+					w_data.original_pos = w.getPos();
 				}
 
 				grid_rect = this._dashboard_grid.getBoundingClientRect();

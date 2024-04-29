@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class ClassWidgetSelectPopup {
+
+class CWidgetSelectPopup {
 
 	static #table_template = `
 		<table class="${ZBX_STYLE_LIST_TABLE}">
@@ -50,19 +51,19 @@ class ClassWidgetSelectPopup {
 	#overlay;
 
 	constructor(widgets) {
-		const widgets_table = new Template(ClassWidgetSelectPopup.#table_template).evaluateToElement();
+		const widgets_table = new Template(CWidgetSelectPopup.#table_template).evaluateToElement();
 
 		let rows_html = '';
 
 		if (widgets.length > 0) {
-			const widget_row = new Template(ClassWidgetSelectPopup.#row_template);
+			const widget_row = new Template(CWidgetSelectPopup.#row_template);
 
 			for (const widget of widgets) {
 				rows_html += widget_row.evaluate(widget);
 			}
 		}
 		else {
-			rows_html = ClassWidgetSelectPopup.#nothing_to_show_template;
+			rows_html = CWidgetSelectPopup.#nothing_to_show_template;
 		}
 
 		widgets_table.querySelector('tbody').innerHTML = rows_html;
@@ -95,7 +96,7 @@ class ClassWidgetSelectPopup {
 	 * @param {function}      listener
 	 * @param {Object|false}  options
 	 *
-	 * @returns {ClassWidgetSelectPopup}
+	 * @returns {CWidgetSelectPopup}
 	 */
 	on(type, listener, options = false) {
 		this.#overlay.$dialogue[0].addEventListener(type, listener, options);
@@ -110,7 +111,7 @@ class ClassWidgetSelectPopup {
 	 * @param {function}      listener
 	 * @param {Object|false}  options
 	 *
-	 * @returns {ClassWidgetSelectPopup}
+	 * @returns {CWidgetSelectPopup}
 	 */
 	off(type, listener, options = false) {
 		this.#overlay.$dialogue[0].removeEventListener(type, listener, options);

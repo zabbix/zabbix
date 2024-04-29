@@ -94,6 +94,8 @@ class CWidgetBase {
 
 	#ready_promise = null;
 
+	#is_awaiting_data = false;
+
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
 	 *
@@ -429,15 +431,14 @@ class CWidgetBase {
 		return ZABBIX.EventHub.getData(descriptor) !== undefined;
 	}
 
-	/**
-	 * Broadcast default data (nulls) to dependent widgets. Invoked to ensure that all the declared data is broadcast.
-	 */
-	#broadcastDefaults() {
-		for (const {type} of this._defaults.out) {
-			if (!this.hasBroadcast(type)) {
-				this.broadcast({[type]: null});
-			}
+	getBroadcastDefaults() {
+		const broadcast_defaults = {};
+
+		for (const parameter of this._defaults.out) {
+			broadcast_defaults[parameter.type] = CWidgetsData.getDefault(parameter.type);
 		}
+
+		return broadcast_defaults;
 	}
 
 	/**
@@ -625,6 +626,36 @@ class CWidgetBase {
 	 */
 	isFieldsReferredDataUpdated(path) {
 		return this.#fields_referred_data_updated.has(path);
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	isFieldsReferredDataValid() {
+	}
+
+	/**
+	 * Check if the referred fields marked as required are having non-default (non-empty) values.
+	 *
+	 * @returns {boolean}
+	 */
+	isFieldsReferredDataRequirementFulfilled() {
+		const fields_referred_data = this.getFieldsReferredData();
+
+		for (const [name, parameters] of Object.entries(this._defaults.in)) {
+			if (!parameters.required || !fields_referred_data.has(name)) {
+				continue;
+			}
+
+			const value = fields_referred_data.get(name).value;
+			const value_default = CWidgetsData.getDefault(parameters.type);
+
+			if (JSON.stringify(value) === JSON.stringify(value_default)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1241,6 +1272,35 @@ class CWidgetBase {
 			return;
 		}
 
+		if (!this.isFieldsReferredDataValid()) {
+			if (!this.#is_awaiting_data) {
+				this.#is_awaiting_data = true;
+
+				this._hidePreloader();
+				this._show_preloader_asap = true;
+
+				this.clearContents();
+				this.setCoverMessage({
+					message: t('Awaiting data'),
+					icon: 'awaiting-data.svg'
+				});
+
+				this.broadcast(this.getBroadcastDefaults());
+
+				if (this.#ready_promise === null) {
+					this.#ready_promise = Promise.resolve();
+					this.fire(CWidgetBase.EVENT_READY);
+				}
+			}
+
+			return;
+		}
+
+		if (this.#is_awaiting_data) {
+			this.#is_awaiting_data = false;
+			this.clearContents();
+		}
+
 		this._contents_size = this._getContentsSize();
 
 		this._update_abort_controller = new AbortController();
@@ -1260,7 +1320,11 @@ class CWidgetBase {
 
 				this.#fields_referred_data_updated.clear();
 
-				this.#broadcastDefaults();
+				for (const [type, value] of Object.entries(this.getBroadcastDefaults())) {
+					if (!this.hasBroadcast(type)) {
+						this.broadcast({[type]: value});
+					}
+				}
 
 				if (this.#ready_promise === null) {
 					this.#ready_promise = this.promiseReady();
@@ -1492,6 +1556,26 @@ class CWidgetBase {
 	 */
 	_updateDebug(debug = '') {
 		this._debug.innerHTML = debug;
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	clearContents() {
+	}
+
+	/**
+	 *
+	 * @param {string}      message
+	 * @param {string|null} description
+	 * @param {string|null} icon
+	 */
+	setCoverMessage({message, description = null, icon = null} = {}) {
+		this._updateMessages();
+		this._updateInfo();
+
+		// TODO: Replace with actual implementation
+		this._body.innerHTML = `${message} --- ${description} --- ${icon}`;
 	}
 
 	/**

@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CWidgetFieldTimePeriod {
 
 	static DATA_SOURCE_DEFAULT = 0;
@@ -170,7 +171,7 @@ class CWidgetFieldTimePeriod {
 
 			this.#reference_multiselect
 				.multiSelect('getSelectButton').addEventListener('click', () => {
-					const popup = new ClassWidgetSelectPopup(this.#getWidgets());
+					const popup = new CWidgetSelectPopup(this.#getWidgets());
 
 					popup.on('dialogue.submit', (e) => {
 						this.#selectTypedReference(e.detail.reference);
