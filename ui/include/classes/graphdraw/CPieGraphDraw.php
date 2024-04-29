@@ -805,7 +805,7 @@ class CPieGraphDraw extends CGraphDraw {
 		$space_to_split = 360 - count($visible_values);
 		$sum = array_sum($visible_values);
 
-		// Because angles must be integers angles are rounded and all values summed may take less then 360 degrees.
+		// Because angles must be integers angles are rounded and all values summed may take less than 360 degrees.
 		// Calculate how many angles are missed because of rounding.
 		$rounding_diff = $space_to_split;
 		foreach ($visible_values as $value) {
