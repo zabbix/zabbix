@@ -71,7 +71,8 @@ $table = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
 		(new CColHeader(_('Templates')))->setColSpan(2)
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $current_time = time();
 
@@ -139,7 +140,6 @@ foreach ($data['groups'] as $group) {
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'groupids', [
 		'templategroup.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))

@@ -69,7 +69,8 @@ $trigger_table = (new CTableInfo())
 		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url),
 		_('Tags')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
@@ -169,7 +170,6 @@ foreach ($data['triggers'] as $trigger) {
 // append table to form
 $trigger_form->addItem([
 	$trigger_table,
-	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.prototype.massenable' => [

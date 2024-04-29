@@ -1476,7 +1476,7 @@ class testFormUserRoles extends CWebTest {
 
 				/**
 				 * After the filter is submitted, check that the expected services are returned in the list,
-				 * or that 'No data found.' message is returned.
+				 * or that 'No data found' message is returned.
 				 */
 				if ($result !== null) {
 					$this->assertTableDataColumn($result);
