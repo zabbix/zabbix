@@ -22,7 +22,6 @@ class CItemNavigator {
 
 	static ZBX_STYLE_CLASS =		'item-navigator';
 	static ZBX_STYLE_LIMIT =		'item-navigator-limit';
-	static ZBX_STYLE_NO_DATA =		'item-navigator-no-data';
 
 	static GROUP_BY_HOST_GROUP = 0;
 	static GROUP_BY_HOST_NAME = 1;
@@ -117,6 +116,7 @@ class CItemNavigator {
 				severities: this.#config.severities
 			});
 
+			this.#container.classList.remove(ZBX_STYLE_NO_DATA);
 			this.#container.appendChild(this.#navigation_tree.getContainer());
 
 			if (is_limit_exceeded) {
@@ -140,11 +140,10 @@ class CItemNavigator {
 			}
 		}
 		else {
-			const no_data = document.createElement('div');
-			no_data.classList.add(CItemNavigator.ZBX_STYLE_NO_DATA);
-			no_data.innerText = t('No data found.');
-
-			this.#container.appendChild(no_data);
+			this.#container.classList.add(ZBX_STYLE_NO_DATA);
+			this.#container.appendChild(
+				this.#setNoDataMessage(t('No data found'), null, ZBX_ICON_SEARCH_LARGE)
+			);
 		}
 	}
 
@@ -493,5 +492,30 @@ class CItemNavigator {
 		this.#container.innerHTML = '';
 		this.#navigation_tree = null;
 		this.#nodes = [];
+	}
+
+	#setNoDataMessage(message, description = null, icon = null) {
+		const container = document.createElement('div');
+
+		const message_container = document.createElement('div');
+		message_container.classList.add(ZBX_STYLE_NO_DATA_MESSAGE);
+		message_container.innerText = message;
+
+		if (icon !== null) {
+			container.classList.add(ZBX_STYLE_NO_DATA_FOUND);
+			message_container.classList.add(icon);
+		}
+
+		container.appendChild(message_container);
+
+		if (description !== null) {
+			const description_container = document.createElement('div');
+			description_container.classList.add(ZBX_STYLE_NO_DATA_DESCRIPTION);
+			description_container.innerText = description;
+
+			container.appendChild(description_container);
+		}
+
+		return container;
 	}
 }

@@ -4436,13 +4436,8 @@ div.dashboard-widget-itemnavigator .item-navigator .item-navigator-limit {
   height: 18px;
   padding: 9px 8px;
   color: #737373; }
-div.dashboard-widget-itemnavigator .item-navigator .item-navigator-no-data {
-  display: flex;
-  justify-content: center;
-  height: 18px;
-  padding: 9px 8px;
-  color: #737373;
-  border-bottom: 1px solid #383838; }
+div.dashboard-widget-itemnavigator .item-navigator.no-data {
+  height: 100%; }
 
 div.dashboard-widget-map .sysmap-widget-container {
   overflow: hidden;

@@ -22,13 +22,8 @@ div.dashboard-widget-itemnavigator {
 			color: $font-alt-color;
 		}
 
-		.item-navigator-no-data {
-			display: flex;
-			justify-content: center;
-			height: 18px;
-			padding: 9px 8px;
-			color: $font-alt-color;
-			border-bottom: 1px solid $table-border-color;
+		&.no-data {
+			height: 100%;
 		}
 	}
 }
