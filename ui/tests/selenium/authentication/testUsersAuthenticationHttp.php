@@ -22,8 +22,7 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
- * @onBefore removeGuestFromDisabledGroup
- * @onBefore addDefaultAllowAuthKeyToConfig
+ * @onBefore removeGuestFromDisabledGroup, addDefaultAllowAuthKeyToConfig
  *
  * @onAfter addGuestToDisabledGroup
  *
@@ -647,7 +646,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	 * @dataProvider getHttpAuthData
 	 */
 	public function testUsersAuthenticationHttp_HttpAuthStatusChange($data) {
-		// Update Zabbix frontend config .
+		// Update Zabbix frontend config.
 		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
 		$pattern = array('/\/\/ \$ALLOW_HTTP_AUTH = false;/', '/\$ALLOW_HTTP_AUTH = true;/');
 		$content = preg_replace($pattern, $data['config_string'], file_get_contents($file_path), 1);
@@ -665,7 +664,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * Creating a configuration file.
 	 *
-	 * @param type $data
+	 * @param array $data	data array for HTTP settings setup
 	 */
 	protected function createConfigurationFiles($data) {
 		switch (CTestArrayHelper::get($data, 'file')) {
