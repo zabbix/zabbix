@@ -459,9 +459,8 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_BROWSERPOLLER))
 				break;
 
-			return ZBX_POLLER_TYPE_NORMAL;
+			return ZBX_POLLER_TYPE_BROWSER;
 		case ITEM_TYPE_INTERNAL:
-
 			return ZBX_POLLER_TYPE_INTERNAL;
 		case ITEM_TYPE_DB_MONITOR:
 			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_ODBCPOLLER))
@@ -1049,7 +1048,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 					"default_timezone", "hk_events_service", "auditlog_enabled",
 					"timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent",
 					"timeout_external_check", "timeout_db_monitor", "timeout_http_agent",
-					"timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "auditlog_mode"};
+					"timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "auditlog_mode",
+					"timeout_browser"};
 
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
@@ -1382,6 +1382,12 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->revision.config_table = revision;
 	}
 
+	if (NULL == config->config->item_timeouts.browser || 0 != strcmp(config->config->item_timeouts.browser, row[44]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.browser, row[44]);
+		config->revision.config_table = revision;
+	}
+
 	if (config->config->auditlog_mode != (value_int = atoi(row[43])))
 	{
 		config->config->auditlog_mode = value_int;
@@ -1710,6 +1716,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	dc_strpool_release(proxy->item_timeouts.ssh);
 	dc_strpool_release(proxy->item_timeouts.telnet);
 	dc_strpool_release(proxy->item_timeouts.script);
+	dc_strpool_release(proxy->item_timeouts.browser);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	dc_strpool_release(proxy->tls_issuer);
@@ -3025,8 +3032,10 @@ static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 			global_timeout = config->config->item_timeouts.simple;
 			break;
 		case ITEM_TYPE_SCRIPT:
-		case ITEM_TYPE_BROWSER:
 			global_timeout = config->config->item_timeouts.script;
+			break;
+		case ITEM_TYPE_BROWSER:
+			global_timeout = config->config->item_timeouts.browser;
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 			global_timeout = config->config->item_timeouts.http;
@@ -7520,6 +7529,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		dc_strpool_replace(found, &proxy->item_timeouts.ssh, row[19]);
 		dc_strpool_replace(found, &proxy->item_timeouts.telnet, row[20]);
 		dc_strpool_replace(found, &proxy->item_timeouts.script, row[21]);
+		dc_strpool_replace(found, &proxy->item_timeouts.browser, row[26]);
 
 		if (PROXY_OPERATING_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
 		{
@@ -15763,6 +15773,7 @@ void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeo
 		zbx_strscpy(timeouts->ssh, timeouts_src->ssh);
 		zbx_strscpy(timeouts->telnet, timeouts_src->telnet);
 		zbx_strscpy(timeouts->script, timeouts_src->script);
+		zbx_strscpy(timeouts->browser, timeouts_src->browser);
 	}
 
 	UNLOCK_CACHE;
@@ -15803,6 +15814,7 @@ static void	proxy_discovery_get_timeouts(const ZBX_DC_PROXY *proxy, struct zbx_j
 	proxy_discovery_add_item_type_timeout("ssh_agent", json, timeouts->ssh, proxy->proxyid);
 	proxy_discovery_add_item_type_timeout("telnet_agent", json, timeouts->telnet, proxy->proxyid);
 	proxy_discovery_add_item_type_timeout("script", json, timeouts->script, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("browser", json, timeouts->browser, proxy->proxyid);
 
 	zbx_json_close(json);
 }

@@ -89,6 +89,7 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  ssh:%s", config->config->item_timeouts.ssh);
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:%s", config->config->item_timeouts.telnet);
 	zabbix_log(LOG_LEVEL_TRACE, "  script:%s", config->config->item_timeouts.script);
+	zabbix_log(LOG_LEVEL_TRACE, "  browser:%s", config->config->item_timeouts.browser);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
