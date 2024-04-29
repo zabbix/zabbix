@@ -136,9 +136,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'evaltype' => $this->fields_values['item_tags_evaltype'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
 			'filter' => [
-				'state' => $this->fields_values['state'] == WidgetForm::STATE_ALL
-					? null
-					: $this->fields_values['state']
+				'state' => $this->fields_values['state'] == WidgetForm::STATE_ALL ? null : $this->fields_values['state']
 			],
 			'search' => [
 				'name' => in_array('*', $this->fields_values['items'], true) ? null : $this->fields_values['items']
