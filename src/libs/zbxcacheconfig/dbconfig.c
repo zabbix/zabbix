@@ -456,7 +456,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 
 			return ZBX_POLLER_TYPE_NORMAL;
 		case ITEM_TYPE_BROWSER:
-			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_BROWSERPOLLER))
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;

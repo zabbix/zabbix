@@ -299,7 +299,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
 #define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
 #define ZBX_PROCESS_TYPE_PG_MANAGER		45
-#define ZBX_PROCESS_TYPE_COUNT			46	/* number of process types */
+#define ZBX_PROCESS_TYPE_BROWSERPOLLER		46
+#define ZBX_PROCESS_TYPE_COUNT			47	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
