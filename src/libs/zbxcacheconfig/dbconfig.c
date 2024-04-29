@@ -3206,11 +3206,13 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *old_type,
 		zbx_vector_ptr_t *dep_items, char **row)
 {
-	zbx_vector_ptr_t	*parameters = NULL;
+	zbx_vector_ptr_t	parameters_local, *parameters = NULL;
 
 	if (1 == found && *old_type != item->type)
 	{
-		parameters = dc_item_parameters(item);
+		if (NULL != (parameters = dc_item_parameters(item)))
+			parameters_local = *parameters;
+
 		dc_item_type_free(item, *old_type);
 		found = 0;
 	}
@@ -3224,7 +3226,9 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			{
 				if (1 == found)
 				{
-					parameters = dc_item_parameters(item);
+					if (NULL != (parameters = dc_item_parameters(item)))
+						parameters_local = *parameters;
+
 					dc_item_type_free(item, item->type);
 				}
 
@@ -3414,13 +3418,13 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			{
 				if (NULL == parameters)
 				{
-					zbx_vector_ptr_create_ext(&item->itemtype.scriptitem ->params,
+					zbx_vector_ptr_create_ext(&item->itemtype.scriptitem->params,
 							__config_shmem_malloc_func, __config_shmem_realloc_func,
 							__config_shmem_free_func);
 				}
 				else
 				{
-					item->itemtype.scriptitem->params = *parameters;
+					item->itemtype.scriptitem->params = parameters_local;
 					parameters = NULL;
 				}
 			}
@@ -3444,7 +3448,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 				}
 				else
 				{
-					item->itemtype.browseritem->params = *parameters;
+					item->itemtype.browseritem->params = parameters_local;
 					parameters = NULL;
 				}
 			}
@@ -3452,7 +3456,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 	}
 
 	if (NULL != parameters)
-		zbx_vector_ptr_destroy(parameters);
+		zbx_vector_ptr_destroy(&parameters_local);
 }
 
 static void	dc_item_value_type_free(ZBX_DC_ITEM *item, zbx_item_value_type_t type)
@@ -8754,10 +8758,12 @@ clean:
 	}
 
 	zbx_hashset_destroy(&activated_hosts);
-
+zabbix_increase_log_level();
+zabbix_increase_log_level();
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
-
+	zabbix_decrease_log_level();
+	zabbix_decrease_log_level();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return new_revision;
