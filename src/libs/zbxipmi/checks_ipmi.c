@@ -309,7 +309,7 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_full_name(const zbx_ipmi_host_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if item name starts from domain name and find domain name  *
+ * Purpose: checks if item name starts from domain name and finds domain name *
  *          length                                                            *
  *                                                                            *
  * Parameters: h         - [IN] ipmi host                                     *
@@ -334,7 +334,7 @@ static size_t	get_domain_offset(const zbx_ipmi_host_t *h, const char *full_name)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: converts sensor id to printable string and return id_type         *
+ * Purpose: converts sensor id to printable string and returns id_type        *
  *                                                                            *
  * Parameters: sensor    - [IN]                                               *
  *             id        - [OUT] sensor id                                    *
@@ -425,8 +425,10 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, const ipmi_sensor_t *sens
 		zbx_free(h->sensors[i].full_name);
 
 		h->sensor_count--;
+
 		if (h->sensor_count != i)
 			memmove(&h->sensors[i], &h->sensors[i + 1], sz * (size_t)(h->sensor_count - i));
+
 		h->sensors = (zbx_ipmi_sensor_t *)zbx_realloc(h->sensors, sz * (size_t)h->sensor_count);
 
 		break;
@@ -555,8 +557,10 @@ static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, const ipmi_control_t *co
 		zbx_free(h->controls[i].full_name);
 
 		h->control_count--;
+
 		if (h->control_count != i)
 			memmove(&h->controls[i], &h->controls[i + 1], sz * (size_t)(h->control_count - i));
+
 		h->controls = (zbx_ipmi_control_t *)zbx_realloc(h->controls, sz * (size_t)h->control_count);
 
 		break;
@@ -602,10 +606,10 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 	for (enum ipmi_thresh_e i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
 	{
 		double	thr;
-		int	val, ret;
+		int	val, ret = ipmi_sensor_threshold_readable(sensor, i, &val);
 
 		s->thresholds[i].status = ZBX_IPMI_THRESHOLD_STATUS_DISABLED;
-		ret = ipmi_sensor_threshold_readable(sensor, i, &val);
+
 		if (0 != ret || 0 == val)
 			continue;
 
@@ -623,7 +627,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
 
-/* get sensor units full string*/
+/* get sensor units full string */
 static char	*zbx_get_ipmi_units(ipmi_sensor_t *sensor)
 {
 	const char	*base, *mod_use = "", *modifier = "", *rate;
@@ -1612,7 +1616,7 @@ out:
 
 void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 {
-#define INACTIVE_HOST_LIMIT	3 * SEC_PER_HOUR	/* delete inactive hosts after this period */
+#define INACTIVE_HOST_LIMIT	(3 * SEC_PER_HOUR)	/* delete inactive hosts after this period */
 
 	zbx_ipmi_host_t	*h = hosts, *prev = NULL, *next;
 
@@ -1647,7 +1651,7 @@ void	zbx_delete_inactive_ipmi_hosts(time_t last_check)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if string starts with one of predefined prefixes and set   *
+ * Purpose: checks if string starts with one of predefined prefixes and sets  *
  *          prefix length                                                     *
  *                                                                            *
  * Parameters: str        - [IN] string to examine                            *

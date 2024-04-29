@@ -50,7 +50,7 @@ static void	ipmi_poller_register(zbx_ipc_async_socket_t *socket)
  * Purpose: sends IPMI poll result to manager                                 *
  *                                                                            *
  * Parameters: socket  - [IN] connections socket                              *
- *             itemid  - [IN]                                                 *
+ *             code    - [IN]                                                 *
  *             errcode - [IN] result error code                               *
  *             value   - [IN] resulting value/error message                   *
  *                                                                            *

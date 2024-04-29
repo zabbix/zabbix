@@ -634,8 +634,6 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
  * Purpose: serializes IPMI poll and discovery requests                       *
  *                                                                            *
  * Parameters: item      - [IN] item to poll                                  *
- *             command   - [IN] command to execute                            *
- *             key       - [IN] valid item key                                *
  *             message   - [OUT] message                                      *
  *                                                                            *
  ******************************************************************************/
@@ -686,22 +684,21 @@ static void	ipmi_manager_schedule_request(zbx_ipmi_manager_t *manager, zbx_uint6
  *********************************************************************************/
 static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, int config_timeout, int *nextcheck)
 {
-	int			num;
 	zbx_dc_item_t		items[ZBX_MAX_POLLER_ITEMS];
-
-	num = zbx_dc_config_get_ipmi_poller_items(now, ZBX_MAX_POLLER_ITEMS, config_timeout, items, nextcheck);
+	int			num = zbx_dc_config_get_ipmi_poller_items(now, ZBX_MAX_POLLER_ITEMS, config_timeout,
+						items, nextcheck);
 
 	for (int i = 0; i < num; i++)
 	{
-		zbx_timespec_t		ts;
-		unsigned char		state = ITEM_STATE_NOTSUPPORTED;
-		int			errcode = CONFIG_ERROR;
 		zbx_ipmi_request_t	*request;
 		char			*error = NULL;
 
 		if (FAIL == zbx_ipmi_port_expand_macros(items[i].host.hostid, items[i].interface.port_orig,
 				&items[i].interface.port, &error))
 		{
+			int			errcode = CONFIG_ERROR;
+			unsigned char		state = ITEM_STATE_NOTSUPPORTED;
+			zbx_timespec_t		ts;
 
 			zbx_timespec(&ts);
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
@@ -791,7 +788,7 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
  * Purpose: processes IPMI check result received from IPMI poller                     *
  *                                                                                    *
  * Parameters: manager            - [IN]                                              *
- *             client             - [IN] IPMI poller client                           *
+ *             client             - [IN] client (IPMI poller)                          *
  *             message            - [IN] received ZBX_IPC_IPMI_VALUE_RESULT message   *
  *             now                - [IN] current time                                 *
  *             unavailable_delay  - [IN]                                              *
@@ -1030,6 +1027,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
 #undef ZBX_IPMI_MANAGER_DELAY
+#undef ZBX_IPMI_MANAGER_CLEANUP_DELAY
 }
 
 #endif
