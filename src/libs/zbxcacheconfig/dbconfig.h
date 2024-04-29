@@ -224,6 +224,14 @@ typedef struct
 }
 ZBX_DC_SCRIPTITEM;
 
+typedef struct
+{
+	const char		*script;
+	zbx_vector_ptr_t	params;
+	unsigned char		browser;
+}
+ZBX_DC_BROWSERITEM;
+
 typedef union
 {
 	ZBX_DC_TRAPITEM		*trapitem;
@@ -238,6 +246,7 @@ typedef union
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
+	ZBX_DC_BROWSERITEM	*browseritem;
 }
 ZBX_DC_ITEMTYPE;
 

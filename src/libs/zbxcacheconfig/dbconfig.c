@@ -455,6 +455,11 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 				break;
 
 			return ZBX_POLLER_TYPE_NORMAL;
+		case ITEM_TYPE_BROWSER:
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_NORMAL;
 		case ITEM_TYPE_INTERNAL:
 
 			return ZBX_POLLER_TYPE_INTERNAL;
@@ -3020,6 +3025,7 @@ static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 			global_timeout = config->config->item_timeouts.simple;
 			break;
 		case ITEM_TYPE_SCRIPT:
+		case ITEM_TYPE_BROWSER:
 			global_timeout = config->config->item_timeouts.script;
 			break;
 		case ITEM_TYPE_HTTPAGENT:
@@ -3063,6 +3069,19 @@ do													\
 	}												\
 }													\
 while(0)
+
+static zbx_vector_ptr_t	*dc_item_parameters(const ZBX_DC_ITEM *item)
+{
+	switch (item->type)
+	{
+		case ITEM_TYPE_SCRIPT:
+			return &item->itemtype.scriptitem->params;
+		case ITEM_TYPE_BROWSER:
+			return &item->itemtype.browseritem->params;
+		default:
+			return NULL;
+	}
+}
 
 static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 {
@@ -3165,9 +3184,12 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 		case ITEM_TYPE_SCRIPT:
 			dc_strpool_release(item->itemtype.scriptitem->script);
 
-			zbx_vector_ptr_destroy(&item->itemtype.scriptitem->params);
-
 			__config_shmem_free_func(item->itemtype.scriptitem);
+			break;
+		case ITEM_TYPE_BROWSER:
+			dc_strpool_release(item->itemtype.browseritem->script);
+
+			__config_shmem_free_func(item->itemtype.browseritem);
 			break;
 	}
 }
@@ -3175,8 +3197,11 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *old_type,
 		zbx_vector_ptr_t *dep_items, char **row)
 {
+	zbx_vector_ptr_t	*parameters = NULL;
+
 	if (1 == found && *old_type != item->type)
 	{
+		parameters = dc_item_parameters(item);
 		dc_item_type_free(item, *old_type);
 		found = 0;
 	}
@@ -3189,7 +3214,10 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			if ('\0' == *row[9])
 			{
 				if (1 == found)
+				{
+					parameters = dc_item_parameters(item);
 					dc_item_type_free(item, item->type);
+				}
 
 				item->itemtype.trapitem = NULL;
 				break;
@@ -3375,11 +3403,47 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 
 			if (0 == found)
 			{
-				zbx_vector_ptr_create_ext(&item->itemtype.scriptitem->params, __config_shmem_malloc_func,
-						__config_shmem_realloc_func, __config_shmem_free_func);
+				if (NULL == parameters)
+				{
+					zbx_vector_ptr_create_ext(&item->itemtype.scriptitem ->params,
+							__config_shmem_malloc_func, __config_shmem_realloc_func,
+							__config_shmem_free_func);
+				}
+				else
+				{
+					item->itemtype.scriptitem->params = *parameters;
+					parameters = NULL;
+				}
+			}
+			break;
+		case ITEM_TYPE_BROWSER:
+			if (0 == found)
+			{
+				item->itemtype.browseritem = (ZBX_DC_BROWSERITEM *)__config_shmem_malloc_func(NULL,
+						sizeof(ZBX_DC_BROWSERITEM));
+			}
+
+			dc_strpool_replace(found, &item->itemtype.browseritem->script, row[11]);
+
+			if (0 == found)
+			{
+				if (NULL == parameters)
+				{
+					zbx_vector_ptr_create_ext(&item->itemtype.browseritem->params,
+							__config_shmem_malloc_func, __config_shmem_realloc_func,
+							__config_shmem_free_func);
+				}
+				else
+				{
+					item->itemtype.browseritem->params = *parameters;
+					parameters = NULL;
+				}
 			}
 			break;
 	}
+
+	if (NULL != parameters)
+		zbx_vector_ptr_destroy(parameters);
 }
 
 static void	dc_item_value_type_free(ZBX_DC_ITEM *item, zbx_item_value_type_t type)
@@ -3811,6 +3875,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			dc_interface_snmpitems_remove(item);
 
 		dc_item_value_type_free(item, item->value_type);
+
+		zbx_vector_ptr_t	*parameters;
+
+		if (NULL != (parameters = dc_item_parameters(item)))
+			zbx_vector_ptr_destroy(parameters);
+
 		dc_item_type_free(item, item->type);
 
 		/* items */
@@ -5998,12 +6068,15 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	zbx_vector_ptr_t		items;
 	ZBX_DC_ITEM			*dc_item;
 
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&items);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
+		zbx_vector_ptr_t	*params;
+
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
@@ -6011,7 +6084,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UINT64(itemid, row[1]);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)) ||
-				ITEM_TYPE_SCRIPT != item->type)
+				NULL == (params = dc_item_parameters(item)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,
 					"cannot find parent item for item parameters (itemid=" ZBX_FS_UI64")", itemid);
@@ -6028,7 +6101,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (0 == found)
 		{
 			scriptitem_params->itemid = itemid;
-			zbx_vector_ptr_append(&item->itemtype.scriptitem->params, scriptitem_params);
+			zbx_vector_ptr_append(params, scriptitem_params);
 		}
 
 		zbx_vector_ptr_append(&items, item);
@@ -6038,6 +6111,8 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		zbx_vector_ptr_t	*params;
+
 		if (NULL == (scriptitem_params =
 				(zbx_dc_scriptitem_param_t *)zbx_hashset_search(&config->itemscript_params, &rowid)))
 		{
@@ -6045,12 +6120,12 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 
 		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &scriptitem_params->itemid)) &&
-				ITEM_TYPE_SCRIPT == item->type)
+				NULL != (params = dc_item_parameters(item)))
 		{
-			if (FAIL != (index = zbx_vector_ptr_search(&item->itemtype.scriptitem->params,
-					scriptitem_params, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			if (FAIL != (index = zbx_vector_ptr_search(params, scriptitem_params,
+					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
-				zbx_vector_ptr_remove_noorder(&item->itemtype.scriptitem->params, index);
+				zbx_vector_ptr_remove_noorder(params, index);
 				zbx_vector_ptr_append(&items, item);
 			}
 		}
@@ -6067,11 +6142,15 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	for (i = 0; i < items.values_num; i++)
 	{
+		zbx_vector_ptr_t	*params;
+
 		dc_item = (ZBX_DC_ITEM *)items.values[i];
 		dc_item_update_revision(dc_item, revision);
 
-		if (0 < dc_item->itemtype.scriptitem->params.values_num)
-			zbx_vector_ptr_sort(&dc_item->itemtype.scriptitem->params, dc_compare_itemscript_param);
+		params = dc_item_parameters(item);
+
+		if (0 < params->values_num)
+			zbx_vector_ptr_sort(params, dc_compare_itemscript_param);
 	}
 
 	zbx_vector_ptr_destroy(&items);
@@ -9754,6 +9833,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 	struct zbx_json			json;
+	zbx_vector_ptr_t		*parameters;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -9937,6 +10017,26 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 			dst_item->timeout = 0;
 			break;
+		case ITEM_TYPE_BROWSER:
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+			dst_item->params = zbx_strdup(NULL, src_item->itemtype.browseritem->script);
+
+			parameters = dc_item_parameters(src_item);
+
+			for (i = 0; i < parameters->values_num; i++)
+			{
+				zbx_dc_scriptitem_param_t	*param =
+						(zbx_dc_scriptitem_param_t*)(parameters->values[i]);
+
+				zbx_json_addstring(&json, param->name, param->value, ZBX_JSON_TYPE_STRING);
+			}
+
+			dst_item->script_params = zbx_strdup(NULL, json.buffer);
+			zbx_json_free(&json);
+
+			dst_item->timeout = 0;
+			break;
 		case ITEM_TYPE_TELNET:
 			zbx_strscpy(dst_item->username_orig, src_item->itemtype.telnetitem->username);
 			zbx_strscpy(dst_item->password_orig, src_item->itemtype.telnetitem->password);
@@ -9991,6 +10091,7 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 				zbx_free(items[i].posts);
 				break;
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 				zbx_free(items[i].script_params);
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_DB_MONITOR:

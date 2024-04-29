@@ -140,6 +140,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 #endif
 			break;
 		case ITEM_TYPE_SCRIPT:
+		case ITEM_TYPE_BROWSER:
 			res = get_value_script(item, config_comms->config_source_ip, result);
 			break;
 		default:
@@ -292,6 +293,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_SNMP:
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 			case ITEM_TYPE_HTTPAGENT:
 				ZBX_STRDUP(timeout, items[i].timeout_orig);
 				break;
@@ -356,6 +358,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						0);
 				break;
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
