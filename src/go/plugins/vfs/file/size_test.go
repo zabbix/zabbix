@@ -25,12 +25,11 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/std"
+	"golang.zabbix.com/sdk/std"
 )
 
 func TestFileSize(t *testing.T) {
 	stdOs = std.NewMockOs()
-
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
 	if result, err := impl.Export("vfs.file.size", []string{"text.txt"}, nil); err != nil {

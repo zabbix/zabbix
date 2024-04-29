@@ -24,9 +24,8 @@ import (
 	"errors"
 	"fmt"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (

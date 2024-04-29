@@ -72,6 +72,10 @@ class CAuthenticationHelper {
 		return self::$params[$field];
 	}
 
+	public static function reset() {
+		self::$params = [];
+	}
+
 	/**
 	 * Get the value of the given Authentication API object's field available to parts of the UI without authentication.
 	 *

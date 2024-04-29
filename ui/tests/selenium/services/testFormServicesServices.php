@@ -1232,7 +1232,7 @@ class testFormServicesServices extends CWebTest {
 
 		$this->assertMessage(TEST_GOOD, 'Service updated');
 
-		// Check "No data found." text in table under Parent.
+		// Check "No data found" text in table under Parent.
 		$this->assertTableData([]);
 
 		foreach ([$parent, $child] as $name) {

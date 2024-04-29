@@ -17,21 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_REPORT_WRITER_H
-#define ZABBIX_REPORT_WRITER_H
+#ifndef ZABBIX_PG_SERVICE_H
+#define ZABBIX_PG_SERVICE_H
 
-#include "zbxthreads.h"
+#include "pg_cache.h"
+#include "zbxipcservice.h"
 
 typedef struct
 {
-	char	*config_tls_ca_file;
-	char	*config_tls_cert_file;
-	char	*config_tls_key_file;
-	char	*config_source_ip;
-	char	*config_webservice_url;
+	zbx_pg_cache_t		*cache;
+	zbx_ipc_service_t	service;
+	pthread_t		thread;
 }
-zbx_thread_report_writer_args;
+zbx_pg_service_t;
 
-ZBX_THREAD_ENTRY(report_writer_thread, args);
+int	pg_service_init(zbx_pg_service_t *service, zbx_pg_cache_t *cache, char **error);
+void	pg_service_destroy(zbx_pg_service_t *service);
 
 #endif

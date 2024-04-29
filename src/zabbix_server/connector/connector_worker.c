@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "connector_worker.h"
+#include "connector_server.h"
 
+#include "zbxthreads.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"

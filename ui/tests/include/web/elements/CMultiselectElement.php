@@ -362,9 +362,11 @@ class CMultiselectElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one(false);
-		if (!$input->isEnabled($enabled)) {
-			return false;
+		if (!$this->query('class:search-disabled')->one(false)->isValid()) {
+			$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one(false);
+			if (!$input->isEnabled($enabled)) {
+				return false;
+			}
 		}
 
 		$multiselect = $this->query('class:multiselect')->one(false);

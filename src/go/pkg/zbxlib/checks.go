@@ -71,8 +71,8 @@ import (
 	"errors"
 	"unsafe"
 
+	"golang.zabbix.com/sdk/log"
 	"zabbix.com/pkg/itemutil"
-	"git.zabbix.com/ap/plugin-support/log"
 )
 
 func ExecuteCheck(key string, params []string) (result *string, err error) {

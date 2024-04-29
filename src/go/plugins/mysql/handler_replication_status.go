@@ -25,7 +25,7 @@ import (
 	"errors"
 	"fmt"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const masterKey = "Master_Host"

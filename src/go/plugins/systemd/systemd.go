@@ -27,8 +27,8 @@ import (
 	"strings"
 	"sync"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"github.com/godbus/dbus/v5"
 )
 

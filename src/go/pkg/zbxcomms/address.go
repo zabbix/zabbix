@@ -16,11 +16,34 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef ZABBIX_REPORT_H
-#define ZABBIX_REPORT_H
 
-#include "zbxjson.h"
+package zbxcomms
 
-void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j);
+type singleAddress string
 
-#endif
+// NewAddress creates single address implementing AddressSet interface
+func NewAddress(addr string) AddressSet {
+	return singleAddress(addr)
+}
+
+func (a singleAddress) Get() string {
+	return string(a)
+}
+
+func (a singleAddress) String() string {
+	return string(a)
+}
+
+func (a singleAddress) next() {
+}
+
+func (a singleAddress) reset() {
+}
+
+func (a singleAddress) addRedirect(addr string, revision uint64) bool {
+	return false
+}
+
+func (a singleAddress) count() int {
+	return 1
+}

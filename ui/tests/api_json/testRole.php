@@ -190,6 +190,10 @@ class testRole extends CAPITest {
 								'status' => '1'
 							],
 							[
+								'name' => 'administration.proxy_groups',
+								'status' => '1'
+							],
+							[
 								'name' => 'administration.proxies',
 								'status' => '1'
 							],
@@ -824,6 +828,10 @@ class testRole extends CAPITest {
 								],
 								[
 									'name' => 'administration.housekeeping',
+									'status' => '1'
+								],
+								[
+									'name' => 'administration.proxy_groups',
 									'status' => '1'
 								],
 								[

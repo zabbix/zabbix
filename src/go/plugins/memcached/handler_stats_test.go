@@ -24,8 +24,7 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-
+	"golang.zabbix.com/sdk/zbxerr"
 	"github.com/memcachier/mc/v3"
 )
 

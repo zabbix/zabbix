@@ -753,7 +753,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestAssertElementPresentXpath('//tr[@class="nothing-to-show"]/td[text()="No data found."]');
+			$this->assertEquals('No data found', $this->query('class:nothing-to-show')->one()->getText());
 		}
 	}
 

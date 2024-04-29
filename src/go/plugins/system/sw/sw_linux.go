@@ -35,8 +35,8 @@ import (
 	"syscall"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/zbxerr"
 	"zabbix.com/pkg/zbxcmd"
 	"zabbix.com/util"
 )

@@ -48,7 +48,9 @@ class CControllerHostEdit extends CController {
 			'status'				=> 'db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
 											HOST_STATUS_NOT_MONITORED
 										]),
+			'monitored_by'			=> 'db hosts.monitored_by|in '.implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]),
 			'proxyid'				=> 'db hosts.proxyid',
+			'proxy_groupid'			=> 'db hosts.proxy_groupid',
 			'interfaces'			=> 'array',
 			'mainInterfaces'		=> 'array',
 			'groups'				=> 'array',
@@ -135,9 +137,10 @@ class CControllerHostEdit extends CController {
 			}
 			else {
 				$hosts = API::Host()->get([
-					'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxyid', 'ipmi_authtype',
-						'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
-						'tls_subject', 'flags', 'inventory_mode'
+					'output' => ['hostid', 'host', 'name', 'monitored_by', 'proxyid', 'proxy_groupid',
+						'assigned_proxyid', 'status', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+						'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'flags',
+						'inventory_mode'
 					],
 					'selectDiscoveryRule' => ['itemid', 'name', 'parent_hostid'],
 					'selectHostGroups' => ['groupid'],
@@ -187,10 +190,12 @@ class CControllerHostEdit extends CController {
 			'host' => $this->host,
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
 			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
-			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'warnings' => [],
 			'user' => [
-				'debug_mode' => $this->getDebugMode()
+				'debug_mode' => $this->getDebugMode(),
+				'can_edit_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
+				'can_edit_proxy_groups' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS),
+				'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 			]
 		];
 
@@ -308,8 +313,33 @@ class CControllerHostEdit extends CController {
 
 		CArrayHelper::sort($data['host']['parentTemplates'], ['name']);
 		$this->extendLinkedTemplates($data['editable_templates']);
-		$this->extendProxies($data['proxies']);
 		$this->extendInventory($data['inventory_items'], $data['inventory_fields']);
+
+		$data['ms_proxy'] = [];
+		$data['ms_proxy_group'] = [];
+		$data['host']['assigned_proxy_name'] = '';
+
+		if ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+			$data['ms_proxy'] = CArrayHelper::renameObjectsKeys(API::Proxy()->get([
+				'output' => ['proxyid', 'name'],
+				'proxyids' => $data['host']['proxyid']
+			]), ['proxyid' => 'id']);
+		}
+		elseif ($data['host']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+			$data['ms_proxy_group'] = CArrayHelper::renameObjectsKeys(API::ProxyGroup()->get([
+				'output' => ['proxy_groupid', 'name'],
+				'proxy_groupids' => $data['host']['proxy_groupid']
+			]), ['proxy_groupid' => 'id']);
+
+			if ($data['host']['assigned_proxyid'] != 0) {
+				$db_proxies = API::Proxy()->get([
+					'output' => ['name'],
+					'proxyids' => $data['host']['assigned_proxyid']
+				]);
+
+				$data['host']['assigned_proxy_name'] = $db_proxies[0]['name'];
+			}
+		}
 
 		$data['is_discovery_rule_editable'] = $this->host['discoveryRule']
 			&& API::DiscoveryRule()->get([
@@ -408,34 +438,6 @@ class CControllerHostEdit extends CController {
 	}
 
 	/**
-	 * Function to select data for 'Monitored by proxy' field.
-	 *
-	 * @param array $proxies
-	 *
-	 * @return void
-	 */
-	protected function extendProxies(?array &$proxies): void {
-		if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$proxies = $this->host['proxyid'] != 0
-				? API::Proxy()->get([
-					'output' => ['name', 'proxyid'],
-					'proxyids' => [$this->host['proxyid']],
-					'preservekeys' => true
-				])
-				: [];
-		}
-		else {
-			$proxies = API::Proxy()->get([
-				'output' => ['name', 'proxyid'],
-				'preservekeys' => true
-			]);
-			CArrayHelper::sort($proxies, ['name']);
-		}
-
-		$proxies = array_column($proxies, 'name', 'proxyid');
-	}
-
-	/**
 	 * Function to prepare data of inventory fields and find items selected to populate each of inventory fields.
 	 *
 	 * @param array $inventory_items
@@ -489,10 +491,9 @@ class CControllerHostEdit extends CController {
 			$inputs['name'] = $this->getInput('visiblename', '');
 			$inputs['inventory'] = $this->getInput('host_inventory', []);
 
-			$this->getInputs($inputs, [
-				'host', 'description', 'status', 'proxyid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'tls_connect', 'tls_accept', 'tls_subject', 'tls_issuer', 'tls_psk_identity',
-				'tls_psk', 'tags', 'inventory_mode', 'host_inventory'
+			$this->getInputs($inputs, ['host', 'monitored_by', 'proxyid', 'proxy_groupid', 'description', 'status',
+				'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept',
+				'tls_subject', 'tls_issuer', 'tls_psk_identity', 'tls_psk', 'tags', 'inventory_mode', 'host_inventory'
 			]);
 
 			$field_add_templates = $this->getInput('add_templates', []);
@@ -568,7 +569,10 @@ class CControllerHostEdit extends CController {
 			'hostid' => null,
 			'name' => '',
 			'host' => '',
+			'monitored_by' => ZBX_MONITORED_BY_SERVER,
 			'proxyid' => '0',
+			'proxy_groupid' => '0',
+			'assigned_proxyid' => '0',
 			'status' => HOST_STATUS_MONITORED,
 			'ipmi_authtype' => IPMI_AUTHTYPE_DEFAULT,
 			'ipmi_privilege' => IPMI_PRIVILEGE_USER,
