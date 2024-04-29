@@ -36,6 +36,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	const LOGIN_USER	= 2;
 	const LOGIN_HTTP	= 3;
 
+	protected function getFilePath() {
+		return dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+	}
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -647,10 +651,9 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	 */
 	public function testUsersAuthenticationHttp_HttpAuthStatusChange($data) {
 		// Update Zabbix frontend config.
-		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
 		$pattern = array('/\/\/ \$ALLOW_HTTP_AUTH = false;/', '/\$ALLOW_HTTP_AUTH = true;/');
-		$content = preg_replace($pattern, $data['config_string'], file_get_contents($file_path), 1);
-		file_put_contents($file_path, $content);
+		$content = preg_replace($pattern, $data['config_string'], file_get_contents($this->getFilePath()), 1);
+		file_put_contents($this->getFilePath(), $content);
 
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
@@ -793,12 +796,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	 * Add a commented $ALLOW_HTTP_AUTH variable to frontend configuration file to check disabling of HTTP authentication.
 	 */
 	public function addDefaultAllowAuthKeyToConfig() {
-		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
-
-		$content = file_get_contents($file_path);
+		$content = file_get_contents($this->getFilePath());
 		$content .= '// $ALLOW_HTTP_AUTH = false;'."\n";
 
-		file_put_contents($file_path, $content);
+		file_put_contents($this->getFilePath(), $content);
 	}
 
 	public static function addGuestToDisabledGroup() {
