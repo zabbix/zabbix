@@ -2301,7 +2301,7 @@ button {
     color: #768d99; }
 
 .list-table {
-  min-width: 100%;
+  width: 100%;
   background-color: #ffffff;
   border-collapse: separate;
   border: 1px solid #dfe4e7; }
