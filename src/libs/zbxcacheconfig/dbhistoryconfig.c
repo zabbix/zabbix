@@ -27,6 +27,7 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxtagfilter.h"
+#include "proxy_group.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
 
@@ -41,6 +42,7 @@ static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZB
 
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxyid = src_host->proxyid;
+	dst_host->monitored_by = src_host->monitored_by;
 	dst_host->status = src_host->status;
 
 	zbx_strscpy(dst_host->host, src_host->host);
@@ -520,6 +522,7 @@ static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZB
 {
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxyid = src_host->proxyid;
+	dst_host->monitored_by = src_host->monitored_by;
 	dst_host->status = src_host->status;
 
 	if (ZBX_ITEM_GET_HOST & mode)
@@ -873,11 +876,11 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 		connector_filter.connectorid = dc_connector->connectorid;
 		connector_filter.tags_evaltype = dc_connector->tags_evaltype;
-		zbx_vector_match_tags_create(&connector_filter.connector_tags);
+		zbx_vector_match_tags_ptr_create(&connector_filter.connector_tags);
 
 		if (0 != dc_connector->tags.values_num)
 		{
-			zbx_vector_match_tags_reserve(&connector_filter.connector_tags,
+			zbx_vector_match_tags_ptr_reserve(&connector_filter.connector_tags,
 					(size_t)dc_connector->tags.values_num);
 
 			for (i = 0; i < dc_connector->tags.values_num; i++)
@@ -890,11 +893,11 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 				connector_tag->value = zbx_strdup(NULL, dc_connector->tags.values[i]->value);
 				connector_tag->op = dc_connector->tags.values[i]->op;
 
-				zbx_vector_match_tags_append(&connector_filter.connector_tags, connector_tag);
+				zbx_vector_match_tags_ptr_append(&connector_filter.connector_tags, connector_tag);
 			}
 		}
 
-		zbx_vector_match_tags_sort(&connector_filter.connector_tags, zbx_compare_match_tags);
+		zbx_vector_match_tags_ptr_sort(&connector_filter.connector_tags, zbx_compare_match_tags);
 
 		zbx_vector_connector_filter_append(connector_filter_dest, connector_filter);
 	}
@@ -905,8 +908,8 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
 {
-	zbx_vector_match_tags_clear_ext(&connector_filter.connector_tags, zbx_match_tag_free);
-	zbx_vector_match_tags_destroy(&connector_filter.connector_tags);
+	zbx_vector_match_tags_ptr_clear_ext(&connector_filter.connector_tags, zbx_match_tag_free);
+	zbx_vector_match_tags_ptr_destroy(&connector_filter.connector_tags);
 }
 
 static void	substitute_orig_unmasked(const char *orig, char **data)
@@ -1065,4 +1068,111 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		zbx_dc_close_user_macros(um_handle);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host information by name                                      *
+ *                                                                            *
+ * Parameters: host      - [IN] host name                                     *
+ *             sock      - [IN] connection socket                             *
+ *             mode      - [IN] host retrieval mode                           *
+ *             recv_host - [OUT] host information                             *
+ *             redirect  - [OUT] host redirection data (optional)             *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, unsigned int mode,
+		zbx_history_recv_host_t *recv_host, zbx_comms_redirect_t *redirect)
+{
+	const ZBX_DC_HOST	*dc_host = NULL;
+	int			ret = FAIL;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_conn_attr_t	attr;
+	char			*error = NULL;
+
+	if (FAIL == zbx_tls_get_attr(sock, &attr, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get connection attributes: %s", __func__, error);
+		zbx_free(error);
+		return FAIL;
+	}
+#else
+	zbx_tls_conn_attr_t	attr = {.connection_type = ZBX_TCP_SEC_UNENCRYPTED};
+
+	ZBX_UNUSED(sock);
+
+#endif
+	RDLOCK_CACHE;
+
+	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, &attr, redirect))
+	{
+		ret = SUCCEED_PARTIAL;
+		goto out;
+	}
+
+	if (NULL != (dc_host = DCfind_host(host)))
+	{
+		dc_get_history_recv_host(recv_host, dc_host, mode);
+		ret = SUCCEED;
+	}
+out:
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host information by name                                      *
+ *                                                                            *
+ * Parameters: host      - [IN] host name                                     *
+ *             sock      - [IN] connection socket                             *
+ *             recv_host - [OUT] host information                             *
+ *             redirect  - [OUT] host redirection data (optional)             *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
+		zbx_comms_redirect_t *redirect)
+{
+	return dc_config_get_host_by_name(host, sock, ZBX_ITEM_GET_HOSTINFO, recv_host, redirect);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host identifier by name                                       *
+ *                                                                            *
+ * Parameters: host     - [IN] host name                                      *
+ *             sock     - [IN] connection socket                              *
+ *             hostid   - [OUT] host identifier                               *
+ *             redirect - [OUT] host redirection data (optional)              *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
+		zbx_comms_redirect_t *redirect)
+{
+	zbx_history_recv_host_t	recv_host;
+	int			ret;
+
+	if (SUCCEED == (ret = dc_config_get_host_by_name(host, sock, 0, &recv_host, redirect)))
+		*hostid = recv_host.hostid;
+
+	return ret;
+}
+
+
 #undef ZBX_CONNECTOR_STATUS_ENABLED
+

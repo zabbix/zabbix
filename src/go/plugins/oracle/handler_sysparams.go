@@ -22,7 +22,7 @@ package oracle
 import (
 	"context"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func sysParamsHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {

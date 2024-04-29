@@ -113,10 +113,9 @@ class CImportDataAdapter {
 					}
 				}
 
-				$hosts[] = CArrayHelper::getByKeys($host, [
-					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
-					'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
-					'inventory_mode', 'tags', 'valuemaps'
+				$hosts[] = CArrayHelper::getByKeys($host, ['host', 'name', 'description', 'monitored_by', 'proxy',
+					'proxy_group', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+					'templates', 'groups', 'interfaces', 'tags', 'macros', 'inventory', 'inventory_mode', 'valuemaps'
 				]);
 			}
 		}

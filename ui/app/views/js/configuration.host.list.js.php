@@ -39,7 +39,13 @@
 
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-template')) {
-					this.editTemplate({templateid: e.target.dataset.templateid})
+					this.editTemplate({templateid: e.target.dataset.templateid});
+				}
+				else if (e.target.classList.contains('js-edit-proxy')) {
+					this.editProxy(e.target.dataset.proxyid);
+				}
+				else if (e.target.classList.contains('js-edit-proxy-group')) {
+					this.editProxyGroup(e.target.dataset.proxy_groupid);
 				}
 			});
 		},
@@ -51,20 +57,39 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('hosts');
-				postMessageOk(e.detail.title);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+		},
 
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
+		editProxy(proxyid) {
+			const overlay = PopUp('popup.proxy.edit', {proxyid}, {
+				dialogueid: 'proxy_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
 			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+		},
+
+		editProxyGroup(proxy_groupid) {
+			const overlay = PopUp('popup.proxygroup.edit', {proxy_groupid}, {
+				dialogueid: 'proxy-group-edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+		},
+
+		reload(success) {
+			postMessageOk(success.title);
+
+			if ('messages' in success) {
+				postMessageDetails('success', success.messages);
+			}
+
+			uncheckTableRows('hosts');
+
+			location.href = location.href;
 		},
 
 		initFilter() {
@@ -80,16 +105,27 @@
 				new CTagFilterItem(row);
 			});
 
-			$('#filter_monitored_by').on('change', function() {
-				const filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
+			$('#filter_monitored_by')
+				.on('change', function() {
+					const filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
 
-				if (filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?>) {
-					$('#filter_proxyids_').multiSelect('enable');
-				}
-				else {
-					$('#filter_proxyids_').multiSelect('disable');
-				}
-			});
+					for (const field of document.querySelectorAll('.js-filter-proxyids')) {
+						field.style.display = filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?> ? '' : 'none';
+					}
+
+					$('#filter_proxyids_').multiSelect(
+						filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?> ? 'enable' : 'disable'
+					);
+
+					for (const field of document.querySelectorAll('.js-filter-proxy-groupids')) {
+						field.style.display = filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? '' : 'none';
+					}
+
+					$('#filter_proxy_groupids_').multiSelect(
+						filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? 'enable' : 'disable'
+					);
+				})
+				.trigger('change');
 		},
 
 		createHost() {

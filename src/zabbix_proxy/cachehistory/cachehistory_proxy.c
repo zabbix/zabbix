@@ -365,15 +365,15 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	ZBX_UNUSED(events_cbs);
 	ZBX_UNUSED(rtc);
 
-	int				history_num, txn_rc;
+	int				history_num, txn_rc = ZBX_DB_OK;
 	time_t				sync_start;
-	zbx_vector_ptr_t		history_items;
+	zbx_vector_hc_item_ptr_t	history_items;
 	zbx_vector_item_diff_ptr_t	item_diff;
 	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
 
 	ZBX_UNUSED(config_history_storage_pipelines);
-	zbx_vector_ptr_create(&history_items);
-	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
+	zbx_vector_hc_item_ptr_create(&history_items);
+	zbx_vector_hc_item_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 	zbx_vector_item_diff_ptr_create(&item_diff);
 
 	sync_start = time(NULL);
@@ -433,7 +433,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 			zbx_dbcache_unlock();
 		}
 
-		zbx_vector_ptr_clear(&history_items);
+		zbx_vector_hc_item_ptr_clear(&history_items);
 		zbx_vector_item_diff_ptr_clear_ext(&item_diff, zbx_item_diff_free);
 
 		/* Exit from sync loop if we have spent too much time here */
@@ -443,5 +443,5 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
 
 	zbx_vector_item_diff_ptr_destroy(&item_diff);
-	zbx_vector_ptr_destroy(&history_items);
+	zbx_vector_hc_item_ptr_destroy(&history_items);
 }

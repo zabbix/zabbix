@@ -25,8 +25,7 @@ import (
 	"regexp"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-
+	"golang.zabbix.com/sdk/zbxerr"
 	"github.com/mediocregopher/radix/v3"
 )
 

@@ -9,15 +9,10 @@ zabbix_export:
       name: 'Asterisk by HTTP'
       description: |
         The template gets Asterisk metrics from AMI by HTTP agent.
-        You should enable the mini-HTTP Server, add the option webenabled=yes
-        in the general section of the manager.conf file and create Asterisk Manager
-        user with system and command write permissions within your Asterisk instance.
+        You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and create Asterisk Manager user with system and command write permissions within your Asterisk instance.
         Disable the PJSIP driver if you do not use PJSIP or do not have PJSIP endpoints.
-        Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host
-        should have an Agent interface with the AMI address to check Asterisk service
-        status.
-        Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in
-        the template for using on the host level.
+        Please, define AMI address in the {$AMI.URL} macro. Also, set the hostname or IP address of the AMI host in the {$AMI.HOST} macro for Zabbix to check Asterisk service status.
+        Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level.
         If there are errors, increase the logging to debug level and see the Zabbix server log.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/410060-discussion-thread-for-official-zabbix-template-asterisk
@@ -744,7 +739,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Asterisk: Service is down'
-                  expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0'
+                  expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0'
               tags:
                 - tag: scope
                   value: availability
@@ -819,7 +814,7 @@ zabbix_export:
         - uuid: 09102393dc6a4ac598f02d95801c6ca0
           name: 'Asterisk: Service response time'
           type: SIMPLE
-          key: 'net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"]'
+          key: 'net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -829,21 +824,21 @@ zabbix_export:
               value: network
           triggers:
             - uuid: dbc74502be01498194003dc1a3d90014
-              expression: 'min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}'
               name: 'Asterisk: Service response time is too high'
               event_name: 'Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 - name: 'Asterisk: Service is down'
-                  expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0'
+                  expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 58e18df6a5534395bf74d3babdb73170
           name: 'Asterisk: Service status'
           type: SIMPLE
-          key: 'net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]'
+          key: 'net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"]'
           history: 7d
           description: 'Asterisk Manager API port availability.'
           valuemap:
@@ -859,7 +854,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 1fa3370fa93f4d07a2c470f993096554
-              expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0'
+              expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0'
               name: 'Asterisk: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -1283,6 +1278,9 @@ zabbix_export:
         - tag: target
           value: asterisk
       macros:
+        - macro: '{$AMI.HOST}'
+          value: '<SET AMI HOST>'
+          description: 'The hostname or IP address of the Asterisk Manager API host.'
         - macro: '{$AMI.PORT}'
           value: '5038'
           description: 'AMI port number for checking service availability.'

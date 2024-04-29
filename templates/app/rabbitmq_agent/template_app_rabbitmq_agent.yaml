@@ -927,6 +927,13 @@ zabbix_export:
               path: $.type
             - lld_macro: '{#VHOST}'
               path: $.vhost
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(JSON.parse(value),[''name'',''type'',''vhost'']);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 406836367f45425fbd181a20dc3d08d7
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -969,7 +976,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the cluster'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -986,6 +993,9 @@ zabbix_export:
                   	parseInt(value.split('.')[1]) * 100 +
                   	parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
@@ -1499,6 +1509,9 @@ zabbix_export:
               parameters:
                 - '\n\s?\n(.*)'
                 - \1
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: raw
@@ -1573,6 +1586,9 @@ zabbix_export:
                   	parseInt(value.split('.')[1]) * 100 +
                   	parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version < 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 3c0021a3e57142eb806deb5b47b6700a
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -1616,7 +1632,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are valid TLS certificates expiring in the next month'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1655,7 +1671,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the node'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1695,7 +1711,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are queues that could potentially lose data if this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks whether there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'It checks whether there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1735,7 +1751,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks if there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'It checks if there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1774,7 +1790,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are not running virtual hosts'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'It checks if there are not running virtual hosts via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'It checks if there are not running virtual hosts via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1791,6 +1807,9 @@ zabbix_export:
                   	parseInt(value.split('.')[1]) * 100 +
                   	parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 7cdf2316fa664f34b5de4f315bb7caf9
           name: 'RabbitMQ process discovery'
           type: DEPENDENT
@@ -2310,7 +2329,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: aabd7d6fe6a047d186504386d3a48ae1
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages'
+              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages total'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2515,6 +2534,13 @@ zabbix_export:
               path: $.name
             - lld_macro: '{#VHOST}'
               path: $.vhost
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(JSON.parse(value),[''node'',''name'',''vhost'']);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software

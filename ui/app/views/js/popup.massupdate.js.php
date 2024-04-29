@@ -159,6 +159,31 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	mass_action_tpls.dispatchEvent(new CustomEvent('change', {}));
 })();
 
+// Monitored by.
+(() => {
+	const element = document.querySelector('#monitored-by-field');
+
+	if (element === null) {
+		return false;
+	}
+
+	const obj = element.tagName === 'SPAN' ? element.originalObject : element;
+	const monitored_by = obj.querySelector('#monitored_by');
+
+	if (monitored_by === null) {
+		return false;
+	}
+
+	monitored_by.addEventListener('change', (e) => {
+		obj.querySelector('.js-field-proxy').style.display =
+			e.target.value == <?= ZBX_MONITORED_BY_PROXY ?> ? '' : 'none';
+		obj.querySelector('.js-field-proxy-group').style.display =
+			e.target.value == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? '' : 'none';
+	});
+
+	monitored_by.dispatchEvent(new CustomEvent('change', {}));
+})();
+
 // Inventory mode.
 (() => {
 	const inventory = document.querySelector('#inventoryFormList');

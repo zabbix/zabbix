@@ -46,8 +46,8 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/internal/agent"
 )
 
@@ -88,11 +88,12 @@ type AgentCommands struct {
 
 type AgentDataRequest struct {
 	Request  string           `json:"request"`
-	Data     []*AgentData     `json:"data",omitempty"`
+	Data     []*AgentData     `json:"data,omitempty"`
 	Commands []*AgentCommands `json:"commands,omitempty"`
 	Session  string           `json:"session"`
 	Host     string           `json:"host"`
 	Version  string           `json:"version"`
+	Variant  int              `json:"variant"`
 }
 
 type Uploader interface {

@@ -1,5 +1,5 @@
 .list-table {
-	width: 100%;
+	min-width: 100%;
 	background-color: $ui-bg-color;
 	border-collapse: separate;
 	border: 1px solid $ui-border-color;
@@ -20,6 +20,7 @@
 
 			.text-vertical {
 				max-height: 150px;
+				min-width: 22px;
 				overflow: hidden;
 				text-overflow: ellipsis;
 				writing-mode: vertical-lr;
@@ -173,12 +174,18 @@
 
 	.nothing-to-show {
 		td {
+			height: auto;
 			color: $font-alt-color;
 			text-align: center;
 
 			&:hover {
 				background-color: $ui-bg-color;
 			}
+		}
+
+		.no-data-found {
+			margin-top: 100px;
+			margin-bottom: 100px;
 		}
 	}
 

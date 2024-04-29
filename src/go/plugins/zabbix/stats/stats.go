@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"zabbix.com/pkg/zbxcomms"
 )
 
@@ -60,7 +60,7 @@ func (p *Plugin) getRemoteZabbixStats(addr string, req []byte, timeout int) ([]b
 	var parse response
 
 	resp, errs, _ := zbxcomms.Exchange(
-		&[]string{addr},
+		zbxcomms.NewAddress(addr),
 		&p.localAddr,
 		time.Duration(timeout)*time.Second,
 		time.Duration(timeout)*time.Second,
