@@ -27,12 +27,12 @@ import (
 	"time"
 	"unsafe"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/zbxlib"
 )
 
 // clientItem represents item monitored by client

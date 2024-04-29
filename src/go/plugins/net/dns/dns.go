@@ -27,10 +27,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/miekg/dns"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
-	"github.com/miekg/dns"
 )
 
 const (

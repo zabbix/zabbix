@@ -27,8 +27,8 @@ import (
 	"strings"
 	"time"
 
-	"golang.zabbix.com/sdk/zbxerr"
 	"github.com/miekg/dns"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (

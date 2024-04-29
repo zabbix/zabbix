@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"time"
 
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
 )
 
 func checkMetric(s scheduler.Scheduler, metric string) {

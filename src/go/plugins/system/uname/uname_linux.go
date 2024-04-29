@@ -26,7 +26,7 @@ import (
 	"strings"
 	"syscall"
 
-	"zabbix.com/util"
+	"golang.zabbix.com/agent2/util"
 )
 
 func getUname(params []string) (uname string, err error) {

@@ -23,9 +23,9 @@ import (
 	"fmt"
 	"unsafe"
 
+	"golang.zabbix.com/agent2/pkg/pdh"
+	"golang.zabbix.com/agent2/pkg/win32"
 	"golang.zabbix.com/sdk/log"
-	"zabbix.com/pkg/pdh"
-	"zabbix.com/pkg/win32"
 )
 
 type pdhCollector struct {

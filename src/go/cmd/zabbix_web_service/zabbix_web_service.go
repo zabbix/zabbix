@@ -30,11 +30,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"golang.zabbix.com/agent2/pkg/version"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxflag"
 	"golang.zabbix.com/sdk/zbxnet"
-	"zabbix.com/pkg/version"
 )
 
 const usageMessageFormat = //
