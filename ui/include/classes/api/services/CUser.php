@@ -528,7 +528,7 @@ class CUser extends CApiService {
 		}
 
 		$db_roles = self::getDbRoles($users, $db_users);
-		self::checkRoles($users, $db_roles);
+		self::checkRoles($users, $db_roles, $db_users);
 		self::addRoleType($users, $db_roles, $db_users);
 
 		self::addAffectedObjects($users, $db_users);
@@ -1050,13 +1050,24 @@ class CUser extends CApiService {
 	 *
 	 * @param array      $users
 	 * @param array      $db_roles
+	 * @param array|null $db_users
 	 *
 	 * @throws APIException
 	 */
-	private static function checkRoles(array $users, array $db_roles): void {
+	private static function checkRoles(array $users, array $db_roles, array $db_users = null): void {
 		foreach ($users as $i => $user) {
-			if (array_key_exists('roleid', $user) && $user['roleid'] != 0
-					&& !array_key_exists($user['roleid'], $db_roles)) {
+			if (!array_key_exists('roleid', $user)) {
+				continue;
+			}
+
+			if ($db_users !== null && $db_users[$user['userid']]['userdirectoryid'] != 0
+					&& bccomp($user['roleid'], $db_users[$user['userid']]['roleid']) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_s('cannot update readonly parameter "%1$s" of provisioned user', 'roleid')
+				));
+			}
+
+			if ($user['roleid'] != 0 && !array_key_exists($user['roleid'], $db_roles)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/roleid',
 					_('object does not exist')
 				));
