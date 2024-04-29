@@ -23,6 +23,7 @@
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"
+#include "checks_browser.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
 
@@ -140,8 +141,10 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 #endif
 			break;
 		case ITEM_TYPE_SCRIPT:
-		case ITEM_TYPE_BROWSER:
 			res = get_value_script(item, config_comms->config_source_ip, result);
+			break;
+		case ITEM_TYPE_BROWSER:
+			res = get_value_browser(item, config_comms->config_source_ip, result);
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
@@ -850,6 +853,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
+	browseritem_es_engine_init();
 
 	zbx_get_program_type_cb = poller_args_in->zbx_get_program_type_cb_arg;
 	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
@@ -943,6 +947,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	}
 
 	scriptitem_es_engine_destroy();
+	browseritem_es_engine_destroy();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
