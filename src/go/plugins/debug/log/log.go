@@ -22,9 +22,9 @@ package log
 import (
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 var impl Plugin

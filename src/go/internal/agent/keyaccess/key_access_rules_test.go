@@ -24,8 +24,8 @@ package keyaccess
 import (
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"zabbix.com/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/sdk/conf"
 )
 
 type accessRules struct {

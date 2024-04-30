@@ -54,7 +54,8 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $list_url),
 		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $list_url),
 		_('Tags')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['items'] as $item) {
 	$name = [makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
@@ -128,7 +129,7 @@ foreach ($data['items'] as $item) {
 	]);
 }
 
-$form->addItem([$table, $data['paging']]);
+$form->addItem($table);
 
 $buttons = [
 	[

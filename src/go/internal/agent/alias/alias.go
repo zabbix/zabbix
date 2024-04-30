@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"strings"
 
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/itemutil"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/itemutil"
 )
 
 type keyAlias struct {

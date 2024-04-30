@@ -2391,6 +2391,8 @@ int	zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char *
 		return FAIL;
 	}
 
+	attr->connection_type = sock->connection_type;
+
 	return SUCCEED;
 }
 
@@ -2400,10 +2402,10 @@ int	zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char *
  *          context of established connection                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *attr, const char *tls_issuer,
-		const char *tls_subject, const char *tls_psk_identity, const char **msg)
+int	zbx_tls_validate_attr(const zbx_tls_conn_attr_t *attr, const char *tls_issuer, const char *tls_subject,
+		const char *tls_psk_identity, const char **msg)
 {
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	if (ZBX_TCP_SEC_TLS_CERT == attr->connection_type)
 	{
 		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *tls_issuer && 0 != strcmp(tls_issuer, attr->issuer))
@@ -2420,7 +2422,7 @@ int	zbx_tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *a
 		}
 	}
 #if defined(HAVE_OPENSSL_WITH_PSK)
-	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	else if (ZBX_TCP_SEC_TLS_PSK == attr->connection_type)
 	{
 		if (NULL != tls_psk_identity)
 		{

@@ -25,7 +25,8 @@
  *                                                                            *
  * Purpose: processes program type (proxy) specific internal checks           *
  *                                                                            *
- * Parameters: param1  - [IN] first parameter                                 *
+ * Parameters: item    - [IN] item to process                                 *
+ *             param1  - [IN] first parameter                                 *
  *             request - [IN]                                                 *
  *             result  - [OUT]                                                *
  *                                                                            *
@@ -37,8 +38,11 @@
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext_proxy(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext_proxy(const zbx_dc_item_t *item, const char *param1,
+		const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(item);
+
 	if (0 == strcmp(param1, "proxy_history"))
 	{
 		if (1 != get_rparams_num(request))

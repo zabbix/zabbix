@@ -29,14 +29,14 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({popup_url, form_name, host_interfaces, host_is_discovered, warnings}) {
+	init({popup_url, form_name, host_interfaces, proxy_groupid, host_is_discovered, warnings}) {
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		history.replaceState({}, '', popup_url);
 
-		host_edit.init({form_name, host_interfaces, host_is_discovered});
+		host_edit.init({form_name, host_interfaces, proxy_groupid, host_is_discovered});
 
 		if (warnings.length) {
 			const message_box = warnings.length == 1
@@ -59,6 +59,9 @@ window.host_edit_popup = {
 			if (target.classList.contains('js-edit-linked-template')) {
 				this.editTemplate({templateid: e.target.dataset.templateid});
 			}
+			else if (target.classList.contains('js-edit-proxy')) {
+				this.editProxy(e.target.dataset.proxyid);
+			}
 			else if (target.classList.contains('js-update-item')) {
 				this.editItem(target, target.dataset);
 			}
@@ -75,6 +78,24 @@ window.host_edit_popup = {
 		const overlay = PopUp('template.edit', parameters, {
 			dialogueid: 'templates-form',
 			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) =>
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
+		);
+	},
+
+	editProxy(proxyid) {
+		if (!this.isConfirmed()) {
+			return;
+		}
+
+		overlayDialogueDestroy(this.overlay.dialogueid);
+
+		const overlay = PopUp('popup.proxy.edit', {proxyid}, {
+			dialogueid: 'proxy_edit',
+			dialogue_class: 'modal-popup-static',
 			prevent_navigation: true
 		});
 
