@@ -3268,8 +3268,7 @@ static int	dbsync_compare_maintenance(const zbx_dc_maintenance_t *maintenance, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares item script params table row with cached configuration   *
- *          data                                                              *
+ * Purpose: compares item params table row with cached configuration data     *
  *                                                                            *
  * Parameter: script - [IN] the cached item script                            *
  *            dbrow  - [IN] the database row                                  *
