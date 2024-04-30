@@ -53,7 +53,8 @@ $menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
 // UI
 $ui-bg-color: #2b2b2b;
 $ui-bg-selected-color: #4f4f4f;
-$ui-hover-bg-color: #383838;
+$ui-hover-bg-color: #3a3a3a;
+$ui-selected-bg-color: #4a4a4a;
 $ui-border-color: #303030;
 $ui-placeholder-background-color: darken($ui-hover-bg-color, 15%);
 $ui-highlighted-parent-background-color: darken($ui-hover-bg-color, 10%);
@@ -141,6 +142,9 @@ $honeycomb-cell-color: #3d5059;
 $honeycomb-no-data-cell-color: #383838;
 $honeycomb-label-color: #eeeeee;
 $honeycomb-no-data-label-color: #eeeeee;
+
+// Map.
+$map-selection-stroke-color: #383838;
 
 // Statuses
 $problem-unack-fg-color: #ff3333;

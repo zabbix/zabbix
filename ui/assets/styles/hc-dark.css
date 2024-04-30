@@ -2288,16 +2288,16 @@ button {
       border: 0; }
       .list-table thead th a:hover, .list-table thead th a:focus, .list-table thead th a:active {
         text-decoration: none;
-        background-color: #222222; }
+        background-color: #3b3b3b; }
   .list-table tbody tr.hidden {
     display: none; }
   .list-table tbody tr:last-child th,
   .list-table tbody tr:last-child td {
     border-bottom-style: none; }
   .list-table tbody tr:not(.hover-nobg):not(.row-selected):hover {
-    background-color: #222222; }
+    background-color: #3b3b3b; }
   .list-table tbody tr.row-selected {
-    background-color: #222222; }
+    background-color: #575757; }
   .list-table tbody th.table-info,
   .list-table tbody td.table-info {
     color: #cacaca; }
@@ -3012,7 +3012,7 @@ output {
   padding: 9px 8px;
   border-bottom: 1px solid #333333; }
   .navigation-tree .navigation-tree-node-info:hover {
-    background-color: #222222; }
+    background-color: #3b3b3b; }
 .navigation-tree .navigation-tree-node-info-helpers {
   display: flex; }
 .navigation-tree .navigation-tree-node-info-primary {
@@ -3855,7 +3855,7 @@ section {
     border: none;
     padding: 8px 10px; }
     .ui-tabs-nav .ui-tabs-anchor:not(.btn):hover, .ui-tabs-nav .ui-tabs-anchor:not(.btn):focus, .ui-tabs-nav .ui-tabs-anchor:not(.btn):active {
-      background-color: #222222; }
+      background-color: #3b3b3b; }
   .ui-tabs-nav .ui-tabs-active .ui-tabs-anchor:not(.btn) {
     padding-bottom: 6px;
     background-color: transparent;
@@ -3873,7 +3873,7 @@ section {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0; }
     .ui-tabs-nav .ui-tabs-active .btn:hover, .ui-tabs-nav .ui-tabs-active .btn:focus, .ui-tabs-nav .ui-tabs-active .btn:active {
-      background-color: #222222; }
+      background-color: #3b3b3b; }
   .ui-tabs-nav .ui-state-focus .ui-tabs-anchor:not(:focus) {
     box-shadow: 0 0 0 2px #ffffff; }
   .ui-tabs-nav .ui-state-disabled .ui-tabs-anchor {
@@ -4372,6 +4372,12 @@ div.dashboard-widget-map .sysmap-widget-container {
   display: flex; }
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
+    div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
+      fill: #3b3b3b;
+      stroke-width: 1px;
+      stroke: #797676; }
+      div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
+        fill: #575757; }
 div.dashboard-widget-map .btn-back-map-container {
   text-align: left;
   position: absolute;
@@ -4518,7 +4524,7 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   padding: 9px 0;
   border-bottom: 1px solid #333333; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row:hover {
-    background-color: #222222; }
+    background-color: #3b3b3b; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content {
     position: relative;
     display: flex;
@@ -4565,9 +4571,9 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .sortable-error {
   border-color: transparent;
   background: rgba(255, 80, 80, 0.2); }
 div.dashboard-widget-navtree .navtree .tree .highlighted-parent > .tree-row {
-  background: #555555; }
+  background: #6e6e6e; }
 div.dashboard-widget-navtree .navtree .tree .placeholder {
-  background-color: #3c3c3c;
+  background-color: #555555;
   animation: fadein .5s; }
 div.dashboard-widget-navtree .treeview {
   display: inline-block;
@@ -6533,7 +6539,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   color: #00ff00; }
 
 .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
-  background-color: #222222; }
+  background-color: #575757; }
 
 @keyframes is-loading-kf {
   to {
@@ -7894,7 +7900,7 @@ td.inactive-bg {
   box-shadow: 0 0 0 2px #ffffff; }
 .ui-tabs-nav .ui-state-focus.ui-tabs-active .btn-time,
 .ui-tabs-nav .ui-state-focus.ui-tabs-active .filter-trigger {
-  background-color: #222222;
+  background-color: #3b3b3b;
   box-shadow: 0 0 0 2px #ffffff; }
 
 .time-quick li a:focus {

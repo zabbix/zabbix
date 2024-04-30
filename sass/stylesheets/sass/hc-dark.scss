@@ -97,7 +97,8 @@ $sidebar-server-name-color: #787878;
 // UI
 $ui-bg-color: #000000;
 $ui-bg-selected-color: #dddddd;
-$ui-hover-bg-color: #222222;
+$ui-hover-bg-color: #3b3b3b;
+$ui-selected-bg-color: #575757;
 $ui-border-color: #444444;
 $ui-placeholder-background-color: lighten($ui-hover-bg-color, 10%);
 $ui-highlighted-parent-background-color: lighten($ui-hover-bg-color, 20%);
@@ -200,6 +201,9 @@ $honeycomb-cell-color: #335463;
 $honeycomb-no-data-cell-color: #111111;
 $honeycomb-label-color: #eeeeee;
 $honeycomb-no-data-label-color: #cacaca;
+
+// Map.
+$map-selection-stroke-color: #797676;
 
 // Statuses
 $problem-unack-fg-color: #ff3333;

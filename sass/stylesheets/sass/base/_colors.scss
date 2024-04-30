@@ -136,7 +136,8 @@ $sidebar-server-name-color: rgba($menu-user-color, 0.5) !default;
 // UI.
 $ui-bg-color: #ffffff !default;
 $ui-border-color: #dfe4e7 !default;
-$ui-hover-bg-color: #e8f5ff !default;
+$ui-hover-bg-color: #e0f7ff !default;
+$ui-selected-bg-color: #c9e3fc !default;
 $ui-selected-color: #fff !default;
 $ui-selected-hover-color: #dfe4e7 !default;
 $ui-bg-selected-color: #768d99 !default;
@@ -145,7 +146,7 @@ $ui-highlighted-parent-background-color: lighten($body-bg-color, 4%) !default;
 $ui-sortable-helper-background-color: $ui-bg-color !default;
 $ui-sortable-helper-border-color: $ui-border-color !default;
 
-$action-hover-color: #e8f5ff !default;
+$action-hover-color: #e0f7ff !default;
 $action-border-color: #ccd5d9 !default;
 $action-shadow-color: rgba(#768d99, .5) !default;
 
@@ -328,6 +329,9 @@ $honeycomb-cell-color: #d9e7ed !default;
 $honeycomb-no-data-cell-color: #ebebeb !default;
 $honeycomb-label-color: #1f2c33 !default;
 $honeycomb-no-data-label-color: #3c5563 !default;
+
+// Map.
+$map-selection-stroke-color: #ced7db !default;
 
 // Timeline.
 $timeline-color: #aad7f0;

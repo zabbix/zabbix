@@ -40,6 +40,11 @@ class CWidgetMap extends CWidget {
 	 */
 	#event_handlers;
 
+	/**
+	 * @type {string}
+	 */
+	#selected_element_id = '';
+
 	onStart() {
 		this.#registerEvents();
 	}
@@ -56,6 +61,10 @@ class CWidgetMap extends CWidget {
 		const fields_data = this.getFieldsData();
 
 		fields_data.sysmapid = fields_data.sysmapid ? fields_data.sysmapid[0] : fields_data.sysmapid;
+
+		if (fields_data.sysmapid !== undefined) {
+			this.#deselectMapElement();
+		}
 
 		if (this.#map_svg !== null || this.isFieldsReferredDataUpdated('sysmapid')) {
 			this.#previous_maps = [];
@@ -142,6 +151,8 @@ class CWidgetMap extends CWidget {
 		this.#sysmapid = sysmapid;
 		this.#map_svg = null;
 
+		this.#deselectMapElement();
+
 		this._startUpdating();
 	}
 
@@ -149,19 +160,34 @@ class CWidgetMap extends CWidget {
 		options.canvas.useViewBox = true;
 		options.show_timestamp = false;
 		options.container = this._target.querySelector('.sysmap-widget-container');
+		options.can_select_element = true;
+		options.selected_element_id = this.#selected_element_id;
 
 		this.#map_svg = new SVGMap(options);
 	}
 
+	#deselectMapElement() {
+		this.#selected_element_id = '';
+
+		this.broadcast({
+			_hostid: CWidgetsData.getDefault('_hostid'),
+			_hostgroupid: CWidgetsData.getDefault('_hostgroupid')
+		});
+	}
+
 	#activateContentEvents() {
+		this.#map_svg?.container.addEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
 			link.addEventListener('click', this.#event_handlers.back);
 		});
 	}
 
 	#deactivateContentEvents() {
+		this.#map_svg?.container.removeEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
-			link.addEventListener('click', this.#event_handlers.back);
+			link.removeEventListener('click', this.#event_handlers.back);
 		});
 	}
 
@@ -173,7 +199,18 @@ class CWidgetMap extends CWidget {
 				this.#sysmapid = sysmap.sysmapid;
 				this.#map_svg = null;
 
+				this.#deselectMapElement();
+
 				this._startUpdating();
+			},
+			select: e => {
+				if (this.#selected_element_id === e.detail.selected_element_id) {
+					return;
+				}
+
+				this.#selected_element_id = e.detail.selected_element_id;
+
+				this.broadcast({_hostid: e.detail._hostid, _hostgroupid: e.detail._hostgroupid});
 			}
 		};
 	}

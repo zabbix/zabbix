@@ -8,6 +8,18 @@ div.dashboard-widget-map {
 
 		svg {
 			flex-grow: 1;
+
+			.map-selections {
+				ellipse {
+					fill: $ui-hover-bg-color;
+					stroke-width: 1px;
+					stroke: $map-selection-stroke-color;
+
+					&.selected {
+						fill: $ui-selected-bg-color;
+					}
+				}
+			}
 		}
 	}
 

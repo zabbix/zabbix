@@ -12,6 +12,14 @@
 		"in": {
 			"sysmapid": {"type": "_mapid"}
 		},
+		"out": [
+			{
+				"type": "_hostid"
+			},
+			{
+				"type": "_hostgroupid"
+			}
+		],
 		"size": {
 			"width": 18,
 			"height": 5
