@@ -8311,8 +8311,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	update_sec = zbx_time() - sec;
 
 	config->revision.config = new_revision;
-zabbix_increase_log_level();
-zabbix_increase_log_level();
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec +
