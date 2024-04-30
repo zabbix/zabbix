@@ -3860,20 +3860,12 @@ static int	DBpatch_6050285(void)
 
 static int	DBpatch_6050286(void)
 {
-	const zbx_db_field_t	field = {"timeout_browser", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"timeout_browser", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
 static int	DBpatch_6050287(void)
-{
-	if (ZBX_DB_OK > zbx_db_execute("update config set timeout_browser='%ds'", DBget_config_timeout()))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_6050288(void)
 {
 	const zbx_db_field_t	field = {"timeout_browser", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -4172,6 +4164,5 @@ DBPATCH_ADD(6050284, 0, 1)
 DBPATCH_ADD(6050285, 0, 1)
 DBPATCH_ADD(6050286, 0, 1)
 DBPATCH_ADD(6050287, 0, 1)
-DBPATCH_ADD(6050288, 0, 1)
 
 DBPATCH_END()
