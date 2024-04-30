@@ -381,9 +381,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 	else if (DNS_QUERY_PERF == short_answer)
 	{
-		if (DNS_RCODE_NOERROR != res && DNS_ERROR_RCODE_NAME_ERROR != res)
+		if (ERROR_TIMEOUT == res)
 		{
 			SET_DBL_RESULT(result, 0.0);
+			ret = SYSINFO_RET_OK;
 			goto clean_dns;
 		}
 		else
@@ -564,6 +565,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #endif
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create DNS query: %s", zbx_strerror(errno)));
+
+#ifdef HAVE_RES_NDESTROY
+		res_ndestroy(&res_state_local);
+#else
+		res_nclose(&res_state_local);
+#endif
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -572,6 +579,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		if (0 == inet_aton(ip, &inaddr))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IP address."));
+
+#ifdef HAVE_RES_NDESTROY
+			res_ndestroy(&res_state_local);
+#else
+			res_nclose(&res_state_local);
+#endif
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -595,6 +608,11 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		if (0 == inet_pton(ip_type, ip, &in6addr))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IPv6 address."));
+#ifdef HAVE_RES_NDESTROY
+			res_ndestroy(&res_state_local);
+#else
+			res_nclose(&res_state_local);
+#endif
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -652,7 +670,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	res_state_local.retrans = retrans;
 	res_state_local.retry = retry;
-
+	memset(&answer.buffer, 0, sizeof(answer));
 	res = res_nsend(&res_state_local, buf, res, answer.buffer, sizeof(answer.buffer));
 
 #	ifdef HAVE_RES_U_EXT	/* Linux */
@@ -708,13 +726,27 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (DNS_QUERY_SHORT == short_answer)
 	{
 		SET_UI64_RESULT(result, dns_is_down ? 0 : 1);
+
+#ifdef HAVE_RES_NDESTROY
+		res_ndestroy(&res_state_local);
+#else
+		res_nclose(&res_state_local);
+#endif
 		return SYSINFO_RET_OK;
 	}
 	else if (DNS_QUERY_PERF == short_answer)
 	{
-		if (1 == dns_is_down && NXDOMAIN != hp->rcode)
+		/* -1 for res is returned also for REFUSED and SERVFAIL for res_send()          */
+		/* for NXDOMAIN - res is 0 and hp->rcode is set                                 */
+		/* for REFUXED and SERVFAIL res is -1, with hp->rcode set for particular error  */
+		/* for missing connection - res is -1, but hp->rcode it is uninitialized        */
+		/* So, the only to detect the missing connection is to set hp->rcode to 0 first,*/
+		/* and then to check if res is -1 with rcode beting set to 0.                   */
+		if (-1 == res && 0 == hp->rcode)
 		{
 			SET_DBL_RESULT(result, 0.0);
+			ret = SYSINFO_RET_OK;
+			goto clean;
 		}
 		else
 		{
@@ -724,13 +756,22 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				check_time = zbx_get_float_epsilon();
 			SET_DBL_RESULT(result, check_time);
 		}
-
+#ifdef HAVE_RES_NDESTROY
+		res_ndestroy(&res_state_local);
+#else
+		res_nclose(&res_state_local);
+#endif
 		return SYSINFO_RET_OK;
 	}
 
 	if (1 == dns_is_down)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot perform DNS query."));
+#ifdef HAVE_RES_NDESTROY
+		res_ndestroy(&res_state_local);
+#else
+		res_nclose(&res_state_local);
+#endif
 		return SYSINFO_RET_FAIL;
 	}
 
