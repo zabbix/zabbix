@@ -300,9 +300,10 @@ func (p *Plugin) Configure(
 
 	go func() {
 		if err := <-pluginExit; err != nil {
-			// TODO: handle this better. Need to notify the ower of Plugin
-			// struct that the plugin has failed. Then it can futher notify
-			// the run func from main.
+			//nolint:godox
+			// FIXME: Will be fixed in DEV-3709.
+			// Need to notify the owner of Plugin struct that the plugin has
+			// failed. Then it can further notify the run func from main.
 			panic(err)
 		}
 	}()

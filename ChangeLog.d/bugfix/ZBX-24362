@@ -1,1 +1,1 @@
-...G...... [ZBX-24362] fix loadable plugin process handling catchin all child process exits (rzvejs)
+...G...... [ZBX-24362] fix Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)

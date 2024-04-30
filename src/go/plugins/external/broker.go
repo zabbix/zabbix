@@ -40,9 +40,9 @@ type pluginBroker struct {
 	socket     string
 	timeout    time.Duration
 	conn       net.Conn
-	requests   map[uint32]chan interface{}
+	requests   map[uint32]chan any
 	errx       chan error
-	log        chan interface{}
+	log        chan any
 	// channel to handle agent->plugin requests
 	tx chan *request
 	// channel to handle plugin->agent requests/responses

@@ -89,11 +89,16 @@ Zabbix home page: <https://www.zabbix.com>
 Documentation: <https://www.zabbix.com/documentation>
 `
 
+//nolint:gochecknoglobals
 var (
 	manager          *scheduler.Manager
 	listeners        []*serverlistener.ServerListener
 	serverConnectors []*serverconnector.Connector
 	closeChan        = make(chan bool)
+
+	confDefault     string
+	applicationName string
+	pluginSocket    string
 )
 
 type AgentUserParamOption struct {
@@ -260,20 +265,8 @@ func run() error {
 	}
 }
 
-var (
-	confDefault     string
-	applicationName string
-	pluginsocket    string
-
-	argConfig  bool
-	argTest    bool
-	argPrint   bool
-	argVersion bool
-	argVerbose bool
-)
-
 func main() {
-	err := log.Open(log.Console, log.Debug, "", 0)
+	err := log.Open(log.Console, log.Warning, "", 0)
 	if err != nil {
 		fatalExit("cannot initialize default logger", err)
 	}
@@ -376,7 +369,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	pluginsocket, err = initExternalPlugins(&agent.Options)
+	pluginSocket, err = initExternalPlugins(&agent.Options)
 	if err != nil {
 		fatalExit("cannot register plugins", err)
 	}
@@ -749,7 +742,7 @@ func helpMessage(flagsUsage string) string {
 func fatalExit(message string, err error) {
 	fatalCloseOSItems()
 
-	if pluginsocket != "" {
+	if pluginSocket != "" {
 		cleanUpExternal()
 	}
 
