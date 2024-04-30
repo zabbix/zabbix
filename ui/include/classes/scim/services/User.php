@@ -375,7 +375,7 @@ class User extends ScimApiService {
 				continue;
 			}
 
-			$new_user_data['medias'][] = $db_media;
+			$new_user_data['medias'][] = ['sendto' => (array) $db_media['sendto']] + $db_media;
 		}
 
 		if (array_key_exists('active', $user_idp_data)) {
