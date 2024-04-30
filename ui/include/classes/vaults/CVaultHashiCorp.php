@@ -48,12 +48,14 @@ class CVaultHashiCorp extends CVault {
 			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint));
 		}
 
-		if ($this->db_prefix == self::DB_PREFIX_DEFAULT) {
-			$secret_parser = new CVaultSecretParser(['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false]);
+		$secret_parser = new CVaultSecretParser([
+			'provider' => ZBX_VAULT_TYPE_HASHICORP,
+			'with_namespace' => $this->db_prefix == self::DB_PREFIX_DEFAULT,
+			'with_key' => false
+		]);
 
-			if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
-				$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path));
-			}
+		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
+			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path));
 		}
 
 		if ($this->token === '') {
