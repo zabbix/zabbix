@@ -132,16 +132,16 @@ This template has been tested on:
 
 6. Set the `{$ORACLE.HOST}`, `{$ORACLE.DRIVER}` and `{$ORACLE.SERVICE}` in the host macros.
 
-    * ```{$ORACLE.HOST}``` is a hostname or IP address of the Oracle DB instance.
+    * `{$ORACLE.HOST}` is a hostname or IP address of the Oracle DB instance.
 
-    * ```{$ORACLE.DRIVER}``` is a path to the driver location in OS. The ODBC driver file should be found in __Instant Client__ directory and named ```libsqora.so.XX.Y```.
-    
-    * ```{$ORACLE.SERVICE}``` is a service name to which the host will connect to. The value in this macro is important as it determines if the connection is established to a non-CDB, CDB, or PDB. If you wish to monitor tablespaces of all PDBs, you will need to set a service name that points to the CDB.
+    * `{$ORACLE.DRIVER}` is a path to the driver location in the OS. The ODBC driver file should be found in the Instant Client directory and named `libsqora.so.XX.Y`.
+
+    * `{$ORACLE.SERVICE}` is a service name to which the host will connect to. The value in this macro is important as it determines if the connection is established to a non-CDB, CDB, or PDB. If you wish to monitor tablespaces of all PDBs, you will need to set a service name that points to the CDB.
       Active service names can be seen from the instance running Oracle Database with `lsnrctl status`.
       
     **Important! Make sure that the user created in step #1 is present on the specified service.**
 
-    The "Service's TCP port state" item uses ```{$ORACLE.HOST}``` and ```{$ORACLE.PORT}``` macros to check the availability of the listener.
+    The "Service's TCP port state" item uses `{$ORACLE.HOST}` and `{$ORACLE.PORT}` macros to check the availability of the listener.
 
 ### Macros used
 
