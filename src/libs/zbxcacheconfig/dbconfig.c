@@ -5882,10 +5882,10 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two item script parameters                                *
+ * Purpose: compare two item parameters                                       *
  *                                                                            *
  ******************************************************************************/
-static int	dc_compare_itemscript_param(const void *d1, const void *d2)
+static int	dc_compare_items_param(const void *d1, const void *d2)
 {
 	zbx_dc_item_param_t	*p1 = *(zbx_dc_item_param_t **)d1;
 	zbx_dc_item_param_t	*p2 = *(zbx_dc_item_param_t **)d2;
@@ -6162,7 +6162,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		params = dc_item_parameters(item);
 
 		if (0 < params->values_num)
-			zbx_vector_ptr_sort(params, dc_compare_itemscript_param);
+			zbx_vector_ptr_sort(params, dc_compare_items_param);
 	}
 
 	zbx_vector_ptr_destroy(&items);
