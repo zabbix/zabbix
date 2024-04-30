@@ -6059,28 +6059,28 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Updates item script parameters in configuration cache             *
+ * Purpose: Updates item parameters in configuration cache                    *
  *                                                                            *
  * Parameters: sync - [IN] the db synchronization data                        *
  *                                                                            *
  * Comments: The result contains the following fields:                        *
- *           0 - item_script_paramid                                          *
+ *           0 - item_paramid                                                 *
  *           1 - itemid                                                       *
  *           2 - name                                                         *
  *           3 - value                                                        *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
+static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
-	char				**row;
-	zbx_uint64_t			rowid;
-	unsigned char			tag;
-	zbx_uint64_t			item_script_paramid, itemid;
-	int				found, ret, i, index;
-	ZBX_DC_ITEM			*item;
-	zbx_dc_item_param_t		*scriptitem_params;
-	zbx_vector_ptr_t		items;
-	ZBX_DC_ITEM			*dc_item;
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
+	zbx_uint64_t		item_paramid, itemid;
+	int			found, ret, i, index;
+	ZBX_DC_ITEM		*item;
+	zbx_dc_item_param_t	*item_param;
+	zbx_vector_ptr_t	items;
+	ZBX_DC_ITEM		*dc_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6104,17 +6104,17 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			continue;
 		}
 
-		ZBX_STR2UINT64(item_script_paramid, row[0]);
-		scriptitem_params = (zbx_dc_item_param_t *)DCfind_id(&config->itemscript_params, item_script_paramid,
+		ZBX_STR2UINT64(item_paramid, row[0]);
+		item_param = (zbx_dc_item_param_t *)DCfind_id(&config->items_params, item_paramid,
 				sizeof(zbx_dc_item_param_t), &found);
 
-		dc_strpool_replace(found, &scriptitem_params->name, row[2]);
-		dc_strpool_replace(found, &scriptitem_params->value, row[3]);
+		dc_strpool_replace(found, &item_param->name, row[2]);
+		dc_strpool_replace(found, &item_param->value, row[3]);
 
 		if (0 == found)
 		{
-			scriptitem_params->itemid = itemid;
-			zbx_vector_ptr_append(params, scriptitem_params);
+			item_param->itemid = itemid;
+			zbx_vector_ptr_append(params, item_param);
 		}
 
 		zbx_vector_ptr_append(&items, item);
@@ -6126,26 +6126,25 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	{
 		zbx_vector_ptr_t	*params;
 
-		if (NULL == (scriptitem_params =
-				(zbx_dc_item_param_t *)zbx_hashset_search(&config->itemscript_params, &rowid)))
+		if (NULL == (item_param =
+				(zbx_dc_item_param_t *)zbx_hashset_search(&config->items_params, &rowid)))
 		{
 			continue;
 		}
 
-		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &scriptitem_params->itemid)) &&
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &item_param->itemid)) &&
 				NULL != (params = dc_item_parameters(item)))
 		{
-			if (FAIL != (index = zbx_vector_ptr_search(params, scriptitem_params,
-					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			if (FAIL != (index = zbx_vector_ptr_search(params, item_param, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				zbx_vector_ptr_remove_noorder(params, index);
 				zbx_vector_ptr_append(&items, item);
 			}
 		}
 
-		dc_strpool_release(scriptitem_params->name);
-		dc_strpool_release(scriptitem_params->value);
-		zbx_hashset_remove_direct(&config->itemscript_params, scriptitem_params);
+		dc_strpool_release(item_param->name);
+		dc_strpool_release(item_param->value);
+		zbx_hashset_remove_direct(&config->items_params, item_param);
 	}
 
 	/* sort item script parameters */
@@ -8130,7 +8129,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	/* relies on items, must be after DCsync_items() */
 	sec = zbx_time();
-	DCsync_itemscript_param(&itemscrp_sync, new_revision);
+	DCsync_items_param(&itemscrp_sync, new_revision);
 	itemscrp_sec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -9156,7 +9155,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 			__config_shmem_malloc_func, __config_shmem_realloc_func, __config_shmem_free_func)
 
 	CREATE_HASHSET(config->items, 0);
-	CREATE_HASHSET(config->itemscript_params, 0);
+	CREATE_HASHSET(config->items_params, 0);
 	CREATE_HASHSET(config->template_items, 0);
 	CREATE_HASHSET(config->item_discovery, 0);
 	CREATE_HASHSET(config->prototype_items, 0);

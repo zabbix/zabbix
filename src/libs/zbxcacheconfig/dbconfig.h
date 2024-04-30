@@ -1030,7 +1030,7 @@ typedef struct
 	zbx_hashset_t		gmacro_kv;
 	zbx_hashset_t		hmacro_kv;
 	zbx_hashset_t		preprocops;
-	zbx_hashset_t		itemscript_params;
+	zbx_hashset_t		items_params;
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;

@@ -512,7 +512,7 @@ static void	DCdump_scriptitem(const ZBX_DC_SCRIPTITEM *scriptitem)
 	{
 		zbx_dc_item_param_t	*params = (zbx_dc_item_param_t *)scriptitem->params.values[i];
 
-		zabbix_log(LOG_LEVEL_TRACE, "      item_script_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
+		zabbix_log(LOG_LEVEL_TRACE, "      item_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
 				params->item_script_paramid, params->name, params->value);
 	}
 }
@@ -527,7 +527,7 @@ static void	DCdump_browseritem(const ZBX_DC_BROWSERITEM *browseritem)
 	{
 		zbx_dc_item_param_t	*params = (zbx_dc_item_param_t *)browseritem->params.values[i];
 
-		zabbix_log(LOG_LEVEL_TRACE, "      item_script_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
+		zabbix_log(LOG_LEVEL_TRACE, "      item_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
 				params->item_script_paramid, params->name, params->value);
 	}
 }
