@@ -506,7 +506,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 
 	sz = (size_t)ipmi_control_get_id_length(control);
 	c_name = (char *)zbx_malloc(c_name, sz + 1);
-	ipmi_control_get_id(control, c_name, sz);
+	ipmi_control_get_id(control, c_name, (int)sz);
 
 	ipmi_control_get_name(control, full_name, sizeof(full_name));
 	dm_sz = get_domain_offset(h, full_name);
@@ -606,7 +606,8 @@ static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_threshold
 	for (enum ipmi_thresh_e i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
 	{
 		double	thr;
-		int	val, ret = ipmi_sensor_threshold_readable(sensor, i, &val);
+		int	val;
+		int	ret = ipmi_sensor_threshold_readable(sensor, i, &val);
 
 		s->thresholds[i].status = ZBX_IPMI_THRESHOLD_STATUS_DISABLED;
 
@@ -805,7 +806,7 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 
 		zabbix_log(LOG_LEVEL_DEBUG, "State [%s | %s | %s | %s | state %d value is %d]",
 				zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-				ipmi_get_entity_id_string(id), ipmi_sensor_get_sensor_type_string(sensor),
+				ipmi_get_entity_id_string((unsigned int)id), ipmi_sensor_get_sensor_type_string(sensor),
 				ipmi_sensor_get_event_reading_type_string(sensor), i, is_state_set);
 
 		if (0 != is_state_set)
@@ -1484,8 +1485,8 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 
 	if (0 != (ret = ipmi_ip_setup_con(addrs, ports, 1,
 			h->authtype == -1 ? (unsigned int)IPMI_AUTHTYPE_DEFAULT : (unsigned int)h->authtype,
-			(unsigned int)h->privilege, h->username, strlen(h->username),
-			h->password, strlen(h->password), os_hnd, NULL, &h->con)))
+			(unsigned int)h->privilege, h->username, (unsigned int)strlen(h->username),
+			h->password, (unsigned int)strlen(h->password), os_hnd, NULL, &h->con)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d."
 				" ipmi_ip_setup_con() returned error 0x%x",
@@ -1983,7 +1984,7 @@ int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *er
 	for (p = command; '\0' != *p && NULL == strchr(" \t", *p); p++)
 		;
 
-	if (0 == (sz_c_name = p - command))
+	if (0 == (sz_c_name = (size_t)(p - command)))
 	{
 		zbx_strlcpy(error, "IPMI command is empty", max_error_len);
 		goto fail;

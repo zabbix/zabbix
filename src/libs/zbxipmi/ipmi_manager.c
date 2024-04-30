@@ -583,7 +583,7 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 
 	if (NULL != data)
 	{
-		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, data_offset, NULL);
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
 		zbx_free(data);
 	}
 }
@@ -624,7 +624,7 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
 
 	if (NULL != data)
 	{
-		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, data_offset, NULL);
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
 		zbx_free(data);
 	}
 }
@@ -717,7 +717,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 	}
 
 	zbx_preprocessor_flush();
-	zbx_dc_config_clean_items(items, NULL, num);
+	zbx_dc_config_clean_items(items, NULL, (size_t)num);
 
 	return num;
 }
@@ -746,7 +746,7 @@ static void	ipmi_manager_process_client_request(zbx_ipmi_manager_t *manager, zbx
 	request = ipmi_request_create(0);
 	request->client = client;
 	zbx_ipc_message_copy(&request->message, message);
-	request->message.code = code;
+	request->message.code = (zbx_uint32_t)code;
 
 	ipmi_manager_schedule_request(manager, hostid, request, now);
 }
@@ -775,7 +775,7 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
 
 	if (SUCCEED == zbx_ipc_client_connected(poller->request->client))
 	{
-		zbx_ipc_client_send(poller->request->client, code, message->data, message->size);
+		zbx_ipc_client_send(poller->request->client, (zbx_uint32_t)code, message->data, message->size);
 		zbx_ipc_client_release(poller->request->client);
 	}
 
@@ -788,7 +788,7 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
  * Purpose: processes IPMI check result received from IPMI poller                     *
  *                                                                                    *
  * Parameters: manager            - [IN]                                              *
- *             client             - [IN] client (IPMI poller)                          *
+ *             client             - [IN] client (IPMI poller)                         *
  *             message            - [IN] received ZBX_IPC_IPMI_VALUE_RESULT message   *
  *             now                - [IN] current time                                 *
  *             unavailable_delay  - [IN]                                              *
