@@ -8311,7 +8311,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	update_sec = zbx_time() - sec;
 
 	config->revision.config = new_revision;
-
+zabbix_increase_log_level();
+zabbix_increase_log_level();
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec +
@@ -10038,10 +10039,10 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 			if (0 != parameters->values_num)
 			{
-				dst_item->tags = (zbx_vector_tags_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_tags_ptr_t));
+				dst_item->parameters = (zbx_vector_tags_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_tags_ptr_t));
 
-				zbx_vector_tags_ptr_create(dst_item->tags);
-				zbx_vector_tags_ptr_reserve(dst_item->tags, parameters->values_num);
+				zbx_vector_tags_ptr_create(dst_item->parameters);
+				zbx_vector_tags_ptr_reserve(dst_item->parameters, parameters->values_num);
 
 				for (i = 0; i < parameters->values_num; i++)
 				{
@@ -10050,11 +10051,11 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 					tag->tag = zbx_strdup(NULL, param->name);
 					tag->value = zbx_strdup(NULL, param->value);
-					zbx_vector_tags_ptr_append(dst_item->tags, tag);
+					zbx_vector_tags_ptr_append(dst_item->parameters, tag);
 				}
 			}
 			else
-				dst_item->tags = NULL;
+				dst_item->parameters = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
 			zbx_strscpy(dst_item->username_orig, src_item->itemtype.telnetitem->username);
@@ -10107,12 +10108,12 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 		{
 			case ITEM_TYPE_BROWSER:
 				zbx_free(items[i].params);
-				if (NULL != items[i].tags)
+				if (NULL != items[i].parameters)
 				{
-					zbx_vector_tags_ptr_clear_ext(items[i].tags, zbx_free_tag);
-					zbx_vector_tags_ptr_destroy(items[i].tags);
+					zbx_vector_tags_ptr_clear_ext(items[i].parameters, zbx_free_tag);
+					zbx_vector_tags_ptr_destroy(items[i].parameters);
 				}
-				zbx_free(items[i].tags);
+				zbx_free(items[i].parameters);
 				break;
 			case ITEM_TYPE_HTTPAGENT:
 				zbx_free(items[i].headers);
