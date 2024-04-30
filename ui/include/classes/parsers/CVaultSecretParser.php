@@ -25,8 +25,10 @@
  * Valid token must match format:
  * - <namespace>/<path/to/secret>:<key>
  * - <namespace>/<path/to/secret>
+ * - <path/to/secret>:<key>
+ * - <path/to/secret>
  *
- * Mutlibyte strings are supported.
+ * Multibyte strings are supported.
  */
 class CVaultSecretParser extends CParser {
 
@@ -42,6 +44,7 @@ class CVaultSecretParser extends CParser {
 	/**
 	 * @param array $options
 	 * @param int   $options['provider']  Vault provider.
+	 * @param bool  $options['with_namespace']  (optional) Validated string must contain namespace. Only for HashiCorp.
 	 * @param bool  $options['with_key']  (optional) Validated string must contain key.
 	 */
 	public function __construct(array $options = []) {
