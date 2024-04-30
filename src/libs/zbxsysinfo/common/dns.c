@@ -745,8 +745,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		if (-1 == res && 0 == hp->rcode)
 		{
 			SET_DBL_RESULT(result, 0.0);
-			ret = SYSINFO_RET_OK;
-			goto clean;
+#ifdef HAVE_RES_NDESTROY
+			res_ndestroy(&res_state_local);
+#else
+			res_nclose(&res_state_local);
+#endif
+			return SYSINFO_RET_OK;
 		}
 		else
 		{
