@@ -92,14 +92,8 @@ class CVaultSecretParser extends CParser {
 			$key_sep = strpos($source, ':', $current_pos);
 
 			if ($key_sep === false || $key_sep === $current_pos || $key_sep === $src_size - 1
-					|| strrpos($source, '//', $key_sep - $src_size) !== false) {
+					|| $source[$key_sep - 1] === '/' || strrpos($source, '//', $key_sep - $src_size) !== false) {
 				$this->errorPos($source, $current_pos);
-
-				return self::PARSE_FAIL;
-			}
-
-			if ($source[$key_sep - 1] === '/') {
-				$this->errorPos($source, $key_sep);
 
 				return self::PARSE_FAIL;
 			}
