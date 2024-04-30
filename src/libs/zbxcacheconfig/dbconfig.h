@@ -228,7 +228,6 @@ typedef struct
 {
 	const char		*script;
 	zbx_vector_ptr_t	params;
-	unsigned char		browser;
 }
 ZBX_DC_BROWSERITEM;
 
