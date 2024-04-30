@@ -300,7 +300,7 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 				'name' => $this->field->getName().'['.$row_num.'][items][]',
 				'object_name' => 'items',
 				'data' => $value['items'],
-				'placeholder' => _('item pattern'),
+				'placeholder' => _('item patterns'),
 				'wildcard_allowed' => 1,
 				'popup' => [
 					'parameters' => [
