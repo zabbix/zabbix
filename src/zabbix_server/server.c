@@ -464,6 +464,11 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HTTPPOLLER];
 	}
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_BROWSERPOLLER;
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER];
+	}
 	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERYMANAGER;
@@ -609,11 +614,6 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PG_MANAGER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_PG_MANAGER];
-	}
-	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER]))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_BROWSERPOLLER;
-		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER];
 	}
 	else
 		return FAIL;
