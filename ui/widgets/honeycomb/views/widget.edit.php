@@ -56,7 +56,7 @@ $form
 	)
 	->addField(
 		(new CWidgetFieldPatternSelectItemView($data['fields']['items']))
-			->setPlaceholder(_('item pattern'))
+			->setPlaceholder(_('patterns'))
 			->setFilterPreselect($hostids_field !== null
 				? [
 					'id' => $hostids_field->getId(),

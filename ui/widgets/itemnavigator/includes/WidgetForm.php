@@ -75,7 +75,7 @@ class WidgetForm extends CWidgetForm {
 				: new CWidgetFieldTags('host_tags')
 			)
 			->addField(
-				new CWidgetFieldPatternSelectItem('items', _('Item pattern'))
+				new CWidgetFieldPatternSelectItem('items', _('Item patterns'))
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('item_tags_evaltype', _('Item tags'), [
