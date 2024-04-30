@@ -3278,7 +3278,7 @@ static int	dbsync_compare_maintenance(const zbx_dc_maintenance_t *maintenance, c
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dbsync_compare_itemscript_param(const zbx_dc_scriptitem_param_t *scriptitem_param,
+static int	dbsync_compare_itemscript_param(const zbx_dc_item_param_t *scriptitem_param,
 		const zbx_db_row_t dbrow)
 {
 	if (FAIL == dbsync_compare_uint64(dbrow[1], scriptitem_param->itemid))
@@ -3310,7 +3310,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	zbx_hashset_t			ids;
 	zbx_hashset_iter_t		iter;
 	zbx_uint64_t			rowid;
-	zbx_dc_scriptitem_param_t	*itemscript_params;
+	zbx_dc_item_param_t	*itemscript_params;
 	char				**row;
 
 	if (NULL == (result = zbx_db_select(
@@ -3347,7 +3347,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 
 		row = dbsync_preproc_row(sync, dbrow);
 
-		if (NULL == (itemscript_params = (zbx_dc_scriptitem_param_t *)
+		if (NULL == (itemscript_params = (zbx_dc_item_param_t *)
 				zbx_hashset_search(&dbsync_env.cache->itemscript_params, &rowid)))
 		{
 			tag = ZBX_DBSYNC_ROW_ADD;
@@ -3363,7 +3363,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->itemscript_params, &iter);
 
-	while (NULL != (itemscript_params = (zbx_dc_scriptitem_param_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (itemscript_params = (zbx_dc_item_param_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL == zbx_hashset_search(&ids, &itemscript_params->item_script_paramid))
 			dbsync_add_row(sync, itemscript_params->item_script_paramid, ZBX_DBSYNC_ROW_REMOVE, NULL);

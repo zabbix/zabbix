@@ -1382,7 +1382,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->revision.config_table = revision;
 	}
 
-	if (NULL == config->config->item_timeouts.browser || 0 != strcmp(config->config->item_timeouts.browser, row[44]))
+	if (NULL == config->config->item_timeouts.browser || 0 != strcmp(config->config->item_timeouts.browser,
+			row[44]))
 	{
 		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.browser, row[44]);
 		config->revision.config_table = revision;
@@ -5886,8 +5887,8 @@ static void	DCsync_host_tags(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dc_compare_itemscript_param(const void *d1, const void *d2)
 {
-	zbx_dc_scriptitem_param_t	*p1 = *(zbx_dc_scriptitem_param_t **)d1;
-	zbx_dc_scriptitem_param_t	*p2 = *(zbx_dc_scriptitem_param_t **)d2;
+	zbx_dc_item_param_t	*p1 = *(zbx_dc_item_param_t **)d1;
+	zbx_dc_item_param_t	*p2 = *(zbx_dc_item_param_t **)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->name, p2->name);
 	ZBX_RETURN_IF_NOT_EQUAL(p1->value, p2->value);
@@ -6077,10 +6078,9 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	zbx_uint64_t			item_script_paramid, itemid;
 	int				found, ret, i, index;
 	ZBX_DC_ITEM			*item;
-	zbx_dc_scriptitem_param_t	*scriptitem_params;
+	zbx_dc_item_param_t		*scriptitem_params;
 	zbx_vector_ptr_t		items;
 	ZBX_DC_ITEM			*dc_item;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6105,8 +6105,8 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 
 		ZBX_STR2UINT64(item_script_paramid, row[0]);
-		scriptitem_params = (zbx_dc_scriptitem_param_t *)DCfind_id(&config->itemscript_params,
-				item_script_paramid, sizeof(zbx_dc_scriptitem_param_t), &found);
+		scriptitem_params = (zbx_dc_item_param_t *)DCfind_id(&config->itemscript_params, item_script_paramid,
+				sizeof(zbx_dc_item_param_t), &found);
 
 		dc_strpool_replace(found, &scriptitem_params->name, row[2]);
 		dc_strpool_replace(found, &scriptitem_params->value, row[3]);
@@ -6127,7 +6127,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		zbx_vector_ptr_t	*params;
 
 		if (NULL == (scriptitem_params =
-				(zbx_dc_scriptitem_param_t *)zbx_hashset_search(&config->itemscript_params, &rowid)))
+				(zbx_dc_item_param_t *)zbx_hashset_search(&config->itemscript_params, &rowid)))
 		{
 			continue;
 		}
@@ -8758,10 +8758,12 @@ clean:
 	}
 
 	zbx_hashset_destroy(&activated_hosts);
-
+zabbix_increase_log_level();
+zabbix_increase_log_level();
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
-
+	zabbix_decrease_log_level();
+	zabbix_decrease_log_level();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return new_revision;
@@ -10020,8 +10022,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 			for (i = 0; i < src_item->itemtype.scriptitem->params.values_num; i++)
 			{
-				zbx_dc_scriptitem_param_t	*params =
-						(zbx_dc_scriptitem_param_t*)(src_item->itemtype.scriptitem->params.values[i]);
+				zbx_dc_item_param_t	*params =
+						(zbx_dc_item_param_t*)(src_item->itemtype.scriptitem->params.values[i]);
 
 				zbx_json_addstring(&json, params->name, params->value, ZBX_JSON_TYPE_STRING);
 			}
@@ -10040,8 +10042,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 			for (i = 0; i < parameters->values_num; i++)
 			{
-				zbx_dc_scriptitem_param_t	*param =
-						(zbx_dc_scriptitem_param_t*)(parameters->values[i]);
+				zbx_dc_item_param_t	*param = (zbx_dc_item_param_t*)(parameters->values[i]);
 
 				zbx_json_addstring(&json, param->name, param->value, ZBX_JSON_TYPE_STRING);
 			}
