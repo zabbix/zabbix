@@ -27,8 +27,8 @@ import (
 	"syscall"
 
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/wmi"
-	"zabbix.com/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/wmi"
 )
 
 func getHostname(params []string) (uname string, err error) {

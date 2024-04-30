@@ -27,8 +27,8 @@ import (
 	"regexp"
 	"testing"
 
-	"zabbix.com/pkg/zbxregexp"
-	"zabbix.com/pkg/zbxtest"
+	"golang.zabbix.com/agent2/pkg/zbxregexp"
+	"golang.zabbix.com/agent2/pkg/zbxtest"
 )
 
 func TestExecuteRegex(t *testing.T) {

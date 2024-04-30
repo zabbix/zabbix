@@ -118,7 +118,8 @@ static void	DCdump_hosts(void)
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " host:'%s' name:'%s' status:%u revision:" ZBX_FS_UI64,
 				host->hostid, host->host, host->name, host->status, host->revision);
 
-		zabbix_log(LOG_LEVEL_TRACE, "  proxyid:" ZBX_FS_UI64, host->proxyid);
+		zabbix_log(LOG_LEVEL_TRACE, "monitored_by:%u  proxyid:" ZBX_FS_UI64 " proxy_groupid:" ZBX_FS_UI64,
+				host->monitored_by, host->proxyid, host->proxy_groupid);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", host->data_expected_from);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  maintenanceid:" ZBX_FS_UI64 " maintenance_status:%u maintenance_type:%u"
@@ -1059,19 +1060,19 @@ static void	DCdump_actions(void)
 
 static void	DCdump_corr_conditions(zbx_dc_correlation_t *correlation)
 {
-	int			i;
-	zbx_vector_ptr_t	index;
+	zbx_vector_dc_corr_condition_ptr_t	index;
 
-	zbx_vector_ptr_create(&index);
+	zbx_vector_dc_corr_condition_ptr_create(&index);
 
-	zbx_vector_ptr_append_array(&index, correlation->conditions.values, correlation->conditions.values_num);
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_dc_corr_condition_ptr_append_array(&index, correlation->conditions.values,
+			correlation->conditions.values_num);
+	zbx_vector_dc_corr_condition_ptr_sort(&index, zbx_dc_corr_condition_compare_func);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  conditions:");
 
-	for (i = 0; i < index.values_num; i++)
+	for (int i = 0; i < index.values_num; i++)
 	{
-		zbx_dc_corr_condition_t	*condition = (zbx_dc_corr_condition_t *)index.values[i];
+		zbx_dc_corr_condition_t	*condition = index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "      conditionid:" ZBX_FS_UI64 " type:%d",
 				condition->corr_conditionid, condition->type);
 
@@ -1097,29 +1098,29 @@ static void	DCdump_corr_conditions(zbx_dc_correlation_t *correlation)
 		}
 	}
 
-	zbx_vector_ptr_destroy(&index);
+	zbx_vector_dc_corr_condition_ptr_destroy(&index);
 }
 
 static void	DCdump_corr_operations(zbx_dc_correlation_t *correlation)
 {
-	int			i;
-	zbx_vector_ptr_t	index;
+	zbx_vector_dc_corr_operation_ptr_t	index;
 
-	zbx_vector_ptr_create(&index);
+	zbx_vector_dc_corr_operation_ptr_create(&index);
 
-	zbx_vector_ptr_append_array(&index, correlation->operations.values, correlation->operations.values_num);
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_dc_corr_operation_ptr_append_array(&index, correlation->operations.values,
+			correlation->operations.values_num);
+	zbx_vector_dc_corr_operation_ptr_sort(&index, zbx_dc_corr_operation_compare_func);
 
 	zabbix_log(LOG_LEVEL_TRACE, "  operations:");
 
-	for (i = 0; i < index.values_num; i++)
+	for (int i = 0; i < index.values_num; i++)
 	{
 		zbx_dc_corr_operation_t	*operation = (zbx_dc_corr_operation_t *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "      operetionid:" ZBX_FS_UI64 " type:%d",
 				operation->corr_operationid, operation->type);
 	}
 
-	zbx_vector_ptr_destroy(&index);
+	zbx_vector_dc_corr_operation_ptr_destroy(&index);
 }
 
 static void	DCdump_correlations(void)
@@ -1610,6 +1611,41 @@ static void	DCdump_connectors(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static void	DCdump_proxy_groups(void)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_dc_proxy_group_t	*pg;
+	zbx_dc_config_t		*config = get_dc_config();
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
+	while (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "proxy_groupid:" ZBX_FS_UI64 " failover_delay:%d min_online:%d"
+				" revision:" ZBX_FS_UI64,
+				pg->proxy_groupid, pg->failover_delay, pg->min_online, pg->revision);
+	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
+
+static void	DCdump_host_proxy_index(void)
+{
+	zbx_hashset_iter_t		iter;
+	zbx_dc_host_proxy_index_t	*hpi;
+	zbx_dc_config_t			*config = get_dc_config();
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_hashset_iter_reset(&config->host_proxy_index, &iter);
+	while (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_iter_next(&iter)))
+		zabbix_log(LOG_LEVEL_TRACE, "host:%s proxyid:" ZBX_FS_UI64, hpi->host, hpi->host_proxy->proxyid);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
+}
+
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:" ZBX_FS_UI64 ") ===",
@@ -1648,6 +1684,8 @@ void	DCdump_configuration(void)
 	DCdump_httpstep_fields();
 	DCdump_autoreg_hosts();
 	DCdump_connectors();
+	DCdump_proxy_groups();
+	DCdump_host_proxy_index();
 #ifdef HAVE_TESTS
 	DCdump_strpool();
 #endif

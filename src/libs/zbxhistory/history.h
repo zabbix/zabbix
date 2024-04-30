@@ -21,7 +21,6 @@
 #define ZABBIX_HISTORY_H
 
 #include "zbxjson.h"
-#include "zbxalgo.h"
 #include "zbxhistory.h"
 
 #define ZBX_HISTORY_IFACE_SQL		0
@@ -30,13 +29,13 @@
 typedef struct zbx_history_iface zbx_history_iface_t;
 
 typedef void (*zbx_history_destroy_func_t)(struct zbx_history_iface *hist);
-typedef int (*zbx_history_add_values_func_t)(struct zbx_history_iface *hist, const zbx_vector_ptr_t *history,
+typedef int (*zbx_history_add_values_func_t)(struct zbx_history_iface *hist, const zbx_vector_dc_history_ptr_t *history,
 		int config_history_storage_pipelines);
 typedef int (*zbx_history_get_values_func_t)(struct zbx_history_iface *hist, zbx_uint64_t itemid, int start,
 		int count, int end, zbx_vector_history_record_t *values);
 typedef int (*zbx_history_flush_func_t)(struct zbx_history_iface *hist);
 
-typedef void (*zbx_history_func_t)(const zbx_vector_ptr_t *);
+typedef void (*zbx_history_func_t)(const zbx_vector_dc_history_ptr_t *);
 
 struct zbx_history_iface
 {

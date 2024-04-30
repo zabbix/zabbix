@@ -97,7 +97,8 @@ $maintenance_list = (new CTableInfo())
 		make_sorting_header(_('Active till'), 'active_till', $data['sort'], $data['sortorder'], $view_url),
 		_('State'),
 		_('Description')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 	switch ($maintenance['status']) {
@@ -127,7 +128,7 @@ foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 	]);
 }
 
-$form->addItem([$maintenance_list, $data['paging']]);
+$form->addItem($maintenance_list);
 
 if ($data['allowed_edit']) {
 	$form->addItem(

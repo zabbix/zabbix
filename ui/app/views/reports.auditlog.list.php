@@ -108,7 +108,8 @@ $table = (new CTableInfo())
 		_('Action'),
 		_('Recordset ID'),
 		_('Details')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['auditlogs'] as $auditlog) {
 	$table->addRow([
@@ -163,7 +164,7 @@ $html_page
 	->addItem(
 		(new CForm('get'))
 			->setName('auditForm')
-			->addItem([$table, $data['paging']])
+			->addItem($table)
 	)
 	->show();
 

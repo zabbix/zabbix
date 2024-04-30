@@ -98,7 +98,8 @@ $scriptsTable = (new CTableInfo())
 		_('User group'),
 		_('Host group'),
 		_('Host access')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['scripts'] as $script) {
 	$actions = [];
@@ -231,7 +232,6 @@ foreach ($data['scripts'] as $script) {
 // append table to form
 $scriptsForm->addItem([
 	$scriptsTable,
-	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
 		'script.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))

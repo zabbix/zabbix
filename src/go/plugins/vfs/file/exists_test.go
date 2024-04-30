@@ -25,12 +25,11 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/std"
+	"golang.zabbix.com/sdk/std"
 )
 
 func TestFileExists(t *testing.T) {
 	stdOs = std.NewMockOs()
-
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
 	if result, err := impl.Export("vfs.file.exists", []string{"text.txt"}, nil); err != nil {
@@ -48,7 +47,6 @@ func TestFileExists(t *testing.T) {
 
 func TestFileNotExists(t *testing.T) {
 	stdOs = std.NewMockOs()
-
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
 	if result, err := impl.Export("vfs.file.exists", []string{"text2.txt"}, nil); err != nil {

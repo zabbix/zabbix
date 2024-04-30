@@ -26,7 +26,7 @@ import (
 	"io"
 	"os"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 // Export -

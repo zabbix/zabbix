@@ -24,7 +24,7 @@ import (
 	"math"
 	"sort"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type aggDataInt struct {

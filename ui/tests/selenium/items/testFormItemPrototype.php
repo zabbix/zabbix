@@ -958,7 +958,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					}
 				}
 				else {
-					$this->assertEquals('No data found.', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
+					$this->assertEquals('No data found', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
 				}
 				$valuemap_overlay->getFooter()->query('button:Cancel')->one()->click();
 			}

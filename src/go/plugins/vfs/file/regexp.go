@@ -29,7 +29,7 @@ import (
 	"strings"
 	"time"
 
-	"zabbix.com/pkg/zbxregexp"
+	"golang.zabbix.com/agent2/pkg/zbxregexp"
 )
 
 func (p *Plugin) exportRegexp(params []string, timeout int) (result interface{}, err error) {

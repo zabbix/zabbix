@@ -254,7 +254,7 @@ typedef struct
 	int			severity;
 	unsigned char		suppressed;
 
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
@@ -289,7 +289,7 @@ typedef struct
 	char			*description;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_db_event_t	events;
-	zbx_vector_tags_t	service_tags;
+	zbx_vector_tags_ptr_t	service_tags;
 }
 zbx_db_service;
 
@@ -379,15 +379,9 @@ zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, zbx_db_mediaty
 
 typedef struct
 {
-	zbx_uint64_t	alertid;
-	zbx_uint64_t	actionid;
-	int		clock;
-	zbx_uint64_t	mediatypeid;
 	char		*sendto;
 	char		*subject;
 	char		*message;
-	zbx_alert_status_t	status;
-	int		retries;
 }
 zbx_db_alert;
 
@@ -581,10 +575,15 @@ typedef struct
 }
 zbx_trigger_diff_t;
 
-void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff);
+ZBX_PTR_VECTOR_DECL(trigger_diff_ptr, zbx_trigger_diff_t *)
+
+int	zbx_trigger_diff_compare_func(const void *d1, const void *d2);
+
+void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
-void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
-		zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange, const char *error);
+void	zbx_append_trigger_diff(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_uint64_t triggerid,
+		unsigned char priority, zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange,
+		const char *error);
 
 char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
 char	*zbx_db_dyn_escape_string(const char *src);
@@ -604,10 +603,10 @@ const char	*zbx_user_string(zbx_uint64_t userid);
 
 typedef struct
 {
-	zbx_uint64_t		connectorid;
-	int			tags_evaltype;
-	zbx_vector_match_tags_t	connector_tags;
-	int			item_value_type;
+	zbx_uint64_t			connectorid;
+	int				tags_evaltype;
+	zbx_vector_match_tags_ptr_t	connector_tags;
+	int				item_value_type;
 }
 zbx_connector_filter_t;
 
@@ -617,12 +616,12 @@ ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_type, const zbx_vector_tags_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
 
-typedef int	(*zbx_process_events_func_t)(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
-		zbx_vector_escalation_new_ptr_t *escalations);
+typedef int	(*zbx_process_events_func_t)(zbx_vector_trigger_diff_ptr_t *trigger_diff,
+		zbx_vector_uint64_t *triggerids_lock, zbx_vector_escalation_new_ptr_t *escalations);
 typedef void	(*zbx_clean_events_func_t)(void);
 typedef void	(*zbx_reset_event_recovery_func_t)(void);
 typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
@@ -689,21 +688,24 @@ void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
 void	zbx_db_check_character_set(void);
 
+ZBX_PTR_VECTOR_DECL(db_field_ptr, zbx_db_field_t *)
+ZBX_PTR_VECTOR_DECL(db_value_ptr, zbx_db_value_t *)
+
 /* bulk insert support */
 
 /* database bulk insert data */
 typedef struct
 {
 	/* the target table */
-	const zbx_db_table_t	*table;
+	const zbx_db_table_t		*table;
 	/* the fields to insert (pointers to the zbx_db_field_t structures from database schema) */
-	zbx_vector_ptr_t	fields;
+	zbx_vector_db_field_ptr_t	fields;
 	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
-	zbx_vector_ptr_t	rows;
+	zbx_vector_db_value_ptr_t	rows;
 	/* index of autoincrement field */
-	int			autoincrement;
+	int				autoincrement;
 	/* the last id assigned by autoincrement */
-	zbx_uint64_t		lastid;
+	zbx_uint64_t			lastid;
 }
 zbx_db_insert_t;
 
@@ -727,7 +729,7 @@ typedef struct
 	int			value;
 	int			severity;
 
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 	int			suppressed;
 	int			mtime;
 }
@@ -799,6 +801,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_vector_item_diff_ptr_t *item_diff, zbx_uint64_t mask);
 
 int	zbx_db_check_instanceid(void);
+int	zbx_db_update_software_update_checkid(void);
 
 /* tags */
 typedef struct

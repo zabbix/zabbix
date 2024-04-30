@@ -38,6 +38,8 @@ class CDocHelper {
 	const ADMINISTRATION_MODULE_LIST =							'web_interface/frontend_sections/administration/general#modules';
 	const ADMINISTRATION_PROXY_EDIT =							'distributed_monitoring/proxies#configuration';
 	const ADMINISTRATION_PROXY_LIST =							'web_interface/frontend_sections/administration/proxies';
+	const ADMINISTRATION_PROXY_GROUP_EDIT =						'distributed_monitoring/proxies/ha';
+	const ADMINISTRATION_PROXY_GROUP_LIST =						'web_interface/frontend_sections/administration/proxy_groups';
 	const ADMINISTRATION_REGEX_EDIT =							'regular_expressions#global-regular-expressions';
 	const ADMINISTRATION_REGEX_LIST =							'web_interface/frontend_sections/administration/general#regular-expressions';
 	const ADMINISTRATION_TIMEOUTS =								'web_interface/frontend_sections/administration/general#timeouts';

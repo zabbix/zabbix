@@ -8,13 +8,20 @@ zabbix_export:
       template: 'CockroachDB by HTTP'
       name: 'CockroachDB by HTTP'
       description: |
-        Get CockroachDB metrics from Prometheus and health endpoints by HTTP agent.
+        The template to monitor CockroachDB nodes by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        
+        The template collects metrics by HTTP agent from Prometheus endpoint and health endpoints.
         
         Internal node metrics are collected from Prometheus /_status/vars endpoint.
         Node health metrics are collected from /health and /health?ready=1 endpoints.
-        Template doesn't require usage of session token.
+        The template doesn't require usage of session token.
         
-        Don't forget change macros {$COCKROACHDB.API.SCHEME} according to your situation (secure/insecure node).
+        Note, that some metrics may not be collected depending on your CockroachDB version and configuration.
+        
+        Setup:
+        
+        Set the hostname or IP address of the the CockroachDB node host in the '{$COCKROACHDB.API.HOST}' macro. You can also change the port in the '{$COCKROACHDB.API.PORT}' macro and the scheme in the '{$COCKROACHDB.API.SCHEME}' macro if necessary.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -424,7 +431,7 @@ zabbix_export:
               parameters:
                 - 3h
           timeout: 15s
-          url: '{$COCKROACHDB.API.SCHEME}://{HOST.CONN}:{$COCKROACHDB.API.PORT}/health'
+          url: '{$COCKROACHDB.API.SCHEME}://{$COCKROACHDB.API.HOST}:{$COCKROACHDB.API.PORT}/health'
           status_codes: '200,500'
           retrieve_mode: HEADERS
           tags:
@@ -438,7 +445,7 @@ zabbix_export:
               description: 'Node''s /health endpoint has returned HTTP 500 Internal Server Error which indicates unhealthy mode.'
               dependencies:
                 - name: 'CockroachDB: Service is down'
-                  expression: 'last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0'
+                  expression: 'last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]) = 0'
               tags:
                 - tag: scope
                   value: health
@@ -455,7 +462,7 @@ zabbix_export:
               parameters:
                 - '-1'
           timeout: 15s
-          url: '{$COCKROACHDB.API.SCHEME}://{HOST.CONN}:{$COCKROACHDB.API.PORT}/_status/vars'
+          url: '{$COCKROACHDB.API.SCHEME}://{$COCKROACHDB.API.HOST}:{$COCKROACHDB.API.PORT}/_status/vars'
           tags:
             - tag: component
               value: raw
@@ -479,7 +486,7 @@ zabbix_export:
               parameters:
                 - 3h
           timeout: 15s
-          url: '{$COCKROACHDB.API.SCHEME}://{HOST.CONN}:{$COCKROACHDB.API.PORT}/health?ready=1'
+          url: '{$COCKROACHDB.API.SCHEME}://{$COCKROACHDB.API.HOST}:{$COCKROACHDB.API.PORT}/health?ready=1'
           status_codes: '200,503'
           retrieve_mode: HEADERS
           tags:
@@ -1278,7 +1285,7 @@ zabbix_export:
               description: 'Zabbix has not received data for items for the last 5 minutes.'
               dependencies:
                 - name: 'CockroachDB: Service is down'
-                  expression: 'last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0'
+                  expression: 'last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]) = 0'
               tags:
                 - tag: scope
                   value: availability
@@ -1326,7 +1333,7 @@ zabbix_export:
         - uuid: 00afa7b32af9499c89e939c96e0e29d1
           name: 'CockroachDB: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]'
+          key: 'net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]'
           history: 7d
           description: 'Check if HTTP/HTTPS service accepts TCP connections.'
           valuemap:
@@ -1342,7 +1349,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: d3c0d0a9e1f44c95a2246ab7081f581b
-              expression: 'last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0'
+              expression: 'last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]) = 0'
               name: 'CockroachDB: Service is down'
               priority: AVERAGE
               tags:
@@ -2121,6 +2128,9 @@ zabbix_export:
         - tag: target
           value: cockroachdb
       macros:
+        - macro: '{$COCKROACHDB.API.HOST}'
+          value: '<SET COCKROACHDB HOST>'
+          description: 'The hostname or IP address of the CockroachDB host.'
         - macro: '{$COCKROACHDB.API.PORT}'
           value: '8080'
           description: 'The port of CockroachDB API and Prometheus endpoint.'
@@ -2854,7 +2864,7 @@ zabbix_export:
         - node is unable to communicate with a majority of the other nodes in the cluster, likely because the cluster is unavailable due to too many nodes being down.
       dependencies:
         - name: 'CockroachDB: Service is down'
-          expression: 'last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0'
+          expression: 'last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]) = 0'
       tags:
         - tag: scope
           value: health
