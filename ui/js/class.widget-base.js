@@ -431,6 +431,11 @@ class CWidgetBase {
 		return ZABBIX.EventHub.getData(descriptor) !== undefined;
 	}
 
+	/**
+	 * Get default (empty) broadcast values.
+	 *
+	 * @returns {Object}
+	 */
 	getBroadcastDefaults() {
 		const broadcast_defaults = {};
 
