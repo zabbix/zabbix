@@ -489,10 +489,7 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER];
 	}
 	else
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER]:%d", config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER]);
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
