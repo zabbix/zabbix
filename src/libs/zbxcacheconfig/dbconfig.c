@@ -6161,7 +6161,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		params = dc_item_parameters(item);
 
-		if (0 < params->values_num)
+		if (NULL != params && 0 < params->values_num)
 			zbx_vector_ptr_sort(params, dc_compare_items_param);
 	}
 
@@ -10036,7 +10036,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			parameters = dc_item_parameters(src_item);
 			dst_item->timeout = 0;
 
-			if (0 != parameters->values_num)
+			if (NULL != parameters && 0 != parameters->values_num)
 			{
 				dst_item->parameters = (zbx_vector_tags_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_tags_ptr_t));
 
