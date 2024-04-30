@@ -67,47 +67,52 @@ class CVaultSecretParser extends CParser {
 	private function parseHashiCorp($source, $pos) {
 		$this->errorClear();
 
-		if (!isset($source) || $source === '' || $source[0] === '/' || str_contains($source, '//')) {
+		if (!isset($source) || $source === '' || $source[0] === '/') {
 			$this->errorPos($source, 0);
 
 			return self::PARSE_FAIL;
 		}
 
 		$src_size = strlen($source);
-
-		if (!$this->options['with_namespace'] && !$this->options['with_key']) {
-			if ($source[$src_size - 1] === '/') {
-				$this->errorPos($source, 0);
-
-				return self::PARSE_FAIL;
-			}
-
-			return self::PARSE_SUCCESS;
-		}
+		$current_pos = 0;
 
 		if ($this->options['with_namespace']) {
 			$namespace_sep = strpos($source, '/');
 
-			if ($namespace_sep === false || $namespace_sep === 0
-					|| (!$this->options['with_key'] && $source[$src_size - 1] === '/')) {
+			if ($namespace_sep === false || $namespace_sep === 0 || $namespace_sep === $src_size - 1) {
 				$this->errorPos($source, 0);
 
 				return self::PARSE_FAIL;
 			}
+
+			$current_pos = $namespace_sep + 1;
 		}
 
 		if ($this->options['with_key']) {
-			$key_sep = strpos($source, ':');
+			$key_sep = strpos($source, ':', $current_pos);
 
-			if ($key_sep === false || $key_sep === 0 || $key_sep === $src_size - 1
-					|| ($this->options['with_namespace'] && $key_sep < $namespace_sep)) {
-				$this->errorPos($source, 0);
+			if ($key_sep === false || $key_sep === $current_pos || $key_sep === $src_size - 1
+					|| strrpos($source, '//', $key_sep - $src_size) !== false) {
+				$this->errorPos($source, $current_pos);
 
 				return self::PARSE_FAIL;
 			}
 
 			if ($source[$key_sep - 1] === '/') {
-				$this->errorPos($source, $key_sep - 1);
+				$this->errorPos($source, $key_sep);
+
+				return self::PARSE_FAIL;
+			}
+		}
+		else {
+			if (str_contains($source, '//')) {
+				$this->errorPos($source, $current_pos);
+
+				return self::PARSE_FAIL;
+			}
+
+			if ($source[$src_size - 1] === '/') {
+				$this->errorPos($source, $current_pos);
 
 				return self::PARSE_FAIL;
 			}
