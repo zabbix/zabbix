@@ -207,6 +207,9 @@ $translate_strings = [
 		'Dashboard is used as data source.' => _('Dashboard is used as data source.'),
 		'Another widget is used as data source.' => _('Another widget is used as data source.')
 	],
+	'class.widget-field.time-period.js' => [
+		'Unavailable widget' => _('Unavailable widget')
+	],
 	'functions.js' => [
 		'Error' => _('Error'),
 		'Ok' => _('Ok'),

@@ -264,6 +264,16 @@ class CWidgetFieldTimePeriod {
 	}
 
 	#selectTypedReference(typed_reference) {
+		if (typed_reference === '') {
+			this.#reference_multiselect.multiSelect('addData', [{
+				id: '',
+				name: t('Unavailable widget'),
+				inaccessible: true
+			}]);
+
+			return;
+		}
+
 		for (const widget of this.#getWidgets()) {
 			if (widget.id === typed_reference) {
 				this.#reference_multiselect.multiSelect('addData', [widget]);
