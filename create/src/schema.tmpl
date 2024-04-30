@@ -672,12 +672,9 @@ FIELD		|timeout_script		|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|auditlog_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|mfa_status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|mfaid			|t_id		|	|NULL		|0		|5|mfa	|	|RESTRICT
-<<<<<<< HEAD
-FIELD		|timeout_browser	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
-=======
 FIELD		|software_update_checkid|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|software_update_check_data	|t_shorttext	|''	|NOT NULL	|ZBX_NODATA
->>>>>>> origin/master
+FIELD		|timeout_browser	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
