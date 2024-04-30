@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/pkg/zbxcomms"
 )
 
 const defaultServerPort = 10051

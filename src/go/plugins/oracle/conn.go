@@ -28,12 +28,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/godror/godror"
+	"github.com/omeid/go-yarn"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
-	"github.com/godror/godror"
-	"github.com/omeid/go-yarn"
 )
 
 var errInvalidPrivilege = errs.New("invalid connection privilege")

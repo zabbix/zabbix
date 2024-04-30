@@ -153,9 +153,8 @@ elseif ($data['service'] === null) {
 		$report->addRow($row);
 	}
 
-	$form
-		->addItem($report)
-		->addItem($data['paging']);
+	$report->setPageNavigation($data['paging']);
+	$form->addItem($report);
 }
 else {
 	$report->setHeader([

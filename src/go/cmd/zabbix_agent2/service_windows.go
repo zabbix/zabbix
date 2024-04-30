@@ -30,12 +30,12 @@ import (
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/monitor"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxflag"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/monitor"
 )
 
 const usageMessageExampleConfPath = `C:\zabbix\zabbix_agent2.conf`

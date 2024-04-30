@@ -31,11 +31,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-ldap/ldap"
+	"golang.zabbix.com/agent2/pkg/web"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"github.com/go-ldap/ldap"
-	"zabbix.com/pkg/web"
 )
 
 const (

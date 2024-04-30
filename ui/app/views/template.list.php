@@ -148,7 +148,8 @@ $table = (new CTableInfo())
 		_('Linked templates'),
 		_('Linked to templates'),
 		_('Tags')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['templates'] as $template) {
 	$name = (new CLink($template['name']))
@@ -292,7 +293,6 @@ foreach ($data['templates'] as $template) {
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'templates', [
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
