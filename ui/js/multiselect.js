@@ -1044,7 +1044,7 @@
 			}
 		});
 		$('input', $obj).each(function() {
-			if ($(this).val() !== '' && $(this).val() == id) {
+			if ($(this).val() == id) {
 				$(this).remove();
 			}
 		});
