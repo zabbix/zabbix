@@ -37,10 +37,10 @@ import (
 	"sync"
 	"time"
 
+	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/pkg/procfs"
 )
 
 const (

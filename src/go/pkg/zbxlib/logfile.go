@@ -240,8 +240,8 @@ import (
 	"time"
 	"unsafe"
 
+	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/sdk/log"
-	"zabbix.com/pkg/itemutil"
 )
 
 const (

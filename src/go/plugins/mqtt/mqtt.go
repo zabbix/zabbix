@@ -37,13 +37,13 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/tlsconfig"
 	"golang.zabbix.com/sdk/zbxerr"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/watch"
 )
 
 const (

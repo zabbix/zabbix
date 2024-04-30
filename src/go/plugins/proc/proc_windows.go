@@ -26,9 +26,9 @@ import (
 	"unsafe"
 
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/agent2/pkg/win32"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/pkg/win32"
 )
 
 const maxName = 256

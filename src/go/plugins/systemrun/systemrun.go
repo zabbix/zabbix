@@ -23,11 +23,11 @@ import (
 	"fmt"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/zbxcmd"
 )
 
 var impl Plugin

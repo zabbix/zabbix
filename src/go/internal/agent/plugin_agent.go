@@ -25,10 +25,10 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"golang.zabbix.com/agent2/pkg/version"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/pkg/version"
 )
 
 var (
