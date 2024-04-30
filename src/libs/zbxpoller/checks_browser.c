@@ -54,7 +54,7 @@ int	get_value_browser(zbx_dc_item_t *item, const char *config_source_ip, AGENT_R
 
 	zbx_es_set_timeout(&es_engine, item->timeout);
 
-	if (SUCCEED != zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, item->script_params, &output,
+	if (SUCCEED != zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, "", &output,
 			&error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot execute script: %s", error));

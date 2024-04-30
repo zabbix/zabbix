@@ -30,6 +30,7 @@
 #include "zbxtagfilter.h"
 #include "zbxautoreg.h"
 #include "zbxpgservice.h"
+#include "zbxalgo.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -207,6 +208,7 @@ typedef struct
 	char			*error;
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
+	zbx_vector_tags_ptr_t	*tags;
 }
 zbx_dc_item_t;
 
