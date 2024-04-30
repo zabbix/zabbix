@@ -1570,10 +1570,9 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'IPMI agent LLD',
 						'Type' => 'IPMI agent',
 						'Key' => 'ipmi_check[]',
+						// This field is not being trimmed on purpose.
 						'IPMI sensor' => '     test sensor  🙂🙃み け め 𒁥     '
-					],
-					// TODO: Uncomment after ZBX-24409 is fixed.
-					//'trim' => true
+					]
 				]
 			],
 			// #69.
