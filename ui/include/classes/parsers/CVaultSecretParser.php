@@ -33,7 +33,7 @@ class CVaultSecretParser extends CParser {
 	private $options = [
 		'provider' => ZBX_VAULT_TYPE_UNKNOWN,
 		'with_namespace' => false,
-		'with_key' => true,
+		'with_key' => true
 	];
 
 	private $cyberark_has_appid = true;
