@@ -7,7 +7,7 @@ OUTPUTDIR := output
 
 MODULEDIR = $(TOPDIR)\src\go
 TARGETDIR = $(TOPDIR)\src\go\cmd\zabbix_agent2
-TARGETPKG=zabbix.com/cmd/zabbix_agent2
+TARGETPKG=golang.zabbix.com/agent2/cmd/zabbix_agent2
 
 CC = gcc
 WINDRES = windres.exe
@@ -292,7 +292,7 @@ $(TARGETBIN): $(OBJS) .FORCE
 	set GOLDFLAGS=%GOLDFLAGS% -X $(PKG).compileTime=%BUILD_TIME%
 	cd $(MODULEDIR)
 
-	go build -tags "$(TAGS)" -ldflags="%GOLDFLAGS%" -o $(TARGETBIN) zabbix.com/cmd/zabbix_agent2
+	go build -tags "$(TAGS)" -ldflags="%GOLDFLAGS%" -o $(TARGETBIN) golang.zabbix.com/agent2/cmd/zabbix_agent2
 
 clean:
 	go clean -cache

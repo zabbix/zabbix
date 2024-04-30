@@ -58,7 +58,8 @@ $table = (new CTableInfo())
 		(new CColHeader(_('Created at')))->addStyle('width: 10%;'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
 		(new CColHeader())
-	]));
+	]))
+	->setPageNavigation($data['paging']);
 
 foreach ($data['services'] as $serviceid => $service) {
 	$row = [(new CCheckBox('serviceids['.$serviceid.']', $serviceid))->setEnabled(!$service['readonly'])];
@@ -146,5 +147,5 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 ], $path !== null ? 'service_'.implode('_', $path) : 'service');
 
 $form
-	->addItem([$table, $data['paging'], $action_buttons])
+	->addItem([$table, $action_buttons])
 	->show();

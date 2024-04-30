@@ -87,7 +87,8 @@ $table = (new CTableInfo())
 		_('Author'),
 		_('Description'),
 		_('Status')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['modules'] as $moduleid => $module) {
 	$name = (new CLink($module['name']))
@@ -123,7 +124,6 @@ foreach ($data['modules'] as $moduleid => $module) {
 // append table to form
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'moduleids', [
 		'module.massenable' => [
 			'content' => (new CSimpleButton(_('Enable')))

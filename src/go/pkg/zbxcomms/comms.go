@@ -30,8 +30,8 @@ import (
 	"net"
 	"time"
 
+	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/sdk/log"
-	"zabbix.com/pkg/tls"
 )
 
 const (

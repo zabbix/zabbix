@@ -22,9 +22,9 @@ package vfsfs
 import (
 	"syscall"
 
+	"golang.org/x/sys/windows"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
-	"golang.org/x/sys/windows"
 )
 
 func init() {

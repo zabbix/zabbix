@@ -27,12 +27,12 @@ import (
 	"strings"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/web"
+	"golang.zabbix.com/agent2/pkg/zbxregexp"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/web"
-	"zabbix.com/pkg/zbxregexp"
 )
 
 var impl Plugin

@@ -20,7 +20,7 @@
 package serverlistener
 
 import (
-	"zabbix.com/pkg/zbxcomms"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
 )
 
 type passiveConnection struct {

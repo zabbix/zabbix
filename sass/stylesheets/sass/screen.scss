@@ -4,6 +4,7 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;  // Sync with JavaScript variable: UI_TRANSITION_DURATION.
 $ui-controls-transition-duration: .2s !default;
 
+$icon-large-size: 40px !default;
 $icon-default-size: 18px !default;
 $icon-medium-size: 16px !default;
 $icon-small-size: 12px !default;
@@ -49,6 +50,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/form-search";
 @import "components/inline-filter";
 @import "components/list-table";
+@import "components/no-data-found";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";

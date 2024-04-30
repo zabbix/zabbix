@@ -204,10 +204,12 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
 	public function testPageUserGroups_FilterByStatus() {
