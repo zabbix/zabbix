@@ -99,6 +99,8 @@ var (
 	confDefault     string
 	applicationName string
 	pluginSocket    string
+
+	argConfig, argTest, argPrint, argVersion, argVerbose bool
 )
 
 type AgentUserParamOption struct {
@@ -287,8 +289,6 @@ func main() {
 	}
 
 	setServiceRun(args.foreground)
-
-	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
