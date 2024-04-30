@@ -3213,7 +3213,7 @@ class CUser extends CApiService {
 			if (!$user_totp_secret || $user_totp_secret[0]['status'] == TOTP_SECRET_CONFIRMATION_REQUIRED) {
 				$totp_generator = self::createTotpGenerator($data['mfa']);
 				$data['totp_secret'] = $totp_generator->generateSecretKey(TOTP_SECRET_LENGTH_32);
-				$data['qr_code_url'] = $totp_generator->getQRCodeUrl('Zabbix', $data['mfa']['name'],
+				$data['qr_code_url'] = $totp_generator->getQRCodeUrl($data['mfa']['name'], $db_user['username'],
 					$data['totp_secret']
 				);
 
