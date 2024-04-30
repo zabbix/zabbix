@@ -153,10 +153,12 @@ class testPageUsers extends CLegacyWebTest {
 		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 		$form->fill(['Username' => '1928379128ksdhksdjfh']);
 		$form->submit();
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_username', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
 	public function testPageUsers_FilterByAllFields() {

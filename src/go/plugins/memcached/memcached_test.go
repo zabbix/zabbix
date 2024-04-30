@@ -26,9 +26,9 @@ import (
 	"testing"
 	"time"
 
+	"golang.zabbix.com/agent2/plugins/memcached/mockserver"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
-	"zabbix.com/plugins/memcached/mockserver"
 )
 
 func handleStat(req *mockserver.MCRequest, w io.Writer) (ret *mockserver.MCResponse) {

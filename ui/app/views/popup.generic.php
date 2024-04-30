@@ -177,7 +177,7 @@ if ($data['multiselect'] && $form !== null) {
 $table = (new CTableInfo())->setHeader(array_merge($table_columns, $data['table_columns']));
 
 if ($data['preselect_required']) {
-	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
+	$table->setNoDataMessage(_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE);
 }
 
 // Output table rows.

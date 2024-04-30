@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $html_page = (new CHtmlPage())
@@ -77,14 +78,16 @@ $sysmapTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_maps'))->onClick("checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
-		make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder'], $url),
-		make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Width'), 'width', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Height'), 'height', $data['sort'], $data['sortorder'], $url),
 		_('Actions')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
-foreach ($this->data['maps'] as $map) {
+foreach ($data['maps'] as $map) {
 	$user_type = CWebUser::getType();
+
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $map['editable']) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
 		$properties_link = $data['allowed_edit']
@@ -106,6 +109,7 @@ foreach ($this->data['maps'] as $map) {
 		$properties_link = '';
 		$edit_link = '';
 	}
+
 	$sysmapTable->addRow([
 		$checkbox,
 		(new CLink($map['name'],
@@ -122,7 +126,6 @@ foreach ($this->data['maps'] as $map) {
 // append table to form
 $sysmapForm->addItem([
 	$sysmapTable,
-	$this->data['paging'],
 	new CActionButtonList('action', 'maps', [
 		'map.export' => [
 			'content' => new CButtonExport('export.sysmaps',

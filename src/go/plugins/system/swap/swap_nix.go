@@ -31,9 +31,9 @@ import (
 	"strings"
 	"syscall"
 
+	"golang.org/x/sys/unix"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.org/x/sys/unix"
 )
 
 const (

@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"time"
 
+	"golang.zabbix.com/agent2/pkg/pdh"
+	"golang.zabbix.com/agent2/pkg/win32"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/pkg/pdh"
-	"zabbix.com/pkg/win32"
 )
 
 var impl Plugin

@@ -37,7 +37,7 @@ class Widget extends CWidget {
 			'class.hostnavigator.js' => [
 				'Uncategorized' => _('Uncategorized'),
 				'%1$d of %1$d+ hosts are shown' => _('%1$d of %1$d+ hosts are shown'),
-				'No data found.' => _('No data found.'),
+				'No data found' => _('No data found'),
 				'Host group' => _('Host group'),
 				'Severity' => _('Severity')
 			]

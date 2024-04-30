@@ -25,10 +25,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mediocregopher/radix/v3"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
-	"github.com/mediocregopher/radix/v3"
 )
 
 const hkInterval = 10

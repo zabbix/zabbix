@@ -110,7 +110,8 @@ $token_table = (new CTableInfo())
 				->setArgument('action', 'user.token.list')
 				->getUrl()
 		)
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('token');
 
@@ -151,7 +152,6 @@ foreach ($data['tokens'] as $token) {
 
 $token_form->addItem([
 	$token_table,
-	$data['paging'],
 	new CActionButtonList('action', 'tokenids', [
 		'token.enable' => [
 			'name' => _('Enable'),

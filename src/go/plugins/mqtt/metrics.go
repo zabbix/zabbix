@@ -20,11 +20,11 @@
 package mqtt
 
 import (
+	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
-	"zabbix.com/pkg/watch"
 )
 
 const (
