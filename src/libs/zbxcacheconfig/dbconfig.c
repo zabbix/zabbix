@@ -8758,12 +8758,10 @@ clean:
 	}
 
 	zbx_hashset_destroy(&activated_hosts);
-zabbix_increase_log_level();
-zabbix_increase_log_level();
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
-	zabbix_decrease_log_level();
-	zabbix_decrease_log_level();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return new_revision;
