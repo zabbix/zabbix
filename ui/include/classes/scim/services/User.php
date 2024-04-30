@@ -359,6 +359,24 @@ class User extends ScimApiService {
 		$new_user_data = $provisioning->getUserAttributes($user_idp_data);
 		$new_user_data['medias'] = $provisioning->getUserMedias(array_merge($ins_attrs, $upd_attrs));
 		$new_user_data = array_merge($db_user, $new_user_data);
+		$idp_mediaids = array_column($new_user_data['medias'], 'userdirectory_mediaid', 'userdirectory_mediaid');
+		$del_userdirectory_mediaids = [];
+
+		if ($del_attrs) {
+			$del_userdirectory_mediaids = array_column($provisioning->getUserMediaMappingByAttribute($del_attrs),
+				'userdirectory_mediaid', 'userdirectory_mediaid'
+			);
+		}
+
+		foreach ($db_user['medias'] as $db_media) {
+			if ($db_media['userdirectory_mediaid'] == 0
+					|| array_key_exists($db_media['userdirectory_mediaid'], $del_userdirectory_mediaids)
+					|| array_key_exists($db_media['userdirectory_mediaid'], $idp_mediaids)) {
+				continue;
+			}
+
+			$new_user_data['medias'][] = $db_media;
+		}
 
 		if (array_key_exists('active', $user_idp_data)) {
 			if ($user_idp_data['active'] === false) {
@@ -418,6 +436,7 @@ class User extends ScimApiService {
 		$db_user = APIRPC::User()->get([
 			'output' => ['userid', 'name', 'surname', 'userdirectoryid', 'roleid'],
 			'userids' => $options['id'],
+			'selectMedias' => ['mediaid', 'mediatypeid', 'sendto', 'userdirectory_mediaid'],
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 

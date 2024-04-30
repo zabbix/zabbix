@@ -214,6 +214,30 @@ class CProvisioning {
 	}
 
 	/**
+	 * Get userdirectory media mappings defined for attributes in $idp_attrs.
+	 *
+	 * @param array $idp_attrs       Array of strings with attributes names from IdP.
+	 * @param bool  $case_sensitive  How IdP attributes should be matched.
+	 *
+	 * @return array
+	 */
+	public function getUserMediaMappingByAttribute(array $idp_attrs, bool $case_sensitive = true): array {
+		$mappings = [];
+
+		if (!$case_sensitive) {
+			$idp_attrs = array_merge($idp_attrs, array_map('strtolower', $idp_attrs));
+		}
+
+		foreach ($this->userdirectory['provision_media'] as $provision_media) {
+			if (array_key_exists($provision_media['attribute'], $idp_attrs)) {
+				$mappings[$provision_media['userdirectory_mediaid']] = $provision_media;
+			}
+		}
+
+		return $mappings;
+	}
+
+	/**
 	 * Return array with user media created from matched provision_media on external user data attributes.
 	 *
 	 * @param array $idp_user        User data from external source, LDAP/SAML.
