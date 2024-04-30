@@ -1,8 +1,7 @@
 # This binary exists to ensure that libzbxcommon does not depend on any other Zabbix library.
-# It cannot be done in cmocka, since all compilation objects in tests directory are wrapped with undefined
-# references, which can be resolved by linking various others Zabbix libraries like libzbxnix.a
-# Unfortunately, libzbxcommon depends currently on other libraries. This needs to be fixed.
-# Once this is done, the test_libzbxcommon_bin rules can be moved to zbxcommon directory.
+# There is already zbxcommon libs folder, but there are MOCK_DATA_DEPS MOCK_TEST_DEPS dependencies on cmocka.
+# However, to make it very clear and obvious that common should not have any dependencies at all,
+# it is preferred to keep this test in a separate dedicate directory and be a separate build target.
 bin_PROGRAMS = test_libzbxcommon_bin
 
 test_libzbxcommon_bin_SOURCES = test_libzbxcommon_bin.c
