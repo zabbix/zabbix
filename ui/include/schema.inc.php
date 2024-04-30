@@ -3096,6 +3096,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => ''
+			],
+			'timeout_browser' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '1m'
 			]
 		]
 	],
@@ -10205,6 +10211,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'proxy_group',
 				'ref_field' => 'proxy_groupid'
+			],
+			'timeout_browser' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			]
 		]
 	],
