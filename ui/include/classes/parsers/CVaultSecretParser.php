@@ -98,18 +98,10 @@ class CVaultSecretParser extends CParser {
 				return self::PARSE_FAIL;
 			}
 		}
-		else {
-			if (str_contains($source, '//')) {
-				$this->errorPos($source, $current_pos);
+		else if ($source[$src_size - 1] === '/' || str_contains($source, '//')) {
+			$this->errorPos($source, $current_pos);
 
-				return self::PARSE_FAIL;
-			}
-
-			if ($source[$src_size - 1] === '/') {
-				$this->errorPos($source, $current_pos);
-
-				return self::PARSE_FAIL;
-			}
+			return self::PARSE_FAIL;
 		}
 
 		return self::PARSE_SUCCESS;
