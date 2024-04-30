@@ -10035,7 +10035,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 			parameters = dc_item_parameters(src_item);
 			dst_item->timeout = 0;
-	
+
 			if (0 != parameters->values_num)
 			{
 				dst_item->tags = (zbx_vector_tags_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_tags_ptr_t));
