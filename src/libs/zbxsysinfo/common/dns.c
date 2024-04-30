@@ -374,7 +374,6 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	if (DNS_QUERY_SHORT == short_answer)
 	{
-		/* DNS_RCODE_NOERROR, not DNS_RCODE_NXDOMAIN */
 		SET_UI64_RESULT(result, DNS_RCODE_NOERROR != res ? 0 : 1);
 		ret = SYSINFO_RET_OK;
 		goto clean_dns;
@@ -571,6 +570,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #else
 		res_nclose(&res_state_local);
 #endif
+
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -585,6 +585,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #else
 			res_nclose(&res_state_local);
 #endif
+
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -608,11 +609,13 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		if (0 == inet_pton(ip_type, ip, &in6addr))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IPv6 address."));
+
 #ifdef HAVE_RES_NDESTROY
 			res_ndestroy(&res_state_local);
 #else
 			res_nclose(&res_state_local);
 #endif
+
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -732,6 +735,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #else
 		res_nclose(&res_state_local);
 #endif
+
 		return SYSINFO_RET_OK;
 	}
 	else if (DNS_QUERY_PERF == short_answer)
@@ -745,11 +749,13 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		if (-1 == res && 0 == hp->rcode)
 		{
 			SET_DBL_RESULT(result, 0.0);
+
 #ifdef HAVE_RES_NDESTROY
 			res_ndestroy(&res_state_local);
 #else
 			res_nclose(&res_state_local);
 #endif
+
 			return SYSINFO_RET_OK;
 		}
 		else
@@ -760,11 +766,13 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 				check_time = zbx_get_float_epsilon();
 			SET_DBL_RESULT(result, check_time);
 		}
+
 #ifdef HAVE_RES_NDESTROY
 		res_ndestroy(&res_state_local);
 #else
 		res_nclose(&res_state_local);
 #endif
+
 		return SYSINFO_RET_OK;
 	}
 
