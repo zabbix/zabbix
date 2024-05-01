@@ -858,7 +858,8 @@ switch ($data['method']) {
 		if (array_key_exists('itemid', $data) && is_scalar($data['itemid'])) {
 			$items = API::Item()->get([
 				'output' => ['value_type'],
-				'itemids' => $data['itemid']
+				'itemids' => $data['itemid'],
+				'webitems' => true
 			]);
 
 			if ($items) {

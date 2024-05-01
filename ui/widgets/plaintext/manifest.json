@@ -2,7 +2,7 @@
 	"manifest_version": 2.0,
 	"id": "plaintext",
 	"type": "widget",
-	"name": "Plain text",
+	"name": "Item history",
 	"namespace": "PlainText",
 	"version": "1.0",
 	"author": "Zabbix",
@@ -17,6 +17,11 @@
 	"actions": {
 		"widget.plaintext.view": {
 			"class": "WidgetView"
+		},
+		"widget.item_history.column.edit": {
+			"class": "ColumnEdit",
+			"view": "column.edit",
+			"layout": "layout.json"
 		}
 	}
 }

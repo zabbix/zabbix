@@ -29,7 +29,6 @@ use Zabbix\Widgets\{
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldIntegerBox,
-	CWidgetFieldMultiSelectItem,
 	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList
 };
@@ -39,17 +38,29 @@ use Zabbix\Widgets\Fields\{
  */
 class WidgetForm extends CWidgetForm {
 
+	public const LAYOUT_HORIZONTAL = 0;
+	public const LAYOUT_VERTICAL = 1;
+
+	public const NEW_VALUES_TOP = 0;
+	public const NEW_VALUES_BOTTOM = 1;
+
+	public const COLUMN_HEADER_OFF = 0;
+	public const COLUMN_HEADER_HORIZONTAL = 1;
+	public const COLUMN_HEADER_VERTICAL = 2;
+
+	public const SHOW_TIMESTAMP_ON = 1;
+
 	public function addFields(): self {
 		return $this
 			->addField(
-				(new CWidgetFieldMultiSelectItem('itemids', _('Items')))
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+				(new CWidgetFieldRadioButtonList('layout', _('Layout'), [
+					self::LAYOUT_HORIZONTAL => _('Horizontal'),
+					self::LAYOUT_VERTICAL => _('Vertical')
+				]))->setDefault(self::LAYOUT_HORIZONTAL)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('style', _('Items location'), [
-					STYLE_LEFT => _('Left'),
-					STYLE_TOP => _('Top')
-				]))->setDefault(STYLE_LEFT)
+				(new CWidgetFieldColumnsList('columns', _('Columns')))
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
@@ -59,7 +70,20 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('show_as_html', _('Show text as HTML'))
+				(new CWidgetFieldRadioButtonList('sortorder', _('New values'), [
+					self::NEW_VALUES_TOP => _('Top'),
+					self::NEW_VALUES_BOTTOM => _('Bottom')
+				]))->setDefault(self::NEW_VALUES_TOP)
+			)
+			->addField(
+				(new CWidgetFieldCheckBox('show_timestamp', _('Show timestamp')))->setDefault(self::SHOW_TIMESTAMP_ON)
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('show_column_header', _('Show column header'), [
+					self::COLUMN_HEADER_OFF => _('Off'),
+					self::COLUMN_HEADER_HORIZONTAL => _('Horizontal'),
+					self::COLUMN_HEADER_VERTICAL => _('Vertical')
+				]))->setDefault(self::COLUMN_HEADER_VERTICAL)
 			)
 			->addField(
 				new CWidgetFieldMultiSelectOverrideHost()

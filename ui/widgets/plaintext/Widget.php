@@ -26,6 +26,6 @@ use Zabbix\Core\CWidget;
 class Widget extends CWidget {
 
 	public function getDefaultName(): string {
-		return _('Plain text');
+		return _('Item history');
 	}
 }

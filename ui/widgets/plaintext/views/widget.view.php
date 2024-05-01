@@ -33,7 +33,7 @@ if ($data['error'] !== null) {
 }
 else {
 	$table_header = [(new CColHeader(_x('Timestamp', 'compact table header')))->addClass(ZBX_STYLE_CELL_WIDTH)];
-	$names_at_top = ($data['style'] == STYLE_TOP && count($data['items']) > 1);
+	$names_at_top = $data['layout'] == STYLE_TOP && count($data['items']) > 1;
 
 	if ($names_at_top) {
 		foreach ($data['items'] as $item) {
@@ -45,7 +45,7 @@ else {
 		}
 	}
 	else {
-		if ($data['style'] == STYLE_LEFT) {
+		if ($data['layout'] == STYLE_LEFT) {
 			$table_header[] = _x('Name', 'compact table header');
 		}
 		$table_header[] = _x('Value', 'compact table header');
@@ -62,7 +62,7 @@ else {
 			$table_row = [
 				(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])))->addClass(ZBX_STYLE_NOWRAP)
 			];
-			if ($data['style'] == STYLE_LEFT) {
+			if ($data['layout'] == STYLE_LEFT) {
 				$table->setHeadingColumn(1);
 				$table_row[] = ($data['same_host']
 					? ''

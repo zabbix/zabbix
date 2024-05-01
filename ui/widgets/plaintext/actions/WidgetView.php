@@ -42,7 +42,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$items = [];
 		$histories = [];
 
+		$error = _('No data.');
+
 		// Editing template dashboard?
+		/*
 		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$error = _('No data.');
 		}
@@ -130,12 +133,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 		}
+		*/
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
 			'items' => $items,
 			'histories' => $histories,
-			'style' => $this->fields_values['style'],
+			'layout' => $this->fields_values['layout'],
 			'same_host' => $same_host,
 			'show_lines' => $this->fields_values['show_lines'],
 			'error' => $error,
