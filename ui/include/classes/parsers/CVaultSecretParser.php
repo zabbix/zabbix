@@ -43,9 +43,9 @@ class CVaultSecretParser extends CParser {
 
 	/**
 	 * @param array $options
-	 * @param int   $options['provider']  Vault provider.
+	 * @param int   $options['provider']        Vault provider.
 	 * @param bool  $options['with_namespace']  (optional) Validated string must contain namespace. Only for HashiCorp.
-	 * @param bool  $options['with_key']  (optional) Validated string must contain key.
+	 * @param bool  $options['with_key']        (optional) Validated string must contain key.
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
@@ -70,39 +70,34 @@ class CVaultSecretParser extends CParser {
 	private function parseHashiCorp($source, $pos) {
 		$this->errorClear();
 
-		if (!isset($source) || $source === '' || $source[0] === '/') {
-			$this->errorPos($source, 0);
-
-			return self::PARSE_FAIL;
-		}
-
-		$src_size = strlen($source);
-		$current_pos = 0;
+		$path_pos = 0;
 
 		if ($this->options['with_namespace']) {
-			$namespace_sep = strpos($source, '/');
-
-			if ($namespace_sep === false || $namespace_sep === 0 || $namespace_sep === $src_size - 1) {
+			if (($namespace_sep = strpos($source, '/')) === false || $namespace_sep == 0) {
 				$this->errorPos($source, 0);
 
 				return self::PARSE_FAIL;
 			}
 
-			$current_pos = $namespace_sep + 1;
+			$path_pos = $namespace_sep + 1;
 		}
 
 		if ($this->options['with_key']) {
-			$key_sep = strpos($source, ':', $current_pos);
-
-			if ($key_sep === false || $key_sep === $current_pos || $key_sep === $src_size - 1
-					|| $source[$key_sep - 1] === '/' || strrpos($source, '//', $key_sep - $src_size) !== false) {
-				$this->errorPos($source, $current_pos);
+			if (($key_sep = strpos($source, ':', $path_pos)) === false) {
+				$this->errorPos($source, $path_pos);
 
 				return self::PARSE_FAIL;
 			}
+
+			$path_len = $key_sep - $path_pos;
 		}
-		else if ($source[$src_size - 1] === '/' || str_contains($source, '//')) {
-			$this->errorPos($source, $current_pos);
+		else {
+			$path_len = strlen($source) - $path_pos;
+		}
+
+		if ($path_len == 0 || $source[$path_pos] === '/' || $source[$path_pos + $path_len - 1] === '/'
+				|| (($pos = strpos($source, '//', $path_pos)) !== false && $pos < $path_pos + $path_len)) {
+			$this->errorPos($source, $path_pos);
 
 			return self::PARSE_FAIL;
 		}

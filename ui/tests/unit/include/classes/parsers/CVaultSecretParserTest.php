@@ -109,7 +109,7 @@ class CVaultSecretParserTest extends TestCase {
 			// Path is empty.
 			['namespace/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
-				'error' => 'incorrect syntax near "namespace/"'
+				'error' => 'unexpected end of string'
 			]],
 			// Path has trailing slash.
 			['namespace/path/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true, 'with_key' => false], [
@@ -137,6 +137,10 @@ class CVaultSecretParserTest extends TestCase {
 			['zabbix/secret/:path:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "secret/:path:key"'
+			]],
+			['', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'string is empty'
 			]],
 
 			// CyberArk
