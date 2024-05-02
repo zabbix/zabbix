@@ -33,6 +33,7 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 		(new CDiv(
 			new CPartial('administration.system.info', [
 				'system_info' => $data['system_info'],
+				'show_software_update_check_details' => true,
 				'user_type' => $data['user_type']
 			])
 		))->addClass(ZBX_STYLE_CONTAINER)

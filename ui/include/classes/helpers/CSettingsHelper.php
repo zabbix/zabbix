@@ -97,6 +97,8 @@ class CSettingsHelper {
 	public const TIMEOUT_SSH_AGENT = 'timeout_ssh_agent';
 	public const TIMEOUT_TELNET_AGENT = 'timeout_telnet_agent';
 	public const TIMEOUT_SCRIPT = 'timeout_script';
+	public const SOFTWARE_UPDATE_CHECKID = 'software_update_checkid';
+	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
 
 	private static $params = [];
 	private static $params_public = [];
@@ -169,7 +171,9 @@ class CSettingsHelper {
 			self::$params_private = CSettings::getPrivate();
 		}
 
-		$supported_params = array_intersect_key(self::$params_private, array_flip([self::SESSION_KEY]));
+		$supported_params = array_intersect_key(self::$params_private,
+			array_flip([self::SESSION_KEY, self::SOFTWARE_UPDATE_CHECKID])
+		);
 
 		return $supported_params[$field];
 	}
@@ -190,7 +194,19 @@ class CSettingsHelper {
 		return self::$params_private[self::SERVER_STATUS];
 	}
 
+	public static function getSoftwareUpdateCheckData(): array {
+		if (!self::$params_private) {
+			self::$params_private = CSettings::getPrivate();
+		}
+
+		return self::$params_private[self::SOFTWARE_UPDATE_CHECK_DATA];
+	}
+
 	public static function isGlobalScriptsEnabled(): bool {
 		return self::getServerStatus()['configuration']['enable_global_scripts'];
+	}
+
+	public static function isSoftwareUpdateCheckEnabled(): bool {
+		return !CWebUser::isGuest() && self::getServerStatus()['configuration']['allow_software_update_check'];
 	}
 }

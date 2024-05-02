@@ -84,6 +84,15 @@
 			&.row-selected {
 				background-color: $lighter-yellow;
 			}
+
+			&.sub-row {
+				th,
+				td {
+					&:first-child {
+						padding-left: 20px;
+					}
+				}
+			}
 		}
 
 		th,

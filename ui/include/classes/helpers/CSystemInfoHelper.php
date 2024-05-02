@@ -36,10 +36,15 @@ class CSystemInfoHelper {
 
 		$data = [
 			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
+			'is_software_update_check_enabled' => CSettingsHelper::isSoftwareUpdateCheckEnabled(),
 			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
 			'failover_delay' => 0
 		];
+
+		if ($data['is_software_update_check_enabled']) {
+			$data['check_data'] = CSettingsHelper::getSoftwareUpdateCheckData();
+		}
 
 		$db_backend = DB::getDbBackend();
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();

@@ -33,26 +33,133 @@ $info_table = (new CTableInfo())
 	->addRow([
 		_('Zabbix server is running'),
 		(new CSpan($status['is_running'] ? _('Yes') : _('No')))
-			->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+			->addClass($status['is_running'] ? ZBX_STYLE_COLOR_POSITIVE : ZBX_STYLE_COLOR_NEGATIVE),
 		$data['system_info']['server_details']
-	])
-	->addRow([
-		_('Zabbix server version'),
-		$status['has_status'] ? $status['server_version'] : '',
-		''
-	])
-	->addRow([
-		_('Zabbix frontend version'),
-		ZABBIX_VERSION,
-		''
-	])
+	]);
+
+$server_version = [
+	'version' => $status['has_status'] ? $status['server_version'] : '',
+	'version_details' => ''
+];
+$frontend_version = [
+	'version' => ZABBIX_VERSION,
+	'version_details' => ''
+];
+$last_checked = '';
+$latest_release = '';
+$release_notes = '';
+
+if ($data['system_info']['is_software_update_check_enabled']) {
+	$check_data = $data['system_info']['check_data'];
+
+	if ($check_data) {
+		// Display data only if the last successful check for software updates was made no more than a week ago.
+		$is_recent_data = $check_data['lastcheck'] - $check_data['lastcheck_success'] < 604800;
+
+		if ($is_recent_data) {
+			if (array_key_exists('end_of_full_support', $check_data) && $check_data['end_of_full_support']) {
+				$version_details = [makeWarningIcon(_('Please upgrade to latest major release.')), ' ', _('Outdated')];
+
+				$server_version['version_details'] = $version_details;
+				$frontend_version['version_details'] = $version_details;
+			}
+			elseif (array_key_exists('latest_release', $check_data)) {
+				if ($status['has_status']) {
+					if (version_compare($server_version['version'], $check_data['latest_release']['release'], '<')) {
+						$server_version['version_details'] = (new CSpan(_('New update available')))
+							->addClass(ZBX_STYLE_COLOR_WARNING);
+					}
+					else {
+						$server_version['version_details'] = (new CSpan(_('Up to date')))
+							->addClass(ZBX_STYLE_COLOR_POSITIVE);
+					}
+				}
+
+				if (version_compare($frontend_version['version'], $check_data['latest_release']['release'], '<')) {
+					$frontend_version['version_details'] = (new CSpan(_('New update available')))
+						->addClass(ZBX_STYLE_COLOR_WARNING);
+				}
+				else {
+					$frontend_version['version_details'] = (new CSpan(_('Up to date')))
+						->addClass(ZBX_STYLE_COLOR_POSITIVE);
+				}
+			}
+		}
+
+		if ($data['show_software_update_check_details']) {
+			if ($check_data['lastcheck'] > 0) {
+				$last_checked = (new DateTime('@'.$check_data['lastcheck']))->format(ZBX_DATE);
+			}
+
+			if ($is_recent_data && array_key_exists('latest_release', $check_data)) {
+				$latest_release = $check_data['latest_release']['release'];
+				$release_notes = [
+					(new CLink(_('Release notes'),
+						(new CUrl("https://www.zabbix.com/rn/rn{$latest_release}"))->getUrl()
+					))->setTarget('_blank'),
+					new CButtonIcon(ZBX_ICON_REFERENCE)
+				];
+			}
+		}
+	}
+}
+
+$info_table->addRow([
+	_('Zabbix server version'),
+	$server_version['version'],
+	$status['has_status'] ? $server_version['version_details'] : ''
+]);
+
+if ($data['show_software_update_check_details']) {
+	$info_table
+		->addRow(
+			(new CRow([
+				_('Software update last checked'),
+				$status['has_status'] ? $last_checked : '',
+				''
+			]))->addClass(ZBX_STYLE_SUB_ROW)
+		)
+		->addRow(
+			(new CRow([
+				_('Latest release'),
+				$status['has_status'] ? $latest_release : '',
+				$status['has_status'] ? $release_notes : ''
+			]))->addClass(ZBX_STYLE_SUB_ROW)
+		);
+}
+
+$info_table->addRow([
+	_('Zabbix frontend version'),
+	$frontend_version['version'],
+	$frontend_version['version_details']
+]);
+
+if ($data['show_software_update_check_details']) {
+	$info_table
+		->addRow(
+			(new CRow([
+				_('Software update last checked'),
+				$last_checked,
+				''
+			]))->addClass(ZBX_STYLE_SUB_ROW)
+		)
+		->addRow(
+			(new CRow([
+				_('Latest release'),
+				$latest_release,
+				$release_notes
+			]))->addClass(ZBX_STYLE_SUB_ROW)
+		);
+}
+
+$info_table
 	->addRow([
 		_('Number of hosts (enabled/disabled)'),
 		$status['has_status'] ? $status['hosts_count'] : '',
 		$status['has_status']
 			? [
-				(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-				(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED)
+				(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE), ' / ',
+				(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 			]
 			: ''
 	])
@@ -67,8 +174,8 @@ $info_table = (new CTableInfo())
 		$status['has_status'] ? $status['items_count'] : '',
 		$status['has_status']
 			? [
-				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
+				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE), ' / ',
+				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_COLOR_NEGATIVE), ' / ',
 				(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
 			]
 			: ''
@@ -83,9 +190,9 @@ $info_table = (new CTableInfo())
 				' / ',
 				$status['triggers_count_disabled'],
 				' [',
-				(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED),
+				(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_COLOR_NEGATIVE),
 				' / ',
-				(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN),
+				(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_COLOR_POSITIVE),
 				']'
 			]
 			: ''
@@ -93,7 +200,7 @@ $info_table = (new CTableInfo())
 	->addRow([
 		_('Number of users (online)'),
 		$status['has_status'] ? $status['users_count'] : '',
-		$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
+		$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_COLOR_POSITIVE) : ''
 	]);
 
 if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
@@ -111,7 +218,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 					$requirement['name'],
 					$requirement['current'],
 					$requirement['error']
-				]))->addClass(ZBX_STYLE_RED)
+				]))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 			);
 		}
 	}
@@ -120,7 +227,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		$info_table->addRow(
 			(new CRow(
 				(new CCol($data['system_info']['encoding_warning']))->setAttribute('colspan', 3)
-			))->addClass(ZBX_STYLE_RED)
+			))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 		);
 	}
 }
@@ -128,7 +235,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
 	$info_table->addRow([
 		_('Database history tables use primary key'),
-		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+		(new CSpan(_('No')))->addClass(ZBX_STYLE_COLOR_NEGATIVE),
 		''
 	]);
 }
@@ -196,7 +303,8 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		}
 
 		$info_table->addRow(
-			(new CRow([$dbversion['database'], $dbversion['current_version'], $error]))->addClass(ZBX_STYLE_RED)
+			(new CRow([$dbversion['database'], $dbversion['current_version'], $error]))
+				->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 		);
 	}
 
@@ -207,7 +315,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			);
 
 			$info_table->addRow(
-				(new CRow([$dbversion['database'], '', $db_error]))->addClass(ZBX_STYLE_RED)
+				(new CRow([$dbversion['database'], '', $db_error]))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 			);
 		}
 	}
@@ -222,7 +330,7 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 				new CLink([_('Configuration'), HELLIP()],
 					(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
 				)
-			]))->addClass(ZBX_STYLE_RED)
+			]))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 		])));
 	}
 
@@ -236,14 +344,14 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 				new CLink([_('Configuration'), HELLIP()],
 					(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
 				)
-			]))->addClass(ZBX_STYLE_RED)
+			]))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 		])));
 	}
 
 	if ($data['system_info']['ha_cluster_enabled']) {
 		$info_table->addRow([
 			_('High availability cluster'),
-			(new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
+			(new CSpan(_('Enabled')))->addClass(ZBX_STYLE_COLOR_POSITIVE),
 			_s('Fail-over delay: %1$s', $data['system_info']['failover_delay'])
 		]);
 	}

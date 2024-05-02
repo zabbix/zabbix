@@ -30,4 +30,8 @@
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['info_type'])
 	)
+	->addField(CSettingsHelper::isSoftwareUpdateCheckEnabled()
+		? new CWidgetFieldCheckBoxView($data['fields']['show_software_update_check_details'])
+		: null
+	)
 	->show();
