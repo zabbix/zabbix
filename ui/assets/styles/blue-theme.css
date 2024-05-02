@@ -4424,11 +4424,11 @@ div.dashboard-widget-map .sysmap-widget-container {
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
     div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
-      fill: #e0f7ff;
-      stroke-width: 1px;
-      stroke: #ced7db; }
+      fill: #e0f7ff; }
       div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
-        fill: #c9e3fc; }
+        fill: #c9e3fc;
+        stroke: #ced7db;
+        stroke-width: 1px; }
 div.dashboard-widget-map .btn-back-map-container {
   text-align: left;
   position: absolute;

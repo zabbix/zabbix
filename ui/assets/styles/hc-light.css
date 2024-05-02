@@ -4370,11 +4370,11 @@ div.dashboard-widget-map .sysmap-widget-container {
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
     div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
-      fill: #e8e9ed;
-      stroke-width: 1px;
-      stroke: #747474; }
+      fill: #e8e9ed; }
       div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
-        fill: #d9d9d9; }
+        fill: #d9d9d9;
+        stroke: #747474;
+        stroke-width: 1px; }
 div.dashboard-widget-map .btn-back-map-container {
   text-align: left;
   position: absolute;
@@ -4412,6 +4412,8 @@ div.dashboard-widget-map .btn-back-map-container {
       height: 24px;
       vertical-align: middle; }
 
+div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
+  stroke-width: 2px; }
 div.dashboard-widget-map .btn-back-map-container a {
   border-bottom: 0; }
 

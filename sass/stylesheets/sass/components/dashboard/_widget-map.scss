@@ -12,11 +12,11 @@ div.dashboard-widget-map {
 			.map-selections {
 				ellipse {
 					fill: $ui-hover-bg-color;
-					stroke-width: 1px;
-					stroke: $map-selection-stroke-color;
 
 					&.selected {
 						fill: $ui-selected-bg-color;
+						stroke: $map-selected-stroke-color;
+						stroke-width: 1px;
 					}
 				}
 			}
@@ -82,6 +82,18 @@ div.dashboard-widget-map {
 
 @if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
 	div.dashboard-widget-map {
+		.sysmap-widget-container {
+			svg {
+				.map-selections {
+					ellipse {
+						&.selected {
+							stroke-width: 2px;
+						}
+					}
+				}
+			}
+		}
+
 		.btn-back-map-container {
 			a {
 				border-bottom: 0;

@@ -4432,11 +4432,11 @@ div.dashboard-widget-map .sysmap-widget-container {
   div.dashboard-widget-map .sysmap-widget-container svg {
     flex-grow: 1; }
     div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse {
-      fill: #3a3a3a;
-      stroke-width: 1px;
-      stroke: #383838; }
+      fill: #3a3a3a; }
       div.dashboard-widget-map .sysmap-widget-container svg .map-selections ellipse.selected {
-        fill: #4a4a4a; }
+        fill: #4a4a4a;
+        stroke: #383838;
+        stroke-width: 1px; }
 div.dashboard-widget-map .btn-back-map-container {
   text-align: left;
   position: absolute;
