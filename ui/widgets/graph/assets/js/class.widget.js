@@ -253,6 +253,13 @@ class CWidgetGraph extends CWidget {
 		this._flickerfreescreen_container.removeEventListener('rangeupdate', this.events_handlers.rangeUpdate);
 	}
 
+	onClearContents() {
+		if (this._is_graph_mode) {
+			this._is_graph_mode = false;
+			this._deactivateGraph();
+		}
+	}
+
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
 		const menu = super.getActionsContextMenu({can_copy_widget, can_paste_widget});
 

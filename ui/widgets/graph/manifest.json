@@ -15,6 +15,10 @@
 				"type": "_itemid",
 				"required": true
 			},
+			"graphid": {
+				"type": "_graphid",
+				"required": true
+			},
 			"time_period": {
 				"type": "_timeperiod"
 			}
