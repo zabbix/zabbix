@@ -55,7 +55,7 @@ class testHighAvailability extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'HANodeName' => self::NODE1_NAME,
-				'CacheSize' => '128K',
+				'CacheSize' => '256K',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX
 			]
 		];

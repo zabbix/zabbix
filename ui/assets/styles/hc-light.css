@@ -2249,7 +2249,7 @@ button {
     color: #333333; }
 
 .list-table {
-  min-width: 100%;
+  width: 100%;
   background-color: #ffffff;
   border-collapse: separate;
   border: 1px solid #9f9f9f; }

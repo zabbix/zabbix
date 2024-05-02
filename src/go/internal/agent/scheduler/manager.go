@@ -29,18 +29,18 @@ import (
 	"strings"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/alias"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/plugins/external"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/alias"
-	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/plugins/external"
 )
 
 const (

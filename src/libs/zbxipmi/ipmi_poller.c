@@ -29,21 +29,18 @@
 #include "checks_ipmi.h"
 #include "zbxtime.h"
 #include "zbxipmi.h"
-
-#define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
+#include "zbxthreads.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: registers IPMI poller with IPMI manager                           *
  *                                                                            *
- * Parameters: socket - [IN] the connections socket                           *
+ * Parameters: socket - [IN] connections socket                               *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_poller_register(zbx_ipc_async_socket_t *socket)
 {
-	pid_t	ppid;
-
-	ppid = getppid();
+	pid_t	ppid = getppid();
 
 	zbx_ipc_async_socket_send(socket, ZBX_IPC_IPMI_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 }
@@ -52,10 +49,10 @@ static void	ipmi_poller_register(zbx_ipc_async_socket_t *socket)
  *                                                                            *
  * Purpose: sends IPMI poll result to manager                                 *
  *                                                                            *
- * Parameters: socket  - [IN] the connections socket                          *
- *             itemid  - [IN] the item identifier                             *
- *             errcode - [IN] the result error code                           *
- *             value   - [IN] the resulting value/error message               *
+ * Parameters: socket  - [IN] connections socket                              *
+ *             code    - [IN]                                                 *
+ *             errcode - [IN] result error code                               *
+ *             value   - [IN] resulting value/error message                   *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t code, int errcode,
@@ -74,10 +71,10 @@ static void	ipmi_poller_send_result(zbx_ipc_async_socket_t *socket, zbx_uint32_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets IPMI sensor value from the specified host                    *
+ * Purpose: gets IPMI sensor value from specified host                        *
  *                                                                            *
- * Parameters: socket  - [IN] the connections socket                          *
- *             message - [IN] the value request message                       *
+ * Parameters: socket  - [IN] connections socket                              *
+ *             message - [IN] value request message                           *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zbx_ipc_message_t *message)
@@ -123,10 +120,10 @@ static void	ipmi_poller_process_value_request(zbx_ipc_async_socket_t *socket, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose:sets IPMI sensor value                                             *
+ * Purpose: sets IPMI sensor value                                            *
  *                                                                            *
- * Parameters: socket  - [IN] the connections socket                          *
- *             message - [IN] the command request message                     *
+ * Parameters: socket  - [IN] connections socket                              *
+ *             message - [IN] command request message                         *
  *                                                                            *
  ******************************************************************************/
 static void	ipmi_poller_process_command_request(zbx_ipc_async_socket_t *socket, zbx_ipc_message_t *message)
@@ -173,8 +170,8 @@ ZBX_THREAD_ENTRY(zbx_ipmi_poller_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-#define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
-				/* once in STAT_INTERVAL seconds */
+#define	STAT_INTERVAL	5	/* If a process is busy and does not sleep then update status not faster than */
+				/* once in STAT_INTERVAL seconds. */
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 

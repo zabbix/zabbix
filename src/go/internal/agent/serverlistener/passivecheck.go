@@ -24,10 +24,10 @@ import (
 	"fmt"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/pkg/version"
 	"golang.zabbix.com/sdk/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/pkg/version"
 )
 
 const notsupported = "ZBX_NOTSUPPORTED"

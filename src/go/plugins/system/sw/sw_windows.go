@@ -29,9 +29,9 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.zabbix.com/sdk/plugin"
 	"golang.org/x/sys/windows/registry"
-	"zabbix.com/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/win32"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 const (

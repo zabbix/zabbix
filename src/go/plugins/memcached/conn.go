@@ -24,10 +24,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/memcachier/mc/v3"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
-	"github.com/memcachier/mc/v3"
 )
 
 const poolSize = 1
