@@ -1,9 +1,9 @@
 @font-face {
   font-family: "zabbix-icons";
-  src: url("zabbix-icons.woff2?t=1713182914816") format("woff2"),
-  url("zabbix-icons.woff?t=1713182914816") format("woff"),
-  url('zabbix-icons.ttf?t=1713182914816') format('truetype'),
-  url('zabbix-icons.svg?t=1713182914816#zabbix-icons') format('svg');
+  src: url("zabbix-icons.woff2?t=1714638813635") format("woff2"),
+  url("zabbix-icons.woff?t=1714638813635") format("woff"),
+  url('zabbix-icons.ttf?t=1714638813635') format('truetype'),
+  url('zabbix-icons.svg?t=1714638813635#zabbix-icons') format('svg');
 }
 
 [class^="zi-"]::before, [class*=" zi-"]::before {
@@ -124,7 +124,9 @@
 .zi-users-filled:before { content: "\ea6d"; }
 .zi-users:before { content: "\ea6e"; }
 .zi-widget-add:before { content: "\ea6f"; }
-.zi-widget-resize:before { content: "\ea70"; }
-.zi-wrench-alt:before { content: "\ea71"; }
-.zi-wrench:before { content: "\ea72"; }
+.zi-widget-awaiting-data-large:before { content: "\ea70"; }
+.zi-widget-empty-references-large:before { content: "\ea71"; }
+.zi-widget-resize:before { content: "\ea72"; }
+.zi-wrench-alt:before { content: "\ea73"; }
+.zi-wrench:before { content: "\ea74"; }
 

@@ -41,7 +41,7 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1713182914816") format("woff2"), url("../fonts/zabbix-icons.woff?t=1713182914816") format("woff"), url("../fonts/zabbix-icons.ttf?t=1713182914816") format("truetype"), url("../fonts/zabbix-icons.svg?t=1713182914816#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1714638813635") format("woff2"), url("../fonts/zabbix-icons.woff?t=1714638813635") format("woff"), url("../fonts/zabbix-icons.ttf?t=1714638813635") format("truetype"), url("../fonts/zabbix-icons.svg?t=1714638813635#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .color-picker .use-transparent::after,
 .color-picker-dialogue .use-transparent::after, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .z-select .focusable::after,
 z-select .focusable::after, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after {
@@ -394,14 +394,20 @@ button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"]
 .zi-widget-add:before {
   content: "\ea6f"; }
 
-.zi-widget-resize:before {
+.zi-widget-awaiting-data-large:before {
   content: "\ea70"; }
 
-.zi-wrench-alt:before, .zi-wrench-alt-small:before {
+.zi-widget-empty-references-large:before {
   content: "\ea71"; }
 
-.zi-wrench:before {
+.zi-widget-resize:before {
   content: "\ea72"; }
+
+.zi-wrench-alt:before, .zi-wrench-alt-small:before {
+  content: "\ea73"; }
+
+.zi-wrench:before {
+  content: "\ea74"; }
 
 .zabbix-logo {
   width: 114px;
@@ -1725,7 +1731,7 @@ button {
     background: #dadfe3;
     box-shadow: inset 2px 2px 6px rgba(118, 141, 153, 0.5); }
     .dashboard-widget-placeholder .dashboard-widget-placeholder-resizing .dashboard-widget-placeholder-label::before {
-      content: ""; }
+      content: ""; }
   .dashboard-widget-placeholder.disabled {
     opacity: 1; }
     .dashboard-widget-placeholder.disabled .dashboard-widget-placeholder-box {
