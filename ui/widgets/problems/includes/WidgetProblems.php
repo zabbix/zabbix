@@ -472,29 +472,32 @@ class WidgetProblems extends CTableInfo {
 					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 				: new CSpan(_('Update'));
 
-			$row->addItem([
-				$data['show_recovery_data'] ? $cell_r_clock : null,
-				$data['show_recovery_data'] ? $cell_status : null,
-				makeInformationList($info_icons),
-				$data['triggers_hosts'][$trigger['triggerid']],
-				$description,
-				($data['fields']['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY)
-					? $opdata->addClass(ZBX_STYLE_WORDBREAK)
-					: null,
-				(new CCol(
-					(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0)
-						? $problem['r_clock']
-						: 0
-					)))
-						->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $problem['eventid'],
-							$data['show_timeline'], $data['fields']['show_tags'], $data['fields']['tags'],
-							$data['fields']['tag_name_format'], $data['fields']['tag_priority']
-						))
-				))->addClass(ZBX_STYLE_NOWRAP),
-				$problem_update_link,
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
-				$data['fields']['show_tags'] ? $data['tags'][$problem['eventid']] : null
-			]);
+			$row
+				->addItem([
+					$data['show_recovery_data'] ? $cell_r_clock : null,
+					$data['show_recovery_data'] ? $cell_status : null,
+					makeInformationList($info_icons),
+					$data['triggers_hosts'][$trigger['triggerid']],
+					$description,
+					($data['fields']['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY)
+						? $opdata->addClass(ZBX_STYLE_WORDBREAK)
+						: null,
+					(new CCol(
+						(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0)
+							? $problem['r_clock']
+							: 0
+						)))
+							->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $problem['eventid'],
+								$data['show_timeline'], $data['fields']['show_tags'], $data['fields']['tags'],
+								$data['fields']['tag_name_format'], $data['fields']['tag_priority']
+							))
+					))->addClass(ZBX_STYLE_NOWRAP),
+					$problem_update_link,
+					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
+					$data['fields']['show_tags'] ? $data['tags'][$problem['eventid']] : null
+				])
+				->setAttribute('data-eventid', $problem['eventid'])
+			;
 
 			$this->addRow($row);
 
