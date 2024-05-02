@@ -512,8 +512,10 @@ SVGMap.prototype.update = function (options, incremental) {
 
 						const detail = {
 							selected_element_id: this.selected_element_id,
-							_hostid: CWidgetsData.getDefault('_hostid'),
-							_hostgroupid: CWidgetsData.getDefault('_hostgroupid')
+							[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+							[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: CWidgetsData.getDefault(
+								CWidgetsData.DATA_TYPE_HOST_GROUP_ID
+							)
 						};
 
 						this.container.dispatchEvent(new CustomEvent(this.EVENT_ELEMENT_SELECT, {detail}));
@@ -978,15 +980,15 @@ SVGMapElement.prototype.select = function() {
 
 	const detail = {
 		selected_element_id: this.map.selected_element_id,
-		_hostid: CWidgetsData.getDefault('_hostid'),
-		_hostgroupid: CWidgetsData.getDefault('_hostgroupid')
+		[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+		[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_ID)
 	};
 
 	if (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST) {
-		detail._hostid = this.options.elements[0].hostid;
+		detail[CWidgetsData.DATA_TYPE_HOST_ID] = this.options.elements[0].hostid;
 	}
 	else if (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-		detail._hostgroupid = this.options.elements[0].groupid;
+		detail[CWidgetsData.DATA_TYPE_HOST_GROUP_ID] = this.options.elements[0].groupid;
 	}
 
 	this.map.container.dispatchEvent(new CustomEvent(this.map.EVENT_ELEMENT_SELECT, {detail}));

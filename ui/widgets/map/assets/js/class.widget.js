@@ -170,8 +170,8 @@ class CWidgetMap extends CWidget {
 		this.#selected_element_id = '';
 
 		this.broadcast({
-			_hostid: CWidgetsData.getDefault('_hostid'),
-			_hostgroupid: CWidgetsData.getDefault('_hostgroupid')
+			[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+			[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_ID)
 		});
 	}
 
@@ -210,7 +210,10 @@ class CWidgetMap extends CWidget {
 
 				this.#selected_element_id = e.detail.selected_element_id;
 
-				this.broadcast({_hostid: e.detail._hostid, _hostgroupid: e.detail._hostgroupid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: e.detail[CWidgetsData.DATA_TYPE_HOST_ID],
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: e.detail[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]
+				});
 			}
 		};
 	}
