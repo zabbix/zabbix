@@ -62,12 +62,7 @@ class CWidgetMisconfigured extends CWidget {
 		}
 	}
 
-	isFieldsReferredDataReady() {
-		return true;
-	}
-
-	promiseUpdate() {
-		return Promise.resolve();
+	_startUpdating({delay_sec = 0} = {}) {
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {

@@ -16,8 +16,8 @@
 		"js_class": "CWidgetItem",
 		"in": {
 			"itemid": {
-				"type": "_itemid"
-
+				"type": "_itemid",
+				"required": true
 			},
 			"time_period": {
 				"type": "_timeperiod"
