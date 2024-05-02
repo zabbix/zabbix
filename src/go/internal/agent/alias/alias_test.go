@@ -22,9 +22,9 @@ package alias
 import (
 	"testing"
 
+	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/log"
-	"zabbix.com/internal/agent"
 )
 
 func TestGetAlias(t *testing.T) {

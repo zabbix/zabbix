@@ -32,15 +32,15 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
 	"golang.zabbix.com/sdk/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxcomms"
 )
 
 const defaultAgentPort = 10050
@@ -66,6 +66,7 @@ type activeChecksRequest struct {
 	Request        string `json:"request"`
 	Host           string `json:"host"`
 	Version        string `json:"version"`
+	Variant        int    `json:"variant"`
 	Session        string `json:"session"`
 	ConfigRevision uint64 `json:"config_revision"`
 	HostMetadata   string `json:"host_metadata,omitempty"`
@@ -94,6 +95,8 @@ type heartbeatMessage struct {
 	Request            string `json:"request"`
 	Host               string `json:"host"`
 	HeartbeatFrequency int    `json:"heartbeat_freq"`
+	Version            string `json:"version"`
+	Variant            int    `json:"variant"`
 }
 
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
@@ -154,7 +157,8 @@ func (c *Connector) refreshActiveChecks() {
 	a := activeChecksRequest{
 		Request:        "active checks",
 		Host:           c.hostname,
-		Version:        version.Short(),
+		Version:        version.Long(),
+		Variant:        agent.Variant,
 		Session:        c.session,
 		ConfigRevision: c.configRevision,
 	}
@@ -352,6 +356,8 @@ func (c *Connector) sendHeartbeatMsg() {
 		Request:            "active check heartbeat",
 		HeartbeatFrequency: c.options.HeartbeatFrequency,
 		Host:               c.hostname,
+		Version:            version.Long(),
+		Variant:            agent.Variant,
 	}
 
 	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.address)

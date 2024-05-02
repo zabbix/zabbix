@@ -26,8 +26,8 @@ import (
 	"errors"
 	"fmt"
 
-	"golang.zabbix.com/sdk/zbxerr"
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 // Export -

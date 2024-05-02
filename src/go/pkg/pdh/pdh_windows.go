@@ -26,8 +26,8 @@ import (
 	"unsafe"
 
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/agent2/pkg/win32"
 	"golang.zabbix.com/sdk/log"
-	"zabbix.com/pkg/win32"
 )
 
 var ObjectsNames map[string]string

@@ -98,7 +98,8 @@ $media_type_table = (new CTableInfo())
 		_('Used in actions'),
 		_('Details'),
 		_('Action')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('mediatype');
 
@@ -186,7 +187,6 @@ foreach ($data['mediatypes'] as $media_type) {
 // append table to form
 $media_type_form->addItem([
 	$media_type_table,
-	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => [
 
