@@ -1952,7 +1952,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description2'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path:".',
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":".',
 					'vault' => 'Hashicorp'
 				]
 			],
@@ -1984,7 +1984,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description5'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "key".',
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":key".',
 					'vault' => 'Hashicorp'
 				]
 			],
@@ -2000,7 +2000,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 						'description' => 'vault description6'
 					],
 					'title' => 'Cannot update '.$this->vault_object,
-					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "path".',
+					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "secret/path".',
 					'vault' => 'Hashicorp'
 				]
 			],
@@ -2371,28 +2371,14 @@ abstract class testFormMacros extends CLegacyWebTest {
 	}
 
 	/**
-	 * Check vault macros validation after changing vault type.
+	 * Check vault macros validation after changing vault type. Works only for CyberArk. Right now, there is almost NO
+	 * incorrect validation for HashiCorp.
 	 *
 	 * @param string $url		URL that leads to the configuration form of corresponding entity
 	 * @param string $source    type of entity that is being checked (host, hostPrototype, template)
 	 * @param type $name		name of a host where macros are updated
 	 */
 	public function checkVaultValidation($url, $source, $name = null, $discovered = false) {
-		$cyberark = [
-			'fields' =>
-				[
-				'action' => USER_ACTION_UPDATE,
-				'index' => 0,
-				'macro' => '{$VAULT}',
-				'value' => [
-					'text' => 'AppID=zabbix:key/keys',
-					'type' => 'Vault secret'
-				],
-				'description' => 'CyberArk vault description'
-			],
-			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "keys".'
-		];
-
 		$hashicorp = [
 			'fields' =>
 				[
@@ -2410,63 +2396,56 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->page->login();
 
-		for ($i = 0; $i <= 1; $i++) {
-			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 
-			// Check in setting what Vault is enabled.
-			$setting_form = $this->query('name:otherForm')->asForm()->one();
-			$vault = $setting_form->getField('Vault provider')->getText();
+		// Check in setting what Vault is enabled.
+		$setting_form = $this->query('name:otherForm')->asForm()->one();
+		$setting_form->fill(['Vault provider' => 'CyberArk Vault']);
+		$setting_form->submit();
 
-			// Try to create macros with Vault type different from settings.
-			$form = $this->openMacrosTab($url, $source, false, $name);
-			$vault_values = ($vault === 'CyberArk Vault') ? $hashicorp : $cyberark;
+		// Try to create macros with Vault type different from settings.
+		$form = $this->openMacrosTab($url, $source, false, $name);
 
-			// Click "Change" button for discovered host form in the first case.
-			if ($discovered && $i === 0) {
-				$form->query('id:macros_0_change_state')->one()->waitUntilClickable()->click();
-			}
+		// Click "Change" button for discovered host form in the first case.
+		if ($discovered) {
+			$form->query('id:macros_0_change_state')->one()->waitUntilClickable()->click();
+		}
 
-			$this->fillMacros([$vault_values['fields']]);
-			$form->submit();
-			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $vault_values['error']);
+		$this->fillMacros([$hashicorp['fields']]);
+		$form->submit();
+		$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $hashicorp['error']);
 
-			// Hosts in edit view opens in overlay and need to be closed manually.
-			if ($source === 'hosts' || $source === 'templates') {
-				COverlayDialogElement::find()->one()->close();
-			}
+		// Hosts in edit view opens in overlay and need to be closed manually.
+		if ($source === 'hosts' || $source === 'templates') {
+			COverlayDialogElement::find()->one()->close();
+		}
 
-			// Change Vault in settings to correct one.
-			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
-			$vault_settings = ($vault === 'CyberArk Vault') ? 'HashiCorp Vault' : 'CyberArk Vault';
-			$setting_form->fill(['Vault provider' => $vault_settings])->submit();
+		// Change Vault in settings to correct one.
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$setting_form->fill(['Vault provider' => 'HashiCorp Vault'])->submit();
 
-			// Check simple update.
-			$this->openMacrosTab($url, $source, false, $name);
+		// Check simple update.
+		$this->openMacrosTab($url, $source, false, $name);
 
-			if ($discovered && $i === 0) {
-				$form->query('id:macros_0_change_state')->one()->waitUntilClickable()->click();
-			}
+		if ($discovered) {
+			$form->query('id:macros_0_change_state')->one()->waitUntilClickable()->click();
+		}
 
-			$form->submit();
-			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object);
-			CMessageElement::find()->one()->close();
+		// Create macros with correct value.
+		$this->fillMacros([$hashicorp['fields']]);
 
-			// Create macros with correct value.
-			$this->fillMacros([$vault_values['fields']]);
-
-			// For discovered host macro becomes editable only after marco is redefined first.
-			if ($discovered && $i === 0) {
-				$form->submit();
-				$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
-				CMessageElement::find()->one()->close();
-				$this->openMacrosTab($url, $source, false, $name);
-				$form->invalidate();
-				$this->fillMacros([$vault_values['fields']]);
-			}
-
+		// For discovered host macro becomes editable only after marco is redefined first.
+		if ($discovered) {
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
+			CMessageElement::find()->one()->close();
+			$this->openMacrosTab($url, $source, false, $name);
+			$form->invalidate();
+			$this->fillMacros([$hashicorp['fields']]);
 		}
+
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
 	}
 
 	public function getResolveSecretMacroData() {
