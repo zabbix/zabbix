@@ -48,8 +48,6 @@ class WidgetForm extends CWidgetForm {
 	public const COLUMN_HEADER_HORIZONTAL = 1;
 	public const COLUMN_HEADER_VERTICAL = 2;
 
-	public const SHOW_TIMESTAMP_ON = 1;
-
 	public function addFields(): self {
 		return $this
 			->addField(
@@ -76,7 +74,7 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::NEW_VALUES_TOP)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('show_timestamp', _('Show timestamp')))->setDefault(self::SHOW_TIMESTAMP_ON)
+				new CWidgetFieldCheckBox('show_timestamp', _('Show timestamp'))
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('show_column_header', _('Show column header'), [
