@@ -4664,6 +4664,11 @@ div.dashboard-widget-piechart {
   div.dashboard-widget-piechart .dashboard-grid-widget-body svg {
     display: block; }
 
+form.dashboard-widget-plaintext #list_columns .overflow-ellipsis {
+  max-width: 250px; }
+form.dashboard-widget-plaintext #list_columns .inaccessible {
+  color: #9f9f9f; }
+
 div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;
   padding-left: 42px; }

@@ -4712,6 +4712,11 @@ div.dashboard-widget-piechart {
   div.dashboard-widget-piechart .dashboard-grid-widget-body svg {
     display: block; }
 
+form.dashboard-widget-plaintext #list_columns .overflow-ellipsis {
+  max-width: 250px; }
+form.dashboard-widget-plaintext #list_columns .inaccessible {
+  color: #acbbc2; }
+
 form.dashboard-widget-svggraph .svg-graph-preview,
 form.dashboard-widget-svggraph .graph-widget-config-tabs {
   grid-column: 1 / -1; }
