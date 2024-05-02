@@ -305,6 +305,6 @@ class CWidget extends CWidgetBase {
 	 *
 	 * Possible widget state: WIDGET_STATE_ACTIVE.
 	 */
-	onClear() {
+	onClearContents() {
 	}
 }

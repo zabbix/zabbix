@@ -1567,7 +1567,7 @@ class CWidgetBase {
 	 * Clear widget contents, messages and debug info, prior to displaying specific view defined by the framework.
 	 */
 	clearContents() {
-		this.onClear();
+		this.onClearContents();
 
 		this._updateMessages();
 		this._updateDebug();
@@ -1577,7 +1577,7 @@ class CWidgetBase {
 	/**
 	 * Stub method redefined in class.widget.js.
 	 */
-	onClear() {
+	onClearContents() {
 	}
 
 	/**
