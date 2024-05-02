@@ -83,8 +83,8 @@ class CVaultSecretParser extends CParser {
 		}
 
 		if ($this->options['with_key']) {
-			if (($key_sep = strpos($source, ':', $path_pos)) === false) {
-				$this->errorPos($source, $path_pos);
+			if (($key_sep = strpos($source, ':', $path_pos)) === false || !isset($source[$key_sep + 1])) {
+				$this->errorPos($source, $key_sep !== false ? $key_sep : $path_pos);
 
 				return self::PARSE_FAIL;
 			}
