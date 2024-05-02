@@ -216,6 +216,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Volume [{#NAME}]: Get data|<p>The discovered volume data.</p>|Dependent item|hpe.msa.get.volumes["{#NAME}",data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@['volume-name'] == "{#NAME}")].first()`</p></li></ul>|
+|Volume [{#NAME}]: Health|<p>Volume health status.</p>|Dependent item|hpe.msa.volumes["{#DURABLE.ID}",health]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric']`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Volume [{#NAME}]: Get statistics data|<p>The discovered volume statistics data.</p>|Dependent item|hpe.msa.get.volumes.statistics["{#NAME}",data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@['volume-name'] == "{#NAME}")].first()`</p></li></ul>|
 |Volume [{#NAME}]: Space allocated|<p>The amount of space currently allocated to the volume.</p>|Dependent item|hpe.msa.volumes.space["{#NAME}",allocated]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['allocated-size-numeric']`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `512`</p></li></ul>|
 |Volume [{#NAME}]: Space total|<p>The capacity of the volume.</p>|Dependent item|hpe.msa.volumes.space["{#NAME}",total]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['size-numeric']`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `512`</p></li></ul>|
@@ -229,6 +230,14 @@ This template has been tested on:
 |Volume [{#NAME}]: Cache: Read misses, rate|<p>For the controller that owns the volume, the number of times the block to be read is not found in cache per second.</p>|Dependent item|hpe.msa.volumes.cache.read.misses["{#NAME}",rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['read-cache-misses']`</p></li><li>Change per second</li></ul>|
 |Volume [{#NAME}]: Cache: Write hits, rate|<p>For the controller that owns the volume, the number of times the block written to is found in cache per second.</p>|Dependent item|hpe.msa.volumes.cache.write.hits["{#NAME}",rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['write-cache-hits']`</p></li><li>Change per second</li></ul>|
 |Volume [{#NAME}]: Cache: Write misses, rate|<p>For the controller that owns the volume, the number of times the block written to is not found in cache per second.</p>|Dependent item|hpe.msa.volumes.cache.write.misses["{#NAME}",rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['write-cache-misses']`</p></li><li>Change per second</li></ul>|
+
+### Trigger prototypes for Volumes discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Volume [{#NAME}]: Volume health is in degraded state|<p>Volume health is in degraded state.</p>|`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=1`|Warning||
+|Volume [{#NAME}]: Volume health is in fault state|<p>Volume health is in fault state.</p>|`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=2`|Average||
+|Volume [{#NAME}]: Volume health is in unknown state|<p>Volume health is in unknown state.</p>|`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=3`|Info||
 
 ### LLD rule Enclosures discovery
 
@@ -276,7 +285,7 @@ This template has been tested on:
 |Power supply [{#DURABLE.ID}]: Status|<p>Power supply status.</p>|Dependent item|hpe.msa.power_supplies["{#DURABLE.ID}",status]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['status-numeric']`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Power supply [{#DURABLE.ID}]: Part number|<p>Power supply part number.</p>|Dependent item|hpe.msa.power_supplies["{#DURABLE.ID}",part_number]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['part-number']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Power supply [{#DURABLE.ID}]: Serial number|<p>Power supply serial number.</p>|Dependent item|hpe.msa.power_supplies["{#DURABLE.ID}",serial_number]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['serial-number']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Power supply [{#DURABLE.ID}]: Temperature|<p>Power supply temperature.</p>|Dependent item|hpe.msa.power_supplies["{#DURABLE.ID}",temperature]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Power supply [{#DURABLE.ID}]: Temperature|<p>Power supply temperature.</p>|Dependent item|hpe.msa.power_supplies["{#DURABLE.ID}",temperature]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['dctemp']`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Power supplies discovery
 
@@ -352,7 +361,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Disk [{#DURABLE.ID}]: Get data|<p>The discovered disk data.</p>|Dependent item|hpe.msa.get.disks["{#DURABLE.ID}",data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@['durable-id'] == "{#DURABLE.ID}")].first()`</p></li></ul>|
-|Disk [{#DURABLE.ID}]: Health|<p>Disk health status.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",health]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric'].first()`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Disk [{#DURABLE.ID}]: Health|<p>Disk health status.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",health]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric']`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disk [{#DURABLE.ID}]: Temperature status|<p>Disk temperature status.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",temperature_status]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['temperature-status-numeric']`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>In range: `1 -> 3`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disk [{#DURABLE.ID}]: Temperature|<p>Temperature of the disk.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",temperature]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['temperature-numeric']`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disk [{#DURABLE.ID}]: Type|<p>Disk type:</p><p>SAS: Enterprise SAS spinning disk.</p><p>SAS MDL: Midline SAS spinning disk.</p><p>SSD SAS: SAS solit-state disk.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",type]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['description-numeric']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|

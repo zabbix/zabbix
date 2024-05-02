@@ -36,14 +36,14 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/metric"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/tlsconfig"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/watch"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/watch"
+	"golang.zabbix.com/sdk/metric"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/tlsconfig"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (

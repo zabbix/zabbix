@@ -28,9 +28,9 @@ import (
 	"net"
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/plugins/external"
+	"golang.zabbix.com/agent2/plugins/external"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {

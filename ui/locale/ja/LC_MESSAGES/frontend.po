@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-01-26 09:48+0000\n"
-"Last-Translator: JK <kim.jongkwon@zabbix.com>\n"
+"PO-Revision-Date: 2024-04-25 07:57+0000\n"
+"Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -3166,7 +3166,7 @@ msgstr "メディアタイプを更新できません"
 
 #: app/controllers/CControllerModuleUpdate.php:139
 msgid "Cannot update module"
-msgstr ""
+msgstr "モジュールを更新できません"
 
 #: sysmaps.php:189
 msgid "Cannot update network map"
@@ -11658,7 +11658,7 @@ msgstr[0] ""
 
 #: app/controllers/CControllerModuleUpdate.php:128
 msgid "Module updated"
-msgstr ""
+msgstr "モジュールを更新しました"
 
 #: include/classes/api/services/CRole.php:707
 #, c-format
@@ -21072,11 +21072,11 @@ msgstr "データの保存期間設定(全体設定)"
 
 #: include/classes/api/services/CGraphGeneral.php:836
 msgid "graph prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのグラフプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CGraphGeneral.php:830
 msgid "graph with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのグラフがすでに存在します"
 
 #: include/func.inc.php:594 include/func.inc.php:661 jsLoader.php:225
 msgctxt "hour short"
@@ -21100,7 +21100,7 @@ msgstr "ホストグループ"
 
 #: include/classes/api/services/CHostGroup.php:819
 msgid "host group with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのホストグループがすでに存在します"
 
 #: include/classes/widgets/CWidgetHelper.php:816
 #: include/classes/widgets/CWidgetHelper.php:1177
@@ -21110,7 +21110,7 @@ msgstr "ホストパターン"
 
 #: include/classes/api/services/CHostPrototype.php:1236
 msgid "host prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのホストプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -21329,11 +21329,11 @@ msgstr "アイテムパターン"
 
 #: include/classes/api/services/CItemGeneral.php:715
 msgid "item prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのアイテムプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CItemGeneral.php:703
 msgid "item with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのアイテムがすでに存在します"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -22046,11 +22046,11 @@ msgstr "テンプレートID\"%1$s\"が%2$s回使用されています"
 
 #: include/classes/api/services/CTemplateDashboard.php:395
 msgid "template dashboard with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのテンプレートダッシュボードがすでに存在します"
 
 #: include/classes/api/services/CTemplate.php:449
 msgid "template with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのテンプレートがすでに存在します"
 
 #: include/classes/validators/CApiInputValidator.php:2932
 msgid "the last new line feed is missing"
@@ -22171,7 +22171,7 @@ msgstr "トリガーのプロトタイプは他のテンプレートやホスト
 
 #: include/classes/api/services/CTriggerGeneral.php:686
 msgid "trigger prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのトリガープロトタイプがすでに存在します"
 
 #: include/classes/api/services/CTriggerGeneral.php:2257
 msgid "trigger with linkages cannot be moved to another template or host"
@@ -22179,7 +22179,7 @@ msgstr "リンクのあるトリガーは他のテンプレートやホストに
 
 #: include/classes/api/services/CTriggerGeneral.php:680
 msgid "trigger with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのトリガーがすでに存在します"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -22388,7 +22388,7 @@ msgstr "値が長すぎます"
 
 #: include/classes/api/services/CValueMap.php:501
 msgid "value map with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDの値のマッピングがすでに存在します"
 
 #: include/classes/api/services/CReport.php:198
 #: include/classes/api/services/CReport.php:582
@@ -22490,7 +22490,7 @@ msgstr "w"
 
 #: include/classes/api/services/CHttpTest.php:438
 msgid "web scenario with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのWebシナリオがすでに存在します"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

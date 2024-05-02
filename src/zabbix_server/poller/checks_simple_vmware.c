@@ -717,20 +717,22 @@ out:
 	return ret;
 }
 
-static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key, const DC_ITEM *item,
-		zbx_vector_ptr_t *add_results)
+static void	vmware_get_events(const zbx_vector_ptr_t *events, const zbx_vmware_eventlog_state_t *evt_state,
+		const DC_ITEM *item, zbx_vector_ptr_t *add_results)
 {
-	int	i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T " events:%d top event id:"
+			ZBX_FS_UI64 " top event ts:" ZBX_FS_TIME_T, __func__, evt_state->last_key, evt_state->last_ts,
+			events->values_num, ((zbx_vmware_event_t *)events->values[0])->key,
+			((zbx_vmware_event_t *)events->values[0])->timestamp);
 
 	/* events were retrieved in reverse chronological order */
-	for (i = events->values_num - 1; i >= 0; i--)
+	for (int i = events->values_num - 1; i >= 0; i--)
 	{
 		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
 		AGENT_RESULT			*add_result = NULL;
 
-		if (event->key <= eventlog_last_key)
+		/* Event id of ESXi will reset when ESXi is rebooted */
+		if (event->timestamp <= evt_state->last_ts && event->key <= evt_state->last_key)
 			continue;
 
 		add_result = (AGENT_RESULT *)zbx_malloc(add_result, sizeof(AGENT_RESULT));
@@ -743,7 +745,7 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
 				add_result->log->logeventid = event->key;
-				add_result->log->timestamp = event->timestamp;
+				add_result->log->timestamp = (int)event->timestamp;
 			}
 
 			zbx_vector_ptr_append(add_results, add_result);
@@ -797,6 +799,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	{
 		/* this may happen if recreate item vmware.eventlog for the same service URL */
 		service->eventlog.last_key = request->lastlogsize;
+		service->eventlog.last_ts = 0;
 		service->eventlog.skip_old = skip_old;
 	}
 	else if (0 != service->eventlog.oom)
@@ -813,8 +816,9 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	}
 	else if (0 < service->data->events.values_num)
 	{
-		vmware_get_events(&service->data->events, request->lastlogsize, item, add_results);
+		vmware_get_events(&service->data->events, &service->eventlog, item, add_results);
 		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+		service->eventlog.last_ts = ((const zbx_vmware_event_t *)service->data->events.values[0])->timestamp;
 	}
 
 	ret = SYSINFO_RET_OK;

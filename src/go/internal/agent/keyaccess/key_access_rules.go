@@ -25,10 +25,10 @@ import (
 	"math"
 	"sort"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/wildcard"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/wildcard"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
 )
 
 // RuleType Access rule permission type
