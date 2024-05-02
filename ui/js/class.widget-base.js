@@ -652,10 +652,7 @@ class CWidgetBase {
 				continue;
 			}
 
-			const value = fields_referred_data.get(name).value;
-			const value_default = CWidgetsData.getDefault(parameters.type);
-
-			if (JSON.stringify(value) === JSON.stringify(value_default)) {
+			if (CWidgetsData.isDefault(parameters.type, fields_referred_data.get(name).value)) {
 				return false;
 			}
 		}

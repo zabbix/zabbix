@@ -18,6 +18,9 @@
 **/
 
 
+/**
+ * Singleton class, containing information about standard widget data types.
+ */
 class CWidgetsData {
 
 	static DATA_TYPE_HOST_GROUP_ID =		'_hostgroupid';
@@ -33,31 +36,71 @@ class CWidgetsData {
 	static DATA_TYPE_SLA_ID =				'_slaid';
 	static DATA_TYPE_TIME_PERIOD =			'_timeperiod';
 
-	static getDefault(data_type) {
-		switch (data_type) {
-			case CWidgetsData.DATA_TYPE_HOST_GROUP_ID:
-			case CWidgetsData.DATA_TYPE_HOST_GROUP_IDS:
-			case CWidgetsData.DATA_TYPE_HOST_ID:
-			case CWidgetsData.DATA_TYPE_HOST_IDS:
-			case CWidgetsData.DATA_TYPE_ITEM_ID:
-			case CWidgetsData.DATA_TYPE_ITEM_PROTOTYPE_ID:
-			case CWidgetsData.DATA_TYPE_GRAPH_ID:
-			case CWidgetsData.DATA_TYPE_GRAPH_PROTOTYPE_ID:
-			case CWidgetsData.DATA_TYPE_MAP_ID:
-			case CWidgetsData.DATA_TYPE_SERVICE_ID:
-			case CWidgetsData.DATA_TYPE_SLA_ID:
-				return [];
+	/**
+	 * @type {CWidgetsData|null}
+	 */
+	static #singleton = null;
 
-			case CWidgetsData.DATA_TYPE_TIME_PERIOD:
-				return {
-					from: null,
-					from_ts: null,
-					to: null,
-					to_ts: null
-				};
+	#defaults = new Map();
 
-			default:
-				return null;
+	static #getSingleton() {
+		if (CWidgetsData.#singleton === null) {
+			CWidgetsData.#singleton = new CWidgetsData();
 		}
+
+		return CWidgetsData.#singleton;
+	}
+
+	static getDefault(data_type) {
+		const singleton = CWidgetsData.#getSingleton();
+
+		if (singleton.#defaults.has(data_type)) {
+			return singleton.#defaults.get(data_type).value;
+		}
+
+		return null;
+	}
+
+	static setDefault(data_type, value, {is_comparable} = {}) {
+		const singleton = CWidgetsData.#getSingleton();
+
+		singleton.#defaults.set(data_type, {value, is_comparable});
+	}
+
+	static isDefault(data_type, value) {
+		const singleton = CWidgetsData.#getSingleton();
+
+		if (singleton.#defaults.has(data_type)) {
+			const _default = singleton.#defaults.get(data_type);
+
+			if (_default.is_comparable && JSON.stringify(value) === JSON.stringify(_default.value)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	constructor() {
+		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_GROUP_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_GROUP_IDS, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_IDS, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_ITEM_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_ITEM_PROTOTYPE_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_GRAPH_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_GRAPH_PROTOTYPE_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_MAP_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_SERVICE_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_SLA_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_TIME_PERIOD, {
+			value: {
+				from: null,
+				from_ts: null,
+				to: null,
+				to_ts: null
+			},
+			is_comparable: true
+		});
 	}
 }

@@ -29,6 +29,13 @@
 		init({dashboard, widget_defaults, dashboard_time_period}) {
 			timeControl.refreshPage = false;
 
+			CWidgetsData.setDefault('_timeperiod', {
+				from: dashboard_time_period.from,
+				from_ts: dashboard_time_period.from_ts,
+				to: dashboard_time_period.to,
+				to_ts: dashboard_time_period.to_ts
+			}, {is_comparable: false});
+
 			ZABBIX.Dashboard = new CDashboardPrint(document.querySelector('.wrapper'), {
 				containers: {
 					grid: document.querySelector('.wrapper'),
