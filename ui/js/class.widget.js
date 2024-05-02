@@ -297,10 +297,14 @@ class CWidget extends CWidgetBase {
 	}
 
 	/**
-	 * Clear widget messages and contents prior to displaying specific view defined by the framework.
+	 * Clear widget contents and cancel any asynchronous tasks related to updating the contents.
+	 *
+	 * Invoked prior to displaying specific view defined by the framework or user (by calling "setCoverMessage").
+	 *
+	 * Invoked by the default implementation of the "clearContents" method only.
+	 *
+	 * Possible widget state: WIDGET_STATE_ACTIVE.
 	 */
-	clearContents() {
-		this._updateMessages();
-		this._body.innerHTML = '';
+	onClear() {
 	}
 }

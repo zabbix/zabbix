@@ -40,7 +40,7 @@ class CWidgetSelectPopup {
 	`;
 
 	static #nothing_to_show_template = `
-		<tr class="${ZBX_STYLE_NOTHING_TO_SHOW}">
+		<tr>
 			<td>${t('No compatible widgets.')}</td>
 		</tr>
 	`;
@@ -63,6 +63,7 @@ class CWidgetSelectPopup {
 			}
 		}
 		else {
+			widgets_table.classList.add(ZBX_STYLE_NO_DATA);
 			rows_html = CWidgetSelectPopup.#nothing_to_show_template;
 		}
 

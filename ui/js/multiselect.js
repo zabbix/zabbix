@@ -1043,7 +1043,7 @@
 				$(this).remove();
 			}
 		});
-		$('input', $obj).each(function() {
+		$('input[type="hidden"]', $obj).each(function() {
 			if ($(this).val() == id) {
 				$(this).remove();
 			}

@@ -1287,7 +1287,7 @@ class CWidgetBase {
 				this.clearContents();
 				this.setCoverMessage({
 					message: t('Awaiting data'),
-					icon: 'awaiting-data.svg'
+					icon: ZBX_ICON_WIDGET_AWAITING_DATA_LARGE
 				});
 
 				this.broadcast(this.getBroadcastDefaults());
@@ -1564,9 +1564,20 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Stub method redefined in class.widget.js.
+	 * Clear widget contents, messages and debug info, prior to displaying specific view defined by the framework.
 	 */
 	clearContents() {
+		this.onClear();
+
+		this._updateMessages();
+		this._updateDebug();
+		this._body.innerHTML = '';
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	onClear() {
 	}
 
 	/**
@@ -1576,11 +1587,25 @@ class CWidgetBase {
 	 * @param {string|null} icon
 	 */
 	setCoverMessage({message, description = null, icon = null} = {}) {
-		this._updateMessages();
-		this._updateInfo();
+		const container = document.createElement('div');
 
-		// TODO: Replace with actual implementation
-		this._body.innerHTML = `${message} --- ${description} --- ${icon}`;
+		container.classList.add(ZBX_STYLE_NO_DATA_MESSAGE);
+		container.innerText = message;
+
+		if (icon !== null) {
+			container.classList.add(icon);
+		}
+
+		if (description !== null) {
+			const description_container = document.createElement('div');
+
+			description_container.classList.add(ZBX_STYLE_NO_DATA_DESCRIPTION);
+			description_container.innerText = description;
+
+			container.appendChild(description_container);
+		}
+
+		this._body.appendChild(container);
 	}
 
 	/**

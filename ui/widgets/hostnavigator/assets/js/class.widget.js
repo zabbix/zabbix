@@ -61,14 +61,24 @@ class CWidgetHostNavigator extends CWidget {
 	}
 
 	setContents(response) {
+		if (response.hosts.length === 0) {
+			this.clearContents();
+			this.setCoverMessage({
+				message: t('No data found'),
+				icon: ZBX_ICON_SEARCH_LARGE
+			});
+
+			return;
+		}
+
 		if (this.#host_navigator === null) {
 			this.#host_navigator = new CHostNavigator(response.config);
-
-			this._body.appendChild(this.#host_navigator.getContainer());
 
 			this.#registerEvents();
 			this.#activateEvents();
 		}
+
+		this._body.appendChild(this.#host_navigator.getContainer());
 
 		this.#host_navigator.setValue({
 			hosts: response.hosts,

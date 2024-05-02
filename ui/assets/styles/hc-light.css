@@ -1349,7 +1349,7 @@ button {
   .btn-debug.visible {
     opacity: 0.75; }
 
-.zi-filter-large::before, .zi-search-large::before {
+.zi-filter-large::before, .zi-search-large::before, .zi-widget-awaiting-data-large::before, .zi-widget-empty-references-large::before {
   font-size: 40px; }
 
 .sidebar .sidebar-header-buttons .btn-icon::before, .zi-chevron-down::before, .zi-chevron-down-small::before,
@@ -1414,6 +1414,9 @@ button {
 .zi-i-warning, .zi-i-warning.btn-icon {
   color: #ffffff;
   background-color: #af6b00; }
+
+.zi-widget-empty-references-large::before {
+  color: #990000; }
 
 .checkbox-list {
   display: grid;
@@ -1792,15 +1795,15 @@ button {
       margin-bottom: -8px; }
       .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: -8px; }
-    .dashboard-grid-widget-contents .list-table.no-data {
+    .dashboard-grid-widget-contents .list-table.no-data:not(.no-data-without-icon) {
       height: 100%; }
-      .dashboard-grid-widget-contents .list-table.no-data thead th, .dashboard-grid-widget-contents .list-table.no-data thead td {
+      .dashboard-grid-widget-contents .list-table.no-data:not(.no-data-without-icon) thead th, .dashboard-grid-widget-contents .list-table.no-data:not(.no-data-without-icon) thead td {
         height: 1%; }
-      .dashboard-grid-widget-contents .list-table.no-data .nothing-to-show td {
+      .dashboard-grid-widget-contents .list-table.no-data:not(.no-data-without-icon) tbody tr td {
         vertical-align: middle; }
-      .dashboard-grid-widget-contents .list-table.no-data .nothing-to-show:last-child td {
+      .dashboard-grid-widget-contents .list-table.no-data:not(.no-data-without-icon) tbody tr:last-child td {
         border-bottom: 0; }
-      .dashboard-grid-widget-contents .list-table.no-data .nothing-to-show .no-data-found {
+      .dashboard-grid-widget-contents .list-table.no-data:not(.no-data-without-icon) tbody tr .no-data-message[class^="zi-"], .dashboard-grid-widget-contents .list-table.no-data:not(.no-data-without-icon) tbody tr .no-data-message[class*=" zi-"] {
         margin-top: 0;
         margin-bottom: 0; }
   .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-debug .debug-output {
@@ -2355,15 +2358,6 @@ button {
     .list-table .action-container .separator {
       flex-shrink: 0;
       margin-right: 4px; }
-  .list-table .nothing-to-show td {
-    height: auto;
-    color: #333333;
-    text-align: center; }
-    .list-table .nothing-to-show td:hover {
-      background-color: #ffffff; }
-  .list-table .nothing-to-show .no-data-found {
-    margin-top: 100px;
-    margin-bottom: 100px; }
   .list-table .latest-values,
   .list-table .opdata {
     max-width: 300px; }
@@ -2386,6 +2380,15 @@ button {
       margin: 0; }
     .list-table.compact-view td.nowrap {
       text-overflow: clip; }
+  .list-table.no-data tbody tr td {
+    height: auto;
+    color: #333333;
+    text-align: center; }
+    .list-table.no-data tbody tr td:hover {
+      background-color: #ffffff; }
+  .list-table.no-data tbody tr .no-data-message[class^="zi-"], .list-table.no-data tbody tr .no-data-message[class*=" zi-"] {
+    margin-top: 100px;
+    margin-bottom: 100px; }
 
 .list-table .btn-icon,
 .list-table .icon,
@@ -2527,19 +2530,18 @@ button {
   margin-bottom: 0;
   border: 1px solid #ffffff; }
 
-.no-data-found {
+.no-data-message {
   display: grid;
   align-content: center;
   height: 100%;
   color: #333333;
   text-align: center; }
-  .no-data-found [class^="zi-"]::before, .no-data-found [class*=" zi-"]::before {
-    display: block;
-    margin-bottom: 8px; }
-  .no-data-found .no-data-message {
-    font-size: 16px;
-    text-align: center; }
-  .no-data-found .no-data-description {
+  .no-data-message[class^="zi-"], .no-data-message[class*=" zi-"] {
+    font-size: 16px; }
+    .no-data-message[class^="zi-"]::before, .no-data-message[class*=" zi-"]::before {
+      display: block;
+      margin-bottom: 8px; }
+  .no-data-message .no-data-description {
     font-size: 14px;
     margin-top: 4px; }
 

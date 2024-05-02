@@ -57,9 +57,13 @@ class CWidgetMisconfigured extends CWidget {
 				return {
 					message: t('Referred widget is unavailable'),
 					description: t('Please update configuration'),
-					icon: 'icon.svg'
+					icon: ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE
 				};
 		}
+	}
+
+	isFieldsReferredDataReady() {
+		return true;
 	}
 
 	promiseUpdate() {
