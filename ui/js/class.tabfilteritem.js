@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ const TABFILTERITEM_STYLE_SELECTED = 'selected';
 const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
 const TABFILTERITEM_STYLE_DISABLED = 'disabled';
 const TABFILTERITEM_STYLE_FOCUSED = 'focused';
+const TABFILTERITEM_STYLE_SEPARATED = 'separated';
 
 class CTabFilterItem extends CBaseComponent {
 
@@ -210,10 +211,10 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
-	 * Set browser focus to filter label element.
+	 * Set focused state of item.
 	 */
 	setFocused() {
-		this._target.focus();
+		this._target.focus({preventScroll: true});
 	}
 
 	/**
@@ -294,12 +295,30 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Set item separated state (whether to visually separate the item from the previous one).
+	 *
+	 * @param {boolean} state
+	 */
+	setSeparated(state) {
+		this.toggleClass(TABFILTERITEM_STYLE_SEPARATED, state);
+	}
+
+	/**
 	 * Check if item have custom time interval.
 	 *
 	 * @return {boolean}
 	 */
 	hasCustomTime() {
 		return !!this._data.filter_custom_time;
+	}
+
+	/**
+	 * Get custom time label.
+	 *
+	 * @returns {string}
+	 */
+	getCustomTimeLabel() {
+		return this.hasCustomTime() ? this._data.filter_custom_time_label : '';
 	}
 
 	/**
@@ -316,6 +335,7 @@ class CTabFilterItem extends CBaseComponent {
 			};
 
 		if (data.filter_custom_time) {
+			this._data.filter_custom_time_label = data.filter_custom_time_label;
 			this._data.from = data.from;
 			this._data.to = data.to;
 		}
@@ -589,7 +609,6 @@ class CTabFilterItem extends CBaseComponent {
 					return;
 				}
 
-				this.setFocused();
 				this.fire(TABFILTERITEM_EVENT_SELECT);
 			},
 

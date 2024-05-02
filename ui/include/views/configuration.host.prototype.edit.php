@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -296,13 +296,55 @@ $host_tab->addRow(
 // Display inherited parameters only for hosts prototypes on hosts.
 if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 	$host_tab->addRow(
-		_('Monitored by proxy'),
-		(new CTextBox(
-			'proxyid',
-			($parent_host['proxyid'] != 0) ? $this->data['proxy']['name'] : _('(no proxy)'),
-			true
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		_('Monitored by'),
+		(new CRadioButtonList('monitored_by', (int) $parent_host['monitored_by']))
+			->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
+			->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
+			->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
+			->setReadonly(true)
+			->setModern()
 	);
+
+	if ($parent_host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+		$host_tab->addRow(
+			(new CMultiSelect([
+				'name' => 'proxyid',
+				'object_name' => 'proxies',
+				'multiple' => false,
+				'data' => $data['ms_proxy'],
+				'disabled' => true,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxies',
+						'srcfld1' => 'proxyid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxyid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
+	}
+	elseif ($parent_host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+		$host_tab->addRow(
+			(new CMultiSelect([
+				'name' => 'proxy_groupid',
+				'object_name' => 'proxy_groups',
+				'multiple' => false,
+				'data' => $data['ms_proxy_group'],
+				'disabled' => true,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxy_groups',
+						'srcfld1' => 'proxy_groupid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxy_groupid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
+	}
 }
 
 $host_tab->addRow(_('Create enabled'),

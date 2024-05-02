@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,20 +77,38 @@ static zbx_metric_t	parameter_hostname =
 
 static zbx_metric_t		*commands = NULL;
 static zbx_metric_t		*commands_local = NULL;
-zbx_vector_ptr_t		key_access_rules;
-static zbx_get_config_int_f	get_config_timeout_cb = NULL;
 static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
-static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
-static zbx_get_config_int_f	get_config_unsafe_user_parameters_cb = NULL;
-static zbx_get_config_str_f	get_config_source_ip_cb = NULL;
-static zbx_get_config_str_f	get_config_hostname_cb = NULL;
-static zbx_get_config_str_f	get_config_hostnames_cb = NULL;
-static zbx_get_config_str_f	get_config_host_metadata_cb = NULL;
-static zbx_get_config_str_f	get_config_host_metadata_item_cb = NULL;
+
+static zbx_vector_ptr_t		key_access_rules;
+
+zbx_vector_ptr_t	*get_key_access_rules(void)
+{
+	return &key_access_rules;
+}
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
 #define ZBX_COMMAND_WITH_PARAMS		2
+
+#define GET_CONFIG_VAR(callback_type, callback, func_type, func)	\
+static callback_type	callback = NULL;				\
+func_type func(void)							\
+{									\
+	return callback();						\
+}
+
+GET_CONFIG_VAR(zbx_get_config_int_f, get_config_timeout_cb, int, sysinfo_get_config_timeout)
+GET_CONFIG_VAR(zbx_get_config_int_f, get_config_log_remote_commands_cb, int, sysinfo_get_config_log_remote_commands)
+GET_CONFIG_VAR(zbx_get_config_int_f, get_config_unsafe_user_parameters_cb, int,
+		sysinfo_get_config_unsafe_user_parameters)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_source_ip_cb, const char *, sysinfo_get_config_source_ip)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_hostname_cb, const char *, sysinfo_get_config_hostname)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_hostnames_cb, const char *, sysinfo_get_config_hostnames)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_host_metadata_cb, const char *, sysinfo_get_config_host_metadata)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_host_metadata_item_cb, const char *,
+		sysinfo_get_config_host_metadata_item)
+GET_CONFIG_VAR(zbx_get_config_str_f, get_config_service_name_cb, const char *, sysinfo_get_config_service_name)
+#undef GET_CONFIG_VAR
 
 static int	compare_key_access_rules(const void *rule_a, const void *rule_b);
 static int	zbx_parse_key_access_rule(char *pattern, zbx_key_access_rule_t *rule);
@@ -165,7 +183,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 		zbx_get_config_int_f get_config_unsafe_user_parameters_f, zbx_get_config_str_f
 		get_config_source_ip_f, zbx_get_config_str_f get_config_hostname_f, zbx_get_config_str_f
 		get_config_hostnames_f, zbx_get_config_str_f get_config_host_metadata_f, zbx_get_config_str_f
-		get_config_host_metadata_item_f)
+		get_config_host_metadata_item_f, zbx_get_config_str_f get_config_service_name_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
 	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
@@ -176,6 +194,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 	get_config_hostnames_cb = get_config_hostnames_f;
 	get_config_host_metadata_cb = get_config_host_metadata_f;
 	get_config_host_metadata_item_cb = get_config_host_metadata_item_f;
+	get_config_service_name_cb = get_config_service_name_f;
 }
 
 /******************************************************************************
@@ -298,21 +317,6 @@ void	zbx_set_metrics(zbx_metric_t *metrics)
 	commands = metrics;
 }
 #endif
-
-#define GET_CONFIG_VAR(type, varname) \
-type	sysinfo_get_config_##varname(void) \
-{ \
-	return get_config_##varname##_cb(); \
-}
-GET_CONFIG_VAR(int, timeout)
-GET_CONFIG_VAR(int, log_remote_commands)
-GET_CONFIG_VAR(int, unsafe_user_parameters)
-GET_CONFIG_VAR(const char *, source_ip)
-GET_CONFIG_VAR(const char *, hostname)
-GET_CONFIG_VAR(const char *, hostnames)
-GET_CONFIG_VAR(const char *, host_metadata)
-GET_CONFIG_VAR(const char *, host_metadata_item)
-#undef GET_CONFIG_VAR
 
 void	zbx_init_metrics(void)
 {
@@ -989,6 +993,9 @@ void	zbx_test_parameter(const char *key)
 	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, ZBX_CHECK_TIMEOUT_UNDEFINED))
 	{
 		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
+
+		if (0 == ZBX_ISSET_VALUE(&result))
+			printf(" [-|" ZBX_NODATA "]");
 
 		if (0 != ZBX_ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);

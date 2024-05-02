@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "zbxeval.h"
 #include "eval.h"
-#include "count_pattern.h"
 
 #include "zbxalgo.h"
 #include "zbxvariant.h"
@@ -2438,8 +2437,12 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 	if (SUCCEED != function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
 			token->opt, args, ctx->data_cb, &ctx->ts, &value, &errmsg))
 	{
-		*error = zbx_dsprintf(*error, "%s at \"%s\".", errmsg, ctx->expression + token->loc.l);
+		char	*composed_expr = NULL;
+
+		zbx_eval_compose_expression_from_pos(ctx, &composed_expr, token->loc.l);
+		*error = zbx_dsprintf(*error, "%s at \"%s\".", errmsg, composed_expr);
 		zbx_free(errmsg);
+		zbx_free(composed_expr);
 
 		if (0 == (ctx->rules & ZBX_EVAL_PROCESS_ERROR))
 			return FAIL;

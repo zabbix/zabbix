@@ -8,7 +8,25 @@ zabbix_export:
       template: 'RabbitMQ cluster by HTTP'
       name: 'RabbitMQ cluster by HTTP'
       description: |
-        Get cluster metrics from RabbitMQ management plugin provided an HTTP-based API using HTTP agent.
+        This template is developed to monitor the messaging broker RabbitMQ cluster by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        
+        The template collects metrics by polling RabbitMQ management plugin with HTTP agent remotely.
+        
+        Setup:
+        
+        1. Enable the RabbitMQ management plugin. See the RabbitMQ documentation for the instructions:
+        https://www.rabbitmq.com/management.html
+        
+        2. Create a user to monitor the service:
+        
+        rabbitmqctl add_user zbx_monitor <PASSWORD>
+        rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
+        rabbitmqctl set_user_tags zbx_monitor monitoring
+        
+        3. Set the hostname or IP address of the the RabbitMQ cluster host in the '{$RABBITMQ.API.CLUSTER_HOST}' macro. You can also change the port in the '{$RABBITMQ.API.PORT}' macro and the scheme in the '{$RABBITMQ.API.SCHEME}' macro if necessary.
+        
+        4. Set the user name and password in the macros '{$RABBITMQ.API.USER}' and '{$RABBITMQ.API.PASSWORD}'.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
@@ -30,7 +48,7 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns exchanges metrics.'
-          url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/exchanges'
+          url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges'
           tags:
             - tag: component
               value: raw
@@ -45,7 +63,7 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns cluster-wide metrics.'
-          url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/overview'
+          url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview'
           tags:
             - tag: component
               value: raw
@@ -927,6 +945,13 @@ zabbix_export:
               path: $.type
             - lld_macro: '{#VHOST}'
               path: $.vhost
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(JSON.parse(value),[''name'',''type'',''vhost'']);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 8655f85b65cc4eb0a0470db45ca1c963
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -953,14 +978,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/alarms'
+              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms'
               status_codes: '200,503,404'
               retrieve_mode: HEADERS
               tags:
@@ -974,7 +999,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the cluster'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -988,15 +1013,21 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                       parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2])
-                  return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
+                  	parseInt(value.split('.')[1]) * 100 +
+                  	parseInt(value.split('.')[2]);
+                  return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
         - tag: target
           value: rabbitmq
       macros:
+        - macro: '{$RABBITMQ.API.CLUSTER_HOST}'
+          value: '<SET CLUSTER API HOST>'
+          description: 'The hostname or IP of the API endpoint for the RabbitMQ cluster.'
         - macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
         - macro: '{$RABBITMQ.API.PORT}'
@@ -1097,7 +1128,25 @@ zabbix_export:
       template: 'RabbitMQ node by HTTP'
       name: 'RabbitMQ node by HTTP'
       description: |
-        Get node metrics from RabbitMQ management plugin provided an HTTP-based API using HTTP agent.
+        This template is developed to monitor the messaging broker RabbitMQ node by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        
+        The template collects metrics by polling RabbitMQ management plugin with HTTP agent remotely.
+        
+        Setup:
+        
+        1. Enable the RabbitMQ management plugin. See the RabbitMQ documentation for the instructions:
+        https://www.rabbitmq.com/management.html
+        
+        2. Create a user to monitor the service:
+        
+        rabbitmqctl add_user zbx_monitor <PASSWORD>
+        rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
+        rabbitmqctl set_user_tags zbx_monitor monitoring
+        
+        3. Set the hostname or IP address of the the RabbitMQ node host in the '{$RABBITMQ.API.HOST}' macro. You can also change the port in the '{$RABBITMQ.API.PORT}' macro and the scheme in the '{$RABBITMQ.API.SCHEME}' macro if necessary.
+        
+        4. Set the user name and password in the macros '{$RABBITMQ.API.USER}' and '{$RABBITMQ.API.PASSWORD}'.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
@@ -1111,7 +1160,7 @@ zabbix_export:
         - uuid: 542f36f0b4e24d99a402a98b6f6fe4c4
           name: 'RabbitMQ: Service response time'
           type: SIMPLE
-          key: 'net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]'
+          key: 'net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -1120,21 +1169,21 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 220eedd4f69b43fabe233b5127e09c50
-              expression: 'min(/RabbitMQ node by HTTP/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/RabbitMQ node by HTTP/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
               name: 'RabbitMQ: Service response time is too high'
               event_name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 - name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: f53379f858f74714b15ee12fe6fc2d08
           name: 'RabbitMQ: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"]'
+          key: 'net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]'
           history: 7d
           valuemap:
             name: 'Service state'
@@ -1149,7 +1198,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 636356e5255d49d992df4b7a0c7d222d
-              expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
+              expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
               name: 'RabbitMQ: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -1167,7 +1216,7 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns metrics of the nodes.'
-          url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true'
+          url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true'
           tags:
             - tag: component
               value: raw
@@ -1181,7 +1230,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
               tags:
                 - tag: scope
                   value: availability
@@ -1196,7 +1245,11 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns cluster-wide metrics.'
-          url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/overview'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview'
           tags:
             - tag: component
               value: raw
@@ -1211,7 +1264,7 @@ zabbix_export:
           username: '{$RABBITMQ.API.USER}'
           password: '{$RABBITMQ.API.PASSWORD}'
           description: 'The HTTP API endpoint that returns metrics of the queues metrics.'
-          url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/queues'
+          url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues'
           tags:
             - tag: component
               value: raw
@@ -1476,7 +1529,7 @@ zabbix_export:
               description: 'RabbitMQ node is not running.'
               dependencies:
                 - name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{HOST.CONN}","{$RABBITMQ.API.PORT}"])=0'
+                  expression: 'last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
               tags:
                 - tag: scope
                   value: availability
@@ -1588,7 +1641,7 @@ zabbix_export:
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/healthchecks/node'
+              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node'
               tags:
                 - tag: component
                   value: health
@@ -1614,9 +1667,12 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                       parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2])
-                  return JSON.stringify(rabbit_version < 30810 ? [{'{#SINGLETON}': ''}] : []);
+                  	parseInt(value.split('.')[1]) * 100 +
+                  	parseInt(value.split('.')[2]);
+                  return JSON.stringify(rabbit_version < 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: ab89d103c015400fbbeecaaf9bf01400
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -1646,14 +1702,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months'
+              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months'
               status_codes: '200,503,404'
               retrieve_mode: HEADERS
               tags:
@@ -1667,7 +1723,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are valid TLS certificates expiring in the next month'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1692,14 +1748,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms'
+              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms'
               status_codes: '200,503,404'
               retrieve_mode: HEADERS
               tags:
@@ -1713,7 +1769,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the node'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1727,7 +1783,7 @@ zabbix_export:
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
                 It checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down).
-                It responds with a status code `200 OK` if there are no such classic mirrored queues. 
+                It responds with a status code `200 OK` if there are no such classic mirrored queues.
                 Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1739,14 +1795,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical'
+              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical'
               status_codes: '200,503,404'
               retrieve_mode: HEADERS
               tags:
@@ -1760,7 +1816,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are queues that could potentially lose data if this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1773,8 +1829,8 @@ zabbix_export:
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
-                It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). 
-                It responds with a status code `200 OK` if there are no such quorum queues. 
+                It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down).
+                It responds with a status code `200 OK` if there are no such quorum queues.
                 Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1786,14 +1842,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical'
+              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical'
               status_codes: '200,503,404'
               retrieve_mode: HEADERS
               tags:
@@ -1807,7 +1863,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1820,7 +1876,7 @@ zabbix_export:
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
-                It responds with It responds with a status code `200 OK` if all virtual hosts are running on the target node. 
+                It responds with It responds with a status code `200 OK` if all virtual hosts are running on the target node.
                 Otherwise it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1832,14 +1888,14 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts'
+              url: '{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts'
               status_codes: '200,503,404'
               retrieve_mode: HEADERS
               tags:
@@ -1853,7 +1909,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are not running virtual hosts'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.'
+                  description: 'This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1867,9 +1923,12 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                       parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2])
-                  return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
+                  	parseInt(value.split('.')[1]) * 100 +
+                  	parseInt(value.split('.')[2]);
+                  return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: cc1d85b6045b44b38f588cd9a4c6c62d
           name: 'Queues discovery'
           type: DEPENDENT
@@ -2196,7 +2255,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 171e5dbff18f47c98da2c1a3b7120622
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages'
+              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages total'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2401,12 +2460,22 @@ zabbix_export:
               path: $.name
             - lld_macro: '{#VHOST}'
               path: $.vhost
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(JSON.parse(value),[''node'',''name'',''vhost'']);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
         - tag: target
           value: rabbitmq
       macros:
+        - macro: '{$RABBITMQ.API.HOST}'
+          value: '<SET NODE API HOST>'
+          description: 'The hostname or IP of the API endpoint for the RabbitMQ.'
         - macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
         - macro: '{$RABBITMQ.API.PORT}'

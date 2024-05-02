@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,6 +62,13 @@ class CControllerScriptCreate extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if (!CSettingsHelper::isGlobalScriptsEnabled()
+				&& $this->getInput('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER) == ZBX_SCRIPT_EXECUTE_ON_SERVER) {
+			error(_('Global script execution on Zabbix server is disabled by server configuration.'));
+
+			$ret = false;
+		}
 
 		if (!$ret) {
 			$this->setResponse(

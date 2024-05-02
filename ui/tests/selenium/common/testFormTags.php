@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -785,8 +785,7 @@ class testFormTags extends CWebTest {
 
 		$element->checkValue($tags);
 
-		if (in_array($object, ['connector', 'template', 'trigger', 'item', 'trigger prototype', 'item prototype',
-				'host', 'service'])) {
+		if (!in_array($object, ['host prototype', 'web scenario'])) {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}

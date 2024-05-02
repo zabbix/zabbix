@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -135,6 +135,9 @@ typedef struct
 	int		retries;
 	int		source;
 	int		object;
+
+	char		*expression;
+	char		*recovery_expression;
 }
 zbx_am_db_alert_t;
 
@@ -170,17 +173,19 @@ zbx_uint32_t	zbx_alerter_serialize_result_ext(unsigned char **data, const char *
 		int errcode, const char *error, const char *debug);
 
 zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t alertid, zbx_uint64_t mediatypeid,
-		zbx_uint64_t eventid, const char *sendto, const char *subject, const char *message,
-		const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
-		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type);
+		zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, const char *sendto,
+		const char *subject, const char *message, const char *smtp_server, unsigned short smtp_port,
+		const char *smtp_helo, const char *smtp_email, unsigned char smtp_security,
+		unsigned char smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
+		const char *username, const char *password, unsigned char content_type, const char *expression,
+		const char *recovery_expression);
 
 void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *alertid, zbx_uint64_t *mediatypeid,
-		zbx_uint64_t *eventid, char **sendto, char **subject, char **message, char **smtp_server,
-		unsigned short *smtp_port, char **smtp_helo, char **smtp_email, unsigned char *smtp_security,
-		unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host, unsigned char *smtp_authentication,
-		char **username, char **password, unsigned char *content_type);
+		zbx_uint64_t *eventid, int *source, int *object, zbx_uint64_t *objectid, char **sendto, char **subject,
+		char **message, char **smtp_server, unsigned short *smtp_port, char **smtp_helo, char **smtp_email,
+		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
+		unsigned char *smtp_authentication, char **username, char **password, unsigned char *content_type,
+		char **expression, char **recovery_expression);
 
 zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
 		const char *message, const char *gsm_modem);

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,8 @@ $table = (new CTableInfo())
 		(new CColHeader(_('Created at')))->addStyle('width: 10%;'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
 		(new CColHeader())
-	]));
+	]))
+	->setPageNavigation($data['paging']);
 
 foreach ($data['services'] as $serviceid => $service) {
 	$row = [(new CCheckBox('serviceids['.$serviceid.']', $serviceid))->setEnabled(!$service['readonly'])];
@@ -146,5 +147,5 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 ], $path !== null ? 'service_'.implode('_', $path) : 'service');
 
 $form
-	->addItem([$table, $data['paging'], $action_buttons])
+	->addItem([$table, $action_buttons])
 	->show();

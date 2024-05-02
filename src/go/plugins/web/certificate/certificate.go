@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,11 +30,22 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/uri"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/zbxerr"
 )
+
+const (
+	dateFormat         = "Jan 02 15:04:05 2006 GMT"
+	allParameters      = 3
+	noThirdParameter   = 2
+	onlyFirstParameter = 1
+	emptyParameters    = 0
+)
+
+var impl Plugin
 
 type Output struct {
 	X509              Cert             `json:"x509"`
@@ -74,15 +85,12 @@ type Plugin struct {
 	options Options
 }
 
-const (
-	dateFormat         = "Jan 02 15:04:05 2006 GMT"
-	allParameters      = 3
-	noThirdParameter   = 2
-	onlyFirstParameter = 1
-	emptyParameters    = 0
-)
-
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "WebCertificate", "web.certificate.get", "Get TLS/SSL website certificate.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 }
@@ -299,8 +307,4 @@ func getCertificatesPEM(address, domain string, timeout int) ([]*x509.Certificat
 	defer conn.Close()
 
 	return conn.ConnectionState().PeerCertificates, nil
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "WebCertificate", "web.certificate.get", "Get TLS/SSL website certificate.")
 }

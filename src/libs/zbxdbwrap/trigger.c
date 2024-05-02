@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,14 @@
 
 #include "zbxdbhigh.h"
 #include "zbxexpression.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 /* temporary cache of trigger related data */
 typedef struct

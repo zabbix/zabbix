@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #ifndef ZABBIX_PROXYDATA_H
 #define ZABBIX_PROXYDATA_H
 
-#include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
@@ -28,7 +27,5 @@
 void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency);
 
-int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
-		int upload_status, int config_timeout);
 
 #endif

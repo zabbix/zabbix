@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,28 +72,34 @@ class testDataDisplayInGraphs extends CWebTest {
 						'key_' => 'item_key_1',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '1m'
+						'delay' => '1m',
+						'history' => '9125d',
+						'trends' => 0
 					],
 					[
 						'name' => 'Item for history data display 2',
 						'key_' => 'item_key_2',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '1m'
+						'delay' => '1m',
+						'history' => '9125d',
+						'trends' => 0
 					],
 					[
 						'name' => 'Item for trends data display 1',
 						'key_' => 'item_key_3',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '2h'
+						'delay' => '2h',
+						'trends' => '9125d'
 					],
 					[
 						'name' => 'Item for trends data display 2',
 						'key_' => 'item_key_4',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '2h'
+						'delay' => '2h',
+						'trends' => '9125d'
 					],
 					[
 						'name' => 'Item for pie chart 1',
@@ -2164,6 +2170,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Set time selector to display the time period, required for the corresponding data type.
 		$this->setTimeSelector(self::TIMESTAMPS[$data['type']]);
+		$this->page->waitUntilReady();
 
 		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');

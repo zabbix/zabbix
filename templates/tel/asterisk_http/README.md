@@ -24,7 +24,7 @@ This template has been tested on:
 
 You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and create Asterisk Manager user with system and command write permissions within your Asterisk instance. 
 Disable the PJSIP driver if you do not use PJSIP or do not have PJSIP endpoints.
-Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host should have an Agent interface with the AMI address to check Asterisk service status.
+Please, define AMI address in the {$AMI.URL} macro. Also, set the hostname or IP address of the AMI host in the {$AMI.HOST} macro for Zabbix to check Asterisk service status.
 Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level.
 If there are errors, increase the logging to debug level and see the Zabbix server log.
 
@@ -33,6 +33,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 |Name|Description|Default|
 |----|-----------|-------|
 |{$AMI.URL}|<p>The Asterisk Manager API URL in the format `<scheme>://<host>:<port>/<prefix>/rawman`.</p>|`http://asterisk:8088/asterisk/rawman`|
+|{$AMI.HOST}|<p>The hostname or IP address of the Asterisk Manager API host.</p>|`<SET AMI HOST>`|
 |{$AMI.PORT}|<p>AMI port number for checking service availability.</p>|`5038`|
 |{$AMI.USERNAME}|<p>The Asterisk Manager name.</p>|`zabbix`|
 |{$AMI.SECRET}|<p>The Asterisk Manager secret.</p>|`zabbix`|
@@ -48,8 +49,8 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Asterisk: Service status|<p>Asterisk Manager API port availability.</p>|Simple check|net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|Asterisk: Service response time|<p>Asterisk Manager API performance.</p>|Simple check|net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"]|
+|Asterisk: Service status|<p>Asterisk Manager API port availability.</p>|Simple check|net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Asterisk: Service response time|<p>Asterisk Manager API performance.</p>|Simple check|net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"]|
 |Asterisk: Get stats|<p>Asterisk system information in JSON format.</p>|HTTP agent|asterisk.get_stats<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Asterisk: Version|<p>Service version</p>|Dependent item|asterisk.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li></ul>|
 |Asterisk: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|asterisk.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime`</p></li></ul>|
@@ -79,8 +80,8 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Asterisk: Service is down||`last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0`|Average|**Manual close**: Yes|
-|Asterisk: Service response time is too high||`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
+|Asterisk: Service is down||`last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0`|Average|**Manual close**: Yes|
+|Asterisk: Service response time is too high||`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
 |Asterisk: Version has changed|<p>The Asterisk version has changed. Acknowledge to close the problem manually.</p>|`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0`|Info|**Manual close**: Yes|
 |Asterisk: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime)<10m`|Info|**Manual close**: Yes|
 |Asterisk: Failed to fetch AMI page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
@@ -120,7 +121,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IAX trunk "{#OBJECTNAME}": Get IAX trunk|<p>Raw data for a IAX trunk.</p>|Dependent item|asterisk.iax.trunk.get[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].first()`</p></li></ul>|
+|IAX trunk "{#OBJECTNAME}": Get IAX trunk|<p>Raw data for an IAX trunk.</p>|Dependent item|asterisk.iax.trunk.get[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].first()`</p></li></ul>|
 |IAX trunk "{#OBJECTNAME}": Status|<p>IAX trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.iax.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Status`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |IAX trunk "{#OBJECTNAME}": Active channels|<p>The total number of active IAX trunk channels.</p>|Dependent item|asterisk.iax.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_channels`</p></li></ul>|
 

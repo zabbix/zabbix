@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,17 +46,7 @@ $fields = [
 	'to' =>					[T_ZBX_RANGE_TIME,	O_OPT,	P_SYS,				null,	null]
 ];
 check_fields($fields);
-
-if (hasRequest('from') || hasRequest('to')) {
-	validateTimeSelectorPeriod(
-		hasRequest('from') ? getRequest('from') : null,
-		hasRequest('to') ? getRequest('to') : null
-	);
-}
-
-$timeselector_from = getRequest('from', CProfile::get('web.avail_report.filter.from',
-	'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)));
-$timeselector_to = getRequest('to', CProfile::get('web.avail_report.filter.to', 'now'));
+validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
 $report_mode = getRequest('mode', CProfile::get('web.avail_report.mode', AVAILABILITY_REPORT_BY_HOST));
 CProfile::update('web.avail_report.mode', $report_mode, PROFILE_TYPE_INT);
@@ -102,8 +92,6 @@ if (hasRequest('filter_set')) {
 		CProfile::update($key_prefix.'.hostgroupid', getRequest('hostgroupid', 0), PROFILE_TYPE_ID);
 	}
 	else {
-		CProfile::update('web.avail_report.filter.from', $timeselector_from, PROFILE_TYPE_STR);
-		CProfile::update('web.avail_report.filter.to', $timeselector_to, PROFILE_TYPE_STR);
 		CProfile::updateArray($key_prefix.'.groupids', getRequest('filter_groups', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($key_prefix.'.hostids', getRequest('filter_hostids', []), PROFILE_TYPE_ID);
 	}
@@ -139,6 +127,15 @@ $data['filter'] = ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE)
 		// 'Hosts' field.
 		'hostids' => CProfile::getArray($key_prefix.'.hostids', getRequest('filter_hostids', []))
 	];
+
+// Get time selector filter values.
+$timeselector_options = [
+	'profileIdx' => 'web.avail_report.filter',
+	'profileIdx2' => 0,
+	'from' => getRequest('from'),
+	'to' => getRequest('to')
+];
+updateTimeSelectorPeriod($timeselector_options);
 
 /*
  * Header
@@ -207,12 +204,7 @@ else {
 	 * Filter
 	 */
 	$data['filter'] += [
-		'timeline' => getTimeSelectorPeriod([
-			'profileIdx' => 'web.avail_report.filter',
-			'profileIdx2' => 0,
-			'from' => $timeselector_from,
-			'to' => $timeselector_to
-		]),
+		'timeline' => getTimeSelectorPeriod($timeselector_options),
 		'active_tab' => CProfile::get('web.avail_report.filter.active', 1)
 	];
 
@@ -509,8 +501,6 @@ else {
 	/*
 	 * Triggers
 	 */
-	$triggerTable = (new CTableInfo())->setHeader([_('Host'), _('Name'), _('Problems'), _('Ok'), _('Graph')]);
-
 	CArrayHelper::sort($triggers, ['host_name', 'description']);
 
 	// pager
@@ -518,6 +508,10 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 	$paging = CPagerHelper::paginate($page_num, $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 	$allowed_ui_problems = CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
+
+	$triggerTable = (new CTableInfo())
+		->setHeader([_('Host'), _('Name'), _('Problems'), _('Ok'), _('Graph')])
+		->setPageNavigation($paging);
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],
@@ -557,7 +551,7 @@ else {
 	zbx_add_post_js('timeControl.processObjects();');
 
 	$html_page
-		->addItem([$triggerTable, $paging])
+		->addItem($triggerTable)
 		->show();
 }
 

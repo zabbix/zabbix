@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -371,6 +371,24 @@ switch ($data['method']) {
 				}
 				break;
 
+			case 'proxy_groups':
+				$db_proxy_groups = API::ProxyGroup()->get([
+					'output' => ['proxy_groupid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($db_proxy_groups) {
+					CArrayHelper::sort($db_proxy_groups, ['name']);
+
+					if (array_key_exists('limit', $data)) {
+						$db_proxy_groups = array_slice($db_proxy_groups, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($db_proxy_groups, ['proxy_groupid' => 'id']);
+				}
+				break;
+
 			case 'triggers':
 				$host_fields = ['name'];
 				if (array_key_exists('real_hosts', $data) && $data['real_hosts']) {
@@ -427,7 +445,7 @@ switch ($data['method']) {
 				break;
 
 			case 'users':
-				$users = API::User()->get([
+				$options = [
 					'output' => ['userid', 'username', 'name', 'surname'],
 					'search' => array_key_exists('search', $data)
 						? [
@@ -438,7 +456,13 @@ switch ($data['method']) {
 						: null,
 					'searchByAny' => true,
 					'limit' => $limit
-				]);
+				];
+
+				if (array_key_exists('exclude_provisioned', $data) && $data['exclude_provisioned']) {
+					$options['filter']['userdirectoryid'] = 0;
+				}
+
+				$users = API::User()->get($options);
 
 				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {
 					$users[] = ['userid' => '0', 'username' => 'System', 'name' => '', 'surname' => ''];

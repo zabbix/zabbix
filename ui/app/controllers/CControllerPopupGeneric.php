@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,6 +218,18 @@ class CControllerPopupGeneric extends CController {
 				'form' => [
 					'name' => 'proxiesform',
 					'id' => 'proxies'
+				],
+				'table_columns' => [
+					_('Name')
+				]
+			],
+			'proxy_groups' => [
+				'title' => _('Proxy groups'),
+				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'allowed_src_fields' => 'proxy_groupid,name',
+				'form' => [
+					'name' => 'proxy_groups_form',
+					'id' => 'proxy-groups'
 				],
 				'table_columns' => [
 					_('Name')
@@ -583,7 +595,8 @@ class CControllerPopupGeneric extends CController {
 			'host_pattern_wildcard_allowed' =>		'in 1',
 			'host_pattern_multiple' =>				'in 1',
 			'hide_host_filter' =>					'in 1',
-			'resolve_macros' =>						'in 1'
+			'resolve_macros' =>						'in 1',
+			'exclude_provisioned' =>				'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -1190,13 +1203,6 @@ class CControllerPopupGeneric extends CController {
 				}
 				break;
 
-			case 'items':
-				foreach ($records as $itemid => $row) {
-					$records[$row['name']] = ['pattern' => $row['name']] + $row;
-					unset($records[$itemid]);
-				}
-				break;
-
 			case 'graphs':
 				foreach ($records as $graphid => $row) {
 					$records[$row['name']] = [
@@ -1257,6 +1263,10 @@ class CControllerPopupGeneric extends CController {
 				$options += [
 					'output' => ['userid', 'username', 'name', 'surname', 'type', 'theme', 'lang']
 				];
+
+				if ($this->hasInput('exclude_provisioned')) {
+					$options['filter']['userdirectoryid'] = 0;
+				}
 
 				$records = API::User()->get($options);
 
@@ -1616,6 +1626,16 @@ class CControllerPopupGeneric extends CController {
 				$records = API::Proxy()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id']);
+				break;
+
+			case 'proxy_groups':
+				$options += [
+					'output' => ['proxy_groupid', 'name']
+				];
+
+				$records = API::ProxyGroup()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['proxy_groupid' => 'id']);
 				break;
 
 			case 'roles':

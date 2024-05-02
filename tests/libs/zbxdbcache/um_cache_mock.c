@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -648,8 +648,8 @@ static int	mock_strpool_compare(const void *d1, const void *d2)
  *********************************************************************************/
 void	um_mock_config_init(void)
 {
-	config = (ZBX_DC_CONFIG *)zbx_malloc(NULL, sizeof(ZBX_DC_CONFIG));
-	memset(config, 0, sizeof(ZBX_DC_CONFIG));
+	zbx_dc_config_t	*config = (zbx_dc_config_t *)zbx_malloc(NULL, sizeof(zbx_dc_config_t));
+	memset(config, 0, sizeof(zbx_dc_config_t));
 
 	zbx_hashset_create(&config->gmacros, 100, um_macro_hash, um_macro_compare);
 	zbx_hashset_create(&config->hmacros, 100, um_macro_hash, um_macro_compare);
@@ -659,6 +659,7 @@ void	um_mock_config_init(void)
 
 	zbx_hashset_create(&config->gmacro_kv, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&config->hmacro_kv, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	set_dc_config(config);
 }
 
 static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
@@ -683,6 +684,8 @@ void	um_mock_config_destroy(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_um_macro_t		**pmacro;
+
+	zbx_dc_config_t		*config = get_dc_config();
 
 	zbx_hashset_iter_reset(&config->gmacros, &iter);
 	while (NULL != (pmacro = (zbx_um_macro_t **)zbx_hashset_iter_next(&iter)))

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,11 +26,14 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 
-int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssh_key_location,
+		AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
 	const char	*port, *encoding, *dns;
+
+	ZBX_UNUSED(config_ssh_key_location);
 
 	zbx_init_agent_request(&request);
 

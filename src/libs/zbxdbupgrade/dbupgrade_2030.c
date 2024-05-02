@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -220,7 +220,7 @@ static int	DBpatch_2030021(void)
 					{"operator", "8", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"macro", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -465,7 +465,7 @@ static int	DBpatch_2030043(void)
 
 static int	DBpatch_2030044(void)
 {
-	/* 21 - AUDIT_RESOURCE_NODE */
+	/* 21 - ZBX_AUDIT_RESOURCE_NODE */
 	const char	*sql = "delete from auditlog where resourcetype=21";
 
 	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))

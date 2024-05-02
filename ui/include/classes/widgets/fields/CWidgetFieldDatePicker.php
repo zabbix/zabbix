@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		}
 
 		return [
-			_s('Invalid parameter "%1$s": %2$s.', $this->full_name ?? $this->label ?? $this->name,
+			_s('Invalid parameter "%1$s": %2$s.', $this->label ?? $this->name,
 				$this->is_date_only ? _('a date is expected') : _('a time is expected')
 			)
 		];

@@ -35,7 +35,7 @@ function run
 	cd "$workdir" || die
 
 	local pofiles=locale/*/LC_MESSAGES/frontend.po
-	local curpot=locale/en/LC_MESSAGES/frontend.pot
+	local curpot=locale/en_US/LC_MESSAGES/frontend.pot
 	local oldpot=locale/old.pot
 	local newpot=locale/new.pot
 	local cur_msgids=locale/cur_msgids
@@ -75,7 +75,7 @@ function run
 		mv $newpot $curpot
 		local num_msgids_not_removed=-1
 	else
-		# compute the number of strings that were repoved from php, but we still are keeping in po
+		# compute the number of strings that were removed from php, but we still are keeping in po
 		grep msgid $curpot | sort > $cur_msgids
 		grep msgid $newpot | sort > $new_msgids
 		local num_msgids_not_removed=$(diff $cur_msgids $new_msgids | grep '^<' | wc -l)

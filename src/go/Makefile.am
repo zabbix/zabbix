@@ -6,7 +6,7 @@ BUILD_TIME=`date +%H:%M:%S`
 BUILD_DATE=`date +"%b %_d %Y"`
 GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
-PKG=zabbix.com/pkg/version
+PKG=golang.zabbix.com/agent2/pkg/version
 NEW_FROM_REV=""
 
 GOLDFLAGS = -X '${PKG}.compileDate=${BUILD_DATE}'
@@ -34,32 +34,39 @@ TARGETS =
 INSTALL_TARGETS =
 
 if AGENT2
-TARGETS += zabbix.com/cmd/zabbix_agent2
-INSTALL_TARGETS += install-zabbix.com/cmd/zabbix_agent2
-DBGTARGETS = zabbix.com/cmd/mock_server
+TARGETS += bin/zabbix_agent2
+INSTALL_TARGETS += install-bin/zabbix_agent2
 dist_sysconf_DATA += conf/zabbix_agent2.conf
 endif
 
 if WEBSERVICE
-TARGETS += zabbix.com/cmd/zabbix_web_service
-INSTALL_TARGETS += install-zabbix.com/cmd/zabbix_web_service
+TARGETS += bin/zabbix_web_service
+INSTALL_TARGETS += install-bin/zabbix_web_service
 dist_sysconf_DATA += conf/zabbix_web_service.conf
 endif
 
 all: build
 
-zabbix.com/cmd/zabbix_agent2:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -tags="${AGENT_GOTAGS}" -ldflags="${AGENT_GOLDFLAGS}" -o bin zabbix.com/cmd/zabbix_agent2
+bin/zabbix_agent2: FORCE
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" \
+		$(GO) build \
+		-tags="${AGENT_GOTAGS}" \
+		-ldflags="${AGENT_GOLDFLAGS}" \
+		-o bin \
+		golang.zabbix.com/agent2/cmd/zabbix_agent2
 
-zabbix.com/cmd/zabbix_web_service:
-	go build -ldflags="${WEBSERVICE_GOLDFLAGS}" -o bin zabbix.com/cmd/zabbix_web_service
+bin/zabbix_web_service: FORCE
+	$(GO) build \
+	-ldflags="${WEBSERVICE_GOLDFLAGS}" \
+	-o bin \
+	golang.zabbix.com/agent2/cmd/zabbix_web_service
 
 build: ${TARGETS}
 
 clean: clean-go-build clean-sbom
 
 clean-go-build:
-	-go clean ./...
+	-$(GO) clean ./...
 	-rm -f bin/mock_server
 	-rm -f bin/zabbix_agent2
 	-rm -f bin/zabbix_web_service
@@ -72,18 +79,25 @@ clean-sbom:
 	-rm -f sbom-zws.json
 	-rm -f sbom-zws.xml
 
-install-zabbix.com/cmd/zabbix_agent2:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
-		go install -ldflags="${AGENT_GOLDFLAGS}" ${TARGETS}
-	$(MKDIR_P) "$(DESTDIR)$(AGENT2_CONFIG_PLUGINS_PATH)"
-	test -f "$(DESTDIR)$(AGENT2_CONFIG_FILE)" || cp "conf/zabbix_agent2.conf" "$(DESTDIR)$(AGENT2_CONFIG_FILE)"
-	for cfg in conf/zabbix_agent2.d/plugins.d/*.conf; do \
-		test -f "$(DESTDIR)$(AGENT2_CONFIG_PLUGINS_PATH)/"`basename $$cfg` || \
-		cp "$$cfg" "$(DESTDIR)$(AGENT2_CONFIG_PLUGINS_PATH)/"`basename $$cfg`; \
-	done
+# Mode flags (-m) for $(INSTALL) have been intentionally omitted to avoid
+# changing permission flags of existing directories and breaking their
+# conformance to system policy.
+#
+# Directories are created for the case when we're installing into a staging
+# environment where they may not exist at all.
+install-bin/zabbix_agent2: bin/zabbix_agent2
+	$(INSTALL) -d "$(DESTDIR)$(sbindir)"
+	$(INSTALL_PROGRAM) bin/zabbix_agent2 "$(DESTDIR)$(sbindir)"
+	$(INSTALL) -d "$(DESTDIR)$(AGENT2_PLUGIN_CONFIG_DIR)"
+	$(INSTALL_DATA) conf/zabbix_agent2.conf "$(DESTDIR)$(sysconfdir)"
+	$(INSTALL) -d "$(DESTDIR)$(AGENT2_PLUGIN_CONFIG_DIR)"
+	(cd conf/zabbix_agent2.d/plugins.d && \
+	for _f in *.conf; do \
+		$(INSTALL_DATA) $${_f} "$(DESTDIR)$(AGENT2_PLUGIN_CONFIG_DIR)"; \
+	done)
 
-install-zabbix.com/cmd/zabbix_web_service:
-	GOBIN=${GOBIN} go install -ldflags="${WEBSERVICE_GOLDFLAGS}" zabbix.com/cmd/zabbix_web_service
+install-bin/zabbix_web_service: bin/zabbix_web_service
+	$(INSTALL_PROGRAM) bin/zabbix_web_service "$(DESTDIR)$(sbindir)"
 
 install-exec-local: ${INSTALL_TARGETS}
 
@@ -151,10 +165,25 @@ sbom-mod: sbom-mod.json
 sbom: sbom-apps sbom-mod
 
 check:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" $(GO) test ./...
 style:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" golangci-lint run --new-from-rev=$(NEW_FROM_REV)  ./...
+	golangci-lint run --new-from-rev=$(NEW_FROM_REV)  ./...
 format:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go fmt ./... 
+	$(GO) fmt ./...
 
 .PHONY: all build check clean clean-go-build clean-sbom format sbom sbom-apps sbom-mod sbom-za2 sbom-zws style
+
+# This is a target to be used as a prerequisite for other targets to force
+# their build. See
+# https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
+#
+# In the case of bin/zabbix_{agent2,web_service} targets, make is unaware of
+# their prerequisites, i.e. source files, as all it does is drive the Go build
+# system.
+#
+# When building either target, and then modifying the source files, any repeat
+# builds of these targets will not execute, as the target already exists.
+# This leads to the subtle issue when iterating in development, where modifying
+# the source and asking to build the `install` target would install the initial
+# executable.
+FORCE:

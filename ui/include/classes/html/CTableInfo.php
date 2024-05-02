@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,13 +21,42 @@
 
 class CTableInfo extends CTable {
 
-	protected $message;
+	protected $message = null;
+	protected $page_navigation;
 
 	public function __construct() {
 		parent::__construct();
 
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
-		$this->setNoDataMessage(_('No data found.'));
+	}
+
+	public function setNoDataMessage($message, $description = null, $icon = null) {
+		if ($description === null && $icon === null) {
+			$container = (new CDiv($message))->addClass(ZBX_STYLE_NO_DATA_MESSAGE);
+		}
+		else {
+			$container = new CDiv([
+				(new CDiv($message))
+					->addClass(ZBX_STYLE_NO_DATA_MESSAGE)
+					->addClass($icon),
+				$description !== null ? (new CDiv($description))->addClass(ZBX_STYLE_NO_DATA_DESCRIPTION) : null
+			]);
+
+			if ($icon !== null) {
+				$this->addClass(ZBX_STYLE_NO_DATA);
+				$container->addClass(ZBX_STYLE_NO_DATA_FOUND);
+			}
+		}
+
+		$this->message = new CCol($container);
+
+		return $this;
+	}
+
+	public function setPageNavigation($page_navigation) {
+		$this->page_navigation = $page_navigation;
+
+		return $this;
 	}
 
 	public function toString($destroy = true) {
@@ -39,21 +68,25 @@ class CTableInfo extends CTable {
 			$this->setId($tableid);
 		}
 
+		if ($this->rownum == 0 && $this->message === null) {
+			$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE);
+		}
+
 		return parent::toString($destroy);
-	}
-
-	public function setNoDataMessage($message) {
-		$this->message = $message;
-
-		return $this;
 	}
 
 	protected function endToString() {
 		$ret = '';
-		if ($this->rownum == 0 && $this->message !== null) {
-			$ret .= $this->prepareRow(new CCol($this->message), ZBX_STYLE_NOTHING_TO_SHOW)->toString();
+
+		if ($this->rownum == 0) {
+			$ret .= $this->prepareRow($this->message, ZBX_STYLE_NOTHING_TO_SHOW)->toString();
 		}
+
 		$ret .= parent::endToString();
+
+		if ($this->page_navigation && $this->getNumRows() > 0) {
+			$ret .= $this->page_navigation;
+		}
 
 		return $ret;
 	}

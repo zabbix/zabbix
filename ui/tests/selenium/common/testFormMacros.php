@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -687,12 +687,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'index' => 0,
 							'macro' => '{$SNMP_COMMUNITY}',
 							'value' => 'new redefined value 1',
-							'description' => 'new redifined description 1'
+							'description' => 'new redefined description 1'
 						],
 						[
 							'macro' => '{$_}',
-							'value' => 'new redifined value 2',
-							'description' => 'new redifined description 2'
+							'value' => 'new redefined value 2',
+							'description' => 'new redefined description 2'
 						]
 					]
 				]
@@ -1388,7 +1388,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				[
 					'macro' => '{$SECRET_HOST_MACRO}',
 					'type' => 'Secret text',
-					'chenge_type' => true
+					'change_type' => true
 				]
 			],
 			[
@@ -1478,7 +1478,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				$value_field->invalidate();
 
-				$this->assertFalse($change_button->isEnabled());
+				$this->assertFalse($value_field->getNewValueButton()->isEnabled());
 				$this->assertTrue($revert_button->isClickable());
 			}
 			else {
@@ -2434,7 +2434,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 			// Hosts in edit view opens in overlay and need to be closed manually.
 			if ($source === 'hosts' || $source === 'templates') {
 				COverlayDialogElement::find()->one()->close();
-				COverlayDialogElement::ensureNotPresent();
 			}
 
 			// Change Vault in settings to correct one.
@@ -2451,6 +2450,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 			$form->submit();
 			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object);
+			CMessageElement::find()->one()->close();
 
 			// Create macros with correct value.
 			$this->fillMacros([$vault_values['fields']]);
@@ -2459,6 +2459,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			if ($discovered && $i === 0) {
 				$form->submit();
 				$this->assertMessage(TEST_GOOD, ucfirst($this->vault_object).' updated');
+				CMessageElement::find()->one()->close();
 				$this->openMacrosTab($url, $source, false, $name);
 				$form->invalidate();
 				$this->fillMacros([$vault_values['fields']]);

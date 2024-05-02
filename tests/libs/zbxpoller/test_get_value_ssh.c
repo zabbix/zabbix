@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,9 +38,10 @@ int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error)
 {
 	AGENT_RESULT	result;
 	int		ret;
+	const char	*config_ssh_key_location = NULL;
 
 	zbx_init_agent_result(&result);
-	ret = zbx_ssh_get_value(item, get_zbx_config_source_ip(), &result);
+	ret = zbx_ssh_get_value(item, get_zbx_config_source_ip(), config_ssh_key_location, &result);
 
 	if (NULL != result.msg && '\0' != *(result.msg))
 	{

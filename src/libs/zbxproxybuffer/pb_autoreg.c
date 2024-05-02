@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,13 @@
 
 #include "pb_autoreg.h"
 #include "proxybuffer.h"
-#include "zbxproxybuffer.h"
-#include "zbxdbhigh.h"
 #include "zbxcachehistory.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxproxybuffer.h"
+#include "zbxshmem.h"
 
 static zbx_history_table_t	areg = {
 	"proxy_autoreg_host", "autoreg_host_lastid",
@@ -34,7 +38,7 @@ static zbx_history_table_t	areg = {
 		{"host_metadata",	ZBX_PROTO_TAG_HOST_METADATA,	ZBX_JSON_TYPE_STRING,	""},
 		{"flags",		ZBX_PROTO_TAG_FLAGS,		ZBX_JSON_TYPE_STRING,	"0"},
 		{"tls_accepted",	ZBX_PROTO_TAG_TLS_ACCEPTED,	ZBX_JSON_TYPE_INT,	"0"},
-		{NULL}
+		{0}
 		}
 };
 
@@ -165,7 +169,7 @@ out:
 	if (SUCCEED == ret)
 		row->id = zbx_dc_get_nextid("proxy_autoreg_host", 1);
 	else if (NULL != row)
-		pb_list_free_autoreg(&pb_data->autoreg, row);
+		pb_list_free_autoreg(&get_pb_data()->autoreg, row);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T , __func__, zbx_result_string(ret),
 			pb_get_free_size());
@@ -195,7 +199,7 @@ static int	pb_autoreg_write_host_mem(zbx_pb_t *pb, const char *host, const char 
 		if (0 == size)
 			size = pb_autoreg_estimate_row_size(host, host_metadata, ip, dns);
 
-		if (FAIL == pb_free_space(pb_data, size))
+		if (FAIL == pb_free_space(get_pb_data(), size))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "auto registration record with size " ZBX_FS_SIZE_T
 					" is too large for proxy memory buffer, discarding", size);
@@ -312,8 +316,8 @@ void	pb_autoreg_flush(zbx_pb_t *pb)
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	if (pb_data->autoreg_lastid_db < lastid)
-		pb_data->autoreg_lastid_db = lastid;
+	if (get_pb_data()->autoreg_lastid_db < lastid)
+		get_pb_data()->autoreg_lastid_db = lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
 }
@@ -381,12 +385,13 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 		unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
 	zbx_uint64_t	id;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pb_lock();
 
-	if (PB_MEMORY == pb_dst[pb_data->state])
+	if (PB_MEMORY == get_pb_dst(pb_data->state))
 	{
 		if (PB_MEMORY == pb_data->state && SUCCEED != pb_autoreg_check_age(pb_data))
 		{
@@ -403,8 +408,8 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 
 			if (PB_DATABASE_MEMORY == pb_data->state)
 			{
-				pd_fallback_to_database(pb_data, "not enough space to complete transition to memory"
-						" mode");
+				pd_fallback_to_database(pb_data, "not enough space to complete transition to"
+						" memory mode");
 			}
 			else
 			{
@@ -447,12 +452,12 @@ int	zbx_pb_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int	ret, state;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64 ", more:" ZBX_FS_UI64, __func__, *lastid, *more);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, *lastid);
 
 	pb_lock();
 
-	if (PB_MEMORY == (state = pb_src[pb_data->state]))
-		ret = pb_autoreg_get_mem(pb_data, j, lastid, more);
+	if (PB_MEMORY == (state = get_pb_src(get_pb_data()->state)))
+		ret = pb_autoreg_get_mem(get_pb_data(), j, lastid, more);
 
 	pb_unlock();
 
@@ -471,7 +476,8 @@ int	zbx_pb_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
  ******************************************************************************/
 void	zbx_pb_autoreg_set_lastid(const zbx_uint64_t lastid)
 {
-	int	state;
+	int		state;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
@@ -479,7 +485,7 @@ void	zbx_pb_autoreg_set_lastid(const zbx_uint64_t lastid)
 
 	pb_data->autoreg_lastid_sent = lastid;
 
-	if (PB_MEMORY == (state = pb_src[pb_data->state]))
+	if (PB_MEMORY == (state = get_pb_src(pb_data->state)))
 		pb_autoreg_clear(pb_data, lastid);
 
 	pb_unlock();

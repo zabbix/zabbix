@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,16 +32,20 @@
  * @return {jQuery}
  */
 function makeStepResult(step) {
-	if (typeof step.error !== 'undefined') {
+	if (step.error !== undefined) {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: escapeHtml(step.error) || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
+			{error: escapeHtml(step.error) || <?= json_encode(htmlspecialchars(_('<empty string>'))) ?>}
 		));
 	}
-	else if (typeof step.result === 'undefined' || step.result === null) {
+
+	if (step.result === undefined || step.result === null) {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('No value')) ?>);
 	}
 	else if (step.result === '') {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('<empty string>')) ?>);
+	}
+	else if (step.warning !== undefined) {
+		return jQuery(new Template(jQuery('#preprocessing-step-result-warning').html()).evaluate(step));
 	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
 		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
@@ -71,7 +75,11 @@ function disableItemTestForm() {
 		<?php endif ?>
 
 		<?php if ($data['proxies_enabled']): ?>
-			jQuery('#proxyid').prop('disabled', true);
+			for (const element of document.querySelectorAll('#test_with input')) {
+				element.disabled = true;
+			}
+
+			jQuery('#proxyid').multiSelect('disable');
 		<?php endif ?>
 
 	<?php else: ?>
@@ -103,7 +111,11 @@ function enableItemTestForm() {
 		<?php endif ?>
 
 		<?php if ($data['proxies_enabled']): ?>
-			jQuery('#proxyid').prop('disabled', false);
+			for (const element of document.querySelectorAll('#test_with input')) {
+				element.disabled = false;
+			}
+
+			jQuery('#proxyid').multiSelect('enable');
 		<?php endif ?>
 
 	<?php else: ?>
@@ -160,6 +172,7 @@ function itemGetValueTest(overlay) {
 			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
+		test_with: form_data['test_with'],
 		proxyid: form_data['proxyid'],
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
@@ -210,6 +223,10 @@ function itemGetValueTest(overlay) {
 			<?php endif ?>
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
+			jQuery('#value_warning', $form)
+				.toggle('value_warning' in ret)
+				.toggleClass('js-retrieved', 'value_warning' in ret)
+				.attr('data-hintbox-contents', ret.value_warning);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -247,6 +264,7 @@ function itemCompleteTest(overlay) {
 			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
+		test_with: form_data['test_with'],
 		proxyid: form_data['proxyid'],
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
 		test_type: <?= $data['test_type'] ?>,
@@ -309,6 +327,10 @@ function itemCompleteTest(overlay) {
 			}
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
+			jQuery('#value_warning', $form)
+				.toggle('value_warning' in ret)
+				.toggleClass('js-retrieved', 'value_warning' in ret)
+				.attr('data-hintbox-contents', ret.value_warning);
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
@@ -320,8 +342,9 @@ function itemCompleteTest(overlay) {
 
 			if (typeof ret.final !== 'undefined') {
 				var result = makeStepResult(ret.final);
+
 				if (result !== null) {
-					$result = jQuery(result).css('float', 'right');
+					$result = result.css('float', 'right');
 				}
 
 				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
@@ -379,6 +402,7 @@ function processItemPreprocessingTestResults(steps) {
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
+					step.result = step.result === '' ? <?= json_encode(_('<empty string>')) ?> : step.result;
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
 					]) ?>, {failed: step.result, failed_hint: escapeHtml(step.result)})));
@@ -424,9 +448,13 @@ function saveItemTestInputs() {
 			input_values.runtime_error = jQuery('#runtime_error').multilineInput('value');
 		}
 
+		const test_with = $form[0].querySelector('[name="test_with"]:checked').value;
+		const proxyid = jQuery('#proxyid', $form).multiSelect('getData').map((proxy) => proxy.id)[0] || 0;
+
 		input_values = jQuery.extend(input_values, {
 			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
-			proxyid: jQuery('#proxyid', $form).val(),
+			test_with,
+			proxyid: test_with == <?= CControllerPopupItemTest::TEST_WITH_PROXY ?> ? proxyid : 0,
 			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val(),
@@ -504,14 +532,23 @@ jQuery(document).ready(function($) {
 	});
 
 	<?php if ($data['is_item_testable']): ?>
+		$('#proxyid').multiSelect();
+
+		document.getElementById('test_with').addEventListener('change', (e) => {
+			document.querySelector('.js-test-with-proxy').style.display =
+				e.target.value == <?= CControllerPopupItemTest::TEST_WITH_SERVER ?> ? 'none' : '';
+		});
+
 		$('#get_value').on('change', function() {
-			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
+			var $rows = $('.js-host-address-row, .js-test-with-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
 				$form = $('#preprocessing-test-form'),
 				$submit_btn = overlays_stack.getById('item-test').$btn_submit,
 				$not_supported = $('[name="not_supported"]', $form);
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
+				$('#value_warning.js-retrieved').show();
+
 				$not_supported.prop('disabled', true);
 				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 
@@ -521,7 +558,11 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
-					$('#proxyid').prop('disabled', false);
+					for (const element of document.querySelectorAll('#test_with input')) {
+						element.disabled = false;
+					}
+
+					$('#proxyid').multiSelect('enable');
 				<?php endif ?>
 
 				<?php if ($data['interface_address_enabled']): ?>
@@ -582,9 +623,15 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				$not_supported
-					.prop('disabled', false)
-					.trigger('change');
+				if ($not_supported.length) {
+					$not_supported
+						.prop('disabled', false)
+						.trigger('change');
+				}
+				else {
+					$('#value', $form).multilineInput('unsetReadOnly');
+				}
+				$('#value_warning').hide();
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');
@@ -592,7 +639,11 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
-					$('#proxyid').prop('disabled', true);
+					for (const element of document.querySelectorAll('#test_with input')) {
+						element.disabled = true;
+					}
+
+					$('#proxyid').multiSelect('disable');
 				<?php endif ?>
 
 				<?php if ($data['interface_address_enabled']): ?>

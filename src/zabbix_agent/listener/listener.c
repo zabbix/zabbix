@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,8 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 	char			**value;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION_SHORT, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(&j, ZBX_PROTO_TAG_VARIANT, ZBX_PROGRAM_VARIANT_AGENT);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_REQUEST, tmp, sizeof(tmp), NULL))
 	{
@@ -113,6 +114,8 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 				zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+			else
+				zbx_json_addraw(&j, ZBX_PROTO_TAG_VALUE, "null");
 		}
 		else
 		{
@@ -244,7 +247,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	zbx_free(args);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(init_child_args_in->zbx_config_tls, init_child_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(init_child_args_in->zbx_config_tls, init_child_args_in->zbx_get_program_type_cb_arg, NULL);
 #endif
 
 #ifndef _WINDOWS

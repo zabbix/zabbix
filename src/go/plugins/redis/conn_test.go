@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/uri"
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/sdk/uri"
 )
 
 func TestConnManager_closeUnused(t *testing.T) {

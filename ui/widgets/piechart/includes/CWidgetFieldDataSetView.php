@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ use CButton,
 	CDiv,
 	CFormField,
 	CFormGrid,
+	CItemHelper,
 	CLabel,
 	CLink,
 	CList,
@@ -53,9 +54,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 	}
 
 	public function getView(): CList {
-		$view = (new CList())
-			->setId('data_sets')
-			->addClass(ZBX_STYLE_SORTABLE_LIST);
+		$view = (new CList())->setId('data_sets');
 
 		$values = $this->field->getValue();
 
@@ -264,11 +263,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		return (new CListItem([
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-main-drag-icon'),
-			(new CLabel(''))
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
-				->addClass('js-dataset-label'),
+			(new CLabel(''))->addClass('js-dataset-label'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass('dataset-head')
@@ -289,13 +285,13 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
 									->setValue((int) $value['aggregate_function'])
 									->addOptions(CSelect::createOptionsFromArray([
-										AGGREGATE_LAST => $this->aggr_fnc2str(AGGREGATE_LAST),
-										AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
-										AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
-										AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
-										AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
-										AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM),
-										AGGREGATE_FIRST => $this->aggr_fnc2str(AGGREGATE_FIRST)
+										AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST),
+										AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+										AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+										AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+										AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+										AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM),
+										AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -311,12 +307,12 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_dataset_aggregation')
 									->setValue((int) $value['dataset_aggregation'])
 									->addOptions(CSelect::createOptionsFromArray([
-										AGGREGATE_NONE => $this->aggr_fnc2str(AGGREGATE_NONE),
-										AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
-										AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
-										AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
-										AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
-										AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM)
+										AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
+										AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+										AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+										AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+										AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+										AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -335,7 +331,6 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
-			->addClass(ZBX_STYLE_SORTABLE_ITEM)
 			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
 			->setAttribute('data-set', $row_num)
 			->setAttribute('data-type', $dataset_type);
@@ -377,29 +372,6 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			]))
 				->addClass('table-col-action')
 				->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass(ZBX_STYLE_SORTABLE)
-			->addClass('single-item-table-row');
-	}
-
-	private function aggr_fnc2str($function) {
-		switch ($function) {
-			case AGGREGATE_NONE:
-				return _('none');
-			case AGGREGATE_MIN:
-				return _('min');
-			case AGGREGATE_MAX:
-				return _('max');
-			case AGGREGATE_AVG:
-				return _('avg');
-			case AGGREGATE_COUNT:
-				return _('count');
-			case AGGREGATE_SUM:
-				return _('sum');
-			case AGGREGATE_FIRST:
-				return _('first');
-			case AGGREGATE_LAST:
-				return _('last');
-		}
+		]))->addClass('single-item-table-row');
 	}
 }

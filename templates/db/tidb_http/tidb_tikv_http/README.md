@@ -36,7 +36,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |----|-----------|-------|
 |{$TIKV.PORT}|<p>The port of TiKV server metrics web endpoint</p>|`20180`|
 |{$TIKV.URL}|<p>TiKV server URL</p>|`localhost`|
-|{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}|<p>Maximum number of coprocessor request errors</p>|`1`|
+|{$TIKV.COPROCESSOR.ERRORS.MAX.WARN}|<p>Maximum number of coprocessor request errors</p>|`1`|
 |{$TIKV.STORE.ERRORS.MAX.WARN}|<p>Maximum number of failure messages</p>|`1`|
 |{$TIKV.PENDING_COMMANDS.MAX.WARN}|<p>Maximum number of pending commands</p>|`1`|
 |{$TIKV.PENDING_TASKS.MAX.WARN}|<p>Maximum number of tasks currently running by the worker or pending</p>|`1`|
@@ -85,7 +85,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|TiKV: Too many coprocessor request error||`min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}`|Warning||
+|TiKV: Too many coprocessor request error||`min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPROCESSOR.ERRORS.MAX.WARN}`|Warning||
 |TiKV: Too many pending commands||`min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}`|Average||
 |TiKV: Too many pending tasks||`min(/TiDB TiKV by HTTP/tikv.worker_pending_task,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}`|Average||
 |TiKV: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB TiKV by HTTP/tikv.uptime)<10m`|Info|**Manual close**: Yes|

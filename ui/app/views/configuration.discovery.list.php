@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,8 +84,10 @@ $discoveryTable = (new CTableInfo())
 		_('Proxy'),
 		_('Interval'),
 		_('Checks'),
-		_('Status')
-	]);
+		_('Status'),
+		_('Info')
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['drules'] as $drule) {
 	$status = $drule['status'] == DRULE_STATUS_ACTIVE
@@ -100,6 +102,11 @@ foreach ($data['drules'] as $drule) {
 			->addClass('js-enable-drule')
 			->setAttribute('data-druleid', (int) $drule['druleid']);
 
+	$drule_icons = [];
+	if ($drule['status'] == DRULE_STATUS_ACTIVE && $drule['error'] !== '') {
+		$drule_icons[] = makeErrorIcon($drule['error']);
+	}
+
 	$discoveryTable->addRow([
 		new CCheckBox('druleids['.$drule['druleid'].']', $drule['druleid']),
 		(new CLink($drule['name']))
@@ -109,13 +116,13 @@ foreach ($data['drules'] as $drule) {
 		$drule['proxy'],
 		$drule['delay'],
 		!empty($drule['checks']) ? implode(', ', $drule['checks']) : '',
-		$status
+		$status,
+		makeInformationList($drule_icons)
 	]);
 }
 
 $discoveryForm->addItem([
 	$discoveryTable,
-	$this->data['paging'],
 	new CActionButtonList('action', 'druleids', [
 		'discovery.enable' => [
 			'content' => (new CSimpleButton(_('Enable')))

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -156,7 +156,8 @@ class CCheckBox extends CInput {
 			: [new CSpan(), $this->label];
 
 		$label = (new CLabel($elements, $this->getId()))
-			->addClass($this->label_position === self::LABEL_POSITION_LEFT ? 'label-pos-left' : null);
+			->addClass($this->label_position === self::LABEL_POSITION_LEFT ? 'label-pos-left' : null)
+			->setTitle($this->label);
 
 		return parent::toString($destroy).$label->toString();
 	}

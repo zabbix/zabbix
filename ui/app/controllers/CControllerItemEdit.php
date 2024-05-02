@@ -1,7 +1,7 @@
 <?php declare(strict_types=0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class CControllerItemEdit extends CControllerItem {
 			'clone' => 'in 1'
 		] + static::getValidationFields();
 
-		$ret = $this->validateInput($fields) && $this->validateRefferedObjects();
+		$ret = $this->validateInput($fields) && $this->validateReferredObjects();
 
 		if ($ret) {
 			if ($this->hasInput('clone') && !$this->hasInput('itemid')) {
@@ -135,11 +135,16 @@ class CControllerItemEdit extends CControllerItem {
 	 */
 	protected function getHost(): array {
 		[$host] = API::Host()->get([
-			'output' => ['hostid', 'proxyid', 'name', 'flags', 'status'],
+			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
 			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
 			'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
 			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
 		]);
+
+		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+			$host['proxyid'] = $host['assigned_proxyid'];
+		}
+		unset($host['monitored_by'], $host['assigned_proxyid']);
 
 		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
 		// Sort interfaces to be listed starting with one selected as 'main'.
@@ -246,7 +251,7 @@ class CControllerItemEdit extends CControllerItem {
 				],
 				'selectDiscoveryRule' => ['name', 'templateid'],
 				'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip', 'main'],
-				'selectItemDiscovery' => ['parent_itemid'],
+				'selectItemDiscovery' => ['parent_itemid', 'disable_source'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'selectTags' => ['tag', 'value'],
 				'itemids' => [$this->getInput('itemid')]

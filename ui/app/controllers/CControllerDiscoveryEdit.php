@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,14 +131,18 @@ class CControllerDiscoveryEdit extends CController {
 
 		$data = [
 			'drule' => $this->drule,
+			'discovery_by' => (int) ($this->drule['proxyid'] != 0),
+			'ms_proxy' => [],
 			'concurrency_max_type' => $concurrency_max_type,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
-		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'name']
-		]);
-		CArrayHelper::sort($data['proxies'], ['name']);
+		if ($data['drule']['proxyid'] != 0) {
+			$data['ms_proxy'] = CArrayHelper::renameObjectsKeys(API::Proxy()->get([
+				'output' => ['proxyid', 'name'],
+				'proxyids' => $data['drule']['proxyid']
+			]), ['proxyid' => 'id']);
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));

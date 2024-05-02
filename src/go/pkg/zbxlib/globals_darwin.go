@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,10 +51,10 @@ package zbxlib
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxlog.h"
-#include "../src/zabbix_agent/metrics.h"
+#include "../src/zabbix_agent/metrics/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 
-typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
+typedef zbx_active_metric_t* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 

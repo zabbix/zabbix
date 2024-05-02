@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ class CWidgetsData {
 					'field_class' => CWidgetFieldMultiSelectHost::class,
 					'label' => _('Hosts'),
 					'is_multiple' => true,
-					'accepts_dashboard' => false
+					'accepts_dashboard' => true
 				],
 				self::DATA_TYPE_ITEM_ID => [
 					'field_class' => CWidgetFieldMultiSelectItem::class,
@@ -126,7 +126,7 @@ class CWidgetsData {
 				self::DATA_TYPE_TIME_PERIOD => [
 					'field_class' => CWidgetFieldTimePeriod::class,
 					'label' => _('Time period'),
-					'is_multiple' => false,
+					'is_multiple' => null,
 					'accepts_dashboard' => true
 				]
 			];

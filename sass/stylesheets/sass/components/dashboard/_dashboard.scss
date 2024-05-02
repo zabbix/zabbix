@@ -60,98 +60,86 @@
 	.sortable {
 		// Accommodate 2px shadow of focused tabs.
 		padding: 2px 0;
-		// Hide the invisible tab paddings.
-		margin: 0 -1.5px;
-	}
 
-	.sortable-list {
 		display: flex;
-		padding: 0;
-		margin: 0;
 		align-items: center;
 
-		& > .sortable-item:focus:not(:active) {
+		li {
+			// This container should not be visually styled at this level.
+			box-sizing: border-box;
+			display: block;
+			// Invisible padding for tab separation.
+			padding: 0 1.5px;
+			margin: 0;
+			list-style-type: none;
+			outline: none;
+
+			div {
+				display: flex;
+				align-items: center;
+
+				min-height: 22px;
+				line-height: 22px;
+				padding: 0 10px;
+				flex-shrink: 0;
+
+				font-size: 12px;
+				white-space: nowrap;
+
+				cursor: pointer;
+				user-select: none;
+
+				background-color: $ui-bg-color;
+				border: 1px solid $ui-border-color;
+				border-radius: 2px;
+
+				@if $ui-transitions {
+					transition: background-color $ui-transition-duration,
+								border-color $ui-transition-duration;
+				}
+
+				span {
+					@extend %overflow-ellipsis;
+					max-width: 300px;
+					color: $font-color;
+				}
+
+				button {
+					margin: -1px -9px -1px 4px;
+				}
+
+				&:not(.selected-tab) {
+					button {
+						display: none;
+					}
+				}
+			}
+		}
+
+		li:not(.sortable-item-dragging):focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
 			padding: 0 3.5px;
 
-			& > div {
+			div {
 				padding: 0 8px;
 				border: 1px solid transparent;
 				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
-	}
 
-	.sortable-item {
-		// This container should not be visually styled at this level.
-		box-sizing: border-box;
-		display: block;
-		// Invisible padding for tab separation.
-		padding: 0 1.5px;
-		margin: 0;
-		list-style-type: none;
-		outline: none;
+		li div:hover,
+		li.sortable-item-dragging div {
+			background: $action-hover-color;
+			border: 1px solid darken($action-hover-color, 20%);
+		}
 
-		& > div {
-			display: flex;
-			align-items: center;
-
-			min-height: 22px;
-			line-height: 22px;
-			padding: 0 10px;
-			flex-shrink: 0;
-
-			font-size: 12px;
-			white-space: nowrap;
-
-			cursor: pointer;
-			user-select: none;
-
-			background-color: $ui-bg-color;
-			border: 1px solid $ui-border-color;
-			border-radius: 2px;
-
-			@if $ui-transitions {
-				transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
-			}
+		li div.selected-tab {
+			background-color: $ui-bg-selected-color;
+			border: 1px solid transparent;
 
 			span {
-				@extend %overflow-ellipsis;
-				max-width: 300px;
-				color: $font-color;
+				color: $font-selected-color;
 			}
-
-			button {
-				margin: -1px -9px -1px 4px;
-			}
-
-			&:not(.selected-tab) {
-				button {
-					display: none;
-				}
-			}
-		}
-	}
-
-	.sortable > .sortable-item > div,
-	.sortable-list > .sortable-item > div:hover {
-		background: $action-hover-color;
-		border: 1px solid darken($action-hover-color, 20%);
-	}
-
-	.sortable > .sortable-item > div.selected-tab,
-	.sortable-list > .sortable-item > div.selected-tab {
-		background-color: $ui-bg-selected-color;
-		border: 1px solid transparent;
-
-		span {
-			color: $font-selected-color;
-		}
-	}
-
-	.sortable-item {
-		&.sortable-dragging > div {
-			@extend %cursor-dragging;
 		}
 	}
 
@@ -421,6 +409,33 @@
 				bottom: -8px;
 			}
 		}
+
+		&.no-data {
+			height: 100%;
+
+			thead {
+				th, td {
+					height: 1%;
+				}
+			}
+
+			.nothing-to-show {
+				td {
+					vertical-align: middle;
+				}
+
+				&:last-child {
+					td {
+						border-bottom: 0;
+					}
+				}
+
+				.no-data-found {
+					margin-top: 0;
+					margin-bottom: 0;
+				}
+			}
+		}
 	}
 
 	&.no-padding {
@@ -447,8 +462,12 @@
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
 			height: 0;
-			transition: height $ui-transition-duration, margin-top $ui-transition-duration,
-				box-shadow $ui-transition-duration;
+
+			@if $ui-transitions {
+				transition: height $ui-transition-duration,
+							margin-top $ui-transition-duration,
+							box-shadow $ui-transition-duration;
+			}
 		}
 
 		.dashboard-grid-widget-contents {
@@ -492,20 +511,6 @@
 			opacity: 1;
 		}
 	}
-
-	&.ui-resizable-resizing.resizing-top {
-		.dashboard-grid-widget-container {
-			top: auto;
-			bottom: 0;
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-left {
-		.dashboard-grid-widget-container {
-			left: auto;
-			right: 0;
-		}
-	}
 }
 
 .dashboard-grid-iterator-container {
@@ -534,8 +539,12 @@
 	opacity: 0;
 
 	// Transition for opacity is set for best border disappearance on different themes.
-	transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
-		opacity .15s .15s ease-out, box-shadow $ui-transition-duration ease-out;
+	@if $ui-transitions {
+		transition: margin-top $ui-transition-duration ease-out,
+					height $ui-transition-duration ease-out,
+					opacity .15s .15s ease-out,
+					box-shadow $ui-transition-duration ease-out;
+	}
 
 	// Not to loose hovered header while widget underneath is updating.
 	z-index: 3;
@@ -601,7 +610,9 @@
 	// To allow overflowing of the floating headers of child widgets.
 	overflow: visible;
 
-	transition: margin-top $ui-transition-duration ease-out;
+	@if $ui-transitions {
+		transition: margin-top $ui-transition-duration ease-out;
+	}
 }
 
 .dashboard-grid-iterator-placeholder {
@@ -670,8 +681,11 @@
 			opacity: 1;
 
 			// Not inheriting opacity transition here.
-			transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
-				box-shadow $ui-transition-duration ease-out;
+			@if $ui-transitions {
+				transition: margin-top $ui-transition-duration ease-out,
+							height $ui-transition-duration ease-out,
+							box-shadow $ui-transition-duration ease-out;
+			}
 		}
 
 		.dashboard-grid-iterator-actions {
@@ -683,20 +697,6 @@
 				margin-top: calc(-4rem - 8px);
 				height: calc(4rem + 8px);
 			}
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-top {
-		.dashboard-grid-iterator-container {
-			top: auto;
-			bottom: 0;
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-left {
-		.dashboard-grid-iterator-container {
-			left: auto;
-			right: 0;
 		}
 	}
 
@@ -749,13 +749,13 @@
 .dashboard-grid-iterator.ui-draggable {
 	.dashboard-grid-widget-header,
 	.dashboard-grid-iterator-header {
-		@extend %cursor-drag;
+		cursor: grab;
 	}
 
 	&.ui-draggable-dragging {
 		.dashboard-grid-widget-header,
 		.dashboard-grid-iterator-header {
-			@extend %cursor-dragging;
+			cursor: grabbing;
 		}
 	}
 
@@ -859,9 +859,11 @@
 			}
 		}
 
-		&:not(.dashboard-grid-widget-focus) {
-			transition-property: width, height, left, top;
-			transition-duration: 0.15s;
+		@if $ui-transitions {
+			&:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
+				transition-property: height, top;
+				transition-duration: 0.15s;
+			}
 		}
 	}
 
@@ -944,6 +946,20 @@
 				border-top: 0;
 			}
 		}
+
+		@if $ui-transitions {
+			&:not(.ui-draggable-dragging):not(.dashboard-grid-iterator-focus) {
+				transition-property: height, top;
+				transition-duration: 0.15s;
+			}
+
+			.dashboard-grid-widget {
+				&:not(.dashboard-grid-widget-focus) {
+					transition-property: height, top;
+					transition-duration: 0s;
+				}
+			}
+		}
 	}
 
 	.dashboard-grid-widget-placeholder {
@@ -961,54 +977,21 @@
 	}
 }
 
-@keyframes zoom-in-out {
-	0% {
-		transform: scale(1);
-	}
-	50% {
-		transform: scale(1.05);
-	}
-	100% {
-		transform: scale(1);
-	}
-}
-
-.new-widget {
-	animation: zoom-in-out $ui-controls-transition-duration linear;
-}
-
-.dashboard-widget {
-	min-width: 250px;
-	margin: 0 10px 10px 0;
-	background-color: $ui-bg-color;
-	border: 1px solid $ui-border-color;
-
-	.dashboard-widget-head {
-		margin: 8px 10px;
-	}
-
-	.list-table {
-		border: 0;
-
-		th {
-			@extend %dashboard-widget-td;
+@if $ui-transitions {
+	@keyframes zoom-in-out {
+		0% {
+			transform: scale(1);
 		}
-
-		td {
-			@extend %dashboard-widget-td;
+		50% {
+			transform: scale(1.05);
 		}
-
-		tbody tr {
-			&:last-child td {
-				border-bottom: 1px solid $table-border-color;
-			}
+		100% {
+			transform: scale(1);
 		}
 	}
 
-	.msg-bad,
-	.msg-good,
-	.msg-warning {
-		margin: 0 10px;
+	.new-widget {
+		animation: zoom-in-out $ui-controls-transition-duration linear;
 	}
 }
 
@@ -1019,32 +1002,6 @@
 
 	&:last-child {
 		padding-right: 10px;
-	}
-}
-
-.dashboard-widget-head {
-	display: flex;
-	margin-bottom: 8px;
-
-	h4 {
-		color: widget-head-font-color($font-color);
-		font-weight: bold;
-		margin-right: auto;
-	}
-
-	& > ul {
-		margin: -8px -10px -10px 10px;
-	}
-}
-
-.dashboard-widget-foot {
-	text-align: right;
-	color: $font-alt-color;
-	margin: 0 10px;
-
-	li {
-		display: inline-block;
-		padding: 8px 0 8px 13px;
 	}
 }
 

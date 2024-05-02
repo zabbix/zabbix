@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -204,7 +204,7 @@ struct zbx_option	longopts[] =
 	{"tls-cipher13",		1,	NULL,	'A'},
 	{"tls-cipher",			1,	NULL,	'B'},
 	{"protocol",			1,	NULL,	'P'},
-	{NULL}
+	{0}
 };
 
 /* short options */
@@ -325,6 +325,10 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 					zbx_rtrim(result.msg, "\r\n");
 					printf("%s: %s\n", ZBX_NOTSUPPORTED, result.msg);
 				}
+				else if (0 == ZBX_ISSET_VALUE(&result))
+				{
+					puts(ZBX_NODATA ": No value was received.");
+				}
 				else
 				{
 					zbx_rtrim(result.text, "\r\n");
@@ -374,7 +378,7 @@ int	main(int argc, char **argv)
 
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 #ifndef _WINDOWS
-	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
@@ -586,7 +590,7 @@ int	main(int argc, char **argv)
 #if defined(_WINDOWS)
 			zbx_tls_init_parent(get_zbx_program_type);
 #endif
-			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type);
+			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type, NULL);
 		}
 #else
 		ZBX_UNUSED(get_zbx_program_type);

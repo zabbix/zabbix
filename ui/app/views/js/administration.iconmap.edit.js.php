@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 
@@ -28,7 +29,7 @@
 <?=
 	(new CRow([
 		(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-		(new CSpan('#0:'))->addClass('rowNum'),
+		(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 		(new CSelect('iconmap[mappings][#{iconmappingid}][inventory_link]'))
 			->addOptions(CSelect::createOptionsFromArray($data['inventory_list']))
 			->setId('iconmap_mappings_#{iconmappingid}_inventory_link'),
@@ -54,9 +55,7 @@
 				->addClass('remove_mapping')
 				->removeId()
 		))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->setId('iconmapidRow_#{iconmappingid}')
-		->addClass('sortable')
+	]))->setId('iconmapidRow_#{iconmappingid}')
 ?>
 </script>
 <script type="text/javascript">
@@ -82,46 +81,14 @@
 		var iconMapTable = $('#iconMapTable'),
 			addMappingButton = $('#addMapping');
 
-		function recalculateSortOrder() {
-			var i = 1;
-
-			iconMapTable.find('tr.sortable .rowNum').each(function() {
-				$(this).text(i++ + ':');
-			});
-		}
-
-		iconMapTable.sortable({
-			disabled: (iconMapTable.find('tr.sortable').length < 2),
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			containment: 'parent',
-			cursor: 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			update: recalculateSortOrder,
-			helper: function(e, ui) {
-				ui.children().each(function() {
-					var td = $(this);
-
-					td.width(td.width());
-				});
-
-				return ui;
-			},
-			start: function(e, ui) {
-				$(ui.placeholder).height($(ui.helper).height());
-			}
+		new CSortable(iconMapTable[0].querySelector('tbody'), {
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			freeze_end: 2
 		});
 
 		iconMapTable.find('tbody')
 			.on('click', '.remove_mapping', function() {
 				$(this).parent().parent().remove();
-
-				if (iconMapTable.find('tr.sortable').length < 2) {
-					iconMapTable.sortable('disable');
-				}
-				recalculateSortOrder();
 			})
 			.on('change', 'z-select.js-mapping-icon, z-select#iconmap_default_iconid', function() {
 				$(this).closest('tr').find('.preview')
@@ -145,17 +112,9 @@
 
 			mapping.iconmappingid = iconmappingid;
 			$('#iconMapListFooter').before(tpl.evaluate(mapping));
-
-			iconMapTable.sortable('refresh');
-
-			if (iconMapTable.find('tr.sortable').length > 1) {
-				iconMapTable.sortable('enable');
-			}
-
-			recalculateSortOrder();
 		});
 
-		if (iconMapTable.find('tr.sortable').length === 0) {
+		if (iconMapTable.find('tr[id^="iconmapidRow_"]').length === 0) {
 			addMappingButton.click();
 		}
 	});

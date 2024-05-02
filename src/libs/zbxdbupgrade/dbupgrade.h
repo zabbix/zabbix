@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ zbx_dbpatch_t;
 #define DBPATCHES_ARRAY_DECL(zabbix_version)		extern zbx_dbpatch_t	zbx_dbpatches_##zabbix_version[]
 
 #define DBPATCH_START(zabbix_version)			zbx_dbpatch_t	DBPATCH_VERSION(zabbix_version)[] = {
-#define DBPATCH_END()					{NULL}};
+#define DBPATCH_END()					{0}};
 
 #ifdef HAVE_SQLITE3
 

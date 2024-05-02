@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,21 +60,21 @@ foreach (getLocales() as $localeid => $locale) {
 // Restoring original locale.
 setlocale(LC_MONETARY, zbx_locale_variants($data['default_lang']));
 
-$language_error = '';
+$language_error = null;
+
 if (!function_exists('bindtextdomain')) {
-	$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+	$language_error = makeErrorIcon('Translations are unavailable because the PHP gettext module is missing.');
+
 	$lang_select->setReadonly();
 }
 elseif (!$all_locales_available) {
-	$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+	$language_error = makeWarningIcon(
+		_('You are not able to choose some of the languages, because locales for them are not installed on the web server.')
+	);
 }
 
 $gui_tab = (new CFormList())
-	->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()),
-		($language_error !== '')
-			? [$lang_select, makeErrorIcon($language_error)]
-			: $lang_select
-	)
+	->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()), [$lang_select, $language_error])
 	->addRow(new CLabel(_('Default time zone'), 'label-default-timezone'),
 		(new CSelect('default_timezone'))
 			->addOptions(CSelect::createOptionsFromArray($data['timezones']))

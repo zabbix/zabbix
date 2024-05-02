@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,17 +22,36 @@
 
 #include "zbxdbhigh.h"
 
-void	zbx_autoreg_host_free(zbx_autoreg_host_t *autoreg_host);
+typedef struct
+{
+	zbx_uint64_t	autoreg_hostid;
+	zbx_uint64_t	hostid;
+	char		*host;
+	char		*ip;
+	char		*dns;
+	char		*host_metadata;
+	int		now;
+	unsigned short	port;
+	unsigned short	flag;
+	unsigned int	connection_type;
+}
+zbx_autoreg_host_t;
 
-void	zbx_autoreg_update_host(zbx_uint64_t proxyid, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
-		int clock, const zbx_events_funcs_t *events_cbs);
+ZBX_PTR_VECTOR_DECL(autoreg_host_ptr, zbx_autoreg_host_t*)
 
-void	zbx_autoreg_flush_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
+int      zbx_autoreg_host_compare_func(const void *d1, const void *d2);
+
+typedef void	(*zbx_autoreg_host_free_func_t)(zbx_autoreg_host_t *autoreg_host);
+
+typedef void	(*zbx_autoreg_update_host_func_t)(zbx_uint64_t proxyid, const char *host, const char *ip,
+		const char *dns, unsigned short port, unsigned int connection_type, const char *host_metadata,
+		unsigned short flags, int clock, const zbx_events_funcs_t *events_cbs);
+
+typedef void	(*zbx_autoreg_flush_hosts_func_t)(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
 		const zbx_events_funcs_t *events_cbs);
 
-void	zbx_autoreg_prepare_host(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now);
+typedef void	(*zbx_autoreg_prepare_host_func_t)(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, const char *host,
+		const char *ip, const char *dns, unsigned short port, unsigned int connection_type,
+		const char *host_metadata, unsigned short flag, int now);
 
 #endif

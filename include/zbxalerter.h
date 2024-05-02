@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@
 #define MEDIA_STATUS_DISABLED	1
 
 #define ZBX_IPC_SERVICE_ALERTER	"alerter"
+
+#define ZBX_IPC_ALERTER_SYNC_ALERTS	1400
 
 typedef struct
 {

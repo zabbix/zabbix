@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,9 @@
 #include "zbxvariant.h"
 #include "zbx_dbversion_constants.h"
 
-/* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
-#if defined(HAVE_LIBCURL) && LIBCURL_VERSION_NUM >= 0x071c00
+#ifdef HAVE_LIBCURL
+
+#include "zbxcurl.h"
 
 #define		ZBX_HISTORY_STORAGE_DOWN	10000 /* Timeout in milliseconds */
 
@@ -36,10 +37,6 @@
 #define		ZBX_JSON_ALLOCATE		2048
 
 const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
-
-extern char	*CONFIG_HISTORY_STORAGE_URL;
-extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
-extern int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS;
 
 static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
@@ -383,6 +380,7 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	CURLoption		opt;
 	CURLcode		err;
+	char			*error = NULL;
 
 	elastic_writer_init();
 
@@ -402,26 +400,17 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_FAILONERROR, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ERRORBUFFER,
 					page_w[hist->value_type].errbuf)) ||
-			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS,
-			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
+	if (SUCCEED != zbx_curl_setopt_https(data->handle, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_ERR, error);
 		goto out;
 	}
-#endif
 
 	*page_w[hist->value_type].errbuf = '\0';
 
@@ -442,6 +431,7 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 
 	return;
 out:
+	zbx_free(error);
 	elastic_close(hist);
 }
 
@@ -502,7 +492,7 @@ try_again:
 			break;
 		}
 
-		if (CURLM_OK != (code = curl_multi_wait(writer.handle, NULL, 0, ZBX_HISTORY_STORAGE_DOWN, &fds)))
+		if (CURLM_OK != (code = zbx_curl_multi_wait(writer.handle, ZBX_HISTORY_STORAGE_DOWN, &fds)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot wait on curl multi handle: %s", curl_multi_strerror(code));
 			break;
@@ -658,7 +648,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 	CURLcode		err;
 	struct zbx_json		query;
 	struct curl_slist	*curl_headers = NULL;
-	char			*scroll_id = NULL, *scroll_query = NULL, errbuf[CURL_ERROR_SIZE];
+	char			*scroll_id = NULL, *scroll_query = NULL, errbuf[CURL_ERROR_SIZE], *error = NULL;
 	CURLoption		opt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -728,26 +718,17 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_FAILONERROR, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ERRORBUFFER, errbuf)) ||
-			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS,
-			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
+	if (SUCCEED != zbx_curl_setopt_https(data->handle, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_ERR, error);
 		goto out;
 	}
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "sending query to %s; post data: %s", data->post_url, query.buffer);
 
@@ -884,6 +865,7 @@ out:
 
 	zbx_free(scroll_id);
 	zbx_free(scroll_query);
+	zbx_free(error);
 
 	zbx_vector_history_record_sort(values, (zbx_compare_func_t)zbx_history_record_compare_desc_func);
 
@@ -900,7 +882,8 @@ out:
  *              history - [IN] the history data vector (may have mixed value types) *
  *                                                                                  *
  ************************************************************************************/
-static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history)
+static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_history_ptr_t *history,
+		int config_history_storage_pipelines)
 {
 	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	int			i, num = 0;
@@ -916,7 +899,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 	zbx_json_addobject(&json_idx, "index");
 	zbx_json_addstring(&json_idx, "_index", value_type_str[hist->value_type], ZBX_JSON_TYPE_STRING);
 
-	if (1 == CONFIG_HISTORY_STORAGE_PIPELINES)
+	if (1 == config_history_storage_pipelines)
 	{
 		zbx_snprintf(pipeline, sizeof(pipeline), "%s-pipeline", value_type_str[hist->value_type]);
 		zbx_json_addstring(&json_idx, "pipeline", pipeline, ZBX_JSON_TYPE_STRING);
@@ -927,7 +910,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (zbx_dc_history_t *)history->values[i];
+		h = history->values[i];
 
 		if (hist->value_type != h->value_type)
 			continue;
@@ -997,17 +980,23 @@ static int	elastic_flush(zbx_history_iface_t *hist)
  *                                                                                  *
  * Purpose: initializes history storage interface                                   *
  *                                                                                  *
- * Parameters:  hist       - [IN] the history storage interface                     *
- *              value_type - [IN] the target value type                             *
- *              error      - [OUT] the error message                                *
+ * Parameters:                                                                      *
+ *    hist                       - [IN] history storage interface                   *
+ *    value_type                 - [IN] target value type                           *
+ *    config_history_storage_url - [IN]                                             *
+ *    error                      - [OUT] error message                              *
  *                                                                                  *
- * Return value: SUCCEED - the history storage interface was initialized            *
+ * Return value: SUCCEED - history storage interface was initialized                *
  *               FAIL    - otherwise                                                *
  *                                                                                  *
  ************************************************************************************/
-int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
+int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
+		const char *config_history_storage_url, char **error)
 {
 	zbx_elastic_data_t	*data;
+
+	if (SUCCEED != zbx_curl_good_for_elasticsearch(error))
+		return FAIL;
 
 	if (0 != curl_global_init(CURL_GLOBAL_ALL))
 	{
@@ -1017,7 +1006,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 
 	data = (zbx_elastic_data_t *)zbx_malloc(NULL, sizeof(zbx_elastic_data_t));
 	memset(data, 0, sizeof(zbx_elastic_data_t));
-	data->base_url = zbx_strdup(NULL, CONFIG_HISTORY_STORAGE_URL);
+	data->base_url = zbx_strdup(NULL, config_history_storage_url);
 	zbx_rtrim(data->base_url, "/");
 	data->buf = NULL;
 	data->post_url = NULL;
@@ -1040,7 +1029,8 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
  *          the response string                                                     *
  *                                                                                  *
  ************************************************************************************/
-void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
+void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
+		const char *config_history_storage_url)
 {
 #define RIGHT2(x)	((int)((zbx_uint32_t)(x) - ((zbx_uint32_t)((x)/100))*100))
 	zbx_httppage_t			page;
@@ -1050,7 +1040,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 	CURLoption			opt;
 	CURL				*handle;
 	size_t				version_len = 0;
-	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE];
+	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE], *error = NULL;
 	int				major_num, minor_num, increment_num, ret = FAIL;
 	zbx_uint32_t			version;
 	struct zbx_db_version_info_t	db_version_info = {0};
@@ -1058,6 +1048,12 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	memset(&page, 0, sizeof(zbx_httppage_t));
+
+	if (SUCCEED != zbx_curl_good_for_elasticsearch(&error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, error);
+		goto out;
+	}
 
 	if (0 != curl_global_init(CURL_GLOBAL_ALL))
 	{
@@ -1073,32 +1069,23 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 
 	curl_headers = curl_slist_append(NULL, "Content-Type: application/json");
 
-	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_URL, CONFIG_HISTORY_STORAGE_URL)) ||
+	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_URL, config_history_storage_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEDATA, &page)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_FAILONERROR, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_ERRORBUFFER, errbuf)) ||
-			CURLE_OK != (err = curl_easy_setopt(handle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto clean;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_PROTOCOLS,
-			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
+	if (SUCCEED != zbx_curl_setopt_https(handle, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
-		goto clean;
+		zabbix_log(LOG_LEVEL_WARNING, error);
+		goto out;
 	}
-#endif
 
 	*errbuf = '\0';
 
@@ -1122,6 +1109,8 @@ clean:
 	curl_slist_free_all(curl_headers);
 	curl_easy_cleanup(handle);
 out:
+	zbx_free(error);
+
 	if (FAIL == ret)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Failed to extract ElasticDB version");
@@ -1156,7 +1145,7 @@ out:
 
 	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info.flag)
 	{
-		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
+		if (0 == config_allow_unsupported_db_versions)
 		{
 			zabbix_log(LOG_LEVEL_ERR, " ");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix server due to unsupported %s database server"
@@ -1199,23 +1188,31 @@ out:
 
 zbx_uint32_t	zbx_elastic_version_get(void)
 {
+	if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
+		return ZBX_DBVERSION_UNDEFINED;
+
 	return ZBX_ELASTIC_SVERSION;
 }
 #else
-int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error)
+int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
+		const char *config_history_storage_url, char **error)
 {
 	ZBX_UNUSED(hist);
 	ZBX_UNUSED(value_type);
+	ZBX_UNUSED(config_history_storage_url);
 
-	*error = zbx_strdup(*error, "cURL library support >= 7.28.0 is required for Elasticsearch history backend");
+	*error = zbx_strdup(*error, "Zabbix must be compiled with cURL library for Elasticsearch history backend");
 
 	return FAIL;
 }
 
-void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
+void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
+		const char *config_history_storage_url)
 {
 	ZBX_UNUSED(json);
 	ZBX_UNUSED(result);
+	ZBX_UNUSED(config_allow_unsupported_db_versions);
+	ZBX_UNUSED(config_history_storage_url);
 }
 
 zbx_uint32_t	zbx_elastic_version_get(void)

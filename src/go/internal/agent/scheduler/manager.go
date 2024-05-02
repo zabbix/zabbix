@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,18 +29,18 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/plugin/comms"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/alias"
-	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/plugins/external"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/alias"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/plugins/external"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/plugin/comms"
 )
 
 const (
@@ -120,7 +120,7 @@ type Scheduler interface {
 		key string,
 		timeout time.Duration,
 		clientID uint64,
-	) (result string, err error)
+	) (result *string, err error)
 	Query(command string) (status string)
 	QueryUserParams() (status string)
 }
@@ -831,7 +831,7 @@ func (m *Manager) PerformTask(
 	key string,
 	timeout time.Duration,
 	clientID uint64,
-) (string, error) {
+) (*string, error) {
 	var lastLogsize uint64
 	var mtime int
 
@@ -853,21 +853,8 @@ func (m *Manager) PerformTask(
 		time.Now(),
 	)
 
-	var result string
-
 	r := <-w
-	if r.Error == nil {
-		if r.Value != nil {
-			result = *r.Value
-		} else {
-			// single metric requests do not support empty values, return error instead
-			return "", errors.New("No values have been gathered yet.")
-		}
-	} else {
-		return "", r.Error
-	}
-
-	return result, nil
+	return r.Value, r.Error
 }
 
 func (m *Manager) FinishTask(task performer) {

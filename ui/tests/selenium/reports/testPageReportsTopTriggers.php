@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -410,6 +410,12 @@ class testPageReportsTopTriggers extends CWebTest {
 				CDBHelper::setTriggerProblem($params['name'], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
 			}
 		}
+
+		// Delete some hosts and problems from previous tests and data source, not to interfere this test.
+		$rows = CDBHelper::getAll('SELECT * FROM hosts WHERE host='.zbx_dbstr('Host for tag permissions'));
+		if ($rows !== []) {
+			CDataHelper::call('host.delete', [$rows[0]['hostid']]);
+		}
 	}
 
 	public function testPageReportsTopTriggers_Layout() {
@@ -437,7 +443,7 @@ class testPageReportsTopTriggers extends CWebTest {
 			$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
 		}
 
-		foreach (['id:from' => 16, 'id:to' => 16] as $input => $value) {
+		foreach (['id:from' => 255, 'id:to' => 255] as $input => $value) {
 			$this->assertEquals($value, $this->query($input)->one()->getAttribute('maxlength'));
 		}
 
@@ -513,7 +519,7 @@ class testPageReportsTopTriggers extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// Check filter results from particular host group.
+			// #0 Check filter results from particular host group.
 			[
 				[
 					'fields' => [
@@ -532,7 +538,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Check filter results from several host groups.
+			// #1 Check filter results from several host groups.
 			[
 				[
 					'fields' => [
@@ -569,7 +575,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Check filter results from particular host.
+			// #2 Check filter results from particular host.
 			[
 				[
 					'fields' => [
@@ -588,7 +594,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Check filter results from several hosts.
+			// #3 Check filter results from several hosts.
 			[
 				[
 					'fields' => [
@@ -618,7 +624,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// No filter results if host doesn't belong to host group.
+			// #4 No filter results if host doesn't belong to host group.
 			[
 				[
 					'fields' => [
@@ -628,6 +634,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
+			// #5.
 			[
 				[
 					'fields' => [
@@ -637,7 +644,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Search by "Problem" should not be case sensitive.
+			// #6 Search by "Problem" should not be case sensitive.
 			[
 				[
 					'fields' => [
@@ -656,7 +663,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Wrong name in filter field "Problem".
+			// #7 Wrong name in filter field "Problem".
 			[
 				[
 					'fields' => [
@@ -665,7 +672,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Trigger name with special characters.
+			// #8 Trigger name with special characters.
 			[
 				[
 					'fields' => [
@@ -684,7 +691,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Trigger name with macro.
+			// #9 Trigger name with macro.
 			[
 				[
 					'fields' => [
@@ -703,7 +710,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by severity.
+			// #10 Search by severity.
 			[
 				[
 					'fields' => [
@@ -722,7 +729,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by severities.
+			// #11 Search by severities.
 			[
 				[
 					'fields' => [
@@ -764,7 +771,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by tag.
+			// #12 Search by tag.
 			[
 				[
 					'tags' => [
@@ -783,6 +790,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'tags' => [
@@ -801,7 +809,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by tags.
+			// #14 Search by tags.
 			[
 				[
 					'tags' => [
@@ -821,6 +829,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'fields' => [
@@ -850,6 +859,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'tags' => [
@@ -878,7 +888,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by tags with empty result.
+			// #17 Search by tags with empty result.
 			[
 				[
 					'tags' => [
@@ -887,7 +897,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Search results with several filtering parameters.
+			// #18 Search results with several filtering parameters.
 			[
 				[
 					'fields' => [
@@ -912,7 +922,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search results without filtering parameters.
+			// #19 Search results without filtering parameters.
 			[
 				[
 					'expected' => [
@@ -991,7 +1001,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			/*
+			/* #20.
 			 * Search by date label.
 			 * Note: This test case depends on time when executed. E.g. if execution time is around 00:00 - 00:30 expected
 			 * result will be different, because some of prepareData generated problems will appear in yesterday's filter.
@@ -1014,6 +1024,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'date' => [
@@ -1032,7 +1043,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by custom time period.
+			// #22 Search by custom time period.
 			[
 				[
 					'date' => [
@@ -1052,6 +1063,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'date' => [
@@ -1071,6 +1083,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #24.
 			[
 				[
 					'date' => [
@@ -1090,17 +1103,17 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by custom time period and without expected data.
+			// #25 Search by custom time period and without expected data.
 			[
 				[
 					'date' => [
-						'from' => 'now-1y/y',
-						'to' => 'now-1y/y'
+						'from' => 'now-10y/y',
+						'to' => 'now-10y/y'
 					],
 					'expected' => []
 				]
 			],
-			// Search results from last month using custom time period.
+			// #26 Search results from last month using custom time period.
 			[
 				[
 					'date' => [
@@ -1191,6 +1204,7 @@ class testPageReportsTopTriggers extends CWebTest {
 	 */
 	public function testPageReportsTopTriggers_Filter($data) {
 		$this->page->login()->open(self::LINK)->waitUntilReady();
+		$table = $this->getTable();
 
 		$filter = CFilterElement::find()->one();
 		if ($filter->getSelectedTabName() !== 'Filter' && !array_key_exists('date', $data)) {
@@ -1230,6 +1244,7 @@ class testPageReportsTopTriggers extends CWebTest {
 		}
 
 		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		if (array_key_exists('background_colors', $data)) {
 			foreach ($data['background_colors'] as $trigger => $color) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,12 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
- * @onBefore removeGuestFromDisabledGroup
+ * @onBefore removeGuestFromDisabledGroup, addDefaultAllowAuthKeyToConfig
+ *
  * @onAfter addGuestToDisabledGroup
+ *
+ * @backupConfig
+ *
  * @dataSource LoginUsers
  */
 class testUsersAuthenticationHttp extends CLegacyWebTest {
@@ -31,6 +35,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	const LOGIN_GUEST	= 1;
 	const LOGIN_USER	= 2;
 	const LOGIN_HTTP	= 3;
+
+	protected function getFilePath() {
+		return dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+	}
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -41,7 +49,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 		return ['class' => CMessageBehavior::class];
 	}
 
-	public function testFormAdministrationAuthenticationHttp_Layout() {
+	public function testUsersAuthenticationHttp_Layout() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('HTTP settings');
@@ -325,11 +333,6 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 					],
 					'pages' => [
 						[
-							'page' => 'zabbix.php?action=dashboard.view',
-							'action' => self::LOGIN_GUEST,
-							'target' => 'Global view'
-						],
-						[
 							'page' => 'index.php',
 							'action' => self::LOGIN_HTTP,
 							'target' => 'Global view'
@@ -368,11 +371,6 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						[
 							'page' => 'index.php?form=default',
 							'action' => self::LOGIN_USER,
-							'target' => 'Global view'
-						],
-						[
-							'page' => 'zabbix.php?action=dashboard.view',
-							'action' => self::LOGIN_GUEST,
 							'target' => 'Global view'
 						],
 						[
@@ -531,6 +529,13 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 			case self::LOGIN_GUEST:
 				$this->page->open($page['page']);
 
+				if ($page['page'] !== 'zabbix.php?action=user.list') {
+					$this->query('button:Login')->one()->click();
+					$this->page->waitUntilReady();
+					$this->query('link:sign in as guest')->one()->click();
+					$this->page->waitUntilReady();
+				}
+
 				return 'guest';
 
 			case self::LOGIN_USER:
@@ -622,10 +627,47 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 		}
 	}
 
+	public function getHttpAuthData() {
+		return [
+			// HTTP authentication enabled in zabbix.conf.php file.
+			[
+				[
+					'config_string' => '$ALLOW_HTTP_AUTH = true;',
+					'tabs' => ['Authentication', 'HTTP settings', 'LDAP settings', 'SAML settings', 'MFA settings']
+				]
+			],
+			// HTTP authentication disabled in zabbix.conf.php file.
+			[
+				[
+					'config_string' => '$ALLOW_HTTP_AUTH = false;',
+					'tabs' => ['Authentication', 'LDAP settings', 'SAML settings', 'MFA settings']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getHttpAuthData
+	 */
+	public function testUsersAuthenticationHttp_HttpAuthStatusChange($data) {
+		// Update Zabbix frontend config.
+		$pattern = array('/\/\/ \$ALLOW_HTTP_AUTH = false;/', '/\$ALLOW_HTTP_AUTH = true;/');
+		$content = preg_replace($pattern, $data['config_string'], file_get_contents($this->getFilePath()), 1);
+		file_put_contents($this->getFilePath(), $content);
+
+		// Wait for frontend to get the new config from updated zabbix.conf.php file.
+		sleep((int) ini_get('opcache.revalidate_freq') + 1);
+
+		// Open authentication configuration form and verify that the HTTP settings tab is/isn't present.
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$form = $this->query('id:authentication-form')->asForm()->one();
+		$this->assertEquals($data['tabs'], $form->getTabs());
+	}
+
 	/**
 	 * Creating a configuration file.
 	 *
-	 * @param type $data
+	 * @param array $data	data array for HTTP settings setup
 	 */
 	protected function createConfigurationFiles($data) {
 		switch (CTestArrayHelper::get($data, 'file')) {
@@ -746,8 +788,18 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
-	public  function removeGuestFromDisabledGroup() {
+	public function removeGuestFromDisabledGroup() {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
+	}
+
+	/**
+	 * Add a commented $ALLOW_HTTP_AUTH variable to frontend configuration file to check disabling of HTTP authentication.
+	 */
+	public function addDefaultAllowAuthKeyToConfig() {
+		$content = file_get_contents($this->getFilePath());
+		$content .= '// $ALLOW_HTTP_AUTH = false;'."\n";
+
+		file_put_contents($this->getFilePath(), $content);
 	}
 
 	public static function addGuestToDisabledGroup() {

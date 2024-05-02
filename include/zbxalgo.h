@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,13 @@ zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 #define ZBX_DEFAULT_STRING_HASH_FUNC		zbx_default_string_hash_func
 #define ZBX_DEFAULT_STRING_PTR_HASH_FUNC	zbx_default_string_ptr_hash_func
 #define ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC	zbx_default_uint64_pair_hash_func
+
+typedef enum
+{
+	ZBX_HASHSET_UNIQ_FALSE,
+	ZBX_HASHSET_UNIQ_TRUE
+}
+zbx_hashset_uniq_t;
 
 typedef int (*zbx_compare_func_t)(const void *d1, const void *d2);
 
@@ -165,7 +172,8 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
 int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req);
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
-void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
+void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset, size_t n,
+		zbx_hashset_uniq_t uniq);
 void	*zbx_hashset_search(const zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove_direct(zbx_hashset_t *hs, void *data);
@@ -357,7 +365,7 @@ ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)
 ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t)
 ZBX_VECTOR_DECL(dbl, double)
 
-ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
+ZBX_PTR_VECTOR_DECL(tags_ptr, zbx_tag_t*)
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
 
@@ -431,7 +439,7 @@ void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type va
 	if (0 < vector->values_num - before_index)								\
 	{													\
 		memmove(vector->values + before_index + 1, vector->values + before_index,			\
-				(vector->values_num - before_index) * sizeof(__type));				\
+				(size_t)(vector->values_num - before_index) * sizeof(__type));			\
 	}													\
 														\
 	vector->values_num++;											\
@@ -447,6 +455,9 @@ void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __typ
 void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, __type const *values,		\
 									int values_num)				\
 {														\
+	if (0 == values_num)											\
+		return;												\
+														\
 	zbx_vector_ ## __id ## _reserve(vector, (size_t)(vector->values_num + values_num));			\
 	memcpy(vector->values + vector->values_num, values, (size_t)values_num * sizeof(__type));		\
 	vector->values_num = vector->values_num + values_num;							\

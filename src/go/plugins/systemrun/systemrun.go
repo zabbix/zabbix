@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,14 @@ import (
 	"fmt"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/zbxcmd"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
+
+var impl Plugin
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -40,7 +43,14 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+
+	impl.SetHandleTimeout(true)
+}
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
@@ -80,7 +90,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return stdoutStderr, nil
 	} else if params[1] == "nowait" {
 		err := zbxcmd.ExecuteBackground(params[0])
-
 		if err != nil {
 			return nil, err
 		}
@@ -89,10 +98,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return nil, fmt.Errorf("Invalid second parameter.")
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "SystemRun", "system.run", "Run specified command.")
-
-	impl.SetHandleTimeout(true)
 }

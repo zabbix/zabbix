@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,10 +35,10 @@ import (
 	"syscall"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"zabbix.com/pkg/zbxcmd"
-	"zabbix.com/util"
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
+	"golang.zabbix.com/agent2/util"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const timeFmt = "Mon Jan _2 15:04:05 2006"
@@ -245,7 +245,7 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 		// [2]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-installed-size
 
 		if split[4] != "" {
-			size, err = strconv.ParseUint(split[4], 10, 64);
+			size, err = strconv.ParseUint(split[4], 10, 64)
 			if err != nil {
 				return "", err
 			}

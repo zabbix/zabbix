@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,11 +19,11 @@
 
 #include "taskmanager_server.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
 #include "../events/events.h"
-#include "../actions.h"
+#include "../actions/actions.h"
+#include "../audit/audit_server.h"
 
-#include "zbxservice.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -35,7 +35,6 @@
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"
-#include "audit/zbxaudit_proxy.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxversion.h"
@@ -62,10 +61,11 @@ static zbx_export_file_t	*get_problems_export(void)
  *             triggerid         - [IN] source trigger id                     *
  *             eventid           - [IN] problem eventid to close              *
  *             userid            - [IN] user that requested to close problem  *
+ *             rtc                 [IN] RTC socket                            *
  *                                                                            *
  ******************************************************************************/
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
-		zbx_uint64_t userid)
+		zbx_uint64_t userid, zbx_ipc_async_socket_t *rtc)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, eventid);
 
@@ -74,7 +74,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 	/* check if the task hasn't been already closed by another process */
 	if (NULL != zbx_db_fetch(result))
-		zbx_close_problem(triggerid, eventid, userid);
+		zbx_close_problem(triggerid, eventid, userid, rtc);
 
 	zbx_db_free_result(result);
 
@@ -88,12 +88,13 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
  * Purpose: tries to close problem by event acknowledgment action             *
  *                                                                            *
  * Parameters: taskid - [IN]                                                  *
+ *             rtc    - [IN] RTC socket                                       *
  *                                                                            *
  * Return value: SUCCEED - task was executed and removed                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_try_task_close_problem(zbx_uint64_t taskid)
+static int	tm_try_task_close_problem(zbx_uint64_t taskid, zbx_ipc_async_socket_t *rtc)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -138,7 +139,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 			{
 				ZBX_STR2UINT64(userid, row[0]);
 				ZBX_STR2UINT64(eventid, row[1]);
-				tm_execute_task_close_problem(taskid, triggerid, eventid, userid);
+				tm_execute_task_close_problem(taskid, triggerid, eventid, userid, rtc);
 
 				zbx_dc_config_unlock_triggers(&locked_triggerids);
 
@@ -1008,9 +1009,9 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 	}
 
-	zbx_audit_prepare();
-	zbx_audit_proxy_config_reload(proxyid, hostname);
-	zbx_audit_flush();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
+	zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxyid, hostname);
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 }
 
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
@@ -1331,7 +1332,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 		{
 			case ZBX_TM_TASK_CLOSE_PROBLEM:
 				/* close problem tasks will never have 'in progress' status */
-				if (SUCCEED == tm_try_task_close_problem(taskid))
+				if (SUCCEED == tm_try_task_close_problem(taskid, rtc))
 					processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND:
@@ -1470,7 +1471,7 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on all proxies");
 
-	zbx_audit_prepare();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	for (int i = 0; i < proxies.values_num; i++)
 	{
@@ -1493,10 +1494,10 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 				notify_proxypollers = 1;
 		}
 
-		zbx_audit_proxy_config_reload(proxy->proxyid, proxy->name);
+		zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxy->proxyid, proxy->name);
 	}
 
-	zbx_audit_flush();
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	if (0 != notify_proxypollers)
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
@@ -1547,7 +1548,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 	zbx_vector_tm_task_create(&tasks_active);
 
-	zbx_audit_prepare();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	for (const char *ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
@@ -1582,11 +1583,11 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 					zbx_vector_str_append(&proxynames_log, zbx_strdup(NULL, name));
 			}
 
-			zbx_audit_proxy_config_reload(proxyid, name);
+			zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxyid, name);
 		}
 	}
 
-	zbx_audit_flush();
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	if (1 == proxynames_log.values_num)
 	{

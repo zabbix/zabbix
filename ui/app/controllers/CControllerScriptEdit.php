@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,6 +187,8 @@ class CControllerScriptEdit extends CController {
 
 		$data['usergroups'] = array_column($usergroups, 'name', 'usrgrpid');
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+
+		$data['is_global_scripts_enabled'] = CSettingsHelper::isGlobalScriptsEnabled();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of scripts'));

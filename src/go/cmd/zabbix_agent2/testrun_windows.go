@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 package main
 
-import "zabbix.com/internal/agent/scheduler"
+import "golang.zabbix.com/agent2/internal/agent/scheduler"
 
 func checkMetrics(s scheduler.Scheduler) {
 	metrics := []string{
@@ -49,6 +49,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`net.dns[,zabbix.com]`,
 		`net.dns.record[,zabbix.com]`,
 		`net.dns.perf[,zabbix.com]`,
+		`net.dns.get[,zabbix.com]`,
 		`net.tcp.dns[,zabbix.com]`,
 		`net.tcp.dns.query[,zabbix.com]`,
 		`net.tcp.port[,80]`,

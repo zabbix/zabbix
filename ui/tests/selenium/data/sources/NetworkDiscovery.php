@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,19 +28,23 @@ class NetworkDiscovery {
 	 */
 	public static function load() {
 		// Create proxies for Discovery rule with proxy.
-		$proxies = CDataHelper::call('proxy.create',
+		CDataHelper::call('proxy.create',
 			[
 				[
+					'name' => 'Test Proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				],
+				[
 					'name' => 'Proxy for Network discovery',
-					'operating_mode' => 0
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 				],
 				[
 					'name' => 'Proxy for Network discovery cloning',
-					'operating_mode' => 0
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 				]
 			]
 		);
-		$proxyid = $proxies['proxyids'][0];
+		$proxyids = CDataHelper::getIds('name');
 
 		CDataHelper::call('drule.create', [
 			[
@@ -108,7 +112,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule for clone',
 				'iprange' => '192.168.2.3-255',
-				'proxyid' => $proxyid,
+				'proxyid' => $proxyids['Proxy for Network discovery'],
 				'delay' => '25h',
 				'status' =>  1,
 				'concurrency_max' => 0,
@@ -311,7 +315,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule to check delete',
 				'iprange' => '192.168.3.1-255',
-				'proxy_hostid' => 20000,
+				'proxy_hostid' => $proxyids['Test Proxy'],
 				'delay' => 600,
 				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
@@ -326,7 +330,7 @@ class NetworkDiscovery {
 			[
 				'name' => "<img src=\"x\" onerror=\"alert('UWAGA');\"/>",
 				'iprange' => '192.168.3.1-255',
-				'proxy_hostid' => 20000,
+				'proxy_hostid' => $proxyids['Test Proxy'],
 				'delay' => 600,
 				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [

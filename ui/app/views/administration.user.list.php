@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.user.list.js.php');
@@ -139,7 +140,8 @@ $table = (new CTableInfo())
 		_('Status'),
 		make_sorting_header(_('Provisioned'), 'ts_provisioned', $data['sort'], $data['sortorder'], $url),
 		_('Info')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('user');
 
@@ -296,7 +298,6 @@ foreach ($data['users'] as $user) {
 // Append table to form.
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'userids', [
 		'user.provision' => [
 			'name' => _('Provision now'),
@@ -304,6 +305,13 @@ $form->addItem([
 			'confirm_singular' => _('Provision selected LDAP user?'),
 			'confirm_plural' => _('Provision selected LDAP users?'),
 			'csrf_token' => $csrf_token
+		],
+		'user.reset.totp' => [
+			'name' => _('Reset TOTP secret'),
+			'confirm_singular' => _('Multi-factor TOTP secret will be deleted.'),
+			'confirm_plural' => _('Multi-factor TOTP secrets will be deleted.'),
+			'csrf_token' => $csrf_token,
+			'disabled' => CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_DISABLED
 		],
 		'user.unblock' => [
 			'name' => _('Unblock'),

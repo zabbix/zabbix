@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ class CWidgetElement extends CElement {
 
 			try {
 				// TODO: fix formatting after git-hook improvements DEV-2396.
-				return $this->query("xpath://div[@data-dialogueid=\"widget_properties\"]//form")->waitUntilVisible()
+				return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()
 						->asForm()->one();
 			}
 			catch (\Exception $e) {

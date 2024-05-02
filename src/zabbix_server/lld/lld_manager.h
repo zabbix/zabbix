@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 #include "zbxthreads.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 typedef struct zbx_lld_value
 {
@@ -66,6 +67,8 @@ typedef struct
 	int		values_num;
 }
 zbx_lld_rule_info_t;
+
+ZBX_PTR_VECTOR_DECL(lld_rule_info_ptr, zbx_lld_rule_info_t*)
 
 typedef struct
 {

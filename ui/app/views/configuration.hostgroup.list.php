@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,8 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
 		(new CColHeader(_('Hosts')))->setColSpan(2),
 		(new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH)
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $current_time = time();
 
@@ -181,7 +182,9 @@ foreach ($data['groups'] as $group) {
 				break;
 			}
 
-			$max = max($max, (int) $group_discovery['ts_delete']);
+			if ($group_discovery['status'] == ZBX_LLD_STATUS_LOST) {
+				$max = max($max, (int) $group_discovery['ts_delete']);
+			}
 		}
 
 		if ($max > 0) {
@@ -215,7 +218,6 @@ foreach ($data['groups'] as $group) {
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'groups', [
 		'hostgroup.massenable' => [
 			'content' => (new CSimpleButton(_('Enable hosts')))

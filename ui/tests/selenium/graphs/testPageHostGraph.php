@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -753,7 +753,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestAssertElementPresentXpath('//tr[@class="nothing-to-show"]/td[text()="No data found."]');
+			$this->assertEquals('No data found', $this->query('class:nothing-to-show')->one()->getText());
 		}
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 require_once dirname(__FILE__).'/js/configuration.httpconf.list.js.php';
 
@@ -148,7 +149,8 @@ $httpTable = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 		_('Tags'),
 		($data['context'] === 'host') ? _('Info') : null
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $http_tests = $data['http_tests'];
@@ -252,9 +254,7 @@ $button_list += [
 ];
 
 // Append table to form.
-$httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action', 'group_httptestid', $button_list,
-	$data['hostid']
-)]);
+$httpForm->addItem([$httpTable, new CActionButtonList('action', 'group_httptestid', $button_list, $data['hostid'])]);
 
 $html_page
 	->addItem($httpForm)

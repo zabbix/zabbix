@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -421,6 +421,10 @@ abstract class CController {
 
 		if (!is_string($csrf_token_form)) {
 			return false;
+		}
+
+		if (strpos(get_class($this), 'Modules\\') === 0) {
+			return CCsrfTokenHelper::check($csrf_token_form, $this->action);
 		}
 
 		foreach (explode('.', $this->action) as $segment) {

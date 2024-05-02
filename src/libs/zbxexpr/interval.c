@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ struct zbx_custom_interval
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
  ******************************************************************************/
-static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
+static int	check_time_period(const zbx_time_period_t period, const struct tm *tm)
 {
 	int		day, time;
 
@@ -115,7 +115,7 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
 	while (NULL != flex_intervals)
 	{
 		if ((-1 == current_delay || flex_intervals->delay < current_delay) &&
-				SUCCEED == check_time_period(flex_intervals->period, localtime(&now)))
+				SUCCEED == check_time_period(flex_intervals->period, zbx_localtime_now(&now)))
 		{
 			current_delay = flex_intervals->delay;
 		}
@@ -143,12 +143,12 @@ static int	get_next_delay_interval(const zbx_flexible_interval_t *flex_intervals
 		time_t *next_interval)
 {
 	int		day, time, next = 0, candidate;
-	struct tm	*tm;
+	const struct tm	*tm;
 
 	if (NULL == flex_intervals)
 		return FAIL;
 
-	tm = localtime(&now);
+	tm = zbx_localtime_now(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
 	time = SEC_PER_HOUR * tm->tm_hour + SEC_PER_MIN * tm->tm_min + tm->tm_sec;
 
@@ -1406,7 +1406,7 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 	struct tm	tm_start, tm, tm_dst;
 	time_t		nextcheck = 0, current_nextcheck;
 
-	tm_start = *(localtime(&now));
+	tm_start = *zbx_localtime_now(&now);
 
 	for (; NULL != interval; interval = interval->next)
 	{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,10 +25,9 @@ import (
 	"syscall"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/pkg/win32"
-
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/agent2/pkg/win32"
+	"golang.zabbix.com/sdk/log"
 )
 
 var ObjectsNames map[string]string

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -257,6 +257,7 @@ class CScript extends CApiService {
 
 		self::checkUniqueness($scripts);
 		$this->checkDuplicates($scripts);
+		self::checkScriptExecutionEnabled($scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
 		self::checkManualInput($scripts);
@@ -330,8 +331,12 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		$extend_fields = CSettingsHelper::isGlobalScriptsEnabled()
+			? ['name', 'type', 'scope']
+			: ['name', 'type', 'scope', 'execute_on'];
+
 		// Populate name, type and scope.
-		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', ['name', 'type', 'scope']);
+		$scripts = $this->extendObjectsByKey($scripts, $db_scripts, 'scriptid', $extend_fields);
 		self::addDbFieldsByType($scripts, $db_scripts);
 
 		$api_input_rules = self::getValidationRules('update');
@@ -345,6 +350,7 @@ class CScript extends CApiService {
 		self::checkUniqueness($scripts, $db_scripts);
 		self::addAffectedObjects($scripts, $db_scripts);
 		$this->checkDuplicates($scripts, $db_scripts);
+		self::checkScriptExecutionEnabled($scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
 		self::checkManualInput($scripts);
@@ -705,6 +711,27 @@ class CScript extends CApiService {
 	}
 
 	/**
+	 * @param array $scripts
+	 *
+	 * @throws APIException if at least one script has execute_on parameter equal to Zabbix server and global script
+	 *                      execution is disabled by Zabbix server.
+	 */
+	private static function checkScriptExecutionEnabled(array $scripts): void {
+		if (!CSettingsHelper::isGlobalScriptsEnabled()) {
+			foreach ($scripts as $index => $script) {
+				if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+						&& $script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($index + 1).'/execute_on',
+							_('global script execution on Zabbix server is disabled by server configuration')
+						)
+					);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Check for valid user groups.
 	 *
 	 * @param array $scripts
@@ -875,7 +902,7 @@ class CScript extends CApiService {
 		if (array_key_exists('eventid', $data)) {
 			$db_events = API::Event()->get([
 				'output' => [],
-				'selectHosts' => ['hostid'],
+				'selectHosts' => ['hostid', 'proxyid'],
 				'eventids' => $data['eventid']
 			]);
 			if (!$db_events) {
@@ -885,6 +912,8 @@ class CScript extends CApiService {
 			}
 
 			$hostids = array_column($db_events[0]['hosts'], 'hostid');
+			$db_hosts = $db_events[0]['hosts'];
+
 			$is_event = true;
 		}
 		else {
@@ -892,7 +921,7 @@ class CScript extends CApiService {
 			$is_event = false;
 
 			$db_hosts = API::Host()->get([
-				'output' => [],
+				'output' => ['proxyid'],
 				'hostids' => $hostids
 			]);
 			if (!$db_hosts) {
@@ -903,13 +932,23 @@ class CScript extends CApiService {
 		}
 
 		$db_scripts = $this->get([
-			'output' => ['type'],
+			'output' => ['type', 'execute_on'],
 			'hostids' => $hostids,
 			'scriptids' => $data['scriptid']
 		]);
 
 		if (!$db_scripts) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$db_script = $db_scripts[0];
+
+		if (!CSettingsHelper::isGlobalScriptsEnabled() && $db_script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+				&& ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
+					|| ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY && $db_hosts[0]['proxyid'] == 0))) {
+			self::exception(ZBX_API_ERROR_INTERNAL,
+				_('Global script execution on Zabbix server is disabled by server configuration.')
+			);
 		}
 
 		if ($db_scripts[0]['type'] == ZBX_SCRIPT_TYPE_URL) {
@@ -1110,7 +1149,7 @@ class CScript extends CApiService {
 
 		foreach ($events as &$event) {
 			if ($event['cause_eventid'] != 0) {
-				// There is not need to select already preselected events again.
+				// There is no need to select already preselected events again.
 				if (array_key_exists($event['cause_eventid'], $events)) {
 					$event['cause'] = [
 						'eventid' => $events[$event['cause_eventid']]['eventid'],

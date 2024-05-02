@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 
 class CWidgetIterator extends CWidget {
+
+	#unique_id_index = 0;
 
 	onInitialize() {
 		this._css_classes = {
@@ -52,7 +54,7 @@ class CWidgetIterator extends CWidget {
 		this._events = {
 			...this._events,
 
-			widgetEnter: (e) => {
+			widgetEnter: e => {
 				const widget = e.detail.target;
 
 				if (!widget.isEntered()) {
@@ -64,7 +66,7 @@ class CWidgetIterator extends CWidget {
 				}
 			},
 
-			widgetLeave: (e) => {
+			widgetLeave: e => {
 				const widget = e.detail.target;
 
 				if (widget.isEntered()) {
@@ -72,7 +74,7 @@ class CWidgetIterator extends CWidget {
 				}
 			},
 
-			iteratorEnter: (e) => {
+			iteratorEnter: e => {
 				if (e.target.closest('.dashboard-grid-iterator-placeholder') !== null) {
 					this._target.classList.remove('iterator-double-header');
 				}
@@ -129,7 +131,7 @@ class CWidgetIterator extends CWidget {
 			this._updatePager();
 		}
 
-		if (this._has_alt_content || this._isTooSmall() || this._isResizing()) {
+		if (this._has_alt_content || this._isTooSmall() || this.isResizing()) {
 			return;
 		}
 
@@ -138,42 +140,12 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
-	_setViewMode(view_mode) {
-		super._setViewMode(view_mode);
-
-		for (const widget of this._widgets.values()) {
-			widget._setViewMode(view_mode);
-		}
-	}
-
-	_setFields(fields) {
-		const num_columns = this._fields.columns;
-		const num_rows = this._fields.rows;
-
-		super._setFields(fields);
-
-		if (num_columns !== this._fields.columns || num_rows !== this._fields.rows) {
-			this._clearContents();
-			this._clearAltContent();
-
-			this._updateTooSmallState();
-
-			if (this._isTooSmall()) {
-				if (this._state === WIDGET_STATE_ACTIVE) {
-					this._stopUpdating();
-				}
-			}
-
-			this._updateGridPositions();
-		}
-	}
-
 	_startUpdating({delay_sec = 0} = {}) {
 		if (this._isTooSmall()) {
 			return;
 		}
 
-		if (this._isResizing()) {
+		if (this.isResizing()) {
 			if (this._has_contents || this._has_alt_content) {
 				return;
 			}
@@ -520,19 +492,7 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_createUniqueId() {
-		let unique_ids = [];
-
-		for (const widget of this._widgets.values()) {
-			unique_ids.push(widget.getUniqueId());
-		}
-
-		let index = 0;
-
-		while (unique_ids.includes(`${this._unique_id}-${index}`)) {
-			index++;
-		}
-
-		return `${this._unique_id}-${index}`;
+		return `${this._unique_id}-${(this.#unique_id_index++).toString(36).toUpperCase().padStart(6, '0')}`;
 	}
 
 	_makeView() {

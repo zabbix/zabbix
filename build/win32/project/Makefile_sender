@@ -49,7 +49,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
-	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcfg\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxgetopt\getopt.o \
@@ -70,6 +70,7 @@ OBJS = \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\libs\zbxversion\version.o \
 	..\..\..\src\libs\zbxxml\xml.o \
+	..\..\..\src\zabbix_sender\send_buffer.o \
 	..\..\..\src\zabbix_sender\zabbix_sender.o
 
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib user32.lib shlwapi.lib $(LIBS)

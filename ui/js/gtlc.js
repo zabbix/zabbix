@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -303,9 +303,11 @@ jQuery(function($) {
 		.on('mousedown', 'img', selectionHandlerDragStart)
 		.on('dblclick', 'img', function(event) {
 			if (typeof $(event.target).data('zbx_sbox') !== 'undefined') {
-				const obj = timeControl.objectList[event.target.id];
+				const obj = event.target.id in timeControl.objectList
+					? timeControl.objectList[event.target.id]
+					: null;
 
-				if (obj.useCustomEvents !== 1) {
+				if (obj === null || obj.useCustomEvents !== 1) {
 					$.publish('timeselector.zoomout', {
 						from: element.from.val(),
 						to: element.to.val()
@@ -456,9 +458,11 @@ jQuery(function($) {
 			return cancelEvent(event);
 		}
 
-		const obj = timeControl.objectList[event.data.target[0].id];
+		const obj = event.data.target[0].id in timeControl.objectList
+			? timeControl.objectList[event.data.target[0].id]
+			: null;
 
-		if (obj.useCustomEvents !== 1) {
+		if (obj === null || obj.useCustomEvents !== 1) {
 			$.publish('timeselector.rangeoffset', {
 				from_offset: Math.ceil(from_offset),
 				to_offset: Math.ceil(to_offset)

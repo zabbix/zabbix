@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1439,7 +1439,7 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param {array}  scripts            Script names and nenu paths.
+ * @param {array}  scripts            Script names and menu paths.
  * @param {Node}   trigger_element    UI element which triggered opening of overlay dialogue.
  * @param {array}  hostid             Host ID.
  * @param {array}  eventid            Event ID.
@@ -1498,7 +1498,6 @@ function getMenuPopupURLData(urls, trigger_element, hostid, eventid) {
 				url: url.url,
 				target: url.target,
 				confirmation: url.confirmation,
-				rel: url.rel,
 				manualinput: url.manualinput,
 				manualinput_prompt: url.manualinput_prompt,
 				manualinput_validator_type: url.manualinput_validator_type,
@@ -1623,6 +1622,38 @@ function getMenuPopupScriptItems(tree, trigger_elm, csrf_token) {
 	}
 
 	return items;
+}
+
+/**
+ * Get menu structure for discovery rules.
+ *
+ * @param {array}  options                            An array of options for discovery rule menu popup.
+ * @param {string} options['druleid']                 Discovery rule ID.
+ * @param {bool}   options['allowed_ui_conf_drules']  Whether user has access to discovery rules configuration page.
+ *
+ * @return {array}
+ */
+function getMenuPopupDRule(options) {
+	const sections = [];
+	const config_urls = [];
+
+	config_urls.push({
+		label: t('Discovery rule'),
+		disabled: !options.allowed_ui_conf_drules,
+		clickCallback: function(e) {
+			e.preventDefault();
+			jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+			view.editDRule({druleid: options.druleid});
+		}
+	});
+
+	sections.push({
+		label: t('Configuration'),
+		items: config_urls
+	});
+
+	return sections;
 }
 
 jQuery(function($) {

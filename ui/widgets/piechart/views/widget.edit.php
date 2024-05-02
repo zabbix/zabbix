@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,7 +173,9 @@ function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
 
 function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 	$show_legend_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
+	$show_value_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_value']));
 	$show_aggregation_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_aggregation']));
+	$legend_lines_mode_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['legend_lines_mode']));
 	$legend_lines_field = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
 	$legend_columns_field = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
 
@@ -187,12 +189,20 @@ function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 					new CFormField($show_legend_field->getView())
 				])
 				->addItem([
+					$show_value_field->getLabel(),
+					new CFormField($show_value_field->getView())
+				])
+				->addItem([
 					$show_aggregation_field->getLabel(),
 					new CFormField($show_aggregation_field->getView())
 				])
 		)
 		->addItem(
 			(new CFormGrid())
+				->addItem([
+					$legend_lines_mode_field->getLabel(),
+					new CFormField($legend_lines_mode_field->getView())
+				])
 				->addItem([
 					$legend_lines_field->getLabel(),
 					new CFormField($legend_lines_field->getView())

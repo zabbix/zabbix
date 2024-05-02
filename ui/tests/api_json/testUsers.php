@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 /**
  * @onBefore prepareUsersData
  *
- * @backup users
+ * @backup users, usrgrp, role, token, mfa, mfa_totp_secret, config
  */
 class testUsers extends CAPITest {
 
@@ -36,7 +36,9 @@ class testUsers extends CAPITest {
 			'user_with_disabled_usergroup' => null,
 			'user_for_token_tests' => null,
 			'user_with_valid_session' => null,
-			'user_for_extend_parameter_tests' => null
+			'user_for_extend_parameter_tests' => null,
+			'user_with_mfa_default' => null,
+			'user_with_mfa_duo' => null
 		],
 		'sessionids' => [
 			'not_authorized_session' => null,
@@ -52,6 +54,10 @@ class testUsers extends CAPITest {
 			'disabled' => null,
 			'valid' => null,
 			'valid_for_user_with_disabled_usergroup' => null
+		],
+		'mfaids' => [
+			'mfa_totp_1' => null,
+			'mfa_duo_1' => null
 		]
 	];
 
@@ -266,6 +272,69 @@ class testUsers extends CAPITest {
 		self::$data['tokens']['disabled'] = $tokens[1]['token'];
 		self::$data['tokens']['valid'] = $tokens[2]['token'];
 		self::$data['tokens']['valid_for_user_with_disabled_usergroup'] = $tokens[3]['token'];
+
+		$mfaids = CDataHelper::call('mfa.create', [
+			[
+				'type' => MFA_TYPE_TOTP,
+				'name' => 'TOTP test case 1',
+				'hash_function' => TOTP_HASH_SHA1,
+				'code_length' => TOTP_CODE_LENGTH_8
+			],
+			[
+				'type' => MFA_TYPE_DUO,
+				'name' => 'DUO test case 1',
+				'api_hostname' => 'api-999a9a99.duosecurity.com',
+				'clientid' => 'AAA58NOODEGUA6ST7AAA',
+				'client_secret' => '1AaAaAaaAaA7OoB4AaQfV547ARiqOqRNxP32Cult'
+			]
+		]);
+		$this->assertArrayHasKey('mfaids', $mfaids, 'prepareUsersData() failed: Could not create MFA method.');
+
+		self::$data['mfaids']['mfa_totp_1'] = $mfaids['mfaids'][0];
+		self::$data['mfaids']['mfa_duo_1'] = $mfaids['mfaids'][1];
+
+		$usergroupids_mfa = CDataHelper::call('usergroup.create', [
+			[
+				'name' => 'API test users MFA Default',
+				'mfaid' => 0,
+				'mfa_status' => GROUP_MFA_ENABLED
+			],
+			[
+				'name' => 'API test users MFA Duo',
+				'mfaid' => self::$data['mfaids']['mfa_duo_1'],
+				'mfa_status' => GROUP_MFA_ENABLED
+			]
+		]);
+
+		$usergroupids['mfa_default'] = $usergroupids_mfa['usrgrpids'][0];
+		$usergroupids['mfa_duo'] = $usergroupids_mfa['usrgrpids'][1];
+
+		CDataHelper::call('authentication.update', [
+			'mfa_status' => MFA_ENABLED,
+			'mfaid' => self::$data['mfaids']['mfa_totp_1']
+		]);
+
+		$userids_mfa = CDataHelper::call('user.create', [
+			[
+				'username' => 'User with mfa default',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['mfa_default']]
+				]
+			],
+			[
+				'username' => 'User with mfa duo',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['mfa_duo']]
+				]
+			]
+		]);
+
+		self::$data['userids']['user_with_mfa_default'] = $userids_mfa['userids'][0];
+		self::$data['userids']['user_with_mfa_duo'] = $userids_mfa['userids'][1];
 	}
 
 	public static function user_create() {
@@ -279,7 +348,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => 7]
 					]
 				],
-				'Incorrect value for field "passwd": cannot be empty.'
+				'User "API user create without password" must have a password, because internal authentication is in effect.'
 			],
 			// Check user username.
 			[
@@ -402,7 +471,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '123456']
 					]
 				],
-				'expected_error' => 'User group with ID "123456" is not available.'
+				'expected_error' => 'Invalid parameter "/1/usrgrps/1": object does not exist.'
 			],
 			[
 				'user' => [
@@ -739,7 +808,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '123456']
 					]
 				]],
-				'expected_error' => 'User group with ID "123456" is not available.'
+				'expected_error' => 'Invalid parameter "/1/usrgrps/1": object does not exist.'
 			],
 			[
 				'user' => [[
@@ -1122,7 +1191,7 @@ class testUsers extends CAPITest {
 					],
 					'lang' => '123456'
 				],
-				'expected_error' => 'Invalid parameter "/1/lang": value must be one of "default", "en_GB", "en_US", "bg_BG", "ca_ES", "zh_CN", "zh_TW", "cs_CZ", "nl_NL", "fi_FI", "fr_FR", "ka_GE", "de_DE", "el_GR", "he_IL", "hu_HU", "id_ID", "it_IT", "ko_KR", "ja_JP", "lv_LV", "lt_LT", "nb_NO", "fa_IR", "pl_PL", "pt_BR", "pt_PT", "ro_RO", "ru_RU", "sk_SK", "es_ES", "sv_SE", "tr_TR", "uk_UA", "vi_VN".'
+				'expected_error' => 'Invalid parameter "/1/lang": value must be one of "default", "en_GB", "en_US", "bg_BG", "ca_ES", "zh_CN", "zh_TW", "cs_CZ", "da_DK", "nl_NL", "fi_FI", "fr_FR", "ka_GE", "de_DE", "el_GR", "he_IL", "hu_HU", "id_ID", "it_IT", "ko_KR", "ja_JP", "lv_LV", "lt_LT", "nb_NO", "fa_IR", "pl_PL", "pt_BR", "pt_PT", "ro_RO", "ru_RU", "sk_SK", "es_ES", "sv_SE", "tr_TR", "uk_UA", "vi_VN".'
 			],
 			// Check user properties, theme.
 			[
@@ -2229,6 +2298,21 @@ class testUsers extends CAPITest {
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'No permissions for system access.'
+			],
+			// Check user with MFA cannot login to API
+			[
+				'login' => [
+					'username' => 'user_with_mfa_default',
+					'password' => 'zabbix123456'
+				],
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
+			],
+			[
+				'login' => [
+					'username' => 'user_with_mfa_duo',
+					'password' => 'zabbix123456'
+				],
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			// Successfully login.
 			[

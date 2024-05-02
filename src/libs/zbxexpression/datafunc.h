@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,6 @@ const char	*trigger_state_string(int state);
 const char	*item_state_string(int state);
 const char	*event_value_string(int source, int object, int value);
 const char	*zbx_dobject_status2str(int st);
-const char	*dservice_type_string(zbx_dservice_type_t service);
 const char	*trigger_value_string(unsigned char value);
 const char	*zbx_type_string(zbx_value_type_t type);
 

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,8 @@ $media_type_table = (new CTableInfo())
 		_('Used in actions'),
 		_('Details'),
 		_('Action')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('mediatype');
 
@@ -186,7 +187,6 @@ foreach ($data['mediatypes'] as $media_type) {
 // append table to form
 $media_type_form->addItem([
 	$media_type_table,
-	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => [
 

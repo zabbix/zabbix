@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #define ZBX_IPC_ALERTER_WATCHDOG	1004
 #define ZBX_IPC_ALERTER_RESULTS		1005
 #define ZBX_IPC_ALERTER_DROP_MEDIATYPES	1006
+#define ZBX_IPC_ALERT_SYNCER_REGISTER	1007
 
 /* manager -> alerter */
 #define ZBX_IPC_ALERTER_EMAIL		1100

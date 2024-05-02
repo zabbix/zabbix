@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,6 @@
 #define ZABBIX_SYSINFO_COMMON_ZABBIX_STATS_H_
 
 #include "module.h"
-
-int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout, AGENT_RESULT *result);
-int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
-		int timeout, AGENT_RESULT *result);
 
 int	zabbix_stats(AGENT_REQUEST *request, AGENT_RESULT *result);
 

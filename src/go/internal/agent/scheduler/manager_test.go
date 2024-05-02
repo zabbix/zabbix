@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,13 +27,13 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/alias"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/pkg/itemutil"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/alias"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 // getNextCheck calculates simplified nextcheck based on the specified delay string and current time
@@ -579,6 +579,10 @@ func (t *mockWatcherTask) GlobalRegexp() plugin.RegexpMatcher {
 
 func (t *mockWatcherTask) Timeout() int {
 	return 3
+}
+
+func (t *mockWatcherTask) Delay() string {
+	return ""
 }
 
 type mockConfigerTask struct {
@@ -1881,7 +1885,7 @@ func Test_getCapacity(t *testing.T) {
 					Nodes: []interface{}{},
 				},
 			},
-			100,
+			1000,
 		},
 		{
 			"both_cap",
@@ -1912,7 +1916,7 @@ func Test_getCapacity(t *testing.T) {
 			50,
 		},
 		{
-			"depriceted_cap",
+			"deprecated_cap",
 			args{
 				&conf.Node{
 					Name: "Test",
@@ -1953,7 +1957,7 @@ func Test_getCapacity(t *testing.T) {
 		{
 			"nil",
 			args{nil},
-			100,
+			1000,
 		},
 	}
 	for _, tt := range tests {

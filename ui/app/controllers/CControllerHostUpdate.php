@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,9 +49,9 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 		}
 
 		$this->host = API::Host()->get([
-			'output' => ['hostid', 'host', 'name', 'status', 'description', 'proxyid', 'ipmi_authtype',
-				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
-				'tls_subject', 'flags', 'inventory_mode'
+			'output' => ['hostid', 'host', 'name', 'monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid',
+				'status', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+				'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'flags', 'inventory_mode'
 			],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'],
 			'hostids' => $this->getInput('hostid'),
@@ -87,8 +87,8 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'hostid' => $this->host['hostid'],
 				'host' => $this->getInput('host', $this->host['host']),
 				'name' => $this->getInput('visiblename', $this->host['name']),
+				'monitored_by' => $this->getInput('monitored_by', $this->host['monitored_by']),
 				'status' => $this->getInput('status', $this->host['status']),
-				'proxyid' => $this->getInput('proxyid', $this->host['proxyid']),
 				'groups' => $this->processHostGroups($this->getInput('groups', [])),
 				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 				'tags' => $this->processTags($this->getInput('tags', [])),
@@ -101,6 +101,13 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
 				'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
 			];
+
+			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+				$host['proxyid'] = $this->getInput('proxyid', 0);
+			}
+			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+				$host['proxy_groupid'] = $this->getInput('proxy_groupid', 0);
+			}
 
 			$host_properties = [
 				'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_subject',

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,16 +43,6 @@
 #define ZBX_IPC_SERVICE_HA_STATUS_UPDATE	(ZBX_IPC_SERVICE_HA_RTC_FIRST + 2)
 
 #define ZBX_HA_SERVICE_TIMEOUT			10
-
-#define ZBX_NODE_STATUS_HATIMEOUT		-3
-#define ZBX_NODE_STATUS_ERROR			-2
-#define ZBX_NODE_STATUS_UNKNOWN			-1
-#define ZBX_NODE_STATUS_STANDBY			0
-#define ZBX_NODE_STATUS_STOPPED			1
-#define ZBX_NODE_STATUS_UNAVAILABLE		2
-#define ZBX_NODE_STATUS_ACTIVE			3
-
-#define ZBX_HA_DEFAULT_FAILOVER_DELAY		SEC_PER_MIN
 
 typedef struct
 {

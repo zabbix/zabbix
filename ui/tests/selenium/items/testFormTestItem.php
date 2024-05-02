@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
 /**
  * "Test item" function tests.
  *
- * @dataSource Proxies
+ * @dataSource Proxies, GlobalMacros
  *
  * @backup items
  */

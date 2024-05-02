@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "zbxcomms.h"
+#include "zbxcurl.h"
 
 #define HTTP_SCHEME_STR		"http://"
 
@@ -143,7 +144,7 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 					sysinfo_get_config_source_ip()))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT,
 					(long)timeout)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
 		goto out;
@@ -166,19 +167,9 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 		}
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
-	{
-		*error = zbx_dsprintf(*error, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+	if (SUCCEED != zbx_curl_setopt_https(easyhandle, error))
 		goto out;
-	}
-#endif
+
 	*errbuf = '\0';
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 	{

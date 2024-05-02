@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@
 		_edit(parameters = {}) {
 			const overlay = PopUp('discovery.edit', parameters, {
 				dialogueid: 'discoveryForm',
-				dialogue_class: 'modal-popup-medium',
+				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 

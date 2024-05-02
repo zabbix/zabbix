@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,8 @@ $table = (new CTableInfo())
 		_('Author'),
 		_('Description'),
 		_('Status')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['modules'] as $moduleid => $module) {
 	$name = (new CLink($module['name']))
@@ -123,7 +124,6 @@ foreach ($data['modules'] as $moduleid => $module) {
 // append table to form
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'moduleids', [
 		'module.massenable' => [
 			'content' => (new CSimpleButton(_('Enable')))

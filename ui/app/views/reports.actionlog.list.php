@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,7 +120,8 @@ $actionlog_list = (new CTableInfo())
 		_('Message'),
 		_('Status'),
 		_('Info')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
@@ -192,7 +193,7 @@ foreach ($data['alerts'] as $alert) {
 	->addItem(
 		(new CForm('get'))
 			->setName('auditForm')
-			->addItem([$actionlog_list, $data['paging']])
+			->addItem($actionlog_list)
 	)
 	->show();
 

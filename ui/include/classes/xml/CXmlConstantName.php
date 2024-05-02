@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,6 +52,10 @@ class CXmlConstantName {
 	const SNMP = 'SNMP';
 	const IPMI = 'IPMI';
 	const JMX = 'JMX';
+
+	const SERVER = 'SERVER';
+	const PROXY = 'PROXY';
+	const PROXY_GROUP = 'PROXY_GROUP';
 
 	// const DISABLED = 'DISABLED'; // Duplicate.
 	const MANUAL = 'MANUAL';
@@ -325,6 +329,14 @@ class CXmlConstantName {
 	const MACRO_TYPE_TEXT = 'TEXT';
 	const MACRO_TYPE_SECRET = 'SECRET_TEXT';
 	const MACRO_TYPE_VAULT = 'VAULT';
+
+	// Constants for low-level discovery rules.
+	const LLD_DELETE_AFTER = 'DELETE_AFTER';
+	const LLD_DELETE_NEVER = 'DELETE_NEVER';
+	const LLD_DELETE_IMMEDIATELY = 'DELETE_IMMEDIATELY';
+	const LLD_DISABLE_AFTER = 'DISABLE_AFTER';
+	const LLD_DISABLE_NEVER = 'DISABLE_NEVER';
+	const LLD_DISABLE_IMMEDIATELY = 'DISABLE_IMMEDIATELY';
 
 	// Constants for low-level discovery rule overrides.
 	const LLD_OVERRIDE_STOP_NO = 'NO_STOP';

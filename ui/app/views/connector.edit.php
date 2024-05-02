@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ $form = (new CForm('post'))
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('connector')))->removeId())
 	->setId('connector-form')
 	->setName('connector_form')
-	->addItem(getMessages());
+	->addItem(getMessages())
+	->addStyle('display: none;');
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -149,6 +150,7 @@ $form_grid = (new CFormGrid())
 						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_type']
 					]
 				])
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setVertical()
 				->setColumns(3)
 		))->addClass('js-field-item-value-types')

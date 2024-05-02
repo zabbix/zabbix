@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,11 +26,13 @@
 #include "zbxexport.h"
 #include "zbxprof.h"
 #include "zbxtimekeeper.h"
-#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbxrtc.h"
+#include "zbx_rtc_constants.h"
+#include "zbxipcservice.h"
 
 static sigset_t			orig_mask;
 
@@ -59,10 +61,10 @@ static zbx_export_file_t	*get_trends_export(void)
  ******************************************************************************/
 static void	zbx_db_flush_timer_queue(void)
 {
-	zbx_vector_ptr_t	persistent_timers;
-	zbx_db_insert_t		db_insert;
+	zbx_vector_trigger_timer_ptr_t	persistent_timers;
+	zbx_db_insert_t			db_insert;
 
-	zbx_vector_ptr_create(&persistent_timers);
+	zbx_vector_trigger_timer_ptr_create(&persistent_timers);
 	zbx_dc_clear_timer_queue(&persistent_timers);
 
 	if (0 != persistent_timers.values_num)
@@ -72,7 +74,7 @@ static void	zbx_db_flush_timer_queue(void)
 
 		for (int i = 0; i < persistent_timers.values_num; i++)
 		{
-			zbx_trigger_timer_t	*timer = (zbx_trigger_timer_t *)persistent_timers.values[i];
+			zbx_trigger_timer_t	*timer = persistent_timers.values[i];
 
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), timer->objectid, timer->type,
 					timer->eval_ts.sec, timer->eval_ts.ns);
@@ -85,7 +87,7 @@ static void	zbx_db_flush_timer_queue(void)
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	zbx_vector_ptr_destroy(&persistent_timers);
+	zbx_vector_trigger_timer_ptr_destroy(&persistent_timers);
 }
 
 static void	db_trigger_queue_cleanup(void)
@@ -104,9 +106,9 @@ static void	db_trigger_queue_cleanup(void)
 ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 {
 	int			sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0,
-				triggers_num;
+				triggers_num, sleeptime_after_notify = 0;
 	double			sec, total_sec = 0.0;
-	time_t			last_stat_time;
+	time_t			last_stat_time, wait_start_time;
 	char			*stats = NULL;
 	const char		*process_name;
 	size_t			stats_alloc = 0, stats_offset = 0;
@@ -114,6 +116,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_HISTORY_SYNC_NOTIFY};
+	zbx_ipc_async_socket_t	rtc;
 
 	zbx_thread_dbsyncer_args	*dbsyncer_args = (zbx_thread_dbsyncer_args *)
 			(((zbx_thread_args_t *)args)->args);
@@ -149,8 +153,13 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		problems_export = zbx_problems_export_init(get_problems_export, "history-syncer", process_num);
 
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbsyncer_args->config_timeout, &rtc);
+
 	for (;;)
 	{
+		unsigned char	*rtc_data = NULL;
+		int		ret;
+
 		sec = zbx_time();
 
 		zbx_prof_update(get_process_type_string(process_type), sec);
@@ -167,7 +176,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zbx_block_signals(&orig_mask);
 
 		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
-		zbx_sync_history_cache(dbsyncer_args->events_cbs, &values_num, &triggers_num, &more);
+		zbx_sync_history_cache(dbsyncer_args->events_cbs, &rtc, dbsyncer_args->config_history_storage_pipelines,
+				&values_num, &triggers_num, &more);
 		zbx_prof_end();
 
 		if (!ZBX_IS_RUNNING() && SUCCEED != zbx_db_trigger_queue_locked())
@@ -217,8 +227,38 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		if (!ZBX_IS_RUNNING())
 			break;
 
-		zbx_sleep_loop(info, sleeptime);
+		wait_start_time = time(NULL);
+		do
+		{
+			zbx_uint32_t	rtc_cmd;
+
+			if (0 == sleeptime_after_notify)
+				sleeptime_after_notify = sleeptime;
+
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+			ret = zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime_after_notify);
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+			sleeptime_after_notify -= (int)(time(NULL) - wait_start_time);
+
+			if (0 > sleeptime_after_notify)
+				sleeptime_after_notify = 0;
+
+			zbx_free(rtc_data);
+
+			if (SUCCEED == ret && 0 != rtc_cmd)
+			{
+				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+					goto end_loop;
+
+				if (ZBX_RTC_HISTORY_SYNC_NOTIFY == rtc_cmd)
+					break;
+			}
+		}
+		while (0 != sleeptime_after_notify);
 	}
+end_loop:
+	if (SUCCEED != zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
+		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num);
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 	zbx_block_signals(&orig_mask);

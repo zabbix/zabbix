@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 
 include __DIR__.'/common.item.edit.js.php';
 include __DIR__.'/item.preprocessing.js.php';
-include __DIR__.'/editabletable.js.php';
 include __DIR__.'/itemtest.js.php';
 include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 ?>
@@ -101,7 +100,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		form_name: null,
 		context: null,
 
-		init({form_name, counter, context, token}) {
+		init({form_name, counter, context, token, readonly, query_fields, headers}) {
 			this.form_name = form_name;
 			this.context = context;
 			this.token = token;
@@ -182,6 +181,72 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			if (button instanceof Element) {
 				button.addEventListener('click', e => this.executeNow(e.target));
 			}
+
+			const updateSortOrder = (table, field_name) => {
+				table.querySelectorAll('.form_row').forEach((row, index) => {
+					for (const field of row.querySelectorAll(`[name^="${field_name}["]`)) {
+						field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+					}
+				});
+			};
+
+			jQuery('#query-fields-table')
+				.dynamicRows({
+					template: '#query-field-row-tmpl',
+					rows: query_fields,
+					allow_empty: true,
+					sortable: true,
+					sortable_options: {
+						target: 'tbody',
+						selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+						freeze_end: 1,
+						enable_sorting: !readonly
+					}
+				})
+				.on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'query_fields'));
+
+			jQuery('#headers-table')
+				.dynamicRows({
+					template: '#item-header-row-tmpl',
+					rows: headers,
+					allow_empty: true,
+					sortable: true,
+					sortable_options: {
+						target: 'tbody',
+						selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+						freeze_end: 1,
+						enable_sorting: !readonly
+					}
+				})
+				.on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'headers'));
+
+			document.querySelectorAll('#lifetime_type, #enabled_lifetime_type').forEach(element => {
+				element.addEventListener('change', () => this.updateLostResourcesFields());
+			});
+
+			this.updateLostResourcesFields();
+		},
+
+		updateLostResourcesFields() {
+			const lifetime_type = document.querySelector('[name="lifetime_type"]:checked').value;
+			const enabled_lifetime_type = document.querySelector('[name="enabled_lifetime_type"]:checked').value;
+			const delete_immediately = lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
+
+			document.getElementById('enabled_lifetime_type').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
+			document.getElementById('lifetime').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				lifetime_type != <?= ZBX_LLD_DELETE_AFTER ?>
+			);
+			document.getElementById('enabled_lifetime').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately || enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>
+			);
+			document.getElementById('js-item-disable-resources-field').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
+			document.getElementById('js-item-disable-resources-label').classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+				delete_immediately
+			);
 		},
 
 		updateExpression() {
@@ -203,7 +268,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		toggleConditionValue(event) {
 			const value = event.currentTarget.closest('.form_row').querySelector('.js-value');
 			const show_value = (event.currentTarget.value == <?= CONDITION_OPERATOR_REGEXP ?>
-					|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
+				|| event.currentTarget.value == <?= CONDITION_OPERATOR_NOT_REGEXP ?>);
 
 			value.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !show_value);
 

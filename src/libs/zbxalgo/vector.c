@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ ZBX_VECTOR_IMPL(ptr_pair, zbx_ptr_pair_t)
 ZBX_VECTOR_IMPL(uint64_pair, zbx_uint64_pair_t)
 ZBX_VECTOR_IMPL(dbl, double)
 
-ZBX_PTR_VECTOR_IMPL(tags, zbx_tag_t*)
+ZBX_PTR_VECTOR_IMPL(tags_ptr, zbx_tag_t*)
 
 void	zbx_ptr_free(void *data)
 {

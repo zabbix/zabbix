@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ if ($data['host']['parentTemplates']) {
 		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 	foreach ($data['host']['parentTemplates'] as $template) {
-		if ($data['allowed_ui_conf_templates']
+		if ($data['user']['can_edit_templates']
 				&& array_key_exists($template['templateid'], $data['editable_templates'])) {
 			$template_link = (new CLink($template['name']))
 				->addClass('js-edit-linked-template')
@@ -174,6 +174,12 @@ $templates_field_items[] = (new CMultiSelect([
 		]
 	]
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+$disabled_by_lld_icon = $data['host']['status'] == HOST_STATUS_NOT_MONITORED
+		&& array_key_exists('hostDiscovery', $data['host']) && $data['host']['hostDiscovery']
+		&& $data['host']['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+	: null;
 
 $host_tab
 	->addItem([
@@ -252,22 +258,84 @@ $host_tab
 		)
 	])
 	->addItem([
-		new CLabel(_('Monitored by proxy'), 'label-proxy'),
+		new CLabel(_('Monitored by'), 'label-proxy'),
 		new CFormField(
-			(new CSelect('proxyid'))
-				->setValue($data['host']['proxyid'])
-				->setFocusableElementId('label-proxy')
+			(new CRadioButtonList('monitored_by', (int) $data['host']['monitored_by']))
+				->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
+				->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
+				->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
 				->setReadonly($host_is_discovered)
-				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
+				->setModern()
 		)
 	])
 	->addItem([
-		new CLabel(_('Enabled'), 'status'),
+		(new CFormField(
+			(new CMultiSelect([
+				'name' => 'proxyid',
+				'object_name' => 'proxies',
+				'multiple' => false,
+				'data' => $data['ms_proxy'],
+				'disabled' => $host_is_discovered,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxies',
+						'srcfld1' => 'proxyid',
+						'srcfld2' => 'name',
+						'dstfrm' => $host_form->getName(),
+						'dstfld1' => 'proxyid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('js-field-proxy')
+	])
+	->addItem([
+		(new CFormField(
+			(new CMultiSelect([
+				'name' => 'proxy_groupid',
+				'object_name' => 'proxy_groups',
+				'multiple' => false,
+				'data' => $data['ms_proxy_group'],
+				'disabled' => $host_is_discovered,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxy_groups',
+						'srcfld1' => 'proxy_groupid',
+						'srcfld2' => 'name',
+						'dstfrm' => $host_form->getName(),
+						'dstfld1' => 'proxy_groupid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('js-field-proxy-group')
+	])
+	->addItem([
+		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(
 			(new CCheckBox('status', HOST_STATUS_MONITORED))
 				->setChecked($data['host']['status'] == HOST_STATUS_MONITORED)
 		)
 	]);
+
+$proxy_name = null;
+
+if ($data['host']['assigned_proxyid'] != 0) {
+	$proxy_name = $data['user']['can_edit_proxies']
+		? (new CLink($data['host']['assigned_proxy_name']))
+			->addClass('js-edit-proxy')
+			->setAttribute('data-proxyid', $data['host']['assigned_proxyid'])
+		: new CSpan($data['host']['assigned_proxy_name']);
+	$proxy_name->addClass('js-proxy-assigned');
+}
+
+$host_tab->addItem([
+	(new CLabel(_('Assigned proxy')))->addClass('js-field-proxy-group-proxy'),
+	(new CFormField([
+		$proxy_name,
+		(new CSpan(_('Proxy is not assigned yet.')))
+			->addClass(ZBX_STYLE_GREY)
+			->addClass('js-proxy-not-assigned')
+	]))->addClass('js-field-proxy-group-proxy')
+]);
 
 $ipmi_tab = (new CFormGrid())
 	->addItem([
@@ -490,14 +558,17 @@ $encryption_tab = (new CFormGrid())
 
 // Value mapping tab.
 if (!$host_is_discovered) {
-	$value_mapping_tab = (new CFormList('valuemap-formlist'))
-		->addRow(null, new CPartial('configuration.valuemap', [
+	$value_mapping_tab = (new CFormList('valuemap-formlist'))->addRow(
+		_('Value mapping'),
+		new CPartial('configuration.valuemap', [
 			'source' => 'host',
 			'valuemaps' => $data['host']['valuemaps'],
 			'readonly' => $host_is_discovered,
 			'form' => 'host',
-			'table_id' => 'valuemap-table'
-		]));
+			'table_id' => 'valuemap-table',
+			'with_label' => true
+		])
+	);
 }
 
 // main output

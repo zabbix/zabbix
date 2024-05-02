@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,10 +81,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.system_hw_cpu)
 	case "system.hw.macaddr":
 		cfunc = unsafe.Pointer(C.system_hw_macaddr)
-	case "system.swap.in":
-		cfunc = unsafe.Pointer(C.system_swap_in)
-	case "system.swap.out":
-		cfunc = unsafe.Pointer(C.system_swap_out)
 	case "vfs.dir.get":
 		cfunc = unsafe.Pointer(C.vfs_dir_get)
 	}

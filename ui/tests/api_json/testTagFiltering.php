@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ class testTagFiltering extends CAPITest {
 				],
 				'expected' => [
 					'Host Browser', 'Host Browser - Chrome', 'Host Browser - Firefox', 'Host Browser - IE',
-					'Host without tags', 'Host with very general tags only'
+					'Host OS - Android', 'Host without tags', 'Host with very general tags only'
 				]
 			],
 			'test-two-not-exists-with-exception' => [
@@ -390,7 +390,7 @@ class testTagFiltering extends CAPITest {
 					'Template OS - Windows'
 				]
 			],
-			'templates-equals-unexisting-value-tag' => [
+			'templates-equals-nonexistent-value-tag' => [
 				'filter' => [
 					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
@@ -515,7 +515,7 @@ class testTagFiltering extends CAPITest {
 					'Template Browser - FF', 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Windows'
 				]
 			],
-			'templates-not-equal-one-of-two-unexisting-tags' => [
+			'templates-not-equal-one-of-two-nonexistent-tags' => [
 				'filter' => [
 					'evaltype' => TAG_EVAL_TYPE_OR,
 					'tags' => [

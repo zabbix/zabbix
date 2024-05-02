@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,6 +78,17 @@ class testDocumentationLinks extends CWebTest {
 						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
 					]
 				]
+			]
+		]);
+
+		CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance for documentation links test',
+				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
+				'active_since' => 1534885200,
+				'active_till' => 1534971600,
+				'groups' => [['groupid' => 4]], // Zabbix servers.
+				'timeperiods' => [[]]
 			]
 		]);
 	}
@@ -189,7 +200,7 @@ class testDocumentationLinks extends CWebTest {
 			// #8 Event details view.
 			[
 				[
-					'url' => 'tr_events.php?triggerid=100028&eventid=95',
+					'url' => 'tr_events.php?triggerid=100032&eventid=9000',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/problems#viewing-details'
 				]
 			],
@@ -1449,7 +1460,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[text()="Maintenance for update (data collection)"]'
+							'element' => 'xpath://a[text()="Maintenance for documentation links test"]'
 						]
 					],
 					'doc_link' => '/en/manual/maintenance#configuration'
@@ -1876,7 +1887,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'link:Proxy for Actions'
+							'element' => 'link:Active proxy 1'
 						]
 					],
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
@@ -2603,6 +2614,42 @@ class testDocumentationLinks extends CWebTest {
 				[
 					'url' => 'zabbix.php?action=timeouts.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
+				]
+			],
+			// #238 Create Pie chart.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Pie chart',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart'
+				]
+			],
+			// #239 Start creating Host navigator widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Host navigator',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_navigator'
 				]
 			]
 		];

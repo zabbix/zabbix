@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,9 +38,13 @@ int	zbx_coredump_disable(void);
 #	error "This module allowed only for Unix OS"
 #endif
 
-void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb);
+typedef int	(*zbx_get_process_info_by_thread_f)(int local_server_num, unsigned char *local_process_type,
+		int *local_process_num);
 
-typedef void	(*zbx_on_exit_t)(int);
+void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb, zbx_get_process_info_by_thread_f
+		get_process_info_by_thread_cb);
+
+typedef void	(*zbx_on_exit_t)(int, void*);
 typedef void	(*zbx_signal_handler_f)(int flags);
 typedef void	(*zbx_signal_redirect_f)(int flags, zbx_signal_handler_f signal_handler_cb);
 typedef	ZBX_THREAD_HANDLE *(*zbx_get_threads_f)(void);
@@ -50,11 +54,8 @@ void	zbx_set_exiting_with_succeed(void);
 int	ZBX_IS_RUNNING(void);
 int	ZBX_EXIT_STATUS(void);
 
-/* callback function prototype for getting PID file path */
-typedef const char*	(*zbx_get_pid_file_pathname_f)(void);
-
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
-		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
+		zbx_get_config_str_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
 		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb,
 		zbx_get_threads_f get_threads_cb,  zbx_get_config_int_f get_threads_num_cb);
 void	zbx_daemon_stop(void);
@@ -127,6 +128,7 @@ void	zbx_set_exit_on_terminate(void);
 void	zbx_unset_exit_on_terminate(void);
 
 void	zbx_log_exit_signal(void);
+void	zbx_set_on_exit_args(void *args);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);

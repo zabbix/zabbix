@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,16 +86,6 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
-	updateProperties({name, view_mode, fields}) {
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating();
-		}
-
-		this._is_graph_mode = false;
-
-		super.updateProperties({name, view_mode, fields});
-	}
-
 	onEdit() {
 		if (this._is_graph_mode && this._graph_url !== null) {
 			this._flickerfreescreen_container.href = 'javascript:void(0)';
@@ -103,25 +93,33 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
-	onFeedback({type, value, descriptor}) {
-		if (type === '_timeperiod' && this.getFieldsReferredData().has('time_period')) {
-			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`], value);
-			timeControl.refreshObject(`graph_${this._unique_id}`);
+	onFeedback({type, value}) {
+		if (type === '_timeperiod') {
+			this._startUpdating();
 
 			this.feedback({time_period: value});
 
 			return true;
 		}
 
-		return super.onFeedback({type, value, descriptor});
+		return super.onFeedback({type, value});
 	}
 
 	promiseUpdate() {
-		if (!this.hasBroadcast('time_period') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: this.getFieldsData().time_period});
+		const time_period = this.getFieldsData().time_period;
+
+		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: time_period});
 		}
 
 		if (this._is_graph_mode) {
+			if (time_period === null) {
+				this._is_graph_mode = false;
+				this._deactivateGraph();
+
+				return super.promiseUpdate();
+			}
+
 			if (this.getFieldsReferredData().has('override_hostid')) {
 				const override_hostid = this.getFieldsReferredData().get('override_hostid').value;
 
@@ -135,15 +133,19 @@ class CWidgetGraph extends CWidget {
 				}
 			}
 
-			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`],
-				this.getFieldsData().time_period
-			);
+			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`], time_period);
 			timeControl.refreshObject(`graph_${this._unique_id}`);
 
 			return Promise.resolve();
 		}
 
 		return super.promiseUpdate();
+	}
+
+	promiseReady() {
+		return new Promise((resolve) => {
+			$(this._target).on('load.image', () => resolve(super.promiseReady()));
+		});
 	}
 
 	getUpdateRequestData() {
@@ -174,7 +176,11 @@ class CWidgetGraph extends CWidget {
 	setContents(response) {
 		super.setContents(response);
 
-		if (!this._is_graph_mode && response.async_data !== undefined) {
+		if (this.getFieldsData().time_period === null) {
+			return;
+		}
+
+		if (!this._is_graph_mode && 'async_data' in response) {
 			this._is_graph_mode = true;
 
 			this._graph_url = response.async_data.graph_url;

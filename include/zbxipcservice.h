@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,25 +60,27 @@ zbx_ipc_socket_t;
 
 typedef struct zbx_ipc_client zbx_ipc_client_t;
 
+ZBX_PTR_VECTOR_DECL(ipc_client_ptr, zbx_ipc_client_t *)
+
 /* IPC service */
 typedef struct
 {
 	/* the listening socket descriptor */
-	int			fd;
+	int				fd;
 
-	struct event_base	*ev;
-	struct event		*ev_listener;
-	struct event		*ev_timer;
-	struct event		*ev_alert;
+	struct event_base		*ev;
+	struct event			*ev_listener;
+	struct event			*ev_timer;
+	struct event			*ev_alert;
 
 	/* the unix socket path */
-	char			*path;
+	char				*path;
 
 	/* the connected clients */
-	zbx_vector_ptr_t	clients;
+	zbx_vector_ipc_client_ptr_t	clients;
 
 	/* the clients with messages */
-	zbx_queue_ptr_t		clients_recv;
+	zbx_queue_ptr_t			clients_recv;
 }
 zbx_ipc_service_t;
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,11 +46,12 @@ static void	free_global_regexp(zbx_vector_expression_t *regexps)
 
 */
 import "C"
+
 import (
 	"errors"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 func NewGlobalRegexp() (grxp unsafe.Pointer) {
@@ -68,7 +69,7 @@ func AddGlobalRegexp(grxp unsafe.Pointer, name, body string, expr_type int, deli
 	cbody := C.CString(body)
 	log.Tracef("Calling C function \"zbx_add_regexp_ex()\"")
 	C.zbx_add_regexp_ex(C.zbx_vector_expression_lp_t(grxp), cname, cbody, C.int(expr_type), C.char(delim),
-			C.int(mode))
+		C.int(mode))
 	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(cname))
 	log.Tracef("Calling C function \"free()\"")
@@ -100,7 +101,7 @@ func MatchGlobalRegexp(
 
 	log.Tracef("Calling C function \"zbx_regexp_sub_ex()\"")
 	ret := C.zbx_regexp_sub_ex(C.zbx_vector_expression_lp_t(grxp), cvalue, cpattern, C.int(mode), ctemplate,
-			&coutput)
+		&coutput)
 	switch ret {
 	case C.ZBX_REGEXP_MATCH:
 		match = true

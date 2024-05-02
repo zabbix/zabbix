@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,8 @@ $table = (new CTableInfo())
 				->setArgument('templateid', $data['templateid'])
 				->getUrl()
 		)
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['dashboards'] as $dashboardid => $dashboard) {
 	$table->addRow([
@@ -64,7 +65,6 @@ foreach ($data['dashboards'] as $dashboardid => $dashboard) {
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
 		'template.dashboard.delete' => [
 			'name' => _('Delete'),

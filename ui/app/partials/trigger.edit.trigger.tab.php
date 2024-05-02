@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -290,6 +290,11 @@ $trigger_form_grid
 		)
 	]);
 
+$disabled_by_lld_icon = $data['status'] == TRIGGER_STATUS_DISABLED && array_key_exists('triggerDiscovery', $data)
+		&& $data['triggerDiscovery'] && $data['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+	: null;
+
 if (array_key_exists('parent_discoveryid', $data)) {
 	$trigger_form_grid
 		->addItem([new CLabel(_('Create enabled'), 'status'),
@@ -307,7 +312,7 @@ if (array_key_exists('parent_discoveryid', $data)) {
 } else {
 	$trigger_form_grid
 		->addItem([
-			new CLabel(_('Enabled'), 'status'),
+			new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 			new CFormField((new CCheckBox('status', TRIGGER_STATUS_ENABLED))
 				->setChecked($data['status'] == TRIGGER_STATUS_ENABLED)
 			)

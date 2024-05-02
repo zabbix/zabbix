@@ -8,14 +8,27 @@ zabbix_export:
       template: 'HAProxy by Zabbix agent'
       name: 'HAProxy by Zabbix agent'
       description: |
-        Get metrics from status page using Zabbix agent
-        https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/.
-        Example configuration of HAProxy:
-          frontend stats
-              bind *:8404
-              stats enable
-              stats uri /stats
-              stats refresh 10s
+        The template to monitor HAProxy by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        
+        The template collects metrics by polling the HAProxy stats page with Zabbix agent.
+        
+        Note, that this template doesn't support authentication and redirects (limitations of 'web.page.get').
+        
+        Setup:
+        
+        1. Set up the HAProxy stats page:
+        https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/
+        
+        The example configuration of HAProxy:
+        
+        frontend stats
+            bind *:8404
+            stats enable
+            stats uri /stats
+            stats refresh 10s
+        
+        2. Set the hostname or IP address of the the HAProxy stats host or container in the '{$HAPROXY.STATS.HOST}' macro. You can also change the status page port in the '{$HAPROXY.STATS.PORT}' macro, the status page scheme in the '{$HAPROXY.STATS.SCHEME}' macro and the status page path in the '{$HAPROXY.STATS.PATH}' macro if necessary.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy
         
@@ -43,7 +56,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
+            key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           tags:
             - tag: component
               value: raw
@@ -60,14 +73,14 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);
-                      return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1;
+                  	var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);
+                  	return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1;
                   }
                   catch (error) {
-                      throw "HAProxy uptime is not found : " + error;
+                  	throw "HAProxy uptime is not found : " + error;
                   }
           master_item:
-            key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
+            key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
           tags:
             - tag: component
               value: application
@@ -101,7 +114,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
+            key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
           tags:
             - tag: component
               value: application
@@ -118,7 +131,7 @@ zabbix_export:
                   value: notice
         - uuid: c224cfe9b7474f9e80618dde78cfcb11
           name: 'HAProxy: Service response time'
-          key: 'net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]'
+          key: 'net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -129,20 +142,20 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 4e881047bbd54c5984922d1189567ece
-              expression: 'min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}'
               name: 'HAProxy: Service response time is too high'
               event_name: 'HAProxy: Service response time is too high (over {$HAPROXY.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 - name: 'HAProxy: Service is down'
-                  expression: 'last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0'
+                  expression: 'last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 97e45c508f5a4df78fc783382088e233
           name: 'HAProxy: Service status'
-          key: 'net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]'
+          key: 'net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"]'
           history: 7d
           valuemap:
             name: 'Service state'
@@ -157,7 +170,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 8d5c7940e5924b469b3e7804043ea7b6
-              expression: 'last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0'
+              expression: 'last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"])=0'
               name: 'HAProxy: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -166,7 +179,7 @@ zabbix_export:
                   value: availability
         - uuid: e70009bd4e3041a3952738673ebb5c29
           name: 'HAProxy: Get stats page'
-          key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
+          key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -176,7 +189,7 @@ zabbix_export:
               value: raw
         - uuid: aabdb5706b6744379561f269e0709141
           name: 'HAProxy: Get stats'
-          key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
+          key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -566,7 +579,7 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
               master_item:
-                key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
+                key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
               tags:
                 - tag: backend
                   value: '{#PXNAME}'
@@ -1084,7 +1097,7 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
               master_item:
-                key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
+                key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
               tags:
                 - tag: component
                   value: raw
@@ -1796,7 +1809,7 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.pxname == ''{#PXNAME}'' && @.svname == ''{#SVNAME}'')].first()'
               master_item:
-                key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
+                key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
               tags:
                 - tag: component
                   value: raw
@@ -2088,6 +2101,9 @@ zabbix_export:
         - macro: '{$HAPROXY.SERVER_RTIME.MAX.WARN}'
           value: 10s
           description: 'Maximum of average server response time for trigger expression.'
+        - macro: '{$HAPROXY.STATS.HOST}'
+          value: localhost
+          description: 'The hostname or IP address of the HAProxy stats host or container.'
         - macro: '{$HAPROXY.STATS.PATH}'
           value: stats
           description: 'The path of HAProxy stats page.'

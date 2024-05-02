@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,11 +79,12 @@ $table = (new CTableInfo())
 		_('Frontend access'),
 		_('Debug mode'),
 		_('Status')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('usergroup');
 
-foreach ($this->data['usergroups'] as $usergroup) {
+foreach ($data['usergroups'] as $usergroup) {
 	$debug_mode = ($usergroup['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 		? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
 			->setArgument('action', 'usergroup.massupdate')
@@ -214,7 +215,6 @@ foreach ($this->data['usergroups'] as $usergroup) {
 
 $form->addItem([
 	$table,
-	$this->data['paging'],
 	new CActionButtonList('action', 'usrgrpids', [
 		[
 			'name' => _('Enable'),

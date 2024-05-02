@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ class CRouter {
 		'dashboard.view'							=> ['CControllerDashboardView',							'layout.htmlpage',		'monitoring.dashboard.view'],
 		'dashboard.widget.check'					=> ['CControllerDashboardWidgetCheck',					'layout.json',			null],
 		'dashboard.widget.rfrate'					=> ['CControllerDashboardWidgetRfRate',					'layout.json',			null],
-		'dashboard.widgets.sanitize'				=> ['CControllerDashboardWidgetsSanitize',				'layout.json',			null],
+		'dashboard.widgets.validate'				=> ['CControllerDashboardWidgetsValidate',				'layout.json',			null],
 		'discovery.check.check'						=> ['CControllerDiscoveryCheckCheck',					'layout.json',			null],
 		'discovery.check.edit'						=> ['CControllerDiscoveryCheckEdit',					'layout.json',			'discovery.check.edit'],
 		'discovery.create'							=> ['CControllerDiscoveryCreate',						'layout.json',			null],
@@ -190,6 +190,8 @@ class CRouter {
 		'mediatype.test.send'						=> ['CControllerMediatypeTestSend',						'layout.json',			null],
 		'mediatype.update'							=> ['CControllerMediatypeUpdate',						'layout.json',			null],
 		'menu.popup'								=> ['CControllerMenuPopup',								'layout.json',			null],
+		'mfa.edit'									=> ['CControllerMfaEdit',								'layout.json',			'mfa.edit'],
+		'mfa.check'									=> ['CControllerMfaCheck',								'layout.json',			null],
 		'miscconfig.edit'							=> ['CControllerMiscConfigEdit',						'layout.htmlpage',		'administration.miscconfig.edit'],
 		'miscconfig.update'							=> ['CControllerMiscConfigUpdate',						null,					null],
 		'module.disable'							=> ['CControllerModuleDisable',							'layout.json',			null],
@@ -201,6 +203,7 @@ class CRouter {
 		'notifications.get'							=> ['CControllerNotificationsGet',						'layout.json',			null],
 		'notifications.mute'						=> ['CControllerNotificationsMute',						'layout.json',			null],
 		'notifications.read'						=> ['CControllerNotificationsRead',						'layout.json',			null],
+		'notifications.snooze'						=> ['CControllerNotificationsSnooze',					'layout.json',			null],
 		'popup'										=> ['CControllerPopup',									'layout.htmlpage',		'popup.view'],
 		'popup.acknowledge.create'					=> ['CControllerPopupAcknowledgeCreate',				'layout.json',			null],
 		'popup.acknowledge.edit'					=> ['CControllerPopupAcknowledgeEdit',					'layout.json',			'popup.acknowledge.edit'],
@@ -231,6 +234,7 @@ class CRouter {
 		'popup.mediatypemapping.check'				=> ['CControllerPopupMediaTypeMappingCheck',			'layout.json',			null],
 		'popup.mediatypemapping.edit'				=> ['CControllerPopupMediaTypeMappingEdit',				'layout.json',			'popup.mediatypemapping.edit'],
 		'popup.proxy.edit'							=> ['CControllerPopupProxyEdit',						'layout.json',			'popup.proxy.edit'],
+		'popup.proxygroup.edit'						=> ['CControllerPopupProxyGroupEdit',					'layout.json',			'popup.proxygroup.edit'],
 		'popup.usergroupmapping.check'				=> ['CControllerPopupUserGroupMappingCheck',			'layout.json',			null],
 		'popup.usergroupmapping.edit'				=> ['CControllerPopupUserGroupMappingEdit',				'layout.json',			'popup.usergroupmapping.edit'],
 		'popup.scheduledreport.create'				=> ['CControllerPopupScheduledReportCreate',			'layout.json',			null],
@@ -265,6 +269,10 @@ class CRouter {
 		'proxy.host.enable'							=> ['CControllerProxyHostEnable',						'layout.json',			null],
 		'proxy.list'								=> ['CControllerProxyList',								'layout.htmlpage',		'administration.proxy.list'],
 		'proxy.update'								=> ['CControllerProxyUpdate',							'layout.json',			null],
+		'proxygroup.create'							=> ['CControllerProxyGroupCreate',						'layout.json',			null],
+		'proxygroup.delete'							=> ['CControllerProxyGroupDelete',						'layout.json',			null],
+		'proxygroup.list'							=> ['CControllerProxyGroupList',						'layout.htmlpage',		'administration.proxygroup.list'],
+		'proxygroup.update'							=> ['CControllerProxyGroupUpdate',						'layout.json',			null],
 		'queue.details'								=> ['CControllerQueueDetails',							'layout.htmlpage',		'administration.queue.details'],
 		'queue.overview'							=> ['CControllerQueueOverview',							'layout.htmlpage',		'administration.queue.overview'],
 		'queue.overview.proxy'						=> ['CControllerQueueOverviewProxy',					'layout.htmlpage',		'administration.queue.overview.proxy'],
@@ -361,6 +369,7 @@ class CRouter {
 		'user.unblock'								=> ['CControllerUserUnblock',							null,					null],
 		'user.update'								=> ['CControllerUserUpdate',							null,					null],
 		'user.provision'							=> ['CControllerUserProvision',							null,					null],
+		'user.reset.totp'							=> ['CControllerUserResetTotp',							null,					null],
 		'usergroup.create'							=> ['CControllerUsergroupCreate',						null,					null],
 		'usergroup.delete'							=> ['CControllerUsergroupDelete',						null,					null],
 		'usergroup.edit'							=> ['CControllerUsergroupEdit',							'layout.htmlpage',		'usergroup.edit'],
@@ -380,6 +389,7 @@ class CRouter {
 		'web.view'									=> ['CControllerWebView',								'layout.htmlpage',		'monitoring.web.view'],
 		'webscenario.step.check'					=> ['CControllerWebScenarioStepCheck',					'layout.json',			null],
 		'webscenario.step.edit'						=> ['CControllerWebScenarioStepEdit',					'layout.json',			'webscenario.step.edit'],
+		'widget.navigation.tree.toggle'				=> ['CControllerWidgetNavigationTreeToggle',			'layout.json',			null],
 
 		// legacy actions
 		'auditacts.php'					=> ['CLegacyAction', null, null],
@@ -402,6 +412,7 @@ class CRouter {
 		'imgstore.php'					=> ['CLegacyAction', null, null],
 		'index.php'						=> ['CLegacyAction', null, null],
 		'index_http.php'				=> ['CLegacyAction', null, null],
+		'index_mfa.php'					=> ['CLegacyAction', null, null],
 		'index_sso.php'					=> ['CLegacyAction', null, null],
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],

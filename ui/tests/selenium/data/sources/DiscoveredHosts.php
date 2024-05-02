@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,11 +126,11 @@ class DiscoveredHosts {
 		DBexecute("INSERT INTO hstgrp (groupid, name, flags, uuid, type) VALUES (".zbx_dbstr(self::DISCOVERED_GROUPID2).
 				", ".zbx_dbstr(self::DISCOVERED_GROUP2).", 4, '', 0)"
 		);
-		DBexecute("INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name, lastcheck, ts_delete) VALUES(50, ".
-				zbx_dbstr(self::DISCOVERED_GROUPID).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP).", '1672831234', '1677670843')"
+		DBexecute("INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name, status, lastcheck, ts_delete) VALUES(50, ".
+				zbx_dbstr(self::DISCOVERED_GROUPID).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP).", 1, '1672831234', '1677670843')"
 		);
-		DBexecute("INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name, lastcheck, ts_delete) VALUES(51, ".
-				zbx_dbstr(self::DISCOVERED_GROUPID2).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP2).", '1672831234', '1677670843')"
+		DBexecute("INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name, status, lastcheck, ts_delete) VALUES(51, ".
+				zbx_dbstr(self::DISCOVERED_GROUPID2).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP2).", 1, '1672831234', '1677670843')"
 		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID).
 				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".$hostgroupid.")"
@@ -343,9 +343,9 @@ class DiscoveredHosts {
 		CDataHelper::call('host.update', [
 			'hostid' => self::DISCOVERED_HOSTID,
 			'templates' => [
-				$templates['templateids']['Test of discovered host Template'],
-				$templates['templateids']['Test of discovered host 1 template for unlink'],
-				$templates['templateids']['Test of discovered host 2 template for clear']
+				['templateid' => $templates['templateids']['Test of discovered host Template']],
+				['templateid' => $templates['templateids']['Test of discovered host 1 template for unlink']],
+				['templateid' => $templates['templateids']['Test of discovered host 2 template for clear']]
 			]
 		]);
 

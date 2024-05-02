@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,8 @@ class CHtmlPageHeader {
 		echo '<!DOCTYPE html>';
 		echo (new CTag('html'))
 			->setAttribute('lang', $this->lang)
-			->setAttribute('theme', $this->theme);
+			->setAttribute('theme', $this->theme)
+			->setAttribute('color-scheme', APP::getColorScheme($this->theme));
 		echo <<<HTML
 			<head>
 				<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>

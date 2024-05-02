@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 	var ZBX_STYLE_CLASS = 'multiselect-control';
 	const MS_ACTION_POPUP = 0;
 	const MS_ACTION_AUTOSUGGEST = 1;
+
+	const FILTER_PRESELECT_ACCEPT_ID = 'id';
 
 	/**
 	 * Multi select helper.
@@ -593,22 +595,23 @@
 		const filter_preselect = ms.options[options_key].filter_preselect;
 		const data = $('#' + filter_preselect.id).multiSelect('getData');
 
-		if (data.length === 0) {
+		const accept = filter_preselect.accept ?? null;
+
+		const ret_data = [];
+
+		for (const item of data) {
+			if (accept === null || (accept === FILTER_PRESELECT_ACCEPT_ID && /^[0-9]+$/g.test(item.id))) {
+				ret_data.push(item.id);
+			}
+		}
+
+		if (ret_data.length === 0) {
 			return {};
 		}
 
-		let ret = {};
-
-		if ('multiple' in filter_preselect && filter_preselect.multiple) {
-			ret[filter_preselect.submit_as] = [];
-
-			for (const item of data) {
-				ret[filter_preselect.submit_as].push(item.id);
-			}
-		}
-		else {
-			ret[filter_preselect.submit_as] = data[0].id;
-		}
+		let ret = {
+			[filter_preselect.submit_as]: filter_preselect.multiple ? ret_data : ret_data[0]
+		};
 
 		if ('submit_parameters' in filter_preselect) {
 			ret = {...ret, ...filter_preselect.submit_parameters};

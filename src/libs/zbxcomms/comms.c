@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,10 +46,6 @@
 
 #ifndef SOCK_CLOEXEC
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
-#endif
-
-#ifdef HAVE_OPENSSL
-extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
 static int	socket_set_nonblocking(ZBX_SOCKET s);
@@ -391,6 +387,33 @@ static void	zbx_socket_free(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: detach receive buffer                                             *
+ *                                                                            *
+ * Return value: Detached dynamic buffer or copy of static buffer.            *
+ *                                                                            *
+ * Comments: The socket buffer is reset.                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_socket_detach_buffer(zbx_socket_t *s)
+{
+	char	*out;
+
+	if (ZBX_BUF_TYPE_DYN == s->buf_type)
+	{
+		out = s->buffer;
+		s->buf_type = ZBX_BUF_TYPE_STAT;
+		s->buffer = s->buf_stat;
+	}
+	else
+		out = zbx_strdup(NULL, s->buf_stat);
+
+	*s->buffer = '\0';
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create socket poll error message                                  *
  *                                                                            *
  ******************************************************************************/
@@ -647,7 +670,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != ip && SUCCEED != zbx_is_ip(ip))
+	if (SUCCEED != zbx_is_ip(ip))
 		server_name = ip;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
@@ -795,14 +818,14 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
 	{
 		zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
-				" size " ZBX_FS_UI64 " bytes.", len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
+				" size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
 
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < reserved)
 	{
 		zbx_set_socket_strerror("cannot send data: uncompressed message size " ZBX_FS_UI64
-				" exceeds the maximum size " ZBX_FS_UI64 " bytes.", reserved,
+				" exceeds the maximum size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)reserved,
 				ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
@@ -1541,6 +1564,8 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
 
 	for (i = 0; i < s->num_socks; i++)
 		zbx_socket_close(s->sockets[i]);
+
+	zbx_socket_clean(s);
 }
 
 /******************************************************************************
@@ -1954,6 +1979,7 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 			ZBX_MAX_RECV_DATA_SIZE;
 #endif
 	zbx_socket_free(s);
+	tcp_recv_context->allocated = 0;
 
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 	s->buffer = s->buf_stat;
@@ -2232,68 +2258,155 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
  ******************************************************************************/
 ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 {
-	ssize_t		nbytes;
-	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0;
-	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE;
-
-	zbx_socket_free(s);
-
-	s->buf_type = ZBX_BUF_TYPE_STAT;
-	s->buffer = s->buf_stat;
+	zbx_tcp_recv_context_t	tcp_recv_context;
+	ssize_t			nbytes;
 
 	if (0 != timeout)
 		zbx_socket_set_deadline(s, timeout);
 
-	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes,
-			NULL)))
+	zbx_tcp_recv_context_init(s, &tcp_recv_context, 0);
+
+	nbytes = zbx_tcp_recv_context_raw(s, &tcp_recv_context, NULL, 0);
+
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, 0);
+
+	return (ZBX_PROTO_ERROR == nbytes ? FAIL : nbytes);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: receive raw data till socket is full or once                      *
+ *                                                                            *
+ * Parameters: s       - [IN/OUT] socket descriptor                           *
+ *             context - [IN/OUT] state of socket descriptor                  *
+ *             events  - [OUT] socket state                                   *
+ *             once    - [IN] read the socket once                            *
+ *                                                                            *
+ * Return value: number of bytes in socket context - success                  *
+ *               ZBX_PROTO_ERROR - an error occurred                          *
+ *                                                                            *
+ * Comments: context must be initialized                                      *
+ *                                                                            *
+ ******************************************************************************/
+ssize_t	zbx_tcp_recv_context_raw(zbx_socket_t *s, zbx_tcp_recv_context_t *context, short *events, int once)
+{
+	ssize_t	nbytes;
+
+	if (NULL != events)
+		*events = 0;
+
+	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + context->buf_stat_bytes,
+			sizeof(s->buf_stat) - context->buf_stat_bytes, events)))
 	{
 		if (ZBX_PROTO_ERROR == nbytes)
 			goto out;
 
 		if (ZBX_BUF_TYPE_STAT == s->buf_type)
-			buf_stat_bytes += (size_t)nbytes;
+			context->buf_stat_bytes += (size_t)nbytes;
 		else
 		{
-			if (buf_dyn_bytes + (size_t)nbytes >= allocated)
+			if (context->buf_dyn_bytes + (size_t)nbytes >= context->allocated)
 			{
-				while (buf_dyn_bytes + (size_t)nbytes >= allocated)
-					allocated *= 2;
-				s->buffer = (char *)zbx_realloc(s->buffer, allocated);
+				while (context->buf_dyn_bytes + (size_t)nbytes >= context->allocated)
+					context->allocated *= 2;
+
+				s->buffer = (char *)zbx_realloc(s->buffer, context->allocated);
 			}
 
-			memcpy(s->buffer + buf_dyn_bytes, s->buf_stat, (size_t)nbytes);
-			buf_dyn_bytes += (size_t)	nbytes;
+			memcpy(s->buffer + context->buf_dyn_bytes, s->buf_stat, (size_t)nbytes);
+			context->buf_dyn_bytes += (size_t)nbytes;
 		}
 
-		if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
+		if (context->buf_stat_bytes + context->buf_dyn_bytes >= context->expected_len)
 			break;
 
-		if (sizeof(s->buf_stat) == buf_stat_bytes)
+		if (sizeof(s->buf_stat) == context->buf_stat_bytes)
 		{
 			s->buf_type = ZBX_BUF_TYPE_DYN;
-			s->buffer = (char *)zbx_malloc(NULL, allocated);
-			buf_dyn_bytes = sizeof(s->buf_stat);
-			buf_stat_bytes = 0;
+			context->allocated = 8 * ZBX_STAT_BUF_LEN;
+			s->buffer = (char *)zbx_malloc(NULL, context->allocated);
+			context->buf_dyn_bytes = sizeof(s->buf_stat);
+			context->buf_stat_bytes = 0;
 			memcpy(s->buffer, s->buf_stat, sizeof(s->buf_stat));
 		}
+
+		if (0 != once)
+			break;
 	}
 
-	if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
+	if (context->buf_stat_bytes + context->buf_dyn_bytes >= context->expected_len)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is longer than " ZBX_FS_UI64 " bytes allowed for"
-				" plain text. Message ignored.", s->peer, expected_len);
+				" plain text. Message ignored.", s->peer, context->expected_len);
 		nbytes = ZBX_PROTO_ERROR;
 		goto out;
 	}
 
-	s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
+	s->read_bytes = context->buf_stat_bytes + context->buf_dyn_bytes;
 	s->buffer[s->read_bytes] = '\0';
 out:
+	return (ZBX_PROTO_ERROR == nbytes ? ZBX_PROTO_ERROR : (ssize_t)(s->read_bytes));
+}
 
-	if (0 != timeout)
-		zbx_socket_set_deadline(s, 0);
+/******************************************************************************
+ *                                                                            *
+ * Purpose: receive next line from socket                                     *
+ *                                                                            *
+ * Parameters: s       - [IN/OUT] socket descriptor                           *
+ *             context - [IN/OUT] state of socket descriptor                  *
+ *             events  - [OUT] socket state                                   *
+ *                                                                            *
+ * Return value: pointer to line - success,                                   *
+ *               NULL - an error occurred                                     *
+ *                                                                            *
+ * Comments: context must be initialized                                      *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_tcp_recv_context_line(zbx_socket_t *s, zbx_tcp_recv_context_t *context, short *events)
+{
+	const char	*line;
 
-	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes));
+	/* check if the buffer already contains the next line */
+	if (NULL != (line = zbx_socket_find_line(s)))
+		return line;
+
+	if (NULL != s->next_line)
+	{
+		if (ZBX_BUF_TYPE_STAT == s->buf_type)
+			context->buf_stat_bytes -= (size_t)(s->next_line - s->buffer);
+		else
+			context->buf_dyn_bytes -= (size_t)(s->next_line - s->buffer);
+
+		memmove(s->buffer, s->next_line, ZBX_BUF_TYPE_STAT == s->buf_type ?
+				context->buf_stat_bytes : context->buf_dyn_bytes);
+
+		s->read_bytes = context->buf_stat_bytes + context->buf_dyn_bytes;
+		s->next_line = NULL;
+	}
+
+	do
+	{
+		ssize_t	nbytes, nbytes_prev = (ssize_t)(context->buf_stat_bytes + context->buf_dyn_bytes);
+
+		if (ZBX_PROTO_ERROR == (nbytes = zbx_tcp_recv_context_raw(s, context, events, 1)))
+			goto out;
+
+		if (nbytes == nbytes_prev)
+		{
+			/* socket was closed before newline was found, just return the data we have */
+			line = 0 != s->read_bytes ? s->buffer : NULL;
+			s->next_line = s->buffer + s->read_bytes;
+
+			goto out;
+		}
+	}
+	while (NULL == strchr(s->buffer, '\n'));
+
+	s->next_line = s->buffer;
+	line = zbx_socket_find_line(s);
+out:
+	return line;
 }
 
 static int	subnet_match(int af, unsigned int prefix_size, const void *address1, const void *address2)

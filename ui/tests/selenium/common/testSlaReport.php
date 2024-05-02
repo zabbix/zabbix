@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -354,7 +354,7 @@ class testSlaReport extends CWebTest {
 
 		// Check empty result if non-related SLA + Service or disabled SLA (in widget) is selected and proceed with next test.
 		if (CTestArrayHelper::get($data, 'no_data')) {
-			$string = (array_key_exists('expected', $data)) ? $data['expected'] : 'No data found.';
+			$string = (array_key_exists('expected', $data)) ? $data['expected'] : 'No data found';
 			$this->assertEquals([$string], $table->getRows()->asText());
 			$this->assertFalse($table->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
 

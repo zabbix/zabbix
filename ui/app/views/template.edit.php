@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,8 +166,7 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
-	'tags_tab_id' => 'template-tags-tab',
-	'field_label' => _('Tags')
+	'tags_tab_id' => 'template-tags-tab'
 ]);
 
 $form->addItem(

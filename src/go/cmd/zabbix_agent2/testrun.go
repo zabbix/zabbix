@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"time"
 
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
 )
 
 func checkMetric(s scheduler.Scheduler, metric string) {
@@ -33,7 +33,9 @@ func checkMetric(s scheduler.Scheduler, metric string) {
 	value, err := s.PerformTask(metric, timeoutForTestrunChecks, agent.TestrunClientID)
 	if err != nil {
 		fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
+	} else if value == nil {
+		fmt.Printf("%-46s[-|ZBX_NODATA]\n", metric)
 	} else {
-		fmt.Printf("%-46s[s|%s]\n", metric, value)
+		fmt.Printf("%-46s[s|%s]\n", metric, *value)
 	}
 }

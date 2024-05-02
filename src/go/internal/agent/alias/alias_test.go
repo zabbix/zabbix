@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@ package alias
 import (
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
 )
 
 func TestGetAlias(t *testing.T) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@ import (
 	"fmt"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/pkg/version"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/sdk/log"
 )
 
 const notsupported = "ZBX_NOTSUPPORTED"
@@ -43,14 +43,18 @@ type passiveChecksRequest struct {
 }
 
 type passiveChecksResponseData struct {
-	Value *string `json:"value,omitempty"`
-	Error *string `json:"error,omitempty"`
+	Value *string `json:"value"`
+}
+
+type passiveChecksErrorResponseData struct {
+	Error *string `json:"error"`
 }
 
 type passiveChecksResponse struct {
-	Version string                      `json:"version"`
-	Data    []passiveChecksResponseData `json:"data,omitempty"`
-	Error   *string                     `json:"error,omitempty"`
+	Version string  `json:"version"`
+	Variant int     `json:"variant"`
+	Data    []any   `json:"data,omitempty"`
+	Error   *string `json:"error,omitempty"`
 }
 
 type passiveCheck struct {
@@ -88,9 +92,13 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 
 	if err != nil {
 		errString := err.Error()
-		response = passiveChecksResponse{Version: version.LongNoRC(), Error: &errString}
+		response = passiveChecksResponse{
+			Version: version.Long(),
+			Variant: agent.Variant,
+			Error:   &errString,
+		}
 	} else {
-		var value string
+		var value *string
 
 		if timeout, err = scheduler.ParseItemTimeoutAny(request.Data[0].Timeout); err == nil {
 			// direct passive check timeout is handled by the scheduler
@@ -99,9 +107,17 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 
 		if err != nil {
 			errString := err.Error()
-			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Error: &errString}}}
+			response = passiveChecksResponse{
+				Version: version.Long(),
+				Variant: agent.Variant,
+				Data:    []any{passiveChecksErrorResponseData{Error: &errString}},
+			}
 		} else {
-			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Value: &value}}}
+			response = passiveChecksResponse{
+				Version: version.Long(),
+				Variant: agent.Variant,
+				Data:    []any{passiveChecksResponseData{Value: value}},
+			}
 		}
 	}
 
@@ -131,14 +147,16 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 	checkTimeout = timeoutForSinglePassiveChecks
 
 	// direct passive check timeout is handled by the scheduler
-	s, err := pc.scheduler.PerformTask(string(data), checkTimeout, agent.PassiveChecksClientID)
+	taskResult, err := pc.scheduler.PerformTask(string(data), checkTimeout, agent.PassiveChecksClientID)
 
 	if err != nil {
 		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())
 		_, err = pc.conn.Write(pc.formatError(err.Error()))
+	} else if taskResult != nil {
+		log.Debugf("sending passive check response: '%s' to '%s'", *taskResult, pc.conn.Address())
+		_, err = pc.conn.Write([]byte(*taskResult))
 	} else {
-		log.Debugf("sending passive check response: '%s' to '%s'", s, pc.conn.Address())
-		_, err = pc.conn.Write([]byte(s))
+		log.Debugf("got nil value, skipping sending of response")
 	}
 
 	if err != nil {

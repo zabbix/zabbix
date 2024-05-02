@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,7 +109,6 @@ static ub4	OCI_DBserver_status(void);
 #define ZBX_PG_DEADLOCK		"40P01"
 
 static PGconn			*conn = NULL;
-static unsigned int		ZBX_PG_BYTEAOID = 0;
 static int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
@@ -816,18 +815,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 
 	if (ZBX_DB_FAIL == ret || ZBX_DB_DOWN == ret)
 		goto out;
-
-	result = zbx_db_select_basic("select oid from pg_type where typname='bytea'");
-
-	if ((zbx_db_result_t)ZBX_DB_DOWN == result || NULL == result)
-	{
-		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch_basic(result)))
-		ZBX_PG_BYTEAOID = atoi(row[0]);
-	zbx_db_free_result(result);
 
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute_basic("set escape_string_warning to off")))
@@ -1977,56 +1964,6 @@ zbx_db_result_t	zbx_db_select_n_basic(const char *query, int n)
 #endif
 }
 
-#ifdef HAVE_POSTGRESQL
-/******************************************************************************
- *                                                                            *
- * Purpose: converts the null terminated string into binary buffer            *
- *                                                                            *
- * Transformations:                                                           *
- *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
- *      \\   == \                                                             *
- *                                                                            *
- * Parameters:                                                                *
- *      io - [IN/OUT] null terminated string / binary data                    *
- *                                                                            *
- * Return value: length of the binary buffer                                  *
- *                                                                            *
- ******************************************************************************/
-static size_t	zbx_db_bytea_unescape(u_char *io)
-{
-	const u_char	*i = io;
-	u_char		*o = io;
-
-	while ('\0' != *i)
-	{
-		switch (*i)
-		{
-			case '\\':
-				i++;
-				if ('\\' == *i)
-				{
-					*o++ = *i++;
-				}
-				else
-				{
-					if (0 != isdigit(i[0]) && 0 != isdigit(i[1]) && 0 != isdigit(i[2]))
-					{
-						*o = (*i++ - 0x30) << 6;
-						*o += (*i++ - 0x30) << 3;
-						*o++ += *i++ - 0x30;
-					}
-				}
-				break;
-
-			default:
-				*o++ = *i++;
-		}
-	}
-
-	return o - io;
-}
-#endif
-
 #if defined(HAVE_ORACLE)
 static void	db_set_fetch_error(int dberr)
 {
@@ -2037,6 +1974,18 @@ static void	db_set_fetch_error(int dberr)
 	}
 }
 #endif
+
+int	zbx_db_get_row_num(zbx_db_result_t result)
+{
+#if defined(HAVE_POSTGRESQL)
+	return result->row_num;
+#elif defined(HAVE_MYSQL)
+	return (int)mysql_num_rows(result->result);
+#else
+	ZBX_UNUSED(result);
+	return 0;
+#endif
+}
 
 zbx_db_row_t	zbx_db_fetch_basic(zbx_db_result_t result)
 {
@@ -2149,35 +2098,27 @@ zbx_db_row_t	zbx_db_fetch_basic(zbx_db_result_t result)
 
 	return result->values;
 #elif defined(HAVE_POSTGRESQL)
-	/* free old data */
-	if (NULL != result->values)
-		zbx_free(result->values);
-
 	/* EOF */
 	if (result->cursor == result->row_num)
 		return NULL;
 
 	/* init result */
-	result->fld_num = PQnfields(result->pg_result);
+	if (0 == result->cursor)
+		result->fld_num = PQnfields(result->pg_result);
 
 	if (result->fld_num > 0)
 	{
 		int	i;
 
-		result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
+		if (NULL == result->values)
+			result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
 
 		for (i = 0; i < result->fld_num; i++)
 		{
-			if (PQgetisnull(result->pg_result, result->cursor, i))
-			{
-				result->values[i] = NULL;
-			}
-			else
-			{
-				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
-				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
-					zbx_db_bytea_unescape((u_char *)result->values[i]);
-			}
+			result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
+
+			if ('\0' == *result->values[i] && PQgetisnull(result->pg_result, result->cursor, i))
+					result->values[i] = NULL;
 		}
 	}
 

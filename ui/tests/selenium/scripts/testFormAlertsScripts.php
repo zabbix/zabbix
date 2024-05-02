@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -889,7 +889,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
 						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
+						'Execute on' => 'Zabbix proxy or server',
 						'Commands' => 'Script command',
 						'Description' => 'Test description',
 						'User group' => 'Selenium user group',
@@ -908,7 +908,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Name' => 'Max script 2',
 						'Scope' => 'Action operation',
 						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
+						'Execute on' => 'Zabbix proxy or server',
 						'Commands' => 'Script command',
 						'Description' => 'Test description',
 						'Host group' => 'Selected',
@@ -924,7 +924,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
 						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
+						'Execute on' => 'Zabbix proxy or server',
 						'Commands' => 'Script command',
 						'Description' => 'Test description',
 						'User group' => 'Selenium user group',
@@ -1487,7 +1487,7 @@ class testFormAlertsScripts extends CWebTest {
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name']));
 			$this->openScriptForm($id, false);
 
-			if(array_key_exists('Advanced configuration', $data['fields'])) {
+			if (array_key_exists('Advanced configuration', $data['fields'])) {
 				$form->fill(['Advanced configuration' => true]);
 			}
 
@@ -1698,7 +1698,7 @@ class testFormAlertsScripts extends CWebTest {
 		$segmented_elements = [
 			'Scope' => ['Action operation', 'Manual host action', 'Manual event action'],
 			'Type' => ['URL', 'Webhook', 'Script', 'SSH', 'Telnet', 'IPMI'],
-			'Execute on' => ['Zabbix agent', 'Zabbix server (proxy)', 'Zabbix server'],
+			'Execute on' => ['Zabbix agent', 'Zabbix proxy or server', 'Zabbix server'],
 			'Required host permissions' => ['Read', 'Write'],
 			'Input type' => ['String', 'Dropdown']
 		];

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,16 +18,18 @@
 **/
 
 #include "proxybuffer.h"
-#include "zbxproxybuffer.h"
-#include "pb_discovery.h"
 #include "pb_autoreg.h"
+#include "pb_discovery.h"
 #include "pb_history.h"
-
-#include "zbxcommon.h"
 #include "zbxalgo.h"
-#include "zbxmutexs.h"
-#include "zbxshmem.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
+#include "zbxmutexs.h"
+#include "zbxnum.h"
+#include "zbxproxybuffer.h"
+#include "zbxshmem.h"
+#include "zbxstr.h"
 
 #define PB_DB_FLUSH_DISABLED	0
 #define PB_DB_FLUSH_ENABLED	1
@@ -35,7 +37,7 @@
 ZBX_PTR_VECTOR_IMPL(pb_history_ptr, zbx_pb_history_t *)
 ZBX_PTR_VECTOR_IMPL(pb_discovery_ptr, zbx_pb_discovery_t *)
 
-zbx_pb_t		*pb_data = NULL;
+static zbx_pb_t		*pb_data = NULL;
 static zbx_shmem_info_t	*pb_mem = NULL;
 
 ZBX_SHMEM_FUNC_IMPL(__pb, pb_mem)
@@ -45,8 +47,18 @@ static void	pb_init_state(zbx_pb_t *pb);
 /* remap states to incoming data destination - database or memory */
 zbx_pb_state_t	pb_dst[] = {PB_DATABASE, PB_MEMORY, PB_MEMORY, PB_DATABASE};
 
+zbx_pb_state_t	get_pb_dst(int i)
+{
+	return pb_dst[i];
+}
+
 /* remap states to outgoing data source - database or memory */
 zbx_pb_state_t	pb_src[] = {PB_DATABASE, PB_DATABASE, PB_MEMORY, PB_MEMORY};
+
+zbx_pb_state_t	get_pb_src(int i)
+{
+	return pb_src[i];
+}
 
 const char	*pb_state_desc[] = {"database", "database->memory", "memory", "memory->database"};
 
@@ -171,7 +183,8 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 						" id:" ZBX_FS_UI64 " clock:%d", __func__, drow->id, drow->clock);
 
 				zbx_list_pop(&pb->discovery, NULL);
-				size_left -= (ssize_t)pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
+				size_left -= (ssize_t)pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns,
+						drow->error);
 				pb_list_free_discovery(&pb->discovery, drow);
 			}
 			while (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->handleid == handleid);
@@ -318,6 +331,11 @@ static void	pb_init_state(zbx_pb_t *pb)
 		pb_set_state(pb, PB_MEMORY, "no unsent database records found");
 
 	zbx_db_close();
+}
+
+zbx_pb_t	*get_pb_data(void)
+{
+	return pb_data;
 }
 
 zbx_uint64_t	pb_get_lastid(const char *table_name, const char *lastidfield)
@@ -602,7 +620,7 @@ void	pb_deregister_handle(zbx_vector_uint64_t *handleids, zbx_uint64_t handleid)
  *                                                                            *
  * Purpose: wait for the opened data handles to be closed                     *
  *                                                                            *
- * parameters: handleids - [IN] the handle list to wait on                    *
+ * parameters: handleids - [IN] handle list to wait on                        *
  *                                                                            *
  ******************************************************************************/
 void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
@@ -660,8 +678,10 @@ void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
  *                                                                            *
  * Purpose: create proxy  buffer                                              *
  *                                                                            *
- * Parameters: size  - [IN] the cache size in bytes                           *
- *             age   - [IN] the maximum allowed data age                      *
+ * Parameters: mode  - [IN]                                                   *
+ *             size  - [IN] cache size in bytes                               *
+ *             age   - [IN] maximum allowed data age                          *
+ *             offline_buffer [IN] offline buffer in seconds                  *
  *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - proxy buffer was created successfully              *

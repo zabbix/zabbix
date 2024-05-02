@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "service_manager_impl.h"
-
 #ifndef ZABBIX_SERVICE_ACTIONS_H
 #define ZABBIX_SERVICE_ACTIONS_H
+
+#include "service_manager_impl.h"
 
 void	service_update_process_actions(const zbx_service_update_t *update, zbx_hashset_t *actions,
 		zbx_vector_uint64_t *actionids);

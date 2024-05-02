@@ -255,32 +255,6 @@ INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, icon
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99004,10084,1,2,1,'127.0.0.1','','161');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004, 2, 1, '{$SNMP_COMMUNITY}');
 
--- discovery action
-INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (99000, 'API active proxy for discovery action', 0, '');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90, 'API action with proxy', 1, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (90, 90, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (90, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (90, 90, 7);
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (90,90,20,0,99000,'');
-
--- autoregistration action
-INSERT INTO usrgrp (usrgrpid, name) VALUES (47, 'User group for action delete');
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (53, 'action-user', '$2a$10$gFL5ORa/Ml0VBDGraHI3tuE1WuiKOX8ef497bAfzNiSXUx4Vrrn.y', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '$2a$10$P8CZ/rs94pLp177hh27KheWKAKa6GXZLFhOE8ymd/QlEKT2FDngZe', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (87, 47, 53);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (88, 47, 54);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (91, 'API Autoregistration action', 2, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (91, 91, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (91, 0, 'Autoregistration: {HOST.HOST}', 'Host name: {HOST.HOST}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (91, 91, 47);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (92, 91, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (92, 0, 'Problem: {EVENT.NAME}', 'Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (92, 92, 47);
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (93, 'API Action for deleting 2', 0, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (93, 91, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (93, 0, 'Problem: {EVENT.NAME}', 'Problem started at {EVENT.TIME} on {EVENT.DATE}\r\nProblem name: {EVENT.NAME}\r\nHost: {HOST.NAME}\r\nSeverity: {TRIGGER.SEVERITY}\r\n\r\nOriginal problem ID: {EVENT.ID}\r\n{TRIGGER.URL}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (94, 93, 47);
-
 -- event correlation
 INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
@@ -301,35 +275,6 @@ INSERT INTO correlation (correlationid, name, description, evaltype, status, for
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
 INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag');
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
-
--- discovery rules
-INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (99006, 'Api active proxy for discovery', 0, '');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (10,NULL,'API discovery rule for delete 1','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (10,10,4,'','','80','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (11,99006,'API discovery rule for delete with proxy','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (11,11,9,'agent.ping','','10050','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (12,NULL,'API discovery rule for delete 3','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (12,12,15,'','','23','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (13,NULL,'API discovery rule for delete 4','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (13,13,3,'','','21','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (14,NULL,'API discovery rule for delete 5','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (14,14,3,'','','21','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (15,NULL,'API discovery rule used in action','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (15,15,3,'','','21','',0,'','',0,0,0,'');
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (16,15,9,'agent.ping','','10050','',0,'','',0,0,0,'');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (95, 'API action for Discovery check', 1, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (95, 95, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (95, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (95, 95, 47);
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (95,95,19,0,'16','');
-
-INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (16,NULL,'API discovery rule used in action 2','192.168.0.1-254','1h',0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (17,16,0,'','','22','',0,'','',0,0,0,'');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (96, 'API action for Discovery rule', 1, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (96, 96, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (96, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (96, 96, 7);
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (97,96,18,0,'16','');
 
 -- testHostGroup_Delete maintenance constraint
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (62002, 0, 'f40b2a0aa36d404d8971cc6d5232497d', 'maintenance_has_only_group');
@@ -490,11 +435,11 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (1017, 'test.
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (1010, 1017, 1, 1, 1, '127.0.0.1', '', '10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (1017, 1017, 1004);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers                 ) VALUES (2600, 1017, 'item.1.1.1.1'                  ,  2, 'item.1.1.1.1'                  , 1, '90d', 0, NULL, NULL, '','', '', '', '');
-INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, trends, status, master_itemid, templateid, params, description, posts, headers, lifetime,query_fields, flags) VALUES (2601, 1017, 'dependent.lld.1'               , 18, 'dependent.lld.1'               , 4, '90d', '365d', 0, 2600, NULL, '', '', '', '', '30d','', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, trends, status, master_itemid, templateid, params, description, posts, headers, lifetime, lifetime_type, enabled_lifetime, enabled_lifetime_type, query_fields, flags) VALUES (2601, 1017, 'dependent.lld.1'               , 18, 'dependent.lld.1'               , 4, '90d', '365d', 0, 2600, NULL, '', '', '', '', '30d', 0, '0', 2, '', 1);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers                 ) VALUES (2602, 1017, 'item.1'                        ,  2, 'item.1'                        , 1, '90d', 0, NULL, NULL, '','', '', '', '');
-INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, trends, status, master_itemid, templateid, params, description, posts, headers, lifetime,query_fields, flags) VALUES (2603, 1017, 'dependent.lld.2'               , 18, 'dependent.lld.2'               , 4, '90d', '365d', 0, 2602, NULL, '', '', '', '', '30d','', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, trends, status, master_itemid, templateid, params, description, posts, headers, lifetime, lifetime_type, enabled_lifetime, enabled_lifetime_type, query_fields, flags) VALUES (2603, 1017, 'dependent.lld.2'               , 18, 'dependent.lld.2'               , 4, '90d', '365d', 0, 2602, NULL, '', '', '', '', '30d', 0, '0', 2, '', 1);
 INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers                 ) VALUES (2604, 1017, 'item.2'                        ,  2, 'item.2'                        , 1, '90d', 0, NULL, NULL, '','', '', '', '');
-INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, trends, status, master_itemid, templateid, params, description, posts, headers, lifetime,query_fields, flags) VALUES (2605, 1017, 'dependent.lld.3'               , 18, 'dependent.lld.3'               , 4, '90d', '365d', 0, 2604, NULL, '', '', '', '', '30d','', 1);
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, trends, status, master_itemid, templateid, params, description, posts, headers, lifetime, lifetime_type, enabled_lifetime, enabled_lifetime_type, query_fields, flags) VALUES (2605, 1017, 'dependent.lld.3'               , 18, 'dependent.lld.3'               , 4, '90d', '365d', 0, 2604, NULL, '', '', '', '', '30d', 0, '0', 2, '', 1);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (1018, 'test.discovery.rule.host.2', 'test.discovery.rule.host.2', 0, '');
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (1011, 1018, 1, 1, 1, '127.0.0.1', '', '10050');
@@ -568,7 +513,7 @@ INSERT INTO history_text (itemid, clock, value, ns) VALUES
 -- INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (9005, 9005, 'groups', 'name', 'HG1', 'HG1 updated');
 
 -- LLD with overrides to delete
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133763,2,'',50009,'Overrides (delete)','overrides.delete','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133763,2,'',50009,'Overrides (delete)','overrides.delete','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10001,133763,'override',1,3,'{10001} or {10002} or {10003}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10002,133763,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10001,10001,8,'{#MACRO1}','d{3}$');
@@ -603,7 +548,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1000
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10006,'5d');
 
 -- LLD with overrides to copy
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133764,2,'',50009,'Overrides (copy)','overrides.copy','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133764,2,'',50009,'Overrides (copy)','overrides.copy','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10003,133764,'override',1,3,'{10004} or {10005} or {10006}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10004,133764,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10004,10003,8,'{#MACRO1}','d{3}$');
@@ -638,7 +583,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1000
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10012,'5d');
 
 -- LLD with overrides to update
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133765,2,'',50009,'Overrides (update)','overrides.update','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133765,2,'',50009,'Overrides (update)','overrides.update','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10005,133765,'override',1,3,'{10007} or {10008} or {10009}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10006,133765,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10007,10005,8,'{#MACRO1}','d{3}$');
@@ -676,7 +621,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1001
 INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131001,NULL,'Overrides template constraint',3,-1,2,'','',NULL,0,0,0,'Overrides template constraint',0,NULL,'',1,1,'','','','',0);
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (139001,1,'27e5744a60894c7c88c8df39573df06e','Overrides',0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139201,131001,139001);
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',50009,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',50009,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10007,133766,'Only template operation',1,0,'',0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10008,133766,'Not only template operation',2,0,'',0);
 INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10019,10007,3,0,'');
@@ -691,319 +636,13 @@ INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_
 INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131003,NULL,'item_prototype',0,-1,2,'','',NULL,0,0,0,'item_prototype',0,NULL,'',1,1,'','','','',0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139203,131003,139002);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139202,131002,139002);
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133767,2,'',131003,'rule','a','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133768,2,'',131003,'prototype','a[{#A}]','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'30d',0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133769,2,'',131002,'item','a','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d',0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133767,2,'',131003,'rule','a','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133768,2,'',131003,'prototype','a[{#A}]','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',2,NULL,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,lifetime_type,enabled_lifetime,enabled_lifetime_type,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133769,2,'',131002,'item','a','0','90d','365d',0,3,'','','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30d',0,'0',2,0,'',NULL,'','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO item_discovery (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck,ts_delete) VALUES (138003,133768,133767,'',0,0);
 INSERT INTO graphs (graphid,name,width,height,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d,percent_left,percent_right,ymin_type,ymax_type,ymin_itemid,ymax_itemid,flags,discover) VALUES (9000,'graph_prototype',900,200,0,100,NULL,1,1,0,1,0,0,0,0,0,NULL,NULL,2,0);
 INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (58000,9000,133769,0,1,'F63100',0,2,0);
 INSERT INTO graphs_items (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type) VALUES (58001,9000,133768,0,0,'1A7C11',0,2,0);
-
--- trigger permissions: BEGIN
-
-INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50101, 0, 'fe26656029d646128d7ae50b22d0d106', 'test-trigger-permissions-group-N');
-INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50102, 0, '7d221858b46e4af09a25b4f4e8f1f027', 'test-trigger-permissions-group-D');
-INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50103, 0, '5863042f931d4496b29c34d6fd9d3cd0', 'test-trigger-permissions-group-R');
-INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50104, 0, 'a1a2176605f44cd8ac981717e45e461e', 'test-trigger-permissions-group-W');
-
-INSERT INTO usrgrp (usrgrpid, name) VALUES (50101, 'test-trigger-permissions-user-group');
-INSERT INTO users (userid, username, passwd, roleid) VALUES (50101, 'test-trigger-permissions-user', '$2y$10$VKVVejdnWSz08PPa0Xb9g.igAz.iWne3EaxXPX5WF8WsbrrA.lE4K', 1);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (50101, 50101, 50101);
-INSERT INTO rights (rightid, groupid, id, permission) VALUES (50101, 50101, 50102, 0), (50102, 50101, 50103, 2), (50103, 50101, 50104, 3);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50101, 'test-trigger-permissions-host-N', 'test-trigger-permissions-host-N', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50101, 50101, 50101);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50101, 50101, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50101, 50101, 50101, 'test-trigger-permissions-item-N', 0, 'test-trigger-permissions-item-N', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50101);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50102, 'test-trigger-permissions-host-D', 'test-trigger-permissions-host-D', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50102, 50102, 50102);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50102, 50102, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50102, 50102, 50102, 'test-trigger-permissions-item-D', 0, 'test-trigger-permissions-item-D', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50102);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50103, 'test-trigger-permissions-host-R', 'test-trigger-permissions-host-R', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50103, 50103, 50103);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50103, 50103, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50103, 50103, 50103, 'test-trigger-permissions-item-R', 0, 'test-trigger-permissions-item-R', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50103);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50104, 'test-trigger-permissions-host-W', 'test-trigger-permissions-host-W', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50104, 50104, 50104);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50104, 50104, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50104, 50104, 50104, 'test-trigger-permissions-item-W', 0, 'test-trigger-permissions-item-W', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50104);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50105, 'test-trigger-permissions-host-ND', 'test-trigger-permissions-host-ND', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50105, 50105, 50101), (50106, 50105, 50102);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50105, 50105, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50105, 50105, 50105, 'test-trigger-permissions-item-ND', 0, 'test-trigger-permissions-item-ND', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50105);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50106, 'test-trigger-permissions-host-NR', 'test-trigger-permissions-host-NR', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50107, 50106, 50101), (50108, 50106, 50103);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50106, 50106, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50106, 50106, 50106, 'test-trigger-permissions-item-NR', 0, 'test-trigger-permissions-item-NR', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50106);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50107, 'test-trigger-permissions-host-NW', 'test-trigger-permissions-host-NW', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50109, 50107, 50101), (50110, 50107, 50104);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50107, 50107, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50107, 50107, 50107, 'test-trigger-permissions-item-NW', 0, 'test-trigger-permissions-item-NW', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50107);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50108, 'test-trigger-permissions-host-DR', 'test-trigger-permissions-host-DR', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50111, 50108, 50102), (50112, 50108, 50103);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50108, 50108, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50108, 50108, 50108, 'test-trigger-permissions-item-DR', 0, 'test-trigger-permissions-item-DR', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50108);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50109, 'test-trigger-permissions-host-DW', 'test-trigger-permissions-host-DW', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50113, 50109, 50102), (50114, 50109, 50104);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50109, 50109, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50109, 50109, 50109, 'test-trigger-permissions-item-DW', 0, 'test-trigger-permissions-item-DW', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50109);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50110, 'test-trigger-permissions-host-RW', 'test-trigger-permissions-host-RW', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50115, 50110, 50103), (50116, 50110, 50104);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50110, 50110, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50110, 50110, 50110, 'test-trigger-permissions-item-RW', 0, 'test-trigger-permissions-item-RW', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50110);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50111, 'test-trigger-permissions-host-NDR', 'test-trigger-permissions-host-NDR', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50117, 50111, 50101), (50118, 50111, 50102), (50119, 50111, 50103);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50111, 50111, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50111, 50111, 50111, 'test-trigger-permissions-item-NDR', 0, 'test-trigger-permissions-item-NDR', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50111);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50112, 'test-trigger-permissions-host-NDW', 'test-trigger-permissions-host-NDW', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50120, 50112, 50101), (50121, 50112, 50102), (50122, 50112, 50104);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50112, 50112, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50112, 50112, 50112, 'test-trigger-permissions-item-NDW', 0, 'test-trigger-permissions-item-NDW', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50112);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50113, 'test-trigger-permissions-host-NRW', 'test-trigger-permissions-host-NRW', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50123, 50113, 50101), (50124, 50113, 50103), (50125, 50113, 50104);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50113, 50113, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50113, 50113, 50113, 'test-trigger-permissions-item-NRW', 0, 'test-trigger-permissions-item-NRW', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50113);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50114, 'test-trigger-permissions-host-DRW', 'test-trigger-permissions-host-DRW', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50126, 50114, 50102), (50127, 50114, 50103), (50128, 50114, 50104);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50114, 50114, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50114, 50114, 50114, 'test-trigger-permissions-item-DRW', 0, 'test-trigger-permissions-item-DRW', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50114);
-
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50115, 'test-trigger-permissions-host-NDRW', 'test-trigger-permissions-host-NDRW', 0, '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50129, 50115, 50101), (50130, 50115, 50102), (50131, 50115, 50103), (50132, 50115, 50104);
-INSERT INTO interface (interfaceid, hostid, type, ip, dns, useip, port, main) VALUES (50115, 50115, 1, '127.0.0.1', '', 1, '10050', 1);
-INSERT INTO items (itemid, hostid, interfaceid, name, type, key_, value_type, delay, history, trends, params, description, posts, headers,query_fields, status) VALUES (50115, 50115, 50115, 'test-trigger-permissions-item-NDRW', 0, 'test-trigger-permissions-item-NDRW', 3, '1m', '90d', '365d', '', '', '', '','', 0);
-INSERT INTO item_rtdata (itemid) VALUES (50115);
-
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50101, 'test-trigger-permissions-trigger-{N}', '{50101}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50101, 50101, 50101, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50102, 'test-trigger-permissions-trigger-{D}', '{50102}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50102, 50102, 50102, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50103, 'test-trigger-permissions-trigger-{R}', '{50103}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50103, 50103, 50103, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50104, 'test-trigger-permissions-trigger-{W}', '{50104}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50104, 50104, 50104, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50105, 'test-trigger-permissions-trigger-{N}-{D}', '{50105} or {50106}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50105, 50105, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50106, 50105, 50102, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50106, 'test-trigger-permissions-trigger-{N}-{R}', '{50107} or {50108}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50107, 50106, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50108, 50106, 50103, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50107, 'test-trigger-permissions-trigger-{N}-{W}', '{50109} or {50110}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50109, 50107, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50110, 50107, 50104, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50108, 'test-trigger-permissions-trigger-{D}-{R}', '{50111} or {50112}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50111, 50108, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50112, 50108, 50103, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50109, 'test-trigger-permissions-trigger-{D}-{W}', '{50113} or {50114}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50113, 50109, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50114, 50109, 50104, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50110, 'test-trigger-permissions-trigger-{R}-{W}', '{50115} or {50116}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50115, 50110, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50116, 50110, 50104, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50111, 'test-trigger-permissions-trigger-{N}-{D}-{R}', '{50117} or {50118} or {50119}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50117, 50111, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50118, 50111, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50119, 50111, 50103, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50112, 'test-trigger-permissions-trigger-{N}-{D}-{W}', '{50120} or {50121} or {50122}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50120, 50112, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50121, 50112, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50122, 50112, 50104, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50113, 'test-trigger-permissions-trigger-{N}-{R}-{W}', '{50123} or {50124} or {50125}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50123, 50113, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50124, 50113, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50125, 50113, 50104, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50114, 'test-trigger-permissions-trigger-{D}-{R}-{W}', '{50126} or {50127} or {50128}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50126, 50114, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50127, 50114, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50128, 50114, 50104, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50115, 'test-trigger-permissions-trigger-{N}-{D}-{R}-{W}', '{50129} or {50130} or {50131} or {50132}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50129, 50115, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50130, 50115, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50131, 50115, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50132, 50115, 50104, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50116, 'test-trigger-permissions-trigger-{ND}', '{50133}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50133, 50116, 50105, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50117, 'test-trigger-permissions-trigger-{NR}', '{50134}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50134, 50117, 50106, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50118, 'test-trigger-permissions-trigger-{NW}', '{50135}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50135, 50118, 50107, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50119, 'test-trigger-permissions-trigger-{DR}', '{50136}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50136, 50119, 50108, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50120, 'test-trigger-permissions-trigger-{DW}', '{50137}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50137, 50120, 50109, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50121, 'test-trigger-permissions-trigger-{RW}', '{50138}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50138, 50121, 50110, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50122, 'test-trigger-permissions-trigger-{NDR}', '{50139}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50139, 50122, 50111, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50123, 'test-trigger-permissions-trigger-{NDW}', '{50140}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50140, 50123, 50112, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50124, 'test-trigger-permissions-trigger-{NRW}', '{50141}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50141, 50124, 50113, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50125, 'test-trigger-permissions-trigger-{DRW}', '{50142}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50142, 50125, 50114, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50126, 'test-trigger-permissions-trigger-{NDRW}', '{50143}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50143, 50126, 50115, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50127, 'test-trigger-permissions-trigger-{N}-{ND}', '{50144} or {50145}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50144, 50127, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50145, 50127, 50105, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50128, 'test-trigger-permissions-trigger-{N}-{NR}', '{50146} or {50147}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50146, 50128, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50147, 50128, 50106, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50129, 'test-trigger-permissions-trigger-{N}-{NW}', '{50148} or {50149}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50148, 50129, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50149, 50129, 50107, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50130, 'test-trigger-permissions-trigger-{N}-{DR}', '{50150} or {50151}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50150, 50130, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50151, 50130, 50108, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50131, 'test-trigger-permissions-trigger-{N}-{DW}', '{50152} or {50153}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50152, 50131, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50153, 50131, 50109, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50132, 'test-trigger-permissions-trigger-{N}-{RW}', '{50154} or {50155}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50154, 50132, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50155, 50132, 50110, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50133, 'test-trigger-permissions-trigger-{N}-{NDR}', '{50156} or {50157}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50156, 50133, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50157, 50133, 50111, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50134, 'test-trigger-permissions-trigger-{N}-{NDW}', '{50158} or {50159}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50158, 50134, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50159, 50134, 50112, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50135, 'test-trigger-permissions-trigger-{N}-{NRW}', '{50160} or {50161}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50160, 50135, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50161, 50135, 50113, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50136, 'test-trigger-permissions-trigger-{N}-{DRW}', '{50162} or {50163}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50162, 50136, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50163, 50136, 50114, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50137, 'test-trigger-permissions-trigger-{N}-{NDRW}', '{50164} or {50165}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50164, 50137, 50101, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50165, 50137, 50115, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50138, 'test-trigger-permissions-trigger-{D}-{ND}', '{50166} or {50167}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50166, 50138, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50167, 50138, 50105, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50139, 'test-trigger-permissions-trigger-{D}-{NR}', '{50168} or {50169}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50168, 50139, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50169, 50139, 50106, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50140, 'test-trigger-permissions-trigger-{D}-{NW}', '{50170} or {50171}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50170, 50140, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50171, 50140, 50107, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50142, 'test-trigger-permissions-trigger-{D}-{DR}', '{50172} or {50173}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50172, 50142, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50173, 50142, 50108, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50143, 'test-trigger-permissions-trigger-{D}-{DW}', '{50174} or {50175}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50174, 50143, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50175, 50143, 50109, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50144, 'test-trigger-permissions-trigger-{D}-{RW}', '{50176} or {50177}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50176, 50144, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50177, 50144, 50110, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50145, 'test-trigger-permissions-trigger-{D}-{NDR}', '{50178} or {50179}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50178, 50145, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50179, 50145, 50111, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50146, 'test-trigger-permissions-trigger-{D}-{NDW}', '{50180} or {50181}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50180, 50146, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50181, 50146, 50112, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50147, 'test-trigger-permissions-trigger-{D}-{NRW}', '{50182} or {50183}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50182, 50147, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50183, 50147, 50113, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50148, 'test-trigger-permissions-trigger-{D}-{DRW}', '{50184} or {50185}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50184, 50148, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50185, 50148, 50114, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50149, 'test-trigger-permissions-trigger-{D}-{NDRW}', '{50186} or {50187}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50186, 50149, 50102, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50187, 50149, 50115, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50150, 'test-trigger-permissions-trigger-{R}-{ND}', '{50188} or {50189}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50188, 50150, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50189, 50150, 50105, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50151, 'test-trigger-permissions-trigger-{R}-{NR}', '{50190} or {50191}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50190, 50151, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50191, 50151, 50106, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50152, 'test-trigger-permissions-trigger-{R}-{NW}', '{50192} or {50193}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50192, 50152, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50193, 50152, 50107, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50153, 'test-trigger-permissions-trigger-{R}-{DR}', '{50194} or {50195}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50194, 50153, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50195, 50153, 50108, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50154, 'test-trigger-permissions-trigger-{R}-{DW}', '{50196} or {50197}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50196, 50154, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50197, 50154, 50109, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50155, 'test-trigger-permissions-trigger-{R}-{RW}', '{50198} or {50199}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50198, 50155, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50199, 50155, 50110, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50156, 'test-trigger-permissions-trigger-{R}-{NDR}', '{50200} or {50201}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50200, 50156, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50201, 50156, 50111, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50157, 'test-trigger-permissions-trigger-{R}-{NDW}', '{50202} or {50203}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50202, 50157, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50203, 50157, 50112, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50158, 'test-trigger-permissions-trigger-{R}-{NRW}', '{50204} or {50205}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50204, 50158, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50205, 50158, 50113, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50159, 'test-trigger-permissions-trigger-{R}-{DRW}', '{50206} or {50207}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50206, 50159, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50207, 50159, 50114, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50160, 'test-trigger-permissions-trigger-{R}-{NDRW}', '{50208} or {50209}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50208, 50160, 50103, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50209, 50160, 50115, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50161, 'test-trigger-permissions-trigger-{W}-{ND}', '{50210} or {50211}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50210, 50161, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50211, 50161, 50105, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50162, 'test-trigger-permissions-trigger-{W}-{NR}', '{50212} or {50213}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50212, 50162, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50213, 50162, 50106, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50163, 'test-trigger-permissions-trigger-{W}-{NW}', '{50214} or {50215}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50214, 50163, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50215, 50163, 50107, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50164, 'test-trigger-permissions-trigger-{W}-{DR}', '{50216} or {50217}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50216, 50164, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50217, 50164, 50108, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50165, 'test-trigger-permissions-trigger-{W}-{DW}', '{50218} or {50219}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50218, 50165, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50219, 50165, 50109, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50166, 'test-trigger-permissions-trigger-{W}-{RW}', '{50220} or {50221}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50220, 50166, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50221, 50166, 50110, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50167, 'test-trigger-permissions-trigger-{W}-{NDR}', '{50222} or {50223}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50222, 50167, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50223, 50167, 50111, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50168, 'test-trigger-permissions-trigger-{W}-{NDW}', '{50224} or {50225}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50224, 50168, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50225, 50168, 50112, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50169, 'test-trigger-permissions-trigger-{W}-{NRW}', '{50226} or {50227}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50226, 50169, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50227, 50169, 50113, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50170, 'test-trigger-permissions-trigger-{W}-{DRW}', '{50228} or {50229}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50228, 50170, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50229, 50170, 50114, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50171, 'test-trigger-permissions-trigger-{W}-{NDRW}', '{50230} or {50231}', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50230, 50171, 50104, 'last', '$');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50231, 50171, 50115, 'last', '$');
-
--- trigger permissions: END
 
 -- test discovered host groups after import parent host
 INSERT INTO hstgrp (groupid, type, uuid, name) VALUES (50025, 0, '45d1ca90cd844dd98762e118ea3208fc', 'Master group');
@@ -1192,5 +831,5 @@ INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node-active','
 
 -- binary value type
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (58739, 99013, 50022, 0, 0, 'master.for.binary', 'master.for.binary', '1d', '90d', 0, '','', '', '', '');
-INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (58740, 99013, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '','', '', '', '');
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, master_itemid, posts, headers) VALUES (58740, 99013, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '','', '', 58739, '', '');
 INSERT INTO history_bin (itemid, clock, value, ns) VALUES (58740, 1549350962, 'This should be binary', 594538048);

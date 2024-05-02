@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -217,6 +217,12 @@ class CWidget extends CModule {
 			'is_multiple' => $is_multiple
 		] = $data_types[$param['type']];
 
-		return (new $field_class($name, $label))->setMultiple($is_multiple);
+		$field = new $field_class($name, $label);
+
+		if ($is_multiple !== null) {
+			$field->setMultiple($is_multiple);
+		}
+
+		return $field;
 	}
 }

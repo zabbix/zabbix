@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,14 +22,17 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "zbxcommon.h"
 #include "zbxcacheconfig.h"
+#include "zbxthreads.h"
 
 typedef struct
 {
-	int	config_timeout;
-	int	config_unavailable_delay;
-	int	config_unreachable_period;
-	int	config_unreachable_delay;
+	int			config_timeout;
+	int			config_unavailable_delay;
+	int			config_unreachable_period;
+	int			config_unreachable_delay;
+	zbx_get_config_forks_f	get_config_forks;
 }
 zbx_thread_ipmi_manager_args;
 

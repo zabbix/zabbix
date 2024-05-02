@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,8 +100,18 @@ class CPage {
 				'--no-sandbox',
 				'--enable-font-antialiasing=false',
 				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
-				'--disable-dev-shm-usage'
+				'--disable-dev-shm-usage',
+				'--autoplay-policy=no-user-gesture-required',
+				'--remote-debugging-pipe'
 			]);
+
+			if (defined('PHPUNIT_BROWSER_LOG_DIR')) {
+				$options->addArguments([
+					'--enable-logging',
+					'--log-file='.PHPUNIT_BROWSER_LOG_DIR.'/'.microtime(true).'.log',
+					'--log-level=0'
+				]);
+			}
 
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
@@ -201,8 +211,8 @@ class CPage {
 
 		if (!$session) {
 			$secret = bin2hex(random_bytes(16));
-			DBexecute('INSERT INTO sessions (sessionid,userid,secret)'.
-				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.zbx_dbstr($secret).')'
+			DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,secret)'.
+				' VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.zbx_dbstr($secret).')'
 			);
 		}
 		elseif ($session['status'] != 0) {	/* ZBX_SESSION_ACTIVE */

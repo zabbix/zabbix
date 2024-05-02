@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,15 +83,18 @@ elseif (!$data['has_serviceid']) {
 		}
 	}
 
-	$report->setFooter(
-		(new CCol(_s('Displaying %1$s of %2$s found', $num_rows_displayed,
-			count($data['services']) > $data['search_limit']
-				? $data['search_limit'].'+'
-				: count($data['services'])
-		)))
-			->setColSpan($report->getNumCols())
-			->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
-	);
+	$total = count($data['services']) > $data['search_limit']
+		? $data['search_limit'].'+'
+		: count($data['services']);
+
+	if ($total > 0) {
+		$report->setFooter(
+			(new CCol(_s('Displaying %1$s of %2$s found', $num_rows_displayed, $total)))
+				->setColSpan($report->getNumCols())
+				->addClass(ZBX_STYLE_LIST_TABLE_FOOTER)
+		);
+	}
+
 }
 else {
 	$report->setHeader([

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,7 +112,8 @@ class CScreenHttpTest extends CScreenBase {
 				_('Last check'),
 				_('Status'),
 				_('Tags')
-			]);
+			])
+			->setPageNavigation($paging);
 
 		foreach ($httptests as $key => $httptest) {
 			if (array_key_exists('lastfailedstep', $httptest) && $httptest['lastfailedstep'] !== null) {
@@ -154,6 +155,6 @@ class CScreenHttpTest extends CScreenBase {
 			]));
 		}
 
-		return $this->getOutput([$table, $paging], true, $this->data);
+		return $this->getOutput($table, true, $this->data);
 	}
 }

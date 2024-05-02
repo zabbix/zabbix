@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,6 +89,8 @@ class CAudit {
 	public const RESOURCE_CONNECTOR = 51;
 	public const RESOURCE_LLD_RULE = 52;
 	public const RESOURCE_HISTORY = 53;
+	public const RESOURCE_MFA = 54;
+	public const RESOURCE_PROXY_GROUP = 55;
 
 	/**
 	 * Audit details actions.
@@ -133,8 +135,10 @@ class CAudit {
 		self::RESOURCE_MACRO => 'globalmacro',
 		self::RESOURCE_MAINTENANCE => 'maintenances',
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
+		self::RESOURCE_MFA => 'mfa',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
+		self::RESOURCE_PROXY_GROUP => 'proxy_group',
 		self::RESOURCE_REGEXP => 'regexps',
 		self::RESOURCE_SCENARIO => 'httptest',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
@@ -187,8 +191,10 @@ class CAudit {
 		self::RESOURCE_MACRO => 'macro',
 		self::RESOURCE_MAINTENANCE => 'name',
 		self::RESOURCE_MEDIA_TYPE => 'name',
+		self::RESOURCE_MFA => 'name',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'name',
+		self::RESOURCE_PROXY_GROUP => 'name',
 		self::RESOURCE_REGEXP => 'name',
 		self::RESOURCE_SCENARIO => 'name',
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
@@ -230,8 +236,10 @@ class CAudit {
 		self::RESOURCE_MACRO => 'usermacro',
 		self::RESOURCE_MAINTENANCE => 'maintenance',
 		self::RESOURCE_MEDIA_TYPE => 'mediatype',
+		self::RESOURCE_MFA => 'mfa',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
+		self::RESOURCE_PROXY_GROUP => 'proxygroup',
 		self::RESOURCE_REGEXP => 'regexp',
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'script',
@@ -336,6 +344,7 @@ class CAudit {
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
+		self::RESOURCE_MFA => ['paths' => ['mfa.client_secret']],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
 		self::RESOURCE_TEMPLATE => [
@@ -681,7 +690,7 @@ class CAudit {
 	 * @return bool
 	 */
 	private static function isAuditEnabled(): bool {
-		return CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
+		return CSettingsHelper::getPublic(CSettingsHelper::AUDITLOG_ENABLED) == self::AUDITLOG_ENABLE;
 	}
 
 	/**

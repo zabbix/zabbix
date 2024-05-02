@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
 	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
+	const USER_PARAM_RELOAD_DELAY			= 3; // User parameters reload delay.
 	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
@@ -43,8 +44,10 @@ class CIntegrationTest extends CAPITest {
 	const COMPONENT_SERVER			= 'server';
 	const COMPONENT_SERVER_HANODE1	= 'server_ha1';
 	const COMPONENT_PROXY			= 'proxy';
+	const COMPONENT_PROXY_HANODE1		= 'proxy_ha1';
 	const COMPONENT_AGENT			= 'agentd';
 	const COMPONENT_AGENT2			= 'agent2';
+	const COMPONENT_AGENT_3_0		= 'agentd_3.0';
 
 	// Zabbix component port constants.
 	const AGENT_PORT_SUFFIX = '50';
@@ -52,6 +55,8 @@ class CIntegrationTest extends CAPITest {
 	const PROXY_PORT_SUFFIX = '52';
 	const SERVER_HANODE1_PORT_SUFFIX = '61';
 	const AGENT2_PORT_SUFFIX = '53';
+	const AGENT_3_0_PORT_SUFFIX = '54';
+	const PROXY_HANODE1_PORT_SUFFIX = '62';
 
 	/**
 	 * Components required by test suite.
@@ -114,6 +119,8 @@ class CIntegrationTest extends CAPITest {
 		foreach ($this->getAnnotationTokensByName($annotations, 'required-components') as $component) {
 			if ($component === 'agent') {
 				$component = self::COMPONENT_AGENT;
+			} else if ($component === 'agent_3.0') {
+				$component = self::COMPONENT_AGENT_3_0;
 			}
 
 			self::validateComponent($component);
@@ -307,7 +314,7 @@ class CIntegrationTest extends CAPITest {
 	private static function getComponents() {
 		return [
 			self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT, self::COMPONENT_AGENT2,
-			self::COMPONENT_SERVER_HANODE1
+			self::COMPONENT_SERVER_HANODE1, self::COMPONENT_AGENT_3_0, self::COMPONENT_PROXY_HANODE1
 		];
 	}
 	/**
@@ -348,6 +355,7 @@ class CIntegrationTest extends CAPITest {
 						self::waitForLogLineToBePresent($component, $line, false, 10, 1);
 						break;
 					case self::COMPONENT_AGENT:
+					case self::COMPONENT_AGENT_3_0:
 						self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);
 						break;
 
@@ -360,8 +368,6 @@ class CIntegrationTest extends CAPITest {
 
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
-
-		var_dump(file_get_contents(self::getLogPath(self::COMPONENT_SERVER)));
 
 		throw new Exception('Failed to wait for component "'.$component.'" to start.');
 	}
@@ -484,19 +490,29 @@ class CIntegrationTest extends CAPITest {
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_SERVER_HANODE1 => array_merge($db, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_PROXY => array_merge($db, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
+			]),
+			self::COMPONENT_PROXY_HANODE1 => array_merge($db, [
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy_ha1.log',
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy_ha1.pid',
+				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_HANODE1_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_AGENT => [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',
@@ -508,10 +524,16 @@ class CIntegrationTest extends CAPITest {
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
 				'ControlSocket' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.sock',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX
+			],
+			self::COMPONENT_AGENT_3_0 => [
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_3.0.log',
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_3.0.pid',
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_3_0_PORT_SUFFIX
 			]
 		];
 
 		$configuration[self::COMPONENT_PROXY]['DBName'] .= '_proxy';
+		$configuration[self::COMPONENT_PROXY_HANODE1]['DBName'] .= '_proxy_ha1';
 
 		return $configuration;
 	}
@@ -527,10 +549,14 @@ class CIntegrationTest extends CAPITest {
 	protected static function prepareComponentConfiguration($component, $values) {
 		self::validateComponent($component);
 
-		if ($component == self::COMPONENT_SERVER_HANODE1) {
+		switch ($component) {
+		case self::COMPONENT_SERVER_HANODE1:
 			$path = PHPUNIT_CONFIG_SOURCE_DIR.'zabbix_'.self::COMPONENT_SERVER.'.conf';
-		}
-		else {
+			break;
+		case self::COMPONENT_PROXY_HANODE1:
+			$path = PHPUNIT_CONFIG_SOURCE_DIR.'zabbix_'.self::COMPONENT_PROXY.'.conf';
+			break;
+		default:
 			$path = PHPUNIT_CONFIG_SOURCE_DIR.'zabbix_'.$component.'.conf';
 		}
 
@@ -575,9 +601,16 @@ class CIntegrationTest extends CAPITest {
 
 		$background = ($component === self::COMPONENT_AGENT2);
 
-		$bin_path = $component === self::COMPONENT_SERVER_HANODE1
-			? PHPUNIT_BINARY_DIR.'zabbix_'.self::COMPONENT_SERVER
-			: PHPUNIT_BINARY_DIR.'zabbix_'.$component;
+		switch ($component) {
+		case self::COMPONENT_SERVER_HANODE1:
+			$bin_path = PHPUNIT_BINARY_DIR.'zabbix_'.self::COMPONENT_SERVER;
+			break;
+		case self::COMPONENT_PROXY_HANODE1:
+			$bin_path = PHPUNIT_BINARY_DIR.'zabbix_'.self::COMPONENT_PROXY;
+			break;
+		default:
+			$bin_path = PHPUNIT_BINARY_DIR.'zabbix_'.$component;
+		}
 
 		self::executeCommand($bin_path, ['-c', $config], $background);
 		self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
@@ -648,7 +681,7 @@ class CIntegrationTest extends CAPITest {
 	protected function getClient($component) {
 		self::validateComponent($component);
 
-		if ($component === self::COMPONENT_AGENT || $component === self::COMPONENT_AGENT2) {
+		if ($component === self::COMPONENT_AGENT || $component === self::COMPONENT_AGENT2 || $component == self::COMPONENT_AGENT_3_0) {
 			throw new Exception('There is no client available for Zabbix Agent.');
 		}
 
@@ -665,7 +698,7 @@ class CIntegrationTest extends CAPITest {
 	protected function getActiveComponent() {
 		$components = [];
 		foreach (array_merge(self::$suite_components, $this->case_components) as $component) {
-			if ($component !== self::COMPONENT_AGENT && $component !== self::COMPONENT_AGENT2) {
+			if ($component !== self::COMPONENT_AGENT && $component !== self::COMPONENT_AGENT2 && $component !== self::COMPONENT_AGENT_3_0) {
 				$components[] = $component;
 			}
 		}
@@ -821,9 +854,30 @@ class CIntegrationTest extends CAPITest {
 			$component = $this->getActiveComponent();
 		}
 
-		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
+		if ($component == self::COMPONENT_PROXY_HANODE1) {
+			self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_proxy', [
+				'-c', PHPUNIT_CONFIG_DIR.'zabbix_'.self::COMPONENT_PROXY_HANODE1.'.conf', '--runtime-control', 'config_cache_reload'
+			]);
+		} else {
+			self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
+		}
 
 		sleep(self::CACHE_RELOAD_DELAY);
+	}
+
+	/**
+	 * Reload user parameters.
+	 *
+	 * @param string $component    component name or null for active component
+	 */
+	protected function reloadUserParameters($component = null) {
+		if ($component === null) {
+			$component = $this->getActiveComponent();
+		}
+
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'userparameter_reload']);
+
+		sleep(self::USER_PARAM_RELOAD_DELAY);
 	}
 
 	/**

@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 package alias
 
 import (
-	"zabbix.com/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent"
 )
 
 func (m *Manager) initialize(options *agent.AgentOptions) (err error) {

@@ -21,13 +21,14 @@ This template has been tested on:
 
 ## Setup
 
-1. Create user zabbix on the storage with browse role and enable it for all domains.
+1. Create a user on the storage with a browse role and enable it for all domains, for example "zabbix".
 2. The WSAPI server does not start automatically.
    Log in to the CLI as Super, Service, or any role granted the wsapi_set right.
    Start the WSAPI server by command: `startwsapi`.
    To check WSAPI state use command: `showwsapi`.
 3. Link template to the host.
-4. Configure macros {$HPE.PRIMERA.API.USERNAME} and {$HPE.PRIMERA.API.PASSWORD}.
+4. Set the hostname or IP address of the host in the {$HPE.PRIMERA.API.HOST} macro and configure the username and password in the {$HPE.PRIMERA.API.USERNAME} and {$HPE.PRIMERA.API.PASSWORD} macros.
+5. Change the {$HPE.PRIMERA.API.SCHEME} and {$HPE.PRIMERA.API.PORT} macros if needed.
 
 ### Macros used
 
@@ -41,6 +42,7 @@ This template has been tested on:
 |{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered tasks by type.</p>|`CHANGE_IF_NEEDED`|
 |{$HPE.PRIMERA.DATA.TIMEOUT}|<p>Response timeout for WSAPI.</p>|`15s`|
 |{$HPE.PRIMERA.API.SCHEME}|<p>The WSAPI scheme (http/https).</p>|`https`|
+|{$HPE.PRIMERA.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
 |{$HPE.PRIMERA.API.PORT}|<p>The WSAPI port.</p>|`443`|
 |{$HPE.PRIMERA.VOLUME.NAME.MATCHES}|<p>This macro is used in filters of volume discovery rule.</p>|`.*`|
 |{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES}|<p>This macro is used in filters of volume discovery rule.</p>|`^(admin\|.srdata\|.mgmtdata)$`|
@@ -74,14 +76,14 @@ This template has been tested on:
 |HPE Primera: Nodes total|<p>Total number of nodes in the system.</p>|Dependent item|hpe.primera.system.nodes.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalNodes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |HPE Primera: Nodes online|<p>Number of online nodes in the system.</p>|Dependent item|hpe.primera.system.nodes.online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.onlineNodes.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |HPE Primera: Disks total|<p>Number of physical disks.</p>|Dependent item|hpe.primera.disks.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HPE Primera: Service ping|<p>Checks if the service is running and accepting TCP connections.</p>|Simple check|net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|HPE Primera: Service ping|<p>Checks if the service is running and accepting TCP connections.</p>|Simple check|net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |HPE Primera: There are errors in requests to WSAPI|<p>Zabbix has received errors in requests to WSAPI.</p>|`length(last(/HPE Primera by HTTP/hpe.primera.get.errors))>0`|Average|**Depends on**:<br><ul><li>HPE Primera: Service is unavailable</li></ul>|
-|HPE Primera: Service is unavailable||`max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
+|HPE Primera: Service is unavailable||`max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
 
 ### LLD rule Common provisioning groups discovery
 

@@ -12,13 +12,14 @@ zabbix_export:
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create user zabbix on the storage with browse role and enable it for all domains.
+          1. Create a user on the storage with a browse role and enable it for all domains, for example "zabbix".
           2. The WSAPI server does not start automatically.
              - Log in to the CLI as Super, Service, or any role granted the wsapi_set right.
              - Start the WSAPI server by command: `startwsapi`.
              - To check WSAPI state use command: `showwsapi`.
           3. Link template to the host.
-          4. Configure macros {$HPE.PRIMERA.USERNAME} and {$HPE.PRIMERA.PASSWORD}.
+          4. Set the hostname or IP address of the host in the {$HPE.PRIMERA.API.HOST} macro and configure the username and password in the {$HPE.PRIMERA.API.USERNAME} and {$HPE.PRIMERA.API.PASSWORD} macros.
+          5. Change the {$HPE.PRIMERA.API.SCHEME} and {$HPE.PRIMERA.API.PORT} macros if needed.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -78,155 +79,155 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Primera = {
-                params: {},
-                session_key: null,
+            	params: {},
+            	session_key: null,
             
-                setParams: function (params) {
-                    ['username', 'password', 'base_url'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['username', 'password', 'base_url'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    Primera.params = params;
-                    if (typeof Primera.params.base_url === 'string' && !Primera.params.base_url.endsWith('/')) {
-                        Primera.params.base_url += '/';
-                    }
-                },
+            		Primera.params = params;
+            		if (typeof Primera.params.base_url === 'string' && !Primera.params.base_url.endsWith('/')) {
+            			Primera.params.base_url += '/';
+            		}
+            	},
             
-                login: function () {
-                    if (Primera.session_key !== null) {
-                        return;
-                    }
+            	login: function () {
+            		if (Primera.session_key !== null) {
+            			return;
+            		}
             
-                    var response, request = new HttpRequest();
-                    request.addHeader('Content-Type: application/json');
+            		var response, request = new HttpRequest();
+            		request.addHeader('Content-Type: application/json');
             
-                    response = request.post(Primera.params.base_url + 'api/v1/credentials', JSON.stringify({
-                        'user': Primera.params.username,
-                        'password': Primera.params.password
-                    }));
+            		response = request.post(Primera.params.base_url + 'api/v1/credentials', JSON.stringify({
+            			'user': Primera.params.username,
+            			'password': Primera.params.password
+            		}));
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    if (response !== null) {
-                        try {
-                            auth_data = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse auth response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by auth request.'
-                    }
+            		if (response !== null) {
+            			try {
+            				auth_data = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse auth response received from device API.';
+            			}
+            		}
+            		else {
+            			throw 'No data received by auth request.'
+            		}
             
-                    if ('key' in auth_data) {
-                        Primera.session_key = auth_data['key'];
-                    } else {
-                        throw 'Auth response does not contain session key.'
-                    }
-                },
+            		if ('key' in auth_data) {
+            			Primera.session_key = auth_data['key'];
+            		} else {
+            			throw 'Auth response does not contain session key.'
+            		}
+            	},
             
-                logout: function () {
-                    if (Primera.session_key !== null) {
-                        (new HttpRequest()).delete(Primera.params.base_url + 'api/v1/credentials/' + Primera.session_key);
-                    }
-                },
+            	logout: function () {
+            		if (Primera.session_key !== null) {
+            			(new HttpRequest()).delete(Primera.params.base_url + 'api/v1/credentials/' + Primera.session_key);
+            		}
+            	},
             
-                requestData: function (method) {
-                    if (Primera.session_key === null) {
-                        return;
-                    }
+            	requestData: function (method) {
+            		if (Primera.session_key === null) {
+            			return;
+            		}
             
-                    request = new HttpRequest();
-                    request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + Primera.session_key);
+            		request = new HttpRequest();
+            		request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + Primera.session_key);
             
-                    raw_data = request.get(Primera.params.base_url + 'api/v1/' + method);
+            		raw_data = request.get(Primera.params.base_url + 'api/v1/' + method);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    if (raw_data !== null) {
-                        try {
-                            return JSON.parse(raw_data);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by ' + method + ' request.';
-                    }
-                }
+            		if (raw_data !== null) {
+            			try {
+            				return JSON.parse(raw_data);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from device API.';
+            			}
+            		}
+            		else {
+            			throw 'No data received by ' + method + ' request.';
+            		}
+            	}
             };
             
             var methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
-                data = {};
+            	data = {};
             
             data['errors'] = {};
             
             try {
-                Primera.setParams(JSON.parse(value));
+            	Primera.setParams(JSON.parse(value));
             
-                try {
-                    Primera.login();
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            	try {
+            		Primera.login();
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    for (var i in methods) {
-                        try {
-                            if (methods[i] === 'tasks') {
-                                var result = [],
-                                    tmp_tasks = {};
+            	if (!('auth' in data.errors)) {
+            		for (var i in methods) {
+            			try {
+            				if (methods[i] === 'tasks') {
+            					var result = [],
+            						tmp_tasks = {};
             
-                                tasks = Primera.requestData(methods[i]);
+            					tasks = Primera.requestData(methods[i]);
             
-                                tasks.members.forEach(function (task) {
-                                    tmp_tasks[task.name] = task;
-                                });
+            					tasks.members.forEach(function (task) {
+            						tmp_tasks[task.name] = task;
+            					});
             
-                                for (var task in tmp_tasks) {
-                                    result.push(tmp_tasks[task]);
-                                }
+            					for (var task in tmp_tasks) {
+            						result.push(tmp_tasks[task]);
+            					}
             
-                                data[methods[i]] = result;
-                            }
-                            else {
-                                data[methods[i]] = Primera.requestData(methods[i]);
-                            }
-                        }
-                        catch (error) {
-                            data.errors[methods[i]] = error.toString();
-                        }
-                    }
-                }
+            					data[methods[i]] = result;
+            				}
+            				else {
+            					data[methods[i]] = Primera.requestData(methods[i]);
+            				}
+            			}
+            			catch (error) {
+            				data.errors[methods[i]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             try {
-                Primera.logout();
+            	Primera.logout();
             }
             catch (error) {
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -234,7 +235,7 @@ zabbix_export:
           timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{$HPE.PRIMERA.API.HOST}:{$HPE.PRIMERA.API.PORT}'
             - name: password
               value: '{$HPE.PRIMERA.API.PASSWORD}'
             - name: username
@@ -291,7 +292,7 @@ zabbix_export:
               description: 'Zabbix has received errors in requests to WSAPI.'
               dependencies:
                 - name: 'HPE Primera: Service is unavailable'
-                  expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
+                  expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
               tags:
                 - tag: scope
                   value: availability
@@ -689,7 +690,7 @@ zabbix_export:
         - uuid: a0b4fdee38a64c5f82fd051ea74a7b2d
           name: 'HPE Primera: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"]'
+          key: 'net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"]'
           history: 7d
           description: 'Checks if the service is running and accepting TCP connections.'
           valuemap:
@@ -705,7 +706,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 8e7aa46322c643878e509461dbb9169d
-              expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
+              expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
               name: 'HPE Primera: Service is unavailable'
               priority: HIGH
               manual_close: 'YES'
@@ -3652,6 +3653,9 @@ zabbix_export:
         - tag: target
           value: primera
       macros:
+        - macro: '{$HPE.PRIMERA.API.HOST}'
+          value: '<SET API HOST>'
+          description: 'The hostname or IP address of the API host.'
         - macro: '{$HPE.PRIMERA.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Specify password for WSAPI.'

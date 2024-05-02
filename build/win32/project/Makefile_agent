@@ -54,6 +54,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexpr\expr.o \
 	..\..\..\src\libs\zbxexpr\function.o \
 	..\..\..\src\libs\zbxexpr\host.o \
+	..\..\..\src\libs\zbxexpr\interval.o \
 	..\..\..\src\libs\zbxexpr\macro.o \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
@@ -62,7 +63,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcomms\telnet.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
-	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcfg\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxgetopt\getopt.o \
 	..\..\..\src\libs\zbxhash\md5.o \
@@ -78,6 +79,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexec\execute.o \
 	..\..\..\src\libs\zbxhash\zbxhash.o \
 	..\..\..\src\libs\zbxhttp\http.o \
+	..\..\..\src\libs\zbxcurl\curl.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \
 	..\..\..\src\libs\zbxhttp\charset.o \
@@ -122,9 +124,10 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwinservice\service.o \
 	..\..\..\src\zabbix_agent\active_checks\active_checks.o \
-	..\..\..\src\zabbix_agent\eventlog\eventlog.o \
-	..\..\..\src\zabbix_agent\eventlog\process_eventslog.o \
-	..\..\..\src\zabbix_agent\eventlog\process_eventslog6.o \
+	..\..\..\src\zabbix_agent\metrics\metrics.o \
+	..\..\..\src\zabbix_agent\active_checks\eventlog_win32\eventlog.o \
+	..\..\..\src\zabbix_agent\active_checks\eventlog_win32\process_eventslog.o \
+	..\..\..\src\zabbix_agent\active_checks\eventlog_win32\process_eventslog6.o \
 	..\..\..\src\zabbix_agent\listener\listener.o \
 	..\..\..\src\zabbix_agent\logfiles\persistent_state.o \
 	..\..\..\src\zabbix_agent\logfiles\logfiles.o \

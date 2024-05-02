@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,14 +24,14 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
 /**
  * "Test item prototype" function tests.
  *
- * @dataSource Proxies
+ * @dataSource Proxies, GlobalMacros
  *
  * @backup items
  */
 class testFormTestItemPrototype extends testItemTest {
 
-	const HOST_LLD_ID = 99294;		// 'Test discovery rule on Test item host'
-	const TEMPLATE_LLD_ID = 99349;  // 'Test discovery rule on Test Item Template'
+	const HOST_LLD_ID = 99294;		// 'Test discovery rule' on 'Test item host'
+	const TEMPLATE_LLD_ID = 99349;  // 'Test discovery rule' on 'Test Item Template'
 
 	/**
 	 * Check Test item prototype Button enabled/disabled state depending on item type for Host.

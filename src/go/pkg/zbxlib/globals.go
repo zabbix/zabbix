@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,19 +32,20 @@ ZBX_GET_CONFIG_VAR(int, config_unsafe_user_parameters, 0)
 ZBX_GET_CONFIG_VAR2(char *, const char *, config_source_ip, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, config_host_metadata, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, config_host_metadata_item, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, config_service_name, NULL)
 
 void	init_globals(void)
 {
 	zbx_init_library_sysinfo(get_config_timeout, get_config_enable_remote_commands,
 			get_config_log_remote_commands, get_config_unsafe_user_parameters, get_config_source_ip,
 			get_config_hostname, get_config_hostnames, get_config_host_metadata,
-			get_config_host_metadata_item);
+			get_config_host_metadata_item, get_config_service_name);
 }
 */
 import "C"
 
 import (
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (

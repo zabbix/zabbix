@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxcomms.h"
-#include "cfg.h"
+#include "zbxcfg.h"
 
 #define HOST_INTERFACE_LEN	255	/* UTF-8 characters, not bytes */
 

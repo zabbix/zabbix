@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,9 @@
 				if (e.target.classList.contains('js-edit-proxy')) {
 					this._edit({proxyid: e.target.dataset.proxyid});
 				}
+				else if (e.target.classList.contains('js-edit-proxy-group')) {
+					this.#editProxyGroup(e.target.dataset.proxy_groupid);
+				}
 				else if (e.target.classList.contains('js-edit-host')) {
 					this._editHost(e.target.dataset.hostid);
 				}
@@ -71,6 +74,16 @@
 		_edit(parameters = {}) {
 			const overlay = PopUp('popup.proxy.edit', parameters, {
 				dialogueid: 'proxy_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
+		}
+
+		#editProxyGroup(proxy_groupid) {
+			const overlay = PopUp('popup.proxygroup.edit', {proxy_groupid}, {
+				dialogueid: 'proxy-group-edit',
 				dialogue_class: 'modal-popup-static',
 				prevent_navigation: true
 			});

@@ -85,6 +85,11 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "nájdené %1$d zhody pre %2$s "
 
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -458,6 +463,10 @@ msgstr ""
 #: app/views/administration.user.list.php:137
 msgid "API access"
 msgstr "API prístup"
+
+#: app/views/mfa.edit.php:102
+msgid "API hostname"
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -1108,6 +1117,14 @@ msgstr "Ďalšie pravidlá"
 msgid "Address"
 msgstr "Adresa"
 
+#: app/controllers/CControllerProxyCreate.php:72
+#: app/controllers/CControllerProxyCreate.php:80
+#: app/controllers/CControllerProxyUpdate.php:67
+#: app/controllers/CControllerProxyUpdate.php:75
+#: app/views/popup.proxy.edit.php:90
+msgid "Address for active agents"
+msgstr ""
+
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
 msgstr "Administrátor"
@@ -1131,6 +1148,17 @@ msgstr "Rozšírené poznámky"
 
 #: app/views/popup.import.php:148
 msgid "Advanced options"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:737
+#: include/views/configuration.host.discovery.list.php:157
+#: include/views/configuration.host.discovery.list.php:172
+msgid "After"
+msgstr ""
+
+#: app/views/js/mfa.edit.js.php:168
+msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
 msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:266
@@ -1560,6 +1588,10 @@ msgstr "Tvrdenia"
 msgid "Asset tag"
 msgstr "Inventárne číslo"
 
+#: app/partials/configuration.host.edit.html.php:331
+msgid "Assigned proxy"
+msgstr ""
+
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
 msgid "At %1$s %2$s of every %3$s week"
@@ -1593,6 +1625,10 @@ msgstr "O (hodina:minúta)"
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Musí existovať aspoň jeden server LDAP."
+
+#: include/classes/api/services/CAuthentication.php:234
+msgid "At least one MFA method must exist."
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2121,6 +2157,18 @@ msgstr "Percento využitia CPU. Vráti float"
 msgid "CRLF"
 msgstr "CRLF"
 
+#: tests/selenium/modules/module_number_7/Module.php:17
+msgid "CSRF test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
+msgid "CSRF token test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
+msgid "CSRF token validation succeeded."
+msgstr ""
+
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
 msgstr "CSV na JSON"
@@ -2290,6 +2338,11 @@ msgstr "Nie je možné pridať mapu siete"
 #: app/controllers/CControllerProxyCreate.php:235
 msgid "Cannot add proxy"
 msgstr "Nie je možné pridať proxy"
+
+#: app/controllers/CControllerProxyGroupCreate.php:42
+#: app/controllers/CControllerProxyGroupCreate.php:74
+msgid "Cannot add proxy group"
+msgstr ""
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2569,6 +2622,11 @@ msgstr[0] "Nie je možné odstrániť token API"
 msgstr[1] "Nie je možné odstrániť tokeny API"
 msgstr[2] " "
 
+#: include/classes/api/services/CMfa.php:459
+#, c-format
+msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
@@ -2608,6 +2666,10 @@ msgid_plural "Cannot delete dashboards"
 msgstr[0] "Nie je možné odstrániť dashboard"
 msgstr[1] "Nie je možné odstrániť dashboardy"
 msgstr[2] " "
+
+#: include/classes/api/services/CMfa.php:446
+msgid "Cannot delete default MFA method."
+msgstr ""
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -2765,6 +2827,17 @@ msgid_plural "Cannot delete proxies"
 msgstr[0] "Nie je možné zmazať proxy"
 msgstr[1] "Nie je možné zmazať proxy"
 msgstr[2] "Nie je možné zmazať proxy"
+
+#: app/controllers/CControllerProxyGroupDelete.php:78
+msgid "Cannot delete proxy group"
+msgid_plural "Cannot delete proxy groups"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerProxyGroupDelete.php:39
+msgid "Cannot delete proxy groups"
+msgstr ""
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -3639,6 +3712,10 @@ msgstr "Nie je možné hromadne aktualizovať meno hosta."
 msgid "Cannot mass update visible host name."
 msgstr "Nie je možné hromadne aktualizovať zobrazované meno hosta."
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -3700,6 +3777,13 @@ msgstr "Značku s názvom „%1$s“ a hodnotou „%2$s“ definovanú v prototy
 #: include/classes/api/services/CUser.php:510
 msgid "Cannot rename guest user."
 msgstr "Nie je možné premenovať používateľa guest."
+
+#: app/controllers/CControllerUserResetTotp.php:85
+msgid "Cannot reset TOTP secret"
+msgid_plural "Cannot reset TOTP secrets"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
@@ -4074,6 +4158,11 @@ msgstr "Nie je možné aktualizovať proxy"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Nie je možné aktualizovať proxy pre zisteného hosta \"%1$s\"."
 
+#: app/controllers/CControllerProxyGroupUpdate.php:43
+#: app/controllers/CControllerProxyGroupUpdate.php:82
+msgid "Cannot update proxy group"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:768
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
@@ -4265,6 +4354,10 @@ msgstr "Zmeniť"
 #: include/views/configuration.host.prototype.edit.php:510
 msgid "Change PSK"
 msgstr "Zmeniť PSK"
+
+#: app/views/mfa.edit.php:128
+msgid "Change client secret"
+msgstr ""
 
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
@@ -4477,6 +4570,14 @@ msgstr "Kliknite a potiahnite na požadovanú veľkosť."
 msgid "Click to view or edit"
 msgstr "Kliknutím zobrazíte alebo upravíte"
 
+#: app/views/mfa.edit.php:111
+msgid "Client ID"
+msgstr ""
+
+#: app/views/mfa.edit.php:120
+msgid "Client secret"
+msgstr ""
+
 #: widgets/clock/Widget.php:46
 msgid "Clock"
 msgstr "Hodiny"
@@ -4561,6 +4662,10 @@ msgstr "Zavrieť problém"
 msgid "Close problems"
 msgstr "Zavrieť problémy"
 
+#: app/views/mfa.edit.php:90
+msgid "Code length"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
 #: include/classes/html/CFormFieldsetCollapsible.php:45
@@ -4604,6 +4709,10 @@ msgstr "Farba \"%1$s\" nie je v správnom formáte: očakávaný je kód farby v
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
 msgstr "Farba (OK)"
+
+#: widgets/honeycomb/includes/WidgetForm.php:213
+msgid "Color interpolation"
+msgstr ""
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -4795,6 +4904,10 @@ msgstr "Nastavenie máp siete"
 #: app/controllers/CControllerProxyList.php:197
 msgid "Configuration of proxies"
 msgstr "Nastavenie proxy"
+
+#: app/controllers/CControllerProxyGroupList.php:131
+msgid "Configuration of proxy groups"
+msgstr ""
 
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
@@ -5116,6 +5229,10 @@ msgstr "Ponuka obsahu"
 msgid "Context name"
 msgstr "Meno kontextu"
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr "Pokračovať v prepisoch"
@@ -5406,6 +5523,10 @@ msgstr "Vytvoriť nové"
 msgid "Create proxy"
 msgstr "Vytvoriť proxy"
 
+#: app/views/administration.proxygroup.list.php:168
+msgid "Create proxy group"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
 msgstr "Vytvoriť report"
@@ -5639,6 +5760,12 @@ msgstr "DNS"
 #: include/views/inventory.host.view.php:81
 msgid "DNS name"
 msgstr "DNS meno"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "DUO Universal Prompt"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
@@ -6006,6 +6133,10 @@ msgstr "Predvolené (%1$s)"
 msgid "Default LDAP server must be specified."
 msgstr "Musí byť špecifikovaný predvolený server LDAP."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:241
+msgid "Default MFA method must be specified."
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:143
 msgid "Default access to new UI elements"
 msgstr "Predvolený prístup k novým prvkom používateľského rozhrania"
@@ -6025,6 +6156,10 @@ msgstr "Predvolená autentifikácia"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "Predvolený mód inventára hosta"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -6056,6 +6191,11 @@ msgstr "Predvolená téma"
 #: include/classes/setup/CSetupWizard.php:716
 msgid "Default time zone"
 msgstr "Predvolené časové pásmo"
+
+#: app/views/administration.proxygroup.list.php:55
+#: app/views/administration.proxygroup.list.php:111
+msgid "Degrading"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:160 app/views/popup.massupdate.item.php:276
 msgid "Delay"
@@ -6187,6 +6327,11 @@ msgstr "Zmazať položku?"
 #: jsLoader.php:276
 msgid "Delete links between selected elements?"
 msgstr "Zmazať prepojenia medzi označenými elementmi?"
+
+#: include/views/configuration.host.discovery.edit.php:716
+#: include/views/configuration.host.discovery.list.php:151
+msgid "Delete lost resources"
+msgstr ""
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6370,6 +6515,15 @@ msgstr "Zmazať označené typy médií?"
 #: app/views/js/administration.proxy.list.js.php:143
 msgid "Delete selected proxies?"
 msgstr "Zmazať označené proxy?"
+
+#: app/views/js/administration.proxygroup.list.js.php:88
+#: app/views/popup.proxygroup.edit.php:147
+msgid "Delete selected proxy group?"
+msgstr ""
+
+#: app/views/js/administration.proxygroup.list.js.php:87
+msgid "Delete selected proxy groups?"
+msgstr ""
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -6717,6 +6871,11 @@ msgstr "Zakázať hostov monitorovaných cez označené proxy?"
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "Zakázať hostov monitorovaných vybratým serverom proxy?"
 
+#: include/views/configuration.host.discovery.edit.php:730
+#: include/views/configuration.host.discovery.list.php:166
+msgid "Disable lost resources"
+msgstr ""
+
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
@@ -6878,6 +7037,14 @@ msgstr "Zakázať označené scenáre?"
 msgid "Disabled"
 msgstr "Vypnuté"
 
+#: app/partials/configuration.host.edit.html.php:181
+#: app/partials/item.edit.item.tab.php:852
+#: app/partials/trigger.edit.trigger.tab.php:295
+#: app/views/configuration.host.list.php:511 app/views/item.list.php:219
+#: app/views/trigger.list.php:358
+msgid "Disabled automatically by an LLD rule."
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
 msgid "Disaster"
@@ -6946,6 +7113,10 @@ msgstr "Zisťovania"
 #: include/classes/helpers/CRoleHelper.php:472
 msgid "Discovery actions"
 msgstr "Discovery akcie"
+
+#: app/views/configuration.discovery.edit.php:52
+msgid "Discovery by"
+msgstr ""
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -7104,6 +7275,10 @@ msgstr "Zobrazovať spúšťače v stave OK po dobu"
 msgid "Display graph"
 msgstr "Zobraziť graf"
 
+#: widgets/svggraph/includes/WidgetForm.php:364
+msgid "Display min/avg/max"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
 msgstr "Zobraziť min/max/priem"
@@ -7250,6 +7425,24 @@ msgstr "Vykresliť"
 #: include/views/configuration.graph.edit.php:388
 msgid "Draw style"
 msgstr "Štýl vykreslenia"
+
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3493
+msgid "Duo state does not match saved state."
+msgstr ""
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7525,6 +7718,10 @@ msgstr "Povoliť hostov monitorovaných cez označené proxy?"
 msgid "Enable internal housekeeping"
 msgstr "Povoliť internú údržbu"
 
+#: app/views/administration.authentication.edit.php:564
+msgid "Enable multi-factor authentication"
+msgstr ""
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7649,6 +7846,10 @@ msgstr "Povoliť označené scenáre?"
 msgid "Enable trapping"
 msgstr "Povoliť zachytávanie"
 
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr ""
+
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
 #: app/partials/configuration.host.edit.html.php:265
@@ -7761,6 +7962,10 @@ msgstr "Chyba rozpočtu"
 msgctxt "compact table header"
 msgid "Error budget"
 msgstr "Chyba rozpočtu"
+
+#: include/classes/api/services/CUser.php:3506
+msgid "Error decoding Duo result."
+msgstr ""
 
 #: include/db.inc.php:554
 #, c-format
@@ -8212,6 +8417,11 @@ msgstr ""
 msgid "Failed to update widget properties."
 msgstr "Nepodarilo sa aktualizovať vlastnosti widgetu."
 
+#: app/views/administration.proxygroup.list.php:79
+#: app/views/popup.proxygroup.edit.php:51
+msgid "Failover period"
+msgstr ""
+
 #: include/items.inc.php:37
 msgid "Failure Audit"
 msgstr "Neúspešný audit"
@@ -8538,6 +8748,11 @@ msgstr "Frontend prístup"
 msgid "Frontend messaging"
 msgstr "Povoliť frontend správy"
 
+#: app/views/administration.user.edit.php:731
+#: app/views/administration.user.edit.php:826
+msgid "Frontend notifications"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:136
@@ -8637,6 +8852,18 @@ msgstr ""
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "Globálny regulárny výraz „%1$s“ neexistuje."
+
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr ""
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr ""
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
@@ -8923,6 +9150,12 @@ msgstr "Skupina \"%1$s\" pre host \"%2$s\" neexistuje."
 msgid "Group base DN"
 msgstr "Group base DN"
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
 msgstr "Konfigurácia skupiny"
@@ -9035,6 +9268,10 @@ msgstr "Hardvér (podrobne)"
 #: include/classes/data/CItemData.php:1313
 msgid "Hardware sensor reading. Returns float"
 msgstr "Čítanie hardvérového senzoru. Vráti desatinné číslo"
+
+#: app/views/mfa.edit.php:77
+msgid "Hash function"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
@@ -9198,6 +9435,10 @@ msgstr "Funkcie histórie"
 msgid "Home"
 msgstr "Domov"
 
+#: widgets/honeycomb/Widget.php:29
+msgid "Honeycomb"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
 msgid "Horizontal"
@@ -9278,6 +9519,11 @@ msgstr "Host \"%1$s\" nemôže byť bez host grupy."
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy \"%2$s\"."
 msgstr "Host \"%1$s\" je monitorovaný serverom proxy \"%2$s\"."
+
+#: include/classes/api/services/CProxyGroup.php:456
+#, c-format
+msgid "Host \"%1$s\" is monitored by proxy group \"%2$s\"."
+msgstr ""
 
 #: include/actions.inc.php:57
 msgid "Host IP"
@@ -9507,6 +9753,10 @@ msgstr "Hostove metaúdaje"
 msgid "Host name"
 msgstr "Meno hosta"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Siete hosta"
@@ -9585,6 +9835,10 @@ msgstr "Prototypy hostov"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "Hostov smerovač"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -10984,6 +11238,18 @@ msgstr "Počiatočný pohľad"
 msgid "Initial view is ignored if the default view is set."
 msgstr "Ak je nastavené predvolené zobrazenie, počiatočné zobrazenie sa ignoruje."
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "Vložiť"
@@ -11148,6 +11414,11 @@ msgstr "Neplatná konfigurácia mapovania skupiny používateľov poskytovania L
 msgid "Invalid LDAP configuration"
 msgstr "Neplatná konfigurácia LDAP"
 
+#: app/controllers/CControllerMfaCheck.php:53
+#: app/controllers/CControllerMfaEdit.php:48
+msgid "Invalid MFA configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr "Neplatná konfigurácia mapovania typov médií poskytovania SAML JIT."
@@ -11155,6 +11426,11 @@ msgstr "Neplatná konfigurácia mapovania typov médií poskytovania SAML JIT."
 #: app/controllers/CControllerAuthenticationUpdate.php:202
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr "Neplatná konfigurácia mapovania skupiny používateľov poskytovania SAML JIT."
+
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr ""
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -11183,6 +11459,10 @@ msgstr "Neplatná e-mailová adresa „%1$s“."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Neplatná e-mailová adresa pre typ média s ID „%1$s“."
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -11654,6 +11934,10 @@ msgstr "Položka je v \"not supported\" stave"
 msgid "Item list"
 msgstr "Zoznam itemov"
 
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Položka nie je označená"
@@ -11934,6 +12218,10 @@ msgstr "Server LDAP"
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP autentifikácia"
+
+#: app/views/usergroup.edit.php:109
+msgid "LDAP authentication is disabled system-wide."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
@@ -12285,6 +12573,14 @@ msgstr "Zoznam hodnôt alebo kľúčov databázy Registry systému Windows umies
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
 msgstr "Zoznam proxy serverov Zabbix s názvom, režimom, šifrovaním, kompresiou, verziou, naposledy zobrazeným, počtom hostiteľov, počtom položiek, požadovanými hodnotami za sekundu (vps) a kompatibilitou (aktuálne/zastarané/nepodporované). Vráti JSON."
 
+#: include/classes/data/CItemData.php:2877
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2905
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Zoznam blokových zariadení a ich typ. Vráti JSON"
@@ -12390,6 +12686,10 @@ msgstr "Zemepisná dĺžka umiestnenia"
 msgid "Log"
 msgstr "Log"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Log monitoring s podporou rotovania log súboru. Vráti log"
@@ -12397,6 +12697,10 @@ msgstr "Log monitoring s podporou rotovania log súboru. Vráti log"
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "Log monitoring. Vráti log"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12493,6 +12797,19 @@ msgstr "MD2"
 #: include/classes/data/CItemData.php:1639
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "MD5 kontrolný súčet súboru. Vráti reťazec (MD5 hash súboru)"
+
+#: app/views/mfa.edit.php:161
+msgid "MFA method"
+msgstr ""
+
+#: include/classes/api/services/CMfa.php:243
+#, c-format
+msgid "MFA method \"%1$s\" already exists."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:606
+msgid "MFA settings"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -12635,6 +12952,10 @@ msgstr "Manuálna akcia udalosti"
 #: app/views/administration.script.list.php:159
 msgid "Manual host action"
 msgstr "Manuálna akcia hosta"
+
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -12892,6 +13213,10 @@ msgstr "Maximálna úroveň priblíženia"
 msgid "Maximum concurrent checks"
 msgstr ""
 
+#: app/views/configuration.discovery.edit.php:85
+msgid "Maximum concurrent checks per type"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Maximálny počet otvorených súborov podporovaný OS. Vráti celé číslo"
@@ -12899,6 +13224,11 @@ msgstr "Maximálny počet otvorených súborov podporovaný OS. Vráti celé č�
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "Maximálny počet procesov podporovaný OS. Vráti celé číslo"
+
+#: widgets/piechart/views/widget.edit.js.php:680
+#: widgets/svggraph/views/widget.edit.js.php:805
+msgid "Maximum number of rows"
+msgstr ""
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -13154,6 +13484,10 @@ msgstr "Správy"
 msgid "Method not found."
 msgstr "Metóda nenájdená."
 
+#: app/views/administration.authentication.edit.php:572
+msgid "Methods"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "Microsoft Edge"
@@ -13175,9 +13509,17 @@ msgstr "Stred"
 msgid "Min"
 msgstr "Min"
 
+#: app/views/popup.proxygroup.edit.php:59
+msgid "Minimum number of proxies"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
 msgstr "Minimálna dĺžka hesla"
+
+#: app/views/administration.proxygroup.list.php:81
+msgid "Minimum proxies"
+msgstr ""
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -13427,6 +13769,23 @@ msgstr "Najkritickejšie z podradených služieb"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
+#: app/views/administration.user.list.php:320
+msgid "Multi-factor TOTP secret will be deleted."
+msgstr ""
+
+#: app/views/administration.user.list.php:321
+msgid "Multi-factor TOTP secrets will be deleted."
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:236
+#: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
+msgid "Multi-factor authentication"
+msgstr ""
+
+#: app/views/usergroup.edit.php:111
+msgid "Multi-factor authentication is disabled system-wide."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
 msgstr "Viacnásobné"
@@ -13438,6 +13797,11 @@ msgstr "Viacnásobné PROBLÉMOVÉ udalosti"
 #: jsLoader.php:284
 msgid "Mute"
 msgstr "Stlmiť"
+
+#: jsLoader.php:286
+#, c-format
+msgid "Mute for %1$s"
+msgstr ""
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -13739,6 +14103,10 @@ msgstr "Nový token API"
 msgid "New LDAP server"
 msgstr "Nový server LDAP"
 
+#: app/views/mfa.edit.php:149
+msgid "New MFA method"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr "Nová SLA"
@@ -13842,6 +14210,11 @@ msgstr "Nová operácia"
 #: app/views/popup.proxy.edit.php:347 app/views/popup.proxy.edit.php:376
 msgid "New proxy"
 msgstr "Nový proxy"
+
+#: app/views/popup.proxygroup.edit.php:127
+#: app/views/popup.proxygroup.edit.php:156
+msgid "New proxy group"
+msgstr ""
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14378,6 +14751,10 @@ msgstr "Žiadny príjemcovia pre operáciu odoslania správy."
 msgid "No refresh"
 msgstr "Neobnovovať"
 
+#: include/classes/api/services/CUser.php:3489
+msgid "No saved state, please login again."
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
 msgstr "Nie je špecifikovany skript pre akciu príkazu."
@@ -14626,6 +15003,10 @@ msgstr "Počet položiek vo fronte, ktoré sú oneskorené na serveri Zabbix ale
 msgid "Number of monitored hosts"
 msgstr "Počet monitorovaných hostov"
 
+#: include/classes/data/CItemData.php:2891
+msgid "Number of online proxies. Returns integer."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Počet out-of-window kolízií. Vráti celé číslo"
@@ -14806,6 +15187,12 @@ msgstr "Október"
 msgid "Off"
 msgstr "Vypnuté"
 
+#: app/views/administration.proxygroup.list.php:56
+#: app/views/administration.proxygroup.list.php:99
+#: app/views/administration.proxy.list.php:166
+msgid "Offline"
+msgstr ""
+
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
 #: app/views/js/mediatype.test.edit.js.php:103
@@ -14861,6 +15248,16 @@ msgstr "Jeden"
 msgid "One time only"
 msgstr "Jednorázovo"
 
+#: app/views/administration.proxygroup.list.php:54
+#: app/views/administration.proxygroup.list.php:107
+#: app/views/administration.proxy.list.php:170
+msgid "Online"
+msgstr ""
+
+#: app/views/administration.proxygroup.list.php:80
+msgid "Online proxies"
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Len kontroly typu Zabbix agent, SNMPv1, SNMPv2 alebo SNMPv3 môžu byť unikátne."
@@ -14913,6 +15310,10 @@ msgstr "Vlastníka reportu môžu nastaviť iba superadministrátori."
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na monitorovaných položkách sú započítané"
+
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
@@ -15180,6 +15581,10 @@ msgstr "Prepísaná položka historickej periódy"
 msgid "Override item trend period"
 msgstr "Prepísaná položka trendovej periódy"
 
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
 msgid "Override with name \"%1$s\" already exists."
@@ -15237,6 +15642,14 @@ msgstr "PHP modul ctype"
 #: include/classes/setup/CFrontendSetup.php:579
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "PHP rozšírenie ctype chýba (PHP parameter --enable-ctype)."
+
+#: include/classes/setup/CFrontendSetup.php:687
+msgid "PHP curl"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:691
+msgid "PHP curl extension missing."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
@@ -15629,6 +16042,10 @@ msgstr "Percentá"
 msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2898
+msgid "Percentage of online proxies. Returns float."
+msgstr ""
+
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr ""
@@ -15748,6 +16165,10 @@ msgstr "Prosím vytvorte databázu a nastavte konfiguračné parametre databázy
 #: include/classes/setup/CSetupWizard.php:240
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "Povoľte príkaz „allow_url_fopen“."
+
+#: include/views/mfa.login.php:62
+msgid "Please scan and get your verification code displayed in your authenticator app."
+msgstr ""
 
 #: jsLoader.php:261
 msgid "Please select two elements"
@@ -15950,6 +16371,15 @@ msgstr "Primárny POC telefón B"
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
 msgstr "Primárne POC meno obrazovky"
+
+#: widgets/honeycomb/includes/WidgetForm.php:109
+#: widgets/honeycomb/includes/WidgetForm.php:125
+#: widgets/honeycomb/includes/WidgetForm.php:131
+#: widgets/honeycomb/includes/WidgetForm.php:142
+#: widgets/honeycomb/includes/WidgetForm.php:148
+#: widgets/honeycomb/views/widget.edit.php:84
+msgid "Primary label"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16239,6 +16669,57 @@ msgstr[0] "Proxy zmazaná"
 msgstr[1] "Proxy zmazaná"
 msgstr[2] "Proxy zmazaná"
 
+#: app/controllers/CControllerAuditLogList.php:239
+#: app/partials/configuration.host.edit.html.php:266
+#: app/views/configuration.host.list.php:153
+#: app/views/popup.massupdate.host.php:114 app/views/popup.proxy.edit.php:70
+#: app/views/popup.proxygroup.edit.php:112
+#: include/views/configuration.host.prototype.edit.php:303
+msgid "Proxy group"
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:369
+#, c-format
+msgid "Proxy group \"%1$s\" already exists."
+msgstr ""
+
+#: include/classes/import/importers/CHostImporter.php:348
+#, c-format
+msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:437
+#, c-format
+msgid "Proxy group \"%1$s\" is used by proxy \"%2$s\"."
+msgstr ""
+
+#: app/controllers/CControllerProxyGroupCreate.php:66
+msgid "Proxy group added"
+msgstr ""
+
+#: app/controllers/CControllerProxyGroupDelete.php:70
+msgid "Proxy group deleted"
+msgid_plural "Proxy groups deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerProxyGroupUpdate.php:74
+msgid "Proxy group updated"
+msgstr ""
+
+#: app/controllers/CControllerPopupGeneric.php:227
+#: app/views/administration.proxygroup.list.php:163
+#: app/views/configuration.host.list.php:177
+#: include/classes/helpers/CMenuHelper.php:378
+#: include/classes/helpers/CRoleHelper.php:512
+msgid "Proxy groups"
+msgstr ""
+
+#: app/partials/configuration.host.edit.html.php:334
+msgid "Proxy is not assigned yet."
+msgstr ""
+
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
 msgstr "Proxy režim"
@@ -16472,6 +16953,11 @@ msgstr "Príjemcovia"
 msgid "Recordset ID"
 msgstr "ID sady záznamov"
 
+#: app/views/administration.proxygroup.list.php:57
+#: app/views/administration.proxygroup.list.php:103
+msgid "Recovering"
+msgstr ""
+
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
 #: app/views/trigger.prototype.list.php:146
 #: include/classes/screens/CScreenProblem.php:1502
@@ -16508,6 +16994,10 @@ msgstr "Obdĺžnik"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Referenčný atribút"
+
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -16941,6 +17431,10 @@ msgstr "Požadované vps"
 msgid "Reset"
 msgstr "Reset"
 
+#: app/views/administration.user.list.php:318
+msgid "Reset TOTP secret"
+msgstr ""
+
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
 #: app/views/js/administration.housekeeping.edit.js.php:85
@@ -17063,6 +17557,14 @@ msgstr "Výsledok je NEPRAVDA"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "Výsledok je PRAVDA"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -17617,6 +18119,10 @@ msgstr ""
 msgid "Scan directory"
 msgstr "Skenovať adresár"
 
+#: include/views/mfa.login.php:60
+msgid "Scan this QR code"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
 msgstr "Scenár"
@@ -17841,6 +18347,15 @@ msgstr "Sekundárny POC telefón B"
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
 msgstr "Sekundárne POC meno obrazovky"
+
+#: widgets/honeycomb/includes/WidgetForm.php:110
+#: widgets/honeycomb/includes/WidgetForm.php:172
+#: widgets/honeycomb/includes/WidgetForm.php:178
+#: widgets/honeycomb/includes/WidgetForm.php:189
+#: widgets/honeycomb/includes/WidgetForm.php:195
+#: widgets/honeycomb/views/widget.edit.php:98
+msgid "Secondary label"
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -18453,6 +18968,10 @@ msgstr "Zobraziť nedostupné mapy"
 msgid "Show units"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:210
+msgid "Show value"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
 msgstr "Zobraziť varovanie ak je Zabbix server vypnutý"
@@ -18464,6 +18983,10 @@ msgstr "Zobraziť pracovný čas"
 #: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
 msgid "Shown"
 msgstr "Zobraz"
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -18593,6 +19116,11 @@ msgstr "Slovensky (sk_SK)"
 #: jsLoader.php:288
 msgid "Snooze"
 msgstr "Odložiť"
+
+#: jsLoader.php:291
+#, c-format
+msgid "Snooze for %1$s"
+msgstr ""
 
 #: include/hosts.inc.php:174
 msgid "Software"
@@ -18758,6 +19286,10 @@ msgstr "Čas štartu Zabbix servera, Unix timestamp."
 #: include/views/configuration.host.discovery.list.php:161
 msgid "State"
 msgstr "Stav"
+
+#: include/classes/data/CItemData.php:2912
+msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
+msgstr ""
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -19012,6 +19544,10 @@ msgstr "Subjekt"
 msgid "Submap"
 msgstr "Podmapa"
 
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
+msgid "Submit"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
 msgstr "Predplatné"
@@ -19145,6 +19681,10 @@ msgstr "Systémové meno hosta. Vráti reťazec"
 msgid "System information"
 msgstr "Systémové informácie"
 
+#: include/classes/setup/CFrontendSetup.php:693
+msgid "System locale"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
 msgstr "Štatistika systému. Vráti celé alebo desatinné číslo"
@@ -19183,6 +19723,21 @@ msgstr "TELNET agent"
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
 msgstr "SPOLU"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
+msgid "TOTP"
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:77
+#, c-format
+msgid "TOTP secret for user \"%1$s\" has been reset."
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:81
+msgid "TOTP secret reset successful."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -19580,6 +20135,16 @@ msgstr "Testovací reťazec"
 msgid "Test subject"
 msgstr "Testovaný subjekt"
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:152
+#: app/controllers/CControllerPopupItemTestSend.php:256
+#: app/views/popup.itemtestedit.view.php:256
+msgid "Test with"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -19607,6 +20172,20 @@ msgstr "Metóda \"%1$s.%2$s\" musí byť volaná bez autorizačnej hlavičky."
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "\"%1$s.%2$s\" metóda musí byť volaná bez \"auth\" parametra."
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+#: include/html.inc.php:725 include/html.inc.php:740 include/html.inc.php:746
+#: include/html.inc.php:752 include/html.inc.php:763 include/html.inc.php:769
+#: include/html.inc.php:775
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s, %3$s."
+msgstr ""
+
+#: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
@@ -19735,6 +20314,14 @@ msgstr "Trigger už nieje viac objavený a bude odstránený o %1$s (na %2$s o %
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Trigger už nebude objavený a bude odstránený pri ďalšom spracovaní pravidla discovery."
+
+#: include/views/configuration.host.discovery.edit.php:712
+msgid "The value should be greater than LLD rule update interval."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3482
+msgid "The verification code was incorrect, please try again."
+msgstr ""
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -20645,6 +21232,10 @@ msgstr "Adresa URL nie je správne zakódovaná."
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Meno URL musí byť jedinečné v mape \"%1$s\"."
 
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
+
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
 msgstr "URL parameter nemôže byť pole."
@@ -20731,6 +21322,11 @@ msgstr "Nie je možné získať stav podpory kompresie TimescaleDB."
 msgid "Unable to retrieve TimescaleDB version."
 msgstr "Nedá sa načítať verzia TimescaleDB."
 
+#: include/views/mfa.login.php:65
+#, c-format
+msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
+msgstr ""
+
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
 msgstr "Nie je možné vybrať konfiguráciu."
@@ -20777,6 +21373,10 @@ msgstr ""
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "Odblokovať označených používateľov?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -20980,6 +21580,11 @@ msgstr ""
 #: jsLoader.php:286
 msgid "Unmute"
 msgstr "Povoliť zvuky"
+
+#: jsLoader.php:293
+#, c-format
+msgid "Unmute for %1$s"
+msgstr ""
 
 #: app/partials/administration.system.info.php:161
 #, c-format
@@ -21293,6 +21898,11 @@ msgstr "Používateľ „%1$s“ sa používa v akcii „%2$s“."
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "Používateľ „%1$s“ je používateľ, v mene ktorého je vytvorený report „%2$s“."
 
+#: include/classes/api/services/CUser.php:937
+#, c-format
+msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
+msgstr ""
+
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
 msgid "User \"%1$s\" provisioned."
@@ -21450,6 +22060,10 @@ msgstr "Skupina používateľov s ID „%1$s“ nie je k dispozícii."
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "Používateľské skupiny"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22192,6 +22806,11 @@ msgstr "Hodnoty"
 msgid "Values without names are not allowed in form fields."
 msgstr "Hodnoty bez názvov nie sú povolené v poliach formulára."
 
+#: widgets/piechart/includes/WidgetForm.php:220
+#: widgets/svggraph/includes/WidgetForm.php:374
+msgid "Variable"
+msgstr ""
+
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
 msgid "Variables"
@@ -22253,6 +22872,10 @@ msgstr ""
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Rozvláčny"
+
+#: include/views/mfa.login.php:72 include/views/mfa.login.php:85
+msgid "Verification code"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -22568,9 +23191,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "S problémami"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Pri tomto nastavení sa v tomto stĺpci zobrazia iba číselné položky."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -22833,6 +23465,10 @@ msgstr "Včera"
 msgid "You are logged in as \"%1$s\"."
 msgstr "Ste prihlásený ako \"%1$s\"."
 
+#: app/views/mfa.edit.php:46
+msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
+msgstr ""
+
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
 #: include/classes/setup/CSetupWizard.php:452
@@ -22934,6 +23570,10 @@ msgstr "Zabbix interná autentifikácia"
 #: app/views/administration.authentication.edit.php:169
 msgid "Zabbix login form"
 msgstr "Prihlasovací formulár Zabbix"
+
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr ""
 
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
@@ -23541,6 +24181,16 @@ msgstr "nemôže byť prázdny"
 msgid "cannot be equal to zero without custom intervals"
 msgstr "nemôže byť rovné nule bez vlastných intervalov"
 
+#: host_discovery.php:563
+#, c-format
+msgid "cannot be greater than or equal to the value of field \"%1$s\""
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#, c-format
+msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -23687,6 +24337,10 @@ msgstr "d"
 msgid "d.M"
 msgstr "d.M"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - Aktuálny dátum"
@@ -23716,6 +24370,10 @@ msgstr "predvolené"
 #: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "stupne() - Prevedie hodnotu z radiánov na stupne"
+
+#: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
+msgid "delimiter"
+msgstr ""
 
 #: widgets/actionlog/includes/WidgetForm.php:80
 #: widgets/actionlog/includes/WidgetForm.php:82
@@ -23885,6 +24543,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globálne nastavenia údržby"
 
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr ""
+
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+msgid "graph"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
 msgstr ""
@@ -23910,6 +24576,14 @@ msgstr "H:i"
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
 msgstr "H:i:s"
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+msgid "has been disabled"
+msgstr ""
+
+#: include/html.inc.php:725
+msgid "has been manually disabled"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -24019,6 +24693,12 @@ msgstr "nesprávna syntax pri \"%1$s\""
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr "nesprávne použitie funkcie \"%1$s\""
+
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -24147,6 +24827,10 @@ msgstr "je menšie alebo rovné"
 #: include/classes/validators/CApiInputValidator.php:2565
 msgid "is not enclosed in {} or is malformed"
 msgstr "nie je uzavretý v {} alebo má nesprávny tvar"
+
+#: app/views/item.list.php:175
+msgid "item"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -24566,6 +25250,10 @@ msgstr "mimo"
 msgid "not selected"
 msgstr "nie je vybratý"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Počet sekúnd od epochy"
@@ -24574,8 +25262,32 @@ msgstr "now() - Počet sekúnd od epochy"
 msgid "number"
 msgstr "číslo"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:823
+msgid "object of TOTP type is expected"
 msgstr ""
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
@@ -24669,6 +25381,10 @@ msgstr "power() – mocnina základnej hodnoty na hodnotu mocniny"
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "problem pattern"
 msgstr "problémový vzor"
+
+#: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"
@@ -24768,6 +25484,10 @@ msgstr "right() – Vráti počet znakov najviac vpravo"
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() – Zaokrúhli hodnotu na desatinné miesta"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -24911,6 +25631,10 @@ msgstr "poskytnuté poverenia nie sú jedinečné"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "tag"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
@@ -25398,6 +26122,10 @@ msgstr "hodnota musí byť v rozsahu %1$s"
 msgid "value of new event tag"
 msgstr "hodnotu nového event tagu"
 
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"
 msgstr "varpop() - Populačný rozptyl"
@@ -25422,6 +26150,35 @@ msgstr ""
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
 msgstr "môžu sa použiť vzory zástupných znakov s '*'"
+
+#: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
+#: include/html.inc.php:806
+#, c-format
+msgid "will be deleted in %1$s"
+msgstr ""
+
+#: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
+#: include/html.inc.php:801
+msgid "will be deleted the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:747 include/html.inc.php:770
+#, c-format
+msgid "will be disabled in %1$s"
+msgstr ""
+
+#: include/html.inc.php:753 include/html.inc.php:764
+msgid "will be disabled the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
+#: include/html.inc.php:796
+msgid "will not be deleted"
+msgstr ""
+
+#: include/html.inc.php:741 include/html.inc.php:776
+msgid "will not be disabled"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122
 #: include/classes/api/services/CTask.php:553

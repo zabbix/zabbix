@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ class testPageReportsAudit extends CWebTest {
 		$this->assertEquals($filter_actions, $this->query('id:filter-actions')->asCheckboxList()->one()->getLabels()->asText());
 
 		// Check that table stats are present.
-		$this->assertTableStats($table->getRows()->count());
+		$this->assertTableStats(0);
 
 		// Resource name with checkboxes that are enabled.
 		$resource_actions =[
@@ -511,7 +511,7 @@ class testPageReportsAudit extends CWebTest {
 
 		// If there is no result - "No data found" displayed in table.
 		if (CTestArrayHelper::get($data, 'no_data')) {
-			$this->assertEquals(['No data found.'], $table->getRows()->asText());
+			$this->assertEquals(['No data found'], $table->getRows()->asText());
 		}
 		else {
 			foreach ($data['fields'] as $column => $values) {

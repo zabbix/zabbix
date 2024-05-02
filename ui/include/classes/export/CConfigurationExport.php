@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,10 +150,11 @@ class CConfigurationExport {
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
 				'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link',
-				'flags', 'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields',
-				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
-				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'parameters', 'uuid'
+				'flags', 'filter', 'lifetime_type', 'lifetime', 'enabled_lifetime_type', 'enabled_lifetime',
+				'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes',
+				'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
+				'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
+				'allow_traps', 'parameters', 'uuid'
 			],
 			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
@@ -207,7 +208,7 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			// Parameter in CImportValidatorFactory is irrelavant here, since export does not validate data.
+			// Parameter in CImportValidatorFactory is irrelevant here, since export does not validate data.
 			$schema = (new CImportValidatorFactory(CExportWriterFactory::YAML))
 				->getObject(ZABBIX_EXPORT_VERSION)
 				->getSchema();
@@ -434,8 +435,8 @@ class CConfigurationExport {
 	protected function gatherHosts(array $hostIds) {
 		$hosts = API::Host()->get([
 			'output' => [
-				'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-				'name', 'description', 'inventory_mode'
+				'host', 'name', 'monitored_by', 'proxyid', 'proxy_groupid', 'description', 'status', 'ipmi_authtype',
+				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'inventory_mode'
 			],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
@@ -460,6 +461,7 @@ class CConfigurationExport {
 
 		if ($hosts) {
 			$hosts = $this->gatherProxies($hosts);
+			$hosts = $this->gatherProxyGroups($hosts);
 			$hosts = $this->gatherItems($hosts);
 			$hosts = $this->gatherDiscoveryRules($hosts);
 			$hosts = $this->gatherHttpTests($hosts);
@@ -649,6 +651,42 @@ class CConfigurationExport {
 		foreach ($hosts as &$host) {
 			$host['proxy'] = ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $db_proxies))
 				? ['name' => $db_proxies[$host['proxyid']]['name']]
+				: [];
+		}
+		unset($host);
+
+		return $hosts;
+	}
+
+	/**
+	 * Get proxy groups from database.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	protected function gatherProxyGroups(array $hosts): array {
+		$proxy_groupids = [];
+
+		foreach ($hosts as $host) {
+			if ($host['proxy_groupid'] != 0) {
+				$proxy_groupids[$host['proxy_groupid']] = true;
+			}
+		}
+
+		$db_proxy_groups = $proxy_groupids
+			? DBfetchArray(DBselect(
+				'SELECT pg.proxy_groupid,pg.name'.
+				' FROM proxy_group pg'.
+				' WHERE '.dbConditionId('pg.proxy_groupid', array_keys($proxy_groupids))
+			))
+			: [];
+		$db_proxy_groups = array_column($db_proxy_groups, null, 'proxy_groupid');
+
+		foreach ($hosts as &$host) {
+			$host['proxy_group'] = $host['proxy_groupid'] != 0
+					&& array_key_exists($host['proxy_groupid'], $db_proxy_groups)
+				? ['name' => $db_proxy_groups[$host['proxy_groupid']]['name']]
 				: [];
 		}
 		unset($host);

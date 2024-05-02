@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,6 +64,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.modules.filter.active':
 				case 'web.problem.filter.active':
 				case 'web.proxies.filter.active':
+				case 'web.proxygroups.filter.active':
 				case 'web.scheduledreport.filter.active':
 				case 'web.scripts.filter.active':
 				case 'web.search.hats.'.SECTION_SEARCH_HOSTS.'.state':

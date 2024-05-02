@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,50 +29,28 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin/comms"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"git.zabbix.com/ap/plugin-support/zbxflag"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/agent/runtimecontrol"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/agent/serverconnector"
-	"zabbix.com/internal/agent/serverlistener"
-	"zabbix.com/internal/agent/statuslistener"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/pidfile"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxlib"
-	_ "zabbix.com/plugins"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/agent/runtimecontrol"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/agent/serverconnector"
+	"golang.zabbix.com/agent2/internal/agent/serverlistener"
+	"golang.zabbix.com/agent2/internal/agent/statuslistener"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/pidfile"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	_ "golang.zabbix.com/agent2/plugins"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/zbxerr"
+	"golang.zabbix.com/sdk/zbxflag"
 )
 
 const runtimeCommandSendingTimeout = time.Second
-
-const usageMessageFormat = //
-`Usage of Zabbix agent 2:
-  %[1]s [-c config-file]
-  %[1]s [-c config-file] [-v] -p
-  %[1]s [-c config-file] [-v] -t item-key
-  %[1]s [-c config-file] -T
-  %[1]s [-c config-file] -R runtime-option
-  %[1]s -h
-  %[1]s -V
-
-A Zabbix daemon for monitoring of various server parameters.
-
-Options:
-%[2]s
-
-Example: zabbix_agent2 -c %[3]s
-
-Report bugs to: <https://support.zabbix.com>
-Zabbix home page: <https://www.zabbix.com>
-Documentation: <https://www.zabbix.com/documentation>
-`
 
 const usageMessageFormatRuntimeControlFormat = //
 `Perform administrative functions (%s timeout)
@@ -83,6 +61,30 @@ const usageMessageFormatRuntimeControlFormat = //
       userparameter_reload   Reload user parameters
       metrics                List available metrics
       version                Display Agent version
+`
+
+const usageMessageFormat = //
+`Usage of Zabbix agent 2:
+  %[1]s [-c config-file]
+  %[1]s [-c config-file] [-v] -p
+  %[1]s [-c config-file] [-v] -t item-key
+  %[1]s [-c config-file] -T
+  %[1]s [-c config-file] -R runtime-option
+  %[1]s -h
+  %[1]s -V
+`
+
+const helpMessageFormat = //
+`A Zabbix daemon for monitoring of various server parameters.
+
+Options:
+%[1]s
+
+Example: zabbix_agent2 -c %[2]s
+
+Report bugs to: <https://support.zabbix.com>
+Zabbix home page: <https://www.zabbix.com>
+Documentation: <https://www.zabbix.com/documentation>
 `
 
 // variables set at build
@@ -125,20 +127,16 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		copyrightMessageModbus(),
 	)
 
-	fs := flag.NewFlagSet("", flag.ContinueOnError)
-	fs.SetOutput(io.Discard)
-
-	args, err := parseArgs(fs)
+	flagsUsage, args, err := parseArgs()
 	if err != nil {
-		fmt.Fprintf(os.Stdout, "%s\n", err)
-
-		return
+		// parseArgs prints usage message on parse error,
+		// safe to allways exit 1.
+		os.Exit(1)
 	}
 
 	if args.help {
-		fs.Usage()
-
-		return
+		fmt.Print(helpMessage(flagsUsage))
+		os.Exit(0)
 	}
 
 	setServiceRun(args.foreground)
@@ -462,7 +460,13 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	waitServiceClose()
 }
 
-func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
+func parseArgs() (string, *Arguments, error) {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	// set to empty cause lib triggers Usage func on --help/-h and invalid
+	// flags error, we want to handle these cases manually
+	fs.Usage = func() {}
+
 	args := &Arguments{}
 
 	f := zbxflag.Flags{
@@ -556,21 +560,34 @@ func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
 	}
 
 	f.Register(fs)
-	fs.Usage = func() {
-		fmt.Printf(
-			usageMessageFormat,
-			filepath.Base(os.Args[0]),
-			f.Usage(),
-			usageMessageExampleConfPath,
-		)
-	}
 
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
-		return nil, zbxerr.New("failed to parse flags").Wrap(err)
+		fmt.Printf("failed to parse flags: %s\n%s", err.Error(), usageMessage())
+
+		return "", nil, zbxerr.ErrorOSExitZero
 	}
 
-	return args, nil
+	return f.Usage(), args, nil
+}
+
+func usageMessage() string {
+	return fmt.Sprintf(
+		usageMessageFormat,
+		filepath.Base(os.Args[0]),
+	)
+}
+
+func helpMessage(flagsUsage string) string {
+	return fmt.Sprintf(
+		"%s\n%s",
+		usageMessage(),
+		fmt.Sprintf(
+			helpMessageFormat,
+			flagsUsage,
+			usageMessageExampleConfPath,
+		),
+	)
 }
 
 func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {

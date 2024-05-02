@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -333,6 +333,13 @@ class API {
 	}
 
 	/**
+	 * @return CMfa
+	 */
+	public static function Mfa() {
+		return self::getApi('mfa');
+	}
+
+	/**
 	 * @return CProblem
 	 */
 	public static function Problem() {
@@ -344,6 +351,13 @@ class API {
 	 */
 	public static function Proxy() {
 		return self::getApi('proxy');
+	}
+
+	/**
+	 * @return CProxyGroup
+	 */
+	public static function ProxyGroup() {
+		return self::getApi('proxygroup');
 	}
 
 	/**

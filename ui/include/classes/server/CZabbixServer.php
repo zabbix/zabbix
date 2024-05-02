@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -197,36 +197,13 @@ class CZabbixServer {
 	}
 
 	/**
-	 * Request server to test item preprocessing steps.
-	 *
-	 * @param array  $data                                     Array of preprocessing steps test.
-	 * @param string $data['value']                            Value to use for preprocessing step testing.
-	 * @param int    $data['value_type']                       Item value type.
-	 * @param array  $data['history']                          Previous value object.
-	 * @param string $data['history']['value']                 Previous value.
-	 * @param string $data['history']['timestamp']             Previous value time.
-	 * @param array  $data['steps']                            Preprocessing step object.
-	 * @param int    $data['steps'][]['type']                  Type of preprocessing step.
-	 * @param string $data['steps'][]['params']                Parameters of preprocessing step.
-	 * @param int    $data['steps'][]['error_handler']         Error handler selected as "custom on fail".
-	 * @param string $data['steps'][]['error_handler_params']  Parameters configured for selected error handler.
-	 * @param string $sid                                      User session ID.
-	 *
-	 * @return array
-	 */
-	public function testPreprocessingSteps(array $data, $sid) {
-		return $this->request([
-			'request' => 'preprocessing.test',
-			'data' => $data,
-			'sid' => $sid
-		]);
-	}
-
-	/**
 	 * Request server to test item.
 	 *
-	 * @param array  $data  Array of item properties to test.
-	 * @param string $sid   User session ID.
+	 * @param array  $data
+	 * @param array  $data['item']     Array of item parameters.
+	 * @param array  $data['host']     (optional) Array of host parameters.
+	 * @param array  $data['options']  (optional) Array of test parameters.
+	 * @param string $sid              User session ID.
 	 *
 	 * @return array|bool
 	 */
@@ -402,7 +379,7 @@ class CZabbixServer {
 
 		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
 			if ((time() - $active_node[0]['lastaccess']) <
-					timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
+					timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HA_FAILOVER_DELAY))) {
 				return true;
 			}
 		}

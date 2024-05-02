@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,38 +17,87 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
+#include "poller_server.h"
+
+#include "../ha/ha.h"
+#include "../lld/lld_protocol.h"
+
 #include "zbxcachevalue.h"
 #include "zbxcacheconfig.h"
-#include "zbxjson.h"
 #include "zbxtime.h"
 #include "zbxconnector.h"
-#include "../ha/ha.h"
 #include "zbxproxybuffer.h"
+#include "zbxpgservice.h"
+#include "zbx_host_constants.h"
 
-#include "checks_internal.h"
-#include "../lld/lld_protocol.h"
+static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option, AGENT_RESULT *result)
+{
+	if (0 == strcmp(option, "state"))
+	{
+		SET_UI64_RESULT(result, stats->status);
+		return SUCCEED;
+	}
+
+	if (0 == strcmp(option, "available"))
+	{
+		SET_UI64_RESULT(result, stats->proxy_online_num);
+		return SUCCEED;
+	}
+
+	if (0 == strcmp(option, "pavailable"))
+	{
+		double	perc;
+
+		if (0 != stats->proxyids.values_num)
+			perc = (double)stats->proxy_online_num / stats->proxyids.values_num * 100;
+		else
+			perc = 0;
+
+		SET_DBL_RESULT(result, perc);
+		return SUCCEED;
+	}
+
+	if (0 == strcmp(option, "proxies"))
+	{
+		char	*out = NULL, *error = NULL;
+
+		if (FAIL == zbx_proxy_proxy_list_discovery_get(&stats->proxyids, &out, &error))
+		{
+			SET_MSG_RESULT(result, error);
+			return NOTSUPPORTED;
+		}
+
+		SET_TEXT_RESULT(result, out);
+		return SUCCEED;
+	}
+
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+
+	return NOTSUPPORTED;
+}
 
 /******************************************************************************
  *                                                                            *
  * Purpose: processes program type (server) specific internal checks          *
  *                                                                            *
- * Parameters: param1  - [IN] the first parameter                             *
- *             request - [IN] the request                                     *
- *             result  - [OUT] the result                                     *
+ * Parameters: item    - [IN] item to process                                 *
+ *             param1  - [IN] first parameter                                 *
+ *             request - [IN]                                                 *
+ *             result  - [OUT]                                                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
- *               FAIL - not a server specific internal check                  *
+ *               FAIL - not server specific internal check                    *
  *                                                                            *
  * Comments: This function is used to process server specific internal checks *
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *param1, const AGENT_REQUEST *request,
+		AGENT_RESULT *result)
 {
 	int		nparams, ret = NOTSUPPORTED;
-	const char	*param2;
+	const char	*param2, *param3;
 
 	nparams = get_rparams_num(request);
 
@@ -83,13 +132,8 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			{
 				char	*data;
 
-				if (SUCCEED == (res = zbx_proxy_discovery_get(&data, &error)))
-					SET_STR_RESULT(result, data);
-				else
-					SET_MSG_RESULT(result, error);
-
-				if (SUCCEED != res)
-					goto out;
+				zbx_proxy_discovery_get(&data);
+				SET_STR_RESULT(result, data);
 			}
 			else
 			{
@@ -100,7 +144,8 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		else
 		{
 			time_t		value;
-			const char	*param3 = get_rparam(request, 2);
+
+			param3 = get_rparam(request, 2);
 
 			if (0 == strcmp(param3, "lastaccess"))
 			{
@@ -114,8 +159,8 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 				param2 = get_rparam(request, 1);
 
 				if (SUCCEED == (res = zbx_dc_get_proxy_delay_by_name(param2, &tmp, &error)) &&
-						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2, &lastaccess,
-						&error)))
+						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2,
+						&lastaccess, &error)))
 				{
 					value = tmp + time(NULL) - lastaccess;
 				}
@@ -137,7 +182,6 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 	}
 	else if (0 == strcmp(param1, "vcache"))
 	{
-		const char	*param3;
 		zbx_vc_stats_t	stats;
 
 		if (FAIL == zbx_vc_get_statistics(&stats))
@@ -271,8 +315,6 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 	else if (0 == strcmp(param1, "vps"))
 	{
 		zbx_vps_monitor_stats_t	stats;
-		const char		*param3;
-
 		zbx_vps_monitor_get_stats(&stats);
 
 		param2 = get_rparam(request, 1);
@@ -347,6 +389,88 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			goto out;
 		}
 	}
+	else if (0 == strcmp(param1, "proxy group"))		/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
+	{							/* zabbix["proxy","discovery"]                        */
+		char		*error = NULL;
+		zbx_pg_stats_t	stats;
+
+		/* this item is always processed by server */
+
+		if (3 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		param2 = get_rparam(request, 1);
+
+		if (FAIL == zbx_pg_get_stats(param2, &stats, &error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain proxy group statistics: %s", error));
+			zbx_free(error);
+			goto out;
+		}
+
+		param3 = get_rparam(request, 2);
+
+		ret = get_proxy_group_stat(&stats, param3, result);
+		zbx_vector_uint64_destroy(&stats.proxyids);
+
+		goto out;
+
+	}
+	else if (0 == strcmp(param1, "host")) /* zabbix["host",*] */
+	{
+		if (3 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		param3 = get_rparam(request, 2);
+
+		if (0 == strcmp(param3, "maintenance"))	/* zabbix["host",,"maintenance"] */
+		{
+			/* this item is always processed by server */
+			if (NULL != (param2 = get_rparam(request, 1)) && '\0' != *param2)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
+			}
+
+			if (HOST_MAINTENANCE_STATUS_ON == item->host.maintenance_status)
+				SET_UI64_RESULT(result, item->host.maintenance_type + 1);
+			else
+				SET_UI64_RESULT(result, 0);
+		}
+		else if (0 == strcmp(param3, "items"))	/* zabbix["host",,"items"] */
+		{
+			/* this item is always processed by server */
+			if (NULL != (param2 = get_rparam(request, 1)) && '\0' != *param2)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
+			}
+
+			SET_UI64_RESULT(result, zbx_dc_get_item_count(item->host.hostid));
+		}
+		else if (0 == strcmp(param3, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
+		{
+			/* this item is always processed by server */
+			if (NULL != (param2 = get_rparam(request, 1)) && '\0' != *param2)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
+			}
+
+			SET_UI64_RESULT(result, zbx_dc_get_item_unsupported_count(item->host.hostid));
+		}
+		else
+		{
+			ret = FAIL;
+			goto out;
+		}
+	}
 	else
 	{
 		ret = FAIL;
@@ -372,4 +496,3 @@ void	zbx_pb_get_state_info(zbx_pb_state_info_t *info)
 {
 	memset(info, 0, sizeof(zbx_pb_state_info_t));
 }
-

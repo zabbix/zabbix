@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,22 +89,22 @@ else {
 			$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
 			$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
 			$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
+		}
 
-			if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
-				$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
-				$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
-				$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
-			}
+		if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
+			$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
+			$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
+			$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
+		}
 
-			if (array_key_exists('allow_revert', $macro)) {
-				$macro_value->setAttribute('placeholder', 'value');
-				$macro_value->addRevertButton();
-				$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
-					|| array_key_exists('value', $macro)
-				);
+		if (array_key_exists('allow_revert', $macro)) {
+			$macro_value->setAttribute('placeholder', 'value');
+			$macro_value->addRevertButton();
+			$macro_value->setRevertButtonVisibility($macro['type'] != ZBX_MACRO_TYPE_SECRET
+				|| array_key_exists('value', $macro)
+			);
 
-				$macro_cell[] = new CVar('macros['.$i.'][allow_revert]', '1');
-			}
+			$macro_cell[] = new CVar('macros['.$i.'][allow_revert]', '1');
 		}
 
 		if (array_key_exists('value', $macro)) {

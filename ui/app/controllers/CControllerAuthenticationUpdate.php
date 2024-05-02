@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,11 +38,12 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function checkInput() {
+		global $ALLOW_HTTP_AUTH;
+
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'disabled_usrgrpid' =>				'id',
-			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
@@ -50,9 +51,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_removed_userdirectoryids' =>	'array_id',
 			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'jit_provision_interval' =>			'db config.jit_provision_interval|time_unit_year '.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
-			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
-			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-			'http_strip_domains' =>				'db config.http_strip_domains',
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
@@ -77,13 +75,27 @@ class CControllerAuthenticationUpdate extends CController {
 			'saml_provision_media' =>			'array',
 			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
 			'passwd_min_length' =>				'int32',
-			'passwd_check_rules' =>				'array'
+			'passwd_check_rules' =>				'array',
+			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
+			'mfa_methods' =>					'array',
+			'mfa_default_row_index' =>			'int32',
+			'mfa_removed_mfaids' =>				'array_id'
 		];
+
+		if ($ALLOW_HTTP_AUTH) {
+			$fields += [
+				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
+				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
+				'http_strip_domains' =>		'db config.http_strip_domains',
+				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
+			];
+		}
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$ret = $this->validateDefaultAuth() && $this->validateLdap() && $this->validateSamlAuth();
+			$ret = $this->validateDefaultAuth() && $this->validateLdap() && $this->validateSamlAuth()
+				&& $this->validateMfa();
 		}
 
 		if (!$ret) {
@@ -223,6 +235,23 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	/**
+	 * Validate MFA settings.
+	 *
+	 * @return bool
+	 */
+	private function validateMfa(): bool {
+		$default_mfa = $this->hasInput('mfa_default_row_index') ? $this->getInput('mfa_default_row_index') : null;
+		$error = $this->getInput('mfa_status', MFA_DISABLED) == MFA_ENABLED
+			&& !array_key_exists($default_mfa, $this->getInput('mfa_methods', []));
+
+		if ($error) {
+			error(_('Default MFA method must be specified.'));
+		}
+
+		return !$error;
+	}
+
+	/**
 	 * Validate is user allowed to change configuration.
 	 *
 	 * @return bool
@@ -280,12 +309,32 @@ class CControllerAuthenticationUpdate extends CController {
 				}
 			}
 
+			$mfaid = 0;
 			if ($result) {
-				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid);
+				$mfa_methods = $this->getInput('mfa_methods', []);
+
+				if ($mfa_methods) {
+					$mfaids = $this->processMfaMethods($mfa_methods);
+
+					if (!$mfaids) {
+						$result = false;
+					}
+					else {
+						$mfaid = $mfaids[$this->getInput('mfa_default_row_index', 0)];
+					}
+				}
+			}
+
+			if ($result) {
+				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid, $mfaid);
 			}
 
 			if ($result && $this->hasInput('ldap_removed_userdirectoryids')) {
 				$result = (bool) API::UserDirectory()->delete($this->getInput('ldap_removed_userdirectoryids'));
+			}
+
+			if ($result && $this->hasInput('mfa_removed_mfaids')) {
+				$result = (bool) API::Mfa()->delete($this->getInput('mfa_removed_mfaids'));
 			}
 
 			if (!$result) {
@@ -311,51 +360,12 @@ class CControllerAuthenticationUpdate extends CController {
 		$this->setResponse($this->response);
 	}
 
-	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid): bool {
-		$fields = [
-			'authentication_type' => ZBX_AUTH_INTERNAL,
-			'disabled_usrgrpid' => 0,
-			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
-			'ldap_userdirectoryid' => $ldap_userdirectoryid,
-			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
-			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
-			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
-			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules')
-		];
-
-		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
-			$fields += [
-				'http_case_sensitive' => 0,
-				'http_login_form' => 0,
-				'http_strip_domains' => ''
-			];
-		}
-
-		if ($this->getInput('ldap_auth_enabled', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED) {
-			$fields += [
-				'ldap_jit_status' => JIT_PROVISIONING_DISABLED,
-				'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
-			];
-
-			if ($this->getInput('ldap_jit_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
-				$fields['jit_provision_interval'] = '1h';
-			}
-		}
-
-		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$fields += [
-				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
-				'saml_jit_status' => JIT_PROVISIONING_DISABLED
-			];
-		}
+	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid, int $mfaid): bool {
+		global $ALLOW_HTTP_AUTH;
 
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
 			CAuthenticationHelper::DISABLED_USER_GROUPID,
-			CAuthenticationHelper::HTTP_AUTH_ENABLED,
-			CAuthenticationHelper::HTTP_LOGIN_FORM,
-			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
-			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_AUTH_ENABLED,
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
@@ -365,8 +375,59 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::SAML_JIT_STATUS,
 			CAuthenticationHelper::SAML_CASE_SENSITIVE,
 			CAuthenticationHelper::PASSWD_MIN_LENGTH,
-			CAuthenticationHelper::PASSWD_CHECK_RULES
+			CAuthenticationHelper::PASSWD_CHECK_RULES,
+			CAuthenticationHelper::MFA_STATUS,
+			CAuthenticationHelper::MFAID
 		];
+
+		$fields = [
+			'authentication_type' => ZBX_AUTH_INTERNAL,
+			'disabled_usrgrpid' => 0,
+			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+			'ldap_userdirectoryid' => $ldap_userdirectoryid,
+			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
+			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
+			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules'),
+			'mfa_status' => MFA_DISABLED,
+			'mfaid' => $mfaid
+		];
+
+		if ($ALLOW_HTTP_AUTH) {
+			$auth_params = array_merge($auth_params, [
+				CAuthenticationHelper::HTTP_AUTH_ENABLED,
+				CAuthenticationHelper::HTTP_LOGIN_FORM,
+				CAuthenticationHelper::HTTP_STRIP_DOMAINS,
+				CAuthenticationHelper::HTTP_CASE_SENSITIVE
+			]);
+
+			$fields['http_auth_enabled'] = ZBX_AUTH_HTTP_DISABLED;
+
+			if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
+				$fields += [
+					'http_case_sensitive' => 0,
+					'http_login_form' => 0,
+					'http_strip_domains' => ''
+				];
+			}
+		}
+
+		if ($this->getInput('ldap_auth_enabled', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED) {
+			$fields += [
+				'ldap_jit_status' => JIT_PROVISIONING_DISABLED,
+				'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
+			];
+
+			if ($this->getInput('ldap_jit_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
+				$fields['jit_provision_interval'] = DB::getDefault('config', 'jit_provision_interval');
+			}
+		}
+
+		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
+			$fields += [
+				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
+				'saml_jit_status' => JIT_PROVISIONING_DISABLED
+			];
+		}
 
 		$auth = [];
 		foreach ($auth_params as $param) {
@@ -392,6 +453,8 @@ class CControllerAuthenticationUpdate extends CController {
 			if ($result && array_key_exists('authentication_type', $data)) {
 				$this->invalidateSessions();
 			}
+
+			CAuthenticationHelper::reset();
 		}
 
 		return $result;
@@ -440,6 +503,47 @@ class CControllerAuthenticationUpdate extends CController {
 		else {
 			return [];
 		}
+	}
+
+	/**
+	 * Updates existing MFA methods, creates new ones, removes deleted ones.
+	 *
+	 * @param array $mfa_methods
+	 *
+	 * @return array
+	 */
+	private function processMfaMethods(array $mfa_methods): array {
+		$ins_mfa_methods = [];
+		$upd_mfa_methods = [];
+		$mfaid_map = [];
+
+		foreach ($mfa_methods as $row_index => $mfa_method) {
+			if (array_key_exists('mfaid', $mfa_method)) {
+				$mfaid_map[$row_index] = $mfa_method['mfaid'];
+				$upd_mfa_methods[] = $mfa_method;
+			}
+			else {
+				$mfaid_map[$row_index] = null;
+				$ins_mfa_methods[] = $mfa_method;
+			}
+		}
+
+		$result = $upd_mfa_methods ? API::Mfa()->update($upd_mfa_methods) : [];
+		$result = ($result !== false && $ins_mfa_methods) ? API::Mfa()->create($ins_mfa_methods) : $result;
+
+		if (!$result) {
+			return [];
+		}
+
+		if ($ins_mfa_methods) {
+			foreach ($mfaid_map as $row_index => $mfaid) {
+				if ($mfaid === null) {
+					$mfaid_map[$row_index] = array_shift($result['mfaids']);
+				}
+			}
+		}
+
+		return $mfaid_map;
 	}
 
 	/**

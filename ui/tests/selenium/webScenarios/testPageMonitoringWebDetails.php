@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -204,6 +204,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		// Test Kiosk mode.
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,7 +97,8 @@ $maintenance_list = (new CTableInfo())
 		make_sorting_header(_('Active till'), 'active_till', $data['sort'], $data['sortorder'], $view_url),
 		_('State'),
 		_('Description')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 	switch ($maintenance['status']) {
@@ -127,7 +128,7 @@ foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 	]);
 }
 
-$form->addItem([$maintenance_list, $data['paging']]);
+$form->addItem($maintenance_list);
 
 if ($data['allowed_edit']) {
 	$form->addItem(

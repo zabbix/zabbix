@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ abstract class CControllerUserEditGeneral extends CController {
 	protected function init(): void {
 		$this->disableCsrfValidation();
 
-		$timezone = CSettingsHelper::get(CSettingsHelper::DEFAULT_TIMEZONE);
+		$timezone = CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_TIMEZONE);
 
 		if ($timezone === ZBX_DEFAULT_TIMEZONE || $timezone === TIMEZONE_DEFAULT) {
 			$timezone = CTimezoneHelper::getSystemTimezone();

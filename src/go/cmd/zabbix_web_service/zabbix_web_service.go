@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/zbxflag"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxnet"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/zbxflag"
+	"golang.zabbix.com/sdk/zbxnet"
 )
 
 const usageMessageFormat = //

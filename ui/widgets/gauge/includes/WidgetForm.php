@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -206,7 +206,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('desc_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setFullName(_('Description size'))
+					->prefixLabel(_('Description'))
 					->setDefault(self::DEFAULT_DESCRIPTION_SIZE_PERCENT)
 			)
 			->addField(
@@ -233,7 +233,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('value_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setFullName(_('Value size'))
+					->prefixLabel(_('Value'))
 					->setDefault(self::DEFAULT_VALUE_SIZE_PERCENT)
 			)
 			->addField(
@@ -242,7 +242,9 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldIntegerBox('value_arc_size', _('Size'),
 					self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX
-				))->setDefault(self::DEFAULT_VALUE_ARC_SIZE_PERCENT)
+				))
+					->prefixLabel(_('Value arc'))
+					->setDefault(self::DEFAULT_VALUE_ARC_SIZE_PERCENT)
 			)
 			->addField(
 				new CWidgetFieldColor('value_arc_color', _('Value arc'))
@@ -261,7 +263,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('units_size', _('Size'),self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setFullName(_('Units size'))
+					->prefixLabel(_('Units'))
 					->setDefault(self::DEFAULT_UNITS_SIZE_PERCENT)
 			)
 			->addField(
@@ -290,7 +292,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('scale_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setFullName(_('Scale size'))
+					->prefixLabel(_('Scale'))
 					->setDefault(self::DEFAULT_SCALE_SIZE_PERCENT)
 			)
 			->addField(

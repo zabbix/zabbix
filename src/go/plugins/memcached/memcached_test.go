@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,10 +26,9 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/plugins/memcached/mockserver"
+	"golang.zabbix.com/agent2/plugins/memcached/mockserver"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func handleStat(req *mockserver.MCRequest, w io.Writer) (ret *mockserver.MCResponse) {

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,9 +114,10 @@ class CControllerHousekeepingEdit extends CController {
 		];
 
 		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			$dbversion_status = CSettingsHelper::getDbVersionStatus();
+			// Temporary state to show checkbox checked and disabled before the real state is detected.
+			$data['compression_not_detected'] = true;
 
-			foreach ($dbversion_status as $dbversion) {
+			foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
 				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 					$data['timescaledb_min_version'] = $dbversion['min_version'];
 					$data['timescaledb_max_version'] = $dbversion['max_version'];
@@ -125,8 +126,12 @@ class CControllerHousekeepingEdit extends CController {
 					$data['compression_availability'] = array_key_exists('compression_availability', $dbversion)
 						&& $dbversion['compression_availability'];
 
+					if (array_key_exists('compression_availability', $dbversion)) {
+						$data['compression_not_detected'] = false;
+					}
+
 					if ($data['compression_availability']) {
-						$data += CHousekeepingHelper::getWarnings($dbversion_status);
+						$data += CHousekeepingHelper::getWarnings();
 					}
 
 					break;

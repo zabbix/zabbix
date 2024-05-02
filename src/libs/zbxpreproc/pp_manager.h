@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxtimekeeper.h"
 #include "zbxcacheconfig.h"
+#include "zbxipcservice.h"
 
 struct zbx_pp_manager
 {
@@ -41,6 +42,7 @@ struct zbx_pp_manager
 	zbx_timekeeper_t		*timekeeper;
 
 	zbx_dc_um_shared_handle_t	*um_handle;
+	zbx_ipc_async_socket_t		rtc;
 };
 
 zbx_get_progname_f	preproc_get_progname_cb(void);

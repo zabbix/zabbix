@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,13 +26,16 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/zbxlib"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
+
+var impl Plugin
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -46,10 +49,22 @@ type Plugin struct {
 }
 
 type metadata struct {
-	key       string
-	params    []string
-	blob      unsafe.Pointer
-	lastcheck time.Time
+	key    string
+	params []string
+	blob   unsafe.Pointer
+}
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsEventlog",
+		"eventlog", "Windows event log file monitoring.",
+		"eventlog.count", "Windows event log file monitoring.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+
+	impl.SetHandleTimeout(true)
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -75,7 +90,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if meta.Data == nil {
 		data = &metadata{key: key, params: params}
 		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
-		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
+
+		data.blob, err = zbxlib.NewActiveMetric(ctx.ItemID(), key, params, meta.LastLogsize(), meta.Mtime())
+		if err != nil {
 			return nil, err
 		}
 		meta.Data = data
@@ -86,7 +103,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			data.key = key
 			data.params = params
 			// recreate if item key has been changed
-			if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
+			data.blob, err = zbxlib.NewActiveMetric(ctx.ItemID(), key, params, meta.LastLogsize(), meta.Mtime())
+			if err != nil {
 				return nil, err
 			}
 		}
@@ -104,17 +122,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	// with flexible checks there are no guaranteed refresh time,
 	// so using number of seconds elapsed since last check
 	now := time.Now()
-	var refresh int
-	if data.lastcheck.IsZero() {
-		refresh = 1
-	} else {
-		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
+	nextcheck := zbxlib.GetNextcheckSeconds(ctx.ItemID(), ctx.Delay(), now)
+	logitem := zbxlib.EventLogItem{
+		Itemid:  ctx.ItemID(),
+		Results: make([]*zbxlib.EventLogResult, 0),
+		Output:  ctx.Output(),
 	}
-
-	logitem := zbxlib.EventLogItem{Results: make([]*zbxlib.EventLogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
-	zbxlib.ProcessEventLogCheck(data.blob, &logitem, refresh, grxp.Cblob, isCountItem)
-	data.lastcheck = now
+	zbxlib.ProcessEventLogCheck(data.blob, &logitem, nextcheck, grxp.Cblob, isCountItem)
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))
@@ -144,13 +159,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return nil, nil
-}
-
-var impl Plugin
-
-func init() {
-	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog", "Windows event log file monitoring.")
-	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog.count", "Windows event log file monitoring.")
-
-	impl.SetHandleTimeout(true)
 }

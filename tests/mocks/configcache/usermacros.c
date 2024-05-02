@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 #include "dbconfig.h"
 #include "configcache.h"
 #include "configcache_mock.h"
-
-extern zbx_mock_config_t	mock_config;
 
 void	mock_config_free_user_macros(void);
 
@@ -49,8 +47,9 @@ void	mock_config_load_user_macros(const char *path)
 	zbx_mock_handle_t	hmacros, handle;
 	zbx_mock_error_t	err;
 	int			i, index = 0;
+	zbx_mock_config_t	*mock_config = get_mock_config();
 
-	zbx_vector_um_host_create(&mock_config.um_hosts);
+	zbx_vector_um_host_create(&(mock_config->um_hosts));
 
 	hmacros = zbx_mock_get_parameter_handle(path);
 	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hmacros, &handle))))
@@ -74,7 +73,7 @@ void	mock_config_load_user_macros(const char *path)
 		else
 			host_local.hostid = 0;
 
-		if (FAIL == (i = zbx_vector_um_host_search(&mock_config.um_hosts, &host_local,
+		if (FAIL == (i = zbx_vector_um_host_search(&(mock_config->um_hosts), &host_local,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			host = (zbx_um_host_t *)zbx_malloc(NULL, sizeof(zbx_um_host_t));
@@ -83,10 +82,10 @@ void	mock_config_load_user_macros(const char *path)
 			zbx_vector_um_macro_create(&host->macros);
 			zbx_vector_uint64_create(&host->templateids);
 
-			zbx_vector_um_host_append(&mock_config.um_hosts, host);
+			zbx_vector_um_host_append(&(mock_config->um_hosts), host);
 		}
 		else
-			host = mock_config.um_hosts.values[i];
+			host = mock_config->um_hosts.values[i];
 
 		macro_name = zbx_mock_get_object_member_string(handle, "name");
 		macro_value = zbx_mock_get_object_member_string(handle, "value");
@@ -106,14 +105,14 @@ void	mock_config_load_user_macros(const char *path)
 		zbx_vector_um_macro_append(&host->macros, macro);
 	}
 
-	for (i = 0; i < mock_config.um_hosts.values_num; i++)
-		zbx_vector_um_macro_sort(&mock_config.um_hosts.values[i]->macros, mock_um_macro_compare);
+	for (i = 0; i < mock_config->um_hosts.values_num; i++)
+		zbx_vector_um_macro_sort(&(mock_config->um_hosts.values[i]->macros), mock_um_macro_compare);
 
-	mock_config.dc.um_cache = (zbx_um_cache_t *)zbx_malloc(NULL, sizeof(zbx_um_cache_t));
-	memset (mock_config.dc.um_cache, 0, sizeof(zbx_um_cache_t));
-	mock_config.dc.um_cache->refcount = 10000;
+	mock_config->dc.um_cache = (zbx_um_cache_t *)zbx_malloc(NULL, sizeof(zbx_um_cache_t));
+	memset (mock_config->dc.um_cache, 0, sizeof(zbx_um_cache_t));
+	mock_config->dc.um_cache->refcount = 10000;
 
-	mock_config.initialized |= ZBX_MOCK_CONFIG_USERMACROS;
+	mock_config->initialized |= ZBX_MOCK_CONFIG_USERMACROS;
 }
 
 static void	mock_str_free(char *str)
@@ -141,6 +140,6 @@ static void	mock_um_host_free(zbx_um_host_t *host)
 
 void	mock_config_free_user_macros(void)
 {
-	zbx_vector_um_host_clear_ext(&mock_config.um_hosts, mock_um_host_free);
-	zbx_vector_um_host_destroy(&mock_config.um_hosts);
+	zbx_vector_um_host_clear_ext(&(get_mock_config()->um_hosts), mock_um_host_free);
+	zbx_vector_um_host_destroy(&(get_mock_config()->um_hosts));
 }

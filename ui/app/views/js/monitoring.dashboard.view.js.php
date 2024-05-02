@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,6 +106,7 @@
 
 			ZABBIX.Dashboard.broadcast({
 				_hostid: dashboard_host !== null ? dashboard_host.id : null,
+				_hostids: dashboard_host !== null ? [dashboard_host.id] : null,
 				_timeperiod: {
 					from: dashboard_time_period.from,
 					from_ts: dashboard_time_period.from_ts,
@@ -120,7 +121,7 @@
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
 
-				if ('_hostid' in broadcast_requirements) {
+				if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
 					jQuery('#dashboard_hostid').on('change', this.events.dashboardHostChange);
 				}
 
@@ -141,7 +142,7 @@
 			ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, this.events.feedback);
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
-			if ('_hostid' in broadcast_requirements) {
+			if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
 				window.addEventListener('popstate', this.events.popState);
 			}
@@ -421,7 +422,10 @@
 
 				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
-				ZABBIX.Dashboard.broadcast({_hostid: host !== null ? host.id : null});
+				ZABBIX.Dashboard.broadcast({
+					_hostid: host !== null ? host.id : null,
+					_hostids: host !== null ? [host.id] : null
+				});
 			},
 
 			dashboardHostChange() {
@@ -446,7 +450,10 @@
 
 				history.pushState({host: host}, '', curl.getUrl());
 
-				ZABBIX.Dashboard.broadcast({_hostid: host !== null ? host.id : null});
+				ZABBIX.Dashboard.broadcast({
+					_hostid: host !== null ? host.id : null,
+					_hostids: host !== null ? [host.id] : null
+				});
 
 				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
 			},
@@ -506,7 +513,7 @@
 			},
 
 			feedback(e) {
-				if (e.detail.type === '_timeperiod') {
+				if (e.detail.type === '_timeperiod' && e.detail.value !== null) {
 					view.skip_time_selector_range_update = true;
 
 					$.publish('timeselector.rangechange', {

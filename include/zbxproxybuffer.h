@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ void	zbx_pb_discovery_write_service(zbx_pb_discovery_data_t *data, zbx_uint64_t 
 		const char *ip, const char *dns, int port, int status, const char *value, int clock);
 
 void	zbx_pb_discovery_write_host(zbx_pb_discovery_data_t *data, zbx_uint64_t druleid, const char *ip,
-		const char *dns, int status, int clock);
+		const char *dns, int status, int clock, const char *error);
 
 int	zbx_pb_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
 

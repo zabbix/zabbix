@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,13 +115,12 @@ class CWidget extends CWidgetBase {
 	 * Must return true to re-broadcast the feedback value or false to ignore the event.
 	 * Feedbacks-aware widgets must generally re-broadcast the value.
 	 *
-	 * @param {string} type        Out data type, as specified in the manifest.json.
-	 * @param {*}      value       Feedback value.
-	 * @param {Object} descriptor  Feedback descriptor.
+	 * @param {string} type   Out data type, as specified in the manifest.json.
+	 * @param {*}      value  Feedback value.
 	 *
 	 * @returns {boolean}  Whether to rebroadcast the value automatically.
 	 */
-	onFeedback({type, value, descriptor}) {
+	onFeedback({type, value}) {
 		return false;
 	}
 
@@ -162,6 +161,40 @@ class CWidget extends CWidgetBase {
 
 				this.processUpdateResponse(response);
 			});
+	}
+
+	/**
+	 * Resolve as soon as the widget is fully rendered (ready for printing).
+	 *
+	 * The method is called once, immediately after the promiseUpdate is resolved.
+	 * Custom implementation must also resolve the promise provided by the default implementation.
+	 *
+	 * @returns {Promise<any>}
+	 */
+	promiseReady() {
+		return new Promise(resolve => {
+			let incomplete = 0;
+
+			const image_complete = () => {
+				if (--incomplete === 0) {
+					resolve();
+				}
+			};
+
+			for (const img of this._body.querySelectorAll('img')) {
+				if (!img.complete) {
+					img.addEventListener('load', image_complete);
+					img.addEventListener('error', image_complete);
+
+					incomplete++;
+				}
+			}
+
+			if (incomplete === 0) {
+				// Wait until preloader icon is removed on animation frame.
+				requestAnimationFrame(() => resolve());
+			}
+		});
 	}
 
 	/**

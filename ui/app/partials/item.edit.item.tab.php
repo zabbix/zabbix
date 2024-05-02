@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,22 +121,22 @@ $formgrid = (new CFormGrid())
 				(new CTable())
 					->setId('query-fields-table')
 					->setHeader(['', _('Name'), '', _('Value'), ''])
-					->setFooter((new CCol(
-						(new CButtonLink(_('Add')))
-							->addClass('element-table-add')
-							->setEnabled(!$readonly)
+					->setFooter(
+						(new CCol(
+							(new CButtonLink(_('Add')))
+								->addClass('element-table-add')
+								->setEnabled(!$readonly)
 						))->setColSpan(5)
 					),
 				new CTemplateTag('query-field-row-tmpl', (new CRow([
-						(new CCol([
-							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('query_fields[#{rowNum}][sortorder]', '#{rowNum}')
-						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[#{rowNum}][name]', '#{name}', $readonly))
+							->removeId()
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
 						(new CTextBox('query_fields[#{rowNum}][value]', '#{value}', $readonly))
+							->removeId()
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
@@ -256,15 +256,14 @@ $formgrid = (new CFormGrid())
 					),
 				new CTemplateTag('item-header-row-tmpl',
 					(new CRow([
-						(new CCol([
-							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('headers[#{rowNum}][sortorder]', '#{rowNum}')
-						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[#{rowNum}][name]', '#{name}', $readonly))
+							->removeId()
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
 						(new CTextBox('headers[#{rowNum}][value]', '#{value}', $readonly, 2000))
+							->removeId()
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
@@ -665,7 +664,6 @@ $formgrid
 		))->setId('js-item-flex-intervals-field')
 	]);
 
-
 /**
  * Append timeout field to form list for item types:
  * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
@@ -677,11 +675,14 @@ $custom_timeout_enabled = $item['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENA
 if ($data['can_edit_source_timeouts'] && (!$readonly || !$custom_timeout_enabled)) {
 	$edit_source_timeouts_link = $data['host']['proxyid']
 		? (new CLink(_('Timeouts')))
-			->setAttribute('data-proxyid', $data['host']['proxyid'])
+			->addClass(ZBX_STYLE_LINK)
 			->addClass('js-edit-proxy')
+			->setAttribute('data-proxyid', $data['host']['proxyid'])
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
-		))->setTarget('_blank');
+		))
+			->addClass(ZBX_STYLE_LINK)
+			->setTarget('_blank');
 }
 
 $formgrid->addItem([
@@ -847,9 +848,15 @@ $formgrid
 		)
 	]);
 
+
+$disabled_by_lld_icon = $item['status'] == ITEM_STATUS_DISABLED && array_key_exists('itemDiscovery', $item)
+		&& $item['itemDiscovery'] && $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+	? makeWarningIcon(_('Disabled automatically by an LLD rule.'))
+	: null;
+
 if ($data['source'] === 'item') {
 	$formgrid->addItem([
-		new CLabel(_('Enabled'), 'status'),
+		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(
 			(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($item['status'] == ITEM_STATUS_ACTIVE))
 	]);

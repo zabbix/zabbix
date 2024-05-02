@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,13 +22,44 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
+ * @onBefore prepareUserMediaData
+ *
  * @dataSource LoginUsers
+ *
+ * @backup users
  */
 class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
 	public $userName = 'Zabbix';
 	public $userSurname = 'Administrator';
 	public $userRole = 'Super admin role';
+
+	/**
+	 * Data for MassDelete scenario.
+	 */
+	public function prepareUserMediaData() {
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 1,
+				'medias' => [
+					[
+						'mediatypeid' => 10, // Discord.
+						'sendto' => 'test@zabbix.com',
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 16,
+						'period' => '1-7,00:00-24:00'
+					],
+					[
+						'mediatypeid' => 12, // Jira.
+						'sendto' => 'test_account',
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 63,
+						'period' => '6-7,09:00-18:00'
+					]
+				]
+			]
+		]);
+	}
 
 	public static function allUsers() {
 		return CDBHelper::getDataProvider('select * from users');
@@ -122,10 +153,12 @@ class testPageUsers extends CLegacyWebTest {
 		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 		$form->fill(['Username' => '1928379128ksdhksdjfh']);
 		$form->submit();
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestInputTypeOverwrite('filter_username', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
 	public function testPageUsers_FilterByAllFields() {

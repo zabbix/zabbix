@@ -1,0 +1,632 @@
+---
+test case: "successfully found low-level discovery function macros token"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  return: SUCCEED
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  token_l: 0
+  token_r: 39
+  macro_l: 1
+  macro_r: 10
+  func_l: 12
+  func_r: 38
+  func_param_l: 18
+  func_param_r: 38
+---
+test case: "invalid low-level discovery function macros token"
+in:
+  expression: '{{#}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  return: 'FAIL'
+---
+test case: "successfully found function macros token"
+in:
+  expression: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")}'
+out:
+  return: SUCCEED
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  token_l: 0
+  token_r: 55
+  macro_l: 1
+  macro_r: 16
+  func_l: 18
+  func_r: 54
+  func_param_l: 24
+  func_param_r: 54
+---
+test case: "invalid function macros token"
+in:
+  expression: '{{}.regsub("App([0-9]) ([a-z]+)","App\1")}'
+out:
+  return: 'FAIL'
+---
+test case: "successfully found user macros token"
+in:
+  expression: '{$MACRO:"A"}'
+out:
+  return: SUCCEED
+  token_type: ZBX_TOKEN_USER_MACRO
+  token_l: 0
+  token_r: 11
+  name_l: 2
+  name_r: 6
+  context_l: 8
+  context_r: 10
+---
+test case: "invalid user macros token"
+in:
+  expression: '{$:"A"}'
+out:
+  return: 'FAIL'
+---
+test case: "LLD macro with function"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: SUCCEED
+---
+test case: "LLD macro with function, with text before"
+in:
+  expression: 'Dummy {{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: SUCCEED
+---
+test case: "LLD macro with function, with text after"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}dummy'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: SUCCEED
+---
+test case: "LLD macro with function with text around"
+in:
+  expression: 'foo{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}bar'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: SUCCEED
+---
+test case: "Nested macro with spaces after after param"
+in:
+  expression: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")    }'
+out:
+  return: SUCCEED
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  token: '{{ITEM.LASTVALUE}.regsub("App([0-9]) ([a-z]+)","App\1")    }'
+  macro: '{ITEM.LASTVALUE}'
+  func: 'regsub("App([0-9]) ([a-z]+)","App\1")'
+  param: '("App([0-9]) ([a-z]+)","App\1")'
+---
+test case: "LLD macro with spaces after after param"
+in:
+  expression: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)    }'
+out:
+  token: '{{#IFALIAS}.regsub("(.*)_([0-9]+)", \1)    }'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#IFALIAS}'
+  func: 'regsub("(.*)_([0-9]+)", \1)'
+  param: '("(.*)_([0-9]+)", \1)'
+  return: SUCCEED
+---
+test case: "LLD macro"
+in:
+  expression: '{#VALUE}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: SUCCEED
+---
+test case: "LLD macro used as simple macro"
+in:
+  expression: '{{#VALUE}:key.func(param)}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: SUCCEED
+---
+test case: "Macro not started"
+in:
+  expression: '{{#'
+out:
+  return: 'FAIL'
+---
+test case: "Empty macro"
+in:
+  expression: '{{#}'
+out:
+  return: 'FAIL'
+---
+test case: "Empty macro full"
+in:
+  expression: '{{#}}'
+out:
+  return: 'FAIL'
+---
+test case: "Invalid macro char"
+in:
+  expression: '{{##VALUE}.regsub(^[0-9]+, Problem)}'
+out:
+  return: 'FAIL'
+---
+test case: "Invalid function delimiter"
+in:
+  expression: '{{#VALUE}#regsub(^[0-9]+, Problem)}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: SUCCEED
+---
+test case: "Ordinary LLD function macro"
+in:
+  expression: '{{#VALUE}.regsub(^[0-9]+, Problem)}'
+out:
+  token: '{{#VALUE}.regsub(^[0-9]+, Problem)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#VALUE}'
+  func: 'regsub(^[0-9]+, Problem)'
+  param: '(^[0-9]+, Problem)'
+  return: SUCCEED
+---
+test case: "Ordinary LLD function macro 2"
+in:
+  expression: '{{#VALUE}.regsub("^([0-9]+)", Problem ID: \1)}'
+out:
+  token: '{{#VALUE}.regsub("^([0-9]+)", Problem ID: \1)}'
+  token_type: ZBX_TOKEN_LLD_FUNC_MACRO
+  macro: '{#VALUE}'
+  func: 'regsub("^([0-9]+)", Problem ID: \1)'
+  param: '("^([0-9]+)", Problem ID: \1)'
+  return: SUCCEED
+---
+test case: "User macro with LLD function macro context"
+in:
+  expression: '{$MACRO:"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"}'
+out:
+  token_type: ZBX_TOKEN_USER_MACRO
+  token: '{$MACRO:"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"}'
+  name: 'MACRO'
+  context: '"{{#VALUE}.regsub(\"^([0-9]+)\", Problem ID: \1)}"'
+  return: SUCCEED
+---
+test case: "LLD function macro missing closing bracket"
+in:
+  expression: '{{#VALUE}.regsub(^[0-9]+, Problem}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: SUCCEED
+---
+test case: "LLD function macro missing opening bracket"
+in:
+  expression: '{{#VALUE}.regsub^[0-9]+, Problem)}'
+out:
+  token: '{#VALUE}'
+  token_type: ZBX_TOKEN_LLD_MACRO
+  macro: '{#VALUE}'
+  name: 'VALUE'
+  return: SUCCEED
+---
+test case: 'Success: {ABC.EFG}'
+in:
+  expression: '{ABC.EFG}'
+out:
+  token: '{ABC.EFG}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'ABC.EFG'
+  return: SUCCEED
+---
+test case: 'Failure: {}'
+in:
+  expression: '{}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {abc}'
+in:
+  expression: '{abc}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC }'
+in:
+  expression: '{ABC }'
+out:
+  return: FAIL
+---
+test case: "Failure: {ABC.'xyz'}"
+in:
+  expression: "{ABC.'xyz'}"
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC."xyz}'
+in:
+  expression: '{ABC."xyz}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC.""}'
+in:
+  expression: '{ABC.""}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC."xyz" }'
+in:
+  expression: '{ABC."xyz" }'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC. "xyz"}'
+in:
+  expression: '{ABC. "xyz"}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC."xyz".EFG}'
+in:
+  expression: '{ABC."xyz".EFG}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC."x\yz"}'
+in:
+  expression: '{ABC."x\yz"}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC.x-z}'
+in:
+  expression: '{ABC.x-z}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC.}'
+in:
+  expression: '{ABC.}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {ABC..XYZ}'
+in:
+  expression: '{ABC..XYZ}'
+out:
+  return: FAIL
+---
+test case: 'Success: {ABC.xyz}'
+in:
+  expression: '{ABC.xyz}'
+out:
+  token: '{ABC.xyz}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'ABC.xyz'
+  return: SUCCEED
+---
+test case: 'Success: {ABC.DEF.xyz}'
+in:
+  expression: '{ABC.DEF.xyz}'
+out:
+  token: '{ABC.DEF.xyz}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'ABC.DEF.xyz'
+  return: SUCCEED
+---
+test case: 'Success: {ABC."xyz"}'
+in:
+  expression: '{ABC."xyz"}'
+out:
+  token: '{ABC."xyz"}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'ABC."xyz"'
+  return: SUCCEED
+---
+test case: 'Success: {ABC."x-z"}'
+in:
+  expression: '{ABC."x-z"}'
+out:
+  token: '{ABC."x-z"}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'ABC."x-z"'
+  return: SUCCEED
+---
+test case: 'Success: {ABC."x\\/z"}'
+in:
+  expression: '{ABC."x\\/z"}'
+out:
+  token: '{ABC."x\\/z"}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'ABC."x\\/z"'
+  return: SUCCEED
+---
+test case: 'Success: {M123}'
+in:
+  expression: '{M123}'
+out:
+  token: '{M123}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'M123'
+  return: SUCCEED
+---
+test case: 'Success: {ABC."x\"\"z"}'
+in:
+  expression: '{ABC."x\"\"z"}'
+out:
+  token: '{ABC."x\"\"z"}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'ABC."x\"\"z"'
+  return: SUCCEED
+---
+test case: 'Success: {{ABC.xyz}.regsub((.*),\1)}'
+in:
+  expression: '{{ABC.xyz}.regsub("(.*)",\1)}'
+out:
+  token: '{{ABC.xyz}.regsub("(.*)",\1)}'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  macro: '{ABC.xyz}'
+  func: 'regsub("(.*)",\1)'
+  param: '("(.*)",\1)'
+  return: SUCCEED
+---
+test case: 'Failure: {{#ABC.xyz}.regsub((.*),\1)}'
+in:
+  expression: '{{#ABC.xyz}.regsub("(.*)",\1)}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {$ABC.xyz}'
+in:
+  expression: '{$ABC.xyz}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {.ABC}'
+in:
+  expression: '{.ABC}'
+out:
+  return: FAIL
+---
+test case: 'Success: {M_1.M_2.M_3}'
+in:
+  expression: '{M_1.M_2.M_3}'
+out:
+  token: '{M_1.M_2.M_3}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'M_1.M_2.M_3'
+  return: SUCCEED
+---
+test case: 'Success: {EVENT.TAGS.TAG123}'
+in:
+  expression: '{EVENT.TAGS.TAG123}'
+out:
+  token: '{EVENT.TAGS.TAG123}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'EVENT.TAGS.TAG123'
+  return: SUCCEED
+---
+test case: 'Success: {EVENT.TAGS.1TAG}'
+in:
+  expression: '{EVENT.TAGS.1TAG}'
+out:
+  token: '{EVENT.TAGS.1TAG}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'EVENT.TAGS.1TAG'
+  return: SUCCEED
+---
+test case: 'Success: {EVENT.TAGS."1TAG"}'
+in:
+  expression: '{EVENT.TAGS."1TAG"}'
+out:
+  token: '{EVENT.TAGS."1TAG"}'
+  token_type: ZBX_TOKEN_MACRO
+  macro: 'EVENT.TAGS."1TAG"'
+  return: SUCCEED
+---
+test case: 'Success: {?1 + 2}'
+in:
+  expression: '{?1 + 2}'
+out:
+  token: '{?1 + 2}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '1 + 2'
+  return: SUCCEED
+---
+test case: 'Success: {?{$VALUE}*2}'
+in:
+  expression: '{?{$VALUE}*2}'
+out:
+  token: '{?{$VALUE}*2}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{$VALUE}*2'
+  return: SUCCEED
+---
+test case: 'Success: {?{$VALUE:"context{}"}*2}'
+in:
+  expression: '{?{$VALUE:"context}"}*2}'
+out:
+  token: '{?{$VALUE:"context}"}*2}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{$VALUE:"context}"}*2'
+  return: SUCCEED
+---
+test case: 'Failure: {?}'
+in:
+  expression: '{?}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {?"}'
+in:
+  expression: '{?"}'
+out:
+  return: FAIL
+---
+test case: 'Failure: {?"\"}'
+in:
+  expression: '{?"\"}'
+out:
+  return: FAIL
+---
+test case: 'Success: {?"abc"}'
+in:
+  expression: '{?"abc"}'
+out:
+  token: '{?"abc"}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '"abc"'
+  return: SUCCEED
+---
+test case: 'Success: {?"a\"b\"c"}'
+in:
+  expression: '{?"a\"b\"c"}'
+out:
+  token: '{?"a\"b\"c"}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '"a\"b\"c"'
+  return: SUCCEED
+---
+test case: 'Success: {?"}"}'
+in:
+  expression: '{?"}"}'
+out:
+  token: '{?"}"}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '"}"'
+  return: SUCCEED
+---
+test case: 'Success: {?{?}}'
+in:
+  expression: '{?{?}}'
+out:
+  token: '{?{?}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{?'
+  return: SUCCEED
+---
+test case: 'Success: {?{host:key.func()}}'
+in:
+  expression: '{?{host:key.func()}}'
+out:
+  token: '{?{host:key.func()}}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{host:key.func()}'
+  return: SUCCEED
+---
+test case: 'Success: {?{HOST.HOST}}'
+in:
+  expression: '{?{HOST.HOST}}'
+out:
+  token: '{?{HOST.HOST}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{HOST.HOST}'
+  return: SUCCEED
+---
+test case: 'Success: {?{$MACRO}}'
+in:
+  expression: '{?{$MACRO}}'
+out:
+  token: '{?{$MACRO}}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{$MACRO}'
+  return: SUCCEED
+---
+test case: 'Success: {{?1}.fmtnum(1)}'
+in:
+  expression: '{{?1}.fmtnum(1)}'
+out:
+  token: '{{?1}.fmtnum(1)}'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  macro: '{?1}'
+  func: 'fmtnum(1)'
+  param: '(1)'
+  return: SUCCEED
+---
+test case: 'Success: {{? {{HOST.HOST}:key.last()} }.fmtnum(2)}'
+in:
+  expression: '{{? {{HOST.HOST}:key.last()} }.fmtnum(2)}'
+out:
+  token: '{{? {{HOST.HOST}:key.last()} }.fmtnum(2)}'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  macro: '{? {{HOST.HOST}:key.last()} }'
+  func: 'fmtnum(2)'
+  param: '(2)'
+  return: SUCCEED
+---
+test case: 'Success: {{? {? {?1 }.fmtnum(1)}'
+in:
+  expression: '{{? {? {?1 }.fmtnum(1)}'
+out:
+  token: '{{? {? {?1 }.fmtnum(1)}'
+  token_type: ZBX_TOKEN_FUNC_MACRO
+  macro: '{? {? {?1 }'
+  func: 'fmtnum(1)'
+  param: '(1)'
+  return: SUCCEED
+---
+test case: 'Success: with recursive expression macros'
+in:
+  expression: 'trap1_trig{{?{?1 + 2}'
+out:
+  token: '{?1 + 2}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{?1 + 2'
+  return: SUCCEED
+---
+test case: 'Success: no hang with lots of recursive expression macros'
+in:
+  expression: '{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{?1 + 2}'
+out:
+  token: '{?1 + 2}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: '{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{?1 + 2'
+  return: SUCCEED
+---
+test case: "successfully found function macros token in user macro"
+in:
+  expression: '{{$USERMACRO}.regsub("App([0-9]) ([a-z]+)","App\1")}'
+out:
+  return: SUCCEED
+  token_type: ZBX_TOKEN_USER_FUNC_MACRO
+  token_l: 0
+  token_r: 51
+  macro_l: 1
+  macro_r: 12
+  func_l: 14
+  func_r: 50
+  func_param_l: 20
+  func_param_r: 50
+---
+test case: 'Success: {?count(//trap[1],#5,"str\\arg", 0)}'
+in:
+  expression: '{?count(//trap[1],#5,"str\\arg", 0)}'
+out:
+  token: '{?count(//trap[1],#5,"str\\arg", 0)}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: 'count(//trap[1],#5,"str\\arg", 0)'
+  return: SUCCEED
+...

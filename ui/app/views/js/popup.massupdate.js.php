@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,6 +157,31 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	});
 
 	mass_action_tpls.dispatchEvent(new CustomEvent('change', {}));
+})();
+
+// Monitored by.
+(() => {
+	const element = document.querySelector('#monitored-by-field');
+
+	if (element === null) {
+		return false;
+	}
+
+	const obj = element.tagName === 'SPAN' ? element.originalObject : element;
+	const monitored_by = obj.querySelector('#monitored_by');
+
+	if (monitored_by === null) {
+		return false;
+	}
+
+	monitored_by.addEventListener('change', (e) => {
+		obj.querySelector('.js-field-proxy').style.display =
+			e.target.value == <?= ZBX_MONITORED_BY_PROXY ?> ? '' : 'none';
+		obj.querySelector('.js-field-proxy-group').style.display =
+			e.target.value == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? '' : 'none';
+	});
+
+	monitored_by.dispatchEvent(new CustomEvent('change', {}));
 })();
 
 // Inventory mode.
@@ -460,7 +485,7 @@ function submitPopup(overlay) {
 			message_box.insertBefore(form);
 		}
 		else if (action === 'item.prototype.massupdate' || action === 'item.massupdate') {
-			// Item and item prototype lists javascript handles successfull update.
+			// Item and item prototype lists javascript handles successful update.
 			overlayDialogueDestroy(overlay.dialogueid);
 			overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		}

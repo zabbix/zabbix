@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ void	zbx_mock_test_entry(void **state)
 
 	if (NULL == zbx_regexp_match(sql, sql_rgx, NULL))
 	{
-		unsigned int len;
+		int	len;
 
 		if (sql_offset > (len = 4 * ZBX_KIBIBYTE) * 2)
 		{

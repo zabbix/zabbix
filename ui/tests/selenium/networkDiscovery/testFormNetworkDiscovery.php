@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,9 +72,9 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form = $dialog->asForm();
 
 		// Check that all labels present and visible.
-		$this->assertEquals(['Name', 'Discovery by proxy', 'IP range', 'Update interval', 'Maximum concurrent checks',
-				'Checks', 'Device uniqueness criteria', 'Host name', 'Visible name', 'Enabled'],
-				$form->getLabels(CElementFilter::VISIBLE)->asText()
+		$this->assertEquals(['Name', 'Discovery by', 'IP range', 'Update interval', 'Maximum concurrent checks per type',
+			'Checks', 'Device uniqueness criteria', 'Host name', 'Visible name', 'Enabled'],
+			$form->getLabels(CElementFilter::VISIBLE)->asText()
 		);
 
 		// Check required fields.
@@ -83,7 +83,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		// Check the default values.
 		$form->checkValue([
 			'Name' => '',
-			'Discovery by proxy' => 'No proxy',
+			'Discovery by' => 'Server',
 			'IP range' => '192.168.0.1-254',
 			'Update interval' => '1h',
 			'id:concurrency_max_type' => 'Unlimited',
@@ -91,7 +91,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			'id:concurrency_max' => 0
 		]);
 
-		// Check Maximum concurrent checks segmented radio field.
+		// Check Maximum concurrent checks per type segmented radio field.
 		$labels = ['One', 'Unlimited', 'Custom'];
 		$max_concurrent_field = $form->getField('id:concurrency_max_type')->asSegmentedRadio();
 		$this->assertEquals($labels, $max_concurrent_field->getLabels()->asText());
@@ -732,7 +732,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Mimimal fields create'
+						'Name' => 'Minimal fields create'
 					],
 					'Checks' => [['default' => true]]
 				]
@@ -821,7 +821,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'All fields',
-						'Discovery by proxy' => 'Proxy for Actions',
+						'id:discovery_by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Test Proxy',
 						'IP range' => '192.168.251.253-254',
 						'id:concurrency_max_type' => 'One',
 						'Update interval' => 604800,
@@ -1579,7 +1580,8 @@ class testFormNetworkDiscovery extends CWebTest {
 					'simple' => true,
 					'expected_fields' => [
 						'Name' => 'New cloned name, no changes',
-						'Discovery by proxy' => 'Proxy for Network discovery',
+						'id:discovery_by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for Network discovery',
 						'IP range' => '192.168.2.3-255',
 						'Update interval' => '25h',
 						'id:concurrency_max_type' => 'Unlimited'
@@ -1629,7 +1631,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected_fields' => [
 						'Name' => 'New cloned name with changes',
-						'Discovery by proxy' => 'Proxy for Network discovery cloning',
+						'id:discovery_by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for Network discovery cloning',
 						'IP range' => '192.168.2.3-255',
 						'Update interval' => '25h',
 						'id:concurrency_max_type' => 'Unlimited',
@@ -1925,7 +1928,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				// Fill form's fields.
 				$form->fill([
 					'Name' => $new_name,
-					'Discovery by proxy' => 'Proxy for Actions',
+					'id:discovery_by' => 'Proxy',
+					'xpath:.//div[@id="proxyid"]/..' => 'Test Proxy',
 					'Update interval' => '15s',
 					'Enabled' => false
 				]);

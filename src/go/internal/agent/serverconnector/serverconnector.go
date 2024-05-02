@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,15 +32,15 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxcomms"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
+	"golang.zabbix.com/sdk/log"
 )
 
 const defaultAgentPort = 10050
@@ -48,7 +48,7 @@ const defaultAgentPort = 10050
 type Connector struct {
 	clientID                   uint64
 	input                      chan interface{}
-	addresses                  []string
+	address                    zbxcomms.AddressSet
 	hostname                   string
 	session                    string
 	configRevision             uint64
@@ -66,6 +66,7 @@ type activeChecksRequest struct {
 	Request        string `json:"request"`
 	Host           string `json:"host"`
 	Version        string `json:"version"`
+	Variant        int    `json:"variant"`
 	Session        string `json:"session"`
 	ConfigRevision uint64 `json:"config_revision"`
 	HostMetadata   string `json:"host_metadata,omitempty"`
@@ -94,6 +95,8 @@ type heartbeatMessage struct {
 	Request            string `json:"request"`
 	Host               string `json:"host"`
 	HeartbeatFrequency int    `json:"heartbeat_freq"`
+	Version            string `json:"version"`
+	Variant            int    `json:"variant"`
 }
 
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
@@ -154,13 +157,14 @@ func (c *Connector) refreshActiveChecks() {
 	a := activeChecksRequest{
 		Request:        "active checks",
 		Host:           c.hostname,
-		Version:        version.Short(),
+		Version:        version.Long(),
+		Variant:        agent.Variant,
 		Session:        c.session,
 		ConfigRevision: c.configRevision,
 	}
 
-	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
-	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.addresses)
+	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.address)
+	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.address)
 
 	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second,
 		"HostInterface", c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen,
@@ -191,12 +195,13 @@ func (c *Connector) refreshActiveChecks() {
 
 	request, err := json.Marshal(&a)
 	if err != nil {
-		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.addresses[0], err)
+		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.address.Get(), err)
 		return
 	}
 
-	data, errs, errRead := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
-		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+	data, errs, errRead := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr,
+		time.Second*time.Duration(c.options.Timeout), time.Second*time.Duration(c.options.Timeout), request,
+		c.tlsConfig)
 
 	if errs != nil {
 		// server is unaware if configuration is actually delivered and saves session
@@ -216,7 +221,7 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	if c.lastActiveCheckErrors != nil {
-		log.Warningf("[%d] active check configuration update from [%s] is working again", c.clientID, c.addresses[0])
+		log.Warningf("[%d] active check configuration update from [%s] is working again", c.clientID, c.address.Get())
 		c.lastActiveCheckErrors = nil
 	}
 
@@ -224,7 +229,7 @@ func (c *Connector) refreshActiveChecks() {
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.addresses[0], err)
+		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.address.Get(), err)
 		return
 	}
 
@@ -232,9 +237,9 @@ func (c *Connector) refreshActiveChecks() {
 
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
-			log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.addresses[0], response.Info)
+			log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.address.Get(), response.Info)
 		} else {
-			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.addresses[0])
+			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address.Get())
 		}
 		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
@@ -255,7 +260,7 @@ func (c *Connector) refreshActiveChecks() {
 	if response.Data == nil {
 		if c.configRevision == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
-				c.addresses[0])
+				c.address.Get())
 		}
 		return
 	}
@@ -266,36 +271,36 @@ func (c *Connector) refreshActiveChecks() {
 		if len(response.Data[i].Key) == 0 {
 			if response.Data[i].Itemid == 0 {
 				log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing",
-					c.clientID, c.addresses[0])
+					c.clientID, c.address.Get())
 				return
 			}
 
 			log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing for itemid '%d'",
-				c.clientID, c.addresses[0], response.Data[i].Itemid)
+				c.clientID, c.address.Get(), response.Data[i].Itemid)
 			return
 		}
 
 		if response.Data[i].Itemid == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: itemid is missing for key '%s'",
-				c.clientID, c.addresses[0], response.Data[i].Key)
+				c.clientID, c.address.Get(), response.Data[i].Key)
 			return
 		}
 
 		if len(response.Data[i].Delay) == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: delay is missing for itemid '%d'",
-				c.clientID, c.addresses[0], response.Data[i].Itemid)
+				c.clientID, c.address.Get(), response.Data[i].Itemid)
 			return
 		}
 
 		if response.Data[i].LastLogsize == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: lastlogsize is missing for itemid '%d'",
-				c.clientID, c.addresses[0], response.Data[i].Itemid)
+				c.clientID, c.address.Get(), response.Data[i].Itemid)
 			return
 		}
 
 		if response.Data[i].Mtime == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: mtime is missing for itemid '%d'",
-				c.clientID, c.addresses[0], response.Data[i].Itemid)
+				c.clientID, c.address.Get(), response.Data[i].Itemid)
 			return
 		}
 	}
@@ -303,37 +308,37 @@ func (c *Connector) refreshActiveChecks() {
 	for i := 0; i < len(response.Expressions); i++ {
 		if len(response.Expressions[i].Name) == 0 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "name"`,
-				c.clientID, c.addresses[0])
+				c.clientID, c.address.Get())
 			return
 		}
 
 		if len(response.Expressions[i].Body) == 0 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression"`,
-				c.clientID, c.addresses[0])
+				c.clientID, c.address.Get())
 			return
 		}
 
 		if response.Expressions[i].Type == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression_type"`,
-				c.clientID, c.addresses[0])
+				c.clientID, c.address.Get())
 			return
 		}
 
 		if response.Expressions[i].Delimiter == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "exp_delimiter"`,
-				c.clientID, c.addresses[0])
+				c.clientID, c.address.Get())
 			return
 		}
 
 		if len(*response.Expressions[i].Delimiter) > 1 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
-				c.clientID, c.addresses[0], *response.Expressions[i].Delimiter)
+				c.clientID, c.address.Get(), *response.Expressions[i].Delimiter)
 			return
 		}
 
 		if response.Expressions[i].Mode == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "case_sensitive"`,
-				c.clientID, c.addresses[0])
+				c.clientID, c.address.Get())
 			return
 		}
 	}
@@ -351,19 +356,22 @@ func (c *Connector) sendHeartbeatMsg() {
 		Request:            "active check heartbeat",
 		HeartbeatFrequency: c.options.HeartbeatFrequency,
 		Host:               c.hostname,
+		Version:            version.Long(),
+		Variant:            agent.Variant,
 	}
 
-	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.addresses)
-	defer log.Debugf("[%d] End of sendHeartBeatMsg() from %s", c.clientID, c.addresses)
+	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.address)
+	defer log.Debugf("[%d] End of sendHeartBeatMsg() from %s", c.clientID, c.address)
 
 	request, err := json.Marshal(&h)
 	if err != nil {
-		log.Errf("[%d] cannot create heartbeat message to [%s]: %s", c.clientID, c.addresses[0], err)
+		log.Errf("[%d] cannot create heartbeat message to [%s]: %s", c.clientID, c.address.Get(), err)
 		return
 	}
 
-	_, errs, _ := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
-		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig, true)
+	_, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr,
+		time.Second*time.Duration(c.options.Timeout), time.Second*time.Duration(c.options.Timeout), request,
+		c.tlsConfig, true)
 
 	if errs != nil {
 		if !reflect.DeepEqual(errs, c.lastActiveHbErrors) {
@@ -378,7 +386,7 @@ func (c *Connector) sendHeartbeatMsg() {
 	}
 
 	if c.lastActiveHbErrors != nil {
-		log.Warningf("[%d] sending of heartbeat message to [%s] is working again", c.clientID, c.addresses[0])
+		log.Warningf("[%d] sending of heartbeat message to [%s] is working again", c.clientID, c.address.Get())
 		c.lastActiveHbErrors = nil
 	}
 }
@@ -389,7 +397,7 @@ func (c *Connector) run() {
 	var lastHeartbeat time.Time
 
 	defer log.PanicHook()
-	log.Debugf("[%d] starting server connector for %s", c.clientID, c.addresses)
+	log.Debugf("[%d] starting server connector for %s", c.clientID, c.address)
 
 	ticker := time.NewTicker(time.Second)
 run:
@@ -439,9 +447,11 @@ func newToken() string {
 
 func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 	options *agent.AgentOptions) (connector *Connector, err error) {
+	address := zbxcomms.NewAddressPool(addresses)
+
 	c := &Connector{
 		taskManager: taskManager,
-		addresses:   addresses,
+		address:     address,
 		hostname:    hostname,
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
@@ -454,7 +464,7 @@ func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 	}
 
 	ac := &activeConnection{
-		addresses: addresses,
+		address:   address,
 		hostname:  hostname,
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
@@ -492,10 +502,15 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 		}
 
 		var err error
-		value, err = taskManager.PerformTask(item, timeout, clientID)
+		var taskResult *string
+		taskResult, err = taskManager.PerformTask(item, timeout, clientID)
 		if err != nil {
 			return "", err
+		} else if taskResult == nil {
+			return "", fmt.Errorf("no values was received")
 		}
+
+		value = *taskResult
 
 		if !utf8.ValidString(value) {
 			return "", fmt.Errorf("value is not a UTF-8 string")

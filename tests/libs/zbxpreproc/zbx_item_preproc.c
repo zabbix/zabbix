@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "libs/zbxpreproc/pp_execute.h"
 #include "libs/zbxpreproc/preproc_snmp.h"
 #include "libs/zbxpreproc/pp_cache.h"
+#include "libs/zbxpreproc/pp_error.h"
 
 #ifdef HAVE_NETSNMP
 #define SNMP_NO_DEBUGGING
@@ -273,7 +274,9 @@ static int	check_mib_existence(zbx_pp_step_t *op)
 }
 #endif
 
+#ifdef HAVE_NETSNMP
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "preproc_mock_progname")
+#endif
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -291,7 +294,7 @@ void	zbx_mock_test_entry(void **state)
 #ifdef HAVE_NETSNMP
 	int			mib_translation_case = 0;
 
-	zbx_init_library_preproc(NULL, get_zbx_progname);
+	zbx_init_library_preproc(NULL, NULL, get_zbx_progname);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.netsnmp_required"))
 		mib_translation_case = 1;
@@ -317,6 +320,7 @@ void	zbx_mock_test_entry(void **state)
 	if (1 == mib_translation_case && FAIL == check_mib_existence(&step))
 	{
 		preproc_shutdown_snmp();
+		release_step(&step);
 		skip();
 	}
 #endif

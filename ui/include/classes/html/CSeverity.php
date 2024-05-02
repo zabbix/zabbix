@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,16 +40,18 @@ class CSeverity extends CRadioButtonList {
 	 * @param string|int $value       Input element value.
 	 * @param string|null $class      List item class name.
 	 * @param string|null $on_change  Javascript handler for onchange event.
+	 * @param bool $disabled          Disables the input element.
 	 *
 	 * @return CSeverity
 	 */
-	public function addValue($label, $value, $class = null, $on_change = null): self {
+	public function addValue($label, $value, $class = null, $on_change = null, $disabled = false): self {
 		$this->values[] = [
 			'name' => $label,
 			'value' => $value,
 			'id' => null,
 			'class' => $class,
-			'on_change' => $on_change
+			'on_change' => $on_change,
+			'disabled' => $disabled
 		];
 
 		return $this;

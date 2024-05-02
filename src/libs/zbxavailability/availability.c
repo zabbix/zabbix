@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,16 @@
 #include "zbx_availability_constants.h"
 
 #include "zbxipcservice.h"
+
+int	zbx_interface_availability_compare_func(const void *d1, const void *d2)
+{
+	const zbx_interface_availability_t	*int_avail_1 = *(const zbx_interface_availability_t **)d1;
+	const zbx_interface_availability_t	*int_avail_2 = *(const zbx_interface_availability_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(int_avail_1->interfaceid, int_avail_2->interfaceid);
+
+	return 0;
+}
 
 ZBX_PTR_VECTOR_IMPL(proxy_hostdata_ptr, zbx_proxy_hostdata_t *)
 

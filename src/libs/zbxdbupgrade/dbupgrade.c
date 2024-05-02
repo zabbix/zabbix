@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbupgrade.h"
 #include "dbupgrade.h"
-#include "zbxdbschema.h"
+#include "zbxdbupgrade.h"
 
-#include "../../zabbix_server/ha/ha.h"
+#include "zbxdbschema.h"
 #include "zbxtime.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
+#include "zbx_ha_constants.h"
 
 #ifdef HAVE_MYSQL
 #	define ZBX_DB_TABLE_OPTIONS	" engine=innodb"
@@ -865,7 +865,7 @@ static int	DBcreate_dbversion_table(void)
 				{
 					{"mandatory", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"optional", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{NULL}
+					{0}
 				},
 				NULL
 			};
@@ -1068,13 +1068,16 @@ static int	DBcheck_nodes(void)
 int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode)
 {
 #define ZBX_DB_WAIT_UPGRADE	10
-	const char		*dbversion_table_name = "dbversion", *ha_node_table_name = "ha_node";
+	const char		*dbversion_table_name = "dbversion";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
 	zbx_dbpatch_t		**dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
+	const char		*ha_node_table_name = "ha_node";
 	int			total = 0, current = 0, completed, last_completed = -1, mandatory_num = 0;
+#else
+	ZBX_UNUSED(ha_mode);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

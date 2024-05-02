@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_discoverer_constants.h"
 #include "zbxdbhigh.h"
+#include "zbxexpression.h"
 
 const char	*item_logtype_string(unsigned char logtype)
 {
@@ -145,7 +146,7 @@ const char	*zbx_dobject_status2str(int st)
 	}
 }
 
-const char	*dservice_type_string(zbx_dservice_type_t service)
+const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {
 	switch (service)
 	{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/pkg/zbxcmd"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
+	"golang.zabbix.com/sdk/log"
 )
 
 func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions) error {
@@ -36,6 +36,7 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 
 	if len(options.Hostname) == 0 {
 		var hostnameItem string
+		var taskResult *string
 
 		if len(options.HostnameItem) == 0 {
 			hostnameItem = "system.hostname"
@@ -43,7 +44,7 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 			hostnameItem = options.HostnameItem
 		}
 
-		options.Hostname, err = taskManager.PerformTask(hostnameItem, time.Second*time.Duration(options.Timeout), agent.LocalChecksClientID)
+		taskResult, err = taskManager.PerformTask(hostnameItem, time.Second*time.Duration(options.Timeout), agent.LocalChecksClientID)
 		if err != nil {
 			if len(options.HostnameItem) == 0 {
 				return fmt.Errorf("cannot get system hostname using \"%s\" item as default for \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
@@ -51,9 +52,12 @@ func updateHostname(taskManager scheduler.Scheduler, options *agent.AgentOptions
 
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: %s", hostnameItem, err.Error())
 		}
-		if len(options.Hostname) == 0 {
+
+		if taskResult == nil || len(*taskResult) == 0 {
 			return fmt.Errorf("cannot get system hostname using \"%s\" item specified by \"HostnameItem\" configuration parameter: value is empty", hostnameItem)
 		}
+
+		options.Hostname = *taskResult
 		hosts := agent.ExtractHostnames(options.Hostname)
 		options.Hostname = strings.Join(hosts, ",")
 		if len(hosts) > 1 {

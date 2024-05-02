@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,8 +90,8 @@ switch ($page['type']) {
 		header('X-Content-Type-Options: nosniff');
 		header('X-XSS-Protection: 1; mode=block');
 
-		if (strcasecmp(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS), 'null') != 0) {
-			$x_frame_options = CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS);
+		if (strcasecmp(CSettingsHelper::getPublic(CSettingsHelper::X_FRAME_OPTIONS), 'null') != 0) {
+			$x_frame_options = CSettingsHelper::getPublic(CSettingsHelper::X_FRAME_OPTIONS);
 
 			if (strcasecmp($x_frame_options, 'SAMEORIGIN') == 0) {
 				header('X-Frame-Options: SAMEORIGIN');
@@ -132,7 +132,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				->addStyle(getTriggerStatusCss());
 
 			// perform Zabbix server check only for standard pages
-			if ($is_standard_page && CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
+			if ($is_standard_page && CSettingsHelper::getPublic(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
 				$page['scripts'][] = 'servercheck.js';
 			}
 		}

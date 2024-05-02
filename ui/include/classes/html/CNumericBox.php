@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,14 @@
 
 class CNumericBox extends CInput {
 
-	public function __construct($name = 'number', $value = '0', $maxlength = 20, $readonly = false, $allowempty = false, $allownegative = true) {
+	public function __construct($name = 'number', $value = '0', $maxlength = 15, $readonly = false, $allowempty = false,
+			$allownegative = true) {
 		parent::__construct('text', $name, $value);
 		$this->setReadonly($readonly);
 		$this->setAttribute('maxlength', $maxlength);
-		$this->onChange('validateNumericBox(this, '.($allowempty ? 'true' : 'false').', '.($allownegative ? 'true' : 'false').');');
+		$this->onChange(
+			'validateNumericBox(this, '.($allowempty ? 'true' : 'false').', '.($allownegative ? 'true' : 'false').');'
+		);
 	}
 
 	public function setWidth($value) {

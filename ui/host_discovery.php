@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,8 +107,17 @@ $fields = [
 								],
 	'trapper_hosts' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({type}) && {type} == 2'
+	],
+	'lifetime_type' =>			[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_LLD_DELETE_AFTER.','.ZBX_LLD_DELETE_NEVER.','.ZBX_LLD_DELETE_IMMEDIATELY]),
+									'(isset({add}) || isset({update}))'
 								],
 	'lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'enabled_lifetime_type' =>	[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_LLD_DISABLE_AFTER.','.ZBX_LLD_DISABLE_NEVER.','.ZBX_LLD_DISABLE_IMMEDIATELY]),
+									'(isset({add}) || isset({update}))'
+								],
+	'enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'evaltype' =>				[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
@@ -216,35 +225,49 @@ $fields = [
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
-	'filter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_hostids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_type' =>			[T_ZBX_INT, O_OPT, null,
-									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-									]),
-									null
-								],
-	'filter_delay' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
-	'filter_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_snmp_oid' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_state' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
-									null
-								],
-	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
-									null
-								],
-	'backurl' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_set' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_rst' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_groupids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_hostids' =>					[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_name' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_key' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_type' =>					[T_ZBX_INT, O_OPT, null,
+											IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+												ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
+												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+												ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
+												ITEM_TYPE_SCRIPT
+											]),
+											null
+										],
+	'filter_delay' =>					[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
+	'filter_lifetime_type' =>			[T_ZBX_INT, O_OPT, null,
+											IN([-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER,
+												ZBX_LLD_DELETE_IMMEDIATELY
+											]),
+											null
+										],
+	'filter_lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_enabled_lifetime_type' =>	[T_ZBX_INT, O_OPT, null,
+											IN([-1, ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER,
+												ZBX_LLD_DISABLE_IMMEDIATELY
+											]),
+											null
+										],
+	'filter_enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_snmp_oid' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_state' =>					[T_ZBX_INT, O_OPT, null,
+											IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
+											null
+										],
+	'filter_status' =>					[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
+											null
+										],
+	'backurl' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
-	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
+	'sortorder' =>						[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-
 check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -258,7 +281,7 @@ $itemid = getRequest('itemid');
 if ($itemid) {
 	$items = API::DiscoveryRule()->get([
 		'output' => ['itemid'],
-		'selectHosts' => ['hostid', 'proxyid', 'status', 'name'],
+		'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status'],
 		'itemids' => $itemid,
 		'editable' => true
 	]);
@@ -274,7 +297,7 @@ else {
 
 	if ($hostid) {
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'proxyid', 'status', 'name'],
+			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status'],
 			'hostids' => $hostid,
 			'templated_hosts' => true,
 			'editable' => true
@@ -309,7 +332,16 @@ if (hasRequest('filter_set')) {
 	CProfile::update($prefix.'host_discovery.filter.key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'host_discovery.filter.type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'host_discovery.filter.delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.lifetime_type', getRequest('filter_lifetime_type', -1),
+		PROFILE_TYPE_INT
+	);
 	CProfile::update($prefix.'host_discovery.filter.lifetime', getRequest('filter_lifetime', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.enabled_lifetime_type',
+		getRequest('filter_enabled_lifetime_type', -1), PROFILE_TYPE_INT
+	);
+	CProfile::update($prefix.'host_discovery.filter.enabled_lifetime', getRequest('filter_enabled_lifetime', ''),
+		PROFILE_TYPE_STR
+	);
 	CProfile::update($prefix.'host_discovery.filter.snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'host_discovery.filter.state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'host_discovery.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
@@ -325,7 +357,10 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete($prefix.'host_discovery.filter.key');
 	CProfile::delete($prefix.'host_discovery.filter.type');
 	CProfile::delete($prefix.'host_discovery.filter.delay');
+	CProfile::delete($prefix.'host_discovery.filter.lifetime_type');
 	CProfile::delete($prefix.'host_discovery.filter.lifetime');
+	CProfile::delete($prefix.'host_discovery.filter.enabled_lifetime_type');
+	CProfile::delete($prefix.'host_discovery.filter.enabled_lifetime');
 	CProfile::delete($prefix.'host_discovery.filter.snmp_oid');
 	CProfile::delete($prefix.'host_discovery.filter.state');
 	CProfile::delete($prefix.'host_discovery.filter.status');
@@ -338,7 +373,10 @@ $filter = [
 	'key' => CProfile::get($prefix.'host_discovery.filter.key', ''),
 	'type' => CProfile::get($prefix.'host_discovery.filter.type', -1),
 	'delay' => CProfile::get($prefix.'host_discovery.filter.delay', ''),
+	'lifetime_type' => CProfile::get($prefix.'host_discovery.filter.lifetime_type', -1),
 	'lifetime' => CProfile::get($prefix.'host_discovery.filter.lifetime', ''),
+	'enabled_lifetime_type' => CProfile::get($prefix.'host_discovery.filter.enabled_lifetime_type', -1),
+	'enabled_lifetime' => CProfile::get($prefix.'host_discovery.filter.enabled_lifetime', ''),
 	'snmp_oid' => CProfile::get($prefix.'host_discovery.filter.snmp_oid', ''),
 	'state' => CProfile::get($prefix.'host_discovery.filter.state', -1),
 	'status' => CProfile::get($prefix.'host_discovery.filter.status', -1)
@@ -427,7 +465,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => getRequest('name', DB::getDefault('items', 'name')),
 			'type' => $type,
 			'key_' => $key,
-			'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
 			'description' => getRequest('description', DB::getDefault('items', 'description')),
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
 			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
@@ -438,6 +475,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'conditions' => getRequest('conditions', [])
 			]),
 			'overrides' => prepareLldOverrides($overrides, $db_item),
+			'lifetime_type' => getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type')),
+			'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
+			'enabled_lifetime_type' => getRequest('enabled_lifetime_type',
+				DB::getDefault('items', 'enabled_lifetime_type')
+			),
+			'enabled_lifetime' => getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime')),
 
 			// Type fields.
 			// The fields used for multiple item types.
@@ -499,34 +542,60 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = true;
 
-		if (hasRequest('add')) {
-			$item = ['hostid' => $hostid];
+		if ($input['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY) {
+			$input['enabled_lifetime_type'] = DB::getDefault('items', 'enabled_lifetime_type');
+			$input['enabled_lifetime'] = DB::getDefault('items', 'enabled_lifetime');
+		}
 
-			$item += getSanitizedItemFields($input + [
-				'templateid' => 0,
-				'flags' => ZBX_FLAG_DISCOVERY_RULE,
-				'hosts' => $hosts
-			]);
+		$converted_lifetime = timeUnitToSeconds($input['lifetime']);
+		$converted_enabled_lifetime = timeUnitToSeconds($input['enabled_lifetime']);
+		$lifetime_valid = $input['lifetime_type'] == ZBX_LLD_DELETE_AFTER && $input['lifetime'] !== ''
+			&& $input['lifetime'][0] !== '{';
+		$enabled_lifetime_valid = $input['enabled_lifetime_type'] == ZBX_LLD_DISABLE_AFTER
+			&& $input['enabled_lifetime'] !== '' && $input['enabled_lifetime'][0] !== '{';
 
-			$response = API::DiscoveryRule()->create($item);
+		if ($lifetime_valid && $enabled_lifetime_valid
+				&& $converted_enabled_lifetime !== null && $converted_lifetime !== null
+				&& $converted_enabled_lifetime >= $converted_lifetime) {
+			$result = false;
 
-			if ($response === false) {
-				throw new Exception();
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'Disable lost resources',
+					_s('cannot be greater than or equal to the value of field "%1$s"', 'Delete lost resources')
+				)
+			);
+		}
+
+		if (!hasErrorMessages()) {
+			if (hasRequest('add')) {
+				$item = ['hostid' => $hostid];
+
+				$item += getSanitizedItemFields($input + [
+						'templateid' => 0,
+						'flags' => ZBX_FLAG_DISCOVERY_RULE,
+						'hosts' => $hosts
+					]);
+
+				$response = API::DiscoveryRule()->create($item);
+
+				if ($response === false) {
+					throw new Exception();
+				}
+			}
+
+			if (hasRequest('update')) {
+				$item = getSanitizedItemFields($input + $db_item + [
+						'flags' => ZBX_FLAG_DISCOVERY_RULE,
+						'hosts' => $hosts
+					]);
+
+				$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
+
+				if ($response === false) {
+					throw new Exception();
+				}
 			}
 		}
 
-		if (hasRequest('update')) {
-			$item = getSanitizedItemFields($input + $db_item + [
-				'flags' => ZBX_FLAG_DISCOVERY_RULE,
-				'hosts' => $hosts
-			]);
-
-			$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
-
-			if ($response === false) {
-				throw new Exception();
-			}
-		}
 	}
 	catch (Exception $e) {
 		$result = false;
@@ -617,7 +686,7 @@ if (hasRequest('form')) {
 	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$items = API::DiscoveryRule()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid', 'proxyid', 'name', 'status', 'flags'],
+			'selectHosts' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'status', 'flags'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -649,17 +718,22 @@ if (hasRequest('form')) {
 		}
 	}
 
+	if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+		$host['proxyid'] = $host['assigned_proxyid'];
+	}
+	unset($host['monitored_by'], $host['assigned_proxyid']);
+
 	$data = getItemFormData($item);
-	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
+
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
-	$data['host'] = $hosts[0];
+	$data['host'] = $host;
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
-	$data['display_interfaces'] = in_array($hosts[0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+	$data['display_interfaces'] = in_array($host['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
 
 	$default_timeout = DB::getDefault('items', 'timeout');
@@ -691,7 +765,38 @@ if (hasRequest('form')) {
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
-		$data['lifetime'] = $item['lifetime'];
+		$lifetime_type = $item['lifetime_type'];
+		$lifetime = $item['lifetime'];
+		$enabled_lifetime_type = $item['enabled_lifetime_type'];
+		$enabled_lifetime = $item['enabled_lifetime'];
+
+		$converted_lifetime = timeUnitToSeconds($lifetime);
+		$converted_enabled_lifetime = timeUnitToSeconds($enabled_lifetime);
+
+		if ($lifetime_type == ZBX_LLD_DELETE_AFTER && $converted_lifetime === 0) {
+			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
+		}
+
+		if ($enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER && $converted_enabled_lifetime === 0) {
+			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
+		}
+
+		if ($lifetime_type == ZBX_LLD_DELETE_IMMEDIATELY) {
+			$enabled_lifetime_type = DB::getDefault('items', 'enabled_lifetime_type');
+		}
+
+		if ($enabled_lifetime_type == ZBX_LLD_DISABLE_IMMEDIATELY) {
+			$enabled_lifetime_type = DB::getDefault('items', 'enabled_lifetime_type');
+		}
+
+		$data['lifetime_type'] = $lifetime_type;
+		$data['lifetime'] = $lifetime_type == ZBX_LLD_DELETE_AFTER
+			? $lifetime
+			: DB::getDefault('items', 'lifetime');
+		$data['enabled_lifetime_type'] = $enabled_lifetime_type;
+		$data['enabled_lifetime'] = $enabled_lifetime_type == ZBX_LLD_DISABLE_AFTER
+			? $enabled_lifetime
+			: ZBX_LLD_RULE_ENABLED_LIFETIME;
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);
@@ -799,8 +904,20 @@ else {
 		}
 	}
 
+	if ($filter['lifetime_type'] != -1) {
+		$options['filter']['lifetime_type'] = $filter['lifetime_type'];
+	}
+
 	if ($filter['lifetime'] !== '') {
 		$options['filter']['lifetime'] = $filter['lifetime'];
+	}
+
+	if ($filter['enabled_lifetime_type'] != -1) {
+		$options['filter']['enabled_lifetime_type'] = $filter['enabled_lifetime_type'];
+	}
+
+	if ($filter['enabled_lifetime'] !== '') {
+		$options['filter']['enabled_lifetime'] = $filter['enabled_lifetime'];
 	}
 
 	if ($filter['snmp_oid'] !== '') {

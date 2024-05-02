@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ class CControllerDiscoveryList extends CController {
 		// Get discovery rules.
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['drules'] = API::DRule()->get([
-			'output' => ['proxyid', 'name', 'status', 'iprange', 'delay'],
+			'output' => ['proxyid', 'name', 'status', 'iprange', 'delay', 'error'],
 			'selectDChecks' => ['type'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']

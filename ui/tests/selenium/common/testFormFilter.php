@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class testFormFilter extends CWebTest {
 			case TEST_GOOD:
 				$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
 				$rows = $table->getRows();
-				$filtered_rows_count = ($rows->count() === 1 && $rows->asText() === ['No data found.'])
+				$filtered_rows_count = ($rows->count() === 1 && $rows->asText() === ['No data found'])
 					? 0
 					: $rows->count();
 
@@ -84,7 +84,7 @@ class testFormFilter extends CWebTest {
 			case TEST_BAD:
 				$this->assertMessage(TEST_BAD, null, $data['error_message']);
 				$this->page->refresh()->waitUntilReady();
-				$this->assertEquals($this->query('xpath://li/ul[@class="ui-sortable-container ui-sortable"]/li')->count(), 1);
+				$this->assertEquals($this->query('xpath://li/ul[contains(@class, "tabfilter-tabs sortable")]/li')->count(), 1);
 				break;
 		}
 	}
@@ -299,7 +299,7 @@ class testFormFilter extends CWebTest {
 	public function getTableResults($table_selector) {
 		$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
 		$text = $table->query('xpath:.//tbody/tr/td')->one()->getText();
-		$result = ($text === 'No data found.') ? 0 : $table->getRows()->count();
+		$result = ($text === 'No data found') ? 0 : $table->getRows()->count();
 
 		return $result;
 	}

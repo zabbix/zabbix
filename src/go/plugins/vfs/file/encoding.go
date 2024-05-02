@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,9 +30,10 @@ import "C"
 
 import (
 	"fmt"
-	"git.zabbix.com/ap/plugin-support/log"
 	"syscall"
 	"unsafe"
+
+	"golang.zabbix.com/sdk/log"
 )
 
 func findEncodingFromBOM(encoding string, inbuf []byte, bytecount int) string {

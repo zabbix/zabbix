@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -370,7 +370,6 @@ class testFormUserProfile extends CLegacyWebTest {
 				break;
 		}
 	}
-
 	public static function messaging() {
 		return [
 			[[
@@ -466,7 +465,7 @@ class testFormUserProfile extends CLegacyWebTest {
 	public function testFormUserProfile_MessagesTimeout($data) {
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
-		$this->zbxTestTabSwitch('Messaging');
+		$this->zbxTestTabSwitch('Frontend notifications');
 
 		if (array_key_exists('messages_disabled', $data)) {
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");

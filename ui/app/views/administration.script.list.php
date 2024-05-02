@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,8 @@ $scriptsTable = (new CTableInfo())
 		_('User group'),
 		_('Host group'),
 		_('Host access')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['scripts'] as $script) {
 	$actions = [];
@@ -231,7 +232,6 @@ foreach ($data['scripts'] as $script) {
 // append table to form
 $scriptsForm->addItem([
 	$scriptsTable,
-	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
 		'script.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))

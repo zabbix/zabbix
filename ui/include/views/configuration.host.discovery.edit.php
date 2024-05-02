@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,18 +106,12 @@ $item_tab
 	]);
 
 // Prepare ITEM_TYPE_HTTPAGENT query fields.
-$query_fields_data = $data['query_fields'];
-
-if (!$query_fields_data && !$data['limited']) {
-	$query_fields_data[] = [
+if (!$data['query_fields'] && !$data['limited']) {
+	$data['query_fields'][] = [
 		'name' => '',
-		'value' => '',
-		'sortorder' => 0
+		'value' => ''
 	];
 }
-
-$query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
-$query_fields->items = [json_encode($query_fields_data)];
 
 // Prepare ITEM_TYPE_SCRIPT parameters.
 $parameters_data = [];
@@ -139,23 +133,24 @@ $parameters_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 if ($parameters_data) {
-	foreach ($parameters_data as $parameter) {
-		$parameters_table->addRow([
-			(new CTextBox('parameters[name][]', $parameter['name'], $data['limited'],
-				DB::getFieldLength('item_parameter', 'name'))
-			)
-				->setAttribute('style', 'width: 100%;')
-				->removeId(),
-			(new CTextBox('parameters[value][]', $parameter['value'], $data['limited'],
-				DB::getFieldLength('item_parameter', 'value'))
-			)
-				->setAttribute('style', 'width: 100%;')
-				->removeId(),
-			(new CButtonLink(_('Remove')))
-				->addClass('element-table-remove')
-				->setEnabled(!$data['limited'])
-				->onClick('jQuery(this).closest("tr").remove();')
-		]);
+	foreach ($parameters_data as $num => $parameter) {
+		$parameters_table->addItem(
+			(new CRow([
+				(new CTextBox('parameters['.$num.'][name]', $parameter['name'], $data['limited'],
+					DB::getFieldLength('item_parameter', 'name'))
+				)
+					->setAttribute('style', 'width: 100%;')
+					->removeId(),
+				(new CTextBox('parameters['.$num.'][value]', $parameter['value'], $data['limited'],
+					DB::getFieldLength('item_parameter', 'value'))
+				)
+					->setAttribute('style', 'width: 100%;')
+					->removeId(),
+				(new CButtonLink(_('Remove')))
+					->addClass('element-table-remove')
+					->setEnabled(!$data['limited'])
+			]))->addClass('form_row')
+		);
 	}
 }
 
@@ -169,70 +164,67 @@ $parameters_table->addRow([
 $item_tab
 	// Append ITEM_TYPE_HTTPAGENT Query fields to form list.
 	->addItem([
-		(new CLabel(_('Query fields'), 'query_fields_pairs'))->setId('js-item-query-fields-label'),
-		(new CFormField((new CDiv([
+		(new CLabel(_('Query fields'), 'query-fields-table'))->setId('js-item-query-fields-label'),
+		(new CFormField(
+			(new CDiv([
 				(new CTable())
+					->setId('query-fields-table')
 					->setAttribute('style', 'width: 100%;')
 					->setHeader(['', _('Name'), '', _('Value'), ''])
-					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
-					->setFooter(new CRow(
+					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))
+								->addClass('element-table-add')
 								->setEnabled(!$data['limited'])
-								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
-					)),
-				(new CTag('script', true))
-					->setAttribute('type', 'text/x-jquery-tmpl')
-					->addItem(new CRow([
-						(new CCol([
-							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('query_fields[#{index}][sortorder]', '#{sortorder}')
-						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('query_fields[#{index}][name]', '#{name}', $data['limited']))
+					),
+				new CTemplateTag('query-field-row-tmpl',
+					(new CRow([
+						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CTextBox('query_fields[#{rowNum}][name]', '#{name}', $data['limited']))
+							->removeId()
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
-						(new CTextBox('query_fields[#{index}][value]', '#{value}', $data['limited']))
+						(new CTextBox('query_fields[#{rowNum}][value]', '#{value}', $data['limited']))
+							->removeId()
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
+							->addClass('element-table-remove')
 							->setEnabled(!$data['limited'])
-							->setAttribute('data-row-action', 'remove_row')
-					])),
-					$query_fields
+					]))->addClass('form_row')
+				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setId('query_fields_pairs')
-				->setAttribute('data-sortable-pairs-table',  $data['limited'] ? '0' : '1')
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		))->setId('js-item-query-fields-field')
 	])
 	// Append ITEM_TYPE_SCRIPT parameters to form list.
-	->addItem(
-		(new CTag('script', true))
-			->setId('parameters_table_row')
-			->setAttribute('type', 'text/x-jquery-tmpl')
-			->addItem(
-				(new CRow([
-					(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('item_parameter', 'name')))
-						->setAttribute('style', 'width: 100%;')
-						->removeId(),
-					(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('item_parameter', 'value')))
-						->setAttribute('style', 'width: 100%;')
-						->removeId(),
-					(new CButtonLink(_('Remove')))
-						->addClass('element-table-remove')
-						->onClick('jQuery(this).closest("tr").remove();')
-				]))
-			)
-	)
 	->addItem([
 		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('js-item-parameters-label'),
-		(new CFormField((new CDiv($parameters_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		))->setId('js-item-parameters-field')
+		(new CFormField([
+			(new CDiv([
+				$parameters_table,
+				(new CTemplateTag('parameters_table_row'))->addItem(
+					(new CRow([
+						(new CTextBox('parameters[#{rowNum}][name]', '', false,
+							DB::getFieldLength('item_parameter', 'name')
+						))
+							->setAttribute('style', 'width: 100%;')
+							->removeId(),
+						(new CTextBox('parameters[#{rowNum}][value]', '', false,
+							DB::getFieldLength('item_parameter', 'value')
+						))
+							->setAttribute('style', 'width: 100%;')
+							->removeId(),
+						(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+					]))->addClass('form_row')
+				)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		]))->setId('js-item-parameters-field')
 	])
 	->addItem([
 		(new CLabel(_('Script'), 'script'))
@@ -288,57 +280,49 @@ $item_tab
 	]);
 
 // Append ITEM_TYPE_HTTPAGENT Headers fields to form list.
-$headers_data = $data['headers'];
-
-if (!$headers_data && !$data['limited']) {
-	$headers_data[] = [
+if (!$data['headers'] && !$data['limited']) {
+	$data['headers'][] = [
 		'name' => '',
-		'value' => '',
-		'sortorder' => 0
+		'value' => ''
 	];
 }
-$headers = (new CTag('script', true))->setAttribute('type', 'text/json');
-$headers->items = [json_encode($headers_data)];
 
 $item_tab
 	->additem([
-		(new CLabel(_('Headers'), 'headers_pairs'))->setId('js-item-headers-label'),
-		(new CFormField((new CDiv([
+		(new CLabel(_('Headers'), 'headers-table'))->setId('js-item-headers-label'),
+		(new CFormField(
+			(new CDiv([
 				(new CTable())
+					->setId('headers-table')
 					->setAttribute('style', 'width: 100%;')
 					->setHeader(['', _('Name'), '', _('Value'), ''])
-					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
-					->setFooter(new CRow(
+					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))
+								->addClass('element-table-add')
 								->setEnabled(!$data['limited'])
-								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
-					)),
-				(new CTag('script', true))
-					->setAttribute('type', 'text/x-jquery-tmpl')
-					->addItem(new CRow([
-						(new CCol([
-							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-							new CVar('headers[#{index}][sortorder]', '#{sortorder}')
-						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('headers[#{index}][name]', '#{name}', $data['limited']))
+					),
+				new CTemplateTag('item-header-row-tmpl',
+					(new CRow([
+						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CTextBox('headers[#{rowNum}][name]', '#{name}', $data['limited']))
+							->removeId()
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 						RARR(),
-						(new CTextBox('headers[#{index}][value]', '#{value}', $data['limited'], 2000))
+						(new CTextBox('headers[#{rowNum}][value]', '#{value}', $data['limited'], 2000))
+							->removeId()
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
+							->addClass('element-table-remove')
 							->setEnabled(!$data['limited'])
-							->setAttribute('data-row-action', 'remove_row')
-					])),
-				$headers
+					]))->addClass('form_row')
+				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setId('headers_pairs')
-				->setAttribute('data-sortable-pairs-table', $data['limited'] ? '0' : '1')
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		))->setId('js-item-headers-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT Required status codes to form list.
@@ -698,11 +682,14 @@ if ($data['can_edit_source_timeouts']
 		&& (!$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)) {
 	$edit_source_timeouts_link = $data['host']['proxyid']
 		? (new CLink(_('Timeouts')))
+			->addClass(ZBX_STYLE_LINK)
 			->setAttribute('data-proxyid', $data['host']['proxyid'])
 			->onClick('view.editProxy(event, this.dataset.proxyid);')
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
-		))->setTarget('_blank');
+		))
+			->addClass(ZBX_STYLE_LINK)
+			->setTarget('_blank');
 }
 
 $item_tab->addItem([
@@ -725,13 +712,38 @@ $item_tab->addItem([
 	]))->setId('js-item-timeout-field')
 ]);
 
+$lld_lifetime_help_icons = makeHelpIcon(_('The value should be greater than LLD rule update interval.'));
+
 $item_tab
 	->addItem([
-		(new CLabel(_('Keep lost resources period'), 'lifetime'))->setAsteriskMark(),
-		new CFormField((new CTextBox('lifetime', $data['lifetime']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-		)
+		(new CLabel([_('Delete lost resources'), $lld_lifetime_help_icons], 'lifetime'))->setAsteriskMark(),
+		new CFormField([
+			(new CRadioButtonList('lifetime_type', (int) $data['lifetime_type']))
+				->addValue(_('Never'), ZBX_LLD_DELETE_NEVER)
+				->addValue(_('Immediately'), ZBX_LLD_DELETE_IMMEDIATELY)
+				->addValue(_('After'), ZBX_LLD_DELETE_AFTER)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('lifetime', $data['lifetime']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		])
+	])
+	->addItem([
+		(new CLabel([_('Disable lost resources'), $lld_lifetime_help_icons], 'enabled_lifetime'))
+			->setId('js-item-disable-resources-label')
+			->setAsteriskMark(),
+		(new CFormField([
+			(new CRadioButtonList('enabled_lifetime_type', (int) $data['enabled_lifetime_type']))
+				->addValue(_('Never'), ZBX_LLD_DISABLE_NEVER)
+				->addValue(_('Immediately'), ZBX_LLD_DISABLE_IMMEDIATELY)
+				->addValue(_('After'), ZBX_LLD_DISABLE_AFTER)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('enabled_lifetime', $data['enabled_lifetime']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))->setId('js-item-disable-resources-field')
 	])
 	->addItem([
 		(new CLabel(_('Enable trapping'), 'allow_traps'))->setId('js-item-allow-traps-label'),
@@ -945,6 +957,7 @@ $lld_macro_tab->addItem([
 // Overrides tab.
 $overrides_tab = new CFormGrid();
 $overrides_list = (new CTable())
+	->setId('lld-overrides-table')
 	->addClass('lld-overrides-table')
 	->setHeader([
 		new CColHeader(),
@@ -1057,7 +1070,10 @@ $html_page->show();
 		'form_name' => $form->getName(),
 		'counter' => $data['counter'],
 		'context' => $data['context'],
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
+		'readonly' => $data['limited'],
+		'query_fields' => $data['query_fields'],
+		'headers' => $data['headers']
 	]).');
 '))
 	->setOnDocumentReady()

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@
 						->setId('snmp_repetition_count_label_#{iface.interfaceid}'),
 					(new CFormField(
 						(new CNumericBox('interfaces[#{iface.interfaceid}][details][max_repetitions]',
-							'#{iface.details.max_repetitions}', 20, false, false, false
+							'#{iface.details.max_repetitions}', 10, false, false, false
 						))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 					))
 						->setId('snmp_repetition_count_field_#{iface.interfaceid}')

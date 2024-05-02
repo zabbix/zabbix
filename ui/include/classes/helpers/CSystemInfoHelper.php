@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ class CSystemInfoHelper {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
+			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
 			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
 			'failover_delay' => 0
@@ -43,9 +44,7 @@ class CSystemInfoHelper {
 		$db_backend = DB::getDbBackend();
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
 
-		$dbversion_status = CSettingsHelper::getDbVersionStatus();
-
-		foreach ($dbversion_status as $dbversion) {
+		foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
 			if (array_key_exists('history_pk', $dbversion)) {
 				$data['history_pk'] = ($dbversion['history_pk'] == 1);
 
@@ -53,7 +52,7 @@ class CSystemInfoHelper {
 			}
 		}
 
-		$housekeeper_warnings = CHousekeepingHelper::getWarnings($dbversion_status);
+		$housekeeper_warnings = CHousekeepingHelper::getWarnings();
 
 		if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $housekeeper_warnings)
 				&& CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
@@ -90,7 +89,7 @@ class CSystemInfoHelper {
 		$data['ha_nodes'] = $ha_nodes;
 
 		if ($ha_cluster_enabled) {
-			$failover_delay = CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY);
+			$failover_delay = CSettingsHelper::get(CSettingsHelper::HA_FAILOVER_DELAY);
 			$failover_delay_seconds = timeUnitToSeconds($failover_delay);
 			$data['failover_delay'] = secondsToPeriod($failover_delay_seconds);
 		}
@@ -107,11 +106,12 @@ class CSystemInfoHelper {
 		}
 
 		$setup = new CFrontendSetup();
+		$setup->setDefaultLang(CWebUser::$data['lang']);
 		$requirements = $setup->checkRequirements();
 		$requirements[] = $setup->checkSslFiles();
-		$data['requirements'] = $requirements;
 
-		$data['dbversion_status'] = $dbversion_status;
+		$data['requirements'] = $requirements;
+		$data['dbversion_status'] = CSettingsHelper::getDbVersionStatus();
 
 		return $data;
 	}

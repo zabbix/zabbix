@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,8 +34,18 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
+
+func GetNextcheckSeconds(itemid uint64, delay string, from time.Time) int {
+	nextcheck, _, nextcheck_err := GetNextcheck(itemid, delay, from)
+
+	if nextcheck_err != nil {
+		return 0
+	}
+
+	return int(nextcheck.Unix())
+}
 
 func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, scheduling bool, err error) {
 	var cnextcheck, cscheduling C.int

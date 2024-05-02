@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 #ifndef ZABBIX_XML_H
 #define ZABBIX_XML_H
 
-#include "config.h"
-#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 #ifdef HAVE_LIBXML2

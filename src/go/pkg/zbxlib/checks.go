@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,8 +71,8 @@ import (
 	"errors"
 	"unsafe"
 
-	"zabbix.com/pkg/itemutil"
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/sdk/log"
 )
 
 func ExecuteCheck(key string, params []string) (result *string, err error) {

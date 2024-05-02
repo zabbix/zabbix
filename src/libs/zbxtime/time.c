@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	static ZBX_THREAD_LOCAL LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
+	int					sec_diff;
 #else
 	struct timeval	tv;
 	int		rc = -1;
@@ -142,8 +143,10 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #endif	/* not _WINDOWS */
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
-			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
+	sec_diff = ts->sec - last_ts.sec;
+
+	/* correction window is 1 sec before the corrected last _ftime clock reading */
+	if ((0 == sec_diff && ts->ns <= last_ts.ns) || (-1 == sec_diff && ts->ns > last_ts.ns))
 #else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
 #endif
@@ -320,6 +323,29 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	ZBX_UNUSED(tz);
 	return localtime(time);
 #endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get broken-down representation of the time and cache result       *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
+ *                                                                            *
+ * Return value: broken-down representation of the time                       *
+ *                                                                            *
+ ******************************************************************************/
+const struct tm	*zbx_localtime_now(const time_t *time)
+{
+	static ZBX_THREAD_LOCAL struct tm	tm_last;
+	static ZBX_THREAD_LOCAL time_t		time_last;
+
+	if (time_last != *time)
+	{
+		time_last = *time;
+		localtime_r(time, &tm_last);
+	}
+
+	return &tm_last;
 }
 
 /******************************************************************************
@@ -1070,13 +1096,18 @@ static int zbx_iso8601_timezone(const char *zone, long int *offset)
 
 	ptr++;
 
-	if (ZBX_CONST_STRLEN("00:00") > strlen(ptr) || ':' != ptr[2])
+	if (ZBX_CONST_STRLEN("0000") > strlen(ptr))
 		return FAIL;
 
-	if (0 == isdigit(*ptr) || 23 < (h = atoi(ptr)))
+	if (SUCCEED != zbx_is_uint_n_range(ptr, 2, &h, sizeof(h), 0, 23))
 		return FAIL;
 
-	if (0 == isdigit(ptr[3]) || 59 < (m = atoi(&ptr[3])))
+	ptr += 2;
+
+	if (':' == *ptr)
+		ptr++;
+
+	if (0 == isdigit(*ptr) || 59 < (m = atoi(ptr)))
 		return FAIL;
 
 	*offset = sign * (m + h * 60) * 60;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -160,9 +160,9 @@ class testPageAlertsScripts extends CWebTest {
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
 						'Commands' => '/sbin/shutdown -r',
-						'User group' => 'Zabbix administrators',
+						'User group' => 'All',
 						'Host group' => 'Zabbix servers',
-						'Host access' => 'Write'
+						'Host access' => 'Read'
 					],
 					[
 						'Name' => self::HOST_GROUP_SCRIPT,

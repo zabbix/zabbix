@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1795,7 +1795,7 @@ class testUserRolesPermissions extends CWebTest {
 	 * Click Sign out button.
 	 */
 	private function signOut() {
-		$this->query('xpath://a[@class="zi-signout"]')->waitUntilPresent()->one()->click();
+		$this->query('xpath://a[@class="zi-sign-out"]')->waitUntilPresent()->one()->click();
 		$this->page->waitUntilReady();
 		$this->query('button:Sign in')->waitUntilVisible();
 	}

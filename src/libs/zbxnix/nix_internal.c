@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,14 +22,22 @@
 
 #include "zbxcommon.h"
 
-static zbx_get_progname_f	get_progname_func_cb = NULL;
+static zbx_get_progname_f		get_progname_func_cb = NULL;
+static zbx_get_process_info_by_thread_f	get_process_info_by_thread_func_cb = NULL;
 
-void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb)
+void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb, zbx_get_process_info_by_thread_f
+		get_process_info_by_thread_cb)
 {
 	get_progname_func_cb = get_progname_cb;
+	get_process_info_by_thread_func_cb = get_process_info_by_thread_cb;
 }
 
 zbx_get_progname_f	nix_get_progname_cb(void)
 {
 	return get_progname_func_cb;
+}
+
+zbx_get_process_info_by_thread_f	nix_get_process_info_by_thread_func_cb(void)
+{
+	return get_process_info_by_thread_func_cb;
 }

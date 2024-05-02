@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
 #include "zbxdb.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 
 #define REMOTE_COMMAND_NEW		0
 #define REMOTE_COMMAND_RESULT_OOM	1
@@ -504,7 +505,11 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 	zbx_dc_interface_t	interface;
 
 	memset(&interface, 0, sizeof(interface));
-	zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT);
+	if (FAIL == zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT))
+	{
+		zbx_strlcpy(error, "cannot find host AGENT interface", max_error_len);
+		return FAIL;
+	}
 
 	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
 			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
@@ -518,12 +523,13 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 }
 
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
-		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, const char *config_ssh_key_location, char *error,
+		size_t max_error_len)
 {
 	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
-	int		(*function)(zbx_dc_item_t *, const char*, AGENT_RESULT *);
+	int		(*function)(zbx_dc_item_t *, const char*, const char *config_ssh_key_location, AGENT_RESULT *);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -540,7 +546,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	for (int i = 0; INTERFACE_TYPE_COUNT > i; i++)
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid,
-				INTERFACE_TYPE_PRIORITY[i])))
+				zbx_get_interface_type_priority(i))))
 		{
 			break;
 		}
@@ -585,7 +591,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = function(&item, config_source_ip, &agent_result)))
+	if (SUCCEED != (ret = function(&item, config_source_ip, config_ssh_key_location, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -655,17 +661,14 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 
 	result = zbx_db_select(
 		"select null"
-			" from hosts_groups hg,rights r,users_groups ug"
-		" where hg.groupid=r.id"
-			" and r.groupid=ug.usrgrpid"
-			" and hg.hostid=" ZBX_FS_UI64
-			" and ug.userid=" ZBX_FS_UI64
-		" group by hg.hostid"
-		" having min(r.permission)>%d"
-			" and max(r.permission)>=%d",
+			" from host_hgset h,permission p,user_ugset u"
+		" where u.ugsetid=p.ugsetid"
+			" and p.hgsetid=h.hgsetid"
+			" and h.hostid=" ZBX_FS_UI64
+			" and u.userid=" ZBX_FS_UI64
+			" and p.permission>=%d",
 		hostid,
 		userid,
-		PERM_DENY,
 		script->host_access);
 
 	if (NULL == zbx_db_fetch(result))
@@ -838,29 +841,32 @@ out:
 	return ret;
 }
 
-/**********************************************************************************
- *                                                                                *
- * Purpose: executing user scripts or remote commands                             *
- *                                                                                *
- * Parameters:  script                 - [IN] script to be executed               *
- *              host                   - [IN] host the script will be executed on *
- *              params                 - [IN] parameters for the script           *
- *              config_timeout         - [IN]                                     *
- *              config_trapper_timeout - [IN]                                     *
- *              config_source_ip       - [IN]                                     *
- *              get_config_forks       - [IN]                                     *
- *              result                 - [OUT] result of a script execution       *
- *              error                  - [OUT] error reported by the script       *
- *              max_error_len          - [IN] maximum error length                *
- *              debug                  - [OUT] debug data (optional)              *
- *                                                                                *
- * Return value:  SUCCEED - processed successfully                                *
- *                FAIL - error occurred                                           *
- *                TIMEOUT_ERROR - timeout occurred                                *
- *                                                                                *
- **********************************************************************************/
+/****************************************************************************************
+ *                                                                                      *
+ * Purpose: executes user scripts or remote commands                                    *
+ *                                                                                      *
+ * Parameters:  script                       - [IN] script to be executed               *
+ *              host                         - [IN] host the script will be executed on *
+ *              params                       - [IN] parameters for the script           *
+ *              config_timeout               - [IN]                                     *
+ *              config_trapper_timeout       - [IN]                                     *
+ *              config_source_ip             - [IN]                                     *
+ *              config_ssh_key_location      - [IN]                                     *
+ *              config_enable_global_scripts - [IN]                                     *
+ *              get_config_forks             - [IN]                                     *
+ *              result                       - [OUT] result of a script execution       *
+ *              error                        - [OUT] error reported by the script       *
+ *              max_error_len                - [IN] maximum error length                *
+ *              debug                        - [OUT] debug data (optional)              *
+ *                                                                                      *
+ * Return value:  SUCCEED - processed successfully                                      *
+ *                FAIL - error occurred                                                 *
+ *                TIMEOUT_ERROR - timeout occurred                                      *
+ *                                                                                      *
+ ***************************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
+		const char *config_ssh_key_location, int config_enable_global_scripts,
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char *error,
 		size_t max_error_len, char **debug)
 {
@@ -886,7 +892,13 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
+					if (0 == config_enable_global_scripts)
+					{
+						zbx_snprintf(error, max_error_len, "Global script execution on Zabbix "
+								"server is disabled by server configuration");
+						ret = FAIL;
+					}
+					else if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
 							config_trapper_timeout, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
 					{
 						ret = FAIL;
@@ -922,7 +934,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
 			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, config_source_ip,
-					error, max_error_len);
+					config_ssh_key_location, error, max_error_len);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);

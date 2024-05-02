@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $table = (new CTableInfo())
@@ -44,7 +45,8 @@ $table = (new CTableInfo())
 		_('Last sent'),
 		_('Status'),
 		_('Info')
-	]);
+	])
+	->setPageNavigation(array_key_exists('paging', $data) ? $data['paging'] : null);
 
 $cycles = [
 	ZBX_REPORT_CYCLE_DAILY => _('Daily'),

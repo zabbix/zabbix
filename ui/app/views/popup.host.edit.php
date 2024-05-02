@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,6 +89,7 @@ $output = [
 			'popup_url' => $popup_url->getUrl(),
 			'form_name' => $data['form_name'],
 			'host_interfaces' => $data['host']['interfaces'],
+			'proxy_groupid' => $data['host']['proxy_groupid'],
 			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 			'warnings' => $data['warnings']
 		]).');',

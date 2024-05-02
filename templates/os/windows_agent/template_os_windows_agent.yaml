@@ -925,12 +925,12 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(net){
-                      return {
-                          "{#IFNAME}": net.Name,
-                          "{#IFDESCR}": net.Description,
-                          "{#IFALIAS}": net.NetConnectionID,
-                          "{#IFGUID}": net.GUID
-                      }})
+                  	return {
+                  		"{#IFNAME}": net.Name,
+                  		"{#IFDESCR}": net.Description,
+                  		"{#IFALIAS}": net.NetConnectionID,
+                  		"{#IFGUID}": net.GUID
+                  	}})
                   return JSON.stringify({"data": output})
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1380,12 +1380,12 @@ zabbix_export:
                   var filesystems = JSON.parse(value);
                   
                   result = filesystems.map(function (filesystem) {
-                      return {
-                          'fsname': filesystem.fsname,
-                          'fstype': filesystem.fstype,
-                          'fslabel': filesystem.fslabel,
-                          'fsdrivetype': filesystem.fsdrivetype
-                      };
+                  	return {
+                  		'fsname': filesystem.fsname,
+                  		'fstype': filesystem.fstype,
+                  		'fslabel': filesystem.fslabel,
+                  		'fsdrivetype': filesystem.fsdrivetype
+                  	};
                   });
                   
                   return JSON.stringify(result);
@@ -1450,7 +1450,7 @@ zabbix_export:
           value: '^.*$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv|edgeupdate)$'
+          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv|edgeupdate|cbdhsvc_.+)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.STARTUPNAME.MATCHES}'
           value: '^(?:automatic|automatic delayed)$'

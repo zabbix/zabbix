@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,5 +44,9 @@
 #define HOST_INVENTORY_COUNT		2
 
 #define HOST_INVENTORY_FIELD_COUNT	70
+
+#define HOST_MONITORED_BY_SERVER	0
+#define HOST_MONITORED_BY_PROXY		1
+#define HOST_MONITORED_BY_PROXY_GROUP	2
 
 #endif /*ZABBIX_ZBX_HOST_CONSTANTS_H*/

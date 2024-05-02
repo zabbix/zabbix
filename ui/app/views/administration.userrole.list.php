@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['uncheck']) {
@@ -68,9 +69,10 @@ $table = (new CTableInfo())
 		),
 		'#',
 		_('Users')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
-foreach ($this->data['roles'] as $role) {
+foreach ($data['roles'] as $role) {
 	$users = [];
 
 	foreach ($role['users'] as $user) {
@@ -124,7 +126,6 @@ foreach ($this->data['roles'] as $role) {
 
 $form->addItem([
 	$table,
-	$this->data['paging'],
 	new CActionButtonList('action', 'roleids', [
 		'userrole.delete' => [
 			'name' => _('Delete'),

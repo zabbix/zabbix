@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,11 +24,14 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
- * Test tag based permissions
+ * Test tag based permissions.
+ *
+ * @dataSource UserPermissions
  */
 class testTagBasedPermissions extends CLegacyWebTest {
-	public $user = 'Tag-user';
-	public $trigger_host = 'Host for tag permissions';
+	const USER = 'Tag-user';
+	const PASSWORD = 'Zabbix_Test_123';
+	const TRIGGER_HOST = 'Host for tag permissions';
 
 	/**
 	 * Set tags permissions in user groups and login as simple user
@@ -91,9 +94,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		$this->zbxTestLogout();
 		$this->zbxTestWaitForPageToLoad();
 		$this->webDriver->manage()->deleteAllCookies();
-		$userid = DBfetch(DBselect('SELECT userid FROM users WHERE username='. zbx_dbstr($this->user)));
-		$this->assertFalse(empty($userid));
-		$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b54f', $userid['userid']);
+		$this->page->userLogin(self::USER, self::PASSWORD);
 	}
 
 	public static function incorrect_tags() {
@@ -185,32 +186,34 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-settings']", 'title', self::USER);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText('//h4[text()="Current problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
+		$this->zbxTestAssertElementText('//h4[text()="Current problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found');
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 
 		// Check trigger filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
-			COverlayDialogElement::find()->waitUntilReady()->one()->setDataContext($this->trigger_host);
+			COverlayDialogElement::find()->waitUntilReady()->one()->setDataContext(self::TRIGGER_HOST);
 			$this->zbxTestClickLinkTextWait($name);
 			COverlayDialogElement::ensureNotPresent();
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
-			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+			$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+			$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();
@@ -294,7 +297,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-settings']", 'title', self::USER);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
@@ -312,7 +315,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->zbxTestLaunchOverlayDialog('Triggers');
-			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
+			COverlayDialogElement::find()->one()->setDataContext(self::TRIGGER_HOST);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
@@ -398,7 +401,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-settings']", 'title', self::USER);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
@@ -415,7 +418,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
-			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
+			COverlayDialogElement::find()->one()->setDataContext(self::TRIGGER_HOST);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ class C52AggregateItemKeyConverter extends CConverter {
 			$timeperiod = trim($timeperiod);
 
 			if ($this->isQuotableTimeperiod($timeperiod)) {
-				$timeperiod = CHistFunctionParser::quoteParam($timeperiod);
+				$timeperiod = CHistFunctionParser::quoteParam($timeperiod, true, ['escape_backslashes' => false]);
 			}
 
 			$new_value .= ','.$timeperiod;

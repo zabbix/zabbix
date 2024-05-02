@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,14 +29,30 @@ typedef enum
 	ZBX_ASYNC_TASK_READ,
 	ZBX_ASYNC_TASK_WRITE,
 	ZBX_ASYNC_TASK_STOP,
-
+	ZBX_ASYNC_TASK_RESOLVE_REVERSE
 }
 zbx_async_task_state_t;
+
+
+typedef enum
+{
+	ZABBIX_ASYNC_STEP_DEFAULT = 0,
+	ZABBIX_ASYNC_STEP_REVERSE_DNS,
+}
+zbx_async_rdns_step_t;
+
+typedef enum
+{
+	ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO = 0,
+	ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES,
+}
+zbx_async_resolve_reverse_dns_t;
 
 typedef int (*zbx_async_task_process_cb_t)(short event, void *data, int *fd, const char *addr, char *dnserr);
 typedef void (*zbx_async_task_clear_cb_t)(void *data);
 
-void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
+zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event);
+void			zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
 		void *data, int timeout, zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
 #endif
 #endif

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,16 @@ $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Proxy tab.
 
+$local_address = (new CTable())
+	->setHeader([_('Address'), _('Port')])
+	->addRow([
+		(new CTextBox('local_address', $data['form']['local_address'], false,
+			DB::getFieldLength('proxy', 'local_address')
+		))->setWidth(336),
+		(new CTextBox('local_port', $data['form']['local_port'], false, DB::getFieldLength('proxy', 'local_port')))
+			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			->setAriaRequired()
+	]);
 $interface = (new CTable())
 	->setHeader([_('Address'), _('Port')])
 	->addRow([
@@ -53,7 +63,36 @@ $proxy_tab = (new CFormGrid())
 			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('proxy', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
 		)
+	])
+	->addItem([
+		new CLabel(_('Proxy group'), 'proxy_groupid_ms'),
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'proxy_groupid',
+				'object_name' => 'proxy_groups',
+				'multiple' => false,
+				'data' => $data['ms_proxy_group'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxy_groups',
+						'srcfld1' => 'proxy_groupid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxy_groupid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Address for active agents')))
+			->addClass('js-local-address')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CDiv($local_address))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		))->addClass('js-local-address')
 	])
 	->addItem([
 		new CLabel(_('Proxy mode'), 'operating_mode'),
@@ -181,6 +220,7 @@ $encryption_tab
 	]);
 
 // Timeouts tab.
+
 $custom_timeouts_enabled = $data['form']['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED;
 $version_mismatch_hint = $data['version_mismatch']
 	? new CSpan(makeWarningIcon(_('Timeouts are disabled because the proxy and server versions do not match.')))
@@ -198,7 +238,9 @@ $timeouts_tab = (new CFormGrid())
 			$data['user']['can_edit_global_timeouts']
 				? (new CLink(_('Global timeouts'),
 					(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
-				))->setTarget('_blank')
+				))
+					->addClass(ZBX_STYLE_LINK)
+					->setTarget('_blank')
 				: null
 		])
 	])

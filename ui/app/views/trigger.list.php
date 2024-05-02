@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -208,25 +208,27 @@ $triggers_form = (new CForm('post', $url))
 	->addVar('context', $data['context'], 'form_context');
 
 // create table
-$triggers_table = (new CTableInfo())->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_triggers'))
-			->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
-	$data['show_value_column'] ? _('Value') : null,
-	($data['single_selected_hostid'] == 0)
-		? ($data['context'] === 'host')
-			? _('Host')
-			: _('Template')
-		: null,
-	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
-	_('Operational data'),
-	_('Expression'),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-	$data['show_info_column'] ? _('Info') : null,
-	_('Tags')
-]);
+$triggers_table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_triggers'))
+				->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
+		$data['show_value_column'] ? _('Value') : null,
+		($data['single_selected_hostid'] == 0)
+			? ($data['context'] === 'host')
+				? _('Host')
+				: _('Template')
+			: null,
+		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
+		_('Operational data'),
+		_('Expression'),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		$data['show_info_column'] ? _('Info') : null,
+		_('Tags')
+	])
+	->setPageNavigation($data['paging']);
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
@@ -288,6 +290,10 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description = array_merge($description, [(new CDiv($trigger_deps))->addClass('dependencies')]);
 	}
 
+	$disable_source = $trigger['status'] == TRIGGER_STATUS_DISABLED && $trigger['triggerDiscovery']
+		? $trigger['triggerDiscovery']['disable_source']
+		: '';
+
 	// info
 	if ($data['show_info_column']) {
 		$info_icons = [];
@@ -295,9 +301,12 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDWRAP));
 		}
 
-		if (array_key_exists('ts_delete', $trigger['triggerDiscovery'])
-				&& $trigger['triggerDiscovery']['ts_delete'] > 0) {
-			$info_icons[] = getTriggerLifetimeIndicator(time(), (int) $trigger['triggerDiscovery']['ts_delete']);
+		if (array_key_exists('status', $trigger['triggerDiscovery'])
+				&& $trigger['triggerDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_icons[] = getLldLostEntityIndicator(time(), $trigger['triggerDiscovery']['ts_delete'],
+				$trigger['triggerDiscovery']['ts_disable'], $disable_source,
+				$trigger['status'] == TRIGGER_STATUS_DISABLED, _('trigger')
+			);
 		}
 	}
 
@@ -336,6 +345,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		)
 		: '';
 
+	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
+
 	$triggers_table->addRow([
 		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
@@ -344,7 +355,10 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description,
 		$trigger['opdata'],
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
-		$status,
+		(new CDiv([
+			$status,
+			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
+		]))->addClass(ZBX_STYLE_NOWRAP),
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
 		$data['tags'][$triggerid]
 	]);
@@ -353,7 +367,6 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 // append table to form
 $triggers_form->addItem([
 	$triggers_table,
-	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.massenable' => [

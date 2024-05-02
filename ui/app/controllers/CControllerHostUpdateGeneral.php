@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,9 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			'status'			=> 'required|db hosts.status|in '.implode(',', [HOST_STATUS_MONITORED,
 										HOST_STATUS_NOT_MONITORED
 									]),
+			'monitored_by'		=> 'db hosts.monitored_by|in '.implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]),
 			'proxyid'		    => 'db hosts.proxyid',
+			'proxy_groupid'		=> 'db hosts.proxy_groupid',
 			'interfaces'		=> 'array',
 			'mainInterfaces'	=> 'array',
 			'groups'			=> 'required|array',

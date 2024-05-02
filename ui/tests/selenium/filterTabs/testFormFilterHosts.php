@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,6 +79,18 @@ class testFormFilterHosts extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'simple_name'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'filter_form' => [
+						'Name' => 'non_exist'
+					],
+					'filter' => [
+						'Name' => 'simple_name and 0 records',
+						'Show number of records' => true
 					]
 				]
 			],

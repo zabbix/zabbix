@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,16 +66,16 @@ $view_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'connector.list')
 	->getUrl();
 
-$header = [
-	(new CColHeader(
-		(new CCheckBox('all_connectors'))->onClick("checkAll('connector_list', 'all_connectors', 'connectorids');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
-	make_sorting_header(_('Data type'), 'data_type', $data['sort'], $data['sortorder'], $view_url),
-	new CColHeader(_('Status'))
-];
-
-$connector_list = (new CTableInfo())->setHeader($header);
+$connector_list = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_connectors'))->onClick("checkAll('connector_list', 'all_connectors', 'connectorids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Data type'), 'data_type', $data['sort'], $data['sortorder'], $view_url),
+		new CColHeader(_('Status'))
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['connectors'] as $connectorid => $connector) {
 	$status_tag = $connector['status'] == ZBX_CONNECTOR_STATUS_ENABLED
@@ -104,30 +104,29 @@ foreach ($data['connectors'] as $connectorid => $connector) {
 	$connector_list->addRow($row);
 }
 
-$form
-	->addItem([$connector_list, $data['paging']])
-	->addItem(
-		new CActionButtonList('action', 'connectorids', [
-			'connector.massenable' => [
-				'content' => (new CSimpleButton(_('Enable')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massenable-connector')
-					->addClass('js-no-chkbxrange')
-			],
-			'connector.massdisable' => [
-				'content' => (new CSimpleButton(_('Disable')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdisable-connector')
-					->addClass('js-no-chkbxrange')
-			],
-			'connector.massdelete' => [
-				'content' => (new CSimpleButton(_('Delete')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-connector')
-					->addClass('js-no-chkbxrange')
-			]
-		], 'connector')
-);
+$form->addItem([
+	$connector_list,
+	new CActionButtonList('action', 'connectorids', [
+		'connector.massenable' => [
+			'content' => (new CSimpleButton(_('Enable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-connector')
+				->addClass('js-no-chkbxrange')
+		],
+		'connector.massdisable' => [
+			'content' => (new CSimpleButton(_('Disable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-connector')
+				->addClass('js-no-chkbxrange')
+		],
+		'connector.massdelete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-connector')
+				->addClass('js-no-chkbxrange')
+		]
+	], 'connector')
+]);
 
 (new CHtmlPage())
 	->setTitle(_('Connectors'))

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,13 +270,22 @@ class CDService extends CApiService {
 
 			$db_services = DBselect(
 				'SELECT DISTINCT ds.dserviceid,h.hostid'.
-				' FROM dservices ds,dchecks dc,drules dr,hosts h,interface i'.
+				' FROM dservices ds,dchecks dc,interface i,hosts h,drules dr'.
+				' LEFT JOIN proxy p ON dr.proxyid=p.proxyid'.
 				' WHERE ds.dcheckid=dc.dcheckid'.
 					' AND dc.druleid=dr.druleid'.
-					' AND (dr.proxyid=h.proxyid OR (dr.proxyid IS NULL AND h.proxyid IS NULL))'.
-					' AND h.hostid=i.hostid'.
 					' AND ds.ip=i.ip'.
-					' AND '.dbConditionId('ds.dserviceid', $dserviceIds)
+					' AND i.hostid=h.hostid'.
+					' AND '.dbConditionId('ds.dserviceid', $dserviceIds).
+					' AND ('.
+						'(h.monitored_by='.ZBX_MONITORED_BY_SERVER.' AND dr.proxyid IS NULL)'.
+						' OR ('.
+							'h.monitored_by='.ZBX_MONITORED_BY_PROXY.
+							' AND dr.proxyid=h.proxyid'.
+							' AND p.proxy_groupid IS NULL'.
+						')'.
+						' OR (h.monitored_by='.ZBX_MONITORED_BY_PROXY_GROUP.' AND h.proxy_groupid=p.proxy_groupid)'.
+					')'
 			);
 
 			$host_services = [];

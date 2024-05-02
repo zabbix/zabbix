@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,6 +218,8 @@ void	zbx_mock_test_entry(void **state)
 
 	while (ZBX_MOCK_SUCCESS == (mock_error = zbx_mock_vector_element(handle, &elem_handle)))
 	{
+		ZBX_DC_SNMPITEM	snmpitem_local = {0};
+
 		read_test(&elem_handle, &test_config);
 
 		memset((void*)&host, 0, sizeof(host));
@@ -230,18 +232,11 @@ void	zbx_mock_test_entry(void **state)
 
 		if (ITEM_TYPE_SNMP == item.type)
 		{
-			int		found;
-			const char	*snmp_oid = test_config.snmp_oid;
+			item.itemtype.snmpitem = &snmpitem_local;
 
-			ZBX_DC_SNMPITEM	*snmpitem = (ZBX_DC_SNMPITEM *)DCfind_id(&config->snmpitems, item.itemid,
-					sizeof(ZBX_DC_SNMPITEM), &found);
+			ZBX_DC_SNMPITEM	*snmpitem = item.itemtype.snmpitem;
 
-			if (0 == found)
-			{
-				snmpitem->snmp_oid = NULL;
-			}
-
-			snmpitem->snmp_oid = zbx_strdup((char *)snmpitem->snmp_oid, snmp_oid);
+			snmpitem->snmp_oid = test_config.snmp_oid;
 
 			if (0 == strncmp(snmpitem->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
@@ -257,8 +252,8 @@ void	zbx_mock_test_entry(void **state)
 
 		if (PROXY == test_config.monitored)
 		{
-			while (0 == host.proxyid)
-				host.proxyid = rand();
+			host.proxyid = (zbx_uint64_t)rand() + 1;
+			host.monitored_by = HOST_MONITORED_BY_PROXY;
 		}
 
 		zbx_snprintf(buffer, sizeof(buffer), "host is monitored %s and is %sreachable, item type is %d, "

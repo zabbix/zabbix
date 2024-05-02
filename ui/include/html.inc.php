@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -219,7 +219,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		'output' => [
 			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'active_available'
 		],
-		'selectHostDiscovery' => ['ts_delete'],
+		'selectHostDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
+		'selectDiscoveryRule' => ['lifetime_type', 'enabled_lifetime_type'],
 		'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available', 'error'],
 		'hostids' => [$hostid],
 		'editable' => true
@@ -266,14 +267,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	$db_host = reset($db_host);
 
 	if (!$is_template) {
-		// Get count for item type ITEM_TYPE_ZABBIX_ACTIVE (7).
-		$db_item_active_count = API::Item()->get([
-			'countOutput' => true,
-			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
-			'hostids' => [$hostid]
-		]);
-
-		if ($db_item_active_count > 0) {
+		if (getItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid])) {
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			$db_host['interfaces'][] = [
 				'type' => INTERFACE_TYPE_AGENT_ACTIVE,
@@ -282,6 +276,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			];
 			unset($db_host['active_available']);
 		}
+
+		$db_host['has_passive_checks'] = (bool) getItemTypeCountByHostId(ITEM_TYPE_ZABBIX, [$hostid]);
 	}
 
 	// get lld-rules
@@ -358,10 +354,19 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				(new CUrl('zabbix.php'))->setArgument('action', 'host.list'))), $host
 			]))
 			->addItem($status)
-			->addItem(getHostAvailabilityTable($db_host['interfaces']));
+			->addItem(getHostAvailabilityTable($db_host['interfaces'], $db_host['has_passive_checks']));
 
-		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
-			$info_icons = [getHostLifetimeIndicator(time(), (int) $db_host['hostDiscovery']['ts_delete'])];
+		$disable_source = $db_host['status'] == HOST_STATUS_NOT_MONITORED && $db_host['hostDiscovery']
+			? $db_host['hostDiscovery']['disable_source']
+			: '';
+
+		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+				&& $db_host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_icons = [getLldLostEntityIndicator(time(), $db_host['hostDiscovery']['ts_delete'],
+				$db_host['hostDiscovery']['ts_disable'], $disable_source,
+				$db_host['status'] == HOST_STATUS_NOT_MONITORED, _('host')
+			)];
+
 			$list->addItem(makeInformationList($info_icons));
 		}
 	}
@@ -629,8 +634,13 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 
 /**
  * Create HTML helper element for host interfaces availability.
+ *
+ * @param array $host_interfaces
+ * @param bool $passive_checks
+ *
+ * @return CHostAvailability
  */
-function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
+function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks = true): CHostAvailability {
 	$interfaces = [];
 
 	foreach ($host_interfaces as $interface) {
@@ -649,7 +659,9 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 		];
 	}
 
-	return (new CHostAvailability())->setInterfaces($interfaces);
+	return (new CHostAvailability())
+		->setInterfaces($interfaces)
+		->enablePassiveChecks($passive_checks);
 }
 
 /**
@@ -663,16 +675,13 @@ function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
 	// Check if the element should've been deleted in the past.
 	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The host group is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _('host group'),
+			_('will be deleted the next time discovery rule is processed')
 		);
 	}
 	else {
-		$warning = _s(
-			'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _('host group'),
+			_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
 		);
 	}
 
@@ -680,107 +689,121 @@ function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimp
 }
 
 /**
- * Returns the discovered host lifetime indicator.
+ * Returns the indicator for lost LLD entity.
  *
- * @param int $current_time  Current Unix timestamp.
- * @param int $ts_delete     Deletion timestamp of the host.
+ * @param int     $current_time    Current Unix timestamp.
+ * @param int     $ts_delete       Deletion timestamp of the entity.
+ * @param int     $ts_disable      Disabling timestamp of the entity.
+ * @param string  $disable_source  Indicator whether entity was disabled by an LLD rule or manually.
+ * @param boolean $disabled        Indicator whether entity is disabled.
+ * @param string  $entity          Type of entity.
  *
  * @throws Exception
  */
-function getHostLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
+function getLldLostEntityIndicator(int $current_time, int $ts_delete, int $ts_disable, string $disable_source,
+		bool $disabled, string $entity): ?CSimpleButton {
+	$warning = '';
+
+	if ($disable_source == ZBX_DISABLE_SOURCE_LLD) {
+		if ($ts_delete > 0 && $current_time < $ts_delete) {
+			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity, _('has been disabled'),
+				_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
+			);
+		}
+		elseif ($ts_delete == 0) {
+			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity, _('has been disabled'),
+				_('will not be deleted')
+			);
+		}
+		elseif ($current_time > $ts_delete) {
+			$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity, _('has been disabled'),
+				_('will be deleted the next time discovery rule is processed')
+			);
+		}
+	}
+	elseif ($disabled && $disable_source == ZBX_DISABLE_DEFAULT && $ts_delete > 0) {
+		$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity, _('has been manually disabled'),
+			_('will not be deleted')
 		);
 	}
-	else {
-		$warning = _s(
-			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
-		);
+	elseif (!$disabled && $ts_delete > 0) {
+		$delete_msg = _s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete));
+
+		switch (true) {
+			case $current_time > $ts_delete:
+				$warning = _s('The %1$s is not discovered anymore and %2$s.', $entity,
+					_('will be deleted the next time discovery rule is processed')
+				);
+				break;
+
+			case $ts_disable == 0:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
+					_s('will not be disabled'), $delete_msg
+				);
+				break;
+
+			case $ts_disable > 0 && $ts_disable > $current_time:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
+					_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)), $delete_msg
+				);
+				break;
+
+			case $ts_disable != 0 && $current_time > $ts_disable:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
+					_('will be disabled the next time discovery rule is processed'), $delete_msg
+				);
+				break;
+		}
+	}
+	elseif (!$disabled && $ts_delete == 0) {
+		$delete_msg = _('will not be deleted');
+
+		switch (true) {
+			case $ts_disable != 0 && $current_time > $ts_disable:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
+					_('will be disabled the next time discovery rule is processed'), $delete_msg
+				);
+				break;
+
+			case $ts_disable > 0:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
+					_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)), $delete_msg
+				);
+				break;
+
+			case $ts_disable == 0:
+				$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', $entity,
+					_('will not be disabled'), $delete_msg
+				);
+				break;
+		}
 	}
 
-	return makeWarningIcon($warning);
+	return $warning === '' ? null : makeWarningIcon($warning);
 }
 
 /**
  * Returns the discovered graph lifetime indicator.
  *
- * @param int $current_time  Current Unix timestamp.
- * @param int $ts_delete     Deletion timestamp of the graph.
+ * @param int $current_time   Current Unix timestamp.
+ * @param int $ts_delete      Deletion timestamp of the graph.
  *
  * @throws Exception
  */
-function getGraphLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The graph is not discovered anymore and will be deleted the next time discovery rule is processed.'
+function getGraphLifetimeIndicator(int $current_time, int $ts_delete): ?CSimpleButton {
+	if ($ts_delete == 0) {
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _('graph'),
+			_('will not be deleted')
+		);
+	}
+	elseif ($current_time > $ts_delete && $ts_delete != 0) {
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _('graph'),
+			_('will be deleted the next time discovery rule is processed')
 		);
 	}
 	else {
-		$warning = _s(
-			'The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
-		);
-	}
-
-	return makeWarningIcon($warning);
-}
-
-/**
- * Returns the discovered trigger lifetime indicator.
- *
- * @param int $current_time  Current Unix timestamp.
- * @param int $ts_delete     Deletion timestamp of the trigger.
- *
- * @throws Exception
- */
-function getTriggerLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The trigger is not discovered anymore and will be deleted the next time discovery rule is processed.'
-		);
-	}
-	else {
-		$warning = _s(
-			'The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
-		);
-	}
-
-	return makeWarningIcon($warning);
-}
-
-/**
- * Returns the discovered item lifetime indicator.
- *
- * @param int $current_time  Current Unix timestamp.
- * @param int $ts_delete     Deletion timestamp of the item.
- *
- * @throws Exception
- */
-function getItemLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The item is not discovered anymore and will be deleted the next time discovery rule is processed.'
-		);
-	}
-	else {
-		$warning = _s(
-			'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _('graph'),
+			_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
 		);
 	}
 
@@ -1065,12 +1088,12 @@ function getTriggerSeverityCss(): string {
 	$css = '';
 
 	$severities = [
-		ZBX_STYLE_NA_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_0),
-		ZBX_STYLE_INFO_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_1),
-		ZBX_STYLE_WARNING_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_2),
-		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_3),
-		ZBX_STYLE_HIGH_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_4),
-		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_5)
+		ZBX_STYLE_NA_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_0),
+		ZBX_STYLE_INFO_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_1),
+		ZBX_STYLE_WARNING_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_2),
+		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_3),
+		ZBX_STYLE_HIGH_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_4),
+		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_5)
 	];
 
 	$css .= ':root {'."\n";
@@ -1093,12 +1116,12 @@ function getTriggerSeverityCss(): string {
 function getTriggerStatusCss(): string {
 	$css = '';
 
-	if (CSettingsHelper::getGlobal(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
+	if (CSettingsHelper::getPublic(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
 		$event_statuses = [
-			ZBX_STYLE_PROBLEM_UNACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_COLOR),
-			ZBX_STYLE_PROBLEM_ACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_COLOR),
-			ZBX_STYLE_OK_UNACK_FG => CSettingsHelper::get(CSettingsHelper::OK_UNACK_COLOR),
-			ZBX_STYLE_OK_ACK_FG => CSettingsHelper::get(CSettingsHelper::OK_ACK_COLOR)
+			ZBX_STYLE_PROBLEM_UNACK_FG => CSettingsHelper::getPublic(CSettingsHelper::PROBLEM_UNACK_COLOR),
+			ZBX_STYLE_PROBLEM_ACK_FG => CSettingsHelper::getPublic(CSettingsHelper::PROBLEM_ACK_COLOR),
+			ZBX_STYLE_OK_UNACK_FG => CSettingsHelper::getPublic(CSettingsHelper::OK_UNACK_COLOR),
+			ZBX_STYLE_OK_ACK_FG => CSettingsHelper::getPublic(CSettingsHelper::OK_ACK_COLOR)
 		];
 
 		foreach ($event_statuses as $class => $color) {

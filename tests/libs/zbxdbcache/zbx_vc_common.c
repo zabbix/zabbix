@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,10 +92,10 @@ void	zbx_vc_common_test_func(
 
 	if (NULL != add_values_cb)
 	{
-		int			ret_flush;
-		zbx_vector_ptr_t	history;
+		int				ret_flush, config_history_storage_pipelines = 0;
+		zbx_vector_dc_history_ptr_t	history;
 
-		add_values_cb(&handle, &history, &err, &data, &ret_flush);
+		add_values_cb(&handle, &history, &err, &data, &ret_flush, config_history_storage_pipelines);
 	}
 	else if (NULL != get_value_cb)
 	{

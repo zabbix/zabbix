@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ $inline_js = getPagePostJs().$this->readJsFile('correlation.condition.edit.js.ph
 $form = (new CForm())
 	->setId('correlation-condition-form')
 	->setName('conditions')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('conditiontype', $data['conditiontype'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 

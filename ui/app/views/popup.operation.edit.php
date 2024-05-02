@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,15 @@ else {
 			->setId('operation-type-select')
 	]))->setId('operation-type');
 }
+
+if ($data['scripts_with_warning']) {
+	$select_operationtype->addItem(
+		makeWarningIcon(_('Global script execution on Zabbix server is disabled by server configuration.'))
+			->addClass('js-script-warning-icon')
+			->addStyle('display: none;')
+	);
+}
+
 $form_grid->addItem([
 	(new CLabel(_('Operation'), 'operationtype'))->setId('operation-type-label'),
 	$select_operationtype
@@ -503,6 +512,7 @@ $output = [
 			'eventsource' => $data['eventsource'],
 			'recovery_phase' => $data['recovery'],
 			'data' => $operation,
+			'scripts_with_warning' => $data['scripts_with_warning'],
 			'actionid' => $data['actionid']
 		]).');'
 ];

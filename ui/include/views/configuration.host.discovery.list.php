@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.list.js.php';
@@ -147,18 +148,43 @@ $filter_column2 = (new CFormList())
 		(new CTextBox('filter_delay', $data['filter']['delay']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_delay_row'
 	)
-	->addRow(_('Keep lost resources period'),
-		(new CTextBox('filter_lifetime', $data['filter']['lifetime']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	->addRow(
+		new CLabel(_('Delete lost resources'), 'filter_lifetime'),
+		new CFormField([
+			(new CRadioButtonList('filter_lifetime_type', (int) $data['filter']['lifetime_type']))
+				->addValue(_('All'), -1)
+				->addValue(_('Never'), ZBX_LLD_DELETE_NEVER)
+				->addValue(_('Immediately'), ZBX_LLD_DELETE_IMMEDIATELY)
+				->addValue(_('After'), ZBX_LLD_DELETE_AFTER)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('filter_lifetime', $data['filter']['lifetime']))
+				->setAttribute('disabled', $data['filter']['lifetime_type'] != ZBX_LLD_DELETE_AFTER)
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		])
+	)
+	->addRow(
+		new CLabel(_('Disable lost resources'), 'filter_enabled_lifetime'),
+		new CFormField([
+			(new CRadioButtonList('filter_enabled_lifetime_type', (int) $data['filter']['enabled_lifetime_type']))
+				->addValue(_('All'), -1)
+				->addValue(_('Never'), ZBX_LLD_DISABLE_NEVER)
+				->addValue(_('Immediately'), ZBX_LLD_DISABLE_IMMEDIATELY)
+				->addValue(_('After'), ZBX_LLD_DISABLE_AFTER)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('filter_enabled_lifetime', $data['filter']['enabled_lifetime']))
+				->setAttribute('disabled', $data['filter']['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER)
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		])
 	)
 	->addRow(_('SNMP OID'),
 		(new CTextBox('filter_snmp_oid', $data['filter']['snmp_oid']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_oid_row'
 	);
 
-$filter_column3 = (new CFormList());
-
 if ($data['context'] === 'host') {
-	$filter_column3->addRow(_('State'),
+	$filter_column2->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter']['state']))
 			->addValue(_('All'), -1)
 			->addValue(_('Normal'), ITEM_STATE_NORMAL)
@@ -167,7 +193,7 @@ if ($data['context'] === 'host') {
 	);
 }
 
-$filter_column3->addRow(_('Status'),
+$filter_column2->addRow(_('Status'),
 	(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
 		->addValue(_('All'), -1)
 		->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
@@ -176,7 +202,7 @@ $filter_column3->addRow(_('Status'),
 		->setModern(true)
 );
 
-$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2, $filter_column3]);
+$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $html_page->addItem($filter);
 
@@ -208,7 +234,8 @@ $discoveryTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 		($data['context'] === 'host') ? _('Info') : null
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $csrf_token = CCsrfTokenHelper::get('host_discovery.php');
@@ -373,9 +400,10 @@ $button_list += [
 ];
 
 // Append table to form.
-$discoveryForm->addItem([$discoveryTable, $data['paging'], new CActionButtonList('action', 'g_hostdruleid',
-	$button_list, $data['checkbox_hash']
-)]);
+$discoveryForm->addItem([
+	$discoveryTable,
+	new CActionButtonList('action', 'g_hostdruleid', $button_list, $data['checkbox_hash'])
+]);
 
 $html_page
 	->addItem($discoveryForm)

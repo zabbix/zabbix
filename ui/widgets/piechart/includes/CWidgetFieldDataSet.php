@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 	// Predefined colors for data-sets in JSON format. Each next data set takes next sequential value from palette.
 	public const DEFAULT_COLOR_PALETTE = [
-		'FF465C', 'B0AF07', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
+		'FF465C', 'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
 		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
 	];
 
@@ -126,7 +126,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 		$validation_rules = $this->getValidationRules($strict);
 		$value = $this->getValue();
-		$label = $this->full_name ?? $this->label ?? $this->name;
+		$label = $this->label ?? $this->name;
 
 		if (!count($value)) {
 			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {

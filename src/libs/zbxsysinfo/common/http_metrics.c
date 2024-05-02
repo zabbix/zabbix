@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,7 @@ static zbx_metric_t	parameters_common_http[] =
 	{"web.page.get",	CF_HAVEPARAMS,	web_page_get,		"localhost,,80"},
 	{"web.page.perf",	CF_HAVEPARAMS,	web_page_perf,		"localhost,,80"},
 	{"web.page.regexp",	CF_HAVEPARAMS,	web_page_regexp,	"localhost,,80,OK"},
-
-	{NULL}
+	{0}
 };
 
 zbx_metric_t	*get_parameters_common_http(void)

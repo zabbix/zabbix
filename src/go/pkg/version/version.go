@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,18 +22,19 @@ package version
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 )
 
 const (
-	ZABBIX_REVDATE          = "24 November 2023"
+	ZABBIX_REVDATE          = "17 April 2024"
 	ZABBIX_VERSION_MAJOR    = 7
 	ZABBIX_VERSION_MINOR    = 0
 	ZABBIX_VERSION_PATCH    = 0
-	ZABBIX_VERSION_RC       = "alpha9"
+	ZABBIX_VERSION_RC       = "rc1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
-	copyrightMessage        = "Copyright (C) 2023 Zabbix SIA\n" +
+	copyrightMessage        = "Copyright (C) 2024 Zabbix SIA\n" +
 		"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n" +
 		"This is free software: you are free to change and redistribute it according to\n" +
 		"the license. There is NO WARRANTY, to the extent permitted by law."
@@ -144,9 +145,15 @@ func TitleMessage() string {
 	return title
 }
 
+// Display shows program version.
+// Program version includes Zabbix revision and it's time and date, compilation time and date, Go compiler tree's
+// version string, copyright message, and additionalMessages provided by the caller function.
 func Display(additionalMessages []string) {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
-	fmt.Printf("Revision %s %s, compilation time: %s %s\n", Revision(), RevDate(), CompileDate(), CompileTime())
+	fmt.Printf(
+		"Revision %s %s, compilation time: %s %s, built with: %s\n",
+		Revision(), RevDate(), CompileDate(), CompileTime(), runtime.Version(),
+	)
 
 	for _, msg := range additionalMessages {
 		fmt.Println(msg)

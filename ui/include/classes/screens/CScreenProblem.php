@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -829,6 +829,8 @@ class CScreenProblem extends CScreenBase {
 		$data = self::getData($this->data['filter'], $this->data['limit'], true);
 		$data = self::sortData($data, $this->data['limit'], $this->data['sort'], $this->data['sortorder']);
 
+		$paging = null;
+
 		if ($this->data['action'] === 'problem.view' || $this->data['action'] === 'problem.view.refresh') {
 			$paging = CPagerHelper::paginate($this->page, $data['problems'], ZBX_SORT_UP, $url);
 		}
@@ -1056,7 +1058,7 @@ class CScreenProblem extends CScreenBase {
 				$header[] = $header_clock;
 			}
 
-			$table = new CTableInfo();
+			$table = (new CTableInfo())->setPageNavigation($paging);
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
@@ -1171,7 +1173,7 @@ class CScreenProblem extends CScreenBase {
 				]
 			], 'problem');
 
-			return $this->getOutput($form->addItem([$table, $paging, $footer]), false, $this->data);
+			return $this->getOutput($form->addItem([$table, $footer]), false, $this->data);
 		}
 
 		/*

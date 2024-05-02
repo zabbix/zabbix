@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class testHighAvailability extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'HANodeName' => self::NODE1_NAME,
-				'CacheSize' => '128K',
+				'CacheSize' => '256K',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX
 			]
 		];

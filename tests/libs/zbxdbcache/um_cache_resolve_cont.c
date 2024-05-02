@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,6 +153,7 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 	zbx_mock_handle_t	hstep, hconfig;
 	zbx_um_mock_cache_t	mock_cache0, *mock_cache_last = &mock_cache0;
 	char			*vault;
+	zbx_dc_config_t		*config = get_dc_config();
 
 	um_mock_cache_init(&mock_cache0, -1);
 

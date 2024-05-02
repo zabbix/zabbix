@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -392,8 +392,8 @@ if (hasRequest('form')) {
 
 	// add parent host
 	$parentHost = API::Host()->get([
-		'output' => ['hostid', 'proxyid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-			'ipmi_password', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_subject'
+		'output' => ['hostid', 'monitored_by', 'proxyid', 'proxy_groupid', 'status', 'ipmi_authtype', 'ipmi_privilege',
+			'ipmi_username', 'ipmi_password', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_subject'
 		],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'hostids' => $discoveryRule['hostid'],
@@ -412,13 +412,20 @@ if (hasRequest('form')) {
 		]);
 	}
 
-	if ($parentHost['proxyid']) {
-		$proxy = API::Proxy()->get([
+	$data['ms_proxy'] = [];
+	$data['ms_proxy_group'] = [];
+
+	if ($parentHost['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+		$data['ms_proxy'] = CArrayHelper::renameObjectsKeys(API::Proxy()->get([
 			'output' => ['proxyid', 'name'],
-			'proxyids' => $parentHost['proxyid'],
-			'limit' => 1
-		]);
-		$data['proxy'] = reset($proxy);
+			'proxyids' => $parentHost['proxyid']
+		]), ['proxyid' => 'id']);
+	}
+	elseif ($parentHost['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+		$data['ms_proxy_group'] = CArrayHelper::renameObjectsKeys(API::ProxyGroup()->get([
+			'output' => ['proxy_groupid', 'name'],
+			'proxy_groupids' => $parentHost['proxy_groupid']
+		]), ['proxy_groupid' => 'id']);
 	}
 
 	if (!hasRequest('form_refresh')) {

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,9 +73,9 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 				->setEnabled(!$this->isDisabled());
 
 			$view_collection[] = [
-				'label' => $this->getLabel(),
+				'label' => $this->getLabel()->addClass('js-'.$field_name.'-data-source'),
 				'view' => $source_selector,
-				'class' => $style_class
+				'class' => $style_class.'js-'.$field_name.'-data-source'
 			];
 		}
 
@@ -93,7 +93,8 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 		if ($this->field->isWidgetAccepted()) {
 			$view_collection[] = [
-				'label' => (new CLabel(_('Widget')))
+				'label' => (new CLabel(_('Widget'), $field_name.'_reference_ms'))
+					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_name.'-reference')
 					->setAsteriskMark($this->isRequired()),
 				'view' =>  (new CMultiSelect([
@@ -126,14 +127,16 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 		array_push($view_collection,
 			[
-				'label' => (new CLabel($this->field->getFromLabel()))
+				'label' => (new CLabel($this->field->getFromLabel(), $field_name.'_from'))
+					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_name.'-from')
 					->setAsteriskMark($this->isRequired()),
 				'view' => $date_selector_from,
 				'class' => $style_class.'js-'.$field_name.'-from'
 			],
 			[
-				'label' => (new CLabel($this->field->getToLabel()))
+				'label' => (new CLabel($this->field->getToLabel(), $field_name.'_to'))
+					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_name.'-to')
 					->setAsteriskMark($this->isRequired()),
 				'view' => $date_selector_to,
@@ -146,14 +149,15 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 	public function getJavaScript(): string {
 		return '
-			new CWidgetFieldTimePeriod('.json_encode([
-				'field_name' => $this->field->getName(),
-				'field_value' => $this->field->getValue(),
-				'in_type' => $this->field->getInType(),
-				'widget_accepted' => $this->field->isWidgetAccepted(),
-				'dashboard_accepted' => $this->field->isDashboardAccepted(),
-				'data_source' => $this->field->getDataSource()
-			]).');
+			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
+				new CWidgetFieldTimePeriod('.json_encode([
+					'field_name' => $this->field->getName(),
+					'field_value' => $this->field->getValue(),
+					'in_type' => $this->field->getInType(),
+					'widget_accepted' => $this->field->isWidgetAccepted(),
+					'dashboard_accepted' => $this->field->isDashboardAccepted(),
+					'data_source' => $this->field->getDataSource()
+				]).');
 		';
 	}
 

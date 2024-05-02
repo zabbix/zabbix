@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,11 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	->addField($groupids)
 	->addField(array_key_exists('hostids', $data['fields'])
 		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
-			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+			->setFilterPreselect([
+				'id' => $groupids->getId(),
+				'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,
+				'submit_as' => 'groupid'
+			])
 		: null
 	)
 	->addField(array_key_exists('evaltype', $data['fields'])

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "lld_worker.h"
 #include "lld.h"
+#include "lld_protocol.h"
 
 #include "../events/events.h"
 
@@ -26,15 +27,16 @@
 #include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "lld_protocol.h"
 #include "zbxtime.h"
-#include "zbxdbwrap.h"
 #include "zbx_item_constants.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: registers lld worker with lld manager                             *
+ * Purpose: registers LLD worker with LLD manager                             *
  *                                                                            *
  * Parameters: socket - [IN] connections socket                               *
  *                                                                            *
@@ -50,13 +52,13 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: processes lld task and updates rule state/error in configuration  *
- *          cache and database                                                *
+ * Purpose: Processes LLD task and updates rule state/error in configuration  *
+ *          cache and database.                                               *
  *                                                                            *
  * Parameters: message - [IN] message with LLD request                        *
  *                                                                            *
  ******************************************************************************/
-static void	lld_process_task(zbx_ipc_message_t *message)
+static void	lld_process_task(const zbx_ipc_message_t *message)
 {
 	zbx_uint64_t		itemid, hostid, lastlogsize;
 	char			*value, *error;
@@ -111,7 +113,10 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 						NULL, NULL, error);
 			}
 
-			zbx_process_events(NULL, NULL);
+			zbx_db_begin();
+			zbx_process_events(NULL, NULL, NULL);
+			zbx_db_commit();
+
 			zbx_clean_events();
 		}
 
@@ -139,23 +144,24 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 
 	if (ZBX_FLAGS_ITEM_DIFF_UNSET != diff.flags)
 	{
-		zbx_vector_ptr_t	diffs;
-		char			*sql = NULL;
-		size_t			sql_alloc = 0, sql_offset = 0;
+		zbx_vector_item_diff_ptr_t	diffs;
+		char				*sql = NULL;
+		size_t				sql_alloc = 0, sql_offset = 0;
 
-		zbx_vector_ptr_create(&diffs);
+		zbx_vector_item_diff_ptr_create(&diffs);
 		diff.itemid = itemid;
-		zbx_vector_ptr_append(&diffs, &diff);
+		zbx_vector_item_diff_ptr_append(&diffs, &diff);
 
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
 		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 		if (16 < sql_offset)
 			zbx_db_execute("%s", sql);
 
 		zbx_dc_config_items_apply_changes(&diffs);
 
-		zbx_vector_ptr_destroy(&diffs);
+		zbx_vector_item_diff_ptr_destroy(&diffs);
 		zbx_free(sql);
 	}
 
@@ -175,8 +181,8 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	double			time_stat, time_idle = 0, time_now, time_read;
 	zbx_uint64_t		processed_num = 0;
 	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num,
+				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
@@ -222,7 +228,8 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		if (SUCCEED != zbx_ipc_socket_read(&lld_socket, &message))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read LLD manager service request");
+			if (ZBX_IS_RUNNING())
+				zabbix_log(LOG_LEVEL_CRIT, "cannot read LLD manager service request");
 			exit(EXIT_FAILURE);
 		}
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -247,8 +254,4 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_db_close();
-
-	zbx_ipc_socket_close(&lld_socket);
 }

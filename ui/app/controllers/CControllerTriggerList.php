@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,8 +247,8 @@ class CControllerTriggerList extends CController {
 				],
 				'selectHosts' => ['hostid', 'host', 'name', 'status'],
 				'selectDependencies' => ['triggerid', 'description'],
-				'selectDiscoveryRule' => ['itemid', 'name'],
-				'selectTriggerDiscovery' => ['ts_delete'],
+				'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
+				'selectTriggerDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 				'selectTags' => ['tag', 'value'],
 				'triggerids' => array_keys($prefetched_triggers),
 				'preservekeys' => true,

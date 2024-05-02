@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -725,7 +725,7 @@ class testPageServicesSla extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (!array_key_exists('expected', $data)) {
-			// Check that 'No data found.' string is returned if no results are expected.
+			// Check that 'No data found' string is returned if no results are expected.
 			$this->assertTableData();
 		}
 		else {

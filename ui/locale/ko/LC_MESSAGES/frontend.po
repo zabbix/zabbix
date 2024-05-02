@@ -82,6 +82,11 @@ msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "%2$s의 %1$d 건이 발견되었습니다."
 
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -423,6 +428,10 @@ msgstr ""
 #: app/views/administration.user.list.php:137
 msgid "API access"
 msgstr "API 액세스"
+
+#: app/views/mfa.edit.php:102
+msgid "API hostname"
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -1061,6 +1070,14 @@ msgstr "추가 규칙"
 msgid "Address"
 msgstr "주소"
 
+#: app/controllers/CControllerProxyCreate.php:72
+#: app/controllers/CControllerProxyCreate.php:80
+#: app/controllers/CControllerProxyUpdate.php:67
+#: app/controllers/CControllerProxyUpdate.php:75
+#: app/views/popup.proxy.edit.php:90
+msgid "Address for active agents"
+msgstr ""
+
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
 msgstr "Admin"
@@ -1084,6 +1101,17 @@ msgstr "확장 라벨"
 
 #: app/views/popup.import.php:148
 msgid "Advanced options"
+msgstr ""
+
+#: include/views/configuration.host.discovery.edit.php:721
+#: include/views/configuration.host.discovery.edit.php:737
+#: include/views/configuration.host.discovery.list.php:157
+#: include/views/configuration.host.discovery.list.php:172
+msgid "After"
+msgstr ""
+
+#: app/views/js/mfa.edit.js.php:168
+msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
 msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:266
@@ -1513,6 +1541,10 @@ msgstr ""
 msgid "Asset tag"
 msgstr "포함 태그"
 
+#: app/partials/configuration.host.edit.html.php:331
+msgid "Assigned proxy"
+msgstr ""
+
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
 msgid "At %1$s %2$s of every %3$s week"
@@ -1542,6 +1574,10 @@ msgstr "시작시간 (시:분)"
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "하나 이상의 LDAP 서버가 있어야 합니다."
+
+#: include/classes/api/services/CAuthentication.php:234
+msgid "At least one MFA method must exist."
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2070,6 +2106,18 @@ msgstr "CPU 사용률. float를 반환합니다."
 msgid "CRLF"
 msgstr ""
 
+#: tests/selenium/modules/module_number_7/Module.php:17
+msgid "CSRF test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
+msgid "CSRF token test"
+msgstr ""
+
+#: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
+msgid "CSRF token validation succeeded."
+msgstr ""
+
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
 msgstr ""
@@ -2237,6 +2285,11 @@ msgstr "네트워크 맵을 추가할 수 없습니다"
 #: app/controllers/CControllerProxyCreate.php:235
 msgid "Cannot add proxy"
 msgstr "프록시를 추가할 수 없습니다"
+
+#: app/controllers/CControllerProxyGroupCreate.php:42
+#: app/controllers/CControllerProxyGroupCreate.php:74
+msgid "Cannot add proxy group"
+msgstr ""
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2508,6 +2561,11 @@ msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
 msgstr[0] "API 토큰을 삭제할 수 없습니다."
 
+#: include/classes/api/services/CMfa.php:459
+#, c-format
+msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
@@ -2539,6 +2597,10 @@ msgstr[0] ""
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] "대시보드를 삭제할 수 없습니다."
+
+#: include/classes/api/services/CMfa.php:446
+msgid "Cannot delete default MFA method."
+msgstr ""
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -2665,6 +2727,15 @@ msgstr "프록시를 삭제할 수 없습니다"
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "프록시를 삭제할 수 없습니다"
+
+#: app/controllers/CControllerProxyGroupDelete.php:78
+msgid "Cannot delete proxy group"
+msgid_plural "Cannot delete proxy groups"
+msgstr[0] ""
+
+#: app/controllers/CControllerProxyGroupDelete.php:39
+msgid "Cannot delete proxy groups"
+msgstr ""
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -3460,6 +3531,10 @@ msgstr "호스트명을 일괄갱신할 수 없습니다"
 msgid "Cannot mass update visible host name."
 msgstr "호스트의 표시명은 일괄갱신할 수 없습니다."
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -3519,6 +3594,11 @@ msgstr "호스트 프로토타입에 정의된 이름이 \"%1$s\"이고 값이 \
 #: include/classes/api/services/CUser.php:510
 msgid "Cannot rename guest user."
 msgstr "게스트 사용자의 이름을 변경할 수 없습니다"
+
+#: app/controllers/CControllerUserResetTotp.php:85
+msgid "Cannot reset TOTP secret"
+msgid_plural "Cannot reset TOTP secrets"
+msgstr[0] ""
 
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
@@ -3881,6 +3961,11 @@ msgstr "프록시를 갱신할 수 없습니다"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "발견된 호스트 \"%1$s\"의 프록시를 갱신할 수 없습니다"
 
+#: app/controllers/CControllerProxyGroupUpdate.php:43
+#: app/controllers/CControllerProxyGroupUpdate.php:82
+msgid "Cannot update proxy group"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:768
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
@@ -4064,6 +4149,10 @@ msgstr "변경"
 #: include/views/configuration.host.prototype.edit.php:510
 msgid "Change PSK"
 msgstr "PSK 변경"
+
+#: app/views/mfa.edit.php:128
+msgid "Change client secret"
+msgstr ""
 
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
@@ -4276,6 +4365,14 @@ msgstr "원하는 크기로 클릭하고 드래그합니다."
 msgid "Click to view or edit"
 msgstr "보거나 수정하려면 클릭하세요."
 
+#: app/views/mfa.edit.php:111
+msgid "Client ID"
+msgstr ""
+
+#: app/views/mfa.edit.php:120
+msgid "Client secret"
+msgstr ""
+
 #: widgets/clock/Widget.php:46
 msgid "Clock"
 msgstr "시각"
@@ -4360,6 +4457,10 @@ msgstr "장애의 클로즈"
 msgid "Close problems"
 msgstr "장애의 클로즈"
 
+#: app/views/mfa.edit.php:90
+msgid "Code length"
+msgstr ""
+
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
 #: include/classes/html/CFormFieldsetCollapsible.php:45
@@ -4403,6 +4504,10 @@ msgstr "색상 \"%1$s\"이(가) 올바르지 않습니다. 16진수 색상 코�
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
 msgstr "색상(확인)"
+
+#: widgets/honeycomb/includes/WidgetForm.php:213
+msgid "Color interpolation"
+msgstr ""
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -4594,6 +4699,10 @@ msgstr "네트워크 맵 설정"
 #: app/controllers/CControllerProxyList.php:197
 msgid "Configuration of proxies"
 msgstr "프록시 설정"
+
+#: app/controllers/CControllerProxyGroupList.php:131
+msgid "Configuration of proxy groups"
+msgstr ""
 
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
@@ -4909,6 +5018,10 @@ msgstr "컨텐츠 메뉴"
 msgid "Context name"
 msgstr "컨텍스트 이름"
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr ""
@@ -5193,6 +5306,10 @@ msgstr "신규 생성"
 msgid "Create proxy"
 msgstr "프록시 생성"
 
+#: app/views/administration.proxygroup.list.php:168
+msgid "Create proxy group"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
 msgstr "보고서 생성"
@@ -5426,6 +5543,12 @@ msgstr "DNS"
 #: include/views/inventory.host.view.php:81
 msgid "DNS name"
 msgstr "DNS 이름"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "DUO Universal Prompt"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
@@ -5791,6 +5914,10 @@ msgstr "기본값(%1$s)"
 msgid "Default LDAP server must be specified."
 msgstr "기본 LDAP 서버를 지정해야 합니다."
 
+#: app/controllers/CControllerAuthenticationUpdate.php:241
+msgid "Default MFA method must be specified."
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:143
 msgid "Default access to new UI elements"
 msgstr "새 UI 요소에 대한 기본 액세스"
@@ -5810,6 +5937,10 @@ msgstr "디폴트 인증"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "기본 호스트 인벤토리 모드"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -5841,6 +5972,11 @@ msgstr "디폴트 테마"
 #: include/classes/setup/CSetupWizard.php:716
 msgid "Default time zone"
 msgstr "기본 시간대"
+
+#: app/views/administration.proxygroup.list.php:55
+#: app/views/administration.proxygroup.list.php:111
+msgid "Degrading"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:160 app/views/popup.massupdate.item.php:276
 msgid "Delay"
@@ -5972,6 +6108,11 @@ msgstr "아이템를 삭제하시겠습니까?"
 #: jsLoader.php:276
 msgid "Delete links between selected elements?"
 msgstr "선택한 요소간의 링크를 삭제하시겠습니까?"
+
+#: include/views/configuration.host.discovery.edit.php:716
+#: include/views/configuration.host.discovery.list.php:151
+msgid "Delete lost resources"
+msgstr ""
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6155,6 +6296,15 @@ msgstr "선택한 미디어 타입을 삭제하시겠습니까?"
 #: app/views/js/administration.proxy.list.js.php:143
 msgid "Delete selected proxies?"
 msgstr "선택한 프록시를 삭제하시겠습니까?"
+
+#: app/views/js/administration.proxygroup.list.js.php:88
+#: app/views/popup.proxygroup.edit.php:147
+msgid "Delete selected proxy group?"
+msgstr ""
+
+#: app/views/js/administration.proxygroup.list.js.php:87
+msgid "Delete selected proxy groups?"
+msgstr ""
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -6502,6 +6652,11 @@ msgstr "선택한 프록시에 의한 호스트 감시를 비활성으로 하시
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "선택한 프록시에서 모니터링하는 호스트를 비활성화하시겠습니까?"
 
+#: include/views/configuration.host.discovery.edit.php:730
+#: include/views/configuration.host.discovery.list.php:166
+msgid "Disable lost resources"
+msgstr ""
+
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
@@ -6663,6 +6818,14 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 msgid "Disabled"
 msgstr "비활성"
 
+#: app/partials/configuration.host.edit.html.php:181
+#: app/partials/item.edit.item.tab.php:852
+#: app/partials/trigger.edit.trigger.tab.php:295
+#: app/views/configuration.host.list.php:511 app/views/item.list.php:219
+#: app/views/trigger.list.php:358
+msgid "Disabled automatically by an LLD rule."
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
 msgid "Disaster"
@@ -6731,6 +6894,10 @@ msgstr "디스커버리"
 #: include/classes/helpers/CRoleHelper.php:472
 msgid "Discovery actions"
 msgstr "디스커버리 액션"
+
+#: app/views/configuration.discovery.edit.php:52
+msgid "Discovery by"
+msgstr ""
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -6885,6 +7052,10 @@ msgstr "복구트리거 표시기간"
 msgid "Display graph"
 msgstr "그래프 표시"
 
+#: widgets/svggraph/includes/WidgetForm.php:364
+msgid "Display min/avg/max"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
 msgstr "최소/최대/평균 표시"
@@ -7031,6 +7202,24 @@ msgstr "그래프 형식"
 #: include/views/configuration.graph.edit.php:388
 msgid "Draw style"
 msgstr "종류"
+
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3493
+msgid "Duo state does not match saved state."
+msgstr ""
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7306,6 +7495,10 @@ msgstr "선택한 프록시에서 모니터링하는 호스트를 사용하시�
 msgid "Enable internal housekeeping"
 msgstr "데이터 삭제처리를 활성화"
 
+#: app/views/administration.authentication.edit.php:564
+msgid "Enable multi-factor authentication"
+msgstr ""
+
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
@@ -7430,6 +7623,10 @@ msgstr "선택한 Web시나리오를 활성화 하시겠습니까?"
 msgid "Enable trapping"
 msgstr "트래핑의 활성화"
 
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr ""
+
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
 #: app/partials/configuration.host.edit.html.php:265
@@ -7541,6 +7738,10 @@ msgstr "오류 예산"
 #: widgets/slareport/views/widget.view.php:103
 msgctxt "compact table header"
 msgid "Error budget"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3506
+msgid "Error decoding Duo result."
 msgstr ""
 
 #: include/db.inc.php:554
@@ -7985,6 +8186,11 @@ msgstr ""
 msgid "Failed to update widget properties."
 msgstr "위젯 속성을 갱신하지 못했습니다."
 
+#: app/views/administration.proxygroup.list.php:79
+#: app/views/popup.proxygroup.edit.php:51
+msgid "Failover period"
+msgstr ""
+
 #: include/items.inc.php:37
 msgid "Failure Audit"
 msgstr "실패 감사"
@@ -8311,6 +8517,11 @@ msgstr "Web 인터페이스에 액세스"
 msgid "Frontend messaging"
 msgstr "Web 인터페이스 알림 표시"
 
+#: app/views/administration.user.edit.php:731
+#: app/views/administration.user.edit.php:826
+msgid "Frontend notifications"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:136
@@ -8410,6 +8621,18 @@ msgstr ""
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "글로벌 정규표현 \"%1$s\" 는 존재하지 않습니다."
+
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr ""
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr ""
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
@@ -8690,6 +8913,12 @@ msgstr "호스트\"%2$s\"의 그룹\"%1$s\"는 존재하지 않습니다."
 msgid "Group base DN"
 msgstr ""
 
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
 msgstr ""
@@ -8802,6 +9031,10 @@ msgstr "하드웨어 (전체설명)"
 #: include/classes/data/CItemData.php:1313
 msgid "Hardware sensor reading. Returns float"
 msgstr "하드웨어 센서 읽기. float를 리턴."
+
+#: app/views/mfa.edit.php:77
+msgid "Hash function"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
@@ -8965,6 +9198,10 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
+#: widgets/honeycomb/Widget.php:29
+msgid "Honeycomb"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
 msgid "Horizontal"
@@ -9043,6 +9280,11 @@ msgstr "호스트\"%1$s\"에 호스트 그룹을 설정해 주세요."
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy \"%2$s\"."
 msgstr "\"%1$s\" 호스트는 \"%2$s\" 프록시에 의해 모니터링됩니다."
+
+#: include/classes/api/services/CProxyGroup.php:456
+#, c-format
+msgid "Host \"%1$s\" is monitored by proxy group \"%2$s\"."
+msgstr ""
 
 #: include/actions.inc.php:57
 msgid "Host IP"
@@ -9264,6 +9506,10 @@ msgstr "호스트 메타데이터"
 msgid "Host name"
 msgstr "호스트 명"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr ""
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "호스트 네트워크"
@@ -9338,6 +9584,10 @@ msgstr "호스트 프로토타입"
 #: include/hosts.inc.php:294
 msgid "Host router"
 msgstr "호스트 라우터"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr ""
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -10731,6 +10981,18 @@ msgstr "처음 보기"
 msgid "Initial view is ignored if the default view is set."
 msgstr "기본 보기가 설정된 경우 초기 보기는 무시됩니다."
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "삽입"
@@ -10895,12 +11157,22 @@ msgstr ""
 msgid "Invalid LDAP configuration"
 msgstr "잘못된 LDAP 구성"
 
+#: app/controllers/CControllerMfaCheck.php:53
+#: app/controllers/CControllerMfaEdit.php:48
+msgid "Invalid MFA configuration"
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
 msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:202
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
+msgstr ""
+
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
 msgstr ""
 
 #: include/classes/import/readers/CYamlImportReader.php:55
@@ -10930,6 +11202,10 @@ msgstr "메일 주소 \"%1$s\"가 올바르지 않습니다."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"의 미디어 타입의 메일 주소가 올바르지 않습니다."
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -11393,6 +11669,10 @@ msgstr "아이템이 \"습득불가\" 상태"
 msgid "Item list"
 msgstr "아이템 리스트"
 
+#: widgets/tophosts/views/column.edit.php:123
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "아이템이 선택되어 있지 않습니다"
@@ -11667,6 +11947,10 @@ msgstr ""
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP인증"
+
+#: app/views/usergroup.edit.php:109
+msgid "LDAP authentication is disabled system-wide."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
@@ -12006,6 +12290,14 @@ msgstr "지정된 키에 있는 Windows 레지스트리 값 또는 키 목록입
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
 msgstr "이름, 모드, 암호화, 압축, 버전, 마지막으로 본 Zabbix 프록시 목록, 호스트 수, 항목 수, 초당 필수 값(vps) 및 호환성(현재/오래된/지원되지 않음). JSON을 반환합니다."
 
+#: include/classes/data/CItemData.php:2877
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2905
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "블록 장치 및 유형 목록. 반환 JSON"
@@ -12111,6 +12403,10 @@ msgstr "경도"
 msgid "Log"
 msgstr "로그"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "로그 로테이션에 대응한 로그파일 감시. 로그 값을 리턴."
@@ -12118,6 +12414,10 @@ msgstr "로그 로테이션에 대응한 로그파일 감시. 로그 값을 리�
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "로그파일 감시. 로그 값을 리턴."
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12214,6 +12514,19 @@ msgstr "MD2"
 #: include/classes/data/CItemData.php:1639
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
 msgstr "파일의 MD5 체크섬. 파일의 MD5해시 값을 string값으로 리턴."
+
+#: app/views/mfa.edit.php:161
+msgid "MFA method"
+msgstr ""
+
+#: include/classes/api/services/CMfa.php:243
+#, c-format
+msgid "MFA method \"%1$s\" already exists."
+msgstr ""
+
+#: app/views/administration.authentication.edit.php:606
+msgid "MFA settings"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -12354,6 +12667,10 @@ msgstr "수동 이벤트 조치"
 #: app/views/administration.script.list.php:159
 msgid "Manual host action"
 msgstr "수동 호스트 작업"
+
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -12611,6 +12928,10 @@ msgstr "최대 확대/축소 수준"
 msgid "Maximum concurrent checks"
 msgstr ""
 
+#: app/views/configuration.discovery.edit.php:85
+msgid "Maximum concurrent checks per type"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "OS가 지원하고 있는 최대 파일 오픈 수. integer를 리턴."
@@ -12618,6 +12939,11 @@ msgstr "OS가 지원하고 있는 최대 파일 오픈 수. integer를 리턴."
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "OS가 지원하고 있는 최대 프로세스 수. integer를 리턴"
+
+#: widgets/piechart/views/widget.edit.js.php:680
+#: widgets/svggraph/views/widget.edit.js.php:805
+msgid "Maximum number of rows"
+msgstr ""
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -12865,6 +13191,10 @@ msgstr "알림 표시"
 msgid "Method not found."
 msgstr "메소드를 찾을 수 없습니다."
 
+#: app/views/administration.authentication.edit.php:572
+msgid "Methods"
+msgstr ""
+
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
 msgstr "마이크로소프트 엣지"
@@ -12886,9 +13216,17 @@ msgstr "가운데"
 msgid "Min"
 msgstr "최소치"
 
+#: app/views/popup.proxygroup.edit.php:59
+msgid "Minimum number of proxies"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
 msgstr "최소 암호 길이"
+
+#: app/views/administration.proxygroup.list.php:81
+msgid "Minimum proxies"
+msgstr ""
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -13128,6 +13466,23 @@ msgstr "가장 중요한 하위 서비스"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
+#: app/views/administration.user.list.php:320
+msgid "Multi-factor TOTP secret will be deleted."
+msgstr ""
+
+#: app/views/administration.user.list.php:321
+msgid "Multi-factor TOTP secrets will be deleted."
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:236
+#: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
+msgid "Multi-factor authentication"
+msgstr ""
+
+#: app/views/usergroup.edit.php:111
+msgid "Multi-factor authentication is disabled system-wide."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
 msgstr "복수"
@@ -13139,6 +13494,11 @@ msgstr "장애이벤트를 계속해서 생성"
 #: jsLoader.php:284
 msgid "Mute"
 msgstr "음소거"
+
+#: jsLoader.php:286
+#, c-format
+msgid "Mute for %1$s"
+msgstr ""
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -13438,6 +13798,10 @@ msgstr "새 API 토큰"
 msgid "New LDAP server"
 msgstr ""
 
+#: app/views/mfa.edit.php:149
+msgid "New MFA method"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
 msgstr ""
@@ -13541,6 +13905,11 @@ msgstr "새로운 작업"
 #: app/views/popup.proxy.edit.php:347 app/views/popup.proxy.edit.php:376
 msgid "New proxy"
 msgstr "새 프록시"
+
+#: app/views/popup.proxygroup.edit.php:127
+#: app/views/popup.proxygroup.edit.php:156
+msgid "New proxy group"
+msgstr ""
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14077,6 +14446,10 @@ msgstr "작업 작업 메시지에 지정된 수신자가 없습니다."
 msgid "No refresh"
 msgstr "새로고침 없음"
 
+#: include/classes/api/services/CUser.php:3489
+msgid "No saved state, please login again."
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
 msgstr "실행하는 액션 커맨드에 스크립트가 설정되어 있지 않습니다"
@@ -14325,6 +14698,10 @@ msgstr "Zabbix 서버 또는 프록시에서 \"from\"에서 \"to\"초까지 지�
 msgid "Number of monitored hosts"
 msgstr "감시호스트수"
 
+#: include/classes/data/CItemData.php:2891
+msgid "Number of online proxies. Returns integer."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "네트워크 충돌 수. integer를 리턴."
@@ -14505,6 +14882,12 @@ msgstr "10월"
 msgid "Off"
 msgstr "OFF"
 
+#: app/views/administration.proxygroup.list.php:56
+#: app/views/administration.proxygroup.list.php:99
+#: app/views/administration.proxy.list.php:166
+msgid "Offline"
+msgstr ""
+
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
 #: app/views/js/mediatype.test.edit.js.php:103
@@ -14560,6 +14943,16 @@ msgstr "1개"
 msgid "One time only"
 msgstr "한번만"
 
+#: app/views/administration.proxygroup.list.php:54
+#: app/views/administration.proxygroup.list.php:107
+#: app/views/administration.proxy.list.php:170
+msgid "Online"
+msgstr ""
+
+#: app/views/administration.proxygroup.list.php:80
+msgid "Online proxies"
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Zabbix에이전트, SNMPv1, SNMPv2, SNMPv3의 유니크 여부를 체크합니다."
@@ -14610,6 +15003,10 @@ msgstr "최고 관리자만 보고서 소유자를 설정할 수 있습니다."
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "활성화된 호스트와 아이템의 트리거만 카운트"
+
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
@@ -14877,6 +15274,10 @@ msgstr "아이템 이력의 보존기간을 덮어쓰기"
 msgid "Override item trend period"
 msgstr "아이템 트렌드의 보존기간을 덮어쓰기"
 
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
 msgid "Override with name \"%1$s\" already exists."
@@ -14934,6 +15335,14 @@ msgstr "PHP ctype"
 #: include/classes/setup/CFrontendSetup.php:579
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)."
 msgstr "PHP ctype모듈이 존재하지 않습니다 (PHP 설정 파라미터 --enable-ctype)."
+
+#: include/classes/setup/CFrontendSetup.php:687
+msgid "PHP curl"
+msgstr ""
+
+#: include/classes/setup/CFrontendSetup.php:691
+msgid "PHP curl extension missing."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
@@ -15326,6 +15735,10 @@ msgstr "백분율"
 msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2898
+msgid "Percentage of online proxies. Returns float."
+msgstr ""
+
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr ""
@@ -15445,6 +15858,10 @@ msgstr "데이터베이스를 수동으로 작성해주세요. 그리고 데이�
 #: include/classes/setup/CSetupWizard.php:240
 msgid "Please enable \"allow_url_fopen\" directive."
 msgstr "\"allow_url_fopen\" 지시문을 활성화하십시오."
+
+#: include/views/mfa.login.php:62
+msgid "Please scan and get your verification code displayed in your authenticator app."
+msgstr ""
 
 #: jsLoader.php:261
 msgid "Please select two elements"
@@ -15647,6 +16064,15 @@ msgstr "Primary POC 전화번호B"
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
 msgstr "Primary POC 스크린명"
+
+#: widgets/honeycomb/includes/WidgetForm.php:109
+#: widgets/honeycomb/includes/WidgetForm.php:125
+#: widgets/honeycomb/includes/WidgetForm.php:131
+#: widgets/honeycomb/includes/WidgetForm.php:142
+#: widgets/honeycomb/includes/WidgetForm.php:148
+#: widgets/honeycomb/views/widget.edit.php:84
+msgid "Primary label"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -15934,6 +16360,55 @@ msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "프록시를 삭제하였습니다"
 
+#: app/controllers/CControllerAuditLogList.php:239
+#: app/partials/configuration.host.edit.html.php:266
+#: app/views/configuration.host.list.php:153
+#: app/views/popup.massupdate.host.php:114 app/views/popup.proxy.edit.php:70
+#: app/views/popup.proxygroup.edit.php:112
+#: include/views/configuration.host.prototype.edit.php:303
+msgid "Proxy group"
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:369
+#, c-format
+msgid "Proxy group \"%1$s\" already exists."
+msgstr ""
+
+#: include/classes/import/importers/CHostImporter.php:348
+#, c-format
+msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:437
+#, c-format
+msgid "Proxy group \"%1$s\" is used by proxy \"%2$s\"."
+msgstr ""
+
+#: app/controllers/CControllerProxyGroupCreate.php:66
+msgid "Proxy group added"
+msgstr ""
+
+#: app/controllers/CControllerProxyGroupDelete.php:70
+msgid "Proxy group deleted"
+msgid_plural "Proxy groups deleted"
+msgstr[0] ""
+
+#: app/controllers/CControllerProxyGroupUpdate.php:74
+msgid "Proxy group updated"
+msgstr ""
+
+#: app/controllers/CControllerPopupGeneric.php:227
+#: app/views/administration.proxygroup.list.php:163
+#: app/views/configuration.host.list.php:177
+#: include/classes/helpers/CMenuHelper.php:378
+#: include/classes/helpers/CRoleHelper.php:512
+msgid "Proxy groups"
+msgstr ""
+
+#: app/partials/configuration.host.edit.html.php:334
+msgid "Proxy is not assigned yet."
+msgstr ""
+
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
 msgstr "프록시 모드"
@@ -16167,6 +16642,11 @@ msgstr "받는 사람"
 msgid "Recordset ID"
 msgstr "레코드세트 ID"
 
+#: app/views/administration.proxygroup.list.php:57
+#: app/views/administration.proxygroup.list.php:103
+msgid "Recovering"
+msgstr ""
+
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
 #: app/views/trigger.prototype.list.php:146
 #: include/classes/screens/CScreenProblem.php:1502
@@ -16202,6 +16682,10 @@ msgstr "직사각형"
 
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
+msgstr ""
+
+#: jsLoader.php:151
+msgid "Referred widget became unavailable. Please update configuration."
 msgstr ""
 
 #: app/views/administration.user.edit.php:309
@@ -16634,6 +17118,10 @@ msgstr ""
 msgid "Reset"
 msgstr "리셋"
 
+#: app/views/administration.user.list.php:318
+msgid "Reset TOTP secret"
+msgstr ""
+
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
 #: app/views/js/administration.housekeeping.edit.js.php:85
@@ -16756,6 +17244,14 @@ msgstr "결과가 FALSE"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "결과가 TRUE"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -17304,6 +17800,10 @@ msgstr ""
 msgid "Scan directory"
 msgstr "디렉터리 스캔"
 
+#: include/views/mfa.login.php:60
+msgid "Scan this QR code"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
 msgstr "시나리오"
@@ -17520,6 +18020,15 @@ msgstr "Secondary POC 전화번호B"
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
 msgstr "Secondary POC 스크린명"
+
+#: widgets/honeycomb/includes/WidgetForm.php:110
+#: widgets/honeycomb/includes/WidgetForm.php:172
+#: widgets/honeycomb/includes/WidgetForm.php:178
+#: widgets/honeycomb/includes/WidgetForm.php:189
+#: widgets/honeycomb/includes/WidgetForm.php:195
+#: widgets/honeycomb/views/widget.edit.php:98
+msgid "Secondary label"
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -18131,6 +18640,10 @@ msgstr "사용불가 맵의 표시"
 msgid "Show units"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:210
+msgid "Show value"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
 msgstr "Zabbix 서버 정지시 경고 보이기"
@@ -18142,6 +18655,10 @@ msgstr "워킹 타임 표시"
 #: include/views/monitoring.sysmap.constructor.php:57 jsLoader.php:254
 msgid "Shown"
 msgstr "표시"
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -18271,6 +18788,11 @@ msgstr "슬로바키아어 (sk_SK)"
 #: jsLoader.php:288
 msgid "Snooze"
 msgstr "스누즈"
+
+#: jsLoader.php:291
+#, c-format
+msgid "Snooze for %1$s"
+msgstr ""
 
 #: include/hosts.inc.php:174
 msgid "Software"
@@ -18436,6 +18958,10 @@ msgstr "Zabbix서버의 기동시각, UNIX 타임스탬프."
 #: include/views/configuration.host.discovery.list.php:161
 msgid "State"
 msgstr "스테이터스"
+
+#: include/classes/data/CItemData.php:2912
+msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
+msgstr ""
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -18690,6 +19216,10 @@ msgstr "서브젝트"
 msgid "Submap"
 msgstr "서브맵"
 
+#: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
+msgid "Submit"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
 msgstr ""
@@ -18823,6 +19353,10 @@ msgstr "시스템 호스트 명. string을 리턴"
 msgid "System information"
 msgstr "시스템 정보"
 
+#: include/classes/setup/CFrontendSetup.php:693
+msgid "System locale"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
 msgstr "시스템 통계값. integer 혹은 float로 리턴"
@@ -18861,6 +19395,21 @@ msgstr "TELNET 에이전트"
 #: include/classes/screens/CScreenHttpTestDetails.php:190
 msgid "TOTAL"
 msgstr "합계"
+
+#: app/controllers/CControllerAuthenticationEdit.php:340
+#: app/controllers/CControllerAuthenticationEdit.php:457
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
+msgid "TOTP"
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:77
+#, c-format
+msgid "TOTP secret for user \"%1$s\" has been reset."
+msgstr ""
+
+#: app/controllers/CControllerUserResetTotp.php:81
+msgid "TOTP secret reset successful."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -19252,6 +19801,16 @@ msgstr "테스트문자열"
 msgid "Test subject"
 msgstr ""
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:152
+#: app/controllers/CControllerPopupItemTestSend.php:256
+#: app/views/popup.itemtestedit.view.php:256
+msgid "Test with"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -19279,6 +19838,20 @@ msgstr ""
 #, c-format
 msgid "The \"%1$s.%2$s\" method must be called without the \"auth\" parameter."
 msgstr "메소드\"%1$s.%2$s\"는 \"auth\"파라미터없이 불러주십시오."
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+#: include/html.inc.php:725 include/html.inc.php:740 include/html.inc.php:746
+#: include/html.inc.php:752 include/html.inc.php:763 include/html.inc.php:769
+#: include/html.inc.php:775
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s, %3$s."
+msgstr ""
+
+#: include/html.inc.php:678 include/html.inc.php:683 include/html.inc.php:734
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+#, c-format
+msgid "The %1$s is not discovered anymore and %2$s."
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:30
 msgid "The URL template is used to load and display the tile layer on geographical maps."
@@ -19403,6 +19976,14 @@ msgstr "트리거는 더 이상 검색되지 않으며 %1$s에서 삭제됩니�
 #: include/html.inc.php:746
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "트리거는 더 이상 검색되지 않으며 다음에 검색 규칙이 처리될 때 삭제됩니다."
+
+#: include/views/configuration.host.discovery.edit.php:712
+msgid "The value should be greater than LLD rule update interval."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:3482
+msgid "The verification code was incorrect, please try again."
+msgstr ""
 
 #: app/views/administration.user.edit.php:288
 msgid "Theme"
@@ -20299,6 +20880,10 @@ msgstr "URL이 올바르게 인코딩되지 않았습니다."
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "맵 \"%1$s\"의 URL명은 중복될 수 없습니다."
 
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
+
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
 msgstr "URL파라미터의 배열은 이용할 수 없습니다."
@@ -20385,6 +20970,11 @@ msgstr ""
 msgid "Unable to retrieve TimescaleDB version."
 msgstr ""
 
+#: include/views/mfa.login.php:65
+#, c-format
+msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
+msgstr ""
+
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
 msgstr "선택한 설정을 할 수 없습니다"
@@ -20431,6 +21021,10 @@ msgstr ""
 #: app/views/administration.user.list.php:311
 msgid "Unblock selected users?"
 msgstr "선택한 사용자의 블록을 해제하시겠습니까?"
+
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr ""
 
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
@@ -20634,6 +21228,11 @@ msgstr ""
 #: jsLoader.php:286
 msgid "Unmute"
 msgstr "음소거 해제"
+
+#: jsLoader.php:293
+#, c-format
+msgid "Unmute for %1$s"
+msgstr ""
 
 #: app/partials/administration.system.info.php:161
 #, c-format
@@ -20945,6 +21544,11 @@ msgstr "유저 \"%1$s\"는 \"%2$s\" 액션 내에서 이용되고 있습니다."
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
 msgstr "사용자 \"%1$s\"는 대신 보고서 \"%2$s\"가 생성된 사용자입니다."
 
+#: include/classes/api/services/CUser.php:937
+#, c-format
+msgid "User \"%1$s\" must have a password, because internal authentication is in effect."
+msgstr ""
+
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
 msgid "User \"%1$s\" provisioned."
@@ -21096,6 +21700,10 @@ msgstr "ID \"%1$s\"의 유저 그룹은 사용할 수 없습니다."
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "유저 그룹"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -21834,6 +22442,11 @@ msgstr "값"
 msgid "Values without names are not allowed in form fields."
 msgstr "폼 필드에서는 이름을 반드시 입력해주십시오."
 
+#: widgets/piechart/includes/WidgetForm.php:220
+#: widgets/svggraph/includes/WidgetForm.php:374
+msgid "Variable"
+msgstr ""
+
 #: app/views/webscenario.step.edit.php:162
 #: include/views/configuration.httpconf.edit.php:129
 msgid "Variables"
@@ -21895,6 +22508,10 @@ msgstr ""
 #: include/items.inc.php:43
 msgid "Verbose"
 msgstr "Verbose"
+
+#: include/views/mfa.login.php:72 include/views/mfa.login.php:85
+msgid "Verification code"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
@@ -22204,8 +22821,17 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr ""
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
 msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
@@ -22469,6 +23095,10 @@ msgstr "어제"
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\"로 로그인 하였습니다."
 
+#: app/views/mfa.edit.php:46
+msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
+msgstr ""
+
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
 #: include/classes/setup/CSetupWizard.php:452
@@ -22570,6 +23200,10 @@ msgstr "Zabbix 내부 데이터베이스 유저 정보에 의한 인증"
 #: app/views/administration.authentication.edit.php:169
 msgid "Zabbix login form"
 msgstr "Zabbix의 로그인 화면"
+
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr ""
 
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
@@ -23177,6 +23811,16 @@ msgstr "공백으로 지정할 수 없습니다"
 msgid "cannot be equal to zero without custom intervals"
 msgstr ""
 
+#: host_discovery.php:563
+#, c-format
+msgid "cannot be greater than or equal to the value of field \"%1$s\""
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:1678
+#, c-format
+msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -23324,6 +23968,10 @@ msgstr "d"
 msgid "d.M"
 msgstr "m/d"
 
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
+msgid "data is missing"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
 msgstr "date() - 현재의 시간"
@@ -23353,6 +24001,10 @@ msgstr "기본"
 #: app/controllers/CControllerPopupTriggerExpr.php:591
 msgid "degrees() - Converts a value from radians to degrees"
 msgstr "degrees() - 값을 라디안에서 도로 변환합니다."
+
+#: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
+msgid "delimiter"
+msgstr ""
 
 #: widgets/actionlog/includes/WidgetForm.php:80
 #: widgets/actionlog/includes/WidgetForm.php:82
@@ -23522,6 +24174,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "글로벌 데이터의 보존기간 설정"
 
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr ""
+
+#: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
+msgid "graph"
+msgstr ""
+
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
 msgstr ""
@@ -23547,6 +24207,14 @@ msgstr "H:i"
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
 msgstr "H:i:s"
+
+#: include/html.inc.php:709 include/html.inc.php:714 include/html.inc.php:719
+msgid "has been disabled"
+msgstr ""
+
+#: include/html.inc.php:725
+msgid "has been manually disabled"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
@@ -23656,6 +24324,12 @@ msgstr "잘못된 서식이 \"%1$s\" 부근에서 발견되었습니다."
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr "함수 \"%1$s\"의 잘못된 사용"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -23784,6 +24458,10 @@ msgstr "이하"
 #: include/classes/validators/CApiInputValidator.php:2565
 msgid "is not enclosed in {} or is malformed"
 msgstr "{}로 포함되어 있지 않거나 잘못된 값입니다"
+
+#: app/views/item.list.php:175
+msgid "item"
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -24203,6 +24881,10 @@ msgstr "범위 밖"
 msgid "not selected"
 msgstr "선택되지 않음"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
@@ -24211,8 +24893,32 @@ msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 msgid "number"
 msgstr "수치"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:823
+msgid "object of TOTP type is expected"
 msgstr ""
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
@@ -24306,6 +25012,10 @@ msgstr "power() - 거듭제곱 값에 대한 기본 값의 거듭제곱"
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "problem pattern"
 msgstr "장애 패턴"
+
+#: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
+msgid "qualifier"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"
@@ -24405,6 +25115,10 @@ msgstr "right() - 가장 오른쪽 카운트 문자를 반환합니다."
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - 값을 소수 자릿수로 반올림합니다."
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -24548,6 +25262,10 @@ msgstr "지정된 자격 정보는 유니크 값이 아닙니다."
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "태그"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
@@ -25031,6 +25749,10 @@ msgstr ""
 msgid "value of new event tag"
 msgstr ""
 
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"
 msgstr "varpop() - 모집단 분산"
@@ -25054,6 +25776,35 @@ msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
+msgstr ""
+
+#: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
+#: include/html.inc.php:806
+#, c-format
+msgid "will be deleted in %1$s"
+msgstr ""
+
+#: include/html.inc.php:679 include/html.inc.php:720 include/html.inc.php:735
+#: include/html.inc.php:801
+msgid "will be deleted the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:747 include/html.inc.php:770
+#, c-format
+msgid "will be disabled in %1$s"
+msgstr ""
+
+#: include/html.inc.php:753 include/html.inc.php:764
+msgid "will be disabled the next time discovery rule is processed"
+msgstr ""
+
+#: include/html.inc.php:715 include/html.inc.php:726 include/html.inc.php:759
+#: include/html.inc.php:796
+msgid "will not be deleted"
+msgstr ""
+
+#: include/html.inc.php:741 include/html.inc.php:776
+msgid "will not be disabled"
 msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:122

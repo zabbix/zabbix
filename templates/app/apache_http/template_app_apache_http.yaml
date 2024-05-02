@@ -8,8 +8,26 @@ zabbix_export:
       template: 'Apache by HTTP'
       name: 'Apache by HTTP'
       description: |
-        Get metrics from mod_status module using HTTP agent.
+        This template is designed for the effortless deployment of Apache monitoring by Zabbix via HTTP and doesn't require any external scripts.
+        
+        The template collects metrics by polling 'mod_status' with HTTP agent remotely.
+        
+        Setup:
+        
+        1. See the setup instructions for mod_status:
         https://httpd.apache.org/docs/current/mod/mod_status.html
+        
+        Check the availability of the module with this command line:
+        httpd -M 2>/dev/null | grep status_module
+        
+        This is an example configuration of the Apache web server:
+        
+        <Location "/server-status">
+          SetHandler server-status
+          Require host example.com
+        </Location>
+        
+        2. Set the hostname or IP address of the Apache status page host in the '{$APACHE.STATUS.HOST}' macro. You can also change the status page port in the '{$APACHE.STATUS.PORT}' macro and status page path in the '{$APACHE.STATUS.PATH}' macro if necessary.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache
         
@@ -82,48 +100,42 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  // Convert Apache status to JSON
                   var lines = value.split('\n');
                   var output = {},
-                      workers = {
-                          '_': 0, 'S': 0, 'R': 0, 'W': 0,
-                          'K': 0, 'D': 0, 'C': 0, 'L': 0,
-                          'G': 0, 'I': 0, '.': 0
-                      };
+                  	workers = {
+                  		'_': 0, 'S': 0, 'R': 0, 'W': 0,
+                  		'K': 0, 'D': 0, 'C': 0, 'L': 0,
+                  		'G': 0, 'I': 0, '.': 0
+                  	};
                   
-                  // Get all "Key: Value" pairs as an object
                   for (var i = 0; i < lines.length; i++) {
-                      var line = lines[i].match(/([A-z0-9 ]+): (.*)/);
+                  	var line = lines[i].match(/([A-z0-9 ]+): (.*)/);
                   
-                      if (line !== null) {
-                          output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);
-                      }
+                  	if (line !== null) {
+                  		output[line[1]] = isNaN(line[2]) ? line[2] : Number(line[2]);
+                  	}
                   }
                   
-                  // Multiversion metrics
                   output.ServerUptimeSeconds = output.ServerUptimeSeconds || output.Uptime;
                   output.ServerVersion = output.ServerVersion || output.Server;
                   
-                  // Parse "Scoreboard" to get worker count.
                   if (typeof output.Scoreboard === 'string') {
-                      for (var i = 0; i < output.Scoreboard.length; i++) {
-                          var char = output.Scoreboard[i];
+                  	for (var i = 0; i < output.Scoreboard.length; i++) {
+                  		var char = output.Scoreboard[i];
                   
-                          workers[char]++;
-                      }
+                  		workers[char]++;
+                  	}
                   }
                   
-                  // Add worker data to the output
                   output.Workers = {
-                      waiting: workers['_'], starting: workers['S'], reading: workers['R'],
-                      sending: workers['W'], keepalive: workers['K'], dnslookup: workers['D'],
-                      closing: workers['C'], logging: workers['L'], finishing: workers['G'],
-                      cleanup: workers['I'], slot: workers['.']
+                  	waiting: workers['_'], starting: workers['S'], reading: workers['R'],
+                  	sending: workers['W'], keepalive: workers['K'], dnslookup: workers['D'],
+                  	closing: workers['C'], logging: workers['L'], finishing: workers['G'],
+                  	cleanup: workers['I'], slot: workers['.']
                   };
                   
-                  // Return JSON string
                   return JSON.stringify(output);
-          url: '{$APACHE.STATUS.SCHEME}://{HOST.CONN}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}'
+          url: '{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}'
           retrieve_mode: BOTH
           tags:
             - tag: component
@@ -138,7 +150,7 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Apache: Service is down'
-                  expression: 'last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0'
+                  expression: 'last(/Apache by HTTP/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
               tags:
                 - tag: scope
                   value: availability
@@ -451,7 +463,7 @@ zabbix_export:
         - uuid: 5039d11bc3964d6e9928a0a46dd0b402
           name: 'Apache: Service response time'
           type: SIMPLE
-          key: 'net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]'
+          key: 'net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -462,21 +474,21 @@ zabbix_export:
               value: health
           triggers:
             - uuid: ffbb564032c7462eb0bb9b4c2f700559
-              expression: 'min(/Apache by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}'
+              expression: 'min(/Apache by HTTP/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}'
               name: 'Apache: Service response time is too high'
               event_name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 - name: 'Apache: Service is down'
-                  expression: 'last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0'
+                  expression: 'last(/Apache by HTTP/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: fb65918695094026838e2b9e4ca00402
           name: 'Apache: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"]'
+          key: 'net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
           history: 7d
           valuemap:
             name: 'Service state'
@@ -491,7 +503,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: afe2fde35d054333adc8369a0f9af778
-              expression: 'last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0'
+              expression: 'last(/Apache by HTTP/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0'
               name: 'Apache: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -645,7 +657,7 @@ zabbix_export:
               parameters:
                 - |
                   return JSON.stringify(JSON.parse(value).ServerMPM === 'event'
-                      ? [{'{#SINGLETON}': ''}] : []);
+                  	? [{'{#SINGLETON}': ''}] : []);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -658,6 +670,9 @@ zabbix_export:
         - macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'
           value: '10'
           description: 'The maximum Apache response time expressed in seconds for a trigger expression.'
+        - macro: '{$APACHE.STATUS.HOST}'
+          value: '<SET APACHE HOST>'
+          description: 'The hostname or IP address of the Apache status page host.'
         - macro: '{$APACHE.STATUS.PATH}'
           value: 'server-status?auto'
           description: 'The URL path.'

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,9 +153,8 @@ elseif ($data['service'] === null) {
 		$report->addRow($row);
 	}
 
-	$form
-		->addItem($report)
-		->addItem($data['paging']);
+	$report->setPageNavigation($data['paging']);
+	$form->addItem($report);
 }
 else {
 	$report->setHeader([

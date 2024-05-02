@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ class CApiService {
 	public static $userData;
 
 	public const ACCESS_RULES = [];
+	public const OUTPUT_FIELDS = [];
 
 	/**
 	 * The name of the table.
@@ -371,7 +372,7 @@ class CApiService {
 	 * @param string $tableName
 	 * @param array  $options
 	 *
-	 * @return array
+	 * @return string
 	 */
 	protected function createSelectQuery($tableName, array $options) {
 		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias(), $options);
@@ -432,7 +433,8 @@ class CApiService {
 				$r_table = DB::getSchema($left_join['table']);
 
 				// Increase count when table linked by non-unique column.
-				if ($left_join['using'] !== $r_table['key']) {
+				if ((array_key_exists('using', $left_join) && $left_join['using'] !== $r_table['key'])
+						|| (!array_key_exists('using', $left_join) && $left_join['use_distinct'])) {
 					$count++;
 					break;
 				}
@@ -455,9 +457,11 @@ class CApiService {
 			$l_table = DB::getSchema($sqlParts['left_table']['table']);
 
 			foreach ($sqlParts['left_join'] as $left_join) {
-				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].
-					' ON '.$sqlParts['left_table']['alias'].'.'.$l_table['key'].
-					'='.$left_join['alias'].'.'.$left_join['using'];
+				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].' ON ';
+				$sql_left_join .= array_key_exists('condition', $left_join)
+					? $left_join['condition']
+					: $sqlParts['left_table']['alias'].'.'.$l_table['key'].'='.
+						$left_join['alias'].'.'.$left_join['using'];
 			}
 
 			// Moving a left table to the end.
@@ -554,6 +558,80 @@ class CApiService {
 		}
 
 		return $sql_parts;
+	}
+
+	/**
+	 * Unset the NCLOB fields from output of the given options, if SQL query contains DISTINCT statement. Replace the
+	 * API_OUTPUT_EXTEND value in output of the given options to self::OUTPUT_FIELDS (if defined) or to all fields that
+	 * are specified in table schema.
+	 *
+	 * @param array $options
+	 * @param array $sql_parts
+	 */
+	protected function unsetNclobFieldsFromOutput(array &$options, array $sql_parts): void {
+		if ($options['countOutput'] || !self::dbDistinct($sql_parts)) {
+			return;
+		}
+
+		$schema = $this->getTableSchema();
+		$nclob_fields = [];
+
+		foreach ($schema['fields'] as $field_name => $field) {
+			if ($field['type'] == DB::FIELD_TYPE_NCLOB
+					&& $this->outputIsRequested($field_name, $options['output'])) {
+				$nclob_fields[] = $field_name;
+			}
+		}
+
+		if ($nclob_fields) {
+			if ($options['output'] === API_OUTPUT_EXTEND) {
+				$output = self::OUTPUT_FIELDS
+					? self::OUTPUT_FIELDS
+					: array_keys($schema['fields']);
+			}
+			else {
+				$output = $options['output'];
+			}
+
+			$options['output'] = array_diff($output, $nclob_fields);
+		}
+	}
+
+	/**
+	 * Add NCLOB type fields if there was DISTINCT in query.
+	 *
+	 * @param array $options    Array of query options.
+	 * @param array $result     Query results.
+	 *
+	 * @return array    The result array with added NCLOB fields.
+	 */
+	protected function addNclobFieldValues(array $options, array $result): array {
+		$schema = $this->getTableSchema();
+		$nclob_fields = [];
+
+		foreach ($schema['fields'] as $field_name => $field) {
+			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
+				$nclob_fields[] = $field_name;
+			}
+		}
+
+		if (!$nclob_fields) {
+			return $result;
+		}
+
+		$pk = $schema['key'];
+		$options = [
+			'output' => $nclob_fields,
+			'filter' => [$pk => array_keys($result)]
+		];
+
+		$db_items = DBselect(DB::makeSql($this->tableName, $options));
+
+		while ($db_item = DBfetch($db_items)) {
+			$result[$db_item[$pk]] += $db_item;
+		}
+
+		return $result;
 	}
 
 	/**

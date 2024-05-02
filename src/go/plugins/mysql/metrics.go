@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,14 +22,11 @@ package mysql
 import (
 	"context"
 
-	"git.zabbix.com/ap/plugin-support/metric"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/uri"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/metric"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/uri"
 )
-
-func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
-}
 
 const (
 	keyCustomQuery            = "mysql.custom.query"
@@ -65,39 +62,55 @@ var (
 
 	metrics = metric.MetricSet{
 		keyCustomQuery: metric.New("Returns result of a custom query.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword,
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword,
 				metric.NewParam("QueryName", "Name of a custom query "+
 					"(must be equal to a name of an SQL file without an extension).").SetRequired(),
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, true),
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			}, true),
 
 		keyDatabasesDiscovery: metric.New("Returns list of databases in LLD format.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 
 		keyDatabaseSize: metric.New("Returns size of given database in bytes.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword,
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword,
 				metric.NewParam("Database", "Database name.").SetRequired(),
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			}, false),
 
 		keyPing: metric.New("Tests if connection is alive or not.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 
 		keyReplicationDiscovery: metric.New("Returns replication information in LLD format.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 
 		keyReplicationSlaveStatus: metric.New("Returns replication status.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam(masterHostParam, "Master host."),
-				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, metric.NewParam(masterHostParam, "Master host."),
+				paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+			}, false),
 
 		keyStatusVars: metric.New("Returns values of global status variables.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 
 		keyVersion: metric.New("Returns MySQL version.",
-			[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-				paramTLSKeyFile}, false),
+			[]*metric.Param{
+				paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
+				paramTLSKeyFile,
+			}, false),
 	}
 )
 
@@ -105,6 +118,13 @@ var (
 type handlerFunc func(
 	ctx context.Context, conn MyClient, params map[string]string, extraParams ...string,
 ) (res interface{}, err error)
+
+func init() {
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 // getHandlerFunc returns a handlerFunc related to a given key.
 func getHandlerFunc(key string) handlerFunc {

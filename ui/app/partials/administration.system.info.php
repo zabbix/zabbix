@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,6 +129,14 @@ if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info'
 	$info_table->addRow([
 		_('Database history tables use primary key'),
 		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+		''
+	]);
+}
+
+if (!$data['system_info']['is_global_scripts_enabled']) {
+	$info_table->addRow([
+		_('Global scripts on Zabbix server'),
+		(new CSpan(_('Disabled'))),
 		''
 	]);
 }

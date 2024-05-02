@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -698,7 +698,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		NULL,
 		portage_details
 	},
-	{NULL}
+	{0}
 };
 
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)

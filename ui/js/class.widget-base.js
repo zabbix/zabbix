@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,9 @@ const WIDGET_EVENT_DELETE = 'widget-delete';
  */
 class CWidgetBase {
 
+	// Widget ready event: informs the dashboard page that the widget has been fully loaded (fired once).
+	static EVENT_READY = 'widget-ready';
+
 	// Require data source event: informs the dashboard page to load the referred foreign data source.
 	static EVENT_REQUIRE_DATA_SOURCE = 'widget-require-data-source';
 
@@ -88,6 +91,8 @@ class CWidgetBase {
 	#broadcast_cache = new Map();
 
 	#feedback_cache = new Map();
+
+	#ready_promise = null;
 
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
@@ -355,19 +360,30 @@ class CWidgetBase {
 	// Widget communication methods.
 
 	/**
+	 * Get broadcast types supported by widget.
+	 *
+	 * @returns {string[]}
+	 */
+	getBroadcastTypes() {
+		const broadcast_types = [];
+
+		for (const {type} of this._defaults.out) {
+			broadcast_types.push(type);
+		}
+
+		return broadcast_types;
+	}
+
+	/**
 	 * Broadcast data to dependent widgets.
 	 *
 	 * @param {Object} data  Object containing key-value pairs, like { _hostid: "123", _itemid: "789" }.
 	 */
 	broadcast(data) {
-		const declared_out_types = new Set();
-
-		for (const {type} of this._defaults.out) {
-			declared_out_types.add(type);
-		}
+		const broadcast_types = this.getBroadcastTypes();
 
 		for (const type of Object.keys(data)) {
-			if (!declared_out_types.has(type)) {
+			if (!broadcast_types.includes(type)) {
 				throw new Error('Cannot broadcast data of undeclared type.');
 			}
 		}
@@ -462,7 +478,7 @@ class CWidgetBase {
 	/**
 	 * Stub method redefined in class.widget.js.
 	 */
-	onFeedback({type, value, descriptor}) {
+	onFeedback({type, value}) {
 		return false;
 	}
 
@@ -479,7 +495,7 @@ class CWidgetBase {
 	/**
 	 * Load and connect to the referred foreign data sources.
 	 *
-	 * Invoked before the first activation of the dashboard page, as well as on fields update.
+	 * Invoked before the first activation of the dashboard page.
 	 */
 	#startDataExchange() {
 		for (const [path, accessor] of this.#getFieldsReferencesAccessors()) {
@@ -522,11 +538,7 @@ class CWidgetBase {
 			this.#fields_referred_data_subscriptions.push(broadcast_subscription);
 		}
 
-		const declared_out_types = new Set();
-
-		for (const {type} of this._defaults.out) {
-			declared_out_types.add(type);
-		}
+		const broadcast_types = this.getBroadcastTypes();
 
 		const feedback_subscription = ZABBIX.EventHub.subscribe({
 			require: {
@@ -535,7 +547,7 @@ class CWidgetBase {
 				reference: this._fields.reference
 			},
 			callback: ({data, descriptor}) => {
-				if (!('type' in descriptor) || !declared_out_types.has(descriptor.type)) {
+				if (!('type' in descriptor) || !broadcast_types.includes(descriptor.type)) {
 					return;
 				}
 
@@ -567,7 +579,7 @@ class CWidgetBase {
 	/**
 	 * Disconnect from the referred foreign data sources, invalidate broadcast data.
 	 *
-	 * Invoked when the widget or the dashboard page gets deleted, as well as on fields update.
+	 * Invoked when the widget or the dashboard page gets deleted.
 	 */
 	#stopDataExchange() {
 		ZABBIX.EventHub.invalidateData({
@@ -731,7 +743,7 @@ class CWidgetBase {
 	 *
 	 * @returns {boolean}
 	 */
-	_isResizing() {
+	isResizing() {
 		return this._target.classList.contains('ui-resizable-resizing');
 	}
 
@@ -815,16 +827,6 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Set custom widget name and, if not empty, display it in the header. Otherwise, display the default name.
-	 *
-	 * @param {string} name
-	 */
-	_setName(name) {
-		this._name = name;
-		this._setHeaderName(this._name !== '' ? this._name : this._defaults.name);
-	}
-
-	/**
 	 * Get widget name displayed in the header.
 	 *
 	 * @returns {string}
@@ -854,35 +856,12 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Set widget header to be either always displayed or displayed only when the widget is entered (focused).
-	 *
-	 * @param {number} view_mode  One of ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER, ZBX_WIDGET_VIEW_MODE_NORMAL.
-	 */
-	_setViewMode(view_mode) {
-		if (this._view_mode !== view_mode) {
-			this._view_mode = view_mode;
-			this._target.classList.toggle(this._css_classes.hidden_header,
-				this._view_mode === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
-			);
-		}
-	}
-
-	/**
 	 * Get widget field values (widget configuration data).
 	 *
 	 * @returns {Object}
 	 */
 	getFields() {
 		return this._fields;
-	}
-
-	/**
-	 * Set widget field values (widget configuration data).
-	 *
-	 * @param {Object} fields
-	 */
-	_setFields(fields) {
-		this._fields = fields;
 	}
 
 	/**
@@ -930,7 +909,7 @@ class CWidgetBase {
 
 					if ('_reference' in container[key]) {
 						accessors.set([...path, key].join('/'), {
-							setTypedReference: (typed_reference) => container[key]._reference = typed_reference,
+							setTypedReference: typed_reference => container[key]._reference = typed_reference,
 							getTypedReference: () => container[key]._reference
 						});
 
@@ -999,53 +978,6 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Update padding of the widget contents' container. Invoked when widget properties have changed.
-	 */
-	_updatePadding() {
-		if (this._state !== WIDGET_STATE_INITIAL) {
-			this._contents.classList.toggle('no-padding', !this.hasPadding());
-		}
-	}
-
-	/**
-	 * Update widget properties and start updating immediately, if widget is active.
-	 *
-	 * @param {string|undefined} name               Widget name to display in the header.
-	 * @param {number|undefined} view_mode          One of ZBX_WIDGET_VIEW_MODE_NORMAL,
-	 *                                              ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
-	 * @param {Object|undefined} fields             Widget field values (widget configuration data).
-	 */
-	updateProperties({name, view_mode, fields}) {
-		if (name !== undefined) {
-			this._setName(name);
-		}
-
-		if (view_mode !== undefined) {
-			this._setViewMode(view_mode);
-		}
-
-		if (fields !== undefined) {
-			if (this._state !== WIDGET_STATE_INITIAL) {
-				this.#stopDataExchange();
-			}
-
-			this._setFields(fields);
-
-			if (this._state !== WIDGET_STATE_INITIAL) {
-				this.#startDataExchange();
-			}
-		}
-
-		this._updatePadding();
-
-		this._show_preloader_asap = true;
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
-	}
-
-	/**
 	 * Get update cycle rate (refresh rate) in seconds.
 	 *
 	 * @returns {number}  Supported values: 0 (no refresh), 10, 30, 60, 120, 600 or 900 seconds.
@@ -1073,13 +1005,13 @@ class CWidgetBase {
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({widgetid: this._widgetid, rf_rate})
 			})
-				.then((response) => response.json())
-				.then((response) => {
+				.then(response => response.json())
+				.then(response => {
 					if ('error' in response) {
 						throw {error: response.error};
 					}
 				})
-				.catch((exception) => {
+				.catch(exception => {
 					console.log('Could not update widget refresh rate', exception);
 				});
 		}
@@ -1329,8 +1261,17 @@ class CWidgetBase {
 				this.#fields_referred_data_updated.clear();
 
 				this.#broadcastDefaults();
+
+				if (this.#ready_promise === null) {
+					this.#ready_promise = this.promiseReady();
+					this.#ready_promise.then(() => {
+						if (this._state !== WIDGET_STATE_DESTROYED) {
+							this.fire(CWidgetBase.EVENT_READY);
+						}
+					});
+				}
 			})
-			.catch((exception) => {
+			.catch(exception => {
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
 				}
@@ -1349,6 +1290,12 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	promiseUpdate() {
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	promiseReady() {
 	}
 
 	// Widget view methods.
@@ -1677,7 +1624,7 @@ class CWidgetBase {
 	 */
 	#registerEvents() {
 		this._events = {
-			actions: (e) => {
+			actions: e => {
 				this.fire(WIDGET_EVENT_ACTIONS, {mouse_event: e});
 			},
 

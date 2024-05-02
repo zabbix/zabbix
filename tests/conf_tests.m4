@@ -1,6 +1,6 @@
 #
 # Zabbix
-# Copyright (C) 2001-2023 Zabbix SIA
+# Copyright (C) 2001-2024 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,31 +57,39 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/Makefile
 			tests/libs/zbxalgo/Makefile
 			tests/libs/zbxcommon/Makefile
+			src/libs/test_zbxcommon/Makefile
 			tests/libs/zbxcomms/Makefile
 			tests/libs/zbxcommshigh/Makefile
-			tests/libs/zbxconf/Makefile
+			tests/libs/zbxcfg/Makefile
 			tests/libs/zbxdbcache/Makefile
 			tests/libs/zbxdbhigh/Makefile
 			tests/libs/zbxeval/Makefile
+			tests/libs/zbxexpr/Makefile
+			tests/libs/zbxfile/Makefile
 			tests/libs/zbxhistory/Makefile
 			tests/libs/zbxjson/Makefile
 			tests/libs/zbxmodules/Makefile
+			tests/libs/zbxnum/Makefile
 			tests/libs/zbxpoller/Makefile
+			tests/libs/zbxparam/Makefile
 			tests/libs/zbxpreproc/Makefile
 			tests/libs/zbxprometheus/Makefile
 			tests/libs/zbxregexp/Makefile
 			tests/libs/zbxexpression/Makefile
-			tests/libs/zbxfile/Makefile
 			tests/libs/zbxsysinfo/Makefile
 			tests/libs/zbxsysinfo/common/Makefile
+			tests/libs/zbxstr/Makefile
 			tests/libs/zbxtagfilter/Makefile
 			tests/libs/zbxtrends/Makefile
 			tests/libs/zbxhttp/Makefile
 			tests/libs/zbxtime/Makefile
+			tests/libs/zbxvariant/Makefile
+			tests/libs/zbxxml/Makefile
 			tests/zabbix_server/Makefile
 			tests/zabbix_server/pinger/Makefile
 			tests/zabbix_server/service/Makefile
 			tests/zabbix_server/trapper/Makefile
+			tests/zabbix_server/lld/Makefile
 			tests/mocks/Makefile
 			tests/mocks/configcache/Makefile
 			tests/mocks/valuecache/Makefile
@@ -108,9 +116,6 @@ AC_DEFUN([CONF_TESTS],
 			;;
 		netbsd)
 			AC_CONFIG_FILES([tests/libs/zbxsysinfo/netbsd/Makefile])
-			;;
-		osf)
-			AC_CONFIG_FILES([tests/libs/zbxsysinfo/osf/Makefile])
 			;;
 		openbsd)
 			AC_CONFIG_FILES([tests/libs/zbxsysinfo/openbsd/Makefile])

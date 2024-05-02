@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -154,20 +154,19 @@ class CItem extends CItemGeneral {
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts_groups hgg'.
-						' JOIN rights r'.
-							' ON r.id=hgg.groupid'.
-								' AND '.dbConditionInt('r.groupid', $userGroups).
-					' WHERE i.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-						' AND MAX(r.permission)>='.zbx_dbstr($permission).
-					')';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where'][] = 'i.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 		}
 
 		// itemids
@@ -832,6 +831,7 @@ class CItem extends CItemGeneral {
 		$upd_items = [];
 		$upd_itemids = [];
 		$upd_items_rtname = [];
+		$upd_item_discoveries = [];
 
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'value_type', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
@@ -865,6 +865,12 @@ class CItem extends CItemGeneral {
 						'where' => ['itemid' => $item['itemid']]
 					];
 				}
+
+				if (array_key_exists('flags', $item) && $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+						&& array_key_exists('status', $item) && $item['status'] == ITEM_STATUS_DISABLED
+						&& $item['status'] != $db_items[$item['itemid']]['status']) {
+					$upd_item_discoveries[] = $item['itemid'];
+				}
 			}
 			else {
 				$item = array_intersect_key($item, $internal_fields + $nested_object_fields);
@@ -878,6 +884,13 @@ class CItem extends CItemGeneral {
 
 		if ($upd_items_rtname) {
 			DB::update('item_rtname', $upd_items_rtname);
+		}
+
+		if ($upd_item_discoveries) {
+			DB::update('item_discovery', [
+				'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
+				'where' => ['itemid' => $upd_item_discoveries]
+			]);
 		}
 
 		self::updateTags($items, $db_items, $upd_itemids);

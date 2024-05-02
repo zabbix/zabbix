@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,12 +28,12 @@
 	const view = {
 		form: null,
 
-		init({form_name, host_interfaces, host_is_discovered}) {
+		init({form_name, host_interfaces, proxy_groupid, host_is_discovered}) {
 			this.form = document.getElementById(form_name);
 			this.form.addEventListener('submit', this.events.submit);
 			this.form_name = form_name;
 
-			host_edit.init({form_name, host_interfaces, host_is_discovered});
+			host_edit.init({form_name, host_interfaces, proxy_groupid, host_is_discovered});
 			this.initEvents();
 		},
 
@@ -43,6 +43,9 @@
 
 				if (target.classList.contains('js-edit-linked-template')) {
 					this.editTemplate({templateid: e.target.dataset.templateid});
+				}
+				else if (target.classList.contains('js-edit-proxy')) {
+					this.editProxy(e.target.dataset.proxyid);
 				}
 				else if (target.classList.contains('js-update-item')) {
 					this.editItem(target, target.dataset);
@@ -77,6 +80,28 @@
 			const overlay = PopUp('template.edit', parameters, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			});
+		},
+
+		editProxy(proxyid) {
+			const overlay = PopUp('popup.proxy.edit', {proxyid}, {
+				dialogueid: 'proxy_edit',
+				dialogue_class: 'modal-popup-static',
 				prevent_navigation: true
 			});
 

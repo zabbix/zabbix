@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ package zbxlib
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxwin32.h"
-#include "../src/zabbix_agent/metrics.h"
+#include "../src/zabbix_agent/metrics/metrics.h"
 
 #cgo LDFLAGS: -Wl,--start-group
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/misc.o

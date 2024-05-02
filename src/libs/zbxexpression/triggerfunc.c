@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -489,17 +489,17 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 		evaluate_item.key_orig = item->key_orig;
 
 		ret = evaluate_function(&func->value, &evaluate_item, func->function, params, &func->timespec, &error);
-		zbx_free(params);
 
 		if (SUCCEED != ret)
 		{
 			/* compose and store error message for future use */
 			zbx_variant_set_error(&func->value,
 					zbx_eval_format_function_error(func->function, item->host.host,
-							item->key_orig, func->parameter, error));
+							item->key_orig, params, error));
 			zbx_free(error);
-			continue;
 		}
+
+		zbx_free(params);
 	}
 
 	zbx_vc_flush_stats();

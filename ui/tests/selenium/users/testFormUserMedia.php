@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,6 +58,35 @@ class testFormUserMedia extends CWebTest {
 				]
 			]);
 		}
+
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 1,
+				'medias' => [
+					[
+						'mediatypeid' => 1, // Email.
+						'sendto' => ['test@zabbix.com'],
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 63,
+						'period' => '1-7,00:00-24:00'
+					],
+					[
+						'mediatypeid' => 1, // Email.
+						'sendto' => ['test2@zabbix.com'],
+						'active' => MEDIA_TYPE_STATUS_DISABLED,
+						'severity' => 63,
+						'period' => '1-7,00:00-24:00'
+					],
+					[
+						'mediatypeid' => 10, // Discord.
+						'sendto' => 'user@test.domain1.com',
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 16,
+						'period' => '1-7,00:00-24:00'
+					]
+				]
+			]
+		]);
 	}
 
 	public function getMediaData() {
@@ -247,7 +276,7 @@ class testFormUserMedia extends CWebTest {
 					'fields' => [
 						'Type' => 'SMS',
 						'Send to' => '192.168.0.1',
-						'When active' => 'allways'
+						'When active' => 'always'
 					],
 					'error_message' => 'Incorrect value for field "period": a time period is expected'
 				]
@@ -411,7 +440,7 @@ class testFormUserMedia extends CWebTest {
 		$this->assertEquals('Media type disabled by Administration.', $type_column->query('tag:button')->one()
 				->getAttribute('data-hintbox-contents'));
 
-		// Check that status of disabled media types is not cickable.
+		// Check that status of disabled media types is not clickable.
 		$this->assertFalse($discord_row->getColumn('Status')->query('xpath:.//a')->one(false)->isValid());
 
 		// Check that disabled media types are shown in red color in media configuration form.
@@ -420,7 +449,7 @@ class testFormUserMedia extends CWebTest {
 		$this->assertEquals('focusable red', $dialog->asForm()->getField('Type')->query('button:Discord')->one()->getAttribute('class'));
 		$dialog->close();
 
-		// Check that there is no icon and no hintbox for disabled user mediathat belong to enabled media type.
+		// Check that there is no icon and no hintbox for disabled user media that belong to enabled media type.
 		$email_row = $mediatype_table->findRow('Send to', 'test2@zabbix.com');
 		$type_column = $email_row->getColumn('Type');
 
@@ -428,7 +457,7 @@ class testFormUserMedia extends CWebTest {
 			$this->assertFalse($type_column->query($selector)->one(false)->isValid());
 		}
 
-		// Check that status of disabled user media is cickable.
+		// Check that status of disabled user media is clickable.
 		$this->assertTrue($email_row->getColumn('Status')->query('button:Disabled')->one()->isValid());
 
 		// Check that disabled media types are not shown if user media with enabled media type is edited.

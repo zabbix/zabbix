@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -191,6 +191,7 @@ class CConfigurationImport {
 		$group_prototypes_refs = [];
 		$host_prototype_macros_refs = [];
 		$proxy_refs = [];
+		$proxy_group_refs = [];
 		$host_prototypes_refs = [];
 		$httptests_refs = [];
 		$httpsteps_refs = [];
@@ -240,6 +241,10 @@ class CConfigurationImport {
 
 			if ($host['proxy']) {
 				$proxy_refs[$host['proxy']['name']] = [];
+			}
+
+			if ($host['proxy_group']) {
+				$proxy_group_refs[$host['proxy_group']['name']] = [];
 			}
 		}
 
@@ -648,6 +653,7 @@ class CConfigurationImport {
 		$this->referencer->addGroupPrototypes($group_prototypes_refs);
 		$this->referencer->addHostPrototypeMacros($host_prototype_macros_refs);
 		$this->referencer->addProxies($proxy_refs);
+		$this->referencer->addProxyGroups($proxy_group_refs);
 		$this->referencer->addHostPrototypes($host_prototypes_refs);
 		$this->referencer->addHttpTests($httptests_refs);
 		$this->referencer->addHttpSteps($httpsteps_refs);

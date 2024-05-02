@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ if (array_key_exists('error', $data)) {
 	return;
 }
 
-$this->addJsFile('d3.v7.min.js');
+$this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
@@ -59,22 +59,21 @@ $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('class.sortable.js');
 $this->addJsFile('items.js');
 $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 $main_filter_form = null;
 
-if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])) {
+if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])
+		|| array_key_exists(CWidgetsData::DATA_TYPE_HOST_IDS, $data['broadcast_requirements'])) {
 	$main_filter_form = (new CForm('get'))
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))

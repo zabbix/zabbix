@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,16 @@ class CWidgetGraphPrototype extends CWidgetIterator {
 		return !this.getFieldsReferredData().has('time_period');
 	}
 
+	promiseUpdate() {
+		const time_period = this.getFieldsData().time_period;
+
+		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: time_period});
+		}
+
+		return super.promiseUpdate();
+	}
+
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
@@ -31,22 +41,14 @@ class CWidgetGraphPrototype extends CWidgetIterator {
 		};
 	}
 
-	processUpdateResponse(response) {
-		super.processUpdateResponse(response);
-
-		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: this.getFieldsData().time_period});
-		}
-	}
-
-	onFeedback({type, value, descriptor}) {
-		if (type === '_timeperiod' && !this.hasCustomTimePeriod()) {
+	onFeedback({type, value}) {
+		if (type === '_timeperiod') {
 			this.feedback({time_period: value});
 
 			return true;
 		}
 
-		return super.onFeedback({type, value, descriptor});
+		return super.onFeedback({type, value});
 	}
 
 	_updateWidget(widget) {

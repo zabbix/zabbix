@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ if ($data['multiselect'] && $form !== null) {
 $table = (new CTableInfo())->setHeader(array_merge($table_columns, $data['table_columns']));
 
 if ($data['preselect_required']) {
-	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
+	$table->setNoDataMessage(_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE);
 }
 
 // Output table rows.
@@ -186,6 +186,7 @@ switch ($data['popup_type']) {
 	case 'template_groups':
 	case 'host_groups':
 	case 'proxies':
+	case 'proxy_groups':
 	case 'host_templates':
 	case 'templates':
 	case 'drules':
@@ -568,7 +569,7 @@ switch ($data['popup_type']) {
 		else {
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
-				$item_pattern = array_key_exists('pattern', $item) ? $item['pattern'] : $item['itemid'];
+				$item_pattern = $options['patternselect'] ? $item['name'] : $item['itemid'];
 
 				$table->addRow([
 					$data['multiselect']
@@ -606,6 +607,10 @@ switch ($data['popup_type']) {
 				];
 			}
 			unset($item);
+
+			if ($options['patternselect']) {
+				$data['table_records'] = array_column($data['table_records'], null, 'name');
+			}
 		}
 		break;
 
@@ -897,6 +902,7 @@ $types = [
 	'item_prototypes',
 	'media_types',
 	'proxies',
+	'proxy_groups',
 	'roles',
 	'templates',
 	'users',

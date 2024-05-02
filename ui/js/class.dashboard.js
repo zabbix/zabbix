@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@ const DASHBOARD_EVENT_APPLY_PROPERTIES = 'dashboard-apply-properties';
 const DASHBOARD_EVENT_CONFIGURATION_OUTDATED = 'dashboard-configuration-outdated';
 
 class CDashboard {
+
+	static ZBX_STYLE_IS_READY = 'is-ready';
 
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
@@ -106,7 +108,6 @@ class CDashboard {
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._is_kiosk_mode = is_kiosk_mode;
-		this._is_kiosk_mode = is_kiosk_mode;
 		this.#broadcast_options = broadcast_options;
 		this._csrf_token = csrf_token;
 
@@ -145,13 +146,13 @@ class CDashboard {
 		this._is_unsaved = false;
 
 		if (!this._is_kiosk_mode) {
-			const sortable = document.createElement('div');
+			const sortable = document.createElement('ul');
 
 			this._containers.navigation_tabs.appendChild(sortable);
 
 			this._tabs = new CSortable(sortable, {
-				is_vertical: false,
-				is_sorting_enabled: this._is_edit_mode
+				is_horizontal: true,
+				enable_sorting: this._is_edit_mode
 			});
 
 			this._tabs_dashboard_pages = new Map();
@@ -214,6 +215,8 @@ class CDashboard {
 	setEditMode({is_internal_call = false} = {}) {
 		this._is_edit_mode = true;
 
+		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
+
 		for (const dashboard_page of this._dashboard_pages.keys()) {
 			if (!dashboard_page.isEditMode()) {
 				dashboard_page.setEditMode();
@@ -226,8 +229,6 @@ class CDashboard {
 
 		this._stopConfigurationChecker();
 		this._stopSlideshow();
-
-		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 
 		if (is_internal_call) {
 			this.fire(DASHBOARD_EVENT_EDIT);
@@ -378,7 +379,7 @@ class CDashboard {
 
 		Promise.resolve()
 			.then(() => this._promiseCheckConfiguration())
-			.catch((exception) => {
+			.catch(exception => {
 				console.log('Could not check the dashboard configuration', exception);
 			})
 			.finally(() => {
@@ -407,8 +408,8 @@ class CDashboard {
 				dashboardid: this._data.dashboardid
 			})
 		})
-			.then((response) => response.json())
-			.then((response) => {
+			.then(response => response.json())
+			.then(response => {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -513,7 +514,7 @@ class CDashboard {
 			unique_id: this._createUniqueId()
 		});
 
-		this._dashboard_pages.set(dashboard_page, {});
+		this._dashboard_pages.set(dashboard_page, {is_ready: false});
 
 		for (const widget_data of widgets) {
 			dashboard_page.addWidgetFromData({
@@ -551,7 +552,7 @@ class CDashboard {
 				}
 			}
 			else {
-				const tabs = [...this._tabs.getList().children];
+				const tabs = [...this._tabs.getTarget().children];
 				const tab_index = tabs.indexOf(this._dashboard_pages.get(dashboard_page).tab);
 
 				this._selectDashboardPage(
@@ -646,8 +647,8 @@ class CDashboard {
 		const busy_condition = this._createBusyCondition();
 
 		Promise.resolve()
-			.then(() => this._promiseDashboardWidgetsSanitize(widgets))
-			.then((response) => {
+			.then(() => this._promiseDashboardWidgetsValidate(widgets))
+			.then(response => {
 				if (this._dashboard_pages.size >= this._max_dashboard_pages) {
 					this._warnDashboardExhausted();
 
@@ -664,7 +665,8 @@ class CDashboard {
 					if (response.widgets[i] !== null) {
 						sane_widgets.push({
 							...widgets[i],
-							fields: response.widgets[i].fields
+							fields: response.widgets[i].fields,
+							messages: response.widgets[i].messages
 						});
 					}
 				}
@@ -678,7 +680,7 @@ class CDashboard {
 
 				this._selectDashboardPage(dashboard_page, {is_async: true});
 			})
-			.catch((exception) => {
+			.catch(exception => {
 				clearMessages();
 
 				let title;
@@ -772,8 +774,8 @@ class CDashboard {
 		const busy_condition = this._createBusyCondition();
 
 		dashboard_page.promiseScrollIntoView(new_widget_pos)
-			.then(() => this._promiseDashboardWidgetsSanitize([new_widget_data]))
-			.then((response) => {
+			.then(() => this._promiseDashboardWidgetsValidate([new_widget_data]))
+			.then(response => {
 				if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_DESTROYED) {
 					return;
 				}
@@ -791,18 +793,21 @@ class CDashboard {
 					return;
 				}
 
-				dashboard_page.replaceWidgetFromData(paste_placeholder_widget, {
+				const widget_replace = dashboard_page.replaceWidgetFromData(paste_placeholder_widget, {
 					...new_widget_data,
 					fields: response.widgets[0].fields,
 					widgetid: null,
 					pos: new_widget_pos,
 					is_new: true,
-					unique_id: this._createUniqueId()
+					unique_id: this._createUniqueId(),
+					messages: response.widgets[0].messages
 				});
 
-				this.#validateFieldsReferences({dashboard_page});
+				if (widget !== null) {
+					this.#validateFieldsReferences({dashboard_page, widget_delete: widget, widget_replace});
+				}
 			})
-			.catch((exception) => {
+			.catch(exception => {
 				dashboard_page.deleteWidget(paste_placeholder_widget);
 
 				clearMessages();
@@ -825,7 +830,7 @@ class CDashboard {
 			.finally(() => this._deleteBusyCondition(busy_condition));
 	}
 
-	_promiseDashboardWidgetsSanitize(widgets_data) {
+	_promiseDashboardWidgetsValidate(widgets_data) {
 		let request_widgets_data = [];
 
 		for (const widget_data of widgets_data) {
@@ -837,15 +842,18 @@ class CDashboard {
 
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'dashboard.widgets.sanitize');
+		curl.setArgument('action', 'dashboard.widgets.validate');
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({widgets: request_widgets_data})
+			body: JSON.stringify({
+				templateid: this._data.templateid ?? undefined,
+				widgets: request_widgets_data
+			})
 		})
-			.then((response) => response.json())
-			.then((response) => {
+			.then(response => response.json())
+			.then(response => {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -938,6 +946,8 @@ class CDashboard {
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
+				this._updateReadyState();
+
 				if (!this._is_edit_mode) {
 					this._keepSteadyConfigurationChecker();
 
@@ -949,7 +959,7 @@ class CDashboard {
 	}
 
 	_promiseSelectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			if (this._is_kiosk_mode) {
 				this._doSelectDashboardPage(dashboard_page);
 
@@ -982,7 +992,7 @@ class CDashboard {
 		this._selected_dashboard_page = dashboard_page;
 
 		if (this._selected_dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
-			this.#startDashboardPage(this._selected_dashboard_page);
+			this._startDashboardPage(this._selected_dashboard_page);
 		}
 
 		this._activateDashboardPage(this._selected_dashboard_page);
@@ -992,7 +1002,8 @@ class CDashboard {
 		}
 	}
 
-	#startDashboardPage(dashboard_page) {
+	_startDashboardPage(dashboard_page) {
+		dashboard_page.on(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.on(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.start();
@@ -1035,6 +1046,7 @@ class CDashboard {
 	}
 
 	#destroyDashboardPage(dashboard_page) {
+		dashboard_page.off(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.off(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.destroy();
@@ -1081,10 +1093,21 @@ class CDashboard {
 			return dashboard_pages.indexOf(dashboard_page);
 		}
 
-		const tabs = [...this._tabs.getList().children];
+		const tabs = [...this._tabs.getTarget().children];
 		const data = this._dashboard_pages.get(dashboard_page);
 
 		return tabs.indexOf(data.tab);
+	}
+
+	/**
+	 * Update readiness state of the dashboard.
+	 *
+	 * Readiness state is updated on switching dashboard pages and as soon as the selected page gets fully loaded.
+	 */
+	_updateReadyState() {
+		const data = this._dashboard_pages.get(this._selected_dashboard_page);
+
+		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, data.is_ready);
 	}
 
 	save() {
@@ -1106,7 +1129,7 @@ class CDashboard {
 			}
 		}
 		else {
-			for (const tab of this._tabs.getList().children) {
+			for (const tab of this._tabs.getTarget().children) {
 				dashboard_pages.push(this._tabs_dashboard_pages.get(tab));
 			}
 		}
@@ -1151,7 +1174,7 @@ class CDashboard {
 
 				this.fire(DASHBOARD_EVENT_APPLY_PROPERTIES);
 			})
-			.catch((exception) => {
+			.catch(exception => {
 				for (const element of form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -1192,8 +1215,8 @@ class CDashboard {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(properties)
 		})
-			.then((response) => response.json())
-			.then((response) => {
+			.then(response => response.json())
+			.then(response => {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -1230,7 +1253,7 @@ class CDashboard {
 
 				overlayDialogueDestroy(overlay.dialogueid);
 			})
-			.catch((exception) => {
+			.catch(exception => {
 				for (const element of form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -1270,8 +1293,8 @@ class CDashboard {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(properties)
 		})
-			.then((response) => response.json())
-			.then((response) => {
+			.then(response => response.json())
+			.then(response => {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -1462,18 +1485,12 @@ class CDashboard {
 
 				overlayDialogueDestroy(overlay.dialogueid);
 
-				if (widget !== null && widget.getType() === type && !(widget instanceof CWidgetMisconfigured)) {
-					widget.updateProperties({name, view_mode, fields});
-
-					return;
-				}
-
-				if (type !== this._widget_last_type) {
+				if (type !== this._widget_last_type && widget?.getType() !== type) {
 					this._widget_last_type = type;
 					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
 				}
 
-				if ('reference' in fields) {
+				if ('reference' in fields && fields.reference === '') {
 					fields.reference = this._createReference();
 				}
 
@@ -1482,7 +1499,7 @@ class CDashboard {
 					name,
 					view_mode,
 					fields,
-					widgetid: null,
+					widgetid: widget === null || widget.getType() !== type ? null : widget.getWidgetId(),
 					pos: widget === null ? this.#edit_widget_cache.new_widget_pos_reserved : widget.getPos(),
 					is_new: widget === null,
 					rf_rate: 0,
@@ -1508,14 +1525,15 @@ class CDashboard {
 
 					dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
-							dashboard_page.replaceWidgetFromData(widget, widget_data);
+							const widget_replace = dashboard_page.replaceWidgetFromData(widget, widget_data);
+
 							dashboard_page.resetWidgetPlaceholder();
 
-							this.#validateFieldsReferences({dashboard_page});
+							this.#validateFieldsReferences({dashboard_page, widget_delete: widget, widget_replace});
 						});
 				}
 			})
-			.catch((exception) => {
+			.catch(exception => {
 				let title;
 				let messages = [];
 
@@ -1529,7 +1547,7 @@ class CDashboard {
 
 				const message_box = makeMessageBox('bad', messages, title);
 
-				if (overlays_stack.getById('widget_properties') !== undefined) {
+				if (form.isConnected) {
 					for (const element of form.parentNode.children) {
 						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 							element.parentNode.removeChild(element);
@@ -1555,9 +1573,9 @@ class CDashboard {
 
 		form.fields = {};
 
-		document.getElementById('type').addEventListener('change', () => this.reloadWidgetProperties());
+		form.querySelector('[name="type"]').addEventListener('change', () => this.reloadWidgetProperties());
 
-		form.addEventListener('change', (e) => {
+		form.addEventListener('change', e => {
 			const do_trim = e.target.matches(
 				'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
 			);
@@ -1607,8 +1625,8 @@ class CDashboard {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({templateid, type, name, view_mode, fields})
 		})
-			.then((response) => response.json())
-			.then((response) => {
+			.then(response => response.json())
+			.then(response => {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -1720,8 +1738,7 @@ class CDashboard {
 		}
 
 		if (!this._is_kiosk_mode) {
-			const has_aria_expanded = this._tabs
-				.getList()
+			const has_aria_expanded = this._tabs.getTarget()
 				.querySelector(`.${ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES}[aria-expanded="true"]`) !== null;
 
 			if (has_aria_expanded) {
@@ -1739,6 +1756,8 @@ class CDashboard {
 
 		tab.appendChild(tab_contents);
 		tab_contents.appendChild(tab_contents_name);
+
+		tab.tabIndex = 0;
 
 		const data = this._dashboard_pages.get(dashboard_page);
 		const name = dashboard_page.getName();
@@ -1779,7 +1798,7 @@ class CDashboard {
 			tab_contents.append(properties_button);
 		}
 
-		this._tabs.insertItemBefore(tab);
+		this._tabs.getTarget().insertBefore(tab, null);
 		this._tabs_dashboard_pages.set(tab, dashboard_page);
 	}
 
@@ -1795,7 +1814,7 @@ class CDashboard {
 			tab_contents_name.title = name;
 		}
 		else {
-			const tab_index = [...this._tabs.getList().children].indexOf(data.tab) + 1;
+			const tab_index = [...this._tabs.getTarget().children].indexOf(data.tab) + 1;
 
 			let max_index = this._dashboard_pages.size - 1;
 			let is_tab_index_available = true;
@@ -1824,20 +1843,20 @@ class CDashboard {
 	_deleteTab(dashboard_page) {
 		const data = this._dashboard_pages.get(dashboard_page);
 
-		this._tabs.removeItem(data.tab);
+		this._tabs.getTarget().removeChild(data.tab);
 		this._tabs_dashboard_pages.delete(data.tab);
 	}
 
 	_selectTab(dashboard_page) {
-		this._tabs.getList().querySelectorAll(`.${ZBX_STYLE_DASHBOARD_SELECTED_TAB}`).forEach((el) => {
-			el.classList.remove(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
+		this._tabs.getTarget().querySelectorAll(`.${ZBX_STYLE_DASHBOARD_SELECTED_TAB}`).forEach(element => {
+			element.classList.remove(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 		})
 
 		const data = this._dashboard_pages.get(dashboard_page);
 
 		data.tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 		this._updateNavigationButtons(dashboard_page);
-		this._tabs.scrollItemIntoView(data.tab);
+		this._tabs.scrollIntoView(data.tab);
 	}
 
 	_updateNavigationButtons(dashboard_page = null) {
@@ -1905,7 +1924,7 @@ class CDashboard {
 	}
 
 	_createUniqueId() {
-		return 'U' + (this._unique_id_index++).toString(36).toUpperCase().padStart(6, '0');
+		return `U${(this._unique_id_index++).toString(36).toUpperCase().padStart(6, '0')}`;
 	}
 
 	/**
@@ -1950,34 +1969,64 @@ class CDashboard {
 		return references;
 	}
 
-	#validateFieldsReferences({dashboard_page}) {
+	#validateFieldsReferences({dashboard_page, widget_delete = null, widget_replace = null}) {
 		const references = this._getReferences({dashboard_page});
 
 		for (const widget of dashboard_page.getWidgets()) {
-			const fields = widget.getFields();
+			const fields = {...widget.getFields()};
 
-			let has_updates = false;
+			let is_altered = false;
+			let is_misconfigured = false;
 
 			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
 				if (accessor.getTypedReference() === '') {
 					continue;
 				}
 
-				const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+				const {reference, type} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
 
-				if (reference === CDashboard.REFERENCE_DASHBOARD) {
+				if (reference === CDashboard.REFERENCE_DASHBOARD || references.has(reference)) {
 					continue;
 				}
 
-				if (!references.has(reference)) {
-					accessor.setTypedReference(CWidgetBase.createTypedReference({reference: ''}));
+				is_altered = true;
 
-					has_updates = true;
+				if (widget_delete !== null && widget_replace !== null
+						&& reference === widget_delete.getFields().reference) {
+					const referable_widgets = this.getReferableWidgets({
+						type,
+						widget_context: {
+							dashboard_page_unique_id: dashboard_page.getUniqueId(),
+							unique_id: widget.getUniqueId()
+						}
+					});
+
+					if (referable_widgets.includes(widget_replace)) {
+						accessor.setTypedReference(CWidgetBase.createTypedReference({
+							reference: widget_replace.getFields().reference,
+							type
+						}));
+
+						continue;
+					}
 				}
+
+				accessor.setTypedReference(CWidgetBase.createTypedReference({reference: ''}));
+
+				is_misconfigured = true;
 			}
 
-			if (has_updates) {
-				widget.updateProperties({fields});
+			if (is_altered) {
+				dashboard_page.replaceWidgetFromData(widget, {
+					...widget.getDataCopy({is_single_copy: false}),
+					fields,
+					widgetid: widget.getWidgetId(),
+					is_new: false,
+					unique_id: this._createUniqueId(),
+					messages: is_misconfigured
+						? [t('Referred widget became unavailable. Please update configuration.')]
+						: []
+				});
 			}
 		}
 	}
@@ -1996,12 +2045,8 @@ class CDashboard {
 		const referable_widgets = new Set();
 
 		for (const widget of widgets_with_reference.values()) {
-			for (const out of this._widget_defaults[widget.getType()].out) {
-				if (out.type === type) {
-					referable_widgets.add(widget);
-
-					break;
-				}
+			if (widget.getBroadcastTypes().includes(type)) {
+				referable_widgets.add(widget);
 			}
 		}
 
@@ -2043,7 +2088,15 @@ class CDashboard {
 		let user_interaction_animation_frame = null;
 
 		this._events = {
-			dashboardPageRequireDataSource: (e) => {
+			dashboardPageReady: e => {
+				const data = this._dashboard_pages.get(e.detail.target);
+
+				data.is_ready = true;
+
+				this._updateReadyState();
+			},
+
+			dashboardPageRequireDataSource: e => {
 				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD) {
 					return;
 				}
@@ -2068,7 +2121,7 @@ class CDashboard {
 				this.setEditMode({is_internal_call: true});
 			},
 
-			dashboardPageWidgetAdd: (e) => {
+			dashboardPageWidgetAdd: e => {
 				const dashboard_page = this._selected_dashboard_page;
 
 				const new_widget_data = this.getStoredWidgetDataCopy();
@@ -2127,7 +2180,7 @@ class CDashboard {
 				this._clearWarnings();
 			},
 
-			dashboardPageWidgetActions: (e) => {
+			dashboardPageWidgetActions: e => {
 				const menu = e.detail.widget.getActionsContextMenu({
 					can_copy_widget: this._can_edit_dashboards
 						&& (this._data.templateid === null || !this.#broadcast_cache.has('_hostid')
@@ -2139,7 +2192,7 @@ class CDashboard {
 				jQuery(e.detail.mouse_event.target).menuPopup(menu, new jQuery.Event(e.detail.mouse_event));
 			},
 
-			dashboardPageWidgetEdit: (e) => {
+			dashboardPageWidgetEdit: e => {
 				const dashboard_page = e.detail.target;
 				const widget = e.detail.widget;
 
@@ -2153,19 +2206,19 @@ class CDashboard {
 				});
 			},
 
-			dashboardPageWidgetCopy: (e) => {
+			dashboardPageWidgetCopy: e => {
 				const widget = e.detail.widget;
 
 				this._storeWidgetDataCopy(widget.getDataCopy({is_single_copy: true}));
 			},
 
-			dashboardPageWidgetPaste: (e) => {
+			dashboardPageWidgetPaste: e => {
 				const widget = e.detail.widget;
 
 				this.pasteWidget(this.getStoredWidgetDataCopy(), {widget});
 			},
 
-			dashboardPageReserveHeaderLines: (e) => {
+			dashboardPageReserveHeaderLines: e => {
 				this._reserveHeaderLines(e.detail.num_lines);
 			},
 
@@ -2186,13 +2239,7 @@ class CDashboard {
 				this._updateNavigationButtons();
 			},
 
-			tabsDragStart: () => {
-				this._selected_dashboard_page.blockInteraction();
-			},
-
 			tabsDragEnd: () => {
-				this._selected_dashboard_page.unblockInteraction();
-
 				this._updateNavigationButtons();
 			},
 
@@ -2202,10 +2249,18 @@ class CDashboard {
 				this._is_unsaved = true;
 			},
 
-			tabsClick: (e) => {
-				const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
+			tabsMouseDown: e => {
+				const tab = e.target.closest('li');
 
-				if (tab !== null && tab.parentNode.classList.contains(ZBX_STYLE_SORTABLE_LIST)) {
+				if (tab !== null && tab.parentElement === this._tabs.getTarget()) {
+					tab.focus();
+				}
+			},
+
+			tabsClick: e => {
+				const tab = e.target.closest('li');
+
+				if (tab !== null && tab.parentElement === this._tabs.getTarget()) {
 					const dashboard_page = this._tabs_dashboard_pages.get(tab);
 
 					if (dashboard_page !== this._selected_dashboard_page) {
@@ -2219,9 +2274,9 @@ class CDashboard {
 				}
 			},
 
-			tabsKeyDown: (e) => {
+			tabsKeyDown: e => {
 				if (e.key === 'Enter') {
-					const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
+					const tab = e.target.closest('li');
 
 					if (tab !== null) {
 						const dashboard_page = this._tabs_dashboard_pages.get(tab);
@@ -2344,10 +2399,10 @@ class CDashboard {
 			new ResizeObserver(this._events.gridResize).observe(this._containers.grid);
 			new ResizeObserver(this._events.tabsResize).observe(this._containers.navigation_tabs);
 
-			this._tabs.on(SORTABLE_EVENT_DRAG_START, this._events.tabsDragStart);
-			this._tabs.on(SORTABLE_EVENT_DRAG_END, this._events.tabsDragEnd);
-			this._tabs.on(SORTABLE_EVENT_SORT, this._events.tabsSort);
+			this._tabs.on(CSortable.EVENT_DRAG_END, this._events.tabsDragEnd);
+			this._tabs.on(CSortable.EVENT_SORT, this._events.tabsSort);
 
+			this._containers.navigation_tabs.addEventListener('mousedown', this._events.tabsMouseDown);
 			this._containers.navigation_tabs.addEventListener('click', this._events.tabsClick);
 			this._containers.navigation_tabs.addEventListener('keydown', this._events.tabsKeyDown);
 

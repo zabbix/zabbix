@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -255,20 +255,18 @@ static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_event_suppres
 			ZBX_STR2UINT64(query->triggerid, row[1]);
 			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
 			zbx_vector_uint64_create(&query->functionids);
-			zbx_vector_tags_create(&query->tags);
+			zbx_vector_tags_ptr_create(&query->tags);
 			zbx_vector_uint64_pair_create(&query->maintenances);
 			zbx_vector_event_suppress_query_ptr_append(event_queries, query);
 		}
 
 		if (FAIL == zbx_db_is_null(row[3]))
 		{
-			zbx_tag_t	*tag;
+			zbx_tag_t	*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 
-			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
-			zbx_vector_tags_append(&query->tags, tag);
-
+			zbx_vector_tags_ptr_append(&query->tags, tag);
 		}
 	}
 }
@@ -649,7 +647,7 @@ static int	update_host_maintenances(void)
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
 #define ZBX_MAINTENANCE_TIMER_DELAY	SEC_PER_MIN
-	time_t			maintenance_time = 0, update_time = 0;
+	time_t			schedule_time = 0, update_time = 0;
 	char			*info = NULL;
 	size_t			info_alloc = 0, info_offset = 0;
 	const zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
@@ -678,17 +676,25 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (1 == process_num)
 		{
+			zbx_maintenance_timer_t	maintenance_timer;
+
+			if (ZBX_MAINTENANCE_TIMER_DELAY <= sec - (double)schedule_time)
+				maintenance_timer = MAINTENANCE_TIMER_PENDING;
+			else
+				maintenance_timer = MAINTENANCE_TIMER_INITIALIZED;
+
 			/* start update process only when all timers have finished their updates */
-			if (sec - (double)maintenance_time >= ZBX_MAINTENANCE_TIMER_DELAY &&
+			if ((SUCCEED == zbx_dc_maintenance_check_immediate_update() ||
+					MAINTENANCE_TIMER_PENDING == maintenance_timer) &&
 					FAIL == zbx_dc_maintenance_check_update_flags())
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
 
-				update = zbx_dc_update_maintenances();
+				update = zbx_dc_update_maintenances(maintenance_timer);
 
 				/* force maintenance updates at server startup */
-				if (0 == maintenance_time)
+				if (0 == schedule_time)
 					update = SUCCEED;
 
 				/* update hosts if there are modified (stopped, started, changed) maintenances */
@@ -697,7 +703,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				else
 					hosts_num = 0;
 
-				db_remove_expired_event_suppress_data((time_t)sec);
+				if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
+					db_remove_expired_event_suppress_data((time_t)sec);
 
 				if (SUCCEED == update)
 				{
@@ -714,7 +721,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 						"updated %d hosts, suppressed %d events in " ZBX_FS_DBL " sec",
 						hosts_num, events_num, zbx_time() - sec);
 
-				update_time = (time_t)sec;
+				if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
+					update_time = (time_t)sec;
 			}
 		}
 		else if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))
@@ -732,12 +740,12 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			zbx_dc_maintenance_reset_update_flag(process_num);
 		}
 
-		if (maintenance_time != update_time)
+		if (schedule_time != update_time)
 		{
 			update_time -= update_time % 60;
-			maintenance_time = update_time;
+			schedule_time = update_time;
 
-			if (0 > (idle = (int)(ZBX_MAINTENANCE_TIMER_DELAY - (zbx_time() - (double)maintenance_time))))
+			if (0 > (idle = (int)(ZBX_MAINTENANCE_TIMER_DELAY - (zbx_time() - (double)schedule_time))))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",

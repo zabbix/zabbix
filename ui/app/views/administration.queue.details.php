@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $html_page = (new CHtmlPage())
@@ -75,16 +76,20 @@ if (CWebUser::getRefresh()) {
 		->show();
 }
 
-$html_page
-	->addItem($table)
-	->addItem((new CDiv())
-		->addClass(ZBX_STYLE_TABLE_PAGING)
-		->addItem((new CDiv())
-			->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+$html_page->addItem($table);
+
+if ($data['total_count'] != 0) {
+	$html_page->addItem(
+		(new CDiv())
+			->addClass(ZBX_STYLE_TABLE_PAGING)
 			->addItem((new CDiv())
-				->addClass(ZBX_STYLE_TABLE_STATS)
-				->addItem(_s('Displaying %1$s of %2$s found', $table->getNumRows(), $data['total_count']))
+				->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				->addItem((new CDiv())
+					->addClass(ZBX_STYLE_TABLE_STATS)
+					->addItem(_s('Displaying %1$s of %2$s found', $table->getNumRows(), $data['total_count']))
+				)
 			)
-		)
-	)
-	->show();
+	);
+}
+
+$html_page->show();

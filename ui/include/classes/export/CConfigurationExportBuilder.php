@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -333,7 +333,9 @@ class CConfigurationExportBuilder {
 				'host' => $host['host'],
 				'name' => $host['name'],
 				'description' => $host['description'],
+				'monitored_by' => $host['monitored_by'],
 				'proxy' => $host['proxy'],
+				'proxy_group' => $host['proxy_group'],
 				'status' => $host['status'],
 				'ipmi_authtype' => $host['ipmi_authtype'],
 				'ipmi_privilege' => $host['ipmi_privilege'],
@@ -637,7 +639,10 @@ class CConfigurationExportBuilder {
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
 				'filter' => self::formatLldFilter($discoveryRule['filter']),
+				'lifetime_type' => $discoveryRule['lifetime_type'],
 				'lifetime' => $discoveryRule['lifetime'],
+				'enabled_lifetime_type' => $discoveryRule['enabled_lifetime_type'],
+				'enabled_lifetime' => $discoveryRule['enabled_lifetime'],
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes'], $simple_trigger_prototypes),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),

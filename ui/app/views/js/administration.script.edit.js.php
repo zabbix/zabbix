@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -183,6 +183,10 @@ window.script_edit_popup = new class {
 
 	clone({title, buttons}) {
 		this.scriptid = null;
+
+		for (const input of this.form.querySelectorAll('input[name=scope]')) {
+			input.disabled = false;
+		}
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
 	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
 	public const UI_ADMINISTRATION_HOUSEKEEPING = 'ui.administration.housekeeping';
+	public const UI_ADMINISTRATION_PROXY_GROUPS = 'ui.administration.proxy_groups';
 	public const UI_ADMINISTRATION_PROXIES = 'ui.administration.proxies';
 	public const UI_ADMINISTRATION_MACROS = 'ui.administration.macros';
 	public const UI_ADMINISTRATION_AUTHENTICATION = 'ui.administration.authentication';
@@ -288,6 +289,7 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_GENERAL,
 				self::UI_ADMINISTRATION_AUDIT_LOG,
 				self::UI_ADMINISTRATION_HOUSEKEEPING,
+				self::UI_ADMINISTRATION_PROXY_GROUPS,
 				self::UI_ADMINISTRATION_PROXIES,
 				self::UI_ADMINISTRATION_MACROS,
 				self::UI_ADMINISTRATION_QUEUE
@@ -507,6 +509,7 @@ class CRoleHelper {
 						self::UI_ADMINISTRATION_GENERAL => _('General'),
 						self::UI_ADMINISTRATION_AUDIT_LOG => _('Audit log'),
 						self::UI_ADMINISTRATION_HOUSEKEEPING => _('Housekeeping'),
+						self::UI_ADMINISTRATION_PROXY_GROUPS => _('Proxy groups'),
 						self::UI_ADMINISTRATION_PROXIES => _('Proxies'),
 						self::UI_ADMINISTRATION_MACROS => _('Macros'),
 						self::UI_ADMINISTRATION_QUEUE => _('Queue')

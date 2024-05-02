@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,9 @@ require_once dirname(__FILE__).'/testItemPrototype.php';
 require_once dirname(__FILE__).'/testItemPreprocessing.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testMap.php';
+require_once dirname(__FILE__).'/testMfa.php';
 require_once dirname(__FILE__).'/testProxy.php';
+require_once dirname(__FILE__).'/testProxyGroup.php';
 require_once dirname(__FILE__).'/testRole.php';
 require_once dirname(__FILE__).'/testScimGroup.php';
 require_once dirname(__FILE__).'/testScimServiceProviderConfig.php';
@@ -79,6 +81,7 @@ require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
+require_once dirname(__FILE__).'/testWebScenarioPermissions.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -125,6 +128,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testItemPreprocessing');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testMap');
+		$suite->addTestSuite('testMfa');
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testRole');
 		$suite->addTestSuite('testScimGroup');
@@ -146,6 +150,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
 		$suite->addTestSuite('testWebScenario');
+		$suite->addTestSuite('testWebScenarioPermissions');
 
 		return $suite;
 	}

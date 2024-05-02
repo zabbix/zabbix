@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -209,6 +209,22 @@ class CMenuPopupHelper {
 				'backurl' => $data['backurl']
 			],
 			'context' => $data['context']
+		];
+	}
+
+	/**
+	 * Prepare data for discovery rule configuration popup menu.
+	 *
+	 * @param string $druleid
+	 *
+	 * @return array
+	 */
+	public static function getDRule(string $druleid): array {
+		return [
+			'type' => 'drule',
+			'data' => [
+				'druleid' => $druleid
+			]
 		];
 	}
 }

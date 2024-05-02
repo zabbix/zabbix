@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ void	zbx_event_get_str_tags(const zbx_db_event *event, char **replace_to)
 {
 	size_t			replace_to_offset = 0, replace_to_alloc = 0;
 	int			i;
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 
 	if (0 == event->tags.values_num)
 	{
@@ -99,9 +99,9 @@ void	zbx_event_get_str_tags(const zbx_db_event *event, char **replace_to)
 
 	/* copy tags to temporary vector for sorting */
 
-	zbx_vector_tags_create(&tags);
-	zbx_vector_tags_append_array(&tags, event->tags.values, event->tags.values_num);
-	zbx_vector_tags_sort(&tags, zbx_compare_tags_natural);
+	zbx_vector_tags_ptr_create(&tags);
+	zbx_vector_tags_ptr_append_array(&tags, event->tags.values, event->tags.values_num);
+	zbx_vector_tags_ptr_sort(&tags, zbx_compare_tags_natural);
 
 	for (i = 0; i < tags.values_num; i++)
 	{
@@ -119,7 +119,7 @@ void	zbx_event_get_str_tags(const zbx_db_event *event, char **replace_to)
 		}
 	}
 
-	zbx_vector_tags_destroy(&tags);
+	zbx_vector_tags_ptr_destroy(&tags);
 }
 
 /******************************************************************************
@@ -171,11 +171,11 @@ void	zbx_event_get_tag(const char *text, const zbx_db_event *event, char **repla
 		{
 			int			i;
 			zbx_tag_t		*tag;
-			zbx_vector_tags_t	tags;
+			zbx_vector_tags_ptr_t	tags;
 
-			zbx_vector_tags_create(&tags);
-			zbx_vector_tags_append_array(&tags, event->tags.values, event->tags.values_num);
-			zbx_vector_tags_sort(&tags, zbx_compare_tags_natural);
+			zbx_vector_tags_ptr_create(&tags);
+			zbx_vector_tags_ptr_append_array(&tags, event->tags.values, event->tags.values_num);
+			zbx_vector_tags_ptr_sort(&tags, zbx_compare_tags_natural);
 
 			for (i = 0; i < tags.values_num; i++)
 			{
@@ -188,7 +188,7 @@ void	zbx_event_get_tag(const char *text, const zbx_db_event *event, char **repla
 				}
 			}
 
-			zbx_vector_tags_destroy(&tags);
+			zbx_vector_tags_ptr_destroy(&tags);
 		}
 
 		zbx_free(name);
@@ -254,6 +254,21 @@ void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, cha
 				*replace_to = zbx_strdup(*replace_to, "unknown");
 		}
 		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
+		{
+			zbx_event_get_str_tags(event, replace_to);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
+		{
+			zbx_event_get_json_tags(event, replace_to);
+		}
+		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
+		{
+			zbx_event_get_tag(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
+		}
+	}
+	else if (EVENT_SOURCE_INTERNAL == event->source)
+	{
+		if (0 == strcmp(macro, MVAR_EVENT_TAGS))
 		{
 			zbx_event_get_str_tags(event, replace_to);
 		}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 #include "zbxtime.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
+#include "zbxinterface.h"
 
 /******************************************************************************
  *                                                                            *
@@ -159,7 +160,8 @@ static void	get_recovery_event_value(const char *macro, const zbx_db_event *r_ev
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%s", r_event->name);
 	}
-	else if (EVENT_SOURCE_TRIGGERS == r_event->source || EVENT_SOURCE_SERVICE == r_event->source)
+	else if (EVENT_SOURCE_TRIGGERS == r_event->source || EVENT_SOURCE_INTERNAL == r_event->source ||
+			EVENT_SOURCE_SERVICE == r_event->source)
 	{
 		if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGS))
 			zbx_event_get_str_tags(r_event, replace_to);
@@ -200,6 +202,7 @@ static int	is_indexed_macro(const char *str, const zbx_token_t *token)
 		case ZBX_TOKEN_MACRO:
 			p = str + token->loc.r - 1;
 			break;
+		case ZBX_TOKEN_USER_FUNC_MACRO:
 		case ZBX_TOKEN_FUNC_MACRO:
 			p = str + token->data.func_macro.macro.r - 1;
 			break;
@@ -708,6 +711,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					(*data)[token.loc.r + 1] = '\0';
 				}
 				break;
+			case ZBX_TOKEN_USER_FUNC_MACRO:
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
 				indexed_macro = is_indexed_macro(*data, &token);
@@ -757,7 +761,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 
 			if (EVENT_SOURCE_TRIGGERS == c_event->source)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					if (NULL == dc_host)
@@ -1145,7 +1149,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					if (SUCCEED == zbx_db_trigger_get_all_hostids(&c_event->trigger, &phostids))
@@ -1405,7 +1409,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					if (NULL == dc_host)
@@ -1467,7 +1471,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 							"c.type")))
 					{
 						replace_to = zbx_strdup(replace_to,
-								dservice_type_string(atoi(replace_to)));
+								zbx_dservice_type_string(atoi(replace_to)));
 					}
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_PORT))
@@ -1556,7 +1560,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					if (NULL == dc_host)
@@ -1659,7 +1663,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
 					EVENT_OBJECT_ITEM == c_event->object)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					cache_item_hostid(&hostids, c_event->objectid);
@@ -1824,7 +1828,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
 					EVENT_OBJECT_LLDRULE == c_event->object)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					cache_item_hostid(&hostids, c_event->objectid);
@@ -1979,7 +1983,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_SERVICE == c_event->source)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					if (NULL == dc_host)
@@ -2103,7 +2107,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					if (SUCCEED == zbx_db_trigger_get_all_hostids(&event->trigger, &phostids))
@@ -2221,7 +2225,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		{
 			if (EVENT_OBJECT_TRIGGER == event->object)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					if (SUCCEED == zbx_db_trigger_get_all_hostids(&event->trigger, &phostids))
@@ -2388,7 +2392,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		}
 		else if (0 != (macro_type & (ZBX_MACRO_TYPE_COMMON | ZBX_MACRO_TYPE_SNMP_OID)))
 		{
-			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 			{
 				if (NULL != hostid)
@@ -2401,7 +2405,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_SCRIPT))
 		{
-			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 			{
 				zbx_dc_get_user_macro(um_handle, m, &dc_host->hostid, 1, &replace_to);
@@ -2446,7 +2450,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_HTTPTEST_FIELD))
 		{
-			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 			{
 				zbx_dc_get_user_macro(um_handle, m, &dc_host->hostid, 1, &replace_to);
@@ -2475,7 +2479,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		else if (0 == indexed_macro && (0 != (macro_type & (ZBX_MACRO_TYPE_HTTP_RAW | ZBX_MACRO_TYPE_HTTP_JSON |
 				ZBX_MACRO_TYPE_HTTP_XML))))
 		{
-			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 			{
 				zbx_dc_get_user_macro(um_handle, m, &dc_host->hostid, 1, &replace_to);
@@ -2517,9 +2521,33 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				replace_to = zbx_strdup(replace_to, dc_item->key_orig);
 			}
 		}
+		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_ALERT_EMAIL) &&
+				ZBX_TOKEN_USER_MACRO == token.type)
+		{
+			if ((EVENT_SOURCE_INTERNAL == event->source && EVENT_OBJECT_TRIGGER == event->object) ||
+					EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (NULL != event->trigger.expression && NULL != event->trigger.recovery_expression &&
+						SUCCEED == zbx_db_trigger_get_all_hostids(&event->trigger, &phostids))
+				{
+					zbx_dc_get_user_macro(um_handle, m, phostids->values, phostids->values_num,
+							&replace_to);
+				}
+			}
+			else if (EVENT_SOURCE_INTERNAL == event->source && (EVENT_OBJECT_ITEM == event->object ||
+					EVENT_OBJECT_LLDRULE == event->object))
+			{
+				cache_item_hostid(&hostids, event->objectid);
+				zbx_dc_get_user_macro(um_handle, m, hostids.values, hostids.values_num, &replace_to);
+			}
+			else
+				zbx_dc_get_user_macro(um_handle, m, NULL, 0, &replace_to);
+
+			pos = token.loc.r;
+		}
 		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_JMX_ENDPOINT))
 		{
-			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 			{
 				zbx_dc_get_user_macro(um_handle, m, &dc_item->host.hostid, 1, &replace_to);
@@ -2582,7 +2610,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 		{
 			if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					if (SUCCEED == zbx_db_trigger_get_all_hostids(&event->trigger, &phostids))
@@ -2667,7 +2695,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
 			{
-				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_FUNC_MACRO == token.type &&
+				if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&
 						0 == strncmp(m, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 				{
 					zbx_dc_get_user_macro(um_handle, m, &dc_item->host.hostid, 1, &replace_to);
@@ -2733,7 +2761,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			replace_to = esc;
 		}
 
-		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
+		if ((ZBX_TOKEN_FUNC_MACRO == token.type || ZBX_TOKEN_USER_FUNC_MACRO == token.type) &&
+				NULL != replace_to)
 		{
 			if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &token.data.func_macro, &replace_to)))
 				zbx_free(replace_to);
@@ -2771,7 +2800,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			zbx_free(replace_to);
 		}
 
-		if (ZBX_TOKEN_FUNC_MACRO == token.type)
+		if (ZBX_TOKEN_FUNC_MACRO == token.type || ZBX_TOKEN_USER_FUNC_MACRO == token.type)
 			zbx_free(m_ptr);
 
 		pos++;
@@ -2803,7 +2832,7 @@ typedef struct
 	zbx_uint64_t				*hostid;
 	zbx_dc_item_t				*dc_item;
 	const struct zbx_json_parse		*jp_row;
-	const zbx_vector_lld_macro_path_t	*lld_macro_paths;
+	const zbx_vector_lld_macro_path_ptr_t	*lld_macro_paths;
 	int					macro_type;
 }
 replace_key_param_data_t;
@@ -2820,7 +2849,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	zbx_uint64_t				*hostid = replace_key_param_data->hostid;
 	zbx_dc_item_t				*dc_item = replace_key_param_data->dc_item;
 	const struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
-	const zbx_vector_lld_macro_path_t	*lld_macros = replace_key_param_data->lld_macro_paths;
+	const zbx_vector_lld_macro_path_ptr_t	*lld_macros = replace_key_param_data->lld_macro_paths;
 	int					macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
 
 	ZBX_UNUSED(num);
@@ -2885,8 +2914,8 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, int macro_type,
-		char *error, size_t maxerrlen)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		int macro_type, char *error, size_t maxerrlen)
 {
 	replace_key_param_data_t	replace_key_param_data;
 	int				key_type, ret;
@@ -2927,7 +2956,7 @@ int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t 
  *                                                                            *
  ******************************************************************************/
 static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, xmlNode *node)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, xmlNode *node)
 {
 	xmlChar	*value;
 	xmlAttr	*attr;
@@ -3022,23 +3051,22 @@ static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const s
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
- *          a node or in CDATA section, validate XML.                         *
+ * Purpose: Substitutes simple or LLD macros in XML text nodes, attributes of *
+ *          a node or in CDATA section, validates XML.                        *
  *                                                                            *
- * Parameters: data            - [IN/OUT] pointer to a buffer that contains   *
- *                                    XML                                     *
+ * Parameters: data            - [IN/OUT] pointer to buffer that contains xml *
  *             item            - [IN] item for simple macro substitution      *
- *             jp_row          - [IN] discovery data for LLD macro            *
+ *             jp_row          - [IN] discovery data for lld macro            *
  *                                    substitution                            *
  *             lld_macro_paths - [IN] lld macro paths                         *
- *             error           - [OUT] reason for XML parsing failure         *
+ *             error           - [OUT] reason for xml parsing failure         *
  *             maxerrlen       - [IN] size of error buffer                    *
  *                                                                            *
  * Return value: SUCCEED or FAIL if XML validation has failed.                *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_macros_xml_impl(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, int maxerrlen)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen)
 {
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(data);
@@ -3137,7 +3165,7 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, int maxerrlen)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen)
 {
 	return substitute_macros_xml_impl(data, item, jp_row, lld_macro_paths, error, maxerrlen);
 }
@@ -3148,7 +3176,7 @@ int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const stru
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, int maxerrlen)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen)
 {
 	int			ret;
 	zbx_dc_um_handle_t	*um_handle;
@@ -3168,8 +3196,8 @@ int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, c
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, int macro_type,
-		char *error, size_t maxerrlen)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		int macro_type, char *error, size_t maxerrlen)
 {
 	return substitute_key_macros_impl(data, hostid, dc_item, jp_row, lld_macro_paths, macro_type, error, maxerrlen);
 }
@@ -3180,8 +3208,8 @@ int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, int macro_type,
-		char *error, size_t maxerrlen)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		int macro_type, char *error, size_t maxerrlen)
 {
 	int			ret;
 	zbx_dc_um_handle_t	*um_handle;

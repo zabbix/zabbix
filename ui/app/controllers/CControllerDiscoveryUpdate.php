@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ class CControllerDiscoveryUpdate extends CController {
 		$fields = [
 			'druleid' =>				'required|db drules.druleid',
 			'name' =>					'required|db drules.name|not_empty',
+			'discovery_by' =>			'int32|in '.implode(',', [ZBX_DISCOVERY_BY_SERVER, ZBX_DISCOVERY_BY_PROXY]),
 			'proxyid' =>				'db drules.proxyid',
 			'iprange' =>				'required|db drules.iprange|not_empty|flags '.P_CRLF,
 			'delay' =>					'required|db drules.delay|not_empty',
@@ -40,6 +41,20 @@ class CControllerDiscoveryUpdate extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->getInput('discovery_by', ZBX_DISCOVERY_BY_SERVER) == ZBX_DISCOVERY_BY_PROXY) {
+			$fields = [
+				'proxyid' =>	'required'
+			];
+
+			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -61,7 +76,12 @@ class CControllerDiscoveryUpdate extends CController {
 
 	protected function doAction(): void {
 		$drule = [];
-		$this->getInputs($drule, ['druleid', 'name', 'proxyid', 'iprange', 'delay', 'dchecks']);
+		$this->getInputs($drule, ['druleid', 'name', 'iprange', 'delay', 'dchecks']);
+
+		$drule['proxyid'] = $this->getInput('discovery_by', ZBX_DISCOVERY_BY_SERVER) == ZBX_DISCOVERY_BY_PROXY
+			? $this->getInput('proxyid')
+			: 0;
+
 		$uniq = $this->getInput('uniqueness_criteria', 0);
 
 		$drule['status'] = $this->getInput('status', DRULE_STATUS_DISABLED);

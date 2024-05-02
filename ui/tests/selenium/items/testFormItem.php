@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -690,7 +690,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->assertEquals(255, $form->getField('History')->getAttribute('maxlength'));
 
 		if (!isset($itemid)) {
-			$this->zbxTestAssertElementValue('history', '90d');
+			$this->zbxTestAssertElementValue('history', '31d');
 		}
 
 		if ($value_type == 'Numeric (unsigned)' || $value_type == 'Numeric (float)') {
@@ -756,7 +756,7 @@ class testFormItem extends CLegacyWebTest {
 					}
 				}
 				else {
-					$this->assertEquals('No data found.', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
+					$this->assertEquals('No data found', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
 				}
 				$valuemap_overlay->getFooter()->query('button:Cancel')->one()->click();
 			}

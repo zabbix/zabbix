@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,8 +34,6 @@
 
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
-
-extern char	*CONFIG_SSH_KEY_LOCATION;
 
 #ifndef HAVE_NO_SSH_OPTIONS
 static int	ssh_set_options(ssh_session session, enum ssh_options_e type, const char *key_str, const char *value,
@@ -193,7 +191,7 @@ static int	ssh_nonblocking_error(ssh_session session, int errcode, int errcode_a
 
 /* example ssh.run["ls /"] */
 int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_ssh_key_location)
 {
 	ssh_session	session;
 	ssh_channel	channel;
@@ -361,7 +359,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 		case ITEM_AUTHTYPE_PUBLICKEY:
 			if (0 != (userauth & SSH_AUTH_METHOD_PUBLICKEY))
 			{
-				if (NULL == CONFIG_SSH_KEY_LOCATION)
+				if (NULL == config_ssh_key_location)
 				{
 					SET_MSG_RESULT(result, zbx_strdup(NULL, "Authentication by public key failed."
 							" SSHKeyLocation option is not set"));
@@ -369,8 +367,8 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 				}
 
 				/* or by public key */
-				publickey = zbx_dsprintf(publickey, "%s/%s", CONFIG_SSH_KEY_LOCATION, item->publickey);
-				privatekey = zbx_dsprintf(privatekey, "%s/%s", CONFIG_SSH_KEY_LOCATION,
+				publickey = zbx_dsprintf(publickey, "%s/%s", config_ssh_key_location, item->publickey);
+				privatekey = zbx_dsprintf(privatekey, "%s/%s", config_ssh_key_location,
 						item->privatekey);
 
 				if (SUCCEED != zbx_is_regular_file(publickey))

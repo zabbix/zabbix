@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,9 @@ class CHostAvailability extends CTag {
 		INTERFACE_AVAILABLE_MIXED => ZBX_STYLE_STATUS_YELLOW
 	];
 
-	protected $type_interfaces = [];
+	protected array $type_interfaces = [];
+
+	protected bool $has_passive_checks = true;
 
 	public function __construct() {
 		parent::__construct('div', true);
@@ -102,22 +104,36 @@ class CHostAvailability extends CTag {
 		return $hint_table;
 	}
 
+	/**
+	 * @param bool $value
+	 *
+	 * @return CHostAvailability
+	 */
+	public function enablePassiveChecks(bool $value = true): CHostAvailability {
+		$this->has_passive_checks = $value;
+
+		return $this;
+	}
+
 	public function toString($destroy = true) {
 		foreach ($this->type_interfaces as $type => $interfaces) {
-			if (!$interfaces || !array_key_exists($type, static::LABELS)) {
-				continue;
-			}
-
-			// Add active checks to agent interfaces.
 			if ($type == INTERFACE_TYPE_AGENT) {
 				$interfaces = array_merge($interfaces, $this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
 			}
 
-			$status = getInterfaceAvailabilityStatus($interfaces);
+			if (!$interfaces || !array_key_exists($type, static::LABELS)) {
+				continue;
+			}
 
-			$this->addItem((new CSpan(static::LABELS[$type]))
-				->addClass(static::COLORS[$status])
-				->setHint($this->getInterfaceHint($interfaces))
+			$status = $type == INTERFACE_TYPE_AGENT && !$this->has_passive_checks
+					&& $this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]
+				? getInterfaceAvailabilityStatus($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE])
+				: getInterfaceAvailabilityStatus($interfaces);
+
+			$this->addItem(
+				(new CSpan(static::LABELS[$type]))
+					->addClass(static::COLORS[$status])
+					->setHint($this->getInterfaceHint($interfaces))
 			);
 		}
 

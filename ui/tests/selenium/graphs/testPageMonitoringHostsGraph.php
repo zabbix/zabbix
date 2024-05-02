@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -903,7 +903,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 		else {
 			$message = (array_key_exists('Hosts', $data['filter']) || array_key_exists('subfilter', $data))
-				? 'No data found.'
+				? 'No data found'
 				: 'Specify host to see the graphs.';
 			$this->assertEquals($message, $this->query('class:nothing-to-show')->one()->getText());
 		}

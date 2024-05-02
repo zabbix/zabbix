@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
 #ifndef ZABBIX_AGENT_CONF_H
 #define ZABBIX_AGENT_CONF_H
 
-#include "cfg.h"
+#include "zbxcfg.h"
 void	load_aliases(char **lines);
 int	load_user_parameters(char **lines, char **err);
-int	load_key_access_rule(const char *value, const struct cfg_line *cfg);
+int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg);
 void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
 		char **config_user_parameters);
 #ifdef _WINDOWS

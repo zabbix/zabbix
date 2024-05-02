@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,6 +67,7 @@ int	zbx_agent_handle_response(char *buffer, size_t read_bytes, ssize_t received_
 		const char		*p = NULL;
 		size_t			value_alloc = 0;
 		char			*value = NULL, tmp[MAX_STRING_LEN];
+		zbx_json_type_t		value_type;
 
 		if (FAIL == zbx_json_open(buffer, &jp))
 		{
@@ -117,15 +118,20 @@ int	zbx_agent_handle_response(char *buffer, size_t read_bytes, ssize_t received_
 		}
 
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc,
-				NULL))
+				&value_type))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot parse response: %s",
 					zbx_json_strerror()));
 			return NETWORK_ERROR;
 		}
 
-		zbx_replace_invalid_utf8(value);
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, value));
+		if (ZBX_JSON_TYPE_NULL != value_type)
+		{
+			zbx_replace_invalid_utf8(value);
+			SET_TEXT_RESULT(result, zbx_strdup(NULL, value));
+		}
+		else
+			zbx_free_agent_result(result);
 
 		zbx_free(value);
 

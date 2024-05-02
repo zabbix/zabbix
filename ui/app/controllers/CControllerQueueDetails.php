@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,12 +91,14 @@ class CControllerQueueDetails extends CController {
 				: [];
 		}
 
+		$total_count = $zabbix_server->getTotalCount();
+
 		$response = new CControllerResponseData([
 			'items' => $items,
 			'hosts' => $hosts,
 			'proxies' => $proxies,
 			'queue_data' => $queue_data,
-			'total_count' => $zabbix_server->getTotalCount()
+			'total_count' => $total_count == null ? 0 : $total_count
 		]);
 
 		$title = _('Queue');

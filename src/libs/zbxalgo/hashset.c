@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,10 +190,11 @@ int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req)
 
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size)
 {
-	return zbx_hashset_insert_ext(hs, data, size, 0);
+	return zbx_hashset_insert_ext(hs, data, size, 0, size, ZBX_HASHSET_UNIQ_FALSE);
 }
 
-void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset)
+void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset, size_t n,
+		zbx_hashset_uniq_t uniq)
 {
 	int			slot;
 	zbx_hash_t		hash;
@@ -204,16 +205,21 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 
 	hash = hs->hash_func(data);
 
-	slot = hash % hs->num_slots;
-	entry = hs->slots[slot];
-
-	while (NULL != entry)
+	if (ZBX_HASHSET_UNIQ_FALSE == uniq)
 	{
-		if (entry->hash == hash && hs->compare_func(entry->data, data) == 0)
-			break;
+		slot = hash % hs->num_slots;
+		entry = hs->slots[slot];
 
-		entry = entry->next;
+		while (NULL != entry)
+		{
+			if (entry->hash == hash && hs->compare_func(entry->data, data) == 0)
+				break;
+
+			entry = entry->next;
+		}
 	}
+	else
+		entry = NULL;
 
 	if (NULL == entry)
 	{
@@ -226,7 +232,9 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 		if (NULL == (entry = (ZBX_HASHSET_ENTRY_T *)hs->mem_malloc_func(NULL, ZBX_HASHSET_ENTRY_OFFSET + size)))
 			return NULL;
 
-		memcpy((char *)entry->data + offset, (const char *)data + offset, size - offset);
+		if (0 != offset)
+			memset(entry->data, 0, offset);
+		memcpy((char *)entry->data + offset, (const char *)data + offset, n - offset);
 		entry->hash = hash;
 		entry->next = hs->slots[slot];
 		hs->slots[slot] = entry;

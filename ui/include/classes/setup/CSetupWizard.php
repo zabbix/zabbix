@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,6 +102,8 @@ class CSetupWizard extends CForm {
 
 		if ($this->getStep() == self::STAGE_REQUIREMENTS) {
 			if (hasRequest('next') && array_key_exists(self::STAGE_REQUIREMENTS, getRequest('next'))) {
+				$default_lang = getRequest('default_lang', $this->getConfig('default_lang'));
+				$this->frontend_setup->setDefaultLang($default_lang);
 				$finalResult = CFrontendSetup::CHECK_OK;
 
 				foreach ($this->frontend_setup->checkRequirements() as $req) {
@@ -306,8 +308,8 @@ class CSetupWizard extends CForm {
 						$vault_config['VAULT'] = CVaultCyberArk::NAME;
 						$vault_config['VAULT_URL'] = $this->getConfig('DB_VAULT_URL');
 						$vault_config['VAULT_DB_PATH'] = $this->getConfig('DB_VAULT_DB_PATH');
-						$vault_config['VAULT_CERT_FILE'] = $this->getConfig('VAULT_CERT_FILE');
-						$vault_config['VAULT_KEY_FILE'] = $this->getConfig('VAULT_KEY_FILE');
+						$vault_config['VAULT_CERT_FILE'] = $this->getConfig('DB_VAULT_CERT_FILE');
+						$vault_config['VAULT_KEY_FILE'] = $this->getConfig('DB_VAULT_KEY_FILE');
 						break;
 
 					default:
@@ -443,16 +445,18 @@ class CSetupWizard extends CForm {
 		// Restoring original locale.
 		setlocale(LC_MONETARY, zbx_locale_variants($default_lang));
 
-		$language_error = '';
+		$language_error = null;
+
 		if (!function_exists('bindtextdomain')) {
-			$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+			$language_error = makeErrorIcon('Translations are unavailable because the PHP gettext module is missing.');
+
 			$lang_select->setReadonly();
 		}
 		elseif (!$all_locales_available) {
-			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
+			$language_error = makeWarningIcon(
+				_('You are not able to choose some of the languages, because locales for them are not installed on the web server.')
+			);
 		}
-
-		$language_error = $language_error !== '' ? makeErrorIcon($language_error) : null;
 
 		$language_select = (new CFormList())
 			->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()), [
@@ -468,6 +472,8 @@ class CSetupWizard extends CForm {
 			->setHeader(['', _('Current value'), _('Required'), '']);
 
 		$messages = [];
+		$default_lang = getRequest('default_lang', $this->getConfig('default_lang'));
+		$this->frontend_setup->setDefaultLang($default_lang);
 		$finalResult = CFrontendSetup::CHECK_OK;
 
 		foreach ($this->frontend_setup->checkRequirements() as $req) {
@@ -621,7 +627,7 @@ class CSetupWizard extends CForm {
 				($db_creds_storage != DB_STORE_CREDS_VAULT_CYBERARK) ? ZBX_STYLE_DISPLAY_NONE : null
 			)
 			->addRow(_('SSL certificate file'),
-				(new CTextBox('vault_cert_file', $this->getConfig('VAULT_CERT_FILE', 'conf/certs/cyberark-cert.pem')))
+				(new CTextBox('vault_cert_file', $this->getConfig('DB_VAULT_CERT_FILE', 'conf/certs/cyberark-cert.pem')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('maxlength', 2048),
 				'vault_cert_file',
@@ -630,7 +636,7 @@ class CSetupWizard extends CForm {
 					: null
 			)
 			->addRow(_('SSL key file'),
-				(new CTextBox('vault_key_file', $this->getConfig('VAULT_KEY_FILE', 'conf/certs/cyberark-key.pem')))
+				(new CTextBox('vault_key_file', $this->getConfig('DB_VAULT_KEY_FILE', 'conf/certs/cyberark-key.pem')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('maxlength', 2048),
 				'vault_key_file',
@@ -820,11 +826,11 @@ class CSetupWizard extends CForm {
 				$table
 					->addRow(
 						(new CSpan(_('SSL certificate file')))->addClass(ZBX_STYLE_GREY),
-						$this->getConfig('VAULT_CERT_FILE') ? $this->getConfig('VAULT_CERT_FILE') : ''
+						$this->getConfig('DB_VAULT_CERT_FILE') ? $this->getConfig('DB_VAULT_CERT_FILE') : ''
 					)
 					->addRow(
 						(new CSpan(_('SSL key file')))->addClass(ZBX_STYLE_GREY),
-						$this->getConfig('VAULT_KEY_FILE') ? $this->getConfig('VAULT_KEY_FILE') : ''
+						$this->getConfig('DB_VAULT_KEY_FILE') ? $this->getConfig('DB_VAULT_KEY_FILE') : ''
 					);
 			}
 		}

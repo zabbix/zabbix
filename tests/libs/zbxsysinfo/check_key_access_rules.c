@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "module.h"
 #include "zbxsysinfo.h"
 
-extern zbx_vector_ptr_t	key_access_rules;
+#include "../../../src/libs/zbxsysinfo/sysinfo.h"
 
 static int	zbx_mock_str_to_key_access_type(const char *str)
 {
@@ -78,9 +78,10 @@ void	zbx_mock_test_entry(void **state)
 
 	rules = zbx_mock_get_parameter_uint64("out.number_of_rules");
 
-	if ((int)rules != key_access_rules.values_num)
+	if ((int)rules != (get_key_access_rules())->values_num)
 	{
-		fail_msg("Number of key access rules is %d, but %d expected", key_access_rules.values_num, (int)rules);
+		fail_msg("Number of key access rules is %d, but %d expected", (get_key_access_rules())->values_num,
+				(int)rules);
 	}
 
 	hmetrics = zbx_mock_get_parameter_handle("out.metrics");

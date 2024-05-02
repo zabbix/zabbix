@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -170,6 +170,18 @@ class testFormFilterProblems extends testFormFilter {
 					]
 				]
 			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'filter_form' => [
+						'Problem' => 'non_exist'
+					],
+					'filter' => [
+						'Name' => 'simple_name and 0 records',
+						'Show number of records' => true
+					]
+				]
+			],
 			// Dataprovider with symbols instead of name.
 			[
 				[
@@ -231,9 +243,9 @@ class testFormFilterProblems extends testFormFilter {
 		return [
 			[
 				[
-					'Hosts' => ['Host for tag permissions'],
-					'Not classified' => true,
-					'Show tags' => '2'
+					'Hosts' => ['Host for triggers filtering'],
+					'Average' => true,
+					'Show tags' => '1'
 				]
 			],
 			[
@@ -324,7 +336,7 @@ class testFormFilterProblems extends testFormFilter {
 			// Enable Set custom time period option.
 			$filter->editProperties();
 			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-			$dialog->fill(['Set custom time period' => true, 'From' => 'now-2y']);
+			$dialog->fill(['Override time period selector' => true, 'From' => 'now-2y']);
 			$dialog->submit();
 			COverlayDialogElement::ensureNotPresent();
 			$this->page->waitUntilReady();

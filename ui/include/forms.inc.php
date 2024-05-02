@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ function getItemFormData(array $item = []) {
 		'key' => getRequest('key', ''),
 		'master_itemid' => getRequest('master_itemid', 0),
 		'hostname' => getRequest('hostname'),
-		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
+		'delay' => getRequest('delay', ZBX_LLD_RULE_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
 		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
@@ -93,9 +93,12 @@ function getItemFormData(array $item = []) {
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
 		'tags' => getRequest('tags', []),
-		'backurl' => getRequest('backurl')
+		'backurl' => getRequest('backurl'),
+		'lifetime_type' => getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type')),
+		'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
+		'enabled_lifetime_type' => getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type')),
+		'enabled_lifetime' => getRequest('enabled_lifetime', ZBX_LLD_RULE_ENABLED_LIFETIME)
 	];
-
 	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 
 	// Unset empty and inherited tags.
@@ -126,21 +129,8 @@ function getItemFormData(array $item = []) {
 	}
 
 	if ($data['type'] == ITEM_TYPE_SCRIPT) {
-		$values = [];
-
-		if (is_array($data['parameters']) && array_key_exists('name', $data['parameters'])
-				&& array_key_exists('value', $data['parameters'])) {
-			foreach ($data['parameters']['name'] as $index => $key) {
-				if (array_key_exists($index, $data['parameters']['value'])) {
-					$values[] = [
-						'name' => $key,
-						'value' => $data['parameters']['value'][$index]
-					];
-				}
-			}
-		}
-
-		$data['parameters'] = $values;
+		CArrayHelper::sort($data['parameters'], ['name']);
+		$data['parameters'] = array_values($data['parameters']);
 	}
 	else {
 		$data['parameters'] = [];
@@ -247,6 +237,7 @@ function getItemFormData(array $item = []) {
 
 		if ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);
+			$data['parameters'] = array_values($data['parameters']);
 		}
 
 		$data['preprocessing'] = $data['item']['preprocessing'];
@@ -268,7 +259,7 @@ function getItemFormData(array $item = []) {
 					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
 							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
 								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
-						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+						$data['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
 					}
 				}
 
@@ -289,7 +280,7 @@ function getItemFormData(array $item = []) {
 				}
 			}
 			else {
-				$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+				$data['delay'] = ZBX_LLD_RULE_DELAY_DEFAULT;
 			}
 
 			$data['history'] = $data['item']['history'];
@@ -347,7 +338,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
 		->addClass('preprocessing-list')
-		->addClass('list-numbered')
+		->addClass(ZBX_STYLE_LIST_NUMBERED)
+		->setAttribute('data-readonly', $readonly)
 		->addItem(
 			(new CListItem([
 				(new CDiv(_('Name')))->addClass('step-name'),
@@ -358,8 +350,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				->addClass('preprocessing-list-head')
 				->addStyle(!$preprocessing ? 'display: none;' : null)
 		);
-
-	$sortable = (count($preprocessing) > 1 && !$readonly);
 
 	$i = 0;
 
@@ -514,11 +504,11 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 				$params = [
 					$step_param_0
-						->setAttribute('placeholder', ',')
+						->setAttribute('placeholder', _('delimiter'))
 						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 						->setAttribute('maxlength', 1),
 					$step_param_1
-						->setAttribute('placeholder', '"')
+						->setAttribute('placeholder', _('qualifier'))
 						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 						->setAttribute('maxlength', 1),
 					(new CCheckBox('preprocessing['.$i.'][params][2]', ZBX_PREPROC_CSV_HEADER))
@@ -725,10 +715,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			(new CListItem([
 				(new CDiv([
 					(new CDiv(new CVar('preprocessing['.$i.'][sortorder]', $step['sortorder'])))
-						->addClass(ZBX_STYLE_DRAG_ICON)
-						->addClass(!$sortable ? ZBX_STYLE_DISABLED : null),
+						->addClass(ZBX_STYLE_DRAG_ICON),
 					(new CDiv($preproc_types_select))
-						->addClass('list-numbered-item')
+						->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),
@@ -747,7 +736,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				$on_fail_options
 			]))
 				->addClass('preprocessing-list-item')
-				->addClass('sortable')
 				->setAttribute('data-step', $i)
 		);
 

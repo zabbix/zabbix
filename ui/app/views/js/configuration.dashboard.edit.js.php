@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,6 +80,7 @@
 
 			ZABBIX.Dashboard.broadcast({
 				_hostid: null,
+				_hostids: null,
 				_timeperiod: {
 					from: dashboard_time_period.from,
 					from_ts: dashboard_time_period.from_ts,

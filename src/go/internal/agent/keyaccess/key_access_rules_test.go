@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ package keyaccess
 import (
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"zabbix.com/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/sdk/conf"
 )
 
 type accessRules struct {

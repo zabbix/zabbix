@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,8 @@ $trigger_form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('context', $data['context'])
 	->addVar('expr_temp', $data['expr_temp'], 'expr_temp')
-	->addVar('recovery_expr_temp', $data['recovery_expr_temp'], 'recovery_expr_temp');
+	->addVar('recovery_expr_temp', $data['recovery_expr_temp'], 'recovery_expr_temp')
+	->addStyle('display: none;');
 
 // Enable form submitting on Enter.
 $trigger_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -65,8 +66,7 @@ $triggers_tab = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'tabs_id' => 'tabs',
-			'tags_tab_id' => 'tags-tab',
-			'field_label' => _('Tags')
+			'tags_tab_id' => 'tags-tab'
 		]), TAB_INDICATOR_TAGS
 	)
 	->addTab('dependenciesTab', _('Dependencies'), new CPartial('trigger.edit.dependencies.tab', $data),

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,9 +114,7 @@ class CControllerHousekeepingUpdate extends CController {
 		}
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			$dbversion_status = CSettingsHelper::getDbVersionStatus();
-
-			foreach ($dbversion_status as $dbversion) {
+			foreach (CSettingsHelper::getDbVersionStatus() as $dbversion) {
 				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 					if (array_key_exists('compression_availability', $dbversion)
 							&& (bool) $dbversion['compression_availability']) {

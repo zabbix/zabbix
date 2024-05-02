@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -745,6 +745,16 @@ function convertUnitsRaw(array $options): array {
 	}
 
 	if ($units === 's') {
+		if ($options['decimals'] !== null && $options['decimals'] != 0) {
+			return [
+				'value' => convertUnitSWithDecimals($value, $options['ignore_milliseconds'], $options['decimals'],
+					$options['decimals_exact']
+				),
+				'units' => '',
+				'is_mapped' => false
+			];
+		}
+
 		return [
 			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
 			'units' => '',
@@ -1668,8 +1678,8 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))
 			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME);
 
-		if (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
-				&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
+		if (CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
+				&& CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
 				&& (!CWebUser::isLoggedIn() || CWebUser::isGuest())) {
 			$redirect_to = (new CUrl('index_http.php'))->setArgument('request', $url->toString());
 			redirect($redirect_to->toString());
@@ -1824,7 +1834,7 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
  * @return array
  */
 function filter_messages(): array {
-	if (!CSettingsHelper::getGlobal(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
+	if (!CSettingsHelper::getPublic(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
 			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
 
 		$type = CMessageHelper::getType();

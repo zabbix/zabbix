@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "zbxnix.h"
 
+#include "nix_internal.h"
 #include "fatal.h"
 #include "sigcommon.h"
 
@@ -36,12 +37,9 @@
 static int	parent_pid = -1;
 
 /* pointer to function for getting caller's PID file location */
-static zbx_get_pid_file_pathname_f	get_pid_file_pathname_cb = NULL;
+static zbx_get_config_str_f		get_pid_file_pathname_cb = NULL;
 static zbx_get_threads_f		get_threads_func_cb;
 static zbx_get_config_int_f		get_threads_num_func_cb;
-
-extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
-		int *local_process_num);
 
 static zbx_signal_handler_f	sigusr_handler;
 static zbx_signal_redirect_f	signal_redirect_handler;
@@ -88,7 +86,7 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	int	threads_num = get_threads_num_func_cb();
 	for (i = 0; i < threads_num; i++)
 	{
-		if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+		if (FAIL == nix_get_process_info_by_thread_func_cb()(i + 1, &process_type, &process_num))
 			break;
 
 		if (proc_type != process_type)
@@ -225,7 +223,7 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
 	struct sigaction	phan;
 
 	signal_redirect_handler = signal_redirect_cb;
-	sig_parent_pid = (int)getpid();
+	set_sig_parent_pid((int)getpid());
 
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;
@@ -242,25 +240,25 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
  * Purpose: init process as daemon                                            *
  *                                                                            *
  * Parameters: allow_root         - [IN] allow root permission for            *
- *                     application                                            *
- *             user               - [IN] user on the system to which to drop  *
- *                     the privileges                                         *
+ *                                       application                          *
+ *             user               - [IN] user on system to which to drop      *
+ *                                       privileges                           *
  *             flags              - [IN] daemon startup flags                 *
  *             get_pid_file_cb    - [IN] callback function for getting        *
- *                     absolute path and name of PID file                     *
+ *                                       absolute path and name of PID file   *
  *             zbx_on_exit_cb_arg - [IN] callback function called when        *
- *                     terminating signal handler                             *
+ *                                       terminating signal handler           *
  *             config_log_type    - [IN]                                      *
  *             config_log_file    - [IN]                                      *
  *             signal_redirect_cb - [IN] USR1 handling callback               *
- *                 get_threads_cb - [IN]                                      *
+ *             get_threads_cb     - [IN]                                      *
  *             get_threads_num_cb - [IN]                                      *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
-		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
+		zbx_get_config_str_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
 		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb,
 		zbx_get_threads_f get_threads_cb, zbx_get_config_int_f get_threads_num_cb)
 {
