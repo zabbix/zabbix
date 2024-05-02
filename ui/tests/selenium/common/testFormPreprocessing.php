@@ -851,7 +851,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'preprocessing' => [
 						[
 							'type' => 'Regular expression',
-							'parameter_1' => '^(\d{4}-\d{1,2}-[0123]{1}\d) test ([\x{1F49A}\x{1F499}])',
+							'parameter_1' => '^(\d{4}-\d{1,2}-[0123]{1}\d) test ([💚💙])',
 							'parameter_2' => 'date \1 emoji \2'
 						]
 					]
@@ -1173,7 +1173,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'custom-multiplier-scientific[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Custom multiplier', 'parameter_1' => '1.5617497e+07']
+						['type' => 'Custom multiplier', 'parameter_1' => '1.5617497E+20']
 					]
 				]
 			],
@@ -1325,7 +1325,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Check for error in XML',
-						'Key' => 'check-for-error-in-json[{#KEY}]'
+						'Key' => 'check-for-error-in-xml[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for error in XML', 'parameter_1' => '//div[contains(@class, "test")]']
@@ -1405,7 +1405,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Discard unchanged with heartbeat',
-						'Key' => 'discard-unchanged[{#KEY}]'
+						'Key' => 'discard-unchanged-with-heartbeat[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '2']
