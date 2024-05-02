@@ -11,12 +11,12 @@
 	"widget": {
 		"js_class": "CWidgetGraph",
 		"in": {
-			"itemid": {
-				"type": "_itemid",
-				"required": true
-			},
 			"graphid": {
 				"type": "_graphid",
+				"required": true
+			},
+			"itemid": {
+				"type": "_itemid",
 				"required": true
 			},
 			"time_period": {
