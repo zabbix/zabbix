@@ -49,13 +49,6 @@
 
 			timeControl.refreshPage = false;
 
-			CWidgetsData.setDefault('_timeperiod', {
-				from: dashboard_time_period.from,
-				from_ts: dashboard_time_period.from_ts,
-				to: dashboard_time_period.to,
-				to_ts: dashboard_time_period.to_ts
-			}, {is_comparable: false});
-
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
 				containers: {
 					grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
@@ -111,15 +104,19 @@
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
 
+			const time_period = {
+				from: dashboard_time_period.from,
+				from_ts: dashboard_time_period.from_ts,
+				to: dashboard_time_period.to,
+				to_ts: dashboard_time_period.to_ts
+			};
+
+			CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+
 			ZABBIX.Dashboard.broadcast({
 				_hostid: dashboard_host !== null ? dashboard_host.id : null,
 				_hostids: dashboard_host !== null ? [dashboard_host.id] : null,
-				_timeperiod: {
-					from: dashboard_time_period.from,
-					from_ts: dashboard_time_period.from_ts,
-					to: dashboard_time_period.to,
-					to_ts: dashboard_time_period.to_ts
-				}
+				_timeperiod: time_period
 			});
 
 			ZABBIX.Dashboard.activate();
@@ -509,14 +506,16 @@
 					return;
 				}
 
-				ZABBIX.Dashboard.broadcast({
-					_timeperiod: {
-						from: data.from,
-						from_ts: data.from_ts,
-						to: data.to,
-						to_ts: data.to_ts
-					}
-				});
+				const time_period = {
+					from: data.from,
+					from_ts: data.from_ts,
+					to: data.to,
+					to_ts: data.to_ts
+				};
+
+				CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+
+				ZABBIX.Dashboard.broadcast({_timeperiod: time_period});
 			},
 
 			feedback(e) {

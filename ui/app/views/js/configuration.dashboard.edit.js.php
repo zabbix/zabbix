@@ -33,13 +33,6 @@
 			this.dashboard = dashboard;
 			this.page = page;
 
-			CWidgetsData.setDefault('_timeperiod', {
-				from: dashboard_time_period.from,
-				from_ts: dashboard_time_period.from_ts,
-				to: dashboard_time_period.to,
-				to_ts: dashboard_time_period.to_ts
-			}, {is_comparable: false});
-
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
 				containers: {
 					grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
@@ -85,15 +78,19 @@
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
 
+			const time_period = {
+				from: dashboard_time_period.from,
+				from_ts: dashboard_time_period.from_ts,
+				to: dashboard_time_period.to,
+				to_ts: dashboard_time_period.to_ts
+			};
+
+			CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+
 			ZABBIX.Dashboard.broadcast({
 				_hostid: null,
 				_hostids: null,
-				_timeperiod: {
-					from: dashboard_time_period.from,
-					from_ts: dashboard_time_period.from_ts,
-					to: dashboard_time_period.to,
-					to_ts: dashboard_time_period.to_ts
-				}
+				_timeperiod: time_period
 			});
 
 			ZABBIX.Dashboard.activate();
