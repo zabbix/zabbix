@@ -496,8 +496,7 @@ class WidgetProblems extends CTableInfo {
 					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
 					$data['fields']['show_tags'] ? $data['tags'][$problem['eventid']] : null
 				])
-				->setAttribute('data-eventid', $problem['eventid'])
-			;
+				->setAttribute('data-eventid', $problem['eventid']);
 
 			$this->addRow($row);
 
