@@ -57,40 +57,24 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
-	public function getValueWithItemNames(): array {
-		$columns = $this->getValue();
+	public function getItemNames(array $itemids): array {
+		$items = $itemids ? API::Item()->get([
+			'output' => $this->isTemplateDashboard() ? ['name'] : ['name_resolved'],
+			'itemid' => $itemids,
+			'selectHosts' => $this->isTemplateDashboard() ? null : ['name'],
+			'webitems' => true,
+			'preservekeys' => true
+		]) : [];
 
-		if ($columns) {
-			$itemids = array_column($columns, 'itemid');
+		$items_names = [];
 
-			$items = $itemids ? API::Item()->get([
-				'output' => $this->isTemplateDashboard() ? ['name'] : ['name_resolved'],
-				'itemid' => $itemids,
-				'selectHosts' => $this->isTemplateDashboard() ? null : ['name'],
-				'webitems' => true,
-				'preservekeys' => true
-			]) : [];
-
-			foreach ($columns as &$column) {
-				if (array_key_exists('itemid', $column) && array_key_exists($column['itemid'], $items)) {
-					$item_name = $this->isTemplateDashboard()
-						? $items[$column['itemid']]['name']
-						: $items[$column['itemid']]['name_resolved'];
-
-					$host_name = $this->isTemplateDashboard()
-						? ''
-						: $items[$column['itemid']]['hosts'][0]['name'].NAME_DELIMITER;
-
-					$column['item_name'] = $host_name.$item_name;
-				}
-				else {
-					$column['item_name'] = _('Inaccessible item');
-				}
-			}
-			unset($column);
+		foreach ($items as $itemid => $item) {
+			$items_names[$itemid] = $this->isTemplateDashboard()
+				? $item['name']
+				: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name_resolved'];
 		}
 
-		return $columns;
+		return $items_names;
 	}
 
 	public function setValue($value): self {

@@ -1,0 +1,13 @@
+// Widget configuration.
+
+form.dashboard-widget-plaintext {
+	#list_columns {
+		.overflow-ellipsis {
+			max-width: 250px;
+		}
+
+		.inaccessible {
+			color: $form-disabled-font-color;
+		}
+	}
+}
