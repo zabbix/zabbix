@@ -55,7 +55,6 @@ class testSla extends CAPITest {
 				'sla' => [''],
 				'expected_error' => 'Invalid parameter "/1": an array is expected.'
 			],
-
 			'Name required' => [
 				'sla' => [[]],
 				'expected_error' => 'Invalid parameter "/1": the parameter "name" is missing.'
@@ -96,7 +95,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
-
 			'Period missing' => [
 				'sla' => [
 					'name' => 'foo'
@@ -166,7 +164,6 @@ class testSla extends CAPITest {
 						ZBX_SLA_PERIOD_ANNUALLY
 					]).'.'
 			],
-
 			'SLO missing' => [
 				'sla' => [
 					'name' => 'foo',
@@ -222,7 +219,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/slo": value must be within the range of 0-100.'
 			],
-
 			'Effective date missing' => [
 				'sla' => [
 					'name' => 'foo',
@@ -285,7 +281,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/effective_date": a number is too large.'
 			],
-
 			'Timezone missing' => [
 				'sla' => [
 					'name' => 'foo',
@@ -345,7 +340,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/timezone": value must be one of '.$timezone_list.'.'
 			],
-
 			'Status null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -414,7 +408,6 @@ class testSla extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/status": value must be one of '.
 					implode(', ', [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED]).'.'
 			],
-
 			'Description null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -463,7 +456,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/description": a character string is expected.'
 			],
-
 			'Service tags missing' => [
 				'sla' => [
 					'name' => 'foo',
@@ -544,7 +536,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/1": an array is expected.'
 			],
-
 			'Service tags, tag null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -635,7 +626,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/1/tag": value is too long.'
 			],
-
 			'Service tags, operator null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -733,7 +723,6 @@ class testSla extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/service_tags/1/operator": value must be one of '.
 					implode(', ', [ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL, ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE]).'.'
 			],
-
 			'Service tags, value null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -863,7 +852,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/2": value (tag, value)=(tag, value) already exists.'
 			],
-
 			'Schedule null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -956,7 +944,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/schedule/1": an array is expected.'
 			],
-
 			'Schedule period_from null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -1091,7 +1078,6 @@ class testSla extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/schedule/1/period_from": value must be one of 0-'.
 					SEC_PER_WEEK.'.'
 			],
-
 			'Schedule period_to missing' => [
 				'sla' => [
 					'name' => 'foo',
@@ -1277,7 +1263,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Start time must be less than end time for SLA "foo".'
 			],
-
 			'Schedule duplicate' => [
 				'sla' => [
 					'name' => 'foo',
@@ -1306,7 +1291,6 @@ class testSla extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/schedule/2": value (period_from, period_to)=('.
 					SEC_PER_DAY.', '.SEC_PER_WEEK.') already exists.'
 			],
-
 			'Schedule excluded_downtimes null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -1403,7 +1387,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/excluded_downtimes": an array is expected.'
 			],
-
 			'Schedule excluded_downtimes non-multi-array' => [
 				'sla' => [
 					'name' => 'foo',
@@ -1598,7 +1581,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/excluded_downtimes/1/name": value is too long.'
 			],
-
 			'Schedule excluded_downtimes period_from missing' => [
 				'sla' => [
 					'name' => 'foo',
@@ -1773,7 +1755,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/excluded_downtimes/1/period_from": a number is too large.'
 			],
-
 			'Schedule excluded_downtimes period_to missing' => [
 				'sla' => [
 					'name' => 'foo',
@@ -1803,7 +1784,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/excluded_downtimes/1": the parameter "period_to" is missing.'
 			],
-
 			'Schedule excluded_downtimes period_to null' => [
 				'sla' => [
 					'name' => 'foo',
@@ -2110,7 +2090,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(foo) already exists.'
 			],
-
 			'Slo too many digits' => [
 				'sla' => [
 					'name' => 'foo',
@@ -2384,7 +2363,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => null
 			],
-
 			'Service tags, value empty string' => [
 				'sla' => [
 					'name' => 'foo',
@@ -2530,7 +2508,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/2": value (slaid)=(50038) already exists.'
 			],
-
 			'Empty name' => [
 				'sla' => [
 					'slaid' => 50038,
@@ -2547,7 +2524,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/name": value is too long.'
 			],
-
 			'Period not in' => [
 				'sla' => [
 					[
@@ -2628,7 +2604,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/description": value is too long.'
 			],
-
 			'Service tags empty' => [
 				'sla' => [
 					'slaid' => 50038,
@@ -2665,7 +2640,6 @@ class testSla extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/2": value (tag, value)=(foo, bar) already exists.'
 			],
-
 			'Schedule not multi-array' => [
 				'sla' => [
 					'slaid' => 50038,
@@ -2751,7 +2725,6 @@ class testSla extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/schedule/2": value (period_from, period_to)=(0, '.
 					SEC_PER_WEEK.') already exists.'
 			],
-
 			'Excluded downtimes not multi-array' => [
 				'sla' => [
 					'slaid' => 50038,
@@ -3040,7 +3013,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/slaids/1": a number is expected.'
 				]
 			],
-
 			'evaltype bool' => [
 				'request' => [
 					'output' => [],
@@ -3087,7 +3059,6 @@ class testSla extends CAPITest {
 						implode(', ', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]).'.'
 				]
 			],
-
 			'service_tags bool' => [
 				'request' => [
 					'output' => [],
@@ -3133,7 +3104,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/service_tags/1": the parameter "tag" is missing.'
 				]
 			],
-
 			'service_tags tag non-string' => [
 				'request' => [
 					'output' => [],
@@ -3178,7 +3148,6 @@ class testSla extends CAPITest {
 					]).'.'
 				]
 			],
-
 			'Serviceids negative int' => [
 				'request' => [
 					'output' => [],
@@ -3260,7 +3229,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/serviceids/1": a number is expected.'
 				]
 			],
-
 			'Filter slaid bool' => [
 				'request' => [
 					'output' => [],
@@ -3272,7 +3240,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/filter/slaid": an array is expected.'
 				]
 			],
-
 			'Filter name bool'  => [
 				'request' => [
 					'output' => [],
@@ -3284,7 +3251,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/filter/name": an array is expected.'
 				]
 			],
-
 			'Filter period bool'  => [
 				'request' => [
 					'output' => [],
@@ -3296,7 +3262,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/filter/period": an array is expected.'
 				]
 			],
-
 			'Filter SLO bool' => [
 				'request' => [
 					'output' => [],
@@ -3308,7 +3273,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/filter/slo": an array is expected.'
 				]
 			],
-
 			'Filter effective_date bool' => [
 				'request' => [
 					'output' => [],
@@ -3320,7 +3284,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/filter/effective_date": an array is expected.'
 				]
 			],
-
 			'Filter timezone bool' => [
 				'request' => [
 					'output' => [],
@@ -3332,7 +3295,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/filter/timezone": an array is expected.'
 				]
 			],
-
 			'Filter status bool' => [
 				'request' => [
 					'output' => [],
@@ -3344,7 +3306,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/filter/status": an array is expected.'
 				]
 			],
-
 			'Search name bool' => [
 				'request' => [
 					'output' => [],
@@ -3356,7 +3317,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/search/name": an array is expected.'
 				]
 			],
-
 			'Search timezone bool' => [
 				'request' => [
 					'output' => [],
@@ -3368,7 +3328,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/search/timezone": an array is expected.'
 				]
 			],
-
 			'Search description bool' => [
 				'request' => [
 					'output' => [],
@@ -3380,7 +3339,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/search/description": an array is expected.'
 				]
 			],
-
 			'SearchByAny null' => [
 				'request' => [
 					'output' => [],
@@ -3426,7 +3384,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/searchByAny": a boolean is expected.'
 				]
 			],
-
 			'SearchWildcardsEnabled null' => [
 				'request' => [
 					'output' => [],
@@ -3472,7 +3429,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/searchWildcardsEnabled": a boolean is expected.'
 				]
 			],
-
 			'SLA output null' => [
 				'request' => [
 					'output' => null
@@ -3531,7 +3487,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/output/1": a character string is expected.'
 				]
 			],
-
 			'selectServiceTags bool' => [
 				'request' => [
 					'selectServiceTags' => true
@@ -3576,7 +3531,6 @@ class testSla extends CAPITest {
 					]).'".'
 				]
 			],
-
 			'selectSchedule bool' => [
 				'request' => [
 					'selectSchedule' => true
@@ -3621,7 +3575,6 @@ class testSla extends CAPITest {
 					]).'".'
 				]
 			],
-
 			'selectExcludedDowntimes bool' => [
 				'request' => [
 					'selectExcludedDowntimes' => true
@@ -3664,7 +3617,6 @@ class testSla extends CAPITest {
 						implode('", "', ['name', 'period_from', 'period_to']).'".'
 				]
 			],
-
 			'sortfield null' => [
 				'request' => [
 					'sortfield' => null
@@ -3717,7 +3669,6 @@ class testSla extends CAPITest {
 					]).'".'
 				]
 			],
-
 			'sortorder null' => [
 				'request' => [
 					'sortorder' => null
@@ -3759,7 +3710,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/sortorder": an array or a character string is expected.'
 				]
 			],
-
 			'limit bool' => [
 				'request' => [
 					'limit' => true
@@ -3808,7 +3758,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/limit": a number is too large.'
 				]
 			],
-
 			'editable null' => [
 				'request' => [
 					'editable' => null
@@ -3849,7 +3798,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/editable": a boolean is expected.'
 				]
 			],
-
 			'preservekeys null' => [
 				'request' => [
 					'preservekeys' => null
@@ -3905,7 +3853,6 @@ class testSla extends CAPITest {
 					'result' => []
 				]
 			],
-
 			'service_tags no value' => [
 				'request' => [
 					'output' => [],
@@ -3929,7 +3876,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'Serviceids unknown' => [
 				'request' => [
 					'output' => [],
@@ -3940,7 +3886,6 @@ class testSla extends CAPITest {
 					'result' => []
 				]
 			],
-
 			'Filter slaid null' => [
 				'request' => [
 					'output' => [],
@@ -3975,7 +3920,6 @@ class testSla extends CAPITest {
 					'result' => []
 				]
 			],
-
 			'Filter name null'  => [
 				'request' => [
 					'output' => [],
@@ -4022,7 +3966,6 @@ class testSla extends CAPITest {
 					'result' => []
 				]
 			],
-
 			'Filter period null'  => [
 				'request' => [
 					'output' => [],
@@ -4045,7 +3988,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'Filter SLO null' => [
 				'request' => [
 					'output' => [],
@@ -4068,7 +4010,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'Filter effective_date null' => [
 				'request' => [
 					'output' => [],
@@ -4091,7 +4032,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'Filter timezone null' => [
 				'request' => [
 					'output' => [],
@@ -4114,7 +4054,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'Filter status null' => [
 				'request' => [
 					'output' => [],
@@ -4137,7 +4076,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'Search name null' => [
 				'request' => [
 					'output' => [],
@@ -4228,7 +4166,6 @@ class testSla extends CAPITest {
 					'result' => []
 				]
 			],
-
 			'Search description null' => [
 				'request' => [
 					'output' => [],
@@ -4274,7 +4211,6 @@ class testSla extends CAPITest {
 					'result' => []
 				]
 			],
-
 			'SearchByAny true' => [
 				'request' => [
 					'output' => [],
@@ -4293,7 +4229,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'StartSearch true' => [
 				'request' => [
 					'output' => [],
@@ -4312,7 +4247,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'ExcludeSearch true' => [
 				'request' => [
 					'output' => [],
@@ -4331,7 +4265,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'SearchWildcardsEnabled bool' => [
 				'request' => [
 					'output' => [],
@@ -4341,7 +4274,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'SLA output empty array' => [
 				'request' => [
 					'output' => []
@@ -4350,7 +4282,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'countOutput true' => [
 				'request' => [
 					'countOutput' => true
@@ -4367,7 +4298,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'selectServiceTags null' => [
 				'request' => [
 					'selectServiceTags' => null
@@ -4392,7 +4322,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'selectSchedule null' => [
 				'request' => [
 					'selectSchedule' => null
@@ -4417,7 +4346,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'selectExcludedDowntimes null' => [
 				'request' => [
 					'selectExcludedDowntimes' => null
@@ -4442,7 +4370,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'sortfield empty array' => [
 				'request' => [
 					'sortfield' => []
@@ -4451,7 +4378,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'sortorder empty array' => [
 				'request' => [
 					'sortorder' => []
@@ -4460,7 +4386,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'limit null' => [
 				'request' => [
 					'limit' => null
@@ -4469,7 +4394,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'editable true' => [
 				'request' => [
 					'editable' => true
@@ -4478,7 +4402,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'editable false' => [
 				'request' => [
 					'editable' => false
@@ -4487,7 +4410,6 @@ class testSla extends CAPITest {
 					'error' => null
 				]
 			],
-
 			'preservekeys true' => [
 				'request' => [
 					'preservekeys' => true
@@ -4646,7 +4568,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/slaid": a number is expected.'
 				]
 			],
-
 			'period_from null' => [
 				'request' => [
 					'slaid' => 50999,
@@ -4701,7 +4622,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/period_from": an integer is expected.'
 				]
 			],
-
 			'period_to null' => [
 				'request' => [
 					'slaid' => 50999,
@@ -4766,7 +4686,6 @@ class testSla extends CAPITest {
 					'error' => 'No permissions to referred object or it does not exist!'
 				]
 			],
-
 			'periods null' => [
 				'request' => [
 					'slaid' => 50999,
@@ -4839,7 +4758,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/periods": an integer is expected.'
 				]
 			],
-
 			'serviceids null' => [
 				'request' => [
 					'slaid' => 50999,
