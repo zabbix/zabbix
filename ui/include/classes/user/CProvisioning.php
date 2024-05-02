@@ -225,7 +225,7 @@ class CProvisioning {
 		$mappings = [];
 
 		if (!$case_sensitive) {
-			$idp_attrs = array_merge($idp_attrs, array_map('strtolower', $idp_attrs));
+			$idp_attrs += array_flip(array_map('strtolower', array_keys($idp_attrs)));
 		}
 
 		foreach ($this->userdirectory['provision_media'] as $provision_media) {
