@@ -3146,7 +3146,7 @@ class CUser extends CApiService {
 		}
 
 		$email_mediatypeids = [];
-		$mediatypeids = array_flip(array_column($medias, 'mediatypeid'));
+		$mediatypeids = array_unique(array_column($medias, 'mediatypeid'));
 
 		if ($mediatypeids) {
 			$email_mediatypeids = DB::select('media_type', [
