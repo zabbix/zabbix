@@ -167,6 +167,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				self::filterTags($host, $host_tags_to_keep);
 			}
 
+			if ($group_by_host_groups && $override_hostid === '' && !$this->isTemplateDashboard()
+					&& $groupids !== null) {
+				$host['hostgroups'] = array_values(array_filter($host['hostgroups'], function($group) use ($groupids) {
+					return in_array($group['groupid'], $groupids);
+				}));
+			}
+
 			$hosts[$hostid] = $host;
 
 			$options['limit'] = $limit_extended - $selected_items_cnt;

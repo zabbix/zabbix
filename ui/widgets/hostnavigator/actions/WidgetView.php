@@ -203,7 +203,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$maintenanceids = [];
 
-		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep) {
+		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep || $group_by_host_groups) {
 			foreach ($hosts as &$host) {
 				if ($tags_to_keep) {
 					$host['tags'] = array_values(array_filter($host['tags'], function($tag) use ($tags_to_keep) {
@@ -231,6 +231,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 						unset($host['maintenanceid']);
 					}
 					unset($host['maintenance_status'], $host['status']);
+				}
+
+				if ($group_by_host_groups && $override_hostid === '' && !$this->isTemplateDashboard()
+						&& $groupids !== null) {
+					$host['hostgroups'] = array_values(
+						array_filter($host['hostgroups'], function($group) use ($groupids) {
+							return in_array($group['groupid'], $groupids);
+						})
+					);
 				}
 			}
 			unset($host);
