@@ -11,10 +11,10 @@ div.dashboard-widget-map {
 
 			.map-selections {
 				ellipse {
-					fill: $ui-hover-bg-color;
+					fill: $map-hover-fill-color;
 
 					&.selected {
-						fill: $ui-selected-bg-color;
+						fill: $map-selected-fill-color;
 						stroke: $map-selected-stroke-color;
 						stroke-width: 1px;
 					}

@@ -88,8 +88,7 @@ $sidebar-server-name-color: #9f9f9f;
 // UI
 $ui-bg-color: #ffffff;
 $ui-bg-selected-color: #333333;
-$ui-hover-bg-color: #e8e9ed;
-$ui-selected-bg-color: #d9d9d9;
+$ui-hover-bg-color: #f4f4f4;
 $ui-border-color: #9f9f9f;
 $ui-placeholder-background-color: darken($body-bg-color, 10%);
 $ui-highlighted-parent-background-color: darken($body-bg-color, 4%);
@@ -184,6 +183,8 @@ $honeycomb-label-color: #1f2c33;
 $honeycomb-no-data-label-color: #1f2c33;
 
 // Map.
+$map-hover-fill-color: #e8e9ed;
+$map-selected-fill-color: #d9d9d9;
 $map-selected-stroke-color: #747474;
 
 // Statuses
