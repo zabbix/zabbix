@@ -156,11 +156,11 @@ static const char	*help_message[] = {
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
-	"                                  (alerter, alert manager, availability manager, configuration syncer,",
-	"                                  configuration syncer worker, connector manager, connector worker,",
-	"                                  discovery manager, escalator, ha manager, history poller, history syncer,",
-	"                                  housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
-	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
+	"                                  (alerter, alert manager, availability manager, browser poller,",
+	"                                  configuration syncer, configuration syncer worker, connector manager,",
+	"                                  connector worker, discovery manager, escalator, ha manager, history poller,",
+	"                                  history syncer, housekeeper, http poller, icmp pinger, internal poller,",
+	"                                  ipmi manager, ipmi poller, java poller, odbc poller, poller, agent poller,",
 	"                                  http agent poller, snmp poller, preprocessing manager, proxy group manager",
 	"                                  proxy poller,self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
@@ -169,14 +169,13 @@ static const char	*help_message[] = {
 	"",
 	"      Profiling control targets:",
 	"        process-type              All processes of specified type",
-	"                                  (alerter, alert manager, availability manager, configuration syncer,",
-	"                                  configuration syncer worker, connector manager, connector worker,",
-	"                                  discovery manager, escalator, ha manager, history poller, history syncer,",
-	"                                  housekeeper, http poller, icmp pinger, internal poller, ipmi manager,",
-	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
+	"                                  (alerter, alert manager, availability manager, browser poller,",
+	"                                  configuration syncer, configuration syncer worker, connector manager,",
+	"                                  connector worker, discovery manager, escalator, ha manager, history poller,",
+	"                                  history syncer, housekeeper, http poller, icmp pinger, internal poller,",
+	"                                  ipmi manager, ipmi poller, java poller, odbc poller, poller, agent poller,",
 	"                                  http agent poller, snmp poller, preprocessing manager, proxy group manager",
 	"                                  proxy poller,self-monitoring, service manager, snmp trapper,",
-	"                                  self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., history syncer,1)",
 	"        pid                       Process identifier",
@@ -277,7 +276,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 	1, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 	1, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
-	1  /* ZBX_PROCESS_TYPE_PG_MANAGER */
+	1, /* ZBX_PROCESS_TYPE_PG_MANAGER */
+	1 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -463,6 +463,11 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HTTPPOLLER];
+	}
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_BROWSERPOLLER;
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER];
 	}
 	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER]))
 	{
@@ -1118,11 +1123,13 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"VPSLimit",			&config_vps_limit,			ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,		ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
+				ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"EnableGlobalScripts",		&config_enable_global_scripts,		ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			1},
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{"AllowSoftwareUpdateCheck",	&config_allow_software_update_check,	ZBX_CFG_TYPE_INT,
-			ZBX_CONF_PARM_OPT,	0,			1},
+				ZBX_CONF_PARM_OPT,	0,			1},
+		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_POLLER], ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			1000},
 		{0}
 	};
 
@@ -1923,6 +1930,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				poller_args.poller_type = ZBX_PROCESS_TYPE_PG_MANAGER;
 				thread_args.args = &poller_args;
 				zbx_thread_start(pg_manager_thread, &thread_args, &zbx_threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_BROWSERPOLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_BROWSER;
+				thread_args.args = &poller_args;
+				zbx_thread_start(zbx_poller_thread, &thread_args, &zbx_threads[i]);
 				break;
 		}
 	}

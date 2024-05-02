@@ -933,7 +933,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	zbx_db_result_t	result;
 
-#define SELECTED_CONFIG_FIELD_COUNT	43	/* number of columns in the following zbx_db_select() */
+#define SELECTED_CONFIG_FIELD_COUNT	44	/* number of columns in the following zbx_db_select() */
 
 	if (NULL == (result = zbx_db_select("select discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
@@ -946,7 +946,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"compression_status,compress_older,instanceid,default_timezone,hk_events_service,"
 				"auditlog_enabled,timeout_zabbix_agent,timeout_simple_check,timeout_snmp_agent,"
 				"timeout_external_check,timeout_db_monitor,timeout_http_agent,timeout_ssh_agent,"
-				"timeout_telnet_agent,timeout_script,auditlog_mode"
+				"timeout_telnet_agent,timeout_script,auditlog_mode,timeout_browser"
 			" from config"
 			" order by configid")))	/* if you change number of columns in zbx_db_select(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */
@@ -3268,8 +3268,7 @@ static int	dbsync_compare_maintenance(const zbx_dc_maintenance_t *maintenance, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares item script params table row with cached configuration   *
- *          data                                                              *
+ * Purpose: compares item params table row with cached configuration data     *
  *                                                                            *
  * Parameter: script - [IN] the cached item script                            *
  *            dbrow  - [IN] the database row                                  *
@@ -3278,16 +3277,16 @@ static int	dbsync_compare_maintenance(const zbx_dc_maintenance_t *maintenance, c
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dbsync_compare_itemscript_param(const zbx_dc_scriptitem_param_t *scriptitem_param,
+static int	dbsync_compare_items_param(const zbx_dc_item_param_t *item_param,
 		const zbx_db_row_t dbrow)
 {
-	if (FAIL == dbsync_compare_uint64(dbrow[1], scriptitem_param->itemid))
+	if (FAIL == dbsync_compare_uint64(dbrow[1], item_param->itemid))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_str(dbrow[2], scriptitem_param->name))
+	if (FAIL == dbsync_compare_str(dbrow[2], item_param->name))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_str(dbrow[3], scriptitem_param->value))
+	if (FAIL == dbsync_compare_str(dbrow[3], item_param->value))
 		return FAIL;
 
 	return SUCCEED;
@@ -3305,13 +3304,13 @@ static int	dbsync_compare_itemscript_param(const zbx_dc_scriptitem_param_t *scri
  ******************************************************************************/
 int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 {
-	zbx_db_row_t			dbrow;
-	zbx_db_result_t			result;
-	zbx_hashset_t			ids;
-	zbx_hashset_iter_t		iter;
-	zbx_uint64_t			rowid;
-	zbx_dc_scriptitem_param_t	*itemscript_params;
-	char				**row;
+	zbx_db_row_t		dbrow;
+	zbx_db_result_t		result;
+	zbx_hashset_t		ids;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		rowid;
+	zbx_dc_item_param_t	*items_params;
+	char			**row;
 
 	if (NULL == (result = zbx_db_select(
 			"select p.item_parameterid,p.itemid,p.name,p.value,i.hostid"
@@ -3335,7 +3334,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->itemscript_params.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->items_params.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = zbx_db_fetch(result)))
@@ -3347,12 +3346,12 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 
 		row = dbsync_preproc_row(sync, dbrow);
 
-		if (NULL == (itemscript_params = (zbx_dc_scriptitem_param_t *)
-				zbx_hashset_search(&dbsync_env.cache->itemscript_params, &rowid)))
+		if (NULL == (items_params = (zbx_dc_item_param_t *)
+				zbx_hashset_search(&dbsync_env.cache->items_params, &rowid)))
 		{
 			tag = ZBX_DBSYNC_ROW_ADD;
 		}
-		else if (FAIL == dbsync_compare_itemscript_param(itemscript_params, row))
+		else if (FAIL == dbsync_compare_items_param(items_params, row))
 		{
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 		}
@@ -3361,12 +3360,12 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 			dbsync_add_row(sync, rowid, tag, row);
 	}
 
-	zbx_hashset_iter_reset(&dbsync_env.cache->itemscript_params, &iter);
+	zbx_hashset_iter_reset(&dbsync_env.cache->items_params, &iter);
 
-	while (NULL != (itemscript_params = (zbx_dc_scriptitem_param_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (items_params = (zbx_dc_item_param_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == zbx_hashset_search(&ids, &itemscript_params->item_script_paramid))
-			dbsync_add_row(sync, itemscript_params->item_script_paramid, ZBX_DBSYNC_ROW_REMOVE, NULL);
+		if (NULL == zbx_hashset_search(&ids, &items_params->item_script_paramid))
+			dbsync_add_row(sync, items_params->item_script_paramid, ZBX_DBSYNC_ROW_REMOVE, NULL);
 	}
 
 	zbx_hashset_destroy(&ids);
@@ -4175,12 +4174,12 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 				"p.timeout_zabbix_agent,p.timeout_simple_check,p.timeout_snmp_agent,"
 				"p.timeout_external_check,p.timeout_db_monitor,p.timeout_http_agent,"
 				"p.timeout_ssh_agent,p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts,"
-				"p.proxy_groupid,p.local_address,p.local_port"
+				"p.proxy_groupid,p.local_address,p.local_port,p.timeout_browser"
 			" from proxy p"
 			" left join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");
 
-	dbsync_prepare(sync, 26, NULL);
+	dbsync_prepare(sync, 27, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
