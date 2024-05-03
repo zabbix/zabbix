@@ -20,13 +20,13 @@
 
 
 /**
- * Host navigator widget form view.
+ * Item navigator widget form view.
  *
  * @var CView $this
  * @var array $data
  */
 
-use Widgets\HostNavigator\Includes\CWidgetFieldHostGroupingView;
+use Widgets\ItemNavigator\Includes\CWidgetFieldItemGroupingView;
 
 $form = new CWidgetFormView($data);
 
@@ -34,8 +34,8 @@ $groupids_field = array_key_exists('groupids', $data['fields'])
 	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
 	: null;
 
-$hosts_field = array_key_exists('hosts', $data['fields'])
-	? (new CWidgetFieldHostPatternSelectView($data['fields']['hosts']))
+$hostids_field = $data['templateid'] === null
+	? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
 		->setFilterPreselect([
 			'id' => $groupids_field->getId(),
 			'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,
@@ -45,11 +45,7 @@ $hosts_field = array_key_exists('hosts', $data['fields'])
 
 $form
 	->addField($groupids_field)
-	->addField($hosts_field)
-	->addField(array_key_exists('status', $data['fields'])
-		? new CWidgetFieldRadioButtonListView($data['fields']['status'])
-		: null
-	)
+	->addField($hostids_field)
 	->addField(array_key_exists('host_tags_evaltype', $data['fields'])
 		? new CWidgetFieldRadioButtonListView($data['fields']['host_tags_evaltype'])
 		: null
@@ -59,19 +55,32 @@ $form
 		: null
 	)
 	->addField(
-		new CWidgetFieldSeveritiesView($data['fields']['severities'])
+		(new CWidgetFieldPatternSelectItemView($data['fields']['items']))
+			->setFilterPreselect($hostids_field !== null
+				? [
+					'id' => $hostids_field->getId(),
+					'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,
+					'submit_as' => 'hostid'
+				]
+				: []
+			)
 	)
 	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
+		new CWidgetFieldRadioButtonListView($data['fields']['item_tags_evaltype'])
+	)
+	->addField(
+		new CWidgetFieldTagsView($data['fields']['item_tags'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['state'])
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['problems'])
 	)
 	->addField(
-		new CWidgetFieldHostGroupingView($data['fields']['group_by'])
+		new CWidgetFieldItemGroupingView($data['fields']['group_by'])
 	)
-	->addField(array_key_exists('show_lines', $data['fields'])
-		? new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
-		: null
+	->addField(
+		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 	)
 	->show();

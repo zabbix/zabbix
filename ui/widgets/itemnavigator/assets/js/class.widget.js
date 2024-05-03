@@ -18,17 +18,17 @@
 **/
 
 
-class CWidgetHostNavigator extends CWidget {
+class CWidgetItemNavigator extends CWidget {
 
 	/**
-	 * Host navigator instance.
+	 * Item navigator instance.
 	 *
-	 * @type {CHostNavigator|null}
+	 * @type {CItemNavigator|null}
 	 */
-	#host_navigator = null;
+	#item_navigator = null;
 
 	/**
-	 * Listeners of host navigator widget.
+	 * Listeners of item navigator widget.
 	 *
 	 * @type {Object}
 	 */
@@ -56,31 +56,31 @@ class CWidgetHostNavigator extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			with_config: this.#host_navigator === null ? 1 : undefined
+			with_config: this.#item_navigator === null ? 1 : undefined
 		};
 	}
 
 	setContents(response) {
-		if (this.#host_navigator === null) {
-			this.#host_navigator = new CHostNavigator(response.config);
+		if (this.#item_navigator === null) {
+			this.#item_navigator = new CItemNavigator(response.config);
 
-			this._body.appendChild(this.#host_navigator.getContainer());
+			this._body.appendChild(this.#item_navigator.getContainer());
 
 			this.#registerListeners();
 			this.#activateListeners();
 		}
 
-		this.#host_navigator.setValue({
+		this.#item_navigator.setValue({
+			items: response.items,
 			hosts: response.hosts,
-			maintenances: response.maintenances,
 			is_limit_exceeded: response.is_limit_exceeded
 		});
 	}
 
 	#registerListeners() {
 		this.#listeners = {
-			hostSelect: e => {
-				this.broadcast({_hostid: e.detail._hostid});
+			itemSelect: e => {
+				this.broadcast({_itemid: e.detail._itemid});
 			},
 
 			groupToggle: e => {
@@ -92,10 +92,10 @@ class CWidgetHostNavigator extends CWidget {
 	}
 
 	#activateListeners() {
-		this.#host_navigator.getContainer().addEventListener(CHostNavigator.EVENT_HOST_SELECT,
-			this.#listeners.hostSelect
+		this.#item_navigator.getContainer().addEventListener(CItemNavigator.EVENT_ITEM_SELECT,
+			this.#listeners.itemSelect
 		);
-		this.#host_navigator.getContainer().addEventListener(CHostNavigator.EVENT_GROUP_TOGGLE,
+		this.#item_navigator.getContainer().addEventListener(CItemNavigator.EVENT_GROUP_TOGGLE,
 			this.#listeners.groupToggle
 		);
 	}

@@ -205,7 +205,7 @@ window.widget_pie_chart_form = new class {
 			{
 				items: [
 					{
-						label: <?= json_encode(_('Item pattern')) ?>,
+						label: <?= json_encode(_('Item patterns')) ?>,
 						clickCallback: () => {
 							this.#addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 						}

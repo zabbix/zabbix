@@ -18,16 +18,17 @@
 **/
 
 
-class CHostNavigator {
+class CItemNavigator {
 
-	static ZBX_STYLE_CLASS =		'host-navigator';
-	static ZBX_STYLE_LIMIT =		'host-navigator-limit';
+	static ZBX_STYLE_CLASS =		'item-navigator';
+	static ZBX_STYLE_LIMIT =		'item-navigator-limit';
 
 	static GROUP_BY_HOST_GROUP = 0;
-	static GROUP_BY_TAG_VALUE = 1;
-	static GROUP_BY_SEVERITY = 2;
+	static GROUP_BY_HOST_NAME = 1;
+	static GROUP_BY_HOST_TAG_VALUE = 2;
+	static GROUP_BY_ITEM_TAG_VALUE = 3;
 
-	static EVENT_HOST_SELECT = 'host.select';
+	static EVENT_ITEM_SELECT = 'item.select';
 	static EVENT_GROUP_TOGGLE = 'group.toggle';
 
 	/**
@@ -52,32 +53,32 @@ class CHostNavigator {
 	#navigation_tree = null;
 
 	/**
-	 * Array of hosts. Grouped in tree structure if grouping provided.
+	 * Array of items. Grouped in tree structure if grouping provided.
 	 *
 	 * @type {Array}
 	 */
 	#nodes = [];
 
 	/**
-	 * All maintenances between retrieved hosts.
+	 * All hosts to which retrieved items belong.
 	 *
-	 * @type {Object}
+	 * @type {Array}
 	 */
-	#maintenances = {};
+	#hosts = [];
 
 	/**
-	 * Listeners of host navigator widget.
+	 * Listeners of item navigator widget.
 	 *
 	 * @type {Object}
 	 */
 	#listeners = {};
 
 	/**
-	 * ID of selected host.
+	 * ID of selected item.
 	 *
 	 * @type {string}
 	 */
-	#selected_host_id = '';
+	#selected_item_id = '';
 
 	/**
 	 * @param {Object} config  Widget configuration.
@@ -86,31 +87,31 @@ class CHostNavigator {
 		this.#config = config;
 
 		this.#container = document.createElement('div');
-		this.#container.classList.add(CHostNavigator.ZBX_STYLE_CLASS);
+		this.#container.classList.add(CItemNavigator.ZBX_STYLE_CLASS);
 
 		this.#registerListeners();
 	}
 
 	/**
-	 * Set list of hosts.
+	 * Set list of items.
 	 *
-	 * @param {Array}   hosts              Array of hosts and their info.
-	 * @param {Object}  maintenances       Info about all maintenances between hosts.
-	 * @param {boolean} is_limit_exceeded  Whether host limit is exceeded or not.
+	 * @param {Array}   items              Array of items and their info.
+	 * @param {Array}   hosts              All hosts to which retrieved items belong.
+	 * @param {boolean} is_limit_exceeded  Whether item limit is exceeded or not.
 	 */
-	setValue({hosts, maintenances, is_limit_exceeded}) {
+	setValue({items, hosts, is_limit_exceeded}) {
 		if (this.#container !== null) {
 			this.#reset();
 		}
 
-		if (hosts.length > 0) {
-			this.#maintenances = maintenances;
+		if (items.length > 0) {
+			this.#hosts = hosts;
 
-			this.#prepareNodesStructure(hosts);
+			this.#prepareNodesStructure(items);
 			this.#prepareNodesProperties(this.#nodes);
 
 			this.#navigation_tree = new CNavigationTree(this.#nodes, {
-				selected_id: this.#selected_host_id,
+				selected_id: this.#selected_item_id,
 				show_problems: this.#config.show_problems,
 				severities: this.#config.severities
 			});
@@ -119,21 +120,21 @@ class CHostNavigator {
 			this.#container.appendChild(this.#navigation_tree.getContainer());
 
 			if (is_limit_exceeded) {
-				this.#createLimit(hosts.length);
+				this.#createLimit(items.length);
 			}
 
 			this.#activateListeners();
 
-			const first_selected_host = this.#container.querySelector(
-				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
+			const first_selected_item = this.#container.querySelector(
+				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_item_id}"]`
 			);
 
-			if (this.#selected_host_id !== '' && first_selected_host === null) {
-				this.#selected_host_id = '';
+			if (this.#selected_item_id !== '' && first_selected_item === null) {
+				this.#selected_item_id = '';
 
-				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
+				this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
 					detail: {
-						_hostid: null
+						_itemid: null
 					}
 				}));
 			}
@@ -147,7 +148,7 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Get the root container element of host navigator widget.
+	 * Get the root container element of item navigator widget.
 	 *
 	 * @returns {HTMLElement}
 	 */
@@ -156,7 +157,7 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Remove the root container element of host navigator widget.
+	 * Remove the root container element of item navigator widget.
 	 */
 	destroy() {
 		this.#container.remove();
@@ -164,14 +165,14 @@ class CHostNavigator {
 
 	/**
 	 * Prepare structure of nodes - create and sort groups.
-	 * If no grouping provided, then leave flat list of hosts.
+	 * If no grouping provided, then leave flat list of items.
 	 *
-	 * @param {Array} hosts  Array of hosts and their info.
+	 * @param {Array} items  Array of items and their info.
 	 */
-	#prepareNodesStructure(hosts) {
+	#prepareNodesStructure(items) {
 		if (this.#config.group_by.length > 0) {
-			for (const host of hosts) {
-				this.#createGroup(host);
+			for (const item of items) {
+				this.#createGroup(item);
 			}
 
 			this.#sortGroups(this.#nodes);
@@ -181,37 +182,27 @@ class CHostNavigator {
 			}
 		}
 		else {
-			this.#nodes = hosts;
+			this.#nodes = items;
 		}
 	}
 
 	/**
-	 * Prepare properties of nodes (groups and hosts) to fit navigation component.
+	 * Prepare properties of nodes (groups and items) to fit navigation component.
 	 *
-	 * @param {Array} nodes  Array of nodes (groups and hosts) and their info.
+	 * @param {Array} nodes  Array of nodes (groups and items) and their info.
 	 */
 	#prepareNodesProperties(nodes) {
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].children === undefined) {
-				const properties = {
-					id: nodes[i].hostid,
+				nodes[i] = {
+					id: nodes[i].itemid,
 					name: nodes[i].name,
 					level: this.#config.group_by?.length || 0,
 					problem_count: nodes[i].problem_count
-				}
-
-				if (nodes[i].maintenanceid !== undefined) {
-					properties.maintenance = this.#maintenances[nodes[i].maintenanceid];
-				}
-
-				nodes[i] = properties;
+				};
 			}
 			else {
 				nodes[i].is_open = this.#config.open_groups.includes(JSON.stringify(nodes[i].group_identifier));
-
-				nodes[i].severity_filter = nodes[i].group_by.attribute === CHostNavigator.GROUP_BY_SEVERITY
-					? nodes[i].severity_index
-					: undefined;
 
 				this.#prepareNodesProperties(nodes[i].children);
 			}
@@ -219,23 +210,22 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Create group for host according to current grouping level.
+	 * Create group for item according to current grouping level.
 	 *
-	 * @param {Object}      host    Host object.
+	 * @param {Object}      item    Item object.
 	 * @param {number}      level   Current grouping level.
 	 * @param {Object|null} parent  Parent object (group).
 	 */
-	#createGroup(host, level = 0, parent = null) {
+	#createGroup(item, level = 0, parent = null) {
 		const attribute = this.#config.group_by[level];
 
 		switch (attribute.attribute) {
-			case CHostNavigator.GROUP_BY_HOST_GROUP:
-				for (const hostgroup of host.hostgroups) {
+			case CItemNavigator.GROUP_BY_HOST_GROUP:
+				for (const hostgroup of this.#hosts[item.hostid].hostgroups) {
 					const new_group = {
-						...CHostNavigator.#getGroupTemplate(),
+						...CItemNavigator.#getGroupTemplate(),
 						name: hostgroup.name,
 						group_by: {
-							attribute: CHostNavigator.GROUP_BY_HOST_GROUP,
 							name: t('Host group')
 						},
 						group_identifier: parent !== null
@@ -244,84 +234,67 @@ class CHostNavigator {
 						level
 					};
 
-					this.#insertGroup(new_group, parent, level, host);
+					this.#insertGroup(new_group, parent, level, item);
 				}
 
 				break;
 
-			case CHostNavigator.GROUP_BY_TAG_VALUE:
-				const matching_tags = host.tags.filter(tag => tag.tag === attribute.tag_name);
+			case CItemNavigator.GROUP_BY_HOST_NAME:
+				const new_group = {
+					...CItemNavigator.#getGroupTemplate(),
+					name: this.#hosts[item.hostid].name,
+					group_by: {
+						name: t('Host name')
+					},
+					group_identifier: parent !== null
+						? [...parent.group_identifier, item.hostid]
+						: [item.hostid],
+					level
+				};
+
+				this.#insertGroup(new_group, parent, level, item);
+
+				break;
+
+			case CItemNavigator.GROUP_BY_HOST_TAG_VALUE:
+			case CItemNavigator.GROUP_BY_ITEM_TAG_VALUE:
+				let tags = this.#hosts[item.hostid].tags || [];
+				let attribute_name = t('Host tag');
+
+				if (attribute.attribute === CItemNavigator.GROUP_BY_ITEM_TAG_VALUE) {
+					tags = item.tags;
+					attribute_name = t('Item tag');
+				}
+
+				const matching_tags = tags.filter(tag => tag.tag === attribute.tag_name);
 
 				if (matching_tags.length === 0) {
 					const new_group = {
-						...CHostNavigator.#getGroupTemplate(),
+						...CItemNavigator.#getGroupTemplate(),
 						name: t('Uncategorized'),
 						group_by: {
-							attribute: CHostNavigator.GROUP_BY_TAG_VALUE,
-							name: attribute.tag_name
+							name: `${attribute_name}: ${attribute.tag_name}`
 						},
 						group_identifier: parent !== null ? [...parent.group_identifier, null] : [null],
 						level,
 						is_uncategorized: true
 					};
 
-					this.#insertGroup(new_group, parent, level, host);
+					this.#insertGroup(new_group, parent, level, item);
 				}
 				else {
 					for (const tag of matching_tags) {
 						const new_group = {
-							...CHostNavigator.#getGroupTemplate(),
+							...CItemNavigator.#getGroupTemplate(),
 							name: tag.value,
 							group_by: {
-								attribute: CHostNavigator.GROUP_BY_TAG_VALUE,
-								name: attribute.tag_name
+								name: `${attribute_name}: ${attribute.tag_name}`
 							},
 							group_identifier: parent !== null ? [...parent.group_identifier, tag.value] : [tag.value],
 							level
 						};
 
-						this.#insertGroup(new_group, parent, level, host);
-					}
-				}
-
-				break;
-
-			case CHostNavigator.GROUP_BY_SEVERITY:
-				const has_problems = host.problem_count.some(count => count > 0);
-
-				if (!has_problems) {
-					const new_group = {
-						...CHostNavigator.#getGroupTemplate(),
-						name: t('Uncategorized'),
-						group_by: {
-							attribute: CHostNavigator.GROUP_BY_SEVERITY,
-							name: t('Severity')
-						},
-						group_identifier: parent !== null ? [...parent.group_identifier, null] : [null],
-						level,
-						is_uncategorized: true,
-						severity_index: -1
-					};
-
-					this.#insertGroup(new_group, parent, level, host);
-				}
-				else {
-					for (let i = 0; i < host.problem_count.length; i++) {
-						if (host.problem_count[i] > 0) {
-							const new_group = {
-								...CHostNavigator.#getGroupTemplate(),
-								name: this.#config.severities[i].label,
-								group_by: {
-									attribute: CHostNavigator.GROUP_BY_SEVERITY,
-									name: t('Severity')
-								},
-								group_identifier: parent !== null ? [...parent.group_identifier, i] : [i],
-								level,
-								severity_index: i
-							};
-
-							this.#insertGroup(new_group, parent, level, host);
-						}
+						this.#insertGroup(new_group, parent, level, item);
 					}
 				}
 
@@ -349,14 +322,14 @@ class CHostNavigator {
 
 	/**
 	 * Insert new group into parent object according to current grouping level.
-	 * Add host into last level.
+	 * Add item into last level.
 	 *
 	 * @param {Object}      new_group  New group object.
 	 * @param {Object|null} parent     Parent object (group).
 	 * @param {number}      level      Current grouping level.
-	 * @param {Object}      host       Host object.
+	 * @param {Object}      item       Item object.
 	 */
-	#insertGroup(new_group, parent, level, host) {
+	#insertGroup(new_group, parent, level, item) {
 		const root = parent?.children || this.#nodes;
 		const same_group = root.find(group => group.name === new_group.name);
 
@@ -368,12 +341,12 @@ class CHostNavigator {
 		}
 
 		if (level === this.#config.group_by.length - 1) {
-			if (!new_group.children.some(child => child.hostid === host.hostid)) {
-				new_group.children.push(host);
+			if (!new_group.children.some(child => child.itemid === item.itemid)) {
+				new_group.children.push(item);
 			}
 		}
 		else {
-			this.#createGroup(host, ++level, new_group);
+			this.#createGroup(item, ++level, new_group);
 		}
 	}
 
@@ -383,21 +356,16 @@ class CHostNavigator {
 	 * @param {Array} groups  Array of groups to sort.
 	 */
 	#sortGroups(groups) {
-		if (groups[0].group_by.attribute === CHostNavigator.GROUP_BY_SEVERITY) {
-			groups.sort((a, b) => b.severity_index - a.severity_index);
-		}
-		else {
-			groups.sort((a, b) => {
-				if (a.is_uncategorized) {
-					return 1;
-				}
-				if (b.is_uncategorized) {
-					return -1;
-				}
+		groups.sort((a, b) => {
+			if (a.is_uncategorized) {
+				return 1;
+			}
+			if (b.is_uncategorized) {
+				return -1;
+			}
 
-				return a.name.localeCompare(b.name);
-			});
-		}
+			return a.name.localeCompare(b.name);
+		});
 
 		for (const group of groups) {
 			if (group.children?.length > 0 && group.level < this.#config.group_by.length - 1) {
@@ -407,61 +375,61 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Calculate problems for groups from each unique child host.
+	 * Calculate problems for groups from each unique child item.
 	 *
 	 * @param {Array}       nodes   Array of nodes.
 	 * @param {Object|null} parent  Group object to set problems to.
 	 *
-	 * @returns {Object}  Problem count of unique hosts in parent group.
+	 * @returns {Object}  Problem count of unique items in parent group.
 	 */
 	#calculateGroupsProblems(nodes, parent = null) {
-		let hosts_problems = {};
+		let items_problems = {};
 
 		for (const node of nodes) {
 			if (node.children?.length > 0) {
-				hosts_problems = {...hosts_problems, ...this.#calculateGroupsProblems(node.children, node)};
+				items_problems = {...items_problems, ...this.#calculateGroupsProblems(node.children, node)};
 			}
 			else {
-				hosts_problems[node.hostid] = node.problem_count;
+				items_problems[node.itemid] = node.problem_count;
 			}
 		}
 
 		if (parent !== null) {
-			for (const problem_count of Object.values(hosts_problems)) {
+			for (const problem_count of Object.values(items_problems)) {
 				for (let i = 0; i < problem_count.length; i++) {
 					parent.problem_count[i] += problem_count[i];
 				}
 			}
 		}
 
-		return hosts_problems;
+		return items_problems;
 	}
 
 	/**
-	 * Add element that informs about exceeding host limit to container.
+	 * Add element that informs about exceeding item limit to container.
 	 *
 	 * @param {number} limit
 	 */
 	#createLimit(limit) {
 		const element = document.createElement('div');
-		element.classList.add(CHostNavigator.ZBX_STYLE_LIMIT);
-		element.innerText = t('%1$d of %1$d+ hosts are shown').replaceAll('%1$d', limit.toString());
+		element.classList.add(CItemNavigator.ZBX_STYLE_LIMIT);
+		element.innerText = t('%1$d of %1$d+ items are shown').replaceAll('%1$d', limit.toString());
 
 		this.#container.appendChild(element);
 	}
 
 	/**
-	 * Register listeners of host navigator widget.
+	 * Register listeners of item navigator widget.
 	 */
 	#registerListeners() {
 		this.#listeners = {
-			hostSelect: e => {
-				if (e.detail.id !== this.#selected_host_id) {
-					this.#selected_host_id = e.detail.id;
+			itemSelect: e => {
+				if (e.detail.id !== this.#selected_item_id) {
+					this.#selected_item_id = e.detail.id;
 
-					this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
+					this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
 						detail: {
-							_hostid: e.detail.id
+							_itemid: e.detail.id
 						}
 					}));
 				}
@@ -495,7 +463,7 @@ class CHostNavigator {
 					}
 				}
 
-				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_GROUP_TOGGLE, {
+				this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_GROUP_TOGGLE, {
 					detail: {
 						group_identifier: e.detail.group_identifier,
 						is_open: e.detail.is_open
@@ -506,11 +474,11 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Activate listeners of host navigator widget.
+	 * Activate listeners of item navigator widget.
 	 */
 	#activateListeners() {
 		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_ITEM_SELECT,
-			this.#listeners.hostSelect
+			this.#listeners.itemSelect
 		);
 		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE,
 			this.#listeners.groupToggle
@@ -518,13 +486,12 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Empty the root container element of host navigator widget and other variables.
+	 * Empty the root container element of item navigator widget and other variables.
 	 */
 	#reset() {
 		this.#container.innerHTML = '';
 		this.#navigation_tree = null;
 		this.#nodes = [];
-		this.#maintenances = {};
 	}
 
 	#setNoDataMessage(message, description = null, icon = null) {

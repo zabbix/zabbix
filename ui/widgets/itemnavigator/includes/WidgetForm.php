@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\HostNavigator\Includes;
+namespace Widgets\ItemNavigator\Includes;
 
 use Zabbix\Widgets\{
 	CWidgetField,
@@ -27,24 +27,23 @@ use Zabbix\Widgets\{
 };
 
 use Zabbix\Widgets\Fields\{
-	CWidgetFieldCheckBox,
-	CWidgetFieldHostPatternSelect,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectHost,
 	CWidgetFieldMultiSelectOverrideHost,
+	CWidgetFieldPatternSelectItem,
 	CWidgetFieldRadioButtonList,
-	CWidgetFieldSeverities,
 	CWidgetFieldTags
 };
 
 /**
- * Host navigator widget form.
+ * Item navigator widget form.
  */
 class WidgetForm extends CWidgetForm {
 
-	public const HOST_STATUS_ANY = -1;
-	public const HOST_STATUS_ENABLED = 0;
-	public const HOST_STATUS_DISABLED = 1;
+	public const STATE_ALL = -1;
+	public const STATE_NORMAL = 0;
+	public const STATE_NOT_SUPPORTED = 1;
 
 	public const PROBLEMS_ALL = 0;
 	public const PROBLEMS_UNSUPPRESSED = 1;
@@ -62,15 +61,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: new CWidgetFieldHostPatternSelect('hosts', _('Host patterns'))
-			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: (new CWidgetFieldRadioButtonList('status', _('Host status'), [
-					self::HOST_STATUS_ANY => _('Any'),
-					self::HOST_STATUS_ENABLED => _('Enabled'),
-					self::HOST_STATUS_DISABLED => _('Disabled')
-				]))->setDefault(self::HOST_STATUS_ANY)
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField($this->isTemplateDashboard()
 				? null
@@ -84,12 +75,23 @@ class WidgetForm extends CWidgetForm {
 				: new CWidgetFieldTags('host_tags')
 			)
 			->addField(
-				new CWidgetFieldSeverities('severities', _('Severity'))
+				new CWidgetFieldPatternSelectItem('items', _('Item patterns'))
 			)
 			->addField(
-				new CWidgetFieldCheckBox('maintenance',
-					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
-				)
+				(new CWidgetFieldRadioButtonList('item_tags_evaltype', _('Item tags'), [
+					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
+					TAG_EVAL_TYPE_OR => _('Or')
+				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
+			)
+			->addField(
+				new CWidgetFieldTags('item_tags')
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('state', _('State'), [
+					self::STATE_ALL => _('All'),
+					self::STATE_NORMAL => _('Normal'),
+					self::STATE_NOT_SUPPORTED => _('Not supported')
+				]))->setDefault(self::STATE_ALL)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('problems', _('Show problems'), [
@@ -99,11 +101,10 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(self::PROBLEMS_UNSUPPRESSED)
 			)
 			->addField(
-				new CWidgetFieldHostGrouping('group_by', _('Group by'))
+				new CWidgetFieldItemGrouping('group_by', _('Group by'))
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: (new CWidgetFieldIntegerBox('show_lines', _('Host limit'), self::LINES_MIN, self::LINES_MAX))
+			->addField(
+				(new CWidgetFieldIntegerBox('show_lines', _('Item limit'), self::LINES_MIN, self::LINES_MAX))
 					->setDefault(self::LINES_DEFAULT)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
