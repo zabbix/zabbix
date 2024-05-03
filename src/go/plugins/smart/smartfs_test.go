@@ -28,9 +28,9 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"golang.zabbix.com/agent2/plugins/smart/mock"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/plugins/smart/mock"
 )
 
 func Test_runner_executeBase(t *testing.T) {

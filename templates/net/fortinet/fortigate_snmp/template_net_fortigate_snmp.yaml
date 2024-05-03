@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-13T13:19:26Z'
+  date: '2024-04-26T03:25:40Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -775,6 +775,7 @@ zabbix_export:
           type: CALCULATED
           key: 'vm.memory.available[fgSysMemFree.0]'
           history: 7d
+          units: B
           params: 'last(//vm.memory.total[fgSysMemCapacity.0])-last(//vm.memory.used[fgSysMemUsage.0])'
           description: 'Total memory available for utilization.'
           tags:
@@ -789,32 +790,37 @@ zabbix_export:
           units: B
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            Total memory allocated for the tasks.
+            Total physical memory (RAM) installed.
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1000'
           tags:
             - tag: component
               value: memory
         - uuid: 15fb0d4185f04b4fb8e2efc6d0ef514c
           name: 'FortiGate: Used memory'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.12356.101.4.1.4.0
+          type: CALCULATED
           key: 'vm.memory.used[fgSysMemUsage.0]'
           history: 7d
+          value_type: FLOAT
           units: B
+          params: '(last(//vm.memory.total[fgSysMemCapacity.0])*last(//vm.memory.util[memoryUsedPercentage.0]))/100'
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            Current memory utilization (percentage).
+            Physical memory (RAM) used calculated based on memory utilization percentage.
           tags:
             - tag: component
               value: memory
         - uuid: 29a7ec8007ef44b0b473f1c16be11059
           name: 'FortiGate: Memory utilization'
-          type: CALCULATED
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12356.101.4.1.4.0
           key: 'vm.memory.util[memoryUsedPercentage.0]'
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last(//vm.memory.used[fgSysMemUsage.0])/last(//vm.memory.total[fgSysMemCapacity.0])*100'
-          description: 'Memory utilization in %.'
+          description: 'Current memory utilization (percentage).'
           tags:
             - tag: component
               value: memory

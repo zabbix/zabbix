@@ -22,9 +22,9 @@ package serverlistener
 import (
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
 	"golang.zabbix.com/sdk/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
 )
 
 const notsupported = "ZBX_NOTSUPPORTED"

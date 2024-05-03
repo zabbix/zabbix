@@ -26,11 +26,11 @@ import (
 	"regexp"
 	"strconv"
 
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/watch"
 )
 
 var impl Plugin

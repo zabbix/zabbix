@@ -23,9 +23,9 @@ import (
 	"encoding/json"
 	"errors"
 
+	"golang.zabbix.com/agent2/pkg/wmi"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
-	"zabbix.com/pkg/wmi"
 )
 
 var impl Plugin
