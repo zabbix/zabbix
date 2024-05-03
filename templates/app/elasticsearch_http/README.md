@@ -6,8 +6,7 @@
 The template to monitor Elasticsearch by Zabbix that work without any external scripts.
 It works with both standalone and cluster instances.
 The metrics are collected in one pass remotely using an HTTP agent.
-They are getting values from REST API _cluster/health, _cluster/stats, _nodes/stats requests.
-
+They are getting values from REST API `_cluster/health`, `_cluster/stats`, `_nodes/stats` requests.
 
 ## Requirements
 
@@ -24,8 +23,11 @@ This template has been tested on:
 
 ## Setup
 
-You can set {$ELASTICSEARCH.USERNAME} and {$ELASTICSEARCH.PASSWORD} macros in the template for using on the host level.
-If you use an atypical location ES API, don't forget to change the macros {$ELASTICSEARCH.SCHEME},{$ELASTICSEARCH.PORT}.
+1. Set the hostname or IP address of the Elasticsearch host in the `{$ELASTICSEARCH.HOST}` macro.
+
+2. Set the login and password in the `{$ELASTICSEARCH.USERNAME}` and `{$ELASTICSEARCH.PASSWORD}` macros.
+
+3. If you use an atypical location of ES API, don't forget to change the macros `{$ELASTICSEARCH.SCHEME}`,`{$ELASTICSEARCH.PORT}`.
 
 ### Macros used
 
@@ -33,6 +35,7 @@ If you use an atypical location ES API, don't forget to change the macros {$ELAS
 |----|-----------|-------|
 |{$ELASTICSEARCH.USERNAME}|<p>The username of the Elasticsearch.</p>||
 |{$ELASTICSEARCH.PASSWORD}|<p>The password of the Elasticsearch.</p>||
+|{$ELASTICSEARCH.HOST}|<p>The hostname or IP address of the Elasticsearch host.</p>|`<SET ELASTICSEARCH HOST>`|
 |{$ELASTICSEARCH.PORT}|<p>The port of the Elasticsearch host.</p>|`9200`|
 |{$ELASTICSEARCH.SCHEME}|<p>The scheme of the Elasticsearch (http/https).</p>|`http`|
 |{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}|<p>The ES cluster maximum response time in seconds for trigger expression.</p>|`10s`|
@@ -47,8 +50,8 @@ If you use an atypical location ES API, don't forget to change the macros {$ELAS
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ES: Service status|<p>Checks if the service is running and accepting TCP connections.</p>|Simple check|net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|ES: Service response time|<p>Checks performance of the TCP service.</p>|Simple check|net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]|
+|ES: Service status|<p>Checks if the service is running and accepting TCP connections.</p>|Simple check|net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|ES: Service response time|<p>Checks performance of the TCP service.</p>|Simple check|net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]|
 |ES: Get cluster health|<p>Returns the health status of a cluster.</p>|HTTP agent|es.cluster.get_health|
 |ES: Cluster health status|<p>Health status of the cluster, based on the state of its primary and replica shards. Statuses are:</p><p>green</p><p>All shards are assigned.</p><p>yellow</p><p>All primary shards are assigned, but one or more replica shards are unassigned. If a node in the cluster fails, some data could be unavailable until that node is repaired.</p><p>red</p><p>One or more primary shards are unassigned, so some data is unavailable. This can occur briefly during cluster startup as primary shards are assigned.</p>|Dependent item|es.cluster.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |ES: Number of nodes|<p>The number of nodes within the cluster.</p>|Dependent item|es.cluster.number_of_nodes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.number_of_nodes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -75,8 +78,8 @@ If you use an atypical location ES API, don't forget to change the macros {$ELAS
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|ES: Service is down|<p>The service is unavailable or does not accept TCP connections.</p>|`last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0`|Average|**Manual close**: Yes|
-|ES: Service response time is too high|<p>The performance of the TCP service is very low.</p>|`min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>ES: Service is down</li></ul>|
+|ES: Service is down|<p>The service is unavailable or does not accept TCP connections.</p>|`last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"])=0`|Average|**Manual close**: Yes|
+|ES: Service response time is too high|<p>The performance of the TCP service is very low.</p>|`min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>ES: Service is down</li></ul>|
 |ES: Health is YELLOW|<p>All primary shards are assigned, but one or more replica shards are unassigned.<br>If a node in the cluster fails, some data could be unavailable until that node is repaired.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=1`|Average||
 |ES: Health is RED|<p>One or more primary shards are unassigned, so some data is unavailable.<br>This can occur briefly during cluster startup as primary shards are assigned.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=2`|High||
 |ES: Health is UNKNOWN|<p>The health status of the cluster is unknown or cannot be obtained.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=255`|High||

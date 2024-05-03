@@ -22,7 +22,9 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "zbxcommon.h"
 #include "zbxcacheconfig.h"
+#include "zbxthreads.h"
 
 typedef struct
 {

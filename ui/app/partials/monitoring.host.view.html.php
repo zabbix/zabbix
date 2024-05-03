@@ -27,22 +27,22 @@
 $form = (new CForm())
 	->setName('host_view');
 
-$table = (new CTableInfo());
-
 $view_url = $data['view_curl']->getUrl();
 
-$table->setHeader([
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
-	(new CColHeader(_('Interface'))),
-	(new CColHeader(_('Availability'))),
-	(new CColHeader(_('Tags'))),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url),
-	(new CColHeader(_('Latest data'))),
-	(new CColHeader(_('Problems'))),
-	(new CColHeader(_('Graphs'))),
-	(new CColHeader(_('Dashboards'))),
-	(new CColHeader(_('Web')))
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+		(new CColHeader(_('Interface'))),
+		(new CColHeader(_('Availability'))),
+		(new CColHeader(_('Tags'))),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url),
+		(new CColHeader(_('Latest data'))),
+		(new CColHeader(_('Problems'))),
+		(new CColHeader(_('Graphs'))),
+		(new CColHeader(_('Dashboards'))),
+		(new CColHeader(_('Web')))
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
@@ -164,6 +164,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 	]);
 }
 
-$form->addItem([$table,	$data['paging']]);
+$form->addItem($table);
 
 echo $form;

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['error']) {
@@ -94,12 +95,12 @@ if (!$data['filter_hostids']) {
 	$html_page->addItem((new CTableInfo())->setNoDataMessage(_('Specify host to see the graphs.')));
 }
 elseif ($data['charts']) {
-	$table = (new CTable())
-		->setAttribute('style', 'width: 100%;')
-		->setId('charts');
-	$html_page
-		->addItem($table)
-		->addItem($data['paging']);
+	$html_page->addItem([
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setId('charts'),
+		$data['paging']
+	]);
 }
 else {
 	$html_page->addItem(new CTableInfo());

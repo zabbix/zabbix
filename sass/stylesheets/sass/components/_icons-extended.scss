@@ -1,3 +1,9 @@
+%icon-large {
+	&::before {
+		font-size: $icon-large-size;
+	}
+}
+
 %icon-medium {
 	&::before {
 		font-size: $icon-medium-size;
@@ -93,6 +99,10 @@
 	@extend %icon-small;
 }
 
+.zi-filter-large {
+	@extend %icon-large;
+}
+
 .zi-help-small {
 	@extend .zi-help;
 	@extend %icon-small;
@@ -161,6 +171,10 @@
 .zi-remove-smaller {
 	@extend .zi-remove;
 	@extend %icon-smaller;
+}
+
+.zi-search-large {
+	@extend %icon-large;
 }
 
 .zi-tree-top-bottom-small {

@@ -232,6 +232,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_SCRIPT:
+		case ITEM_TYPE_BROWSER:
 		case ITEM_TYPE_HTTPAGENT:
 			db_string_from_json(&jp_item, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
 					sizeof(item.timeout_orig));
@@ -254,7 +255,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.ssl_key_password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
 
-	if (ITEM_TYPE_SCRIPT == item.type &&
+	if ((ITEM_TYPE_SCRIPT == item.type || ITEM_TYPE_BROWSER == item.type) &&
 			SUCCEED == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
 	{
 		item.script_params = zbx_dsprintf(NULL, "%.*s",
@@ -435,7 +436,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			case SUCCEED:
 				if (NULL == (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 				{
-					*info = zbx_strdup(NULL, "no value");
+					*info = zbx_strdup(NULL, "No value");
 				}
 				else
 				{

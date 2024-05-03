@@ -141,7 +141,7 @@ static const char	*get_operator_str(unsigned char op)
 	return op_str;
 }
 
-static void	get_mtags(zbx_mock_handle_t handle, zbx_vector_match_tags_t *tags)
+static void	get_mtags(zbx_mock_handle_t handle, zbx_vector_match_tags_ptr_t *tags)
 {
 	zbx_mock_error_t	mock_err;
 	zbx_mock_handle_t	htag;
@@ -155,13 +155,13 @@ static void	get_mtags(zbx_mock_handle_t handle, zbx_vector_match_tags_t *tags)
 		tag->tag = zbx_strdup(NULL, zbx_mock_get_object_member_string(htag, "tag"));
 		tag->value = zbx_strdup(NULL, zbx_mock_get_object_member_string(htag, "value"));
 
-		zbx_vector_match_tags_append(tags, tag);
+		zbx_vector_match_tags_ptr_append(tags, tag);
 	}
 
-	zbx_vector_match_tags_sort(tags, zbx_compare_match_tags);
+	zbx_vector_match_tags_ptr_sort(tags, zbx_compare_match_tags);
 }
 
-static void	get_etags(zbx_mock_handle_t handle, zbx_vector_tags_t *tags)
+static void	get_etags(zbx_mock_handle_t handle, zbx_vector_tags_ptr_t *tags)
 {
 	zbx_mock_error_t	mock_err;
 	zbx_mock_handle_t	htag;
@@ -174,14 +174,14 @@ static void	get_etags(zbx_mock_handle_t handle, zbx_vector_tags_t *tags)
 		tag->tag = zbx_strdup(NULL, zbx_mock_get_object_member_string(htag, "tag"));
 		tag->value = zbx_strdup(NULL, zbx_mock_get_object_member_string(htag, "value"));
 
-		zbx_vector_tags_append(tags, tag);
+		zbx_vector_tags_ptr_append(tags, tag);
 	}
 
-	zbx_vector_tags_sort(tags, zbx_compare_tags);
+	zbx_vector_tags_ptr_sort(tags, zbx_compare_tags);
 }
 
-static void	dump_debug_info(int eval_type, const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags,
-		int expected_ret, int returned_ret)
+static void	dump_debug_info(int eval_type, const zbx_vector_match_tags_ptr_t *mtags,
+		const zbx_vector_tags_ptr_t *etags, int expected_ret, int returned_ret)
 {
 	printf("\n");
 
@@ -211,15 +211,15 @@ static void	dump_debug_info(int eval_type, const zbx_vector_match_tags_t *mtags,
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			eval_type;
-	zbx_vector_match_tags_t	mtags;
-	zbx_vector_tags_t	etags;
-	int			expected_ret, returned_ret;
+	int				eval_type;
+	zbx_vector_match_tags_ptr_t	mtags;
+	zbx_vector_tags_ptr_t		etags;
+	int				expected_ret, returned_ret;
 
 	ZBX_UNUSED(state);
 
-	zbx_vector_match_tags_create(&mtags);
-	zbx_vector_tags_create(&etags);
+	zbx_vector_match_tags_ptr_create(&mtags);
+	zbx_vector_tags_ptr_create(&etags);
 
 	eval_type = get_eval_type(zbx_mock_get_parameter_string("in.eval_type"));
 	get_mtags(zbx_mock_get_parameter_handle("in.match_tags"), &mtags);
@@ -235,9 +235,9 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_int_eq("tagfilter_match_tags return value", expected_ret, returned_ret);
 
-	zbx_vector_match_tags_clear_ext(&mtags, zbx_match_tag_free);
-	zbx_vector_match_tags_destroy(&mtags);
+	zbx_vector_match_tags_ptr_clear_ext(&mtags, zbx_match_tag_free);
+	zbx_vector_match_tags_ptr_destroy(&mtags);
 
-	zbx_vector_tags_clear_ext(&etags, zbx_free_tag);
-	zbx_vector_tags_destroy(&etags);
+	zbx_vector_tags_ptr_clear_ext(&etags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&etags);
 }

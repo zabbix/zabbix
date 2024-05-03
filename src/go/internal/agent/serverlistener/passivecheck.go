@@ -24,10 +24,10 @@ import (
 	"fmt"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/pkg/version"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/sdk/log"
 )
 
 const notsupported = "ZBX_NOTSUPPORTED"
@@ -52,6 +52,7 @@ type passiveChecksErrorResponseData struct {
 
 type passiveChecksResponse struct {
 	Version string  `json:"version"`
+	Variant int     `json:"variant"`
 	Data    []any   `json:"data,omitempty"`
 	Error   *string `json:"error,omitempty"`
 }
@@ -91,7 +92,11 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 
 	if err != nil {
 		errString := err.Error()
-		response = passiveChecksResponse{Version: version.LongNoRC(), Error: &errString}
+		response = passiveChecksResponse{
+			Version: version.Long(),
+			Variant: agent.Variant,
+			Error:   &errString,
+		}
 	} else {
 		var value *string
 
@@ -103,12 +108,14 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 		if err != nil {
 			errString := err.Error()
 			response = passiveChecksResponse{
-				Version: version.LongNoRC(),
+				Version: version.Long(),
+				Variant: agent.Variant,
 				Data:    []any{passiveChecksErrorResponseData{Error: &errString}},
 			}
 		} else {
 			response = passiveChecksResponse{
-				Version: version.LongNoRC(),
+				Version: version.Long(),
+				Variant: agent.Variant,
 				Data:    []any{passiveChecksResponseData{Value: value}},
 			}
 		}

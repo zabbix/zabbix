@@ -234,74 +234,19 @@ class CHistoryManager {
 			$period = $period !== null ? min($period, $hk_history) : $hk_history;
 		}
 
-		if ($period !== null) {
-			$period = time() - $period;
-		}
+		$period_condition = $period === null ? '' : ' AND h.clock>'.(time() - $period);
 
-		$items_by_type = [];
+		foreach ($items as $item) {
+			$db_values = DBselect('SELECT *'.
+				' FROM '.self::getTableName($item['value_type']).' h'.
+				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+					$period_condition.
+				' ORDER BY h.clock DESC,h.ns DESC',
+				$limit
+			);
 
-		foreach ($items as $key => $item) {
-			$value_type = $item['value_type'];
-
-			if (!array_key_exists($value_type, $items_by_type)) {
-				$items_by_type[$value_type] = [];
-			}
-
-			$items_by_type[$value_type][] = $item;
-			unset($items[$key]);
-		}
-
-		if ($limit == 1) {
-			foreach ($items_by_type as $value_type => $items) {
-				$history_table = self::getTableName($value_type);
-
-				$max_clock_per_item = DBselect(
-					'SELECT h.itemid,MAX(h.clock) AS clock'.
-					' FROM '.$history_table.' h'.
-					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
-						($period !== null ? ' AND h.clock>'.$period : '').
-					' GROUP BY h.itemid'
-				);
-
-				while ($itemid_clock = DBfetch($max_clock_per_item, false)) {
-					$db_value = DBfetchArray(DBselect(
-						'SELECT *'.
-						' FROM '.$history_table.' h'.
-						' WHERE h.itemid='.zbx_dbstr($itemid_clock['itemid']).
-							' AND h.clock='.zbx_dbstr($itemid_clock['clock']).
-						' ORDER BY h.ns DESC',
-						$limit
-					));
-
-					if ($db_value) {
-						$results[$itemid_clock['itemid']] = $db_value;
-					}
-				}
-			}
-		}
-		else {
-			foreach ($items_by_type as $value_type => $items) {
-				$history_table = self::getTableName($value_type);
-
-				foreach ($items as $item) {
-					$db_values = DBselect('SELECT *'.
-						' FROM '.$history_table.' h'.
-						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-							($period !== null ? ' AND h.clock>'.$period : '').
-						' ORDER BY h.clock DESC,h.ns DESC',
-						$limit
-					);
-
-					$values = [];
-
-					while ($db_value = DBfetch($db_values, false)) {
-						$values[] = $db_value;
-					}
-
-					if ($values) {
-						$results[$item['itemid']] = $values;
-					}
-				}
+			while ($db_value = DBfetch($db_values, false)) {
+				$results[$db_value['itemid']][] = $db_value;
 			}
 		}
 

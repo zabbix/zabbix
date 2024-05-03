@@ -13,7 +13,8 @@ zabbix_export:
         
         Setup:
           1. Link template to the host.
-          2. Configure macros {$HPE.SYNERGY.API.USERNAME} and {$HPE.SYNERGY.API.PASSWORD}.
+          2. Set the hostname or IP address of the host in the {$HPE.SYNERGY.API.HOST} macro and configure the username and password in the {$HPE.SYNERGY.API.USERNAME} and {$HPE.SYNERGY.API.PASSWORD} macros.
+          3. Change the {$HPE.SYNERGY.API.SCHEME} and {$HPE.SYNERGY.API.PORT} macros if needed.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -243,7 +244,7 @@ zabbix_export:
           timeout: '{$HPE.SYNERGY.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.SYNERGY.API.SCHEME}://{HOST.CONN}:{$HPE.SYNERGY.API.PORT}'
+              value: '{$HPE.SYNERGY.API.SCHEME}://{$HPE.SYNERGY.API.HOST}:{$HPE.SYNERGY.API.PORT}'
             - name: password
               value: '{$HPE.SYNERGY.API.PASSWORD}'
             - name: username
@@ -319,7 +320,7 @@ zabbix_export:
               description: 'Zabbix has received errors from API.'
               dependencies:
                 - name: 'HPE Synergy: Service is unavailable'
-                  expression: 'max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"],5m)=0'
+                  expression: 'max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"],5m)=0'
               tags:
                 - tag: scope
                   value: availability
@@ -554,7 +555,7 @@ zabbix_export:
         - uuid: 86da94cecaa1424e9a22479d556d7b12
           name: 'HPE Synergy: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"]'
+          key: 'net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"]'
           history: 7d
           description: 'Checks if the service is running and accepting the TCP connections.'
           valuemap:
@@ -570,7 +571,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 165774c1ffab46899352a36dd32bb574
-              expression: 'max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"],5m)=0'
+              expression: 'max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"],5m)=0'
               name: 'HPE Synergy: Service is unavailable'
               priority: HIGH
               manual_close: 'YES'
@@ -7136,6 +7137,9 @@ zabbix_export:
         - tag: target
           value: synergy
       macros:
+        - macro: '{$HPE.SYNERGY.API.HOST}'
+          value: '<SET API HOST>'
+          description: 'The hostname or IP address of the API host.'
         - macro: '{$HPE.SYNERGY.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Specify password for API.'

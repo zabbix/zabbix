@@ -173,7 +173,8 @@ class testDashboardPieChartWidget extends testWidgets {
 				]
 			]
 		]);
-		self::$item_ids = $response['itemids'];
+		// Get itemids from host self::HOST_NAME_SCREENSHOTS as array item_key => item_value
+		self::$item_ids = array_slice(CDataHelper::getIds('key_'), 2);
 	}
 
 	/**
@@ -1023,24 +1024,20 @@ class testDashboardPieChartWidget extends testWidgets {
 	public function preparePieChartDisplayData() {
 		$providedData = $this->getProvidedData();
 		$data = reset($providedData);
-
-		// Delete item history in DB.
-		foreach ([1, 2, 3, 4] as $id) {
-			CDataHelper::removeItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':item-'.$id]);
-		}
+		CDataHelper::removeItemData(array_values(self::$item_ids));
 
 		// Minus 10 seconds for safety.
 		$time = time() - 10;
 
 		// Set item history.
 		foreach($data['item_data'] as $key => $value) {
-			CDataHelper::addItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$key], $value, $time);
+			CDataHelper::addItemData(self::$item_ids[$key], $value, $time);
 		}
 
 		// Fill in Item ids (this only applies to Item list data sets).
 		foreach ($data['widget_fields'] as $id => $field) {
 			if (preg_match('/^ds\.[0-9]\.itemids\.[0-9]$/', $field['name'])) {
-				$field['value'] = self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$field['value']];
+				$field['value'] = self::$item_ids[$field['value']];
 				$data['widget_fields'][$id] = $field;
 			}
 		}
