@@ -105,7 +105,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		if (CWebUser::$data['userdirectoryid'] == 0 && CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$user['medias'] = $this->getInputUserMedia();
 		}
 
