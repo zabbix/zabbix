@@ -275,7 +275,9 @@
 
 						widget._startUpdating();
 						widget.feedback({time_period});
-						widget.broadcast({_timeperiod: time_period});
+						widget.broadcast({
+							[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+						});
 					});
 			}
 		}
@@ -768,7 +770,9 @@
 
 								widget._startUpdating();
 								widget.feedback({time_period});
-								widget.broadcast({_timeperiod: time_period});
+								widget.broadcast({
+									[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+								});
 							});
 
 						return false;

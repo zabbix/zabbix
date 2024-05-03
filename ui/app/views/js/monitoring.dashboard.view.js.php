@@ -104,15 +104,23 @@
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
 
+			const time_period = {
+				from: dashboard_time_period.from,
+				from_ts: dashboard_time_period.from_ts,
+				to: dashboard_time_period.to,
+				to_ts: dashboard_time_period.to_ts
+			};
+
+			CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+
 			ZABBIX.Dashboard.broadcast({
-				_hostid: dashboard_host !== null ? dashboard_host.id : null,
-				_hostids: dashboard_host !== null ? [dashboard_host.id] : null,
-				_timeperiod: {
-					from: dashboard_time_period.from,
-					from_ts: dashboard_time_period.from_ts,
-					to: dashboard_time_period.to,
-					to_ts: dashboard_time_period.to_ts
-				}
+				[CWidgetsData.DATA_TYPE_HOST_ID]: dashboard_host !== null
+					? [dashboard_host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+				[CWidgetsData.DATA_TYPE_HOST_IDS]: dashboard_host !== null
+					? [dashboard_host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 
 			ZABBIX.Dashboard.activate();
@@ -423,8 +431,12 @@
 				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
 				ZABBIX.Dashboard.broadcast({
-					_hostid: host !== null ? host.id : null,
-					_hostids: host !== null ? [host.id] : null
+					[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS)
 				});
 			},
 
@@ -451,8 +463,12 @@
 				history.pushState({host: host}, '', curl.getUrl());
 
 				ZABBIX.Dashboard.broadcast({
-					_hostid: host !== null ? host.id : null,
-					_hostids: host !== null ? [host.id] : null
+					[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS)
 				});
 
 				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
@@ -502,13 +518,17 @@
 					return;
 				}
 
+				const time_period = {
+					from: data.from,
+					from_ts: data.from_ts,
+					to: data.to,
+					to_ts: data.to_ts
+				};
+
+				CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+
 				ZABBIX.Dashboard.broadcast({
-					_timeperiod: {
-						from: data.from,
-						from_ts: data.from_ts,
-						to: data.to,
-						to_ts: data.to_ts
-					}
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 				});
 			},
 

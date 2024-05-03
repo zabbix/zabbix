@@ -59,7 +59,9 @@ class CWidgetSvgGraph extends CWidget {
 		const time_period = this.getFieldsData().time_period;
 
 		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: time_period});
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+			});
 		}
 
 		return super.promiseUpdate();

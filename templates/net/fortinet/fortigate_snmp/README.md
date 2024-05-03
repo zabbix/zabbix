@@ -93,10 +93,10 @@ Refer to the vendor documentation.
 |FortiGate: SNMP walk wireless AP|<p>Used for discovering wireless access points from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|wireless.ap.walk|
 |FortiGate: SNMP walk hardware sensors|<p>Used for discovering hardware sensors from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|hw.sensor.walk|
 |FortiGate: SNMP walk virtual domain|<p>Used for discovering virtual domains from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|vdom.walk|
-|FortiGate: Total memory|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Total memory allocated for the tasks.</p>|SNMP agent|vm.memory.total[fgSysMemCapacity.0]|
-|FortiGate: Used memory|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Current memory utilization (percentage).</p>|SNMP agent|vm.memory.used[fgSysMemUsage.0]|
+|FortiGate: Total memory|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Total physical memory (RAM) installed.</p>|SNMP agent|vm.memory.total[fgSysMemCapacity.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li></ul>|
+|FortiGate: Memory utilization|<p>Current memory utilization (percentage).</p>|SNMP agent|vm.memory.util[memoryUsedPercentage.0]|
+|FortiGate: Used memory|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Physical memory (RAM) used calculated based on memory utilization percentage.</p>|Calculated|vm.memory.used[fgSysMemUsage.0]|
 |FortiGate: Available memory|<p>Total memory available for utilization.</p>|Calculated|vm.memory.available[fgSysMemFree.0]|
-|FortiGate: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util[memoryUsedPercentage.0]|
 |FortiGate: IPv4 Active sessions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of active sessions on the device.</p>|SNMP agent|net.ipv4.sessions[fgSysSesCount.0]|
 |FortiGate: SNMP traps (fallback)|<p>Used for collecting all SNMP traps unmatched by other `snmptrap` items.</p>|SNMP trap|snmptrap.fallback|
 |FortiGate: Total disk space|<p>Total hard disk capacity.</p>|SNMP agent|vfs.fs.total[fgSysDiskCapacity.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|

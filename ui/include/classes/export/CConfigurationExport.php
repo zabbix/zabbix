@@ -435,8 +435,8 @@ class CConfigurationExport {
 	protected function gatherHosts(array $hostIds) {
 		$hosts = API::Host()->get([
 			'output' => [
-				'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
-				'name', 'description', 'inventory_mode'
+				'host', 'name', 'monitored_by', 'proxyid', 'proxy_groupid', 'description', 'status', 'ipmi_authtype',
+				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'inventory_mode'
 			],
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
@@ -461,6 +461,7 @@ class CConfigurationExport {
 
 		if ($hosts) {
 			$hosts = $this->gatherProxies($hosts);
+			$hosts = $this->gatherProxyGroups($hosts);
 			$hosts = $this->gatherItems($hosts);
 			$hosts = $this->gatherDiscoveryRules($hosts);
 			$hosts = $this->gatherHttpTests($hosts);
@@ -650,6 +651,42 @@ class CConfigurationExport {
 		foreach ($hosts as &$host) {
 			$host['proxy'] = ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $db_proxies))
 				? ['name' => $db_proxies[$host['proxyid']]['name']]
+				: [];
+		}
+		unset($host);
+
+		return $hosts;
+	}
+
+	/**
+	 * Get proxy groups from database.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	protected function gatherProxyGroups(array $hosts): array {
+		$proxy_groupids = [];
+
+		foreach ($hosts as $host) {
+			if ($host['proxy_groupid'] != 0) {
+				$proxy_groupids[$host['proxy_groupid']] = true;
+			}
+		}
+
+		$db_proxy_groups = $proxy_groupids
+			? DBfetchArray(DBselect(
+				'SELECT pg.proxy_groupid,pg.name'.
+				' FROM proxy_group pg'.
+				' WHERE '.dbConditionId('pg.proxy_groupid', array_keys($proxy_groupids))
+			))
+			: [];
+		$db_proxy_groups = array_column($db_proxy_groups, null, 'proxy_groupid');
+
+		foreach ($hosts as &$host) {
+			$host['proxy_group'] = $host['proxy_groupid'] != 0
+					&& array_key_exists($host['proxy_groupid'], $db_proxy_groups)
+				? ['name' => $db_proxy_groups[$host['proxy_groupid']]['name']]
 				: [];
 		}
 		unset($host);

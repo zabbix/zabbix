@@ -104,19 +104,55 @@ $host_tab->addRow(
 		->setMaxlength(DB::getFieldLength('hosts', 'description'))
 );
 
-// append proxy to form list
-$proxy_select = (new CSelect('proxyid'))
-	->setId('proxyid')
-	->setValue(0)
-	->addOption(new CSelectOption(0, _('(no proxy)')));
-
-foreach ($data['proxies'] as $proxy) {
-	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['name']));
-}
-
+// Append "Monitored by" to form list.
 $host_tab->addRow(
-	(new CVisibilityBox('visible[proxyid]', 'proxyid', _('Original')))->setLabel(_('Monitored by proxy')),
-	$proxy_select
+	(new CVisibilityBox('visible[monitored_by]', 'monitored-by-field', _('Original')))->setLabel(_('Monitored by')),
+	(new CDiv([
+		(new CRadioButtonList('monitored_by', ZBX_MONITORED_BY_SERVER))
+			->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
+			->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
+			->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
+			->setModern(),
+		(new CDiv(
+			(new CMultiSelect([
+				'name' => 'proxyid',
+				'object_name' => 'proxies',
+				'multiple' => false,
+				'data' => [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxies',
+						'srcfld1' => 'proxyid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxyid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->addClass('js-field-proxy')
+			->addStyle('margin-top: 5px;'),
+		(new CDiv(
+			(new CMultiSelect([
+				'name' => 'proxy_groupid',
+				'object_name' => 'proxy_groups',
+				'multiple' => false,
+				'data' => [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxy_groups',
+						'srcfld1' => 'proxy_groupid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxy_groupid'
+					]
+				]
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))
+			->addClass('js-field-proxy-group')
+			->addStyle('margin-top: 5px;')
+	]))->setId('monitored-by-field')
 );
 
 // append status to form list

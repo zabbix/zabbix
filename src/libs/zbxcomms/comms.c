@@ -387,6 +387,33 @@ static void	zbx_socket_free(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: detach receive buffer                                             *
+ *                                                                            *
+ * Return value: Detached dynamic buffer or copy of static buffer.            *
+ *                                                                            *
+ * Comments: The socket buffer is reset.                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_socket_detach_buffer(zbx_socket_t *s)
+{
+	char	*out;
+
+	if (ZBX_BUF_TYPE_DYN == s->buf_type)
+	{
+		out = s->buffer;
+		s->buf_type = ZBX_BUF_TYPE_STAT;
+		s->buffer = s->buf_stat;
+	}
+	else
+		out = zbx_strdup(NULL, s->buf_stat);
+
+	*s->buffer = '\0';
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create socket poll error message                                  *
  *                                                                            *
  ******************************************************************************/

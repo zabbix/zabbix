@@ -22,7 +22,6 @@ class CHostNavigator {
 
 	static ZBX_STYLE_CLASS =		'host-navigator';
 	static ZBX_STYLE_LIMIT =		'host-navigator-limit';
-	static ZBX_STYLE_NO_DATA =		'host-navigator-no-data';
 
 	static GROUP_BY_HOST_GROUP = 0;
 	static GROUP_BY_TAG_VALUE = 1;
@@ -104,46 +103,38 @@ class CHostNavigator {
 			this.#reset();
 		}
 
-		if (hosts.length > 0) {
-			this.#maintenances = maintenances;
+		this.#maintenances = maintenances;
 
-			this.#prepareNodesStructure(hosts);
-			this.#prepareNodesProperties(this.#nodes);
+		this.#prepareNodesStructure(hosts);
+		this.#prepareNodesProperties(this.#nodes);
 
-			this.#navigation_tree = new CNavigationTree(this.#nodes, {
-				selected_id: this.#selected_host_id,
-				show_problems: this.#config.show_problems,
-				severity_names: this.#config.severity_names
-			});
+		this.#navigation_tree = new CNavigationTree(this.#nodes, {
+			selected_id: this.#selected_host_id,
+			show_problems: this.#config.show_problems,
+			severity_names: this.#config.severity_names
+		});
 
-			this.#container.appendChild(this.#navigation_tree.getContainer());
+		this.#container.classList.remove(ZBX_STYLE_NO_DATA);
+		this.#container.appendChild(this.#navigation_tree.getContainer());
 
-			if (is_limit_exceeded) {
-				this.#createLimit(hosts.length);
-			}
-
-			this.#activateEvents();
-
-			const first_selected_host = this.#container.querySelector(
-				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
-			);
-
-			if (this.#selected_host_id !== '' && first_selected_host === null) {
-				this.#selected_host_id = '';
-
-				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
-					detail: {
-						_hostid: null
-					}
-				}));
-			}
+		if (is_limit_exceeded) {
+			this.#createLimit(hosts.length);
 		}
-		else {
-			const no_data = document.createElement('div');
-			no_data.classList.add(CHostNavigator.ZBX_STYLE_NO_DATA);
-			no_data.innerText = t('No data found.');
 
-			this.#container.appendChild(no_data);
+		this.#activateEvents();
+
+		const first_selected_host = this.#container.querySelector(
+			`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
+		);
+
+		if (this.#selected_host_id !== '' && first_selected_host === null) {
+			this.#selected_host_id = '';
+
+			this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
+				detail: {
+					hostid: null
+				}
+			}));
 		}
 	}
 
@@ -462,7 +453,7 @@ class CHostNavigator {
 
 					this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
 						detail: {
-							_hostid: e.detail.id
+							hostid: e.detail.id
 						}
 					}));
 				}

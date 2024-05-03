@@ -44,8 +44,8 @@ $table = (new CTableInfo())
 			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 		)
 	)
-
-	->removeId();
+	->removeId()
+	->setNoDataMessage(_('No data found'));
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
@@ -186,7 +186,10 @@ foreach ($data['hosts'] as $hostid => $host) {
 $sections[] = (new CSectionCollapsible($table))
 	->setId(SECTION_SEARCH_HOSTS)
 	->setHeader(new CTag('h4', true, _('Hosts')))
-	->setFooter(_s('Displaying %1$s of %2$s found', count($data['hosts']), $data['total_hosts_cnt']))
+	->setFooter($data['total_hosts_cnt'] != 0
+		? _s('Displaying %1$s of %2$s found', count($data['hosts']), $data['total_hosts_cnt'])
+		: null
+	)
 	->setProfileIdx('web.search.hats.'.SECTION_SEARCH_HOSTS.'.state')
 	->setExpanded((bool) CProfile::get('web.search.hats.'.SECTION_SEARCH_HOSTS.'.state', true));
 
@@ -202,7 +205,8 @@ $table = (new CTableInfo())
 				? (new CColHeader(_('Configuration')))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 				: null
 		)
-	);
+	)
+	->setNoDataMessage(_('No data found'));
 
 foreach ($data['host_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
@@ -266,7 +270,10 @@ foreach ($data['host_groups'] as $groupid => $group) {
 $sections[] = (new CSectionCollapsible($table))
 	->setId(SECTION_SEARCH_HOSTGROUP)
 	->setHeader(new CTag('h4', true, _('Host groups')))
-	->setFooter(_s('Displaying %1$s of %2$s found', count($data['host_groups']), $data['total_host_groups_cnt']))
+	->setFooter($data['total_host_groups_cnt'] != 0
+		? _s('Displaying %1$s of %2$s found', count($data['host_groups']), $data['total_host_groups_cnt'])
+		: null
+	)
 	->setProfileIdx('web.search.hats.'.SECTION_SEARCH_HOSTGROUP.'.state')
 	->setExpanded((bool) CProfile::get('web.search.hats.'.SECTION_SEARCH_HOSTGROUP.'.state', true));
 
@@ -278,7 +285,8 @@ if ($data['admin']) {
 				->setColSpan($data['templates'] ? 6 : 1)
 				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 			)
-		);
+		)
+		->setNoDataMessage(_('No data found'));
 
 	foreach ($data['templates'] as $templateid => $template) {
 		$visible_name = make_decoration($template['name'], $data['search']);
@@ -366,7 +374,10 @@ if ($data['admin']) {
 	$sections[] = (new CSectionCollapsible($table))
 		->setId(SECTION_SEARCH_TEMPLATES)
 		->setHeader(new CTag('h4', true, _('Templates')))
-		->setFooter(_s('Displaying %1$s of %2$s found', count($data['templates']), $data['total_templates_cnt']))
+		->setFooter($data['total_templates_cnt'] != 0
+			? _s('Displaying %1$s of %2$s found', count($data['templates']), $data['total_templates_cnt'])
+			: null
+		)
 		->setProfileIdx('web.search.hats.'.SECTION_SEARCH_TEMPLATES.'.state')
 		->setExpanded((bool) CProfile::get('web.search.hats.'.SECTION_SEARCH_TEMPLATES.'.state', true));
 }
@@ -379,7 +390,8 @@ $table = (new CTableInfo())
 				? (new CColHeader(_('Configuration')))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 				: null
 		)
-	);
+	)
+	->setNoDataMessage(_('No data found'));
 
 foreach ($data['template_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
@@ -411,8 +423,9 @@ foreach ($data['template_groups'] as $groupid => $group) {
 $sections[] = (new CSectionCollapsible($table))
 	->setId(SECTION_SEARCH_TEMPLATEGROUP)
 	->setHeader(new CTag('h4', true, _('Template groups')))
-	->setFooter(
-		_s('Displaying %1$s of %2$s found', count($data['template_groups']), $data['total_template_groups_cnt'])
+	->setFooter($data['total_template_groups_cnt'] != 0
+		? _s('Displaying %1$s of %2$s found', count($data['template_groups']), $data['total_template_groups_cnt'])
+		: null
 	)
 	->setProfileIdx('web.search.hats.'.SECTION_SEARCH_TEMPLATEGROUP.'.state')
 	->setExpanded((bool) CProfile::get('web.search.hats.'.SECTION_SEARCH_TEMPLATEGROUP.'.state', true));

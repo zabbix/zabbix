@@ -28,7 +28,6 @@ abstract class CWidgetField {
 
 	public const DEFAULT_VIEW = null;
 
-	public const FLAG_ACKNOWLEDGES = 0x01;
 	public const FLAG_NOT_EMPTY = 0x02;
 	public const FLAG_LABEL_ASTERISK = 0x04;
 	public const FLAG_DISABLED = 0x08;
@@ -91,6 +90,21 @@ abstract class CWidgetField {
 		$this->label_prefix = $prefix;
 
 		return $this;
+	}
+
+	/**
+	 * Get fully qualified label for displaying in error messages.
+	 *
+	 * @return string
+	 */
+	public function getErrorLabel(): string {
+		$label = $this->label ?? $this->name;
+
+		if ($this->label_prefix !== null) {
+			$label = $this->label_prefix.': '.$label;
+		}
+
+		return $label;
 	}
 
 	/**
@@ -266,14 +280,8 @@ abstract class CWidgetField {
 		$errors = [];
 
 		$validation_rules = $this->getValidationRules($strict);
-
-		$label = $this->label ?? $this->name;
-
-		if ($this->label_prefix !== null) {
-			$label = $this->label_prefix.': '.$label;
-		}
-
 		$value = $this->getValue();
+		$label = $this->getErrorLabel();
 
 		if (CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
 			$this->setValue($value);

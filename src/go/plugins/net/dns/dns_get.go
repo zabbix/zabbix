@@ -23,11 +23,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"github.com/miekg/dns"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/miekg/dns"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (

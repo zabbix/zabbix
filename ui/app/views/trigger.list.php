@@ -208,25 +208,27 @@ $triggers_form = (new CForm('post', $url))
 	->addVar('context', $data['context'], 'form_context');
 
 // create table
-$triggers_table = (new CTableInfo())->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_triggers'))
-			->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
-	$data['show_value_column'] ? _('Value') : null,
-	($data['single_selected_hostid'] == 0)
-		? ($data['context'] === 'host')
-			? _('Host')
-			: _('Template')
-		: null,
-	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
-	_('Operational data'),
-	_('Expression'),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-	$data['show_info_column'] ? _('Info') : null,
-	_('Tags')
-]);
+$triggers_table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_triggers'))
+				->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
+		$data['show_value_column'] ? _('Value') : null,
+		($data['single_selected_hostid'] == 0)
+			? ($data['context'] === 'host')
+				? _('Host')
+				: _('Template')
+			: null,
+		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
+		_('Operational data'),
+		_('Expression'),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		$data['show_info_column'] ? _('Info') : null,
+		_('Tags')
+	])
+	->setPageNavigation($data['paging']);
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
@@ -365,7 +367,6 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 // append table to form
 $triggers_form->addItem([
 	$triggers_table,
-	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.massenable' => [

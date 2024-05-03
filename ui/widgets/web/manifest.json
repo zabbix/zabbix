@@ -9,6 +9,14 @@
 	"description": "Displays the status summary of the active web monitoring scenarios.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring",
 	"widget": {
+		"in": {
+			"hostids": {
+				"type": "_hostids"
+			},
+			"groupids": {
+				"type": "_hostgroupids"
+			}
+		},
 		"size": {
 			"width": 6,
 			"height": 3

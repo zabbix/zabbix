@@ -185,12 +185,14 @@ $right_column = (new CFormGrid())
 	])
 	->addItem([
 		new CLabel(_('State'), 'state_#{uniqid}'),
-		(new CRadioButtonList('state', (int) $data['state']))
-			->addValue(_('All'), -1, 'state_all#{uniqid}')
-			->addValue(_('Normal'), ITEM_STATE_NORMAL, 'state_'.ITEM_STATE_NORMAL.'#{uniqid}')
-			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED, 'state_'.ITEM_STATE_NOTSUPPORTED.'#{uniqid}')
-			->setModern()
-			->setId('state_#{uniqid}')
+		new CFormField(
+			(new CRadioButtonList('state', (int) $data['state']))
+				->addValue(_('All'), -1, 'state_all#{uniqid}')
+				->addValue(_('Normal'), ITEM_STATE_NORMAL, 'state_'.ITEM_STATE_NORMAL.'#{uniqid}')
+				->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED, 'state_'.ITEM_STATE_NOTSUPPORTED.'#{uniqid}')
+				->setModern()
+				->setId('state_#{uniqid}')
+		)
 	])
 	->addItem([
 		new CLabel(_('Show details'), 'show_details'),
