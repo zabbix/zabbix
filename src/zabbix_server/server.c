@@ -355,7 +355,7 @@ static char	*config_ssl_key_location = NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
-static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
+static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 static zbx_config_dbhigh_t	*zbx_config_dbhigh = NULL;
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
@@ -974,6 +974,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"VaultTLSKeyFile",		&(zbx_config_vault.tls_key_file),	ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"VaultURL",			&(zbx_config_vault.url),		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultPrefix",			&(zbx_config_vault.prefix),		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"VaultDBPath",			&(zbx_config_vault.db_path),		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
