@@ -1,1 +1,1 @@
-A......... [ZBX-20871] fixed support for macro functions in prometheus pattern and labels used in preprocessing (jfreibergs)
+A......... [ZBX-20871] fixed inability to use LLD macro functions in Prometheus pattern and labels used in item prototype preprocessing (jfreibergs)
