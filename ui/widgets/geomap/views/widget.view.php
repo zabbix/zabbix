@@ -26,7 +26,6 @@
  * @var array $data
  */
 
-
 (new CWidgetView($data))
 	->addItem(
 		(new CDiv())->setId($data['unique_id'])
