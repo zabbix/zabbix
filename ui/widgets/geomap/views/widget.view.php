@@ -27,15 +27,9 @@
  */
 
 
-$css = '';
-foreach (getGeomapColors() as $variable => $value) {
-	$css .= $variable.': '.$value.';';
-}
-
 (new CWidgetView($data))
 	->addItem(
 		(new CDiv())->setId($data['unique_id'])
 	)
 	->setVar('geomap', array_intersect_key($data, array_flip(['config', 'hosts', 'selected_hostid'])))
-	->addItem('<style>:root {'.$css.'}</style>')
 	->show();

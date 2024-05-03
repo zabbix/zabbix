@@ -20,7 +20,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.widget.js"],
-		"css": ["geomap.css"]
+		"js": ["class.widget.js"]
 	}
 }

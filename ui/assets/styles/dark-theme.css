@@ -4180,6 +4180,66 @@ div.dashboard-widget-gauge {
     div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
       display: block; }
 
+:root {
+  --geomap-highlight-border: #383838;
+  --geomap-highlight-fill: #4a4a4a; }
+
+div.dashboard-widget-geomap .geomap-filter {
+  position: absolute;
+  right: 0;
+  display: none;
+  padding: 5px 20px 5px 10px;
+  margin-top: 5px;
+  margin-right: -2px;
+  background-color: #2b2b2b;
+  border: 1px solid #383838; }
+  div.dashboard-widget-geomap .geomap-filter.collapsed {
+    display: block; }
+  div.dashboard-widget-geomap .geomap-filter li {
+    width: calc(100% + 20px); }
+  div.dashboard-widget-geomap .geomap-filter label {
+    white-space: nowrap; }
+div.dashboard-widget-geomap .marker-cluster {
+  background: none; }
+  div.dashboard-widget-geomap .marker-cluster > .cluster-outer-shape {
+    padding: 10px; }
+  div.dashboard-widget-geomap .marker-cluster:hover > .cluster-outer-shape, div.dashboard-widget-geomap .marker-cluster.selected > .cluster-outer-shape {
+    border-radius: 50%;
+    height: 30px;
+    width: 30px; }
+  div.dashboard-widget-geomap .marker-cluster:hover > .cluster-outer-shape {
+    outline: 2px solid #4a4a4a !important;
+    background: #4a4a4a; }
+  div.dashboard-widget-geomap .marker-cluster.selected > .cluster-outer-shape {
+    outline: 2px solid #383838;
+    background: #4a4a4a; }
+  div.dashboard-widget-geomap .marker-cluster div {
+    text-align: center;
+    border-radius: 50%;
+    height: 30px;
+    width: 30px; }
+  div.dashboard-widget-geomap .marker-cluster span {
+    line-height: 30px; }
+div.dashboard-widget-geomap .leaflet-marker-icon:focus {
+  box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
+  border-radius: 2px;
+  outline: none; }
+div.dashboard-widget-geomap .leaflet-control .navigate-home-button,
+div.dashboard-widget-geomap .leaflet-control .geomap-filter-button {
+  cursor: pointer; }
+  div.dashboard-widget-geomap .leaflet-control .navigate-home-button::before,
+  div.dashboard-widget-geomap .leaflet-control .geomap-filter-button::before {
+    vertical-align: middle; }
+div.dashboard-widget-geomap .leaflet-control.disabled {
+  background-color: #ffffff;
+  opacity: 1; }
+  div.dashboard-widget-geomap .leaflet-control.disabled .geomap-filter-button {
+    cursor: default;
+    opacity: .4; }
+div.dashboard-widget-geomap .leaflet-container {
+  height: 100%;
+  z-index: 1; }
+
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
   display: grid;
   grid-template-columns: minmax(85px, max-content) 1fr max-content minmax(110px, max-content);
@@ -7392,71 +7452,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   justify-content: space-between; }
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
-
-.geomap-filter {
-  position: absolute;
-  right: 0;
-  display: none;
-  padding: 5px 20px 5px 10px;
-  margin-top: 5px;
-  margin-right: -2px;
-  background-color: #2b2b2b;
-  border: 1px solid #383838; }
-
-.geomap-filter.collapsed {
-  display: block; }
-
-.geomap-filter li {
-  width: calc(100% + 20px); }
-
-.geomap-filter label {
-  white-space: nowrap; }
-
-.marker-cluster {
-  background: none; }
-  .marker-cluster > .cluster-outer-shape {
-    padding: 10px; }
-  .marker-cluster:hover > .cluster-outer-shape, .marker-cluster.selected > .cluster-outer-shape {
-    border-radius: 50%;
-    height: 30px;
-    width: 30px; }
-  .marker-cluster:hover > .cluster-outer-shape {
-    outline: 2px solid var(--geomap-highlight-fill) !important;
-    background: var(--geomap-highlight-fill); }
-  .marker-cluster.selected > .cluster-outer-shape {
-    outline: 2px solid var(--geomap-highlight-border);
-    background: var(--geomap-highlight-fill); }
-
-.marker-cluster div {
-  text-align: center;
-  border-radius: 50%;
-  height: 30px;
-  width: 30px; }
-
-.leaflet-marker-icon:focus {
-  box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
-  border-radius: 2px;
-  outline: none; }
-
-.marker-cluster span {
-  line-height: 30px; }
-
-.leaflet-control .navigate-home-button,
-.leaflet-control .geomap-filter-button {
-  cursor: pointer; }
-  .leaflet-control .navigate-home-button::before,
-  .leaflet-control .geomap-filter-button::before {
-    vertical-align: middle; }
-.leaflet-control.disabled {
-  background-color: #ffffff;
-  opacity: 1; }
-  .leaflet-control.disabled .geomap-filter-button {
-    cursor: default;
-    opacity: .4; }
-
-.leaflet-container {
-  height: 100%;
-  z-index: 1; }
 
 .color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus) {
   color: #f24f1d; }

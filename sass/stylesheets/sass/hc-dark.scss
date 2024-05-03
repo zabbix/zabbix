@@ -237,6 +237,10 @@ $arrow-fill-up: #FFFFFF;
 $arrow-fill-down: #FFFFFF;
 $arrow-fill-up-down: #FFFFFF;
 
+// Geomap.
+$geomap-highlight-fill: #e8e9ed;
+$geomap-highlight-border: #e8e9ed;
+
 // Important! @import string should come after variables.
 @import 'screen.scss';
 

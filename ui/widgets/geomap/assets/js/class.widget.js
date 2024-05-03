@@ -500,7 +500,7 @@ class CWidgetGeoMap extends CWidget {
 		};
 
 		const html = `
-			<table class="list-table geomap-hosts-table">
+			<table class="list-table">
 			<thead>
 			<tr>
 				<th>${t('Host')}</th>

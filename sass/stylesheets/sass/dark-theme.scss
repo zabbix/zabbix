@@ -173,6 +173,9 @@ $compact-view-tag-bg-color: $ui-bg-selected-color;
 $toc-title-color: #f2f2f2;
 $toc-title-bg-color: #4f4f4f;
 
+// Geomap.
+$geomap-highlight-fill: #4a4a4a;
+$geomap-highlight-border: #383838;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
