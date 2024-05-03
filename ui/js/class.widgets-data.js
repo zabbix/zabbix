@@ -88,6 +88,7 @@ class CWidgetsData {
 		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_ID, {value: [], is_comparable: true});
 		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_IDS, {value: [], is_comparable: true});
 		this.#defaults.set(CWidgetsData.DATA_TYPE_ITEM_ID, {value: [], is_comparable: true});
+		this.#defaults.set(CWidgetsData.DATA_TYPE_ITEM_IDS, {value: [], is_comparable: true});
 		this.#defaults.set(CWidgetsData.DATA_TYPE_ITEM_PROTOTYPE_ID, {value: [], is_comparable: true});
 		this.#defaults.set(CWidgetsData.DATA_TYPE_GRAPH_ID, {value: [], is_comparable: true});
 		this.#defaults.set(CWidgetsData.DATA_TYPE_GRAPH_PROTOTYPE_ID, {value: [], is_comparable: true});
