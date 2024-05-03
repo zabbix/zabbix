@@ -18,16 +18,6 @@ zabbix_export:
         Use node_exporter v0.18.0 or above.
 
         2. Set the hostname or IP address of the node_exporter host in the '{$NODE_EXPORTER_HOST}' macro. You can also change the Prometheus endpoint port in the '{$NODE_EXPORTER_PORT}' macro if necessary.
-        This template collects Linux metrics from node_exporter 0.18 and above. Support for older node_exporter versions is provided as 'best effort'.
-
-        Setup:
-
-        1. Set up the node_exporter according to the official documentation:
-        https://prometheus.io/docs/guides/node-exporter/
-
-        Use node_exporter v0.18.0 or above.
-
-        2. Set the hostname or IP address of the node_exporter host in the '{$NODE_EXPORTER_HOST}' macro. You can also change the Prometheus endpoint port in the '{$NODE_EXPORTER_PORT}' macro if necessary.
 
         Known Issues:
 
