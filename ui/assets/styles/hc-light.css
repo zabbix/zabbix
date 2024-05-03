@@ -4715,6 +4715,9 @@ div.dashboard-widget-piechart {
   div.dashboard-widget-piechart .dashboard-grid-widget-body svg {
     display: block; }
 
+div.dashboard-widget-problemhosts .list-table tr[data-hostgroupid] {
+  cursor: pointer; }
+
 div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;
   padding-left: 42px; }

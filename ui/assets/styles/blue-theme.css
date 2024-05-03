@@ -4761,6 +4761,9 @@ div.dashboard-widget-piechart {
   div.dashboard-widget-piechart .dashboard-grid-widget-body svg {
     display: block; }
 
+div.dashboard-widget-problemhosts .list-table tr[data-hostgroupid] {
+  cursor: pointer; }
+
 form.dashboard-widget-svggraph .svg-graph-preview,
 form.dashboard-widget-svggraph .graph-widget-config-tabs {
   grid-column: 1 / -1; }
