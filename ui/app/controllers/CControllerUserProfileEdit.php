@@ -56,13 +56,43 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			];
 		}
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateMedias();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
+	}
+
+	protected function validateMedias(): bool {
+		$validation_rules = [
+			'mediaid' =>		'id',
+			'mediatypeid' =>	'required|db media_type.mediatypeid',
+			'sendto' =>			'required',
+			'period' =>			'required|time_periods',
+			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
+			'severity' =>		'int32|ge 0|le '.(pow(2, TRIGGER_SEVERITY_COUNT) - 1)
+		];
+
+		foreach ($this->getInput('medias', []) as $media) {
+			$validator = new CNewValidator($media, $validation_rules);
+
+			if ($validator->isError()) {
+				return false;
+			}
+		}
+
+		$new_media = $this->getInput('new_media', []);
+
+		if (!$new_media) {
+			return true;
+		}
+
+		unset($validation_rules['mediaid']);
+		$validator = new CNewValidator($new_media, $validation_rules);
+
+		return !$validator->isError();
 	}
 
 	protected function checkPermissions() {
@@ -75,7 +105,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 				'rows_per_page', 'url', 'timezone', 'userdirectoryid'
 			],
 			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
-				? ['mediatypeid', 'period', 'sendto', 'severity', 'active']
+				? ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active', 'userdirectory_mediaid']
 				: null,
 			'userids' => CWebUser::$data['userid'],
 			'selectUsrgrps' => ['userdirectoryid'],

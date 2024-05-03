@@ -25,12 +25,12 @@ import (
 	"reflect"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/zbxlib"
 )
 
 // task priority within the same second is done by setting nanosecond component

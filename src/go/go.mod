@@ -1,4 +1,4 @@
-module zabbix.com
+module golang.zabbix.com/agent2
 
 go 1.19
 

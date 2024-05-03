@@ -25,12 +25,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/version"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/version"
 )
 
 type MemoryCache struct {

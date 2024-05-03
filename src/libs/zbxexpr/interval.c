@@ -1166,7 +1166,7 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
 	tm->tm_mday += value_next - value_now;
 
 	/* check if the resulting month day is valid */
-	return (tm->tm_mday <= zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1) ? SUCCEED : FAIL);
+	return (tm->tm_mday <= zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1) ? SUCCEED : FAIL);
 }
 
 /******************************************************************************
@@ -1199,7 +1199,7 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 	while (SUCCEED == scheduler_get_nearest_filter_value(interval->mdays, &tm->tm_mday))
 	{
 		/* check if the date is still valid - we haven't run out of month days */
-		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
+		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1))
 			break;
 
 		if (SUCCEED == scheduler_validate_wday_filter(interval, tm))
@@ -1208,7 +1208,7 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 		tm->tm_mday++;
 
 		/* check if the date is still valid - we haven't run out of month days */
-		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
+		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1))
 			break;
 	}
 

@@ -82,7 +82,7 @@ class testFormAuthentication extends CWebTest {
 
 		// Check media type mapping popup.
 		$this->checkMappingDialog('Media type mapping', 'New media type mapping',
-				$form, ['Name', 'Media type', 'Attribute'], $auth_type
+				$form, ['Name', 'Media type', 'Attribute', 'When active'], $auth_type
 		);
 	}
 

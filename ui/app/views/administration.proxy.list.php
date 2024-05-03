@@ -92,7 +92,8 @@ $proxy_list = (new CTableInfo())
 		_('Item count'),
 		_('Required vps'),
 		(new CColHeader(_('Hosts')))->setColSpan(2)
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['proxies'] as $proxyid => $proxy) {
 	$proxy_name_prefix = [];
@@ -223,9 +224,8 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 	]);
 }
 
-$form->addItem([$proxy_list, $data['paging']]);
-
-$form->addItem(
+$form->addItem([
+	$proxy_list,
 	new CActionButtonList('action', 'proxyids', [
 		'proxy.config.refresh' => [
 			'content' => (new CSimpleButton(_('Refresh configuration')))
@@ -254,7 +254,7 @@ $form->addItem(
 				->addClass('js-no-chkbxrange')
 		]
 	], 'proxy')
-);
+]);
 
 (new CHtmlPage())
 	->setTitle(_('Proxies'))

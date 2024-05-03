@@ -158,7 +158,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 */
 	protected function getInputUserMedia(): array {
 		$medias = [];
-		$media_fields = array_fill_keys(['mediatypeid', 'sendto', 'active', 'severity', 'period'], '');
+		$media_fields = array_flip(['mediaid', 'mediatypeid', 'sendto', 'active', 'severity', 'period']);
 
 		foreach ($this->getInput('medias', []) as $media) {
 			$medias[] = array_intersect_key($media, $media_fields);
