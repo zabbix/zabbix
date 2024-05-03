@@ -21,9 +21,9 @@
 class CWidgetProblemHosts extends CWidget {
 
 	/**
-	 * Table of problem hosts.
+	 * Table body of problem hosts.
 	 *
-	 * @type {HTMLTableElement|null}
+	 * @type {HTMLElement|null}
 	 */
 	#table_body = null;
 
@@ -51,7 +51,7 @@ class CWidgetProblemHosts extends CWidget {
 				const row = this.#table_body.querySelector(`tr[data-hostgroupid="${this.#selected_host_group_id}"]`);
 
 				if (row !== null) {
-					this.#selectHostGroup(row);
+					this.#selectHostGroup();
 				}
 				else {
 					this.#selected_host_group_id = '';
@@ -78,7 +78,7 @@ class CWidgetProblemHosts extends CWidget {
 					if (hostgroupid !== undefined && hostgroupid !== this.#selected_host_group_id) {
 						this.#selected_host_group_id = hostgroupid;
 
-						this.#selectHostGroup(row);
+						this.#selectHostGroup();
 
 						this.broadcast({
 							[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: [hostgroupid],

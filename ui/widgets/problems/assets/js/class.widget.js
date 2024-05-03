@@ -20,6 +20,20 @@
 
 class CWidgetProblems extends CWidget {
 
+	/**
+	 * Table body of problems.
+	 *
+	 * @type {HTMLElement|null}
+	 */
+	#table_body = null;
+
+	/**
+	 * ID of selected event.
+	 *
+	 * @type {string}
+	 */
+	#selected_event_id = '';
+
 	onInitialize() {
 		this._opened_eventids = [];
 	}
@@ -72,6 +86,26 @@ class CWidgetProblems extends CWidget {
 
 				// When complete enable button again.
 				button.disabled = false;
+			},
+
+			tableBodyClick: e => {
+				if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
+					return;
+				}
+
+				const row = e.target.closest('tr');
+
+				if (row !== null) {
+					const eventid = row.dataset.eventid;
+
+					if (eventid !== undefined && eventid !== this.#selected_event_id) {
+						this.#selected_event_id = eventid;
+
+						this.#selectEvent();
+
+						this.broadcast({[CWidgetsData.DATA_TYPE_EVENT_ID]: [eventid]});
+					}
+				}
 			}
 		}
 	}
@@ -93,6 +127,21 @@ class CWidgetProblems extends CWidget {
 	processUpdateResponse(response) {
 		super.processUpdateResponse(response);
 
+		this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
+
+		if (this.#table_body !== null) {
+			if (this.#selected_event_id !== '') {
+				const row = this.#table_body.querySelector(`tr[data-eventid="${this.#selected_event_id}"]`);
+
+				if (row !== null) {
+					this.#selectEvent();
+				}
+				else {
+					this.#selected_event_id = '';
+				}
+			}
+		}
+
 		this._activateContentsEvents();
 	}
 
@@ -112,11 +161,26 @@ class CWidgetProblems extends CWidget {
 				button.title = t('Collapse');
 			}
 		}
+
+		this.#table_body?.addEventListener('click', this._events.tableBodyClick);
 	}
 
 	_deactivateContentsEvents() {
 		for (const button of this._body.querySelectorAll("button[data-action='show_symptoms']")) {
 			button.removeEventListener('click', this._events.showSymptoms);
+		}
+
+		this.#table_body?.removeEventListener('click', this._events.tableBodyClick);
+	}
+
+	/**
+	 * Select event row.
+	 */
+	#selectEvent() {
+		const rows = this.#table_body.querySelectorAll('tr[data-eventid]');
+
+		for (const row of rows) {
+			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.eventid === this.#selected_event_id);
 		}
 	}
 }

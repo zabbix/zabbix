@@ -23,6 +23,7 @@
  */
 class CWidgetsData {
 
+	static DATA_TYPE_EVENT_ID =				'_eventid';
 	static DATA_TYPE_HOST_GROUP_ID =		'_hostgroupid';
 	static DATA_TYPE_HOST_GROUP_IDS =		'_hostgroupids';
 	static DATA_TYPE_HOST_ID =				'_hostid';
@@ -83,6 +84,7 @@ class CWidgetsData {
 	}
 
 	constructor() {
+		this.#defaults.set(CWidgetsData.DATA_TYPE_EVENT_ID, {value: [], is_comparable: true});
 		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_GROUP_ID, {value: [], is_comparable: true});
 		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_GROUP_IDS, {value: [], is_comparable: true});
 		this.#defaults.set(CWidgetsData.DATA_TYPE_HOST_ID, {value: [], is_comparable: true});
