@@ -5215,12 +5215,10 @@ class testDiscoveryRule extends CAPITest {
 		$this->assertEquals($db_lld_override['evaltype'], $filter['evaltype'], 'Override evaltype value.');
 
 		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-			$conditionid_by_formulaid = array_combine(
-				array_column($filter['conditions'], 'formulaid'),
-				array_column($db_lld_conditions, 'lld_override_conditionid')
+			CConditionHelper::replaceFormulaIds($filter['formula'],
+				array_combine(array_column($db_lld_conditions, 'lld_override_conditionid'), $filter['conditions'])
 			);
-			$formula = CConditionHelper::replaceLetterIds($filter['formula'], $conditionid_by_formulaid);
-			$this->assertEquals($db_lld_override['formula'], $formula);
+			$this->assertEquals($db_lld_override['formula'], $filter['formula']);
 		}
 
 		foreach ($filter['conditions'] as $num => $condition) {

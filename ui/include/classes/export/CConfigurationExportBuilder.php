@@ -638,7 +638,7 @@ class CConfigurationExportBuilder {
 				'password' => $discoveryRule['password'],
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
-				'filter' => self::formatLldFilter($discoveryRule['filter']),
+				'filter' => $discoveryRule['filter'],
 				'lifetime_type' => $discoveryRule['lifetime_type'],
 				'lifetime' => $discoveryRule['lifetime'],
 				'enabled_lifetime_type' => $discoveryRule['enabled_lifetime_type'],
@@ -691,19 +691,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format the LLD filter.
-	 *
-	 * @param array $filter
-	 *
-	 * @return array
-	 */
-	private static function formatLldFilter(array $filter): array {
-		$filter['conditions'] = sortLldRuleFilterConditions($filter['conditions'], $filter['evaltype']);
-
-		return $filter;
-	}
-
-	/**
 	 * Format the LLD macro paths.
 	 *
 	 * @param array $lld_macro_paths
@@ -728,8 +715,6 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($overrides, ['step']);
 
 		foreach ($overrides as &$override) {
-			$override['filter'] = self::formatLldFilter($override['filter']);
-
 			unset($override['filter']['eval_formula']);
 
 			if (!$override['filter']['conditions']) {
