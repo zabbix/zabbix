@@ -1,6 +1,12 @@
 Changes for 7.0.0rc1
 
 New features:
+A.F.....S. [ZBXNEXT-9138] fixed Zabbix server to work with recent versions of mysql_aurora (Sasha, sboidenko)
+.......PS. [ZBXNEXT-9150] added browser poller process and browser item type for future use (vso)
+..F.I..... [ZBXNEXT-8686] implemented new Item navigator widget (apoga, ddauksa)
+A.F....... [ZBXNEXT-8760] added ability to customize media of provisioned users; removed the capability to modify JIT provisioning fields of provisioned users via API; fixed incorrect audit log details format of User directory's provisioned groups and media (gcalenko, vmaksimovs)
+A.F....PS. [ZBXNEXT-9077] added support of custom vault prefix for HashiCorp and CyberArk vault (dfofanovs, vso)
+..F....... [ZBXNEXT-7743] implemented changes in Latest data page when filter is not set, updated message and added icon in widgets, in filter popups and in all list pages when there is no data found (ashubin, dpetra)
 ....I...S. [ZBXNEXT-9108] added server side software update check functionality (dgoloscapov)
 ........S. [ZBXNEXT-7930] added user macros support for username and password fields in email media type (asestakovs)
 ...G...... [ZBXNEXT-9132] updated Zabbix agent to be fully compatibile with Zabix agent 2 active checks protocol (wiper)
@@ -9,6 +15,15 @@ A.FG...PS. [ZBXNEXT-8758] added proxy load balancing and HA (agriscenko, wiper)
 .........T [ZBXNEXT-6864] replaced {HOST.CONN} with user macros in templates (drasikhov)
 
 Bug fixes:
+A.F....... [ZBX-21850] moved the sorting of filter conditions to the action.get, discoveryrule.get and correlation.get methods (Sasha, vmaksimovs)
+........S. [ZBX-24172] fixed Zabbix server issue with scheduled intervals on Feb 29th of leap year (sboidenko)
+A......... [ZBX-23407] improved performance of retrieving last history values when primary keys are available (jfreibergs, vmaksimovs)
+A.F....... [ZBX-24413] changed MFA label appearing in authenticator apps to include the username, enabling users to distinguish between different accounts (epulke)
+.........T [ZBX-24246] updated descriptions for family of MySQL and Oracle templates, changed macro in the trigger 'Tablespace utilization is too high' for family of Oracle templates (akotsegubov)
+.........T [ZBX-24222] fixed incorrect item OIDs in the FortiGate by SNMP template (aiantsen)
+...G...... [ZBX-23988] renamed Agent2 Go module (jxl)
+.........T [ZBX-24393] updated README in Redis by Agent 2 teamplate (abrosimovs)
+A......... [ZBX-24258] fixed issue causing error when removing the old MFA method and adding a new one (epulke)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
 .......PS. [ZBX-24282] fixed Zabbix proxy to report error for not supported items (sboidenko)
 ..F....... [ZBX-24376] fixed resolving of macros for item testing (jfreibergs)
