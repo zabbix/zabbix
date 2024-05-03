@@ -18,6 +18,8 @@ libzbxpoller_a_SOURCES = \
 	checks_internal.h \
 	checks_script.c \
 	checks_script.h \
+	checks_browser.c \
+	checks_browser.h \
 	checks_simple.c \
 	checks_simple.h \
 	checks_snmp.c \

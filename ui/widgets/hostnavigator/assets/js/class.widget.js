@@ -28,11 +28,11 @@ class CWidgetHostNavigator extends CWidget {
 	#host_navigator = null;
 
 	/**
-	 * Events of host navigator widget.
+	 * Listeners of host navigator widget.
 	 *
 	 * @type {Object}
 	 */
-	#events = {};
+	#listeners = {};
 
 	/**
 	 * Scroll amount of contents.
@@ -74,8 +74,8 @@ class CWidgetHostNavigator extends CWidget {
 		if (this.#host_navigator === null) {
 			this.#host_navigator = new CHostNavigator(response.config);
 
-			this.#registerEvents();
-			this.#activateEvents();
+			this.#registerListeners();
+			this.#activateListeners();
 		}
 
 		this._body.appendChild(this.#host_navigator.getContainer());
@@ -87,8 +87,8 @@ class CWidgetHostNavigator extends CWidget {
 		});
 	}
 
-	#registerEvents() {
-		this.#events = {
+	#registerListeners() {
+		this.#listeners = {
 			hostSelect: e => {
 				this.broadcast({
 					[CWidgetsData.DATA_TYPE_HOST_ID]: e.detail.hostid !== null
@@ -108,12 +108,12 @@ class CWidgetHostNavigator extends CWidget {
 		};
 	}
 
-	#activateEvents() {
+	#activateListeners() {
 		this.#host_navigator.getContainer().addEventListener(CHostNavigator.EVENT_HOST_SELECT,
-			this.#events.hostSelect
+			this.#listeners.hostSelect
 		);
 		this.#host_navigator.getContainer().addEventListener(CHostNavigator.EVENT_GROUP_TOGGLE,
-			this.#events.groupToggle
+			this.#listeners.groupToggle
 		);
 	}
 

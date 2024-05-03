@@ -1,0 +1,1 @@
+A.F....... [ZBXNEXT-8760] added ability to customize media of provisioned users; removed the capability to modify JIT provisioning fields of provisioned users via API; fixed incorrect audit log details format of User directory's provisioned groups and media (gcalenko, vmaksimovs)

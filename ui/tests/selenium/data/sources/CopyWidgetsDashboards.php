@@ -1912,7 +1912,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids.0',
-										'value' => 4
+										'value' => 4 // Zabbix servers.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1993,6 +1993,121 @@ class CopyWidgetsDashboards {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'AZIBQ'
+									]
+								]
+							],
+							[
+								'type' => 'itemnavigator',
+								'name' => 'Item navigator for copying',
+								'x' => 16,
+								'y' => 16,
+								'width' => 8,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 60
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.0',
+										'value' => 4 // Zabbix servers.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hosts.0',
+										'value' => 10084 // ЗАББИКС Сервер.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags_evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.0.tag',
+										'value' => 'host tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.0.value',
+										'value' => 'host tag value1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.1.tag',
+										'value' => 'host tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags.1.operator',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.1.value',
+										'value' => 'host tag value2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'trap item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'item_tags_evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'item_tags.0.tag',
+										'value' => 'item tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'item_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'item_tags.0.value',
+										'value' => 'item tag1 value'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'state',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_problems',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'group_by.0.tag_name',
+										'value' => 'item tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 77
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'AZIBO'
 									]
 								]
 							]
@@ -2548,6 +2663,76 @@ class CopyWidgetsDashboards {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'AZIBQ'
+									]
+								]
+							],
+							[
+								'type' => 'itemnavigator',
+								'name' => 'Item navigator widget',
+								'x' => 16,
+								'y' => 16,
+								'width' => 8,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 60
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'trap item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'item_tags_evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'item_tags.0.tag',
+										'value' => 'item tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'item_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'item_tags.0.value',
+										'value' => 'item tag1 value'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'state',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_problems',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'group_by.0.tag_name',
+										'value' => 'item tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 77
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'AZIBO'
 									]
 								]
 							]

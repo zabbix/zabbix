@@ -674,6 +674,7 @@ FIELD		|mfa_status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|mfaid			|t_id		|	|NULL		|0		|5|mfa	|	|RESTRICT
 FIELD		|software_update_checkid|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|software_update_check_data	|t_shorttext	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|timeout_browser	|t_varchar(255)	|'1m'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
@@ -833,8 +834,10 @@ FIELD		|sendto		|t_varchar(1024)|''	|NOT NULL	|0
 FIELD		|active		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'63'	|NOT NULL	|0
 FIELD		|period		|t_varchar(1024)|'1-7,00:00-24:00'|NOT NULL|0
+FIELD		|userdirectory_mediaid	|t_id	|NULL	|NULL		|ZBX_NODATA		|3|userdirectory_media	|userdirectory_mediaid
 INDEX		|1		|userid
 INDEX		|2		|mediatypeid
+INDEX		|3		|userdirectory_mediaid
 
 TABLE|rights|rightid|ZBX_DATA
 FIELD		|rightid	|t_id		|	|NOT NULL	|0
@@ -2150,6 +2153,9 @@ FIELD		|userdirectoryid	|t_id			|	|NOT NULL	|0	|1	|userdirectory
 FIELD		|mediatypeid		|t_id			|	|NOT NULL	|0	|2	|media_type
 FIELD		|name				|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|attribute			|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|active			|t_integer		|'0'	|NOT NULL	|0
+FIELD		|severity		|t_integer		|'63'	|NOT NULL	|0
+FIELD		|period			|t_varchar(1024)	|'1-7,00:00-24:00'|NOT NULL|0
 INDEX		|1	|userdirectoryid
 INDEX		|2	|mediatypeid
 
@@ -2253,6 +2259,7 @@ FIELD		|timeout_script		|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|local_address		|t_varchar(255)	|''		|NOT NULL	|ZBX_PROXY
 FIELD		|local_port		|t_varchar(64)	|'10051'	|NOT NULL	|ZBX_PROXY
 FIELD		|proxy_groupid		|t_id		|		|NULL		|0	|1|proxy_group|	|RESTRICT
+FIELD		|timeout_browser	|t_varchar(255)	|''		|NOT NULL	|0
 UNIQUE		|1		|name
 INDEX		|2		|proxy_groupid
 CHANGELOG	|19
@@ -2317,4 +2324,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050286	|6050286
+ROW		|1		|6050296	|6050296

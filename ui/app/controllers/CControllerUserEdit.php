@@ -75,7 +75,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
 					'rows_per_page', 'url', 'roleid', 'timezone', 'userdirectoryid'
 				],
-				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
+				'selectMedias' => ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active',
+					'userdirectory_mediaid'
+				],
 				'selectRole' => ['roleid'],
 				'selectUsrgrps' => ['usrgrpid'],
 				'userids' => $this->getInput('userid'),
