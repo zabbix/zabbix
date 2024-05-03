@@ -146,14 +146,10 @@ static VOID WINAPI	ServiceEntry(DWORD argc, wchar_t **argv)
 	MAIN_ZABBIX_ENTRY(0);
 }
 
-void	zbx_service_start(int flags, zbx_get_config_str_f get_zbx_service_name_f,
-		zbx_get_config_str_f get_zbx_event_source_f)
+void	zbx_service_start(int flags)
 {
 	int				ret;
 	static SERVICE_TABLE_ENTRY	serviceTable[2];
-
-	get_zbx_service_name_cb = get_zbx_service_name_f;
-	get_zbx_event_source_cb = get_zbx_event_source_f;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -348,7 +344,9 @@ int	ZabbixCreateService(const char *path, const char *config_file, unsigned int 
 	svc_get_command_line(path, flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS, cmdLine, MAX_PATH, config_file);
 
 	wservice_name = zbx_utf8_to_unicode(get_zbx_service_name_cb());
+
 	dwStartType = svc_start_type_get(flags);
+
 
 	if (NULL == (service = CreateService(mgr, wservice_name, wservice_name, GENERIC_READ, SERVICE_WIN32_OWN_PROCESS,
 			dwStartType, SERVICE_ERROR_NORMAL, cmdLine, NULL, NULL, NULL, NULL, NULL)))
@@ -601,4 +599,18 @@ int	zbx_service_startup_flags_set(const char *optarg, unsigned int *flags) {
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set callback variables                                            *
+ *                                                                            *
+ * Parameters: get_zbx_service_name_f - [IN]                                  *
+ *             get_zbx_event_source_f - [IN]                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_service_init(zbx_get_config_str_f get_zbx_service_name_f, zbx_get_config_str_f get_zbx_event_source_f)
+{
+	get_zbx_service_name_cb = get_zbx_service_name_f;
+	get_zbx_event_source_cb = get_zbx_event_source_f;
 }
