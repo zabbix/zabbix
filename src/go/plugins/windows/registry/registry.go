@@ -29,9 +29,9 @@ import (
 	"regexp"
 	"strings"
 
+	"golang.org/x/sys/windows/registry"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
-	"golang.org/x/sys/windows/registry"
 )
 
 // Plugin -

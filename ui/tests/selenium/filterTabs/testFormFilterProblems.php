@@ -170,6 +170,18 @@ class testFormFilterProblems extends testFormFilter {
 					]
 				]
 			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'filter_form' => [
+						'Problem' => 'non_exist'
+					],
+					'filter' => [
+						'Name' => 'simple_name and 0 records',
+						'Show number of records' => true
+					]
+				]
+			],
 			// Dataprovider with symbols instead of name.
 			[
 				[

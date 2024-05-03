@@ -256,7 +256,7 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host groups' => ['Zabbix server']
 					],
 					'expected' => [
-						'No data found.'
+						'No data found'
 					]
 				]
 			],

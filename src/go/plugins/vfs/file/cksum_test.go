@@ -25,8 +25,8 @@ import (
 	"reflect"
 	"testing"
 
+	"golang.zabbix.com/agent2/pkg/zbxtest"
 	"golang.zabbix.com/sdk/std"
-	"zabbix.com/pkg/zbxtest"
 )
 
 var CrcFile = "1234"

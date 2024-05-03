@@ -6,7 +6,7 @@ BUILD_TIME=`date +%H:%M:%S`
 BUILD_DATE=`date +"%b %_d %Y"`
 GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
-PKG=zabbix.com/pkg/version
+PKG=golang.zabbix.com/agent2/pkg/version
 NEW_FROM_REV=""
 
 GOLDFLAGS = -X '${PKG}.compileDate=${BUILD_DATE}'
@@ -53,13 +53,13 @@ bin/zabbix_agent2: FORCE
 		-tags="${AGENT_GOTAGS}" \
 		-ldflags="${AGENT_GOLDFLAGS}" \
 		-o bin \
-		zabbix.com/cmd/zabbix_agent2
+		golang.zabbix.com/agent2/cmd/zabbix_agent2
 
 bin/zabbix_web_service: FORCE
 	$(GO) build \
 	-ldflags="${WEBSERVICE_GOLDFLAGS}" \
 	-o bin \
-	zabbix.com/cmd/zabbix_web_service
+	golang.zabbix.com/agent2/cmd/zabbix_web_service
 
 build: ${TARGETS}
 

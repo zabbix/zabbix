@@ -20,8 +20,8 @@
 package redis
 
 import (
-	"golang.zabbix.com/sdk/zbxerr"
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type slowlog []interface{}

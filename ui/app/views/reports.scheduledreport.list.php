@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['uncheck']) {
@@ -80,9 +81,9 @@ $form->addItem([
 			'sort' => $data['sort'],
 			'sortorder' => $data['sortorder'],
 			'allowed_edit' => $data['allowed_edit'],
-			'reports' => $data['reports']
+			'reports' => $data['reports'],
+			'paging' => $data['paging']
 		]),
-		$data['paging'],
 		new CActionButtonList('action', 'reportids', [
 			'scheduledreport.enable' => [
 				'name' => _('Enable'),

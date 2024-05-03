@@ -3810,7 +3810,6 @@ static int	DBpatch_6050280(void)
 	if (ZBX_DB_OK > zbx_db_execute("update hosts set monitored_by=1 where proxyid is not null"))
 		return FAIL;
 
-
 	return SUCCEED;
 }
 
@@ -3846,17 +3845,46 @@ static int	DBpatch_6050283(void)
 
 static int	DBpatch_6050284(void)
 {
+	const zbx_db_field_t	field = {"software_update_checkid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050285(void)
+{
+	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT,
+			ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050286(void)
+{
+	const zbx_db_field_t	field = {"timeout_browser", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050287(void)
+{
+	const zbx_db_field_t	field = {"timeout_browser", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050288(void)
+{
 	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("media", &field);
 }
 
-static int	DBpatch_6050285(void)
+static int	DBpatch_6050289(void)
 {
 	return DBcreate_index("media", "media_3", "userdirectory_mediaid", 0);
 }
 
-static int	DBpatch_6050286(void)
+static int	DBpatch_6050290(void)
 {
 	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, "userdirectory_media", "userdirectory_mediaid",
 			0, 0, 0, ZBX_FK_CASCADE_DELETE};
@@ -3864,28 +3892,28 @@ static int	DBpatch_6050286(void)
 	return DBadd_foreign_key("media", 3, &field);
 }
 
-static int	DBpatch_6050287(void)
+static int	DBpatch_6050291(void)
 {
 	const zbx_db_field_t	field = {"active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050288(void)
+static int	DBpatch_6050292(void)
 {
 	const zbx_db_field_t	field = {"severity", "63", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050289(void)
+static int	DBpatch_6050293(void)
 {
 	const zbx_db_field_t	field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("userdirectory_media", &field);
 }
 
-static int	DBpatch_6050290(void)
+static int	DBpatch_6050294(void)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -4269,5 +4297,9 @@ DBPATCH_ADD(6050287, 0, 1)
 DBPATCH_ADD(6050288, 0, 1)
 DBPATCH_ADD(6050289, 0, 1)
 DBPATCH_ADD(6050290, 0, 1)
+DBPATCH_ADD(6050291, 0, 1)
+DBPATCH_ADD(6050292, 0, 1)
+DBPATCH_ADD(6050293, 0, 1)
+DBPATCH_ADD(6050294, 0, 1)
 
 DBPATCH_END()
