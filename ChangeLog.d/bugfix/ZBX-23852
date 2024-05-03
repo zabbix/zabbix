@@ -1,1 +1,0 @@
-..F....... [ZBX-23852] fixed template import failing with unexpected server error when trying to import template dashboards with items or graphs from unexisting hosts (agriscenko)

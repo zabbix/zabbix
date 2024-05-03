@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:49:00Z'
+  date: '2024-04-03T12:12:46Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -10,11 +10,11 @@ zabbix_export:
       name: 'MySQL by ODBC'
       description: |
         Requirements for template operation:
-        1. Create MySQL user for monitoring. For example:
+        1. Create a MySQL user for monitoring. For example:
         CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
         GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
         For more information read the MYSQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html , please.
-        2. Set the user name and password in host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}).
+        2. Set the user name and password in the host macros ({$MYSQL.USER} and {$MYSQL.PASSWORD}).
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384189-discussion-thread-for-official-zabbix-template-db-mysql
         
@@ -22,6 +22,35 @@ zabbix_export:
       groups:
         - name: Templates/Databases
       items:
+        - uuid: 70491bf6b6af401c9dfb10c0cbfddee1
+          name: 'MySQL: Get database'
+          type: ODBC
+          key: 'db.odbc.get[get_database,"{$MYSQL.DSN}"]'
+          delay: 1h
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'show databases'
+          username: '{$MYSQL.USER}'
+          password: '{$MYSQL.PASSWORD}'
+          description: 'Used for scanning databases in DBMS.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: e389af9f1d134e028e3b637544c8a265
+          name: 'MySQL: Get replication'
+          type: ODBC
+          key: 'db.odbc.get[get_replication,"{$MYSQL.DSN}"]'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: 'show slave status'
+          username: '{$MYSQL.USER}'
+          password: '{$MYSQL.PASSWORD}'
+          description: 'Gets replication status information.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 72e0f88741d746bf88e8951ef69681f9
           name: 'MySQL: Get status variables'
           type: ODBC
@@ -32,7 +61,7 @@ zabbix_export:
           params: 'show global status'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
-          description: 'The item gets server global status information.'
+          description: 'Gets server global status information.'
           tags:
             - tag: component
               value: raw
@@ -44,6 +73,7 @@ zabbix_export:
           params: 'select "1"'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
+          description: 'MySQL server status.'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -60,6 +90,7 @@ zabbix_export:
               expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
               name: 'MySQL: Service is down'
               priority: HIGH
+              description: 'MySQL is down.'
               tags:
                 - tag: scope
                   value: availability
@@ -74,6 +105,7 @@ zabbix_export:
           params: 'select version()'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
+          description: 'MySQL server version.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -87,7 +119,7 @@ zabbix_export:
               name: 'MySQL: Version has changed'
               event_name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'MySQL version has changed. Acknowledge to close the problem manually.'
+              description: 'The MySQL version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -138,7 +170,7 @@ zabbix_export:
               name: 'MySQL: Server has aborted connections'
               event_name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
               priority: AVERAGE
-              description: 'The number of failed attempts to connect to the MySQL server is more than {$MYSQL.ABORTED_CONN.MAX.WARN} in the last 5 minutes.'
+              description: 'The number of failed attempts to connect to the MySQL server is more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.'
               dependencies:
                 - name: 'MySQL: Refused connections'
                   expression: 'last(/MySQL by ODBC/mysql.connection_errors_max_connections.rate)>0'
@@ -152,7 +184,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.'
+          description: 'Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than `binlog_cache_size`.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -204,7 +236,7 @@ zabbix_export:
               name: 'MySQL: Buffer pool utilization is too low'
               event_name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
               priority: WARNING
-              description: 'The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
+              description: 'The buffer pool utilization is less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
               tags:
                 - tag: scope
                   value: notice
@@ -257,7 +289,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The Com_delete counter variable indicates the number of times the delete statement has been executed.'
+          description: 'The `Com_delete` counter variable indicates the number of times the `DELETE` statement has been executed.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -277,7 +309,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The Com_insert counter variable indicates the number of times the insert statement has been executed.'
+          description: 'The `Com_insert` counter variable indicates the number of times the `INSERT` statement has been executed.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -297,7 +329,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The Com_select counter variable indicates the number of times the select statement has been executed.'
+          description: 'The `Com_select` counter variable indicates the number of times the `SELECT` statement has been executed.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -317,7 +349,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The Com_update counter variable indicates the number of times the update statement has been executed.'
+          description: 'The `Com_update` counter variable indicates the number of times the `UPDATE` statement has been executed.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -357,7 +389,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of errors that occurred during calls to accept() on the listening port.'
+          description: 'Number of errors that occurred during calls to `accept()` on the listening port.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -397,7 +429,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of refused connections due to the max_connections limit being reached.'
+          description: 'Number of refused connections due to the `max_connections` limit being reached.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -416,7 +448,7 @@ zabbix_export:
               name: 'MySQL: Refused connections'
               event_name: 'MySQL: Refused connections (max_connections limit reached)'
               priority: AVERAGE
-              description: 'Number of refused connections due to the max_connections limit being reached.'
+              description: 'Number of refused connections due to the `max_connections` limit being reached.'
               tags:
                 - tag: scope
                   value: availability
@@ -427,7 +459,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of errors while searching for the connecting client IP address.'
+          description: 'Number of errors while searching for the connecting client''s IP address.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -447,7 +479,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of errors during calls to select() or poll() on the listening port. The client would not necessarily have been rejected in these cases.'
+          description: 'Number of errors during calls to `select()` or `poll()` on the listening port. The client would not necessarily have been rejected in these cases.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -508,7 +540,7 @@ zabbix_export:
               name: 'MySQL: Number of on-disk temporary tables created per second is high'
               event_name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'Possibly the application using the database is in need of query optimization.'
+              description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
@@ -519,7 +551,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'How many temporary files mysqld has created.'
+          description: 'How many temporary files `mysqld` has created.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -538,7 +570,7 @@ zabbix_export:
               name: 'MySQL: Number of temporary files created per second is high'
               event_name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'Possibly the application using the database is in need of query optimization.'
+              description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
@@ -570,7 +602,7 @@ zabbix_export:
               name: 'MySQL: Number of internal temporary tables created per second is high'
               event_name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'Possibly the application using the database is in need of query optimization.'
+              description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
@@ -619,7 +651,7 @@ zabbix_export:
           key: mysql.innodb_buffer_pool_reads
           delay: '0'
           history: 7d
-          description: 'Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.'
+          description: 'Number of logical reads that InnoDB could not satisfy from the buffer pool and had to read directly from the disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -638,7 +670,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of logical reads per second that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.'
+          description: 'Number of logical reads per second that InnoDB could not satisfy from the buffer pool and had to read directly from the disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -700,7 +732,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing innodb_buffer_pool_size.'
+          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -722,7 +754,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           params: '(last(//mysql.innodb_os_log_written) - last(//mysql.innodb_os_log_written,#1:now-1h)) / {$MYSQL.INNODB_LOG_FILES}'
-          description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
+          description: '`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$MYSQL.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -909,7 +941,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.'
+          description: 'Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the `Questions` variable.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -929,7 +961,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.'
+          description: 'Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the `Queries` variable.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -949,7 +981,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of queries that have taken more than long_query_time seconds.'
+          description: 'Number of queries that have taken more than `long_query_time` seconds.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -968,7 +1000,7 @@ zabbix_export:
               name: 'MySQL: Server has slow queries'
               event_name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'The number of slow queries is more than {$MYSQL.SLOW_QUERIES.MAX.WARN} in the last 5 minutes.'
+              description: 'The number of slow queries is more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.'
               tags:
                 - tag: scope
                   value: performance
@@ -1011,7 +1043,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.'
+          description: 'Number of threads created to handle connections. If the value of `Threads_created` is large, you may want to increase the `thread_cache_size` value. The cache miss rate can be calculated as `Threads_created`/`Connections`.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1030,7 +1062,7 @@ zabbix_export:
           key: mysql.threads_running
           delay: '0'
           history: 7d
-          description: 'Number of threads which are not sleeping.'
+          description: 'Number of threads that are not sleeping.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1047,7 +1079,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: uptime
-          description: 'The amount of seconds that the server has been up.'
+          description: 'Number of seconds that the server has been up.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1082,19 +1114,16 @@ zabbix_export:
       discovery_rules:
         - uuid: 0987fb6afdae4587bc32864fa42728f2
           name: 'Database discovery'
-          type: ODBC
-          key: 'db.odbc.discovery[databases,"{$MYSQL.DSN}"]'
-          delay: 1h
-          params: 'show databases'
-          username: '{$MYSQL.USER}'
-          password: '{$MYSQL.PASSWORD}'
+          type: DEPENDENT
+          key: mysql.database.discovery
+          delay: '0'
           filter:
             conditions:
               - macro: '{#DATABASE}'
                 value: information_schema
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
-          description: 'Scanning databases in DBMS.'
+          description: 'Used for the discovery of the databases.'
           item_prototypes:
             - uuid: f358179ef78b4a31affa9e049b4048b8
               name: 'MySQL: Size of database {#DATABASE}'
@@ -1106,6 +1135,7 @@ zabbix_export:
               params: 'SELECT COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH),0) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA="{#DATABASE}"'
               username: '{$MYSQL.USER}'
               password: '{$MYSQL.PASSWORD}'
+              description: 'Database size.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1115,164 +1145,11 @@ zabbix_export:
                   value: storage
                 - tag: database
                   value: '{#DATABASE}'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
-        - uuid: d0a235c0267c48e28bc6ecb99fb2380d
-          name: 'Replication discovery'
-          type: ODBC
-          key: 'db.odbc.discovery[replication,"{$MYSQL.DSN}"]'
-          delay: 1h
-          params: 'show slave status'
-          username: '{$MYSQL.USER}'
-          password: '{$MYSQL.PASSWORD}'
-          description: 'If "show slave status" returns Master_Host, "Replication: *" items are created.'
-          item_prototypes:
-            - uuid: d88f65c4bee84e74bb6e00061ab27f0c
-              name: 'MySQL: Replication Slave status {#MASTER_HOST}'
-              type: ODBC
-              key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
-              history: '0'
-              trends: '0'
-              value_type: TEXT
-              params: 'show slave status'
-              username: '{$MYSQL.USER}'
-              password: '{$MYSQL.PASSWORD}'
-              description: 'The item gets status information on the essential parameters of the slave threads.'
-              tags:
-                - tag: component
-                  value: raw
-            - uuid: 15f7b22867f54551afbed139d746e210
-              name: 'MySQL: Replication Seconds Behind Master {#MASTER_HOST}'
-              type: DEPENDENT
-              key: 'mysql.seconds_behind_master["{#MASTER_HOST}"]'
-              delay: '0'
-              history: 7d
-              units: s
-              description: 'The amount of seconds the slave SQL thread has been behind processing the master binary log. A high number (or an increasing one) can indicate that the slave is unable to handle events from the master in a timely fashion.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.[?(@.Master_Host==''{#MASTER_HOST}'')][''Seconds_Behind_Master''].first()'
-                - type: MATCHES_REGEX
-                  parameters:
-                    - \d+
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Replication is not performed.'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: replication
-              trigger_prototypes:
-                - uuid: f2188a73bbf34ffcb95b3e11e2824feb
-                  expression: 'min(/MySQL by ODBC/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
-                  name: 'MySQL: Replication lag is too high'
-                  event_name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
-                  priority: WARNING
-                  tags:
-                    - tag: scope
-                      value: notice
-            - uuid: e063b116753d4124a88443fe4de20d41
-              name: 'MySQL: Replication Slave IO Running {#MASTER_HOST}'
-              type: DEPENDENT
-              key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: 'Whether the I/O thread for reading the master''s binary log is running. Normally, you want this to be Yes unless you have not yet started a replication or have explicitly stopped it with STOP SLAVE.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.[?(@.Master_Host==''{#MASTER_HOST}'')][''Slave_IO_Running''].first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: replication
-              trigger_prototypes:
-                - uuid: 6f216036f4f14ae7adc8c70126bb315a
-                  expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1'
-                  name: 'MySQL: The slave I/O thread is not connected to a replication master'
-                  priority: WARNING
-                  dependencies:
-                    - name: 'MySQL: The slave I/O thread is not running'
-                      expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
-                  tags:
-                    - tag: scope
-                      value: availability
-                - uuid: ba08061a61df4bbb8bac516ecec91b70
-                  expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
-                  name: 'MySQL: The slave I/O thread is not running'
-                  priority: AVERAGE
-                  description: 'Whether the I/O thread for reading the master''s binary log is running.'
-                  tags:
-                    - tag: scope
-                      value: notice
-            - uuid: 113be79554c14c2aad08036febb15d71
-              name: 'MySQL: Replication Slave SQL Running {#MASTER_HOST}'
-              type: DEPENDENT
-              key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: |
-                Whether the SQL thread for executing events in the relay log is running.
-                As with the I/O thread, this should normally be Yes.
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.[?(@.Master_Host==''{#MASTER_HOST}'')][''Slave_SQL_Running''].first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: replication
-              trigger_prototypes:
-                - uuid: 39d229e5e3f34e8b828b4a0e2eaa0026
-                  expression: 'count(/MySQL by ODBC/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1'
-                  name: 'MySQL: The SQL thread is not running'
-                  priority: WARNING
-                  description: 'Whether the SQL thread for executing events in the relay log is running.'
-                  dependencies:
-                    - name: 'MySQL: The slave I/O thread is not running'
-                      expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
-                  tags:
-                    - tag: scope
-                      value: notice
-            - uuid: a88eb463bb9740a4a4256306f11816bf
-              name: 'MySQL: Replication Slave SQL Running State {#MASTER_HOST}'
-              type: DEPENDENT
-              key: 'mysql.slave_sql_running_state["{#MASTER_HOST}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: TEXT
-              description: 'This shows the state of the SQL driver threads.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.[?(@.Master_Host==''{#MASTER_HOST}'')][''Slave_SQL_Running_State''].first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: 'db.odbc.get["{#MASTER_HOST}","{$MYSQL.DSN}"]'
-              tags:
-                - tag: component
-                  value: replication
+          master_item:
+            key: 'db.odbc.get[get_database,"{$MYSQL.DSN}"]'
+          lld_macro_paths:
+            - lld_macro: '{#DATABASE}'
+              path: $.Database
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1282,7 +1159,7 @@ zabbix_export:
           type: DEPENDENT
           key: mysql.extra_metric.discovery
           delay: '0'
-          description: 'Additional metrics if MariaDB is used.'
+          description: 'Used for additional metrics if MariaDB is used.'
           item_prototypes:
             - uuid: eb8713584314461488b8769f1081d48d
               name: 'MySQL: Binlog commits'
@@ -1325,7 +1202,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of times MASTER_GTID_WAIT called.'
+              description: 'The number of times `MASTER_GTID_WAIT` called.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1345,7 +1222,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of timeouts occurring in MASTER_GTID_WAIT.'
+              description: 'Number of timeouts occurring in `MASTER_GTID_WAIT`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1365,7 +1242,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of time spent in MASTER_GTID_WAIT.'
+              description: 'Total number of time spent in `MASTER_GTID_WAIT`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1384,6 +1261,172 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - 'return JSON.stringify(value.search(''MariaDB'')>-1 ? [{''{#SINGLETON}'': ''''}] : []);'
+        - uuid: d0a235c0267c48e28bc6ecb99fb2380d
+          name: 'Replication discovery'
+          type: DEPENDENT
+          key: mysql.replication.discovery
+          delay: '0'
+          description: 'Discovery of the replication.'
+          item_prototypes:
+            - uuid: 15f7b22867f54551afbed139d746e210
+              name: 'MySQL: Replication Seconds Behind Master {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.seconds_behind_master["{#MASTER_HOST}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'The number of seconds the slave SQL thread has been behind processing the master binary log. A high number (or an increasing one) can indicate that the slave is unable to handle events from the master in a timely fashion.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.Seconds_Behind_Master
+                - type: MATCHES_REGEX
+                  parameters:
+                    - \d+
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Replication is not performed.'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mysql.slave_status["{#MASTER_HOST}"]'
+              tags:
+                - tag: component
+                  value: replication
+              trigger_prototypes:
+                - uuid: f2188a73bbf34ffcb95b3e11e2824feb
+                  expression: 'min(/MySQL by ODBC/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
+                  name: 'MySQL: Replication lag is too high'
+                  event_name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
+                  priority: WARNING
+                  description: 'Replication delay is too long.'
+                  tags:
+                    - tag: scope
+                      value: notice
+            - uuid: e063b116753d4124a88443fe4de20d41
+              name: 'MySQL: Replication Slave IO Running {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Whether the I/O thread for reading the master''s binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `STOP SLAVE`.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.Slave_IO_Running
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mysql.slave_status["{#MASTER_HOST}"]'
+              tags:
+                - tag: component
+                  value: replication
+              trigger_prototypes:
+                - uuid: 6f216036f4f14ae7adc8c70126bb315a
+                  expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1'
+                  name: 'MySQL: The slave I/O thread is not connected to a replication master'
+                  priority: WARNING
+                  description: 'Whether the slave I/O thread is connected to the master.'
+                  dependencies:
+                    - name: 'MySQL: The slave I/O thread is not running'
+                      expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
+                  tags:
+                    - tag: scope
+                      value: availability
+                - uuid: ba08061a61df4bbb8bac516ecec91b70
+                  expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
+                  name: 'MySQL: The slave I/O thread is not running'
+                  priority: AVERAGE
+                  description: 'Whether the I/O thread for reading the master''s binary log is running.'
+                  tags:
+                    - tag: scope
+                      value: notice
+            - uuid: 113be79554c14c2aad08036febb15d71
+              name: 'MySQL: Replication Slave SQL Running {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Whether the SQL thread for executing events in the relay log is running.
+                As with the I/O thread, this should normally be `Yes`.
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.Slave_SQL_Running
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'mysql.slave_status["{#MASTER_HOST}"]'
+              tags:
+                - tag: component
+                  value: replication
+              trigger_prototypes:
+                - uuid: 39d229e5e3f34e8b828b4a0e2eaa0026
+                  expression: 'count(/MySQL by ODBC/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1'
+                  name: 'MySQL: The SQL thread is not running'
+                  priority: WARNING
+                  description: 'Whether the SQL thread for executing events in the relay log is running.'
+                  dependencies:
+                    - name: 'MySQL: The slave I/O thread is not running'
+                      expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
+                  tags:
+                    - tag: scope
+                      value: notice
+            - uuid: a88eb463bb9740a4a4256306f11816bf
+              name: 'MySQL: Replication Slave SQL Running State {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.slave_sql_running_state["{#MASTER_HOST}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Shows the state of the SQL driver threads.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.Slave_SQL_Running_State
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'mysql.slave_status["{#MASTER_HOST}"]'
+              tags:
+                - tag: component
+                  value: replication
+            - uuid: d88f65c4bee84e74bb6e00061ab27f0c
+              name: 'MySQL: Replication Slave status {#MASTER_HOST}'
+              type: DEPENDENT
+              key: 'mysql.slave_status["{#MASTER_HOST}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Gets status information on the essential parameters of the slave threads.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.[?(@.Master_Host==''{#MASTER_HOST}'')].first()'
+              master_item:
+                key: 'db.odbc.get[get_replication,"{$MYSQL.DSN}"]'
+              tags:
+                - tag: component
+                  value: raw
+          master_item:
+            key: 'db.odbc.get[get_replication,"{$MYSQL.DSN}"]'
+          lld_macro_paths:
+            - lld_macro: '{#MASTER_HOST}'
+              path: $.Master_Host
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
       tags:
         - tag: class
           value: database
@@ -1392,34 +1435,34 @@ zabbix_export:
       macros:
         - macro: '{$MYSQL.ABORTED_CONN.MAX.WARN}'
           value: '3'
-          description: 'Number of failed attempts to connect to the MySQL server for trigger expression.'
+          description: 'Number of failed attempts to connect to the MySQL server for trigger expressions.'
         - macro: '{$MYSQL.BUFF_UTIL.MIN.WARN}'
           value: '50'
-          description: 'The minimum buffer pool utilization in percentage for trigger expression.'
+          description: 'The minimum buffer pool utilization in percentage for trigger expressions.'
         - macro: '{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
           value: '10'
-          description: 'The maximum number of created tmp tables on a disk per second for trigger expressions.'
+          description: 'The maximum number of temporary tables created on a disk per second for trigger expressions.'
         - macro: '{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
           value: '10'
-          description: 'The maximum number of created tmp files on a disk per second for trigger expressions.'
+          description: 'The maximum number of temporary files created on a disk per second for trigger expressions.'
         - macro: '{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
           value: '30'
-          description: 'The maximum number of created tmp tables in memory per second for trigger expressions.'
+          description: 'The maximum number of temporary tables created in memory per second for trigger expressions.'
         - macro: '{$MYSQL.DSN}'
           value: '<Put your DSN here>'
           description: 'System data source name.'
         - macro: '{$MYSQL.INNODB_LOG_FILES}'
           value: '2'
-          description: 'Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.'
+          description: 'Number of physical files in the InnoDB redo log for calculating `innodb_log_file_size`.'
         - macro: '{$MYSQL.PASSWORD}'
           value: '<Put your password here>'
           description: 'MySQL user password.'
         - macro: '{$MYSQL.REPL_LAG.MAX.WARN}'
           value: 30m
-          description: 'The lag of slave from master for trigger expression.'
+          description: 'Amount of time the slave is behind the master for trigger expressions.'
         - macro: '{$MYSQL.SLOW_QUERIES.MAX.WARN}'
           value: '3'
-          description: 'Number of slow queries for trigger expression.'
+          description: 'Number of slow queries for trigger expressions.'
         - macro: '{$MYSQL.USER}'
           value: '<Put your username here>'
           description: 'MySQL username.'
