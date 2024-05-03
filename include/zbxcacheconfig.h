@@ -30,6 +30,7 @@
 #include "zbxtagfilter.h"
 #include "zbxautoreg.h"
 #include "zbxpgservice.h"
+#include "zbxalgo.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -43,7 +44,8 @@
 #define	ZBX_POLLER_TYPE_AGENT		8
 #define	ZBX_POLLER_TYPE_SNMP		9
 #define ZBX_POLLER_TYPE_INTERNAL	10
-#define	ZBX_POLLER_TYPE_COUNT		11	/* number of poller types */
+#define ZBX_POLLER_TYPE_BROWSER		11
+#define	ZBX_POLLER_TYPE_COUNT		12	/* number of poller types */
 
 typedef enum
 {
@@ -206,6 +208,7 @@ typedef struct
 	char			*error;
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
+	zbx_vector_tags_ptr_t	*parameters;
 }
 zbx_dc_item_t;
 
@@ -1378,6 +1381,7 @@ typedef struct
 	const char	*ssh;
 	const char	*telnet;
 	const char	*script;
+	const char	*browser;
 }
 zbx_config_item_type_timeouts_t;
 
@@ -1395,6 +1399,7 @@ typedef struct
 	char	ssh[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	telnet[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	script[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	browser[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 }
 zbx_dc_item_type_timeouts_t;
 

@@ -23,6 +23,7 @@
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"
+#include "checks_browser.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
 
@@ -141,6 +142,9 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 			break;
 		case ITEM_TYPE_SCRIPT:
 			res = get_value_script(item, config_comms->config_source_ip, result);
+			break;
+		case ITEM_TYPE_BROWSER:
+			res = get_value_browser(item, config_comms->config_source_ip, result);
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
@@ -292,6 +296,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_SNMP:
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 			case ITEM_TYPE_HTTPAGENT:
 				ZBX_STRDUP(timeout, items[i].timeout_orig);
 				break;
@@ -364,6 +369,16 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].script_params,
 						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
+						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].params,
+						ZBX_MACRO_TYPE_COMMON, NULL, 0);
+				break;
+			case ITEM_TYPE_BROWSER:
+				if (ZBX_MACRO_EXPAND_NO == expand_macros)
+					break;
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].params,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
@@ -847,6 +862,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
+	browseritem_es_engine_init();
 
 	zbx_get_program_type_cb = poller_args_in->zbx_get_program_type_cb_arg;
 	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
@@ -940,6 +956,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	}
 
 	scriptitem_es_engine_destroy();
+	browseritem_es_engine_destroy();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

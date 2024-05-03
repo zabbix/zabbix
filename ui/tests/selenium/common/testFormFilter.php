@@ -51,7 +51,7 @@ class testFormFilter extends CWebTest {
 			case TEST_GOOD:
 				$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
 				$rows = $table->getRows();
-				$filtered_rows_count = ($rows->count() === 1 && $rows->asText() === ['No data found.'])
+				$filtered_rows_count = ($rows->count() === 1 && $rows->asText() === ['No data found'])
 					? 0
 					: $rows->count();
 
@@ -299,7 +299,7 @@ class testFormFilter extends CWebTest {
 	public function getTableResults($table_selector) {
 		$table = $this->query($table_selector)->asTable()->waitUntilReady()->one();
 		$text = $table->query('xpath:.//tbody/tr/td')->one()->getText();
-		$result = ($text === 'No data found.') ? 0 : $table->getRows()->count();
+		$result = ($text === 'No data found') ? 0 : $table->getRows()->count();
 
 		return $result;
 	}

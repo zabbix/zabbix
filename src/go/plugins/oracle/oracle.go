@@ -27,11 +27,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/omeid/go-yarn"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
-	"github.com/omeid/go-yarn"
 )
 
 const (

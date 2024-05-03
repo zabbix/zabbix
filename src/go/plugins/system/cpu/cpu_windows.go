@@ -23,10 +23,10 @@ import (
 	"errors"
 	"unsafe"
 
+	"golang.zabbix.com/agent2/pkg/win32"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
-	"zabbix.com/pkg/win32"
 )
 
 const (

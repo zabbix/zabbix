@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.host.prototype.list.js.php';
@@ -69,7 +70,8 @@ $hostTable = (new CTableInfo())
 		make_sorting_header(_('Create enabled'), 'status', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Discover'), 'discover', $data['sort'], $data['sortorder'], $url),
 		_('Tags')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('host_prototypes.php');
 
@@ -187,7 +189,6 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 // append table to form
 $itemForm->addItem([
 	$hostTable,
-	$data['paging'],
 	new CActionButtonList('action', 'group_hostid',
 		[
 			'hostprototype.massenable' => [

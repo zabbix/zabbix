@@ -86,7 +86,8 @@ $discoveryTable = (new CTableInfo())
 		_('Checks'),
 		_('Status'),
 		_('Info')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['drules'] as $drule) {
 	$status = $drule['status'] == DRULE_STATUS_ACTIVE
@@ -122,7 +123,6 @@ foreach ($data['drules'] as $drule) {
 
 $discoveryForm->addItem([
 	$discoveryTable,
-	$this->data['paging'],
 	new CActionButtonList('action', 'druleids', [
 		'discovery.enable' => [
 			'content' => (new CSimpleButton(_('Enable')))
