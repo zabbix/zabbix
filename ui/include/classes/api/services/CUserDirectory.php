@@ -33,33 +33,37 @@ class CUserDirectory extends CApiService {
 	protected $tableAlias = 'ud';
 	protected $sortColumns = ['name'];
 
-	/**
-	 * Common UserDirectory properties.
-	 *
-	 * @var array
-	 */
-	protected $output_fields = ['userdirectoryid', 'name', 'idp_type', 'provision_status', 'description'];
-
-	/**
-	 * LDAP specific properties.
-	 *
-	 * @var array
-	 */
-	protected $ldap_output_fields = [
+	public const COMMON_OUTPUT_FIELDS = ['userdirectoryid', 'name', 'idp_type', 'provision_status', 'description'];
+	public const LDAP_OUTPUT_FIELDS = [
 		'host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'start_tls', 'search_filter', 'group_basedn',
 		'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username', 'user_lastname',
 		'user_ref_attr'
 	];
-
-	/**
-	 * SAML specific properties.
-	 *
-	 * @var array
-	 */
-	protected $saml_output_fields = [
+	public const SAML_OUTPUT_FIELDS = [
 		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
 		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
 		'encrypt_assertions', 'group_name', 'user_username', 'user_lastname', 'scim_status'
+	];
+
+	public const OUTPUT_FIELDS = [
+		// Common output fields.
+		'userdirectoryid', 'name', 'idp_type', 'provision_status', 'description',
+
+		// LDAP and SAML main fields.
+		'group_name', 'user_username', 'user_lastname',
+
+		// LDAP output fields.
+		'host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'start_tls', 'search_filter', 'group_basedn',
+		'group_member', 'group_filter', 'group_membership', 'user_ref_attr',
+
+		// SAML output fields.
+		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
+		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
+		'encrypt_assertions', 'scim_status'
+	];
+
+	public const MEDIA_OUTPUT_FIELDS = [
+		'userdirectory_mediaid', 'mediatypeid', 'name', 'attribute', 'active', 'severity', 'period'
 	];
 
 	/**
@@ -74,18 +78,18 @@ class CUserDirectory extends CApiService {
 
 		if (!$options['countOutput']) {
 			if ($options['output'] === API_OUTPUT_EXTEND) {
-				$options['output'] = array_merge(
-					$this->output_fields, $this->ldap_output_fields, $this->saml_output_fields
-				);
+				$options['output'] = self::OUTPUT_FIELDS;
 			}
 
 			$request_output = $options['output'];
 			$db_userdirectories_by_type = [IDP_TYPE_LDAP => [], IDP_TYPE_SAML => []];
 			$db_userdirectories = [];
 
-			$options['output'] = array_merge(['idp_type'], array_intersect($request_output, $this->output_fields));
-			$ldap_output = array_intersect($request_output, $this->ldap_output_fields);
-			$saml_output = array_intersect($request_output, $this->saml_output_fields);
+			$options['output'] =
+				array_merge(['idp_type'], array_intersect($request_output, self::COMMON_OUTPUT_FIELDS));
+
+			$ldap_output = array_intersect($request_output, self::LDAP_OUTPUT_FIELDS);
+			$saml_output = array_intersect($request_output, self::SAML_OUTPUT_FIELDS);
 		}
 
 
@@ -143,7 +147,7 @@ class CUserDirectory extends CApiService {
 		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
 
 		$selected_ldap_fields = [];
-		foreach ($this->ldap_output_fields as $field) {
+		foreach (self::LDAP_OUTPUT_FIELDS as $field) {
 			if ($this->outputIsRequested($field, $options['output'])) {
 				$selected_ldap_fields[] = 'ldap.'.$field;
 			}
@@ -162,7 +166,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		$selected_saml_fields = [];
-		foreach ($this->saml_output_fields as $field) {
+		foreach (self::SAML_OUTPUT_FIELDS as $field) {
 			if ($this->outputIsRequested($field, $options['output'])) {
 				$selected_saml_fields[] = 'saml.'.$field;
 			}
@@ -184,8 +188,6 @@ class CUserDirectory extends CApiService {
 	}
 
 	private function validateGet(array &$options): void {
-		$output_fields = array_merge($this->output_fields, $this->ldap_output_fields, $this->saml_output_fields);
-
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'userdirectoryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -196,10 +198,10 @@ class CUserDirectory extends CApiService {
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
 			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', CUserGroup::OUTPUT_FIELDS), 'default' => null],
-			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'mediatypeid', 'attribute']), 'default' => null],
+			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::MEDIA_OUTPUT_FIELDS), 'default' => null],
 			'selectProvisionGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'roleid', 'user_groups']), 'default' => null],
 			// sort and limit
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['name']), 'uniq' => true, 'default' => []],
@@ -291,7 +293,7 @@ class CUserDirectory extends CApiService {
 		unset($row);
 
 		if ($options['selectProvisionMedia'] === API_OUTPUT_EXTEND) {
-			$options['selectProvisionMedia'] = ['name', 'mediatypeid', 'attribute'];
+			$options['selectProvisionMedia'] = self::MEDIA_OUTPUT_FIELDS;
 		}
 
 		$db_provisioning_media = DB::select('userdirectory_media', [
@@ -300,10 +302,11 @@ class CUserDirectory extends CApiService {
 				'userdirectoryid' => array_keys($result)
 			]
 		]);
+		$requested_output = array_flip($options['selectProvisionMedia']);
 
 		foreach ($db_provisioning_media as $db_provisioning_media) {
 			$result[$db_provisioning_media['userdirectoryid']]['provision_media'][]
-				= array_diff_key($db_provisioning_media, array_flip(['userdirectoryid']));
+				= array_intersect_key($db_provisioning_media, $requested_output);
 		}
 	}
 
@@ -372,106 +375,51 @@ class CUserDirectory extends CApiService {
 	/**
 	 * @param array $userdirectories
 	 *
-	 * @throws APIException
-	 *
 	 * @return array
 	 */
 	public function create(array $userdirectories): array {
 		self::validateCreate($userdirectories);
 
-		$db_ldap_idp_count = DB::select('userdirectory', [
-			'countOutput' => true,
-			'filter' => [
-				'idp_type' => IDP_TYPE_LDAP
-			]
-		]);
-
 		$userdirectoryids = DB::insert('userdirectory', $userdirectories);
-		$userdirectory_media = [];
-		$userdirectory_idpgroups = [];
-		$userdirectory_usrgrps = [];
-		$create_idps_ldap = [];
-		$create_idps_saml = [];
 
-		foreach ($userdirectories as $index => &$userdirectory) {
-			$userdirectory['userdirectoryid'] = $userdirectoryids[$index];
+		$ins_userdirectories_ldap = [];
+		$ins_userdirectories_saml = [];
+		$ldap_userdirectoryids = [];
+
+		foreach ($userdirectories as $i => &$userdirectory) {
+			$userdirectory['userdirectoryid'] = $userdirectoryids[$i];
 
 			if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
-				$create_idps_ldap[] = $userdirectory;
-			}
-			elseif ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
-				$create_idps_saml[] = $userdirectory;
+				$ins_userdirectories_ldap[] = array_intersect_key($userdirectory,
+					array_flip(self::LDAP_OUTPUT_FIELDS) + array_flip(['userdirectoryid', 'bind_password'])
+				);
+
+				$ldap_userdirectoryids[] = $userdirectory['userdirectoryid'];
 			}
 
-			if (array_key_exists('provision_media', $userdirectory)) {
-				foreach ($userdirectory['provision_media'] as $media) {
-					$userdirectory_media[] = ['userdirectoryid' => $userdirectory['userdirectoryid']] + $media;
-				}
-			}
-
-			if (array_key_exists('provision_groups', $userdirectory)) {
-				foreach ($userdirectory['provision_groups'] as $group) {
-					$userdirectory_idpgroups[] = ['userdirectoryid' => $userdirectory['userdirectoryid']] + $group;
-				}
+			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+				$ins_userdirectories_saml[] = array_intersect_key($userdirectory,
+					array_flip(self::SAML_OUTPUT_FIELDS) + array_flip(['userdirectoryid'])
+				);
 			}
 		}
 		unset($userdirectory);
 
-		if ($userdirectory_idpgroups) {
-			$idpgroupids = DB::insert('userdirectory_idpgroup', $userdirectory_idpgroups);
-
-			foreach ($idpgroupids as $index => $idpgroupid) {
-				foreach ($userdirectory_idpgroups[$index]['user_groups'] as $usrgrp) {
-					$userdirectory_usrgrps[] = [
-						'userdirectory_idpgroupid' => $idpgroupid,
-						'usrgrpid' => $usrgrp['usrgrpid']
-					];
-				}
-			}
-
-			$userdirectory_usrgrpids = DB::insert('userdirectory_usrgrp', $userdirectory_usrgrps);
+		if ($ins_userdirectories_ldap) {
+			DB::insert('userdirectory_ldap', $ins_userdirectories_ldap, false);
 		}
 
-		if ($create_idps_ldap) {
-			DB::insert('userdirectory_ldap', $create_idps_ldap, false);
+		if ($ins_userdirectories_saml) {
+			DB::insert('userdirectory_saml', $ins_userdirectories_saml, false);
 		}
 
-		if ($create_idps_saml) {
-			DB::insert('userdirectory_saml', $create_idps_saml, false);
-		}
-
-		if ($userdirectory_media) {
-			$userdirectory_mediaids = DB::insert('userdirectory_media', $userdirectory_media);
-		}
-
-		// Return IDs for audit log.
-		foreach ($userdirectories as &$userdirectory) {
-			if (array_key_exists('provision_media', $userdirectory)) {
-				foreach ($userdirectory['provision_media'] as &$media) {
-					$media['userdirectory_mediaid'] = array_shift($userdirectory_mediaids);
-				}
-				unset($media);
-			}
-
-			if (array_key_exists('provision_groups', $userdirectory)) {
-				foreach ($userdirectory['provision_groups'] as &$provision_group) {
-					$provision_group['userdirectory_idpgroupid'] = array_shift($idpgroupids);
-
-					foreach ($provision_group['user_groups'] as &$user_group) {
-						$user_group['userdirectory_usrgrpid'] = array_shift($userdirectory_usrgrpids);
-					}
-					unset($user_group);
-				}
-				unset($provision_group);
-			}
-		}
-		unset($userdirectory);
+		self::updateProvisionGroups($userdirectories);
+		self::updateProvisionMedia($userdirectories);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USERDIRECTORY, $userdirectories);
 
-		if ($db_ldap_idp_count == 0 && $create_idps_ldap) {
-			$idp_ldap = reset($create_idps_ldap);
-			API::Authentication()->update(['ldap_userdirectoryid' => $idp_ldap['userdirectoryid']]);
+		if ($ldap_userdirectoryids) {
+			self::setDefaultUserdirectory($ldap_userdirectoryids);
 		}
 
 		return ['userdirectoryids' => $userdirectoryids];
@@ -483,22 +431,22 @@ class CUserDirectory extends CApiService {
 	 * @throws APIException
 	 */
 	private static function validateCreate(array &$userdirectories): void {
-		$api_input_rules = self::getValidationRules('create');
+		$api_input_rules = self::getValidationRules();
 
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::checkDuplicates($userdirectories);
 		self::checkProvisionGroups($userdirectories);
 		self::checkMediaTypes($userdirectories);
-		self::checkDuplicates($userdirectories);
 		self::checkSamlExists($userdirectories);
 	}
 
 	/**
 	 * Validate if only one user directory of type IDP_TYPE_SAML exists.
 	 *
-	 * @return void
+	 * @throws APIException
 	 */
 	private static function checkSamlExists(array $userdirectories): void {
 		$idps = array_column($userdirectories, 'idp_type');
@@ -524,61 +472,89 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
+	private static function setDefaultUserdirectory(array $ldap_userdirectoryids): void {
+		if (!self::checkOtherLdapUserdirectoryExists($ldap_userdirectoryids)) {
+			API::Authentication()->update(['ldap_userdirectoryid' => reset($ldap_userdirectoryids)]);
+		}
+	}
+
+	private static function checkOtherLdapUserdirectoryExists(array $userdirectoryids): bool {
+		return (bool) DBfetch(DBselect(
+			'SELECT u.userdirectoryid'.
+			' FROM userdirectory u'.
+			' WHERE '.dbConditionId('u.userdirectoryid', $userdirectoryids, true).
+				' AND '.dbConditionInt('u.idp_type', [IDP_TYPE_LDAP]),
+			1
+		));
+	}
+
 	/**
 	 * @param array $userdirectories
-	 *
-	 * @throws APIException
 	 *
 	 * @return array
 	 */
 	public function update(array $userdirectories): array {
 		$this->validateUpdate($userdirectories, $db_userdirectories);
 
-		$upd_userdirectories = [];
-		$upd_idps_type = [IDP_TYPE_LDAP => [], IDP_TYPE_SAML => []];
+		self::addFieldDefaultsByType($userdirectories, $db_userdirectories);
 
-		foreach ($userdirectories as $userdirectoryid => $userdirectory) {
-			$db_userdirectory = $db_userdirectories[$userdirectoryid];
+		$upd_userdirectories = [];
+		$upd_userdirectories_ldap = [];
+		$upd_userdirectories_saml = [];
+
+		foreach ($userdirectories as $userdirectory) {
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 
 			$upd_userdirectory = DB::getUpdatedValues('userdirectory',
-				array_intersect_key($userdirectory, array_flip($this->output_fields)),
-				$db_userdirectories[$userdirectoryid]
+				array_intersect_key($userdirectory, array_flip(self::COMMON_OUTPUT_FIELDS)), $db_userdirectory
 			);
+
 			if ($upd_userdirectory) {
 				$upd_userdirectories[] = [
 					'values' => $upd_userdirectory,
-					'where' => ['userdirectoryid' => $userdirectoryid]
+					'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
 				];
 			}
 
-			if ($db_userdirectory['idp_type'] == IDP_TYPE_LDAP) {
-				$new_userdirectory_fields = array_intersect_key($userdirectory,
-					array_flip($this->ldap_output_fields) + ['bind_password' => '']
+			if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
+				$upd_userdirectory_ldap = DB::getUpdatedValues('userdirectory_ldap',
+					array_intersect_key($userdirectory, array_flip(self::LDAP_OUTPUT_FIELDS) + ['bind_password' => '']),
+					$db_userdirectory
 				);
 
-				$upd_fields = DB::getUpdatedValues('userdirectory_ldap',
-					$new_userdirectory_fields,
-					$db_userdirectories[$userdirectoryid]
-				);
-			}
-			else {
-				$upd_fields = DB::getUpdatedValues('userdirectory_saml',
-					array_intersect_key($userdirectory, array_flip($this->saml_output_fields)),
-					$db_userdirectories[$userdirectoryid]
-				);
+				if ($upd_userdirectory_ldap) {
+					$upd_userdirectories_ldap[] = [
+						'values' => $upd_userdirectory_ldap,
+						'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
+					];
+				}
 			}
 
-			if ($upd_fields) {
-				$upd_idps_type[$db_userdirectory['idp_type']][] = [
-					'values' => $upd_fields,
-					'where' => ['userdirectoryid' => $userdirectoryid]
-				];
+			if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+				$upd_userdirectory_saml = DB::getUpdatedValues('userdirectory_saml',
+					array_intersect_key($userdirectory, array_flip(self::SAML_OUTPUT_FIELDS)), $db_userdirectory
+				);
+
+				if ($upd_userdirectory_saml) {
+					$upd_userdirectories_saml[] = [
+						'values' => $upd_userdirectory_saml,
+						'where' => ['userdirectoryid' => $userdirectory['userdirectoryid']]
+					];
+				}
 			}
 		}
 
-		DB::update('userdirectory', $upd_userdirectories);
-		DB::update('userdirectory_ldap', $upd_idps_type[IDP_TYPE_LDAP]);
-		DB::update('userdirectory_saml', $upd_idps_type[IDP_TYPE_SAML]);
+		if ($upd_userdirectories) {
+			DB::update('userdirectory', $upd_userdirectories);
+		}
+
+		if ($upd_userdirectories_ldap) {
+			DB::update('userdirectory_ldap', $upd_userdirectories_ldap);
+		}
+
+		if ($upd_userdirectories_saml) {
+			DB::update('userdirectory_saml', $upd_userdirectories_saml);
+		}
 
 		self::updateProvisionMedia($userdirectories, $db_userdirectories);
 		self::updateProvisionGroups($userdirectories, $db_userdirectories);
@@ -591,11 +567,6 @@ class CUserDirectory extends CApiService {
 	}
 
 	/**
-	 * Validate function for 'update' method.
-	 *
-	 * Validation is performed in multiple steps. First we check if userdirectoryid(s) are present. Then we extend each
-	 * of given $userdirectories objects with 'idp_type' property from database, then perform full input validation.
-	 *
 	 * @param array      $userdirectories
 	 * @param array|null $db_userdirectories
 	 *
@@ -603,14 +574,17 @@ class CUserDirectory extends CApiService {
 	 */
 	private function validateUpdate(array &$userdirectories, ?array &$db_userdirectories): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['userdirectoryid']], 'fields' => [
-			'userdirectoryid' => ['type' => API_ID, 'flags' => API_REQUIRED]
+			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'idp_type' =>			['type' => API_INT32, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])],
+			'provision_status' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])]
+
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_userdirectories = $this->get([
-			'output' => API_OUTPUT_EXTEND,
+			'output' => self::OUTPUT_FIELDS,
 			'userdirectoryids' => array_column($userdirectories, 'userdirectoryid'),
 			'preservekeys' => true
 		]);
@@ -619,7 +593,7 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach ($userdirectories as &$userdirectory) {
+		foreach ($userdirectories as $i => &$userdirectory) {
 			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 			$userdirectory += [
 				'idp_type' => $db_userdirectory['idp_type'],
@@ -628,134 +602,193 @@ class CUserDirectory extends CApiService {
 
 			if ($userdirectory['idp_type'] != $db_userdirectory['idp_type']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'idp_type', _('cannot be changed'))
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/idp_type', _('cannot be changed'))
 				);
 			}
 		}
 		unset($userdirectory);
 
-		$api_input_rules = self::getValidationRules('update');
+		self::addRequiredFieldsByType($userdirectories, $db_userdirectories);
+
+		$api_input_rules = self::getValidationRules(true);
+
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::addAffectedObjects($userdirectories, $db_userdirectories);
+
+		self::validateProvisionMedias($userdirectories, $db_userdirectories);
+
+		self::checkDuplicates($userdirectories, $db_userdirectories);
+		self::checkProvisionGroups($userdirectories, $db_userdirectories);
+		self::checkMediaTypes($userdirectories, $db_userdirectories);
+	}
+
+	private static function addRequiredFieldsByType(array &$userdirectories, array $db_userdirectories): void {
 		foreach ($userdirectories as &$userdirectory) {
 			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
 
-			if (!array_key_exists('provision_status', $userdirectory)
-					|| $userdirectory['provision_status'] == $db_userdirectory['provision_status']
-					|| $userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
-				continue;
+			if ($userdirectory['provision_status'] != $db_userdirectory['provision_status']) {
+				if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
+					$userdirectory += ['provision_groups' => []];
+				}
 			}
-
-			$idp_fields = $db_userdirectory['idp_type'] == IDP_TYPE_LDAP
-				? $this->ldap_output_fields
-				: $this->saml_output_fields;
-			$empty_provision_fields = array_fill_keys(
-				array_intersect(['group_basedn', 'group_member', 'group_membership', 'group_name', 'user_username',
-					'user_lastname', 'user_ref_attr'
-				], $idp_fields),
-				''
-			);
-			$empty_provision_fields['provision_groups'] = [];
-			$empty_provision_fields['provision_media'] = [];
-
-			$userdirectory = $empty_provision_fields + $userdirectory;
 		}
 		unset($userdirectory);
-
-		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
-
-		self::checkProvisionGroups($userdirectories, $db_userdirectories);
-		self::checkMediaTypes($userdirectories);
-		self::checkDuplicates($userdirectories, $db_userdirectories);
-		self::addAffectedObjects($userdirectories, $db_userdirectories);
 	}
 
 	private static function addAffectedObjects(array $userdirectories, array &$db_userdirectories): void {
-		self::addAffectedProvisionMedia($userdirectories, $db_userdirectories);
 		self::addAffectedProvisionGroups($userdirectories, $db_userdirectories);
-	}
-
-	private static function addAffectedProvisionMedia(array $userdirectories, array &$db_userdirectories): void {
-		$affected_userdirectoryids = [];
-		foreach ($userdirectories as $userdirectoryid => $userdirectory) {
-			if (array_key_exists('provision_media', $userdirectory)) {
-				$affected_userdirectoryids[$userdirectoryid] = true;
-				$db_userdirectories[$userdirectoryid]['provision_media'] = [];
-			}
-		}
-
-		if (!$affected_userdirectoryids) {
-			return;
-		}
-
-		$db_provision_media = DB::select('userdirectory_media', [
-			'output' => ['userdirectory_mediaid', 'userdirectoryid', 'mediatypeid', 'name', 'attribute'],
-			'filter' => [
-				'userdirectoryid' => array_keys($affected_userdirectoryids)
-			]
-		]);
-
-		foreach ($db_provision_media as $media) {
-			$db_userdirectories[$media['userdirectoryid']]['provision_media'][] = [
-				'userdirectory_mediaid' => $media['userdirectory_mediaid'],
-				'mediatypeid' => $media['mediatypeid'],
-				'name' => $media['name'],
-				'attribute' => $media['attribute']
-			];
-		}
+		self::addAffectedProvisionMedia($userdirectories, $db_userdirectories);
 	}
 
 	private static function addAffectedProvisionGroups(array $userdirectories, array &$db_userdirectories): void {
-		$affected_userdirectoryids = array_keys(array_column($userdirectories, 'provision_groups', 'userdirectoryid'));
+		$userdirectoryids = [];
 
-		if (!$affected_userdirectoryids) {
+		foreach ($userdirectories as $userdirectory) {
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+
+			if (array_key_exists('provision_groups', $userdirectory)
+					|| ($userdirectory['provision_status'] != $db_userdirectory['provision_status']
+						&& $db_userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED)) {
+				$userdirectoryids[] = $userdirectory['userdirectoryid'];
+				$db_userdirectories[$userdirectory['userdirectoryid']]['provision_groups'] = [];
+			}
+		}
+
+		if (!$userdirectoryids) {
 			return;
 		}
 
-		foreach ($affected_userdirectoryids as $userdirectoryid) {
-			$db_userdirectories[$userdirectoryid]['provision_groups'] = [];
-		}
-
-		$db_provision_groups = DB::select('userdirectory_idpgroup', [
+		$options = [
 			'output' => ['userdirectory_idpgroupid', 'userdirectoryid', 'roleid', 'name'],
-			'filter' => [
-				'userdirectoryid' => $affected_userdirectoryids
-			],
-			'preservekeys' => true
-		]);
+			'filter' => ['userdirectoryid' => $userdirectoryids]
+		];
+		$result = DBselect(DB::makeSql('userdirectory_idpgroup', $options));
 
-		$db_provision_usrgrps = DB::select('userdirectory_usrgrp', [
+		$db_provision_groups = [];
+
+		while ($row = DBfetch($result)) {
+			$db_userdirectories[$row['userdirectoryid']]['provision_groups'][$row['userdirectory_idpgroupid']] =
+				array_diff_key($row, array_flip(['userdirectoryid']));
+
+			$db_provision_groups[$row['userdirectory_idpgroupid']] =
+				&$db_userdirectories[$row['userdirectoryid']]['provision_groups'][$row['userdirectory_idpgroupid']];
+		}
+
+		if (!$db_provision_groups) {
+			return;
+		}
+
+		$options = [
 			'output' => ['userdirectory_usrgrpid', 'userdirectory_idpgroupid', 'usrgrpid'],
-			'filter' => [
-				'userdirectory_idpgroupid' => array_keys($db_provision_groups)
+			'filter' => ['userdirectory_idpgroupid' => array_keys($db_provision_groups)]
+		];
+		$result = DBselect(DB::makeSql('userdirectory_usrgrp', $options));
+
+		while ($row = DBfetch($result)) {
+			$db_provision_groups[$row['userdirectory_idpgroupid']]['user_groups'][$row['userdirectory_usrgrpid']] =
+				array_diff_key($row, array_flip(['userdirectory_idpgroupid']));
+		}
+	}
+
+	private static function addAffectedProvisionMedia(array $userdirectories, array &$db_userdirectories): void {
+		$userdirectoryids = [];
+
+		foreach ($userdirectories as $userdirectory) {
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+
+			if (array_key_exists('provision_media', $userdirectory)
+					|| ($userdirectory['provision_status'] != $db_userdirectory['provision_status']
+						&& $db_userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED)) {
+				$userdirectoryids[] = $userdirectory['userdirectoryid'];
+				$db_userdirectories[$userdirectory['userdirectoryid']]['provision_media'] = [];
+			}
+		}
+
+		if (!$userdirectoryids) {
+			return;
+		}
+
+		$options = [
+			'output' => array_merge(self::MEDIA_OUTPUT_FIELDS, ['userdirectoryid']),
+			'filter' => ['userdirectoryid' => $userdirectoryids]
+		];
+		$result = DBselect(DB::makeSql('userdirectory_media', $options));
+
+		while ($row = DBfetch($result)) {
+			$db_userdirectories[$row['userdirectoryid']]['provision_media'][$row['userdirectory_mediaid']] =
+				array_diff_key($row, array_flip(['userdirectoryid']));
+		}
+	}
+
+	/**
+	 * @return array
+	 */
+	private static function getProvisionMediaValidationFields(bool $is_update = false): array {
+		$api_required = $is_update ? 0 : API_REQUIRED;
+
+		$specific_rules = $is_update
+			? [
+				'userdirectory_mediaid' =>	['type' => API_ANY]
 			]
-		]);
+			: [];
 
-		$db_idpgroup_usergroups = [];
-		foreach ($db_provision_usrgrps as $db_prov_usrgrp) {
-			['userdirectory_idpgroupid' => $prov_groupid, 'userdirectory_usrgrpid' => $prov_usrgrpid] = $db_prov_usrgrp;
+		return $specific_rules + [
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
+			'mediatypeid' =>	['type' => API_ID, 'flags' => $api_required],
+			'attribute' =>		['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')],
+			'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
+			'severity' =>		['type' => API_INT32, 'in' => '0:63'],
+			'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('userdirectory_media', 'period')]
+		];
+	}
 
-			$db_idpgroup_usergroups[$prov_groupid][] = [
-				'usrgrpid' => $db_prov_usrgrp['usrgrpid'],
-				'userdirectory_usrgrpid' => $prov_usrgrpid
-			];
+	private static function validateProvisionMedias(array &$userdirectories, array $db_userdirectories): void {
+		foreach ($userdirectories as $i1 => &$userdirectory) {
+			if (!array_key_exists('provision_media', $userdirectory)) {
+				return;
+			}
+
+			$path = '/'.($i1 + 1).'/provision_media';
+
+			$db_provision_medias =  $db_userdirectories[$userdirectory['userdirectoryid']]['provision_media'];
+
+			foreach ($userdirectory['provision_media'] as $i2 => &$provision_media) {
+				$is_update = array_key_exists('userdirectory_mediaid', $provision_media);
+
+				if ($is_update) {
+					if (!array_key_exists($provision_media['userdirectory_mediaid'], $db_provision_medias)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/'.($i2 + 1).'/userdirectory_mediaid',
+							_('object does not exist or belongs to another object')
+						));
+					}
+
+					$db_provision_media = $db_provision_medias[$provision_media['userdirectory_mediaid']];
+					$provision_media += array_intersect_key($db_provision_media, array_flip(['mediatypeid', 'attribute']));
+				}
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getProvisionMediaValidationFields($is_update)];
+
+				if (!CApiInputValidator::validate($api_input_rules, $provision_media, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+			unset($provision_media);
+
+			$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
+				'mediatypeid' =>	['type' => API_ANY],
+				'attribute' =>		['type' => API_ANY]
+			]];
+			$data = $userdirectory['provision_media'];
+
+			if (!CApiInputValidator::validateUniqueness($api_input_rules, $data, $path, $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
 		}
-
-		foreach ($db_provision_groups as $db_prov_groups) {
-			['userdirectory_idpgroupid' => $prov_groupid, 'userdirectoryid' => $userdirectoryid] = $db_prov_groups;
-
-			CArrayHelper::sort($db_idpgroup_usergroups[$prov_groupid], ['usrgrpid']);
-			$db_idpgroup_usergroups[$prov_groupid] = array_values($db_idpgroup_usergroups[$prov_groupid]);
-
-			$db_userdirectories[$userdirectoryid]['provision_groups'][] = [
-				'userdirectory_idpgroupid' => $prov_groupid,
-				'name' => $db_prov_groups['name'],
-				'roleid' => $db_prov_groups['roleid'],
-				'user_groups' => $db_idpgroup_usergroups[$prov_groupid]
-			];
-		}
+		unset($userdirectory);
 	}
 
 	/**
@@ -798,89 +831,156 @@ class CUserDirectory extends CApiService {
 	}
 
 	private static function checkProvisionGroups(array $userdirectories, array $db_userdirectories = null): void {
-		$roleids = [];
-		$usrgrpids = [];
-		foreach (array_values($userdirectories) as $i => $userdirectory) {
-			$db_userdir = $db_userdirectories ? $db_userdirectories[$userdirectory['userdirectoryid']] : null;
+		$role_indexes = [];
+		$user_group_indexes = [];
 
-			if ($userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
-				continue;
-			}
-			elseif ($db_userdir && $db_userdir['provision_status'] != $userdirectory['provision_status']
-					&& !array_key_exists('provision_groups', $userdirectory)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
-					_s('the parameter "%1$s" is missing', 'provision_groups')
-				));
-			}
-			elseif (!array_key_exists('provision_groups', $userdirectory)) {
+		foreach ($userdirectories as $i1 => $userdirectory) {
+			if ($userdirectory['provision_status'] != JIT_PROVISIONING_ENABLED
+					|| !array_key_exists('provision_groups', $userdirectory)) {
 				continue;
 			}
 
-			foreach ($userdirectory['provision_groups'] as $provision_group) {
-				['roleid' => $roleid, 'user_groups' => $groups] = $provision_group;
+			$db_provision_groups = $db_userdirectories !== null
+				? array_column($db_userdirectories[$userdirectory['userdirectoryid']]['provision_groups'], null, 'name')
+				: [];
 
-				$roleids[$roleid] = $roleid;
-				$usrgrpids = array_merge($usrgrpids, array_column($groups, 'usrgrpid'));
+			foreach ($userdirectory['provision_groups'] as $i2 => $provision_group) {
+				$db_provision_group = array_key_exists($provision_group['name'], $db_provision_groups)
+					? $db_provision_groups[$provision_group['name']]
+					: null;
+
+				if ($db_provision_group === null
+						|| bccomp($provision_group['roleid'], $db_provision_group['roleid']) != 0) {
+					$role_indexes[$provision_group['roleid']][$i1][] = $i2;
+				}
+
+				$db_usrgrpids = $db_provision_group !== null
+					? array_column($db_provision_group['user_groups'], 'usrgrpid')
+					: [];
+
+				foreach ($provision_group['user_groups'] as $i3 => $user_group) {
+					if (!in_array($user_group['usrgrpid'], $db_usrgrpids)) {
+						$user_group_indexes[$user_group['usrgrpid']][$i1][$i2] = $i3;
+					}
+				}
 			}
 		}
 
-		if (count($roleids) != API::Role()->get(['countOutput' => true, 'roleids' => $roleids])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$usrgrpids = array_keys(array_flip($usrgrpids));
-		if (count($usrgrpids) != API::UserGroup()->get(['countOutput' => true, 'usrgrpids' => $usrgrpids])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-	}
-
-	private static function checkMediaTypes(array $userdirectories): void {
-		$mediatypeids = [];
-
-		foreach ($userdirectories as $userdirectory) {
-			if (!array_key_exists('provision_media', $userdirectory) || !$userdirectory['provision_media']) {
-				continue;
-			}
-
-			$mediatypeids = array_merge($mediatypeids, array_column($userdirectory['provision_media'], 'mediatypeid'));
-		}
-
-		if ($mediatypeids) {
-			$mediatypeids = array_keys(array_flip($mediatypeids));
-
-			$db_mediatypes = API::MediaType()->get([
+		if ($role_indexes) {
+			$db_roles = API::Role()->get([
 				'output' => [],
-				'mediatypeids' => $mediatypeids,
+				'roleids' => array_keys($role_indexes),
 				'preservekeys' => true
 			]);
 
-			if (count($db_mediatypes) != count($mediatypeids)) {
-				$missing_mediatypeids = array_diff($mediatypeids, array_keys($db_mediatypes));
-				$missing_mediatypeid = reset($missing_mediatypeids);
-				$userdirectory_index = 0;
-				$media_index = 0;
+			foreach ($role_indexes as $roleid => $indexes) {
+				if (!array_key_exists($roleid, $db_roles)) {
+					$i1 = key($indexes);
+					$i2 = reset($indexes[$i1]);
 
-				foreach (array_values($userdirectories) as $usrdir_index => $userdirectory) {
-					if (!array_key_exists('provision_media', $userdirectory)) {
-						continue;
-					}
-
-					$mediaids = array_column($userdirectory['provision_media'], 'mediatypeid', null);
-					if (($found = array_search($missing_mediatypeid, $mediaids)) !== false) {
-						$userdirectory_index = $usrdir_index;
-						$media_index = $found;
-						break;
-					}
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/provision_groups/'.($i2 + 1).'/roleid', _('object does not exist')
+					));
 				}
-
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.',
-						'/'.($userdirectory_index + 1).'/provision_media/'.($media_index + 1).'/mediatypeid',
-						_('referred object does not exist')
-					)
-				);
 			}
 		}
+
+		if ($user_group_indexes) {
+			$db_user_groups = API::UserGroup()->get([
+				'output' => [],
+				'usrgrpids' => array_keys($user_group_indexes),
+				'preservekeys' => true
+			]);
+
+			foreach ($user_group_indexes as $usrgrpid => $indexes) {
+				if (!array_key_exists($usrgrpid, $db_user_groups)) {
+					$i1 = key($indexes);
+					$i2 = key($indexes[$i1]);
+					$i3 = $indexes[$i1][$i2];
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/provision_groups/'.($i2 + 1).'/user_groups/'.($i3 + 1),
+						_('object does not exist')
+					));
+				}
+			}
+		}
+	}
+
+	private static function checkMediaTypes(array $userdirectories, array $db_userdirectories = null): void {
+		$media_indexes = [];
+
+		foreach ($userdirectories as $i1 => $userdirectory) {
+			if ($userdirectory['provision_status'] != JIT_PROVISIONING_ENABLED
+					|| !array_key_exists('provision_media', $userdirectory) || !$userdirectory['provision_media']) {
+				continue;
+			}
+
+			$db_mediatypeids = $db_userdirectories !== null
+				? array_column($db_userdirectories[$userdirectory['userdirectoryid']], 'mediatypeid', 'mediatypeid')
+				: [];
+
+			foreach ($userdirectory['provision_media'] as $i2 => $media) {
+				if (!in_array($media['mediatypeid'], $db_mediatypeids)) {
+					$media_indexes[$media['mediatypeid']][$i1][] = $i2;
+				}
+			}
+		}
+
+		if (!$media_indexes) {
+			return;
+		}
+
+		$db_mediatypes = API::MediaType()->get([
+			'output' => [],
+			'mediatypeids' => array_keys($media_indexes),
+			'preservekeys' => true
+		]);
+
+		foreach ($media_indexes as $mediatypeid => $indexes) {
+			if (!array_key_exists($mediatypeid, $db_mediatypes)) {
+				$i1 = key($indexes);
+				$i2 = reset($indexes[$i1]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/provision_media/'.($i2 + 1).'/mediatypeid', _('object does not exist')
+				));
+			}
+		}
+	}
+
+	private static function addFieldDefaultsByType(array &$userdirectories, array $db_userdirectories): void {
+		foreach ($userdirectories as &$userdirectory) {
+			$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+
+			if ($userdirectory['provision_status'] != $db_userdirectory['provision_status']
+					&& $db_userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
+				if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
+					$userdirectory += [
+						'group_basedn' => DB::getDefault('userdirectory_ldap', 'group_basedn'),
+						'user_ref_attr' => DB::getDefault('userdirectory_ldap', 'user_ref_attr'),
+						'group_name' => DB::getDefault('userdirectory_ldap', 'group_name'),
+						'user_username' => DB::getDefault('userdirectory_ldap', 'user_username'),
+						'user_lastname' => DB::getDefault('userdirectory_ldap', 'user_lastname'),
+						'group_member' => DB::getDefault('userdirectory_ldap', 'group_member'),
+						'group_membership' => DB::getDefault('userdirectory_ldap', 'group_membership'),
+						'provision_groups' => [],
+						'provision_media' => []
+					];
+				}
+
+				if ($userdirectory['idp_type'] == IDP_TYPE_SAML) {
+					$userdirectory += [
+						'group_name' => DB::getDefault('userdirectory_saml', 'group_name'),
+						'user_username' => DB::getDefault('userdirectory_saml', 'user_username'),
+						'user_lastname' => DB::getDefault('userdirectory_saml', 'user_lastname'),
+						'provision_groups' => [],
+						'provision_media' => []
+					];
+				}
+			}
+		}
+		unset($userdirectory);
 	}
 
 	/**
@@ -898,6 +998,11 @@ class CUserDirectory extends CApiService {
 			'where' => ['userdirectoryid' => $userdirectoryids]
 		]]);
 
+		self::deleteAffectedProvisionGroups($userdirectoryids);
+
+		DB::delete('userdirectory_media', ['userdirectoryid' => $userdirectoryids]);
+		DB::delete('userdirectory_ldap', ['userdirectoryid' => $userdirectoryids]);
+		DB::delete('userdirectory_saml', ['userdirectoryid' => $userdirectoryids]);
 		DB::delete('userdirectory', ['userdirectoryid' => $userdirectoryids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USERDIRECTORY, $db_userdirectories);
@@ -971,6 +1076,17 @@ class CUserDirectory extends CApiService {
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)) {
 			// If last (default) is removed, reset default userdirectoryid to prevent from foreign key constraint.
 			API::Authentication()->update(['ldap_userdirectoryid' => 0]);
+		}
+	}
+
+	private static function deleteAffectedProvisionGroups(array $userdirectoryids): void {
+		$del_provision_groupids = array_keys(DB::select('userdirectory_idpgroup', [
+			'filter' => ['userdirectoryid' => $userdirectoryids],
+			'preservekeys' => true
+		]));
+
+		if ($del_provision_groupids) {
+			self::deleteProvisionGroups($del_provision_groupids);
 		}
 	}
 
@@ -1071,7 +1187,7 @@ class CUserDirectory extends CApiService {
 						'user_ref_attr', 'user_username', 'user_lastname'
 					],
 					'userdirectoryids' => $userdirectory['userdirectoryid'],
-					'selectProvisionMedia' => ['name', 'mediatypeid', 'attribute'],
+					'selectProvisionMedia' => self::MEDIA_OUTPUT_FIELDS,
 					'selectProvisionGroups' => ['name', 'roleid', 'user_groups']
 				])[0];
 			}
@@ -1099,9 +1215,13 @@ class CUserDirectory extends CApiService {
 			'idp_type' =>			['type' => API_INT32, 'in' => implode(',', [IDP_TYPE_LDAP]), 'default' => IDP_TYPE_LDAP],
 			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
-											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
-											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
+											'userdirectory_mediaid' =>	['type' => API_ID, 'default' => 0],
+											'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
+											'mediatypeid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+											'attribute' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')],
+											'active' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]), 'default' => DB::getDefault('userdirectory_media', 'active')],
+											'severity' =>				['type' => API_INT32, 'in' => '0:63', 'default' => DB::getDefault('userdirectory_media', 'severity')],
+											'period' =>					['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('userdirectory_media', 'period'), 'default' => DB::getDefault('userdirectory_media', 'period')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
@@ -1126,179 +1246,252 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
-	/**
-	 * @param array      $userdirectories
-	 */
-	private static function updateProvisionMedia(array &$userdirectories, array $db_userdirectories): void {
-		$userdirectoryids = array_keys(array_column($userdirectories, 'provision_media', 'userdirectoryid'));
-		$provision_media_remove = array_fill_keys($userdirectoryids, []);
-		$provision_media_insert = array_fill_keys($userdirectoryids, []);
+	private static function updateProvisionMedia(array &$userdirectories, array $db_userdirectories = null): void {
+		$ins_provision_medias = [];
+		$upd_provision_medias = [];
+		$del_provision_mediaids = [];
 
-		foreach ($userdirectoryids as $userdirectoryid) {
-			foreach ($db_userdirectories[$userdirectoryid]['provision_media'] as $media) {
-				$provision_media_remove[$userdirectoryid][$media['userdirectory_mediaid']] = [
-					'userdirectoryid' => $userdirectoryid
-				] + array_intersect_key($media, array_flip(['name', 'mediatypeid', 'attribute']));
+		foreach ($userdirectories as $userdirectory) {
+			if (!array_key_exists('provision_media', $userdirectory)) {
+				continue;
 			}
 
-			foreach ($userdirectories[$userdirectoryid]['provision_media'] as $index => $media) {
-				$provision_media_insert[$userdirectoryid][$index] = ['userdirectoryid' => $userdirectoryid] + $media;
-			}
-		}
+			$db_provision_medias = $db_userdirectories !== null
+				? $db_userdirectories[$userdirectory['userdirectoryid']]['provision_media']
+				: [];
 
-		foreach ($userdirectoryids as $userdirectoryid) {
-			foreach ($provision_media_insert[$userdirectoryid] as $index => $new_media) {
-				foreach ($provision_media_remove[$userdirectoryid] as $db_mediaid => $db_media) {
-					if ($db_media == $new_media) {
-						unset($provision_media_remove[$userdirectoryid][$db_mediaid]);
-						unset($provision_media_insert[$userdirectoryid][$index]);
+			foreach ($userdirectory['provision_media'] as $provision_media) {
+				if (array_key_exists('userdirectory_mediaid', $provision_media)) {
+					$upd_provision_media = DB::getUpdatedValues('userdirectory_media', $provision_media,
+						$db_provision_medias[$provision_media['userdirectory_mediaid']]
+					);
 
-						$userdirectories[$userdirectoryid]['provision_media'][$index]['userdirectory_mediaid']
-							= $db_mediaid;
+					if ($upd_provision_media) {
+						$upd_provision_medias[] = [
+							'values' => $upd_provision_media,
+							'where' => ['userdirectory_mediaid' => $provision_media['userdirectory_mediaid']]
+						];
 					}
+
+					unset($db_provision_medias[$provision_media['userdirectory_mediaid']]);
+				}
+				else {
+					$ins_provision_medias[] =
+						['userdirectoryid' => $userdirectory['userdirectoryid']] + $provision_media;
 				}
 			}
+
+			$del_provision_mediaids = array_merge($del_provision_mediaids, array_keys($db_provision_medias));
 		}
 
-		// Remove old provision media records.
-		if ($provision_media_remove) {
-			$provision_mediaids_remove = [];
-			foreach ($provision_media_remove as $media_remove) {
-				$provision_mediaids_remove = array_merge($provision_mediaids_remove, array_keys($media_remove));
+		if ($del_provision_mediaids) {
+			DB::delete('userdirectory_media', ['userdirectory_mediaid' => $del_provision_mediaids]);
+		}
+
+		if ($upd_provision_medias) {
+			DB::update('userdirectory_media', $upd_provision_medias);
+		}
+
+		if ($ins_provision_medias) {
+			$userdirectory_mediaids = DB::insert('userdirectory_media', $ins_provision_medias);
+		}
+
+		foreach ($userdirectories as &$userdirectory) {
+			if (!array_key_exists('provision_media', $userdirectory)) {
+				continue;
 			}
 
-			DB::delete('userdirectory_media', ['userdirectory_mediaid' => $provision_mediaids_remove]);
+			foreach ($userdirectory['provision_media'] as &$provision_media) {
+				if (!array_key_exists('userdirectory_mediaid', $provision_media)) {
+					$provision_media['userdirectory_mediaid'] = array_shift($userdirectory_mediaids);
+				}
+			}
+			unset($provision_media);
+		}
+		unset($userdirectory);
+	}
+
+	private static function updateProvisionGroups(array &$userdirectories, array $db_userdirectories = null): void {
+		$ins_provision_groups = [];
+		$upd_provision_groups = [];
+		$del_provision_groupids = [];
+
+		foreach ($userdirectories as &$userdirectory) {
+			if (!array_key_exists('provision_groups', $userdirectory)) {
+				continue;
+			}
+
+			$db_provision_groups = $db_userdirectories !== null
+				? array_column($db_userdirectories[$userdirectory['userdirectoryid']]['provision_groups'], null, 'name')
+				: [];
+
+			foreach ($userdirectory['provision_groups'] as &$provision_group) {
+				if (array_key_exists($provision_group['name'], $db_provision_groups)) {
+					$db_provision_group = $db_provision_groups[$provision_group['name']];
+					$provision_group['userdirectory_idpgroupid'] = $db_provision_group['userdirectory_idpgroupid'];
+
+					$upd_provision_group =
+						DB::getUpdatedValues('userdirectory_idpgroup', $provision_group, $db_provision_group);
+
+					if ($upd_provision_group) {
+						$upd_provision_groups[] = [
+							'values' => $upd_provision_group,
+							'where' => ['userdirectory_idpgroupid' => $db_provision_group['userdirectory_idpgroupid']]
+						];
+					}
+
+					unset($db_provision_groups[$provision_group['name']]);
+				}
+				else {
+					$ins_provision_groups[] =
+						['userdirectoryid' => $userdirectory['userdirectoryid']] + $provision_group;
+				}
+			}
+			unset($provision_group);
+
+			$del_provision_groupids =
+				array_merge($del_provision_groupids, array_column($db_provision_groups, 'userdirectory_idpgroupid'));
+		}
+		unset($userdirectory);
+
+		if ($del_provision_groupids) {
+			self::deleteProvisionGroups($del_provision_groupids);
 		}
 
-		// Record new provision media records.
-		$provision_media_insert_rows = [];
-		foreach ($provision_media_insert as $userdirectory_media) {
-			$provision_media_insert_rows = array_merge($provision_media_insert_rows, $userdirectory_media);
+		if ($upd_provision_groups) {
+			DB::update('userdirectory_idpgroup', $upd_provision_groups);
 		}
 
-		if ($provision_media_insert_rows) {
-			$new_provision_mediaids = DB::insert('userdirectory_media', $provision_media_insert_rows);
+		if ($ins_provision_groups) {
+			$userdirectory_idpgroupids = DB::insert('userdirectory_idpgroup', $ins_provision_groups);
+		}
 
-			foreach ($userdirectoryids as $userdirectoryid) {
-				foreach ($userdirectories[$userdirectoryid]['provision_media'] as &$new_media) {
-					if (!array_key_exists('userdirectory_mediaid', $new_media)) {
-						$new_media['userdirectory_mediaid'] = array_shift($new_provision_mediaids);
+		$provision_groups = [];
+		$db_provision_groups = $db_userdirectories !== null ? [] : null;
+
+		foreach ($userdirectories as &$userdirectory) {
+			if (!array_key_exists('provision_groups', $userdirectory)) {
+				continue;
+			}
+
+			foreach ($userdirectory['provision_groups'] as &$provision_group) {
+				if (!array_key_exists('userdirectory_idpgroupid', $provision_group)) {
+					$provision_group['userdirectory_idpgroupid'] = array_shift($userdirectory_idpgroupids);
+
+					if ($db_userdirectories !== null) {
+						$db_provision_groups[$provision_group['userdirectory_idpgroupid']] = [
+							'userdirectory_idpgroupid' => $provision_group['userdirectory_idpgroupid'],
+							'user_groups' => []
+						];
 					}
 				}
-				unset($new_media);
+				else {
+					$db_userdirectory = $db_userdirectories[$userdirectory['userdirectoryid']];
+
+					$db_provision_groups[$provision_group['userdirectory_idpgroupid']] =
+						$db_userdirectory['provision_groups'][$provision_group['userdirectory_idpgroupid']];
+				}
+
+				$provision_groups[] = &$provision_group;
 			}
+			unset($provision_group);
+		}
+		unset($userdirectory);
+
+		if ($provision_groups) {
+			self::updateProvisionGroupUserGroups($provision_groups, $db_provision_groups);
 		}
 	}
 
-	private static function updateProvisionGroups(array &$userdirectories, array $db_userdirectories = []): void {
-		$userdirectoryids = array_keys(array_column($userdirectories, 'provision_groups', 'userdirectoryid'));
-		$provision_groups_remove = array_fill_keys($userdirectoryids, []);
-		$provision_groups_insert = array_fill_keys($userdirectoryids, []);
-
-		foreach ($userdirectoryids as $userdirectoryid) {
-			foreach ($db_userdirectories[$userdirectoryid]['provision_groups'] as $db_group) {
-				CArrayHelper::sort($db_group['user_groups'], ['usrgrpid']);
-				$db_group['user_groups'] = array_values($db_group['user_groups']);
-
-				$provision_groups_remove[$userdirectoryid][$db_group['userdirectory_idpgroupid']]
-					= array_intersect_key($db_group, array_flip(['name', 'roleid', 'user_groups']));
-			}
-
-			foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $index => &$group) {
-				CArrayHelper::sort($group['user_groups'], ['usrgrpid']);
-				$group['user_groups'] = array_values($group['user_groups']);
-
-				$provision_groups_insert[$userdirectoryid][$index] = $group + ['userdirectoryid' => $userdirectoryid];
-			}
-			unset($group);
-		}
-
-		foreach ($userdirectoryids as $userdirectoryid) {
-			foreach ($provision_groups_insert[$userdirectoryid] as $index => &$new_group) {
-				foreach ($provision_groups_remove[$userdirectoryid] as $db_groupid => $db_group) {
-					$db_group_compare = [
-						'userdirectoryid' => $userdirectoryid,
-						'user_groups' => array_map(function ($user_group) {
-							return array_intersect_key($user_group, array_flip(['usrgrpid']));
-						}, $db_group['user_groups'])
-					] + $db_group;
-
-					if ($db_group_compare == $new_group) {
-						unset($provision_groups_remove[$userdirectoryid][$db_groupid]);
-						unset($provision_groups_insert[$userdirectoryid][$index]);
-
-						$userdirectories[$userdirectoryid]['provision_groups'][$index]['userdirectory_idpgroupid']
-							= $db_groupid;
-						$userdirectories[$userdirectoryid]['provision_groups'][$index]['user_groups']
-							= $db_group['user_groups'];
-					}
-				}
-			}
-			unset($new_group);
-		}
-
-		// Remove changed provision group records from database.
-		if ($provision_groups_remove) {
-			$provision_groupids_remove = [];
-			foreach ($provision_groups_remove as $groups_remove) {
-				$provision_groupids_remove = array_merge($provision_groupids_remove, array_keys($groups_remove));
-			}
-
-			DB::delete('userdirectory_idpgroup', ['userdirectory_idpgroupid' => $provision_groupids_remove]);
-		}
-
-		// Record new entries in DB and put IDs in their places for audit log.
-		$provision_groups_insert_rows = [];
-		foreach ($provision_groups_insert as $groups) {
-			$provision_groups_insert_rows = array_merge($provision_groups_insert_rows, $groups);
-		}
-
-		if ($provision_groups_insert_rows) {
-			$idpgroupids = DB::insert('userdirectory_idpgroup', $provision_groups_insert_rows);
-
-			$user_groups_insert = [];
-			foreach ($idpgroupids as $index => $idpgroupid) {
-				foreach ($provision_groups_insert_rows[$index]['user_groups'] as $usrgrp) {
-					$user_groups_insert[] = ['userdirectory_idpgroupid' => $idpgroupid] + $usrgrp;
-				}
-			}
-
-			$user_groupids = DB::insert('userdirectory_usrgrp', $user_groups_insert);
-
-			foreach ($userdirectoryids as $userdirectoryid) {
-				foreach ($userdirectories[$userdirectoryid]['provision_groups'] as &$group) {
-					if (!array_key_exists('userdirectory_idpgroupid', $group)) {
-						$group['userdirectory_idpgroupid'] = array_shift($idpgroupids);
-
-						$group['user_groups'] = array_map(function ($user_group) use (&$user_groupids) {
-							return $user_group + ['userdirectory_usrgrpid' => array_shift($user_groupids)];
-						}, $group['user_groups']);
-					}
-				}
-				unset($group);
-			}
-		}
+	private static function deleteProvisionGroups(array $del_provision_groupids): void {
+		DB::delete('userdirectory_usrgrp', ['userdirectory_idpgroupid' => $del_provision_groupids]);
+		DB::delete('userdirectory_idpgroup', ['userdirectory_idpgroupid' => $del_provision_groupids]);
 	}
 
-	private static function getValidationRules(string $method = 'create'): array {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'idp_type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])],
+	private static function updateProvisionGroupUserGroups(array &$provision_groups,
+			?array $db_provision_groups): void {
+		$ins_user_groups = [];
+		$del_user_groupids = [];
+
+		foreach ($provision_groups as &$provision_group) {
+			$idpgroupid = $provision_group['userdirectory_idpgroupid'];
+			$db_user_groups = $db_provision_groups !== null && array_key_exists($idpgroupid, $db_provision_groups)
+				? array_column($db_provision_groups[$idpgroupid]['user_groups'], null, 'usrgrpid')
+				: [];
+
+			foreach ($provision_group['user_groups'] as &$user_group) {
+				if (array_key_exists($user_group['usrgrpid'], $db_user_groups)) {
+					$user_group['userdirectory_usrgrpid'] =
+						$db_user_groups[$user_group['usrgrpid']]['userdirectory_usrgrpid'];
+
+					unset($db_user_groups[$user_group['usrgrpid']]);
+				}
+				else {
+					$ins_user_groups[] =
+						['userdirectory_idpgroupid' => $provision_group['userdirectory_idpgroupid']] + $user_group;
+				}
+			}
+			unset($user_group);
+
+			$del_user_groupids =
+				array_merge($del_user_groupids, array_column($db_user_groups, 'userdirectory_usrgrpid'));
+		}
+		unset($provision_group);
+
+		if ($del_user_groupids) {
+			DB::delete('userdirectory_usrgrp', ['userdirectory_usrgrpid' => $del_user_groupids]);
+		}
+
+		if ($ins_user_groups) {
+			$userdirectory_usrgrpids = DB::insert('userdirectory_usrgrp', $ins_user_groups);
+		}
+
+		foreach ($provision_groups as &$provision_group) {
+			foreach ($provision_group['user_groups'] as &$user_group) {
+				if (!array_key_exists('userdirectory_usrgrpid', $user_group)) {
+					$user_group['userdirectory_usrgrpid'] = array_shift($userdirectory_usrgrpids);
+				}
+			}
+			unset($user_group);
+		}
+		unset($provision_group);
+	}
+
+	private static function getValidationRules(bool $is_update = false): array {
+		$api_required = $is_update ? 0 : API_REQUIRED;
+
+		$specific_fields = $is_update
+			? [
+				'userdirectoryid' =>	['type' => API_ANY],
+				'idp_type' =>			['type' => API_ANY],
+				'provision_status' =>	['type' => API_ANY]
+			]
+			: [];
+
+		$provision_media_rule = $is_update
+			? ['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['userdirectory_mediaid']], 'fields' => [
+				'userdirectory_mediaid' =>	['type' => API_ANY]
+			]]
+			: ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => self::getProvisionMediaValidationFields()];
+
+		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => $specific_fields + [
+			'idp_type' =>			['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [IDP_TYPE_LDAP, IDP_TYPE_SAML])],
 			'name' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'name'), 'default' => DB::getDefault('userdirectory', 'name')]
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'name')],
+										['else' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'name')] + ($is_update ? [] : ['default' => DB::getDefault('userdirectory', 'name')])
 			]],
 			'provision_status' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]), 'default' => DB::getDefault('userdirectory', 'provision_status')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description')],
 			'host' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'host')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'host')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'port' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_PORT, 'flags' => $api_required | API_NOT_EMPTY],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'base_dn' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'base_dn')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'base_dn')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'bind_dn' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -1310,7 +1503,7 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'search_attribute' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_attribute')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_attribute')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'start_tls' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -1378,47 +1571,39 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_messages' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_messages')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_assertions' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_assertions')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_authn_requests' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_authn_requests')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_logout_requests' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_logout_requests')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'sign_logout_responses' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'sign_logout_responses')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'encrypt_nameid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'encrypt_nameid')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'encrypt_assertions' => ['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'encrypt_assertions')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'scim_status' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'scim_status')],
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1'])],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
-											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
-											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
-										]],
-										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
-			]],
 			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 											'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'name')],
 											'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 											'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
@@ -1426,33 +1611,11 @@ class CUserDirectory extends CApiService {
 											]]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]],
+			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])]] + $provision_media_rule,
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]]
 		]];
-
-		if ($method === 'update') {
-			// Make all fields optional and remove default values.
-			foreach ($api_input_rules['fields'] as &$field) {
-				if (array_key_exists('rules', $field)) {
-					foreach ($field['rules'] as &$rule) {
-						if (array_key_exists('flags', $rule) && API_REQUIRED & $rule['flags']) {
-							$rule['flags'] &= ~API_REQUIRED;
-						}
-						unset($rule['default']);
-					}
-					unset($rule);
-				}
-				else {
-					if (array_key_exists('flags', $field) && API_REQUIRED & $field['flags']) {
-						$field['flags'] &= ~API_REQUIRED;
-					}
-					unset($field['default']);
-				}
-			}
-			unset($field);
-
-			$api_input_rules['fields']['userdirectoryid'] = ['type' => API_ID, 'flags' => API_REQUIRED];
-		}
-
-		return $api_input_rules;
 	}
 }
