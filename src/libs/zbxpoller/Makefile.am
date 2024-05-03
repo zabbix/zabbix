@@ -18,6 +18,8 @@ libzbxpoller_a_SOURCES = \
 	checks_internal.h \
 	checks_script.c \
 	checks_script.h \
+	checks_browser.c \
+	checks_browser.h \
 	checks_simple.c \
 	checks_simple.h \
 	checks_snmp.c \
@@ -46,7 +48,10 @@ libzbxpoller_a_SOURCES = \
 	async_queue.h
 
 
-libzbxpoller_a_CFLAGS = $(TLS_CFLAGS) $(LIBXML2_CFLAGS)
+libzbxpoller_a_CFLAGS = \
+	$(TLS_CFLAGS) \
+	$(LIBXML2_CFLAGS) \
+	$(SNMP_CFLAGS)
 
 if HAVE_SSH
 libzbxpoller_a_SOURCES += ssh_run.c

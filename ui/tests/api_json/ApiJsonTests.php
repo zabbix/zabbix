@@ -60,6 +60,7 @@ require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testMfa.php';
 require_once dirname(__FILE__).'/testProxy.php';
+require_once dirname(__FILE__).'/testProxyGroup.php';
 require_once dirname(__FILE__).'/testRole.php';
 require_once dirname(__FILE__).'/testScimGroup.php';
 require_once dirname(__FILE__).'/testScimServiceProviderConfig.php';

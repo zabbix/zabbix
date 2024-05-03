@@ -22,7 +22,6 @@ class CHostNavigator {
 
 	static ZBX_STYLE_CLASS =		'host-navigator';
 	static ZBX_STYLE_LIMIT =		'host-navigator-limit';
-	static ZBX_STYLE_NO_DATA =		'host-navigator-no-data';
 
 	static GROUP_BY_HOST_GROUP = 0;
 	static GROUP_BY_TAG_VALUE = 1;
@@ -116,6 +115,7 @@ class CHostNavigator {
 				severity_names: this.#config.severity_names
 			});
 
+			this.#container.classList.remove(ZBX_STYLE_NO_DATA);
 			this.#container.appendChild(this.#navigation_tree.getContainer());
 
 			if (is_limit_exceeded) {
@@ -139,11 +139,10 @@ class CHostNavigator {
 			}
 		}
 		else {
-			const no_data = document.createElement('div');
-			no_data.classList.add(CHostNavigator.ZBX_STYLE_NO_DATA);
-			no_data.innerText = t('No data found.');
-
-			this.#container.appendChild(no_data);
+			this.#container.classList.add(ZBX_STYLE_NO_DATA);
+			this.#container.appendChild(
+				this.#setNoDataMessage(t('No data found'), null, ZBX_ICON_SEARCH_LARGE)
+			);
 		}
 	}
 
@@ -526,5 +525,30 @@ class CHostNavigator {
 		this.#navigation_tree = null;
 		this.#nodes = [];
 		this.#maintenances = {};
+	}
+
+	#setNoDataMessage(message, description = null, icon = null) {
+		const container = document.createElement('div');
+
+		const message_container = document.createElement('div');
+		message_container.classList.add(ZBX_STYLE_NO_DATA_MESSAGE);
+		message_container.innerText = message;
+
+		if (icon !== null) {
+			container.classList.add(ZBX_STYLE_NO_DATA_FOUND);
+			message_container.classList.add(icon);
+		}
+
+		container.appendChild(message_container);
+
+		if (description !== null) {
+			const description_container = document.createElement('div');
+			description_container.classList.add(ZBX_STYLE_NO_DATA_DESCRIPTION);
+			description_container.innerText = description;
+
+			container.appendChild(description_container);
+		}
+
+		return container;
 	}
 }

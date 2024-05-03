@@ -25,8 +25,8 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/std"
-	"zabbix.com/pkg/zbxtest"
+	"golang.zabbix.com/agent2/pkg/zbxtest"
+	"golang.zabbix.com/sdk/std"
 )
 
 var Md5File = "1234"

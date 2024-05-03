@@ -89,6 +89,7 @@ $output = [
 			'popup_url' => $popup_url->getUrl(),
 			'form_name' => $data['form_name'],
 			'host_interfaces' => $data['host']['interfaces'],
+			'proxy_groupid' => $data['host']['proxy_groupid'],
 			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 			'warnings' => $data['warnings']
 		]).');',

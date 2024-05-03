@@ -28,14 +28,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/version"
-
 	_ "github.com/mattn/go-sqlite3"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 const (
@@ -296,7 +295,8 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		Commands: cresults,
 		Session:  u.Session(),
 		Host:     u.Hostname(),
-		Version:  version.Short(),
+		Version:  version.Long(),
+		Variant:  agent.Variant,
 	}
 
 	var data []byte

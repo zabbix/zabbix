@@ -441,7 +441,7 @@ class ZBase {
 
 		switch ($this->config['DB']['VAULT']) {
 			case CVaultCyberArk::NAME:
-				$this->vault = new CVaultCyberArk($this->config['DB']['VAULT_URL'],
+				$this->vault = new CVaultCyberArk($this->config['DB']['VAULT_URL'], $this->config['DB']['VAULT_PREFIX'],
 					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_CERT_FILE'],
 					$this->config['DB']['VAULT_KEY_FILE']
 				);
@@ -449,7 +449,8 @@ class ZBase {
 
 			case CVaultHashiCorp::NAME:
 				$this->vault = new CVaultHashiCorp($this->config['DB']['VAULT_URL'],
-					$this->config['DB']['VAULT_DB_PATH'], $this->config['DB']['VAULT_TOKEN']
+					$this->config['DB']['VAULT_PREFIX'], $this->config['DB']['VAULT_DB_PATH'],
+					$this->config['DB']['VAULT_TOKEN']
 				);
 				break;
 		}

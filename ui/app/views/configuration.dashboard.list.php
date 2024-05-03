@@ -48,7 +48,8 @@ $table = (new CTableInfo())
 				->setArgument('templateid', $data['templateid'])
 				->getUrl()
 		)
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['dashboards'] as $dashboardid => $dashboard) {
 	$table->addRow([
@@ -64,7 +65,6 @@ foreach ($data['dashboards'] as $dashboardid => $dashboard) {
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
 		'template.dashboard.delete' => [
 			'name' => _('Delete'),

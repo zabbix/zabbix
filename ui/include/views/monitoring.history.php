@@ -291,7 +291,6 @@ else {
 					(new CColHeader(_('Local time')))->addClass(ZBX_STYLE_CELL_WIDTH),
 					_('Value')
 				])
-				->setNoDataMessage(_('Specify some filter condition to see the values.'))
 		);
 	}
 }

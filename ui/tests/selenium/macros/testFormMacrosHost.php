@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
 /**
  * @backup hosts, config
  *
+ * @dataSource GlobalMacros
+ *
  * @onBefore prepareHostMacrosData
  */
 class testFormMacrosHost extends testFormMacros {
@@ -69,7 +71,7 @@ class testFormMacrosHost extends testFormMacros {
 	public $macro_resolve_hostid = 99135;
 
 	public $vault_object = 'host';
-	public $hashi_error_field = '/1/macros/3/value';
+	public $hashi_error_field = '/1/macros/4/value';
 	public $cyber_error_field = '/1/macros/4/value';
 	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
 	public $vault_macro_index = 2;

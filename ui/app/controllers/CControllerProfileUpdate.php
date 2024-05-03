@@ -64,6 +64,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.modules.filter.active':
 				case 'web.problem.filter.active':
 				case 'web.proxies.filter.active':
+				case 'web.proxygroups.filter.active':
 				case 'web.scheduledreport.filter.active':
 				case 'web.scripts.filter.active':
 				case 'web.search.hats.'.SECTION_SEARCH_HOSTS.'.state':
