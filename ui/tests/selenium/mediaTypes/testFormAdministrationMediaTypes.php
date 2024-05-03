@@ -1118,10 +1118,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	 * @dataProvider getGeneralMediaTypeData
 	 */
 	public function testFormAdministrationMediaTypes_Clone($data) {
-		$clone_sql = 'SELECT type, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd, '.
-				'status, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, '.
-				'maxsessions, maxattempts, attempt_interval, content_type, script, timeout, process_tags, show_event_menu, '.
-				'event_menu_url, event_menu_name, description FROM media_type WHERE name=';
+		$clone_sql = 'SELECT type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd,status,'.
+				'smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions,'.
+				'maxattempts,attempt_interval,message_format,script,timeout,process_tags,show_event_menu,'.
+				'event_menu_url,event_menu_name,description FROM media_type WHERE name=';
 		$old_hash = CDBHelper::getHash($clone_sql.zbx_dbstr($data['media_type']));
 
 		// Clone the media type.

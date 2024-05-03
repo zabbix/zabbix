@@ -4016,6 +4016,13 @@ static int	DBpatch_6050295(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050296(void)
+{
+	const zbx_db_field_t	field = {"message_format", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("media_type", "content_type", &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -4316,5 +4323,6 @@ DBPATCH_ADD(6050292, 0, 1)
 DBPATCH_ADD(6050293, 0, 1)
 DBPATCH_ADD(6050294, 0, 1)
 DBPATCH_ADD(6050295, 0, 1)
+DBPATCH_ADD(6050296, 0, 1)
 
 DBPATCH_END()
