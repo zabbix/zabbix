@@ -82,9 +82,9 @@
 			CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
 
 			ZABBIX.Dashboard.broadcast({
-				_hostid: null,
-				_hostids: null,
-				_timeperiod: time_period
+				[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+				[CWidgetsData.DATA_TYPE_HOST_IDS]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 
 			ZABBIX.Dashboard.activate();

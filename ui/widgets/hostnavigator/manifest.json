@@ -22,6 +22,9 @@
 		"out": [
 			{
 				"type": "_hostid"
+			},
+			{
+				"type": "_hostids"
 			}
 		]
 	},

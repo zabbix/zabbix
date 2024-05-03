@@ -90,7 +90,10 @@ class CWidgetHostNavigator extends CWidget {
 	#registerEvents() {
 		this.#events = {
 			hostSelect: e => {
-				this.broadcast({_hostid: e.detail._hostid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [e.detail.hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [e.detail.hostid]
+				});
 			},
 
 			groupToggle: e => {

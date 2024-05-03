@@ -40,7 +40,9 @@ class CWidgetGraph extends CWidget {
 					timeControl.refreshObject(`graph_${this._unique_id}`);
 
 					this.feedback({time_period});
-					this.broadcast({_timeperiod: time_period});
+					this.broadcast({
+						[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+					});
 				}
 			}
 		};
@@ -109,7 +111,9 @@ class CWidgetGraph extends CWidget {
 		const time_period = this.getFieldsData().time_period;
 
 		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: time_period});
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+			});
 		}
 
 		if (this._is_graph_mode) {

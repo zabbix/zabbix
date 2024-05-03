@@ -490,9 +490,9 @@ class CWidgetNavTree extends CWidget {
 			}
 
 			this.broadcast({
-				_mapid: this.#markTreeItemSelected(this.#navtree_item_selected)
-					? this.#navtree[this.#navtree_item_selected].sysmapid
-					: null
+				[CWidgetsData.DATA_TYPE_MAP_ID]: this.#markTreeItemSelected(this.#navtree_item_selected)
+					? [this.#navtree[this.#navtree_item_selected].sysmapid]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_MAP_ID)
 			});
 		}
 	}
@@ -992,7 +992,9 @@ class CWidgetNavTree extends CWidget {
 						[this.getWidgetId()]
 					);
 
-					this.broadcast({_mapid: this.#navtree[this.#navtree_item_selected].sysmapid});
+					this.broadcast({
+						[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
+					});
 				}
 
 				e.preventDefault();

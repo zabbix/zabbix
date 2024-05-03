@@ -28,6 +28,7 @@ class CWidgetsData {
 	static DATA_TYPE_HOST_ID =				'_hostid';
 	static DATA_TYPE_HOST_IDS =				'_hostids';
 	static DATA_TYPE_ITEM_ID =				'_itemid';
+	static DATA_TYPE_ITEM_IDS =				'_itemids';
 	static DATA_TYPE_ITEM_PROTOTYPE_ID =	'_itemprototypeid';
 	static DATA_TYPE_GRAPH_ID =				'_graphid';
 	static DATA_TYPE_GRAPH_PROTOTYPE_ID =	'_graphprototypeid';

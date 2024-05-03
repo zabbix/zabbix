@@ -171,7 +171,9 @@ class CWidgetMap extends CWidget {
 
 		this.broadcast({
 			[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
-			[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_ID)
+			[CWidgetsData.DATA_TYPE_HOST_IDS]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+			[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_ID),
+			[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_IDS)
 		});
 	}
 

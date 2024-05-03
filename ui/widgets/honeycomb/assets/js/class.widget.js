@@ -77,7 +77,12 @@ class CWidgetHoneycomb extends CWidget {
 			this.#honeycomb.setSize(super._getContentsSize());
 
 			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_CLICK, e => {
-				this.broadcast({_hostid: e.detail.hostid, _itemid: e.detail.itemid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [e.detail.hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [e.detail.hostid],
+					[CWidgetsData.DATA_TYPE_ITEM_ID]: [e.detail.itemid],
+					[CWidgetsData.DATA_TYPE_ITEM_IDS]: [e.detail.itemid]
+				});
 			});
 
 			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_ENTER, e => {

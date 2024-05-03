@@ -114,9 +114,13 @@
 			CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
 
 			ZABBIX.Dashboard.broadcast({
-				_hostid: dashboard_host !== null ? dashboard_host.id : null,
-				_hostids: dashboard_host !== null ? [dashboard_host.id] : null,
-				_timeperiod: time_period
+				[CWidgetsData.DATA_TYPE_HOST_ID]: dashboard_host !== null
+					? [dashboard_host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+				[CWidgetsData.DATA_TYPE_HOST_IDS]: dashboard_host !== null
+					? [dashboard_host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 
 			ZABBIX.Dashboard.activate();
@@ -427,8 +431,12 @@
 				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
 				ZABBIX.Dashboard.broadcast({
-					_hostid: host !== null ? host.id : null,
-					_hostids: host !== null ? [host.id] : null
+					[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS)
 				});
 			},
 
@@ -455,8 +463,12 @@
 				history.pushState({host: host}, '', curl.getUrl());
 
 				ZABBIX.Dashboard.broadcast({
-					_hostid: host !== null ? host.id : null,
-					_hostids: host !== null ? [host.id] : null
+					[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS)
 				});
 
 				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
@@ -515,7 +527,9 @@
 
 				CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
 
-				ZABBIX.Dashboard.broadcast({_timeperiod: time_period});
+				ZABBIX.Dashboard.broadcast({
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+				});
 			},
 
 			feedback(e) {
