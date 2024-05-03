@@ -131,7 +131,7 @@ class CWidgetMap extends CWidget {
 				this.#makeSvgMap(sysmap_data.map_options);
 				this.#activateContentEvents();
 
-				this.feedback({'sysmapid': this.#sysmapid});
+				this.feedback({'sysmapid': [this.#sysmapid]});
 			}
 
 			if (sysmap_data.error_msg !== undefined) {
@@ -213,10 +213,18 @@ class CWidgetMap extends CWidget {
 				this.#selected_element_id = e.detail.selected_element_id;
 
 				this.broadcast({
-					[CWidgetsData.DATA_TYPE_HOST_ID]: e.detail[CWidgetsData.DATA_TYPE_HOST_ID],
-					[CWidgetsData.DATA_TYPE_HOST_IDS]: e.detail[CWidgetsData.DATA_TYPE_HOST_ID],
-					[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: e.detail[CWidgetsData.DATA_TYPE_HOST_GROUP_ID],
-					[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: e.detail[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]
+					[CWidgetsData.DATA_TYPE_HOST_ID]: e.detail.hostid !== null
+						? [e.detail.hostid]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: e.detail.hostid !== null
+						? [e.detail.hostid]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: e.detail.hostgroupid !== null
+						? [e.detail.hostgroupid]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_ID),
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: e.detail.hostgroupid !== null
+						? [e.detail.hostgroupid]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_IDS)
 				});
 			}
 		};

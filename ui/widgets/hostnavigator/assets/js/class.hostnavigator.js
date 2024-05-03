@@ -132,7 +132,7 @@ class CHostNavigator {
 
 			this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
 				detail: {
-					_hostid: null
+					hostid: null
 				}
 			}));
 		}
@@ -453,7 +453,7 @@ class CHostNavigator {
 
 					this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
 						detail: {
-							_hostid: e.detail.id
+							hostid: e.detail.id
 						}
 					}));
 				}
