@@ -2442,6 +2442,12 @@ New features:
 .........T [ZBXNEXT-6864] replaced {HOST.CONN} with user macros in templates (drasikhov)
 
 Bug fixes:
+........S. [ZBX-24172] fixed Zabbix server issue with scheduled intervals on Feb 29th of leap year (sboidenko)
+A......... [ZBX-23407] improved performance of retrieving last history values when primary keys are available (jfreibergs, vmaksimovs)
+.........T [ZBX-24246] updated descriptions for family of MySQL and Oracle templates, changed macro in the trigger 'Tablespace utilization is too high' for family of Oracle templates (akotsegubov)
+.......... [ZBX-23988] renamed Agent2 Go module (jxl)
+.........T [ZBX-24222] fixed incorrect item OIDs in the FortiGate by SNMP template (aiantsen)
+.........T [ZBX-24393] updated README in Redis by Agent 2 teamplate (abrosimovs)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
 .........T [ZBX-19990] separated LLD filter macros in Apache Tomcat by JMX template (drasikhov)
 .........T [ZBX-24364] added preprocessing steps for LLD rules in RabbitMQ templates (egordymov)
