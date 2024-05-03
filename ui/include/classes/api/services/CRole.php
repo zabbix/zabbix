@@ -459,7 +459,7 @@ class CRole extends CApiService {
 		}
 
 		$ui_rules = [];
-		$db_ui_rules = $db_rules === null ? [] : array_column($db_rules['ui'], 'status', 'name');
+		$db_ui_rules = $db_rules !== null ? array_column($db_rules['ui'], 'status', 'name') : [];
 
 		foreach (CRoleHelper::getUiElementsByUserType($type) as $ui_element) {
 			$ui_rule_name = substr($ui_element, strlen('ui.'));
