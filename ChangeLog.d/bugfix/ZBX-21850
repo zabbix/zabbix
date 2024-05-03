@@ -1,1 +1,1 @@
-A.F....... [ZBX-21850] moved the sorting of filter conditions to the action.get, discoveryrule.get and correlation.get methods (Sasha)
+A.F....... [ZBX-21850] moved the sorting of filter conditions to the action.get, discoveryrule.get and correlation.get methods (Sasha, vmaksimovs)
