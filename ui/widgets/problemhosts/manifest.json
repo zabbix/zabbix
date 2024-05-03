@@ -9,6 +9,7 @@
 	"description": "Displays the problem count by host group and the highest problem severity within a group.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/problem_hosts",
 	"widget": {
+		"js_class": "CWidgetProblemHosts",
 		"in": {
 			"hostids": {
 				"type": "_hostids"
@@ -16,11 +17,22 @@
 			"groupids": {
 				"type": "_hostgroupids"
 			}
-		}
+		},
+		"out": [
+			{
+				"type": "_hostgroupid"
+			},
+			{
+				"type": "_hostgroupids"
+			}
+		]
 	},
 	"actions": {
 		"widget.problemhosts.view": {
 			"class": "WidgetView"
 		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
 	}
 }

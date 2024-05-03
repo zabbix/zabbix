@@ -41,6 +41,8 @@ const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 
+const ZBX_STYLE_ROW_SELECTED = 'row-selected';
+
 const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 
