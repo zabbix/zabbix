@@ -65,8 +65,8 @@ class CWidgetProblemHosts extends CWidget {
 
 	#registerListeners() {
 		this.#listeners = {
-			click: e => {
-				if (e.target.closest('a') !== null) {
+			tableBodyClick: e => {
+				if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
 					return;
 				}
 
@@ -91,7 +91,7 @@ class CWidgetProblemHosts extends CWidget {
 	}
 
 	#activateListeners() {
-		this.#table_body.addEventListener('click', this.#listeners.click);
+		this.#table_body.addEventListener('click', this.#listeners.tableBodyClick);
 	}
 
 	/**

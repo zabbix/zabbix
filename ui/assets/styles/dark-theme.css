@@ -4775,6 +4775,9 @@ div.dashboard-widget-problemhosts .list-table tr[data-hostgroupid] {
 div.dashboard-widget-problems .list-table tr[data-eventid] {
   cursor: pointer; }
 
+div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
+  cursor: pointer; }
+
 form.dashboard-widget-svggraph .svg-graph-preview,
 form.dashboard-widget-svggraph .graph-widget-config-tabs {
   grid-column: 1 / -1; }

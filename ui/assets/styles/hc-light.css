@@ -4721,6 +4721,9 @@ div.dashboard-widget-problemhosts .list-table tr[data-hostgroupid] {
 div.dashboard-widget-problems .list-table tr[data-eventid] {
   cursor: pointer; }
 
+div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
+  cursor: pointer; }
+
 div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;
   padding-left: 42px; }
