@@ -206,11 +206,13 @@ class testFormSetup extends CWebTest {
 			$vaults = [
 				'HashiCorp Vault' => [
 					'Vault API endpoint' => 'https://localhost:8200',
+					'Vault prefix' => '/v1/secret/data/',
 					'Vault secret path' => 'path/to/secret',
 					'Vault authentication token' => ''
 				],
 				'CyberArk Vault' => [
 					'Vault API endpoint' => 'https://localhost:1858',
+					'Vault prefix' => '/AIMWebService/api/Accounts?',
 					'Vault secret query string' => 'AppID=foo&Query=Safe=bar;Object=buzz',
 					'SSL certificate file' => 'conf/certs/cyberark-cert.pem',
 					'SSL key file' => 'conf/certs/cyberark-key.pem'
@@ -234,7 +236,7 @@ class testFormSetup extends CWebTest {
 					$vault_maxlength = ($field_name === 'Vault API endpoint' || $field_name === 'Vault secret path') ? 255 : 2048;
 					$field = $form->getField($field_name);
 					$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
-					if (in_array($field_name, ['Vault secret query string', 'Vault secret path'])) {
+					if (in_array($field_name, ['Vault secret query string', 'Vault secret path', 'Vault prefix'])) {
 						$this->assertEquals($parameter, $field->getAttribute('placeholder'));
 					}
 					else {

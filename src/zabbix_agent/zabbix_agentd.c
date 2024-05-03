@@ -292,7 +292,9 @@ static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
 	0, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	0, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
-	0 /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
+	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
+	0, /* ZBX_PROCESS_TYPE_PG_MANAGER */
+	0 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
 };
 
 static char	*config_file	= NULL;
@@ -1584,6 +1586,7 @@ int	main(int argc, char **argv)
 
 			zbx_free_config();
 
+			zbx_service_init(get_zbx_service_name, get_zbx_event_source);
 			ret = zbx_exec_service_task(argv[0], &t);
 
 			while (0 == WSACleanup())
@@ -1693,7 +1696,8 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(ZABBIX_SERVICE)
-	zbx_service_start(t.flags, get_zbx_service_name, get_zbx_event_source);
+	zbx_service_init(get_zbx_service_name, get_zbx_event_source);
+	zbx_service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,

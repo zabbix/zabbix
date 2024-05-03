@@ -29,15 +29,7 @@
 		// table row
 		jQuery('#medias_' + index).remove();
 		// hidden variables
-		jQuery('#medias_' + index + '_mediaid').remove();
-		jQuery('#medias_' + index + '_mediatype').remove();
-		jQuery('#medias_' + index + '_mediatypeid').remove();
-		jQuery('#medias_' + index + '_period').remove();
-		jQuery('#medias_' + index + '_sendto').remove();
-		removeVarsBySelector(null, 'input[id^="medias_' + index + '_sendto_"]');
-		jQuery('#medias_' + index + '_severity').remove();
-		jQuery('#medias_' + index + '_active').remove();
-		jQuery('#medias_' + index + '_name').remove();
+		jQuery(`[name^="medias[${index}]["]`).remove();
 	}
 
 	function autologoutHandler() {

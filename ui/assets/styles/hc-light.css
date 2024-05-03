@@ -3085,9 +3085,9 @@ output {
   font-style: italic;
   padding-left: 0.2em;
   padding-right: 0.2em; }
-.navigation-tree .navigation-tree-node:not(.navigation-tree-node-is-group) > .navigation-tree-node-info {
+.navigation-tree .navigation-tree-node-is-item > .navigation-tree-node-info {
   cursor: pointer; }
-  .navigation-tree .navigation-tree-node:not(.navigation-tree-node-is-group) > .navigation-tree-node-info .navigation-tree-node-info-name {
+  .navigation-tree .navigation-tree-node-is-item > .navigation-tree-node-info .navigation-tree-node-info-name {
     color: #555555; }
 .navigation-tree .navigation-tree-node-info-problems {
   display: flex; }
@@ -4371,6 +4371,20 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 
 div.dashboard-widget-item a:link {
   border-bottom: none; }
+
+form.dashboard-widget-itemnavigator .item-grouping {
+  line-height: 1.4em; }
+  form.dashboard-widget-itemnavigator .item-grouping tr:not(.form_row):first-child {
+    line-height: 24px; }
+
+div.dashboard-widget-itemnavigator .item-navigator .item-navigator-limit {
+  display: flex;
+  justify-content: flex-end;
+  height: 18px;
+  padding: 9px 8px;
+  color: #333333; }
+div.dashboard-widget-itemnavigator .item-navigator.no-data {
+  height: 100%; }
 
 div.dashboard-widget-map .sysmap-widget-container {
   overflow: hidden;

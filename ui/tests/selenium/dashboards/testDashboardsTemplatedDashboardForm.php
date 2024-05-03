@@ -4395,9 +4395,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
 				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator',
-				'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Plain text', 'Problem hosts', 'Problems',
-				'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers', 'Trigger overview',
-				'URL', 'Web monitoring', 'Data overview'
+				'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Plain text', 'Problem hosts',
+				'Problems', 'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers',
+				'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}

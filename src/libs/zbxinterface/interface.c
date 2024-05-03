@@ -56,6 +56,7 @@ unsigned char	zbx_get_interface_type_by_item_type(unsigned char type)
 			return INTERFACE_TYPE_ANY;
 		case ITEM_TYPE_HTTPAGENT:
 		case ITEM_TYPE_SCRIPT:
+		case ITEM_TYPE_BROWSER:
 			return INTERFACE_TYPE_OPT;
 		default:
 			return INTERFACE_TYPE_UNKNOWN;
