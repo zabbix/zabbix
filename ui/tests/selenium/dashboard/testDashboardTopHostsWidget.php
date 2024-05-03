@@ -92,7 +92,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -120,7 +120,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -136,11 +136,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory in %'
+							'Item name' => 'Available memory in %'
 						]
 					]
 				]
@@ -158,49 +158,49 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => 'min',
 							'Aggregation function' => 'min',
 							'Aggregation interval' => '20s',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'max',
 							'Aggregation function' => 'max',
 							'Aggregation interval' => '20m',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'avg',
 							'Aggregation function' => 'avg',
 							'Aggregation interval' => '20h',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'count',
 							'Aggregation function' => 'count',
 							'Aggregation interval' => '20d',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'sum',
 							'Aggregation function' => 'sum',
 							'Aggregation interval' => '20w',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'first',
 							'Aggregation function' => 'first',
 							'Aggregation interval' => '20M',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						],
 						[
 							'Data' => 'Item value',
 							'Name' => 'last',
 							'Aggregation function' => 'last',
 							'Aggregation interval' => '20y',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					],
 					'screenshot' => true
@@ -216,20 +216,20 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'As is',
 							'History data' => 'History',
 							'Time shift' => '1'
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'As is',
 							'History data' => 'Trends'
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'History data' => 'Auto',
 							'Min' => '2',
@@ -237,7 +237,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'History data' => 'History',
 							'Min' => '',
@@ -245,7 +245,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'History data' => 'Trends',
 							'Min' => '50',
@@ -253,7 +253,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Auto',
 							'Min' => '2',
@@ -261,7 +261,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'History',
 							'Min' => '',
@@ -269,7 +269,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
 							'Min' => '50',
@@ -288,7 +288,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Base color' => '039BE5'
 						]
 					]
@@ -304,7 +304,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '5'
@@ -324,7 +324,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '1'
@@ -350,7 +350,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '1',
@@ -391,7 +391,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -421,7 +421,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					]
 				]
@@ -467,7 +467,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory'
+							'Item name' => 'Available memory'
 						]
 					],
 					'main_error' => [
@@ -575,7 +575,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Time shift' => 'zzz'
 						]
 					],
@@ -594,7 +594,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Time shift' => '1M'
 						]
 					],
@@ -613,7 +613,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Time shift' => '1y'
 						]
 					],
@@ -632,7 +632,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'count',
 							'Aggregation interval' => 'zzz'
 						]
@@ -652,7 +652,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Aggregation function' => 'count',
 							'Aggregation interval' => ''
 						]
@@ -672,7 +672,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'Min' => 'zzz'
 						]
@@ -692,7 +692,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Bar',
 							'Max' => 'zzz'
 						]
@@ -712,7 +712,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Base color' => '!@#$%^'
 						]
 					],
@@ -731,7 +731,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '1',
@@ -755,7 +755,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '1',
@@ -783,7 +783,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => 'zzz',
@@ -889,7 +889,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'action' => USER_ACTION_UPDATE,
@@ -912,7 +912,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
 							'Min' => 'zzz'
@@ -930,7 +930,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
 							'Max' => 'zzz'
@@ -948,7 +948,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Thresholds' => [
 								[
 									'threshold' => '     '
@@ -1075,7 +1075,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => ''
+							'Item name' => ''
 						]
 					],
 					'column_error' => [
@@ -1090,7 +1090,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Base color' => '#$%$@@'
 						]
 					],
@@ -1157,7 +1157,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Time shift' => '10s'
 						]
 					]
@@ -1173,7 +1173,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Time shift' => '10m'
 						]
 					]
@@ -1189,7 +1189,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Time shift' => '10h'
 						]
 					]
@@ -1205,7 +1205,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Time shift' => '10w'
 						]
 					]
@@ -1225,7 +1225,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => 'Available memory',
+							'Item name' => 'Available memory',
 							'Time shift' => '1',
 							'Display' => 'Indicators',
 							'History data' => 'Trends',
@@ -1463,7 +1463,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 				// Check that column table has correct data.
 				if ($values['Data'] === 'Item value') {
-					$table_name = $values['Item'];
+					$table_name = $values['Item name'];
 				}
 				elseif ($values['Data'] === 'Host name') {
 					$table_name = $values['Data'];
@@ -1557,7 +1557,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item'
+							'Item name' => '1_item'
 						]
 					],
 					'screen_name' => 'as_is'
@@ -1572,7 +1572,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -1595,7 +1595,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -1618,7 +1618,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '0',
 							'Max' => '2000',
@@ -1641,7 +1641,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '500',
 							'Max' => '2000',
@@ -1664,11 +1664,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item'
+							'Item name' => '1_item'
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '500',
 							'Max' => '2000',
@@ -1680,7 +1680,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '0',
 							'Max' => '2000',
@@ -1692,7 +1692,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -1704,7 +1704,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						],
 						[
 							'Data' => 'Item value',
-							'Item' => '1_item',
+							'Item name' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -1795,7 +1795,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text'
+							'Item name' => 'trap_text'
 						]
 					],
 					'text' => 'Text for text item'
@@ -1810,7 +1810,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item name' => 'trap_text',
 							'History data' => 'Trends'
 						]
 					],
@@ -1826,7 +1826,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item name' => 'trap_text',
 							'Display' => 'Bar'
 						]
 					]
@@ -1841,7 +1841,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item name' => 'trap_text',
 							'Display' => 'Indicators'
 						]
 					]
@@ -1856,7 +1856,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item name' => 'trap_text',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -1871,7 +1871,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item name' => 'trap_text',
 							'Thresholds' => [
 								[
 									'threshold' => '10'
@@ -1890,7 +1890,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log'
+							'Item name' => 'trap_log'
 						]
 					],
 					'text' => 'Logs for text item'
@@ -1905,7 +1905,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item name' => 'trap_log',
 							'History data' => 'Trends'
 						]
 					],
@@ -1921,7 +1921,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item name' => 'trap_log',
 							'Display' => 'Bar'
 						]
 					]
@@ -1936,7 +1936,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item name' => 'trap_log',
 							'Display' => 'Indicators'
 						]
 					]
@@ -1951,7 +1951,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item name' => 'trap_log',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -1966,7 +1966,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item name' => 'trap_log',
 							'Thresholds' => [
 								[
 									'threshold' => '10'
@@ -1985,7 +1985,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char'
+							'Item name' => 'trap_char'
 						]
 					],
 					'text' => 'characters_here'
@@ -2000,7 +2000,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item name' => 'trap_char',
 							'History data' => 'Trends'
 						]
 					],
@@ -2016,7 +2016,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item name' => 'trap_char',
 							'Display' => 'Bar'
 						]
 					]
@@ -2031,7 +2031,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item name' => 'trap_char',
 							'Display' => 'Indicators'
 						]
 					]
@@ -2046,7 +2046,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item name' => 'trap_char',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -2061,7 +2061,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item name' => 'trap_char',
 							'Thresholds' => [
 								[
 									'threshold' => '10'

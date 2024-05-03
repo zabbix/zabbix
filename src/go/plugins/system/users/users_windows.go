@@ -20,7 +20,7 @@
 package users
 
 import (
-	"zabbix.com/pkg/pdh"
+	"golang.zabbix.com/agent2/pkg/pdh"
 )
 
 func (p *Plugin) getUsersNum() (num int, err error) {

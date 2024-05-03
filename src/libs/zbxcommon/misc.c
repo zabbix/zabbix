@@ -163,6 +163,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	static ZBX_THREAD_LOCAL LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
+	int					sec_diff;
 #else
 	struct timeval	tv;
 	int		rc = -1;
@@ -250,8 +251,10 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #endif	/* not _WINDOWS */
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
-			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
+	sec_diff = ts->sec - last_ts.sec;
+
+	/* correction window is 1 sec before the corrected last _ftime clock reading */
+	if ((0 == sec_diff && ts->ns <= last_ts.ns) || (-1 == sec_diff && ts->ns > last_ts.ns))
 #else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
 #endif
@@ -1430,7 +1433,7 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
 	tm->tm_mday += value_next - value_now;
 
 	/* check if the resulting month day is valid */
-	return (tm->tm_mday <= zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1) ? SUCCEED : FAIL);
+	return (tm->tm_mday <= zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1) ? SUCCEED : FAIL);
 }
 
 /******************************************************************************
@@ -1505,7 +1508,7 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 	while (SUCCEED == scheduler_get_nearest_filter_value(interval->mdays, &tm->tm_mday))
 	{
 		/* check if the date is still valid - we haven't run out of month days */
-		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
+		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1))
 			break;
 
 		if (SUCCEED == scheduler_validate_wday_filter(interval, tm))
@@ -1514,7 +1517,7 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 		tm->tm_mday++;
 
 		/* check if the date is still valid - we haven't run out of month days */
-		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
+		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1))
 			break;
 	}
 
