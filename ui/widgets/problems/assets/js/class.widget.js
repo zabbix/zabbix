@@ -98,7 +98,7 @@ class CWidgetProblems extends CWidget {
 				if (row !== null) {
 					const eventid = row.dataset.eventid;
 
-					if (eventid !== undefined && eventid !== this.#selected_event_id) {
+					if (eventid !== undefined) {
 						this.#selected_event_id = eventid;
 
 						this.#selectEvent();

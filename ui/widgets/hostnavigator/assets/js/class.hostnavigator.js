@@ -129,12 +129,6 @@ class CHostNavigator {
 
 		if (this.#selected_host_id !== '' && first_selected_host === null) {
 			this.#selected_host_id = '';
-
-			this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
-				detail: {
-					hostid: null
-				}
-			}));
 		}
 	}
 
@@ -448,15 +442,13 @@ class CHostNavigator {
 	#registerListeners() {
 		this.#listeners = {
 			hostSelect: e => {
-				if (e.detail.id !== this.#selected_host_id) {
-					this.#selected_host_id = e.detail.id;
+				this.#selected_host_id = e.detail.id;
 
-					this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
-						detail: {
-							hostid: e.detail.id
-						}
-					}));
-				}
+				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
+					detail: {
+						hostid: e.detail.id
+					}
+				}));
 			},
 
 			groupToggle: e => {

@@ -75,7 +75,7 @@ class CWidgetProblemHosts extends CWidget {
 				if (row !== null) {
 					const hostgroupid = row.dataset.hostgroupid;
 
-					if (hostgroupid !== undefined && hostgroupid !== this.#selected_host_group_id) {
+					if (hostgroupid !== undefined) {
 						this.#selected_host_group_id = hostgroupid;
 
 						this.#selectHostGroup();

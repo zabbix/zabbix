@@ -25,6 +25,9 @@
 		"out": [
 			{
 				"type": "_itemid"
+			},
+			{
+				"type": "_itemids"
 			}
 		]
 	},

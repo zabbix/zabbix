@@ -130,12 +130,6 @@ class CItemNavigator {
 
 		if (this.#selected_item_id !== '' && first_selected_item === null) {
 			this.#selected_item_id = '';
-
-			this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
-				detail: {
-					_itemid: null
-				}
-			}));
 		}
 	}
 
@@ -416,15 +410,13 @@ class CItemNavigator {
 	#registerListeners() {
 		this.#listeners = {
 			itemSelect: e => {
-				if (e.detail.id !== this.#selected_item_id) {
-					this.#selected_item_id = e.detail.id;
+				this.#selected_item_id = e.detail.id;
 
-					this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
-						detail: {
-							_itemid: e.detail.id
-						}
-					}));
-				}
+				this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
+					detail: {
+						itemid: e.detail.id
+					}
+				}));
 			},
 
 			groupToggle: e => {

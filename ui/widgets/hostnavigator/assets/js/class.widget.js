@@ -91,12 +91,8 @@ class CWidgetHostNavigator extends CWidget {
 		this.#listeners = {
 			hostSelect: e => {
 				this.broadcast({
-					[CWidgetsData.DATA_TYPE_HOST_ID]: e.detail.hostid !== null
-						? [e.detail.hostid]
-						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
-					[CWidgetsData.DATA_TYPE_HOST_IDS]: e.detail.hostid !== null
-						? [e.detail.hostid]
-						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [e.detail.hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [e.detail.hostid]
 				});
 			},
 

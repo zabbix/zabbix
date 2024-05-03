@@ -90,7 +90,10 @@ class CWidgetItemNavigator extends CWidget {
 	#registerListeners() {
 		this.#listeners = {
 			itemSelect: e => {
-				this.broadcast({_itemid: e.detail._itemid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_ITEM_ID]: [e.detail.itemid],
+					[CWidgetsData.DATA_TYPE_ITEM_IDS]: [e.detail.itemid]
+				});
 			},
 
 			groupToggle: e => {
