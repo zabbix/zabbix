@@ -28,9 +28,13 @@ class CWidgetGeoMap extends CWidget {
 	static SEVERITY_HIGH = 4;
 	static SEVERITY_DISASTER = 5;
 
+	#selected_hostid = null;
+
 	onInitialize() {
 		this._map = null;
 		this._icons = {};
+		this._selected_icons = {};
+		this._mouseover_icons = {};
 		this._initial_load = true;
 		this._home_coords = {};
 		this._severity_levels = new Map();
@@ -52,6 +56,7 @@ class CWidgetGeoMap extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
+			selected_hostid: this.#selected_hostid ?? undefined,
 			initial_load: this._initial_load ? 1 : 0,
 			unique_id: this._unique_id
 		};
@@ -68,6 +73,10 @@ class CWidgetGeoMap extends CWidget {
 			}
 
 			this._addMarkers(response.geomap.hosts);
+
+			if ('selected_hostid' in response.geomap) {
+				this.#selectHost(response.geomap.selected_hostid);
+			}
 		}
 
 		this._initial_load = false;
@@ -105,9 +114,21 @@ class CWidgetGeoMap extends CWidget {
 
 		// Create markers layer.
 		this._markers = L.geoJSON([], {
-			pointToLayer: function (point, ll) {
+			onEachFeature: (feature, marker) => {
+				marker.on('mouseover', () => marker.setIcon(this._mouseover_icons[feature.properties.severity]));
+				marker.on('mouseout', () => {
+					marker.setIcon(
+						feature.properties.hostid == this.#selected_hostid
+							? this._selected_icons[feature.properties.severity]
+							: this._icons[feature.properties.severity]
+					)
+				});
+			},
+			pointToLayer: function (feature, ll) {
 				return L.marker(ll, {
-					icon: this._icons[point.properties.severity]
+					icon: feature.properties.hostid == this.#selected_hostid
+						? this._selected_icons[feature.properties.severity]
+						: this._icons[feature.properties.severity]
 				});
 			}.bind(this)
 		});
@@ -199,6 +220,8 @@ class CWidgetGeoMap extends CWidget {
 				e.originalEvent.preventDefault();
 			}
 
+			this.#selectHost(e.layer.feature.properties.hostid);
+
 			const container = this._map._container;
 			const content = this.makePopupContent([e.layer.feature]);
 			const style = 'left: 0px; top: 0px;';
@@ -262,6 +285,35 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	/**
+	 * Update style for selected marker and cluster and broadcast _hostid.
+	 *
+	 * @param {string} hostid
+	 */
+	#selectHost(hostid) {
+		Object.values(this._map._layers).forEach(_layer => {
+			if (_layer.hasOwnProperty('_markers')) {
+				if (_layer._markers.some(marker => marker.feature.properties.hostid == this.#selected_hostid)) {
+					_layer._icon.classList.remove('selected');
+				}
+				if (_layer._markers.some(marker => marker.feature.properties.hostid == hostid)) {
+					_layer._icon.classList.add('selected');
+				}
+			}
+			else if (_layer.hasOwnProperty('_icon')) {
+				if (_layer.feature.properties.hostid == hostid) {
+					_layer.setIcon(this._selected_icons[_layer.feature.properties.severity]);
+				}
+				else if (_layer.feature.properties.hostid == this.#selected_hostid) {
+					_layer.setIcon(this._icons[_layer.feature.properties.severity]);
+				}
+			}
+		});
+
+		this.#selected_hostid = hostid;
+		this.broadcast({_hostid: this.#selected_hostid});
+	}
+
+	/**
 	 * Function to create cluster layer.
 	 *
 	 * @returns {CWidgetGeoMap._createClusterLayer.clusters|L.MarkerClusterGroup}
@@ -278,11 +330,13 @@ class CWidgetGeoMap extends CWidget {
 
 				return new L.DivIcon({
 					html: `
-						<div style="background-color: ${color};">
-							<span>${cluster.getChildCount()}</span>
+						<div class="cluster-outer-shape">
+							<div style="background-color: ${color};">
+								<span>${cluster.getChildCount()}</span>
+							</div>
 						</div>`,
 					className: 'marker-cluster',
-					iconSize: new L.Point(40, 40)
+					iconSize: new L.Point(50, 50)
 				});
 			}
 		});
@@ -428,8 +482,10 @@ class CWidgetGeoMap extends CWidget {
 
 			let rows = ``;
 			hosts.forEach(host => {
+				const hostid = host.properties.hostid;
+
 				rows += `
-					<tr>
+					<tr data-hostid="${hostid}" ${hostid == this.#selected_hostid && 'class="row-selected"'}>
 						<td class="nowrap">${makeHostBtn(host).outerHTML}</td>
 						${makeDataCell(host, CWidgetGeoMap.SEVERITY_DISASTER)}
 						${makeDataCell(host, CWidgetGeoMap.SEVERITY_HIGH)}
@@ -444,7 +500,7 @@ class CWidgetGeoMap extends CWidget {
 		};
 
 		const html = `
-			<table class="list-table">
+			<table class="list-table geomap-hosts-table">
 			<thead>
 			<tr>
 				<th>${t('Host')}</th>
@@ -462,6 +518,17 @@ class CWidgetGeoMap extends CWidget {
 		// Make DOM.
 		const dom = document.createElement('template');
 		dom.innerHTML = html;
+
+		dom.content.querySelector('tbody').addEventListener('click', (e) => {
+			const row = e.target.tagName === 'TR' ? e.target : e.target.closest('TR');
+
+			if (row.dataset.hostid !== undefined) {
+				[...row.parentNode.children].forEach(tr => tr.classList.remove('row-selected'));
+				row.classList.add('row-selected');
+
+				this.#selectHost(row.dataset.hostid);
+			}
+		});
 
 		return dom.content;
 	}
@@ -513,28 +580,45 @@ class CWidgetGeoMap extends CWidget {
 			color: severity_colors[CWidgetGeoMap.SEVERITY_DISASTER]
 		});
 
+		const styles = getComputedStyle(document.body);
+		const highlight_fill = styles.getPropertyValue('--geomap-highlight-fill');
+		const highlight_border = styles.getPropertyValue('--geomap-highlight-border');
+
 		for (const severity in severity_colors) {
-			const color = severity_colors[severity];
 			const tmpl = `
-				<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="40px" height="40px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 500 500" xmlns:xlink="http://www.w3.org/1999/xlink">
-				<defs>
-					<style type="text/css"><![CDATA[
-						.outline {fill: #000; fill-rule: nonzero; fill-opacity: .2}
-					]]></style>
-				</defs>
-				<g>
-					<path fill="${color}" d="M254 13c81,0 146,65 146,146 0,40 -16,77 -43,103l-97 233 -11 3 -98 -236c-27,-26 -43,-63 -43,-103 0,-81 65,-146 146,-146zm0 82c84,0 84,127 0,127 -84,0 -84,-127 0,-127z"/>
-					<path class="outline" d="M254 6c109,0 182,111 141,211 -8,18 -19,35 -32,49l-98 235 -19 5 -100 -240c-18,-27 -44,-46 -44,-107 0,-84 68,-153 152,-153zm99 54c-132,-132 -327,70 -197,198l97 233 3 -1 97 -232c54,-54 55,-143 0,-198zm-99 29c92,0 92,140 0,140 -92,0 -92,-140 0,-140zm40 29c-53,-53 -134,28 -80,81 53,53 134,-27 80,-81z"/>
-				</g>
+				<svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path fill="${severity_colors[severity]}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
+				</svg>`;
+
+			const selected_tmpl = `
+				<svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path fill="${highlight_fill}" fill-rule="evenodd" clip-rule="evenodd" d="M12 30C13.62 30 22 17.2124 22 11.8C22 6.38761 17.5228 2 12 2C6.47715 2 2 6.38761 2 11.8C2 17.2124 10.38 30 12 30ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"/>
+					<path fill="${highlight_border}" d="M21.5 11.8C21.5 13.0504 21.009 14.7888 20.2033 16.7359C19.4038 18.6682 18.3176 20.7523 17.1775 22.6746C16.0371 24.5971 14.8501 26.3455 13.8535 27.6075C13.3541 28.24 12.9113 28.7391 12.5528 29.0752C12.3729 29.2439 12.2256 29.3607 12.1123 29.4323C11.9844 29.5131 11.9563 29.5 12 29.5V30.5C12.2462 30.5 12.4734 30.387 12.6463 30.2778C12.8337 30.1595 13.0325 29.9963 13.2368 29.8047C13.6467 29.4203 14.1244 28.8781 14.6384 28.2272C15.6687 26.9225 16.8804 25.1356 18.0376 23.1847C19.1949 21.2335 20.3049 19.1059 21.1273 17.1183C21.9436 15.1455 22.5 13.2558 22.5 11.8H21.5ZM12 2.5C17.2563 2.5 21.5 6.67323 21.5 11.8H22.5C22.5 6.10199 17.7894 1.5 12 1.5V2.5ZM2.5 11.8C2.5 6.67323 6.74372 2.5 12 2.5V1.5C6.21058 1.5 1.5 6.10199 1.5 11.8H2.5ZM12 29.5C12.0437 29.5 12.0156 29.5131 11.8877 29.4323C11.7744 29.3607 11.6271 29.2439 11.4472 29.0752C11.0887 28.7391 10.6459 28.24 10.1465 27.6075C9.14988 26.3455 7.96285 24.5971 6.82253 22.6746C5.68238 20.7523 4.59618 18.6682 3.7967 16.7359C2.99104 14.7888 2.5 13.0504 2.5 11.8H1.5C1.5 13.2558 2.05645 15.1455 2.87267 17.1183C3.69505 19.1059 4.80509 21.2335 5.96244 23.1847C7.11961 25.1356 8.33133 26.9225 9.36163 28.2272C9.87559 28.8781 10.3533 29.4203 10.7632 29.8047C10.9675 29.9963 11.1663 30.1595 11.3537 30.2778C11.5266 30.387 11.7538 30.5 12 30.5V29.5ZM15.5 12C15.5 13.933 13.933 15.5 12 15.5V16.5C14.4853 16.5 16.5 14.4853 16.5 12H15.5ZM12 8.5C13.933 8.5 15.5 10.067 15.5 12H16.5C16.5 9.51472 14.4853 7.5 12 7.5V8.5ZM8.5 12C8.5 10.067 10.067 8.5 12 8.5V7.5C9.51472 7.5 7.5 9.51472 7.5 12H8.5ZM12 15.5C10.067 15.5 8.5 13.933 8.5 12H7.5C7.5 14.4853 9.51472 16.5 12 16.5V15.5Z"/>
+					<path fill="${severity_colors[severity]}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
+				</svg>`;
+
+			const mouseover_tmpl = `
+				<svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path fill="${highlight_fill}" fill-rule="evenodd" clip-rule="evenodd" d="M12 30C13.62 30 22 17.2124 22 11.8C22 6.38761 17.5228 2 12 2C6.47715 2 2 6.38761 2 11.8C2 17.2124 10.38 30 12 30ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"/>
+					<path fill="${severity_colors[severity]}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
 				</svg>`;
 
 			this._icons[severity] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(tmpl),
-				shadowUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAApCAQAAAACach9AAACMUlEQVR4Ae3ShY7jQBAE0Aoz/f9/HTMzhg1zrdKUrJbdx+Kd2nD8VNudfsL/Th/'+'/'+'/dyQN2TH6f3y/BGpC379rV+S+qqetBOxImNQXL8JCAr2V4iMQXHGNJxeCfZXhSRBcQMfvkOWUdtfzlLgAENmZDcmo2TVmt8OSM2eXxBp3DjHSMFutqS7SbmemzBiR+xpKCNUIRkdkkYxhAkyGoBvyQFEJEefwSmmvBfJuJ6aKqKWnAkvGZOaZXTUgFqYULWNSHUckZuR1HIIimUExutRxwzOLROIG4vKmCKQt364mIlhSyzAf1m9lHZHJZrlAOMMztRRiKimp/rpdJDc9Awry5xTZCte7FHtuS8wJgeYGrex28xNTd086Dik7vUMscQOa8y4DoGtCCSkAKlNwpgNtphjrC6MIHUkR6YWxxs6Sc5xqn222mmCRFzIt8lEdKx+ikCtg91qS2WpwVfBelJCiQJwvzixfI9cxZQWgiSJelKnwBElKYtDOb2MFbhmUigbReQBV0Cg4+qMXSxXSyGUn4UbF8l+7qdSGnTC0XLCmahIgUHLhLOhpVCtw4CzYXvLQWQbJNmxoCsOKAxSgBJno75avolkRw8iIAFcsdc02e9iyCd8tHwmeSSoKTowIgvscSGZUOA7PuCN5b2BX9mQM7S0wYhMNU74zgsPBj3HU7wguAfnxxjFQGBE6pwN+GjME9zHY7zGp8wVxMShYX9NXvEWD3HbwJf4giO4CFIQxXScH1/TM+04kkBiAAAAAElFTkSuQmCC',
-				iconSize: [40, 40],
-				iconAnchor: [20, 40],
-				shadowSize: [40, 40],
-				shadowAnchor: [13, 40]
+				iconSize: [48, 64],
+				iconAnchor: [24, 32]
+			});
+
+			this._selected_icons[severity] = L.icon({
+				iconUrl: 'data:image/svg+xml;base64,' + btoa(selected_tmpl),
+				iconSize: [48, 64],
+				iconAnchor: [24, 32]
+			});
+
+			this._mouseover_icons[severity] = L.icon({
+				iconUrl: 'data:image/svg+xml;base64,' + btoa(mouseover_tmpl),
+				iconSize: [48, 64],
+				iconAnchor: [24, 32]
 			});
 		}
 	}

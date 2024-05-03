@@ -2384,6 +2384,38 @@ function getUserGraphTheme() {
 	];
 }
 
+function getGeomapColors(): array {
+	switch (CWebUser::$data['theme']) {
+		case 'blue-theme':
+			return [
+				'--geomap-highlight-fill' => '#E9F7FD',
+				'--geomap-highlight-border' => '#CED7DB',
+				'--geomap-table-row-selected' => '#c9e3fc'
+			];
+
+		case 'dark-theme':
+			return [
+				'--geomap-highlight-fill' => '#4a4a4a',
+				'--geomap-highlight-border' => '#383838',
+				'--geomap-table-row-selected' => '#383838'
+			];
+
+		case 'hc-light':
+			return [
+				'--geomap-highlight-fill' => '#d9d9d9',
+				'--geomap-highlight-border' => '#747474',
+				'--geomap-table-row-selected' => '#f4f4f4'
+			];
+
+		case 'hc-dark':
+			return [
+				'--geomap-highlight-fill' => '#e8e9ed',
+				'--geomap-highlight-border' => '#e8e9ed',
+				'--geomap-table-row-selected' => '#222222'
+			];
+	}
+}
+
 /**
  * Custom error handler for PHP errors.
  *
