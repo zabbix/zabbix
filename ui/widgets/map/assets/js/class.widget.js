@@ -214,7 +214,9 @@ class CWidgetMap extends CWidget {
 
 				this.broadcast({
 					[CWidgetsData.DATA_TYPE_HOST_ID]: e.detail[CWidgetsData.DATA_TYPE_HOST_ID],
-					[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: e.detail[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: e.detail[CWidgetsData.DATA_TYPE_HOST_ID],
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: e.detail[CWidgetsData.DATA_TYPE_HOST_GROUP_ID],
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: e.detail[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]
 				});
 			}
 		};
