@@ -8,7 +8,16 @@ zabbix_export:
       template: 'Linux by Prom'
       name: 'Linux by Prom'
       description: |
-        This template collects Linux metrics from Node Exporter 0.18 and above. Support for older Node Exporter versions is provided as best effort.
+        This template collects Linux metrics from node_exporter 0.18 and above. Support for older node_exporter versions is provided as 'best effort'.
+        
+        Setup:
+        
+        1. Set up the node_exporter according to the official documentation:
+        https://prometheus.io/docs/guides/node-exporter/
+        
+        Use node_exporter v0.18.0 or above.
+        
+        2. Set the hostname or IP address of the node_exporter host in the '{$NODE_EXPORTER_HOST}' macro. You can also change the Prometheus endpoint port in the '{$NODE_EXPORTER_PORT}' macro if necessary.
         
         Known Issues:
         
@@ -115,7 +124,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          url: 'http://{HOST.CONN}:{$NODE_EXPORTER_PORT}/metrics'
+          url: 'http://{$NODE_EXPORTER_HOST}:{$NODE_EXPORTER_PORT}/metrics'
           tags:
             - tag: component
               value: raw
@@ -167,7 +176,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -198,7 +207,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -229,7 +238,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -260,7 +269,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -313,7 +322,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -401,7 +410,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -450,7 +459,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -481,7 +490,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -534,7 +543,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -565,7 +574,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -1211,8 +1220,8 @@ zabbix_export:
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
                     2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value "0", marking this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
-                              
+                    3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
                   tags:
@@ -1794,18 +1803,18 @@ zabbix_export:
                       	total;
                       
                       JSON.parse(value).forEach(function(metric) {
-                        if (metric['name'] == 'node_filesystem_size_bytes'){
-                      	  total = parseFloat(metric['value']);
-                        } else if (metric['name'] == 'node_filesystem_free_bytes'){
-                      	  free = parseFloat(metric['value']);
-                        } else if (metric['name'] == 'node_filesystem_avail_bytes'){
-                      	  available = parseFloat(metric['value']);
-                        }
+                      	if (metric['name'] == 'node_filesystem_size_bytes'){
+                      		total = parseFloat(metric['value']);
+                      	} else if (metric['name'] == 'node_filesystem_free_bytes'){
+                      		free = parseFloat(metric['value']);
+                      	} else if (metric['name'] == 'node_filesystem_avail_bytes'){
+                      		available = parseFloat(metric['value']);
+                      	}
                       });
                       if ((total - free + available) <= 0){
-                        return 0;
+                      	return 0;
                       } else {
-                        return (100 - 100 * available / (total - free + available));
+                      	return (100 - 100 * available / (total - free + available));
                       }
               master_item:
                 key: node_exporter.get
@@ -1898,11 +1907,11 @@ zabbix_export:
                       var total;
                       
                       JSON.parse(value).forEach(function(metric) {
-                        if (metric['name'] == 'node_filesystem_size_bytes'){
-                      	  total = parseFloat(metric['value']);
-                        } else if (metric['name'] == 'node_filesystem_free_bytes'){
-                      	  free = parseFloat(metric['value']);
-                        }
+                      	if (metric['name'] == 'node_filesystem_size_bytes'){
+                      		total = parseFloat(metric['value']);
+                      	} else if (metric['name'] == 'node_filesystem_free_bytes'){
+                      		free = parseFloat(metric['value']);
+                      	}
                       });
                       
                       return (total-free);
@@ -2073,13 +2082,16 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.'
+          description: 'Filters out `loopbacks`, `nulls`, `docker veth` links and `docker0` bridge by default.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
           description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^notpresent$
           description: 'Ignore `notpresent(1)`.'
+        - macro: '{$NODE_EXPORTER_HOST}'
+          value: '<SET NODE EXPORTER HOST>'
+          description: 'The hostname or IP address of the node_exporter host.'
         - macro: '{$NODE_EXPORTER_PORT}'
           value: '9100'
           description: 'TCP Port node_exporter is listening on.'

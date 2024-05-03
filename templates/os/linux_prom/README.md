@@ -37,7 +37,9 @@ This template has been tested on:
 
 ## Setup
 
-Please refer to Node Exporter documentation. Use Node Exporter 0.18.0 or above.
+1. Set up the node_exporter according to the [`official documentation`](https://prometheus.io/docs/guides/node-exporter/). Use node_exporter v0.18.0 or above.
+
+2. Set the hostname or IP address of the node_exporter host in the `{$NODE_EXPORTER_HOST}` macro. You can also change the Prometheus endpoint port in the `{$NODE_EXPORTER_PORT}` macro if necessary.
 
 ### Macros used
 
@@ -49,6 +51,7 @@ Please refer to Node Exporter documentation. Use Node Exporter 0.18.0 or above.
 |{$SYSTEM.FUZZYTIME.MAX}|<p>The threshold for difference of system time in seconds.</p>|`60`|
 |{$KERNEL.MAXFILES.MIN}||`256`|
 |{$LOAD_AVG_PER_CPU.MAX.WARN}|<p>Load per CPU considered sustainable. Tune if needed.</p>|`1.5`|
+|{$NODE_EXPORTER_HOST}|<p>The hostname or IP address of the node_exporter host.</p>|`<SET NODE EXPORTER HOST>`|
 |{$NODE_EXPORTER_PORT}|<p>TCP Port node_exporter is listening on.</p>|`9100`|
 |{$SWAP.PFREE.MIN.WARN}|<p>Warning threshold of the minimum free swap.</p>|`50`|
 |{$VFS.DEV.READ.AWAIT.WARN}|<p>Disk read average response time (in ms) before the trigger fires.</p>|`20`|
@@ -59,7 +62,7 @@ Please refer to Node Exporter documentation. Use Node Exporter 0.18.0 or above.
 |{$MEMORY.AVAILABLE.MIN}|<p>Used as a threshold in the memory available trigger.</p>|`20M`|
 |{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
-|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
+|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, `docker veth` links and `docker0` bridge by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`^.*$`|
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore `notpresent(1)`.</p>|`^notpresent$`|
 |{$NET.IF.IFALIAS.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`^.*$`|
@@ -159,7 +162,7 @@ Please refer to Node Exporter documentation. Use Node Exporter 0.18.0 or above.
 |Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Linux by Prom/net.if.in.errors[node_exporter,"{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Linux by Prom/net.if.out.errors[node_exporter"{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])<0 and last(/Linux by Prom/net.if.speed[node_exporter,"{#IFNAME}"])>0 and ( last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=6 or last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=7 or last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=11 or last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=62 or last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=69 or last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=117 ) and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])<0 and last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])>0 and (last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=6 or last(/Linux by Prom/net.if.type[node_exporter,"{#IFNAME}"])=1) and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br>          <br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))`|Average|**Manual close**: Yes|
+|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"])=2 and (last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#1)<>last(/Linux by Prom/net.if.status[node_exporter,"{#IFNAME}"],#2))`|Average|**Manual close**: Yes|
 
 ### LLD rule Mounted filesystem discovery
 
