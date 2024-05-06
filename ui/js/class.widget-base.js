@@ -1578,6 +1578,7 @@ class CWidgetBase {
 	}
 
 	/**
+	 * Set cover message if standard view can't be displayed.
 	 *
 	 * @param {string}      message
 	 * @param {string|null} description
