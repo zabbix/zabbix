@@ -42,6 +42,9 @@ class CDashboardPage {
 	// Require data source event: informs the dashboard to load the referred data source.
 	static EVENT_REQUIRE_DATA_SOURCE = 'dashboard-page-require-data-source';
 
+	static PLACEHOLDER_DEFAULT_WIDTH = 6;
+	static PLACEHOLDER_DEFAULT_HEIGHT = 2;
+
 	constructor(target, {
 		data,
 		dashboard,
@@ -801,68 +804,18 @@ class CDashboardPage {
 		};
 
 		const move = e => {
-			let event_pos = getGridEventPos(e, {width: 1, height: 1});
-
 			if (this._widget_placeholder_clicked_pos !== null) {
-				let reverse_x = false;
-				let reverse_y = false;
+				const event_pos = getGridEventPos(e, {width: 1, height: 1});
 
-				const delta_x = event_pos.x - this._widget_placeholder_clicked_pos.x;
-				const delta_y = event_pos.y - this._widget_placeholder_clicked_pos.y;
-
-				this._widget_placeholder_pos = {};
-
-				if (this._widget_placeholder_clicked_pos.width === 6) {
-					if (delta_x <= 0) {
-						this._widget_placeholder_clicked_pos.width = 1;
-					}
-					else if (delta_x >= 1) {
-						this._widget_placeholder_clicked_pos.x++;
-						this._widget_placeholder_clicked_pos.width = 1;
-					}
-				}
-
-				if (this._widget_placeholder_clicked_pos.height === 2) {
-					if (delta_y <= 0) {
-						this._widget_placeholder_clicked_pos.height = 1;
-					}
-					else if (delta_y >= 1) {
-						this._widget_placeholder_clicked_pos.y++;
-						this._widget_placeholder_clicked_pos.height = 1;
-					}
-				}
-
-				if (delta_x > 0) {
-					this._widget_placeholder_pos.x = this._widget_placeholder_clicked_pos.x;
-					this._widget_placeholder_pos.width = Math.max(
-						this._widget_placeholder_clicked_pos.width,
-						event_pos.x - this._widget_placeholder_clicked_pos.x + 1
-					);
-				}
-				else {
-					this._widget_placeholder_pos.x = event_pos.x;
-					this._widget_placeholder_pos.width = this._widget_placeholder_clicked_pos.x
-						- event_pos.x + this._widget_placeholder_clicked_pos.width;
-					reverse_x = true;
-				}
-
-				if (event_pos.y >= this._widget_placeholder_clicked_pos.y) {
-					this._widget_placeholder_pos.y = this._widget_placeholder_clicked_pos.y;
-					this._widget_placeholder_pos.height = Math.max(
-						this._widget_placeholder_clicked_pos.height,
-						event_pos.y - this._widget_placeholder_clicked_pos.y + 1
-					);
-				}
-				else {
-					this._widget_placeholder_pos.y = event_pos.y;
-					this._widget_placeholder_pos.height = this._widget_placeholder_clicked_pos.y
-						- event_pos.y + this._widget_placeholder_clicked_pos.height;
-					reverse_y = true;
-				}
-
-				this._widget_placeholder_pos = this.accommodatePos(
-					this._widget_placeholder_pos, {reverse_x, reverse_y}
-				);
+				this._widget_placeholder_pos = this.accommodatePos({
+					x: Math.min(this._widget_placeholder_clicked_pos.x, event_pos.x),
+					y: Math.min(this._widget_placeholder_clicked_pos.y, event_pos.y),
+					width: Math.abs(this._widget_placeholder_clicked_pos.x - event_pos.x) + 1,
+					height: Math.abs(this._widget_placeholder_clicked_pos.y - event_pos.y) + 1
+				}, {
+					reverse_x: event_pos.x < this._widget_placeholder_clicked_pos.x,
+					reverse_y: event_pos.y < this._widget_placeholder_clicked_pos.y
+				});
 
 				this._resizeGrid(this._widget_placeholder_pos.y + this._widget_placeholder_pos.height
 					+ this._grid_pad_rows
@@ -883,35 +836,60 @@ class CDashboardPage {
 					return;
 				}
 
-				const delta_x = event_pos.x - this._widget_placeholder_pos?.x || 0;
-				const delta_y = event_pos.y - this._widget_placeholder_pos?.y || 0;
+				const event_pos_1x1 = getGridEventPos(e, {width: 1, height: 1});
+				const event_pos = getGridEventPos(e, {
+					width: CDashboardPage.PLACEHOLDER_DEFAULT_WIDTH,
+					height: CDashboardPage.PLACEHOLDER_DEFAULT_HEIGHT
+				});
+
+				const offsets_x = [0];
+
+				for (let offset = 1; offset < CDashboardPage.PLACEHOLDER_DEFAULT_WIDTH; offset++) {
+					offsets_x.push(-offset, offset);
+				}
+
+				const offsets_y = [0];
+
+				for (let offset = 1; offset < CDashboardPage.PLACEHOLDER_DEFAULT_HEIGHT; offset++) {
+					offsets_y.push(-offset, offset);
+				}
+
+				if (this._widget_placeholder_pos !== null) {
+					const distance_x = event_pos.x + event_pos.width / 2
+						- this._widget_placeholder_pos.x - this._widget_placeholder_pos.width / 2;
+
+					offsets_x.sort((offset_a, offset_b) =>
+						Math.abs(distance_x + offset_a) - Math.abs(distance_x + offset_b)
+					);
+
+					const distance_y = event_pos.y + event_pos.height / 2
+						- this._widget_placeholder_pos.y - this._widget_placeholder_pos.height / 2;
+
+					offsets_y.sort((offset_a, offset_b) =>
+						Math.abs(distance_y + offset_a) - Math.abs(distance_y + offset_b)
+					);
+				}
 
 				this._widget_placeholder_pos = null;
 
-				if (this._isPosFree(event_pos)) {
-					for (const height of [2, 1]) {
-						for (const offset_y of [0, -1, 1, -2, 2]) {
-							for (const width of [6, 5, 4, 3, 2, 1]) {
-								for (const offset_x of [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5, -6, 6]) {
-									const pos = {
-										x: delta_x < 0 ? event_pos.x + offset_x : event_pos.x - width + offset_x,
-										y: delta_y < 0 ? event_pos.y + offset_y : event_pos.y - height + offset_y,
-										width: width,
-										height: height
-									};
+				for (let width = CDashboardPage.PLACEHOLDER_DEFAULT_WIDTH; width > 0; width--) {
+					for (let height = CDashboardPage.PLACEHOLDER_DEFAULT_HEIGHT; height > 0; height--) {
+						for (const offset_y of offsets_y) {
+							for (const offset_x of offsets_x) {
+								const pos = {
+									x: event_pos.x + offset_x,
+									y: event_pos.y + offset_y,
+									width,
+									height
+								};
 
-									if (pos.x < 0 || pos.x + pos.width > this._max_columns
-											|| pos.y < 0 || pos.y + pos.height > this._max_rows) {
-										continue;
-									}
-
-									if (this._isPosOverlapping(pos, event_pos) && this._isPosFree(pos)) {
-										this._widget_placeholder_pos = pos;
-										break;
-									}
+								if (pos.x < 0 || pos.x + pos.width > this._max_columns
+										|| pos.y < 0 || pos.y + pos.height > this._max_rows) {
+									continue;
 								}
 
-								if (this._widget_placeholder_pos !== null) {
+								if (this._isPosOverlapping(pos, event_pos_1x1) && this._isPosFree(pos)) {
+									this._widget_placeholder_pos = pos;
 									break;
 								}
 							}
@@ -924,6 +902,10 @@ class CDashboardPage {
 						if (this._widget_placeholder_pos !== null) {
 							break;
 						}
+					}
+
+					if (this._widget_placeholder_pos !== null) {
+						break;
 					}
 				}
 
@@ -967,11 +949,11 @@ class CDashboardPage {
 
 				this.blockInteraction();
 
-				this._widget_placeholder_clicked_pos = this._widget_placeholder_pos;
+				this._widget_placeholder_clicked_pos = getGridEventPos(e, {width: 1, height: 1});
 
 				this._widget_placeholder
 					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
-					.showAtPosition(this._widget_placeholder_clicked_pos);
+					.showAtPosition(this._widget_placeholder_pos);
 
 				document.addEventListener('mouseup', this._widget_placeholder_events.mouseUp);
 				document.addEventListener('mousemove', this._widget_placeholder_events.mouseMove);
@@ -985,7 +967,8 @@ class CDashboardPage {
 
 				const new_widget_pos = {...this._widget_placeholder_pos};
 
-				if (new_widget_pos.width === 6 && new_widget_pos.height === 2) {
+				if (new_widget_pos.width === CDashboardPage.PLACEHOLDER_DEFAULT_WIDTH
+						&& new_widget_pos.height === CDashboardPage.PLACEHOLDER_DEFAULT_HEIGHT) {
 					delete new_widget_pos.width;
 					delete new_widget_pos.height;
 				}
