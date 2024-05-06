@@ -502,20 +502,7 @@ SVGMap.prototype.update = function (options, incremental) {
 				this.updateBackground(options.background);
 
 				if (this.selected_element_id !== '') {
-					const element = this.elements[this.selected_element_id];
-
-					if (element !== undefined) {
-						element.select();
-					}
-					else {
-						this.selected_element_id = '';
-
-						this.container.dispatchEvent(new CustomEvent(this.EVENT_ELEMENT_SELECT, {
-							selected_element_id: this.selected_element_id,
-							hostid: null,
-							hostgroupid: null
-						}));
-					}
+					this.elements[this.selected_element_id].select();
 				}
 			}
 			catch(exception) {

@@ -62,13 +62,14 @@ class CWidgetMap extends CWidget {
 
 		fields_data.sysmapid = fields_data.sysmapid ? fields_data.sysmapid[0] : fields_data.sysmapid;
 
-		if (fields_data.sysmapid !== undefined) {
-			this.#deselectMapElement();
-		}
-
 		if (this.#map_svg !== null || this.isFieldsReferredDataUpdated('sysmapid')) {
 			this.#previous_maps = [];
-			this.#sysmapid = fields_data.sysmapid;
+
+			if (this.#sysmapid != fields_data.sysmapid) {
+				this.#sysmapid = fields_data.sysmapid;
+				this.#deselectMapElement();
+			}
+
 			this.#map_svg = null;
 		}
 
@@ -125,9 +126,20 @@ class CWidgetMap extends CWidget {
 		const sysmap_data = response.sysmap_data;
 
 		if (sysmap_data !== undefined) {
-			this.#sysmapid = sysmap_data.current_sysmapid;
+			if (this.#sysmapid != sysmap_data.current_sysmapid) {
+				this.#sysmapid = sysmap_data.current_sysmapid;
+				this.#deselectMapElement();
+			}
 
 			if (sysmap_data.map_options !== null) {
+				const selected_element_exists = sysmap_data.map_options.elements.some(
+					element => element.selementid == this.#selected_element_id
+				);
+
+				if (!selected_element_exists) {
+					this.#deselectMapElement();
+				}
+
 				this.#makeSvgMap(sysmap_data.map_options);
 				this.#activateContentEvents();
 
@@ -167,6 +179,10 @@ class CWidgetMap extends CWidget {
 	}
 
 	#deselectMapElement() {
+		if (this.#selected_element_id === '') {
+			return;
+		}
+
 		this.#selected_element_id = '';
 
 		this.broadcast({
@@ -206,10 +222,6 @@ class CWidgetMap extends CWidget {
 				this._startUpdating();
 			},
 			select: e => {
-				if (this.#selected_element_id === e.detail.selected_element_id) {
-					return;
-				}
-
 				this.#selected_element_id = e.detail.selected_element_id;
 
 				this.broadcast({
