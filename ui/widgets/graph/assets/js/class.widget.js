@@ -96,7 +96,7 @@ class CWidgetGraph extends CWidget {
 	}
 
 	onFeedback({type, value}) {
-		if (type === '_timeperiod') {
+		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD) {
 			this._startUpdating();
 
 			this.feedback({time_period: value});
@@ -104,13 +104,13 @@ class CWidgetGraph extends CWidget {
 			return true;
 		}
 
-		return super.onFeedback({type, value});
+		return false;
 	}
 
 	promiseUpdate() {
 		const time_period = this.getFieldsData().time_period;
 
-		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
+		if (!this.hasBroadcast(CWidgetsData.DATA_TYPE_TIME_PERIOD) || this.isFieldsReferredDataUpdated('time_period')) {
 			this.broadcast({
 				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});

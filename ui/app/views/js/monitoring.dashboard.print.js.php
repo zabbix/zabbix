@@ -79,7 +79,7 @@
 				to_ts: dashboard_time_period.to_ts
 			};
 
-			CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+			CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
 
 			ZABBIX.Dashboard.broadcast({
 				[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),

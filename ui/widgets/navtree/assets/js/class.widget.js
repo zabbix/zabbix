@@ -111,7 +111,7 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	onFeedback({type, value}) {
-		if (type !== CWidgetsData.DATA_TYPE_MAP_ID || !Array.isArray(value)) {
+		if (type !== CWidgetsData.DATA_TYPE_MAP_ID) {
 			return;
 		}
 
