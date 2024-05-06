@@ -58,7 +58,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The average active sessions at a point in time. The number of sessions that are either working or waiting.'
+          description: 'The average number of active sessions at a point in time that are either working or waiting.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -164,7 +164,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'It is calculated by dividing the total CPU (used by the database) by the Oracle time model statistic DB time.'
+          description: 'The ratio calculated by dividing the total CPU (used by the database) by the Oracle time model statistic DB time.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -182,7 +182,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Wait time - the time that the server process spends waiting for available shared resources to be released by other server processes, such as latches, locks, data buffers, etc.'
+          description: 'Wait time - the time that the server process spends waiting for available shared resources to be released by other server processes such as latches, locks, data buffers, etc.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -289,6 +289,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
+          description: 'Number of restore points in the FRA.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -322,7 +323,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the FRA.'
+          description: 'The total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low-priority files from the FRA.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -357,6 +358,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
+          description: 'Percentage of space usable in the FRA.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -390,7 +392,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'The item gets its state of the current instance.'
+          description: 'Gets the state of the current instance.'
           tags:
             - tag: component
               value: application
@@ -400,7 +402,7 @@ zabbix_export:
           key: oracle.instance.role
           delay: '0'
           history: 7d
-          description: 'It indicates whether the instance is an active instance or an inactive secondary instance.'
+          description: 'Indicates whether the instance is an active instance or an inactive secondary instance.'
           valuemap:
             name: 'Oracle instance role'
           preprocessing:
@@ -436,7 +438,7 @@ zabbix_export:
               name: 'Oracle: Instance hostname has changed'
               event_name: 'Oracle: Instance hostname has changed (new hostname received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Oracle DB Instance hostname has changed. Acknowledge to close the problem manually.'
+              description: 'An Oracle Database instance hostname has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -449,7 +451,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The name of an instance.'
+          description: 'The name of the instance.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -465,7 +467,7 @@ zabbix_export:
               name: 'Oracle: Instance name has changed'
               event_name: 'Oracle: Instance name has changed (new name received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Oracle DB Instance name has changed. Acknowledge to close the problem manually.'
+              description: 'An Oracle Database instance name has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -532,7 +534,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Rps
-          description: 'The number of long table scans per second. A table is considered ''long'' if the table is not cached and if its high-water mark is greater than five blocks.'
+          description: 'The number of long table scans per second. A table is considered long if it is not cached and if its high water mark is greater than five blocks.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -550,7 +552,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of sorts (from ORDER BY clauses or index building) that are done to disk vs in-memory.'
+          description: 'The percentage of sorts (from `ORDER BY` clauses or index building) that are done to disk vs. in-memory.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -577,7 +579,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The maximum size of work area executed in automatic mode.'
+          description: 'The maximum size of a work area executed in automatic mode.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -596,7 +598,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The current value of the PGA_AGGREGATE_TARGET initialization parameter. If this parameter is not set, then its value is 0 and automatic management of the PGA memory is disabled.'
+          description: 'The current value of the `PGA_AGGREGATE_TARGET` initialization parameter. If this parameter is not set, then its value is "0" and automatic management of the PGA memory is disabled.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -710,6 +712,7 @@ zabbix_export:
           name: 'Oracle: Number of processes'
           key: 'oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           history: 7d
+          description: 'The current number of user processes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -751,7 +754,7 @@ zabbix_export:
               name: 'Oracle: Number of REDO logs available for switching is too low'
               event_name: 'Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)'
               priority: WARNING
-              description: 'The number of inactive/unused REDOs available for log switching is low (database down risk).'
+              description: 'The number of inactive/unused redos available for log switching is low (risk of database downtime).'
               tags:
                 - tag: scope
                   value: capacity
@@ -849,7 +852,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of concurrency. Concurrency is a DB behavior when different transactions request to change the same resource. In the case of modifying data transactions, it sequentially temporarily blocks the right to change the data, the rest of the transactions are waiting for the access. In the case when the access for the resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on the performance. A high contention value does not indicate the root cause of the problem but is a signal to search for it.'
+          description: 'The percentage of concurrency. Concurrency is a database behavior when different transactions request to change the same resource. In the case of modifying data transactions, it sequentially temporarily blocks the right to change the data, and the rest of the transactions wait for access. When the access to a resource is locked for a long time, the concurrency grows (like the transaction queue), often leaving an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -865,7 +868,7 @@ zabbix_export:
               name: 'Oracle: Too high database concurrency'
               event_name: 'Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)'
               priority: WARNING
-              description: 'The concurrency rate exceeds {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but it is a signal to search for it. In the case of high competition, the analysis of resource consumption should be carried out. Which are the most "heavy" queries made in the database? Possibly, also session tracing. All this will help to determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.'
+              description: 'The concurrency rate exceeds `{$ORACLE.CONCURRENCY.MAX.WARN}`%. A high contention value does not indicate the root cause of the problem, but is a signal to review resource consumption (determine the "heaviest" queries in the database, trace sessions, etc.) This will help find the root cause and possible optimization points both in database configuration and the logic of building queries.'
               tags:
                 - tag: scope
                   value: performance
@@ -876,7 +879,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The count of sessions.'
+          description: 'The session count.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -929,7 +932,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource — either user objects, such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.'
+          description: 'The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource - either user objects, such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -945,7 +948,7 @@ zabbix_export:
               name: 'Oracle: Too many locked sessions'
               event_name: 'Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)'
               priority: WARNING
-              description: 'The number of locked sessions exceeds {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.'
+              description: 'The number of locked sessions exceeds `{$ORACLE.SESSIONS.LOCK.MAX.WARN}`% of the running sessions.'
               tags:
                 - tag: scope
                   value: performance
@@ -956,7 +959,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The count of the prolongedly locked sessions. (You can change the duration of maximum session lock in seconds for a query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default is 600 sec).'
+          description: 'The count of the prolongedly locked sessions. (You can change the duration of the maximum session lock in seconds for a query using the `{$ORACLE.SESSION.LOCK.MAX.TIME}` macro. Default = 600 s).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -972,7 +975,7 @@ zabbix_export:
               name: 'Oracle: Too many sessions locked'
               event_name: 'Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)'
               priority: WARNING
-              description: 'The number of locked sessions exceeding {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect the database performance. Therefore, if they are detected, you should first find the most difficult queries from the database point of view and then analyze possible resource leaks.'
+              description: 'The number of locked sessions exceeding `{$ORACLE.SESSION.LOCK.MAX.TIME}` seconds is too high. Long-term locks can negatively affect the database performance. Therefore, if they are detected, you should first find the most difficult queries from the database point of view and then analyze possible resource leaks.'
               tags:
                 - tag: scope
                   value: performance
@@ -1124,7 +1127,7 @@ zabbix_export:
               name: 'Oracle: Shared pool free is too low'
               event_name: 'Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)'
               priority: WARNING
-              description: 'The free memory percent of the shared pool has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% for the last 5 minutes.'
+              description: 'The free memory percent of the shared pool has been less than `{$ORACLE.SHARED.FREE.MIN.WARN}`% for the last 5 minutes.'
               tags:
                 - tag: scope
                   value: capacity
@@ -1152,7 +1155,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'The item gets the values of the system metrics.'
+          description: 'Gets the values of the system metrics.'
           tags:
             - tag: component
               value: raw
@@ -1191,7 +1194,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The current amount of the PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the PGA_AGGREGATE_TARGET initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when PGA_AGGREGATE_TARGET is set to a small value.'
+          description: 'The current amount of the PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the `PGA_AGGREGATE_TARGET` initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when `PGA_AGGREGATE_TARGET` is set to a small value.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1210,7 +1213,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The number of bytes of the PGA memory in all processes that could be freed back to the operating system.'
+          description: 'The number of bytes of the PGA memory in all processes that could be freed back to the OS.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1229,7 +1232,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'It indicates how much the Program Global Area (PGA) memory is currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).'
+          description: 'The amount of Program Global Area (PGA) memory currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1285,7 +1288,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: days
-          description: 'The number of days before the password of Zabbix account expires.'
+          description: 'The number of days before the Zabbix account password expires.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1299,7 +1302,7 @@ zabbix_export:
               name: 'Oracle: Zabbix account will expire soon'
               event_name: 'Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)'
               priority: WARNING
-              description: 'The password for Zabbix user in the database expires soon.'
+              description: 'The password for the Zabbix user in the database expires soon.'
               tags:
                 - tag: scope
                   value: notice
@@ -1311,7 +1314,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Rps
-          description: 'The number of times that users manually issue the ROLLBACK statement or an error occurred during the users'' transactions.'
+          description: 'The number of times that users manually issued the `ROLLBACK` statement or an error occurred during the users'' transactions.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1342,7 +1345,7 @@ zabbix_export:
               name: 'Oracle: Version has changed'
               event_name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'The Oracle DB version has changed. Acknowledge to close the problem manually.'
+              description: 'The Oracle Database version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1361,7 +1364,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'It gets the archivelog statistics.'
+              description: 'Gets the archive log statistics.'
               tags:
                 - tag: component
                   value: archive-log
@@ -1375,7 +1378,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: TEXT
-              description: 'It displays the error message.'
+              description: 'Displays the error message.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1396,7 +1399,7 @@ zabbix_export:
               key: 'oracle.archivelog_log_sequence["{#DEST_NAME}"]'
               delay: '0'
               history: 7d
-              description: 'It identifies the sequence number of the last archived redo log to be archived.'
+              description: 'Identifies the sequence number of the last archived redo log to be archived.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1415,11 +1418,11 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                It identifies the current status of the destination where:
-                1 - 'VALID';
-                2 - 'DEFERRED';
-                3 - 'ERROR';
-                0 - 'UNKNOWN'.
+                Identifies the current status of the destination where:
+                1 - VALID;
+                2 - DEFERRED;
+                3 - ERROR;
+                0 - UNKNOWN.
               valuemap:
                 name: 'Oracle Archivelog status'
               preprocessing:
@@ -1443,8 +1446,8 @@ zabbix_export:
                   priority: HIGH
                   description: |
                     The trigger will launch if the archive log destination is not in one of these states:
-                    2 - 'DEFERRED';
-                    3 - 'VALID'.
+                    2 - DEFERRED;
+                    3 - VALID.
                   tags:
                     - tag: scope
                       value: availability
@@ -1470,7 +1473,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'It gets the information about the container database (CDB) and non-CDB database on an instance.'
+              description: 'Gets the information about the CDB and non-CDB database on an instance.'
               tags:
                 - tag: component
                   value: cdb
@@ -1482,7 +1485,7 @@ zabbix_export:
               key: 'oracle.db_force_logging["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'It indicates whether the database is under force logging mode ''YES'' or ''NO''.'
+              description: 'Indicates whether the database is under force logging mode (`YES`/`NO`).'
               valuemap:
                 name: 'Oracle force log status'
               preprocessing:
@@ -1509,9 +1512,9 @@ zabbix_export:
               history: 7d
               description: |
                 The archive log mode where:
-                0 - 'NOARCHIVELOG';
-                1 - 'ARCHIVELOG';
-                2 - 'MANUAL'.
+                0 - NOARCHIVELOG;
+                1 - ARCHIVELOG;
+                2 - MANUAL.
               valuemap:
                 name: 'Oracle log mode'
               preprocessing:
@@ -1537,10 +1540,10 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                1 - 'MOUNTED';
-                2 - 'READ WRITE';
-                3 - 'READ ONLY';
-                4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).
+                1 - MOUNTED;
+                2 - READ WRITE;
+                3 - READ ONLY;
+                4 - READ ONLY WITH APPLY (a physical standby database is open in real-time query mode).
               valuemap:
                 name: 'Oracle DB open status'
               preprocessing:
@@ -1565,7 +1568,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB open status has changed. Acknowledge to close the problem manually.'
+                  description: 'The Oracle Database open status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   dependencies:
                     - name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
@@ -1577,7 +1580,7 @@ zabbix_export:
                   expression: 'last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
-                  description: 'The Oracle DB is in a mounted state.'
+                  description: 'The Oracle Database is in a mounted state.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1589,11 +1592,11 @@ zabbix_export:
               history: 7d
               description: |
                 The current role of the database where:
-                1 - 'SNAPSHOT STANDBY';
-                2 - 'LOGICAL STANDBY';
-                3 - 'PHYSICAL STANDBY';
-                4 - 'PRIMARY ';
-                5 - 'FAR SYNC'.
+                1 - SNAPSHOT STANDBY;
+                2 - LOGICAL STANDBY;
+                3 - PHYSICAL STANDBY;
+                4 - PRIMARY;
+                5 - FAR SYNC.
               valuemap:
                 name: 'Oracle DB role'
               preprocessing:
@@ -1618,7 +1621,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Role has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Role has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB role has changed. Acknowledge to close the problem manually.'
+                  description: 'The Oracle Database role has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1628,7 +1631,7 @@ zabbix_export:
               expression: 'last(/Oracle by Zabbix agent 2/oracle.db_force_logging["{#DBNAME}"]) = 0 and last(/Oracle by Zabbix agent 2/oracle.db_log_mode["{#DBNAME}"]) = 1'
               name: 'Oracle Database ''{#DBNAME}'': Force logging is deactivated for DB with active Archivelog'
               priority: WARNING
-              description: 'Force Logging mode - it is very important metric for Databases in ''ARCHIVELOG''. This feature allows to forcibly write all the transactions to the REDO.'
+              description: 'Force logging mode is a very important metric for databases in `ARCHIVELOG`. This feature allows to forcibly write all the transactions to the redo log.'
               tags:
                 - tag: scope
                   value: performance
@@ -1702,7 +1705,7 @@ zabbix_export:
                   name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
                   event_name: 'ASM ''{#DGNAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
                   priority: HIGH
-                  description: 'The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.HIGH}'
+                  description: 'The usage of the ASM disk group expressed in % exceeds `{$ORACLE.ASM.USED.PCT.MAX.HIGH}`.'
                   tags:
                     - tag: scope
                       value: capacity
@@ -1711,7 +1714,7 @@ zabbix_export:
                   name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
                   event_name: 'ASM ''{#DGNAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
                   priority: WARNING
-                  description: 'The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}'
+                  description: 'The usage of the ASM disk group expressed in % exceeds `{$ORACLE.ASM.USED.PCT.MAX.WARN}`.'
                   dependencies:
                     - name: 'ASM ''{#DGNAME}'': Disk group usage is too high'
                       expression: 'min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
@@ -1724,7 +1727,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'It gets the ASM disk group statistics.'
+              description: 'Gets the ASM disk group statistics.'
               tags:
                 - tag: component
                   value: asm
@@ -1765,7 +1768,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'It gets the information about the PDB database on an instance.'
+              description: 'Gets the information about the PDB database on an instance.'
               tags:
                 - tag: component
                   value: pdb
@@ -1778,10 +1781,10 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                1 - 'MOUNTED';
-                2 - 'READ WRITE';
-                3 - 'READ ONLY';
-                4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).
+                1 - MOUNTED;
+                2 - READ WRITE;
+                3 - READ ONLY;
+                4 - READ ONLY WITH APPLY (a physical standby database is open in real-time query mode).
               valuemap:
                 name: 'Oracle DB open status'
               preprocessing:
@@ -1806,7 +1809,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'The Oracle DB open status has changed. Acknowledge to close the problem manually.'
+                  description: 'The Oracle Database open status has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1815,7 +1818,7 @@ zabbix_export:
                   expression: 'last(/Oracle by Zabbix agent 2/oracle.pdb_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
-                  description: 'The Oracle DB is in a mounted state.'
+                  description: 'The Oracle Database is in a mounted state.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1919,9 +1922,9 @@ zabbix_export:
               history: 7d
               description: |
                 The tablespace status where:
-                1 - 'ONLINE';
-                2 - 'OFFLINE';
-                3 - 'READ ONLY'.
+                1 - ONLINE;
+                2 - OFFLINE;
+                3 - READ ONLY.
               valuemap:
                 name: 'Oracle tablespace status'
               preprocessing:
@@ -1968,7 +1971,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Currently used bytes for the tablespace (current size of datafiles - the free space).'
+              description: 'Currently used bytes for the tablespace (current size of datafiles minus the free space).'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2014,6 +2017,7 @@ zabbix_export:
                   name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
                   event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
+                  description: 'The usage of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.USED.PCT.MAX.HIGH}`%'
                   tags:
                     - tag: scope
                       value: capacity
@@ -2022,6 +2026,7 @@ zabbix_export:
                   name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
                   event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
                   priority: WARNING
+                  description: 'The usage of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.USED.PCT.MAX.WARN}`%'
                   dependencies:
                     - name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage is too high'
                       expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
@@ -2058,6 +2063,7 @@ zabbix_export:
                   name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage from MAX is too high'
                   event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization from MAX is too high (over {$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}% for 5m).'
                   priority: WARNING
+                  description: 'The usage of the tablespace `{#TABLESPACE}` from MAX exceeds `{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`%'
                   dependencies:
                     - name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization from MAX is too high'
                       expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
@@ -2069,6 +2075,7 @@ zabbix_export:
                   name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization from MAX is too high'
                   event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization from MAX is too high (over {$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}% for 5m).'
                   priority: HIGH
+                  description: 'The usage of the tablespace `{#TABLESPACE}` from MAX exceeds `{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}`%'
                   tags:
                     - tag: scope
                       value: capacity
@@ -2097,22 +2104,24 @@ zabbix_export:
                 - tag: tablespace
                   value: '{#TABLESPACE}'
               trigger_prototypes:
-                - uuid: 2530cb03fb4e4e728396834f0db89466
-                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}'
-                  name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
-                  event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.USED.PCT.MAX.WARN}% for 5m).'
-                  priority: WARNING
-                  dependencies:
-                    - name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
-                      expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
-                  tags:
-                    - tag: scope
-                      value: capacity
                 - uuid: 451108a2251848ea8719378d5c0abb42
                   expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                   name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
                   event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.HIGH}% for 5m).'
                   priority: HIGH
+                  description: 'The utilization of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`%'
+                  tags:
+                    - tag: scope
+                      value: capacity
+                - uuid: 2530cb03fb4e4e728396834f0db89466
+                  expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.WARN}'
+                  name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
+                  event_name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high (over {$ORACLE.TBS.UTIL.PCT.MAX.WARN}% for 5m).'
+                  priority: WARNING
+                  description: 'The utilization of the tablespace `{#TABLESPACE}` exceeds `{$ORACLE.TBS.UTIL.PCT.MAX.WARN}`%'
+                  dependencies:
+                    - name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace utilization is too high'
+                      expression: 'min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
                   tags:
                     - tag: scope
                       value: capacity
@@ -2122,7 +2131,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'It gets the statistics of the tablespace.'
+              description: 'Gets the statistics of the tablespace.'
               tags:
                 - tag: component
                   value: raw
@@ -2154,40 +2163,40 @@ zabbix_export:
       macros:
         - macro: '{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
           value: '95'
-          description: 'The maximum percentage of used Automatic Storage Management (ASM) disk group for a high trigger expression.'
+          description: 'The maximum percentage of used space in the Automatic Storage Management (ASM) disk group for the High trigger expression.'
         - macro: '{$ORACLE.ASM.USED.PCT.MAX.WARN}'
           value: '90'
-          description: 'The maximum percentage of used ASM disk group for a warning trigger expression.'
+          description: 'The maximum percentage of used space in the Automatic Storage Management (ASM) disk group for the Warning trigger expression.'
         - macro: '{$ORACLE.CONCURRENCY.MAX.WARN}'
           value: '80'
-          description: 'The maximum percentage of sessions concurrency usage for a trigger expression.'
+          description: 'The maximum percentage of session concurrency for the Warning trigger expression.'
         - macro: '{$ORACLE.CONNSTRING}'
           value: 'tcp://localhost:1521'
           description: 'Oracle URI or a session name.'
         - macro: '{$ORACLE.DB.FILE.MAX.WARN}'
           value: '80'
-          description: 'The maximum percentage of used database files for a trigger expression.'
+          description: 'The maximum percentage of used database files for the Warning trigger expression.'
         - macro: '{$ORACLE.DBNAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery of the database. It can be overridden on host level or its linked template level.'
+          description: 'Used in database discovery. It can be overridden on the host or linked template level.'
         - macro: '{$ORACLE.DBNAME.NOT_MATCHES}'
           value: PDB\$SEED
-          description: 'This macro is used in discovery of the database. It can be overridden on host level or its linked template level.'
+          description: 'Used in database discovery. It can be overridden on the host or linked template level.'
         - macro: '{$ORACLE.EXPIRE.PASSWORD.MIN.WARN}'
           value: '7'
-          description: 'The number of warning days before the password expires for a trigger expression.'
+          description: 'The number of days before the password expires for the Warning trigger expression.'
         - macro: '{$ORACLE.PASSWORD}'
           value: zabbix_password
-          description: 'The Oracle user''s password.'
+          description: 'Oracle user''s password.'
         - macro: '{$ORACLE.PGA.USE.MAX.WARN}'
           value: '90'
-          description: 'The maximum percentage of the Program Global Area (PGA) usage that alerts the threshold for a trigger expression.'
+          description: 'Alert threshold for the maximum percentage of the Program Global Area (PGA) usage for the Warning trigger expression.'
         - macro: '{$ORACLE.PROCESSES.MAX.WARN}'
           value: '80'
-          description: 'Alert threshold for the maximum percentage of active processes for a trigger expression.'
+          description: 'Alert threshold for the maximum percentage of active processes for the Warning trigger expression.'
         - macro: '{$ORACLE.REDO.MIN.WARN}'
           value: '3'
-          description: 'Alert threshold for the minimum number of REDO logs for a trigger expression.'
+          description: 'Alert threshold for the minimum number of redo logs for the Warning trigger expression.'
         - macro: '{$ORACLE.SERVICE}'
           value: ORA
           description: 'Oracle Service Name.'
@@ -2196,46 +2205,46 @@ zabbix_export:
           description: 'The maximum duration of the session lock in seconds to count the session as a prolongedly locked query.'
         - macro: '{$ORACLE.SESSION.LONG.LOCK.MAX.WARN}'
           value: '3'
-          description: 'Alert threshold for the maximum number of the prolongedly locked sessions for a trigger expression.'
+          description: 'Alert threshold for the maximum number of the prolongedly locked sessions for the Warning trigger expression.'
         - macro: '{$ORACLE.SESSIONS.LOCK.MAX.WARN}'
           value: '20'
-          description: 'Alert threshold for the maximum percentage of locked sessions for a trigger expression.'
+          description: 'Alert threshold for the maximum percentage of locked sessions for the Warning trigger expression.'
         - macro: '{$ORACLE.SESSIONS.MAX.WARN}'
           value: '80'
-          description: 'Alert threshold for the maximum percentage of active sessions for a trigger expression.'
+          description: 'Alert threshold for the maximum percentage of active sessions for the Warning trigger expression.'
         - macro: '{$ORACLE.SHARED.FREE.MIN.WARN}'
           value: '5'
-          description: 'Alert threshold for the minimum percentage of free shared pool for a trigger expression.'
+          description: 'Alert threshold for the minimum percentage of free shared pool for the Warning trigger expression.'
         - macro: '{$ORACLE.TABLESPACE.CONTAINER.MATCHES}'
           value: '.*'
-          description: 'This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.'
+          description: 'Used in tablespace discovery. It can be overridden on the host or linked template level.'
         - macro: '{$ORACLE.TABLESPACE.CONTAINER.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.'
+          description: 'Used in tablespace discovery. It can be overridden on the host or linked template level.'
         - macro: '{$ORACLE.TABLESPACE.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.'
+          description: 'Used in tablespace discovery. It can be overridden on the host or linked template level.'
         - macro: '{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.'
+          description: 'Used in tablespace discovery. It can be overridden on the host or linked template level.'
         - macro: '{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}'
           value: '95'
-          description: 'High severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for a trigger expression.'
+          description: 'High severity alert threshold for the maximum percentage of tablespace usage (used bytes/max bytes) for the High trigger expression.'
         - macro: '{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}'
           value: '90'
-          description: 'Warning severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for a trigger expression.'
+          description: 'Warning severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for the Warning trigger expression.'
         - macro: '{$ORACLE.TBS.USED.PCT.MAX.HIGH}'
           value: '95'
-          description: 'High severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.'
+          description: 'High severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for the High trigger expression.'
         - macro: '{$ORACLE.TBS.USED.PCT.MAX.WARN}'
           value: '90'
-          description: 'Warning severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.'
+          description: 'Warning severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for the Warning trigger expression.'
         - macro: '{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}'
           value: '90'
-          description: 'High severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.'
+          description: 'High severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for the High trigger expression.'
         - macro: '{$ORACLE.TBS.UTIL.PCT.MAX.WARN}'
           value: '80'
-          description: 'Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.'
+          description: 'Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for the High trigger expression.'
         - macro: '{$ORACLE.USER}'
           value: zabbix
           description: 'Oracle username.'
@@ -2476,7 +2485,7 @@ zabbix_export:
       name: 'Oracle: Too many active processes'
       event_name: 'Oracle: Too many active processes (over {$ORACLE.PROCESSES.MAX.WARN}% for 5 min)'
       priority: WARNING
-      description: 'Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.'
+      description: 'Active processes are using more than `{$ORACLE.PROCESSES.MAX.WARN}`% of the available number of processes.'
       tags:
         - tag: scope
           value: capacity
@@ -2485,7 +2494,7 @@ zabbix_export:
       name: 'Oracle: Too many active sessions'
       event_name: 'Oracle: Too many active sessions (over {$ORACLE.SESSIONS.MAX.WARN}% for 5 min)'
       priority: WARNING
-      description: 'Active sessions are using more than {$ORACLE.SESSIONS.MAX.WARN}% of the available sessions.'
+      description: 'Active sessions are using more than `{$ORACLE.SESSIONS.MAX.WARN}`% of the available sessions.'
       tags:
         - tag: scope
           value: capacity
@@ -2494,7 +2503,7 @@ zabbix_export:
       name: 'Oracle: Too many database files'
       event_name: 'Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)'
       priority: WARNING
-      description: 'The number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafiles limit.'
+      description: 'The number of datafiles is higher than `{$ORACLE.DB.FILE.MAX.WARN}`% of the available datafile limit.'
       tags:
         - tag: scope
           value: capacity
@@ -2503,7 +2512,7 @@ zabbix_export:
       name: 'Oracle: Total PGA inuse is too high'
       event_name: 'Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)'
       priority: WARNING
-      description: 'The total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.'
+      description: 'The total PGA in use is more than `{$ORACLE.PGA.USE.MAX.WARN}`% of `PGA_AGGREGATE_TARGET`.'
       tags:
         - tag: scope
           value: capacity

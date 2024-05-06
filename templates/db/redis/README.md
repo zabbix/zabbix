@@ -12,7 +12,7 @@ Zabbix version: 7.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Redis, version 3.0.6, 4.0.14, 5.0.6, 7.0.8
+- Redis, version 3.0.6, 4.0.14, 5.0.6, 7.2.4
 
 ## Configuration
 
@@ -20,9 +20,13 @@ This template has been tested on:
 
 ## Setup
 
-Setup and configure zabbix-agent2 compiled with the Redis monitoring plugin (ZBXNEXT-5428-4.3).
+Setup and configure zabbix-agent2 compiled with the Redis monitoring plugin.
 
-Test availability: `zabbix_get -s redis-master -k redis.ping`
+Redis' default user should have permissions to run CONFIG, INFO, PING, CLIENT and SLOWLOG commands.
+
+Or default user ACL should have @admin, @slow, @dangerous, @fast and @connection categories.
+
+Test availability: `zabbix_get -s 127.0.0.1 -k redis.ping[tcp://127.0.0.1:6379]`
 
 
 ### Macros used

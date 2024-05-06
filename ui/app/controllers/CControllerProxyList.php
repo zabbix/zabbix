@@ -27,14 +27,14 @@ class CControllerProxyList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'uncheck' =>		                 'in 1',
-			'filter_set' =>		                 'in 1',
-			'filter_rst' =>		                 'in 1',
-			'filter_name' =>	                 'string',
-			'sort' =>			                 'in '.implode(',', ['name', 'operating_mode', 'tls_accept', 'version', 'lastaccess']),
-			'sortorder' =>		                 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'filter_operating_mode' => 'in -1,'.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
-			'filter_version' =>	                 'in -1,'.implode(',', [ZBX_PROXY_VERSION_ANY_OUTDATED, ZBX_PROXY_VERSION_CURRENT])
+			'filter_set' =>				'in 1',
+			'filter_rst' =>				'in 1',
+			'filter_name' =>			'string',
+			'filter_operating_mode' =>	'in '.implode(',', [-1, PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
+			'filter_version' =>			'in '.implode(',', [-1, ZBX_PROXY_VERSION_ANY_OUTDATED, ZBX_PROXY_VERSION_CURRENT]),
+			'sort' =>					'in '.implode(',', ['name', 'operating_mode', 'tls_accept', 'version', 'lastaccess']),
+			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'page' =>					'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,7 +57,6 @@ class CControllerProxyList extends CController {
 		CProfile::update('web.proxies.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.proxies.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.proxies.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.proxies.filter_operating_mode',
@@ -78,12 +77,14 @@ class CControllerProxyList extends CController {
 		];
 
 		$data = [
-			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
 			'filter' => $filter,
 			'active_tab' => CProfile::get('web.proxies.filter.active', 1),
-			'allowed_ui_conf_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			'user' => [
+				'can_edit_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'can_edit_proxy_groups' => $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
+			]
 		];
 
 		if ($filter['version'] == ZBX_PROXY_VERSION_ANY_OUTDATED) {
@@ -106,17 +107,19 @@ class CControllerProxyList extends CController {
 		]);
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['name', 'operating_mode', 'lastaccess', 'tls_connect', 'tls_accept', 'version',
-				'compatibility'
+			'output' => ['proxyid', 'name', 'proxy_groupid', 'operating_mode', 'lastaccess', 'tls_connect',
+				'tls_accept', 'version', 'compatibility', 'state'
 			],
-			'selectHosts' => ['hostid', 'name', 'status'],
+			'selectAssignedHosts' => ['hostid', 'name', 'monitored_by', 'status'],
+			'selectHosts' => ['hostid', 'name', 'monitored_by', 'status'],
+			'selectProxyGroup' => ['name'],
 			'proxyids' => array_keys($data['proxies']),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 		order_result($data['proxies'], $sortField, $sortOrder);
 
-		$page_num = getRequest('page', 1);
+		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('proxy.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['proxies'], $sortOrder,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
@@ -129,8 +132,15 @@ class CControllerProxyList extends CController {
 					($proxy['version'] % 100)
 				: '';
 
-			CArrayHelper::sort($proxy['hosts'], ['name']);
-			$proxy['hosts'] = array_slice($proxy['hosts'], 0, CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1);
+			$proxy['hosts'] = array_merge($proxy['hosts'], $proxy['assignedHosts']);
+			unset($proxy['assignedHosts']);
+			$proxy['host_count_total'] = count($proxy['hosts']);
+
+			if ($proxy['hosts']) {
+				CArrayHelper::sort($proxy['hosts'], ['name']);
+
+				$proxy['hosts'] = array_slice($proxy['hosts'], 0, CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE));
+			}
 		}
 		unset($proxy);
 
@@ -186,12 +196,12 @@ class CControllerProxyList extends CController {
 				}
 			}
 		}
-		$data['config'] = ['max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)];
 
-		$server_version = CSettingsHelper::getPrivate(CSettingsHelper::SERVER_STATUS);
-		if ($server_version !== '') {
-			$data['server_version'] = preg_split('/[a-z]/i', json_decode($server_version, true)['version'], 2)[0];
-		}
+		$server_status = CSettingsHelper::getServerStatus();
+
+		$data['server_version'] = array_key_exists('version', $server_status) && $server_status['version'] !== ''
+			? preg_split('/[a-z]/i', $server_status['version'], 2)[0]
+			: '';
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of proxies'));

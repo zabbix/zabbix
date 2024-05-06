@@ -316,29 +316,8 @@ class CDiscoveryRule extends CItemGeneral {
 			self::prepareItemsForApi($result, false);
 
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['formula', 'evaltype']);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
-
-			foreach ($result as &$rule) {
-				// unset the fields that are returned in the filter
-				unset($rule['formula'], $rule['evaltype']);
-
-				if ($options['selectFilter'] !== null) {
-					$filter = $this->unsetExtraFields([$rule['filter']],
-						['conditions', 'formula', 'evaltype'],
-						$options['selectFilter']
-					);
-					$filter = reset($filter);
-					if (isset($filter['conditions'])) {
-						foreach ($filter['conditions'] as &$condition) {
-							unset($condition['item_conditionid'], $condition['itemid']);
-						}
-						unset($condition);
-					}
-
-					$rule['filter'] = $filter;
-				}
-			}
-			unset($rule);
 		}
 
 		foreach ($result as &$item) {
@@ -348,7 +327,7 @@ class CDiscoveryRule extends CItemGeneral {
 		unset($item);
 
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
 
 		return $result;
@@ -559,72 +538,70 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($options['selectFilter'] !== null) {
-			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
-			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
-			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
+			$has_evaltype = $this->outputIsRequested('evaltype', $options['selectFilter']);
+			$has_formula = $this->outputIsRequested('formula', $options['selectFilter']);
+			$has_eval_formula = $this->outputIsRequested('eval_formula', $options['selectFilter']);
+			$has_conditions = $this->outputIsRequested('conditions', $options['selectFilter']);
 
-			$filters = [];
-			foreach ($result as $rule) {
-				$filters[$rule['itemid']] = [
-					'evaltype' => $rule['evaltype'],
-					'formula' => isset($rule['formula']) ? $rule['formula'] : ''
-				];
+			foreach ($result as &$item) {
+				$item['filter'] = [];
+
+				if ($has_evaltype) {
+					$item['filter']['evaltype'] = $item['evaltype'];
+				}
 			}
+			unset($item);
 
-			// adding conditions
-			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = DB::select('item_condition', [
-					'output' => ['item_conditionid', 'macro', 'value', 'itemid', 'operator'],
-					'filter' => ['itemid' => $itemIds],
-					'preservekeys' => true,
-					'sortfield' => ['item_conditionid']
-				]);
-				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
+			if ($has_formula || $has_eval_formula || $has_conditions) {
+				$db_conditions = DBselect(
+					'SELECT c.itemid,c.item_conditionid,c.macro,c.operator,c.value'.
+					' FROM item_condition c'.
+					' WHERE '.dbConditionInt('c.itemid', $itemIds)
+				);
 
-				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
+				$item_conditions = [];
 
-				foreach ($filters as &$filter) {
-					// in case of a custom expression - use the given formula
-					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $filter['formula'];
+				while ($db_condition = DBfetch($db_conditions)) {
+					$item_conditions[$db_condition['itemid']][$db_condition['item_conditionid']] =
+						array_diff_key($db_condition, array_flip(['item_conditionid', 'itemid']));
+				}
+
+				foreach ($result as &$item) {
+					$eval_formula = '';
+					$conditions = array_key_exists($item['itemid'], $item_conditions)
+						? $item_conditions[$item['itemid']]
+						: [];
+
+					if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $item['formula']);
+
+						$eval_formula = $item['formula'];
 					}
-					// in other cases - generate the formula automatically
 					else {
-						// sort the conditions by macro before generating the formula
-						$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
-						$conditions = order_macros($conditions, 'macro');
+						CConditionHelper::sortLldRuleConditions($conditions);
 
-						$formulaConditions = [];
-						foreach ($conditions as $condition) {
-							$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
-						}
-						$formula = CConditionHelper::getFormula($formulaConditions, $filter['evaltype']);
+						$eval_formula = CConditionHelper::getEvalFormula($conditions, 'macro', (int) $item['evaltype']);
 					}
 
-					// generate formulaids from the effective formula
-					$formulaIds = CConditionHelper::getFormulaIds($formula);
-					foreach ($filter['conditions'] as &$condition) {
-						$condition['formulaid'] = $formulaIds[$condition['item_conditionid']];
-					}
-					unset($condition);
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
 
-					// generated a letter based formula only for rules with custom expressions
-					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
+					if ($has_formula) {
+						$item['filter']['formula'] = $item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+							? $eval_formula
+							: '';
 					}
 
-					if ($evalFormulaRequested) {
-						$filter['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
+					if ($has_eval_formula) {
+						$item['filter']['eval_formula'] = $eval_formula;
+					}
+
+					if ($has_conditions) {
+						$item['filter']['conditions'] = array_values($conditions);
 					}
 				}
-				unset($filter);
+				unset($item);
 			}
-
-			// add filters to the result
-			foreach ($result as &$rule) {
-				$rule['filter'] = $filters[$rule['itemid']];
-			}
-			unset($rule);
 		}
 
 		// Add LLD macro paths.
@@ -665,62 +642,48 @@ class CDiscoveryRule extends CItemGeneral {
 			]);
 
 			if ($filter_requested && $overrides) {
-				$conditions = DB::select('lld_override_condition', [
-					'output' => ['lld_override_conditionid', 'macro', 'value', 'lld_overrideid', 'operator'],
-					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => ['lld_override_conditionid'],
-					'preservekeys' => true
-				]);
+				$db_conditions = DBselect(
+					'SELECT c.lld_overrideid,c.lld_override_conditionid,c.macro,c.operator,c.value'.
+					' FROM lld_override_condition c'.
+					' WHERE '.dbConditionInt('c.lld_overrideid', array_keys($overrides))
+				);
 
-				$relation_map = $this->createRelationMap($conditions, 'lld_overrideid', 'lld_override_conditionid');
+				$override_conditions = [];
+
+				while ($db_condition = DBfetch($db_conditions)) {
+					$override_conditions[$db_condition['lld_overrideid']][$db_condition['lld_override_conditionid']] =
+						array_diff_key($db_condition, array_flip(['lld_override_conditionid', 'lld_overrideid']));
+				}
 
 				foreach ($overrides as &$override) {
+					$eval_formula = '';
+					$conditions = array_key_exists($override['lld_overrideid'], $override_conditions)
+						? $override_conditions[$override['lld_overrideid']]
+						: [];
+
+					if ($override['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $override['formula']);
+
+						$eval_formula = $override['formula'];
+					}
+					else {
+						CConditionHelper::sortLldRuleConditions($conditions);
+
+						$eval_formula =
+							CConditionHelper::getEvalFormula($conditions, 'macro', (int) $override['evaltype']);
+					}
+
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
+
 					$override['filter'] = [
 						'evaltype' => $override['evaltype'],
-						'formula' => $override['formula']
+						'formula' => $override['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION ? $eval_formula : '',
+						'eval_formula' => $eval_formula,
+						'conditions' => array_values($conditions)
 					];
+
 					unset($override['evaltype'], $override['formula']);
-				}
-				unset($override);
-
-				$overrides = $relation_map->mapMany($overrides, $conditions, 'conditions');
-
-				foreach ($overrides as &$override) {
-					$override['filter'] += ['conditions' => $override['conditions']];
-					unset($override['conditions']);
-
-					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $override['filter']['formula'];
-					}
-					else {
-						$conditions = zbx_toHash($override['filter']['conditions'], 'lld_override_conditionid');
-						$conditions = order_macros($conditions, 'macro');
-						$formula_conditions = [];
-
-						foreach ($conditions as $condition) {
-							$formula_conditions[$condition['lld_override_conditionid']] = $condition['macro'];
-						}
-
-						$formula = CConditionHelper::getFormula($formula_conditions, $override['filter']['evaltype']);
-					}
-
-					$formulaids = CConditionHelper::getFormulaIds($formula);
-
-					foreach ($override['filter']['conditions'] as &$condition) {
-						$condition['formulaid'] = $formulaids[$condition['lld_override_conditionid']];
-						unset($condition['lld_override_conditionid'], $condition['lld_overrideid']);
-					}
-					unset($condition);
-
-					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$override['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
-						$override['filter']['eval_formula'] = $override['filter']['formula'];
-					}
-					else {
-						$override['filter']['eval_formula'] = CConditionHelper::replaceNumericIds($formula,
-							$formulaids
-						);
-					}
 				}
 				unset($override);
 			}
@@ -1420,19 +1383,16 @@ class CDiscoveryRule extends CItemGeneral {
 		];
 		$db_filters = DBselect(DB::makeSql($base_table, $options));
 
-		$object_formulaids = [];
-
 		while ($db_filter = DBfetch($db_filters)) {
-			if ($db_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$object_formulaids[$db_filter[$base_pk]] = CConditionHelper::getFormulaIds($db_filter['formula']);
+			$conditions = [];
 
-				$db_filter['formula'] = CConditionHelper::replaceNumericIds($db_filter['formula'],
-					$object_formulaids[$db_filter[$base_pk]]
-				);
+			if ($db_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::addFormulaIds($conditions, $db_filter['formula']);
+				CConditionHelper::replaceConditionIds($db_filter['formula'], $conditions);
 			}
 
 			$db_objects[$db_filter[$base_pk]]['filter'] =
-				array_diff_key($db_filter, array_flip([$base_pk])) + ['conditions' => []];
+				array_diff_key($db_filter, array_flip([$base_pk])) + ['conditions' => $conditions];
 		}
 
 		$options = [
@@ -1443,14 +1403,15 @@ class CDiscoveryRule extends CItemGeneral {
 
 		while ($db_condition = DBfetch($db_conditions)) {
 			if ($db_objects[$db_condition[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$db_condition['formulaid'] = $object_formulaids[$db_condition[$base_pk]][$db_condition[$condition_pk]];
+				$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] +=
+					array_diff_key($db_condition, array_flip([$base_pk]));
 			}
 			else {
 				$db_condition['formulaid'] = '';
-			}
 
-			$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] =
-				array_diff_key($db_condition, array_flip([$base_pk]));
+				$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] =
+					array_diff_key($db_condition, array_flip([$base_pk]));
+			}
 		}
 	}
 
@@ -2038,8 +1999,9 @@ class CDiscoveryRule extends CItemGeneral {
 				if ($db_objects === null
 						|| $object['filter']['formula'] != $db_objects[$object[$base_pk]]['filter']['formula']
 						|| array_key_exists($i, $_upd_objectids)) {
-					$upd_object['formula'] = CConditionHelper::replaceLetterIds($object['filter']['formula'],
-						array_column($object['filter']['conditions'], $condition_pk, 'formulaid')
+					$upd_object['formula'] = $object['filter']['formula'];
+					CConditionHelper::replaceFormulaIds($upd_object['formula'],
+						array_column($object['filter']['conditions'], null, $condition_pk)
 					);
 				}
 			}
@@ -2094,26 +2056,15 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$condition_indexes = [];
-
-				foreach ($object['filter']['conditions'] as $j => $condition) {
-					$condition_indexes[$condition['formulaid']] = $j;
-				}
-
-				$formula = CConditionHelper::replaceLetterIds($object['filter']['formula'], $condition_indexes);
-				$formulaids = CConditionHelper::getFormulaIds($formula);
-
-				$object['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
+				CConditionHelper::resetFormulaIds($object['filter']['formula'], $object['filter']['conditions']);
 			}
 
 			$changed = false;
 			$db_conditions = $db_objects !== null ? $db_objects[$object[$base_pk]]['filter']['conditions'] : [];
 
-			foreach ($object['filter']['conditions'] as $j => &$condition) {
-				if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$condition['formulaid'] = $formulaids[$j];
-				}
-				elseif ($db_objects !== null
+			foreach ($object['filter']['conditions'] as &$condition) {
+				if ($db_objects !== null
+						&& $object['filter']['evaltype'] != $db_objects[$object[$base_pk]]['filter']['evaltype']
 						&& $db_objects[$object[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 					$condition['formulaid'] = '';
 				}

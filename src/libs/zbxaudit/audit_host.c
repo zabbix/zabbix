@@ -123,14 +123,20 @@ PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(funcname)									\
 PREPARE_AUDIT_SNMP_INTERFACE(host, host)
 PREPARE_AUDIT_SNMP_INTERFACE(host_prototype, hostprototype)
 
-void	zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(int audit_context_mode,
-		zbx_uint64_t hostid, zbx_uint64_t proxyid, const char *hostname, int inventory_mode)
+void	zbx_audit_host_update_json_add_monitoring_and_hostname_and_inventory_mode(int audit_context_mode,
+		zbx_uint64_t hostid, unsigned char monitored_by, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid,
+		const char *hostname, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 #define	AUDIT_TABLE_NAME	"hosts"
+
+	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.monitored_by",
+			(int)monitored_by, AUDIT_TABLE_NAME, "monitored_by");
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxyid",
 			proxyid, AUDIT_TABLE_NAME, "proxyid");
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxy_groupid",
+			proxy_groupid, AUDIT_TABLE_NAME, "proxy_groupid");
 	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.host", hostname,
 			AUDIT_TABLE_NAME, "host");
 
@@ -291,8 +297,8 @@ PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, authprotocol, zbx_uint64_t, u
 PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, privprotocol, zbx_uint64_t, uint64)				\
 PREPARE_AUDIT_HOST_INTERFACE(funcname, auditentry, contextname, const char*, string)				\
 
-PREPARE_AUDIT_HOST(host, host, AUDIT_RESOURCE_HOST)
-PREPARE_AUDIT_HOST(host_prototype, hostprototype, AUDIT_RESOURCE_HOST_PROTOTYPE)
+PREPARE_AUDIT_HOST(host, host, ZBX_AUDIT_RESOURCE_HOST)
+PREPARE_AUDIT_HOST(host_prototype, hostprototype, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE)
 #undef PREPARE_AUDIT_HOST
 #undef PREPARE_AUDIT_HOST_INTERFACE
 
@@ -309,6 +315,8 @@ void	zbx_audit_host_update_json_update_##resource(int audit_context_mode, zbx_ui
 PREPARE_AUDIT_HOST_UPDATE(host, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(name, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(proxyid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_HOST_UPDATE(proxy_groupid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_HOST_UPDATE(monitored_by, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_authtype, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_privilege, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_username, const char*, string)
@@ -467,18 +475,22 @@ void	zbx_audit_host_del(int audit_context_mode, zbx_uint64_t hostid, const char 
 }
 
 void	zbx_audit_host_update_json_add_details(int audit_context_mode, zbx_uint64_t hostid, const char *host,
-		zbx_uint64_t proxyid, int ipmi_authtype, int ipmi_privilege, const char *ipmi_username,
-		const char *ipmi_password, int status, int flags, int tls_connect, int tls_accept,
-		const char *tls_issuer, const char *tls_subject, const char *tls_psk_identity, const char *tls_psk,
-		int custom_interfaces, int inventory_mode)
+		unsigned char monitored_by, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, int ipmi_authtype,
+		int ipmi_privilege, const char *ipmi_username, const char *ipmi_password, int status, int flags,
+		int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject,
+		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces, int inventory_mode)
 {
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 #define	AUDIT_TABLE_NAME	"hosts"
 	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.host", host,
 			AUDIT_TABLE_NAME, "host");
+	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.monitored_by",
+			monitored_by, AUDIT_TABLE_NAME, "monitored_by");
 	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxyid",
 			proxyid, AUDIT_TABLE_NAME, "proxyid");
+	zbx_audit_update_json_append_uint64(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.proxy_groupid",
+			proxy_groupid, AUDIT_TABLE_NAME, "proxy_groupid");
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.ipmi_authtype",
 			ipmi_authtype, AUDIT_TABLE_NAME, "ipmi_authtype");
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.ipmi_privilege",
@@ -946,7 +958,7 @@ void	zbx_audit_host_group_create_entry(int audit_context_mode, int audit_action,
 		zbx_audit_entry_t	*local_audit_group_entry_insert;
 
 		local_audit_group_entry_insert = zbx_audit_entry_init(groupid, AUDIT_HOSTGRP_ID, name, audit_action,
-				AUDIT_RESOURCE_HOST_GROUP);
+				ZBX_AUDIT_RESOURCE_HOST_GROUP);
 		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_group_entry_insert,
 				sizeof(local_audit_group_entry_insert));
 	}

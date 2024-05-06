@@ -25,12 +25,11 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/std"
+	"golang.zabbix.com/sdk/std"
 )
 
 func TestFileModifyTime(t *testing.T) {
 	stdOs = std.NewMockOs()
-
 
 	var filetime int64
 
@@ -56,7 +55,6 @@ func TestFileModifyTime(t *testing.T) {
 func TestFileAccessTime(t *testing.T) {
 	stdOs = std.NewMockOs()
 
-
 	var filetime int64
 
 	stdOs.(std.MockOs).MockFile("text.txt", []byte("1234"))
@@ -80,7 +78,6 @@ func TestFileAccessTime(t *testing.T) {
 
 func TestFileChangeTime(t *testing.T) {
 	stdOs = std.NewMockOs()
-
 
 	var filetime int64
 

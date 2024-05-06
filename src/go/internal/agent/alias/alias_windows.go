@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"strings"
 
-	"zabbix.com/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent"
 )
 
 // addPerfCounterAliases adds performance counter metrics defined by PerfCounter,

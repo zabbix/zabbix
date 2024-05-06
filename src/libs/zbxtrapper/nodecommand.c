@@ -30,6 +30,7 @@
 #include "zbxstr.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_scripts_constants.h"
+#include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
@@ -91,6 +92,13 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 	zbx_uint64_t	taskid;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
+
+	if (0 == host->proxyid)
+	{
+		zbx_snprintf(error, max_error_len, "Host is monitored by proxy group, "
+				"but its proxy assignment is still pending.");
+		return FAIL;
+	}
 
 	if (0 == (taskid = zbx_script_create_task(script, host, 0, time(NULL))))
 	{
@@ -317,20 +325,21 @@ static int	validate_manualinput(const char *manualinput, const char *validator,
  *                                                                                    *
  * Purpose: executes command                                                          *
  *                                                                                    *
- * Parameters:  scriptid                - [IN] id of script to be executed            *
- *              hostid                  - [IN] host script will be executed on        *
- *              eventid                 - [IN]                                        *
- *              user                    - [IN] user who executes command              *
- *              clientip                - [IN]                                        *
- *              manualinput             - [IN] user provided value to script          *
- *              config_timeout          - [IN]                                        *
- *              config_trapper_timeout  - [IN]                                        *
- *              config_source_ip        - [IN]                                        *
- *              config_ssh_key_location - [IN]                                        *
- *              get_config_forks        - [IN]                                        *
- *              program_type            - [IN]                                        *
- *              result                  - [OUT] result of script execution            *
- *              debug                   - [OUT] debug data (optional)                 *
+ * Parameters:  scriptid                     - [IN] id of script to be executed       *
+ *              hostid                       - [IN] host script will be executed on   *
+ *              eventid                      - [IN]                                   *
+ *              user                         - [IN] user who executes command         *
+ *              clientip                     - [IN]                                   *
+ *              manualinput                  - [IN] user provided value to script     *
+ *              config_timeout               - [IN]                                   *
+ *              config_trapper_timeout       - [IN]                                   *
+ *              config_source_ip             - [IN]                                   *
+ *              config_ssh_key_location      - [IN]                                   *
+ *              config_enable_global_scripts - [IN]                                   *
+ *              get_config_forks             - [IN]                                   *
+ *              program_type                 - [IN]                                   *
+ *              result                       - [OUT] result of script execution       *
+ *              debug                        - [OUT] debug data (optional)            *
  *                                                                                    *
  * Return value:  SUCCEED - processed successfully                                    *
  *                FAIL - error occurred                                               *
@@ -340,8 +349,9 @@ static int	validate_manualinput(const char *manualinput, const char *validator,
  **************************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
 		const char *clientip, const char *manualinput, int config_timeout, int config_trapper_timeout,
-		const char *config_source_ip, const char *config_ssh_key_location,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char **debug)
+		const char *config_source_ip, const char *config_ssh_key_location, int config_enable_global_scripts,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type,
+		char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, macro_type;
 	zbx_dc_host_t		host;
@@ -598,12 +608,14 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char	*poutput = NULL, *perror = NULL;
 		int		audit_res;
 
-		if (0 == host.proxyid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+		if (HOST_MONITORED_BY_SERVER == host.monitored_by ||
+				ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
 			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
 					config_trapper_timeout, config_source_ip, config_ssh_key_location,
-					get_config_forks, program_type, result, error, sizeof(error), debug);
+					config_enable_global_scripts, get_config_forks, program_type, result, error,
+					sizeof(error), debug);
 		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
@@ -714,7 +726,7 @@ static int	check_user_administration_actions_permissions(const zbx_user_t *user,
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssh_key_location,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
+		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type)
 {
 	char			*result = NULL, *send = NULL, *debug = NULL, *manualinput = NULL, tmp[64],
 				tmp_hostid[64], tmp_eventid[64], clientip[MAX_STRING_LEN],
@@ -822,7 +834,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 
 	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, manualinput,
 			config_timeout, config_trapper_timeout, config_source_ip, config_ssh_key_location,
-			get_config_forks, program_type, &result, &debug)))
+			config_enable_global_scripts, get_config_forks, program_type, &result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);

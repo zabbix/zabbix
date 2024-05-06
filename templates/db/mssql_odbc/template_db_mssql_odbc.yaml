@@ -33,7 +33,7 @@ zabbix_export:
         
           Note! Credentials in the odbc.ini do not work for MSSQL.
         
-        The "Service's TCP port state" item uses the {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.
+        The "Service's TCP port state" item uses the {$MSSQL.HOST} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance, change these if necessary.
         
         If your instance uses a non-default TCP port, set the port in your section of odbc.ini in the line Server = IP or FQDN name, port.
         
@@ -1959,7 +1959,7 @@ zabbix_export:
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
                 - name: 'MSSQL: Service is unavailable'
-                  expression: 'last(/MSSQL by ODBC/net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}])=0'
+                  expression: 'last(/MSSQL by ODBC/net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}])=0'
               tags:
                 - tag: scope
                   value: availability
@@ -2134,7 +2134,7 @@ zabbix_export:
         - uuid: c0302965c2574b43955a1d37a8fce9eb
           name: 'MSSQL: Service''s TCP port state'
           type: SIMPLE
-          key: 'net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]'
+          key: 'net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}]'
           delay: 30s
           history: 7d
           description: 'Test the availability of MSSQL Server on a TCP port.'
@@ -2149,7 +2149,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 152af5cc3ce04d4aa8ab255c37aed6c6
-              expression: 'last(/MSSQL by ODBC/net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}])=0'
+              expression: 'last(/MSSQL by ODBC/net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}])=0'
               name: 'MSSQL: Service is unavailable'
               priority: DISASTER
               description: 'The TCP port of the MSSQL Server service is currently unavailable.'
@@ -4251,6 +4251,9 @@ zabbix_export:
         - macro: '{$MSSQL.FREE_LIST_STALLS.MAX}'
           value: '2'
           description: 'The maximum free list stalls per second - for the trigger expression.'
+        - macro: '{$MSSQL.HOST}'
+          value: localhost
+          description: 'The hostname or IP address of the MSSQL instance.'
         - macro: '{$MSSQL.JOB.MATCHES}'
           value: '.*'
           description: 'This macro is used in job discovery. It can be overridden on the host or linked template level.'

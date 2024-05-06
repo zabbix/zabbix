@@ -1526,18 +1526,18 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#JOB.NAMESPACE}'
-                value: '{$NOMAD.JOB.NAMESPACE.MATCHES}'
-                formulaid: A
-              - macro: '{#JOB.NAMESPACE}'
-                value: '{$NOMAD.JOB.NAMESPACE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#JOB.NAME}'
                 value: '{$NOMAD.JOB.NAME.MATCHES}'
-                formulaid: C
+                formulaid: A
               - macro: '{#JOB.NAME}'
                 value: '{$NOMAD.JOB.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#JOB.NAMESPACE}'
+                value: '{$NOMAD.JOB.NAMESPACE.MATCHES}'
+                formulaid: C
+              - macro: '{#JOB.NAMESPACE}'
+                value: '{$NOMAD.JOB.NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               - macro: '{#JOB.TASK.GROUP}'

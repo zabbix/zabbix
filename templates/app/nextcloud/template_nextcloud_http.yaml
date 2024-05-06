@@ -1346,14 +1346,20 @@ zabbix_export:
                   name: 'Nextcloud: Version'
                   width: '6'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: ''
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.version
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '2'
                 - type: graph
                   name: 'Nextcloud: Active users'
                   'y': '2'
@@ -1415,40 +1421,58 @@ zabbix_export:
                   x: '6'
                   width: '18'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: ''
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.apps.webserver
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '2'
                 - type: item
                   name: 'Nextcloud: Free space'
                   x: '24'
                   width: '12'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: ''
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.freespace
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '2'
                 - type: item
                   name: 'Nextcloud: Database'
                   x: '36'
                   width: '36'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: ''
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.db.version
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '2'
             - name: 'Nextcloud: Users'
               widgets:
                 - type: graphprototype

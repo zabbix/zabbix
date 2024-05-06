@@ -20,9 +20,9 @@
 #include "trapper_history_push.h"
 #include "trapper_server.h"
 
-#include "../proxyconfigread/proxyconfig_read.h"
+#include "../proxyconfigread/proxyconfigread.h"
 #include "proxydata.h"
-#include "../reporter/report.h"
+#include "../reporter/reporter.h"
 
 #include "zbxtrapper.h"
 #include "zbxdbhigh.h"
@@ -90,7 +90,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	struct zbx_json		json;
 	struct zbx_json_parse	jp_data, jp_params;
 	unsigned char		*data = NULL, smtp_security, smtp_verify_peer, smtp_verify_host,
-				smtp_authentication, content_type, *response = NULL;
+				smtp_authentication, message_format, *response = NULL;
 	zbx_uint32_t		size;
 	zbx_user_t		user;
 	unsigned short		smtp_port;
@@ -139,7 +139,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	result = zbx_db_select(
 			"select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd,smtp_port"
 				",smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions"
-				",maxattempts,attempt_interval,content_type,script,timeout"
+				",maxattempts,attempt_interval,message_format,script,timeout"
 			" from media_type"
 			" where mediatypeid=" ZBX_FS_UI64, mediatypeid);
 
@@ -161,12 +161,12 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(smtp_verify_peer, row[10]);
 	ZBX_STR2UCHAR(smtp_verify_host, row[11]);
 	ZBX_STR2UCHAR(smtp_authentication, row[12]);
-	ZBX_STR2UCHAR(content_type, row[16]);
+	ZBX_STR2UCHAR(message_format, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
 
 	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[1], row[2], row[3], row[4], row[5],
 			row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-			smtp_authentication, atoi(row[13]), atoi(row[14]), row[15], content_type, row[17], row[18],
+			smtp_authentication, atoi(row[13]), atoi(row[14]), row[15], message_format, row[17], row[18],
 			sendto, subject, message, params);
 
 	zbx_db_free_result(result);
@@ -217,7 +217,7 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
-int	trapper_process_request_server(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,

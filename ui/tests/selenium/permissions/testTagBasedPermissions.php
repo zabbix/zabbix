@@ -191,13 +191,14 @@ class testTagBasedPermissions extends CLegacyWebTest {
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText('//h4[text()="Current problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found.');
+		$this->zbxTestAssertElementText('//h4[text()="Current problems"]/../../..//tr[@class="nothing-to-show"]', 'No data found');
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->one()->waitUntilVisible();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 
 		// Check trigger filter on Problem page
 		foreach ($data['trigger_names'] as $name) {
@@ -211,7 +212,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
-			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+			$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
+			$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 			// Reset filter.
 			$this->zbxTestClickButtonText('Reset');
 			$table->waitUntilReloaded();

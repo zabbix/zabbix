@@ -60,7 +60,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_GMAIL => [
 				'name' => 'Gmail',
@@ -71,7 +71,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_GMAIL_RELAY => [
 				'name' => 'Gmail relay',
@@ -82,7 +82,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_OFFICE365 => [
 				'name' => 'Office365',
@@ -93,7 +93,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_OFFICE365_RELAY => [
 				'name' => 'Office365 relay',
@@ -104,7 +104,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			]
 		];
 
@@ -398,7 +398,7 @@ class CMediatypeHelper {
 			];
 		}
 
-		if ($media_type == MEDIA_TYPE_EMAIL && $message_format == SMTP_MESSAGE_FORMAT_HTML) {
+		if ($media_type == MEDIA_TYPE_EMAIL && $message_format == ZBX_MEDIA_MESSAGE_FORMAT_HTML) {
 			return [
 				'subject' => $message_templates[$message_type]['template']['subject'],
 				'message' => $message_templates[$message_type]['template']['html']

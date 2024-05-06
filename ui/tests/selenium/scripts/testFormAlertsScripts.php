@@ -889,7 +889,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
 						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
+						'Execute on' => 'Zabbix proxy or server',
 						'Commands' => 'Script command',
 						'Description' => 'Test description',
 						'User group' => 'Selenium user group',
@@ -908,7 +908,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Name' => 'Max script 2',
 						'Scope' => 'Action operation',
 						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
+						'Execute on' => 'Zabbix proxy or server',
 						'Commands' => 'Script command',
 						'Description' => 'Test description',
 						'Host group' => 'Selected',
@@ -924,7 +924,7 @@ class testFormAlertsScripts extends CWebTest {
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
 						'Type' => 'Script',
-						'Execute on' => 'Zabbix server (proxy)',
+						'Execute on' => 'Zabbix proxy or server',
 						'Commands' => 'Script command',
 						'Description' => 'Test description',
 						'User group' => 'Selenium user group',
@@ -1698,7 +1698,7 @@ class testFormAlertsScripts extends CWebTest {
 		$segmented_elements = [
 			'Scope' => ['Action operation', 'Manual host action', 'Manual event action'],
 			'Type' => ['URL', 'Webhook', 'Script', 'SSH', 'Telnet', 'IPMI'],
-			'Execute on' => ['Zabbix agent', 'Zabbix server (proxy)', 'Zabbix server'],
+			'Execute on' => ['Zabbix agent', 'Zabbix proxy or server', 'Zabbix server'],
 			'Required host permissions' => ['Read', 'Write'],
 			'Input type' => ['String', 'Dropdown']
 		];

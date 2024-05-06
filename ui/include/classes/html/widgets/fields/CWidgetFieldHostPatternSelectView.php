@@ -25,8 +25,11 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 
 	private string $placeholder = '';
 
+	private array $filter_preselect = [];
+
 	public function __construct(CWidgetFieldHostPatternSelect $field) {
 		$this->field = $field;
+		$this->placeholder = _('patterns');
 	}
 
 	public function setPlaceholder(string $placeholder): self {
@@ -40,7 +43,7 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 	}
 
 	public function getView(): CPatternSelect {
-		return (new CPatternSelect([
+		$options = [
 			'name' => $this->field->getName().'[]',
 			'object_name' => 'hosts',
 			'data' => $this->field->getValue(),
@@ -55,7 +58,13 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 				]
 			],
 			'add_post_js' => false
-		]))
+		];
+
+		if ($this->filter_preselect) {
+			$options['popup']['filter_preselect'] = $this->filter_preselect;
+		}
+
+		return (new CPatternSelect($options))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setEnabled(!$this->isDisabled())
 			->setAriaRequired($this->isRequired());
@@ -65,5 +74,11 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 		$field_id = zbx_formatDomId($this->field->getName().'[]');
 
 		return 'jQuery("#'.$field_id.'").multiSelect();';
+	}
+
+	public function setFilterPreselect(array $filter_preselect): self {
+		$this->filter_preselect = $filter_preselect;
+
+		return $this;
 	}
 }

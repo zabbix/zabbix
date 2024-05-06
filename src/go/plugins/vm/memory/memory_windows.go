@@ -22,7 +22,7 @@ package memory
 import (
 	"errors"
 
-	"zabbix.com/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/win32"
 )
 
 func (p *Plugin) exportVMMemorySize(mode string) (result interface{}, err error) {

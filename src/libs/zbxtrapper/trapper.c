@@ -34,7 +34,6 @@
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
 #include "zbxpoller.h"
-#include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
 #include "trapper_item_test.h"
 #include "zbxavailability.h"
@@ -138,7 +137,8 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	if (SUCCEED == zbx_vps_monitor_capped())
 	{
-		ext = "{\"" ZBX_PROTO_TAG_HISTORY_UPLOAD "\":\"" ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED "\"}";
+		ext = zbx_strdup(NULL, "{\"" ZBX_PROTO_TAG_HISTORY_UPLOAD "\":\""
+				ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED "\"}");
 		info = zbx_strdup(info, "data collection is paused");
 		ret = FAIL;
 	}
@@ -152,6 +152,12 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 			ret = FAIL;
 		}
 	}
+	else if (SUCCEED_PARTIAL == ret)
+	{
+		ext = info;
+		info = NULL;
+		ret = FAIL;
+	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
@@ -160,6 +166,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 
 	zbx_free(info);
+	zbx_free(ext);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -172,12 +179,12 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
 		int config_timeout)
 {
-	char	*info = NULL;
+	char	*info = NULL, *ext = NULL;
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = zbx_process_sender_history_data(sock, jp, ts, &info)))
+	if (FAIL == (ret = zbx_process_sender_history_data(sock, jp, ts, &info)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
 	}
@@ -187,10 +194,17 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
 		ret = FAIL;
 	}
+	if (SUCCEED_PARTIAL == ret)
+	{
+		ext = info;
+		info = NULL;
+		ret = FAIL;
+	}
 
-	zbx_send_response_same(sock, ret, info, config_timeout);
+	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 
 	zbx_free(info);
+	zbx_free(ext);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -589,10 +603,10 @@ const zbx_status_section_t	status_sections[] = {
 		{
 			{&templates,			ZBX_COUNTER_TYPE_UI64,
 				{
-					{NULL}
+					{0}
 				}
 			},
-			{NULL}
+			{0}
 		}
 	},
 	{"host stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -600,16 +614,16 @@ const zbx_status_section_t	status_sections[] = {
 			{&hosts_monitored,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	HOST_STATUS_MONITORED},
-					{NULL}
+					{0}
 				}
 			},
 			{&hosts_not_monitored,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	HOST_STATUS_NOT_MONITORED},
-					{NULL}
+					{0}
 				}
 			},
-			{NULL}
+			{0}
 		}
 	},
 	{"item stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -618,23 +632,23 @@ const zbx_status_section_t	status_sections[] = {
 				{
 					{"status",	ITEM_STATUS_ACTIVE},
 					{"state",	ITEM_STATE_NORMAL},
-					{NULL}
+					{0}
 				}
 			},
 			{&items_active_notsupported,	ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ITEM_STATUS_ACTIVE},
 					{"state",	ITEM_STATE_NOTSUPPORTED},
-					{NULL}
+					{0}
 				}
 			},
 			{&items_disabled,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ITEM_STATUS_DISABLED},
-					{NULL}
+					{0}
 				}
 			},
-			{NULL}
+			{0}
 		}
 	},
 	{"trigger stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	NULL,
@@ -643,23 +657,23 @@ const zbx_status_section_t	status_sections[] = {
 				{
 					{"status",	TRIGGER_STATUS_ENABLED},
 					{"value",	TRIGGER_VALUE_OK},
-					{NULL}
+					{0}
 				}
 			},
 			{&triggers_enabled_problem,	ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	TRIGGER_STATUS_ENABLED},
 					{"value",	TRIGGER_VALUE_PROBLEM},
-					{NULL}
+					{0}
 				}
 			},
 			{&triggers_disabled,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	TRIGGER_STATUS_DISABLED},
-					{NULL}
+					{0}
 				}
 			},
-			{NULL}
+			{0}
 		}
 	},
 	{"user stats",			ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&users_res,
@@ -667,34 +681,34 @@ const zbx_status_section_t	status_sections[] = {
 			{&users_online,			ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ZBX_SESSION_ACTIVE},
-					{NULL}
+					{0}
 				}
 			},
 			{&users_offline,		ZBX_COUNTER_TYPE_UI64,
 				{
 					{"status",	ZBX_SESSION_PASSIVE},
-					{NULL}
+					{0}
 				}
 			},
-			{NULL}
+			{0}
 		}
 	},
 	{"required performance",	ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_SUPER_ADMIN,	NULL,
 		{
 			{&required_performance,		ZBX_COUNTER_TYPE_DBL,
 				{
-					{NULL}
+					{0}
 				}
 			},
-			{NULL}
+			{0}
 		}
 	},
 	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,
 		{
-			{NULL}
+			{0}
 		}
 	},
-	{NULL}
+	{0}
 };
 
 static void	server_stats_entry_export(struct zbx_json *json, const zbx_status_section_t *section)
@@ -991,31 +1005,41 @@ out:
 	return ret;
 }
 
-static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
+static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
-	char		host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
-			hbfreq[ZBX_MAX_UINT64_LEN];
-	zbx_uint64_t	hostid;
-	zbx_dc_host_t	dc_host;
-	unsigned char	*data = NULL;
-	zbx_uint32_t	data_len;
+	char			host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
+				hbfreq[ZBX_MAX_UINT64_LEN];
+	zbx_history_recv_host_t	recv_host;
+	unsigned char		*data = NULL;
+	zbx_uint32_t		data_len;
+	zbx_comms_redirect_t	redirect;
+	int			ret;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 		return FAIL;
 
-	if (FAIL == zbx_dc_config_get_hostid_by_name(host, &hostid))
+	if (FAIL == (ret = zbx_dc_config_get_host_by_name(host, sock, &recv_host, &redirect)))
 		return FAIL;
 
-	if (FAIL == zbx_dc_get_host_by_hostid(&dc_host, hostid))
-		return FAIL;
+	if (SUCCEED_PARTIAL == ret)
+	{
+		struct zbx_json	j;
 
-	if (0 != dc_host.proxyid || HOST_STATUS_NOT_MONITORED == dc_host.status)
+		zbx_json_init(&j, 1024);
+		zbx_add_redirect_response(&j, &redirect);
+		zbx_send_response_json(sock, FAIL, NULL, NULL, sock->protocol, config_timeout, j.buffer);
+		zbx_json_free(&j);
+
+		return FAIL;
+	}
+
+	if (HOST_MONITORED_BY_SERVER != recv_host.monitored_by || HOST_STATUS_NOT_MONITORED == recv_host.status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
 		return FAIL;
 
-	data_len = zbx_availability_serialize_active_heartbeat(&data, hostid, atoi(hbfreq));
+	data_len = zbx_availability_serialize_active_heartbeat(&data, recv_host.hostid, atoi(hbfreq));
 	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HB, data, data_len, NULL);
 
 	zbx_free(data);
@@ -1120,8 +1144,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
-		zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb, const char *config_ssh_key_location,
-		zbx_trapper_process_request_func_t trapper_process_request_cb,
+		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
+		const char *config_ssh_key_location, zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	int	ret = SUCCEED;
@@ -1178,7 +1202,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
 						config_comms->config_trapper_timeout, config_comms->config_source_ip,
-						config_ssh_key_location, get_config_forks, zbx_get_program_type_cb());
+						config_ssh_key_location, get_config_forks, config_enable_global_scripts, zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1195,11 +1219,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
 					config_stats_allowed_ip);
-		}
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
-		{
-			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = zbx_trapper_preproc_test(sock, &jp, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
 		{
@@ -1218,7 +1237,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
 		{
-			ret = process_active_check_heartbeat(&jp);
+			ret = process_active_check_heartbeat(sock, &jp, config_comms->config_timeout);
 		}
 		else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
 				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks))
@@ -1316,8 +1335,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
-		zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb, const char *config_ssh_key_location,
-		zbx_trapper_process_request_func_t trapper_process_request_cb,
+		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
+		const char *config_ssh_key_location, zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	ssize_t	bytes_received;
@@ -1328,8 +1347,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
-			zbx_get_value_internal_ext_cb, config_ssh_key_location, trapper_process_request_cb,
-			autoreg_update_host_cb);
+			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
+			trapper_process_request_cb, autoreg_update_host_cb);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1430,6 +1449,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_java_gateway,
 					trapper_args_in->config_java_gateway_port,
 					trapper_args_in->config_externalscripts,
+					trapper_args_in->config_enable_global_scripts,
 					trapper_args_in->zbx_get_value_internal_ext_cb,
 					trapper_args_in->config_ssh_key_location,
 					trapper_args_in->trapper_process_request_func_cb,

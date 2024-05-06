@@ -76,10 +76,6 @@
 #define OFF	0
 
 #if defined(_WINDOWS)
-#	define	ZBX_SERVICE_NAME_LEN	64
-extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
-extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
-
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
@@ -146,25 +142,10 @@ typedef enum
 	ITEM_TYPE_DEPENDENT,
 	ITEM_TYPE_HTTPAGENT,
 	ITEM_TYPE_SNMP,
-	ITEM_TYPE_SCRIPT	/* 21 */
+	ITEM_TYPE_SCRIPT,
+	ITEM_TYPE_BROWSER	/* 22 */
 }
 zbx_item_type_t;
-
-typedef enum
-{
-	INTERFACE_TYPE_UNKNOWN = 0,
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_IPMI,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_OPT = 254,
-	INTERFACE_TYPE_ANY = 255
-}
-zbx_interface_type_t;
-const char	*zbx_interface_type_string(zbx_interface_type_t type);
-
-#define INTERFACE_TYPE_COUNT	4	/* number of interface types */
-extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
 #define SNMP_BULK_DISABLED	0
 #define SNMP_BULK_ENABLED	1
@@ -268,6 +249,9 @@ zbx_log_value_t;
 #define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
 
+#define ZBX_PROGRAM_VARIANT_AGENT	1
+#define ZBX_PROGRAM_VARIANT_AGENT2	2
+
 /* process type */
 #define ZBX_PROCESS_TYPE_POLLER			0
 #define ZBX_PROCESS_TYPE_UNREACHABLE		1
@@ -314,7 +298,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SNMP_POLLER		42
 #define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
 #define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
-#define ZBX_PROCESS_TYPE_COUNT			45	/* number of process types */
+#define ZBX_PROCESS_TYPE_PG_MANAGER		45
+#define ZBX_PROCESS_TYPE_BROWSERPOLLER		46
+#define ZBX_PROCESS_TYPE_COUNT			47	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -617,8 +603,6 @@ typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
 
 int	MAIN_ZABBIX_ENTRY(int flags);
-
-unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 #define ZBX_SESSION_ACTIVE		0
 #define ZBX_SESSION_PASSIVE		1

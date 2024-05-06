@@ -60,6 +60,7 @@ typedef struct
 {
 	char		*ip;
 	unsigned short	port;
+	zbx_uint64_t	revision;
 }
 zbx_addr_t;
 

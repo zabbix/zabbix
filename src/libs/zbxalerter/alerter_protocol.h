@@ -68,7 +68,7 @@ typedef struct
 	int			attempt_interval;
 	int			timeout;
 	int			script_bin_sz;
-	unsigned char		content_type;
+	unsigned char		message_format;
 	unsigned char		flags;
 }
 zbx_am_mediatype_t;
@@ -110,7 +110,7 @@ typedef struct
 
 	int			maxsessions;
 	int			maxattempts;
-	unsigned char		content_type;
+	unsigned char		message_format;
 	unsigned char		process_tags;
 	time_t			last_access;
 }
@@ -135,6 +135,9 @@ typedef struct
 	int		retries;
 	int		source;
 	int		object;
+
+	char		*expression;
+	char		*recovery_expression;
 }
 zbx_am_db_alert_t;
 
@@ -170,17 +173,19 @@ zbx_uint32_t	zbx_alerter_serialize_result_ext(unsigned char **data, const char *
 		int errcode, const char *error, const char *debug);
 
 zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t alertid, zbx_uint64_t mediatypeid,
-		zbx_uint64_t eventid, const char *sendto, const char *subject, const char *message,
-		const char *smtp_server, unsigned short smtp_port, const char *smtp_helo, const char *smtp_email,
-		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
-		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type);
+		zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, const char *sendto,
+		const char *subject, const char *message, const char *smtp_server, unsigned short smtp_port,
+		const char *smtp_helo, const char *smtp_email, unsigned char smtp_security,
+		unsigned char smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
+		const char *username, const char *password, unsigned char message_format, const char *expression,
+		const char *recovery_expression);
 
 void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *alertid, zbx_uint64_t *mediatypeid,
-		zbx_uint64_t *eventid, char **sendto, char **subject, char **message, char **smtp_server,
-		unsigned short *smtp_port, char **smtp_helo, char **smtp_email, unsigned char *smtp_security,
-		unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host, unsigned char *smtp_authentication,
-		char **username, char **password, unsigned char *content_type);
+		zbx_uint64_t *eventid, int *source, int *object, zbx_uint64_t *objectid, char **sendto, char **subject,
+		char **message, char **smtp_server, unsigned short *smtp_port, char **smtp_helo, char **smtp_email,
+		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
+		unsigned char *smtp_authentication, char **username, char **password, unsigned char *message_format,
+		char **expression, char **recovery_expression);
 
 zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
 		const char *message, const char *gsm_modem);
@@ -197,7 +202,7 @@ void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t 
 		char **gsm_modem, char **username, char **passwd, unsigned short *smtp_port,
 		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
 		unsigned char *smtp_authentication, int *maxsessions, int *maxattempts, char **attempt_interval,
-		unsigned char *content_type, char **script, char **timeout, char **sendto, char **subject,
+		unsigned char *message_format, char **script, char **timeout, char **sendto, char **subject,
 		char **message, char **params);
 
 zbx_uint32_t	zbx_alerter_serialize_webhook(unsigned char **data, const char *script_bin, int script_sz,
@@ -239,9 +244,9 @@ zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_
 		int sources_num);
 
 zbx_uint32_t	zbx_alerter_serialize_begin_dispatch(unsigned char **data, const char *subject, const char *message,
-		const char *content_name, const char *content_type, const char *content, zbx_uint32_t content_size);
+		const char *content_name, const char *message_format, const char *content, zbx_uint32_t content_size);
 void	zbx_alerter_deserialize_begin_dispatch(const unsigned char *data, char **subject, char **message,
-		char **content_name, char **content_type, char **content, zbx_uint32_t *content_size);
+		char **content_name, char **message_format, char **content, zbx_uint32_t *content_size);
 
 zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx_db_mediatype *mt,
 		const zbx_vector_str_t *recipients);

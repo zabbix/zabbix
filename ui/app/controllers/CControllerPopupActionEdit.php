@@ -139,19 +139,6 @@ class CControllerPopupActionEdit extends CController {
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 
-			CArrayHelper::sort($data['action']['filter']['conditions'], [
-				['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN],
-				['field' => 'value', 'order' => ZBX_SORT_DOWN]
-			]);
-
-			$data['action']['filter']['conditions'] = array_values($data['action']['filter']['conditions']);
-
-			if ($data['action']['filter']['formula'] !== '') {
-				$data['action']['filter']['conditions'] = array_values(CConditionHelper::sortConditionsByFormulaId(
-					$data['action']['filter']['conditions']
-				));
-			}
-
 			foreach ($data['action']['filter']['conditions'] as $row_index => &$condition) {
 				$condition_names = actionConditionValueToString([$data['action']]);
 				$data['condition_name'][] = $condition_names[0][$row_index];

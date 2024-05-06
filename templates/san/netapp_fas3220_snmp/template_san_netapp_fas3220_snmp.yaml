@@ -999,11 +999,11 @@ zabbix_export:
                 value: '{$FAS3220.NET.PORT.ROLE.MATCHES}'
                 formulaid: C
               - macro: '{#TYPE}'
-                value: '{$FAS3220.NET.PORT.ROLE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
+                value: '{$FAS3220.NET.PORT.TYPE.MATCHES}'
                 formulaid: D
               - macro: '{#TYPE}'
-                value: '{$FAS3220.NET.PORT.TYPE.MATCHES}'
+                value: '{$FAS3220.NET.PORT.ROLE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
                 formulaid: E
               - macro: '{#TYPE}'
                 value: '{$FAS3220.NET.PORT.TYPE.NOT_MATCHES}'

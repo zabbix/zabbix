@@ -1298,10 +1298,10 @@ zabbix_export:
                 value: '1'
                 formulaid: A
               - macro: '{#SNMPVALUE}'
-                operator: EXISTS
+                value: (2|3)
                 formulaid: B
               - macro: '{#SNMPVALUE}'
-                value: (2|3)
+                operator: EXISTS
                 formulaid: C
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
           item_prototypes:

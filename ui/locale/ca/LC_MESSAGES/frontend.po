@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-02 13:10+0000\n"
+"PO-Revision-Date: 2024-04-27 10:03+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -81,6 +81,16 @@ msgstr[1] "%1$d dies"
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
 msgstr "S'han trobat %1$d coincidències per a %2$s"
+
+#: widgets/hostnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ hosts are shown"
+msgstr "Es veuen els equips %1$d de %1$d+"
+
+#: widgets/itemnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ items are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1086,6 +1096,14 @@ msgstr "Normes addicionals"
 msgid "Address"
 msgstr "Adreça"
 
+#: app/controllers/CControllerProxyCreate.php:72
+#: app/controllers/CControllerProxyCreate.php:80
+#: app/controllers/CControllerProxyUpdate.php:67
+#: app/controllers/CControllerProxyUpdate.php:75
+#: app/views/popup.proxy.edit.php:90
+msgid "Address for active agents"
+msgstr "Adreça dels agents actius"
+
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
 msgstr "Admin"
@@ -1548,6 +1566,10 @@ msgstr "Afirmacions"
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "Etiqueta d'actiu"
+
+#: app/partials/configuration.host.edit.html.php:331
+msgid "Assigned proxy"
+msgstr "Proxy assignat"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -2293,6 +2315,11 @@ msgstr "No es pot pas afegir el mapa de xarxa"
 msgid "Cannot add proxy"
 msgstr "No es pot pas afegir el servidor intermediari"
 
+#: app/controllers/CControllerProxyGroupCreate.php:42
+#: app/controllers/CControllerProxyGroupCreate.php:74
+msgid "Cannot add proxy group"
+msgstr "No es pot pas afegir el grup de proxys"
+
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
 msgid "Cannot add regular expression"
@@ -2746,6 +2773,16 @@ msgid_plural "Cannot delete proxies"
 msgstr[0] "No es pot pas esborrar el servidor intermediari"
 msgstr[1] "No es poden pas esborrar els servidors intermediaris"
 
+#: app/controllers/CControllerProxyGroupDelete.php:78
+msgid "Cannot delete proxy group"
+msgid_plural "Cannot delete proxy groups"
+msgstr[0] "No es pot pas esborrar el grup de proxys"
+msgstr[1] "No es poden pas esborrar els grups de proxys"
+
+#: app/controllers/CControllerProxyGroupDelete.php:39
+msgid "Cannot delete proxy groups"
+msgstr "No es poden pas esborrar els grups de proxys"
+
 #: include/classes/api/services/CRole.php:362
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
@@ -2849,6 +2886,11 @@ msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "No es pot pas esborrar el grup d'usuaris"
 msgstr[1] "No es poden pas esborrar els grups d'usuaris"
+
+#: include/classes/api/services/CUserGroup.php:1397
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -4011,6 +4053,11 @@ msgstr "No es pot pas actualitzar el servidor intermediari"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "No es pot actualitzar el servidor intermediari per a l'equip descobert \"%1$s\"."
 
+#: app/controllers/CControllerProxyGroupUpdate.php:43
+#: app/controllers/CControllerProxyGroupUpdate.php:82
+msgid "Cannot update proxy group"
+msgstr "No es pot pas actualitzar el grup de proxys"
+
 #: include/classes/api/services/CRole.php:768
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
@@ -4747,6 +4794,10 @@ msgstr "Configuració de mapes de xarxa"
 msgid "Configuration of proxies"
 msgstr "Configuració de servidors intermediaris"
 
+#: app/controllers/CControllerProxyGroupList.php:131
+msgid "Configuration of proxy groups"
+msgstr "Configuració dels grups de proxys"
+
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
 msgid "Configuration of regular expressions"
@@ -5355,6 +5406,10 @@ msgstr "Crea'n un de nou"
 msgid "Create proxy"
 msgstr "Crea un servidor intermediari"
 
+#: app/views/administration.proxygroup.list.php:168
+msgid "Create proxy group"
+msgstr "Crea un grup de proxys"
+
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
 msgstr "Crea un informe"
@@ -5602,6 +5657,10 @@ msgstr "Prompt universal DUO"
 #: include/classes/helpers/CSlaHelper.php:39 report4.php:90
 msgid "Daily"
 msgstr "Diàriament"
+
+#: include/locales.inc.php:40
+msgid "Danish (da_DK)"
+msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -6019,6 +6078,11 @@ msgstr "Tema predeterminat"
 msgid "Default time zone"
 msgstr "Zona horària per defecte"
 
+#: app/views/administration.proxygroup.list.php:55
+#: app/views/administration.proxygroup.list.php:111
+msgid "Degrading"
+msgstr "Degradat"
+
 #: app/views/popup.lldoperation.php:160 app/views/popup.massupdate.item.php:276
 msgid "Delay"
 msgstr "Retard"
@@ -6337,6 +6401,15 @@ msgstr "Vols esborrar els tipus de suports triats?"
 #: app/views/js/administration.proxy.list.js.php:143
 msgid "Delete selected proxies?"
 msgstr "Vols esborrar els servidors intermediaris triats?"
+
+#: app/views/js/administration.proxygroup.list.js.php:88
+#: app/views/popup.proxygroup.edit.php:147
+msgid "Delete selected proxy group?"
+msgstr "Esborrar el grup de proxys triat?"
+
+#: app/views/js/administration.proxygroup.list.js.php:87
+msgid "Delete selected proxy groups?"
+msgstr "Esborrar els grups de proxys triats?"
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -6927,6 +7000,10 @@ msgstr "Descobriment"
 msgid "Discovery actions"
 msgstr "Accions de descoberta"
 
+#: app/views/configuration.discovery.edit.php:52
+msgid "Discovery by"
+msgstr "Descobert per"
+
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
 msgstr "Descobriment per servidor intermediari"
@@ -7239,6 +7316,12 @@ msgstr "Menú desplegable"
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
 msgstr "Opcions desplegables"
+
+#: app/controllers/CControllerAuthenticationEdit.php:362
+#: app/controllers/CControllerAuthenticationEdit.php:479
+#: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
+msgid "Duo Universal Prompt"
+msgstr "Prompt universal Duo"
 
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
@@ -8213,6 +8296,11 @@ msgstr "Ha fallat l'actualització del selector d'hora."
 msgid "Failed to update widget properties."
 msgstr "No s'han pogut actualitzar les propietats del giny."
 
+#: app/views/administration.proxygroup.list.php:79
+#: app/views/popup.proxygroup.edit.php:51
+msgid "Failover period"
+msgstr "Període de failover"
+
 #: include/items.inc.php:37
 msgid "Failure Audit"
 msgstr "Auditoria de d'errors"
@@ -8390,6 +8478,11 @@ msgstr "Filtre"
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
 msgstr "S'ha esborrat el filtre"
+
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Filter is not set"
+msgstr ""
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -8643,6 +8736,18 @@ msgstr "Global"
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "L'expressió regular global \"%1$s\" no existeix."
+
+#: app/controllers/CControllerScriptCreate.php:68
+#: app/controllers/CControllerScriptUpdate.php:74
+#: app/views/administration.script.edit.php:122
+#: app/views/popup.operation.edit.php:63
+#: include/classes/api/services/CScript.php:950
+msgid "Global script execution on Zabbix server is disabled by server configuration."
+msgstr "L'execució global d'scripts al servidor Zabbix és desactivada per la configuració del servidor."
+
+#: app/partials/administration.system.info.php:138
+msgid "Global scripts on Zabbix server"
+msgstr "Scripts globals al servidor Zabbix"
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
@@ -8923,6 +9028,12 @@ msgstr "El grup \"%1$s\" per a l'equip \"%2$s\" no existeix."
 #: app/views/popup.ldap.edit.php:138
 msgid "Group base DN"
 msgstr "DN de base del grup"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+#: widgets/hostnavigator/includes/WidgetForm.php:102
+msgid "Group by"
+msgstr "Agrupar per"
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9287,6 +9398,11 @@ msgstr "L'equip \"%1$s\" no pot ésser pas sense grup d'equips."
 msgid "Host \"%1$s\" is monitored by proxy \"%2$s\"."
 msgstr "L'equip \"%1$s\" és supervisat pel servidor intermediari \"%2$s\"."
 
+#: include/classes/api/services/CProxyGroup.php:456
+#, c-format
+msgid "Host \"%1$s\" is monitored by proxy group \"%2$s\"."
+msgstr "L'equip \"%1$s\" és monitorat per el grup de proxys \"%2$s\"."
+
 #: include/actions.inc.php:57
 msgid "Host IP"
 msgstr "IP de l'equip"
@@ -9510,9 +9626,17 @@ msgstr "Metadades dels equips"
 msgid "Host name"
 msgstr "Nom de l'equip"
 
+#: widgets/hostnavigator/Widget.php:29
+msgid "Host navigator"
+msgstr "Navegador d'equips"
+
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Xarxes d'equips"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:65
+msgid "Host patterns"
+msgstr ""
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
@@ -9586,9 +9710,21 @@ msgstr "Prototips d'equips"
 msgid "Host router"
 msgstr "Encaminador d'equips"
 
+#: widgets/hostnavigator/includes/WidgetForm.php:69
+msgid "Host status"
+msgstr "Estat de l'equip"
+
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
 msgstr "Màscara de subxarxa de l'equip"
+
+#: widgets/itemnavigator/Widget.php:43
+msgid "Host tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
+msgid "Host tag value"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11666,6 +11802,10 @@ msgstr[1] "Elements activats"
 msgid "Item in \"not supported\" state"
 msgstr "Element amb estat \"no compatible\""
 
+#: widgets/itemnavigator/includes/WidgetForm.php:107
+msgid "Item limit"
+msgstr ""
+
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
@@ -11673,6 +11813,10 @@ msgstr "Llistat d'elements"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
+msgstr "Nom de l'element"
+
+#: widgets/itemnavigator/Widget.php:29
+msgid "Item navigator"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
@@ -11683,6 +11827,13 @@ msgstr "Element no triat"
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
 msgstr "Patró d'element"
+
+#: widgets/honeycomb/includes/WidgetForm.php:90
+#: widgets/itemnavigator/includes/WidgetForm.php:78
+#: widgets/piechart/views/widget.edit.js.php:208
+#: widgets/svggraph/views/widget.edit.js.php:279
+msgid "Item patterns"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11726,6 +11877,14 @@ msgstr "El prototip d'element amb l'identificador \"%1$s\" no és pas disponible
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
 msgstr "Prototips d'elements"
+
+#: widgets/itemnavigator/Widget.php:44
+msgid "Item tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
+msgid "Item tag value"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12298,6 +12457,14 @@ msgstr "Llista dels valors on les claus de registre de Windows són sota una cla
 #: include/classes/data/CItemData.php:2743
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
 msgstr "Llista de servidors intermediaris Zabbix amb nom, mode, xifrat, compressió, versió, darrera connexió, nombre d'equips, recompte d'elements, valors consultats per segon (vps) i compatibilitat (actual / no actualitzat /no suportat). Retorna un JSON."
+
+#: include/classes/data/CItemData.php:2877
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
+msgstr "Llista de proxys Zabbix amb nom, mode, xifrat, compressió, versió, darrera connexió, nombre d'equips, recompte d'elements, valors consultats per segon (vps) i compatibilitat (actual / no actualitzat /no suportat), temps d'espera, nom del grup de proxys si el proxy pertany a un grup, estat (desconegut/desconnectat/en línia). Retorna un JSON."
+
+#: include/classes/data/CItemData.php:2905
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
+msgstr "Llista de proxys Zabbix amb nom, mode, xifrat, compressió, versió, darrera connexió, nombre d'equips, recompte d'elements, valors consultats per segon (vps) i compatibilitat (actual / no actualitzat / no suportat), temps d'espera, nom del grup de proxys, estat (desconegut / desconnectat / en línia). Retorna un JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -13087,6 +13254,10 @@ msgstr "Tipus de suport"
 msgid "Media types disabled by Administration."
 msgstr "Tipus de suport desactivats per l'Administrador."
 
+#: app/views/popup.media.php:78
+msgid "Media types disabled in Alerts."
+msgstr ""
+
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
 msgid "Media types used by action \"%1$s\"."
@@ -13222,9 +13393,17 @@ msgstr "Mig"
 msgid "Min"
 msgstr "Mín"
 
+#: app/views/popup.proxygroup.edit.php:59
+msgid "Minimum number of proxies"
+msgstr "Nombre mínim de proxys"
+
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
 msgstr "Allargada mínima de la paraula de pas"
+
+#: app/views/administration.proxygroup.list.php:81
+msgid "Minimum proxies"
+msgstr "Mínim de proxys"
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -13909,6 +14088,11 @@ msgstr "Nova operació"
 msgid "New proxy"
 msgstr "Nou servidor intermediari"
 
+#: app/views/popup.proxygroup.edit.php:127
+#: app/views/popup.proxygroup.edit.php:156
+msgid "New proxy group"
+msgstr "Nou grup de proxys"
+
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Nova expressió regular"
@@ -14035,6 +14219,12 @@ msgstr "No hi ha pas informació"
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
 msgstr "Sense recollida d'informació"
+
+#: app/views/search.php:48 app/views/search.php:209 app/views/search.php:289
+#: app/views/search.php:394 include/classes/html/CTableInfo.php:72
+#: widgets/hostnavigator/Widget.php:40
+msgid "No data found"
+msgstr ""
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -14696,6 +14886,10 @@ msgstr "Nombre d'elements de la cua que s'endarrereixen al servidor Zabbix o al 
 msgid "Number of monitored hosts"
 msgstr "Nombre d'equips supervisats"
 
+#: include/classes/data/CItemData.php:2891
+msgid "Number of online proxies. Returns integer."
+msgstr "Nombre de proxys en línia. Retorna un nombre enter."
+
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "Nombre de col·lisions fora de la finestra. Retorna un nombre enter"
@@ -14876,6 +15070,12 @@ msgstr "Octubre"
 msgid "Off"
 msgstr "Tancat"
 
+#: app/views/administration.proxygroup.list.php:56
+#: app/views/administration.proxygroup.list.php:99
+#: app/views/administration.proxy.list.php:166
+msgid "Offline"
+msgstr "Fora de línia"
+
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
 #: app/views/js/mediatype.test.edit.js.php:103
@@ -14930,6 +15130,16 @@ msgstr "Un"
 #: include/classes/helpers/CMaintenanceHelper.php:29
 msgid "One time only"
 msgstr "Només un cop"
+
+#: app/views/administration.proxygroup.list.php:54
+#: app/views/administration.proxygroup.list.php:107
+#: app/views/administration.proxy.list.php:170
+msgid "Online"
+msgstr "En línia"
+
+#: app/views/administration.proxygroup.list.php:80
+msgid "Online proxies"
+msgstr "Proxys en línia"
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15714,6 +15924,10 @@ msgstr "Percentatge"
 msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Percentatge de memòria física de l'equip que s'ha consumit, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
 
+#: include/classes/data/CItemData.php:2898
+msgid "Percentage of online proxies. Returns float."
+msgstr "Percentatge de proxys en línia. Retorna un flotant."
+
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr "Percentatge de temps que la màquina virtual era llesta, però no es va poder programar per executar-se a la CPU física, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware, \"instance\" - instància de CPU"
@@ -16336,6 +16550,56 @@ msgid_plural "Proxies deleted"
 msgstr[0] "S'ha esborrat el servidor intermediari"
 msgstr[1] "S'han esborrat els servidors intermediaris"
 
+#: app/controllers/CControllerAuditLogList.php:239
+#: app/partials/configuration.host.edit.html.php:266
+#: app/views/configuration.host.list.php:153
+#: app/views/popup.massupdate.host.php:114 app/views/popup.proxy.edit.php:70
+#: app/views/popup.proxygroup.edit.php:112
+#: include/views/configuration.host.prototype.edit.php:303
+msgid "Proxy group"
+msgstr "Grup de proxys"
+
+#: include/classes/api/services/CProxyGroup.php:369
+#, c-format
+msgid "Proxy group \"%1$s\" already exists."
+msgstr "El grup de proxys \"%1$s\" ja existeix."
+
+#: include/classes/import/importers/CHostImporter.php:348
+#, c-format
+msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
+msgstr "El grup de proxys \"%1$s\" per a l'equip \"%2$s\" no existeix."
+
+#: include/classes/api/services/CProxyGroup.php:437
+#, c-format
+msgid "Proxy group \"%1$s\" is used by proxy \"%2$s\"."
+msgstr "El grup de proxys \"%1$s\" és emprat per el proxy \"%2$s\"."
+
+#: app/controllers/CControllerProxyGroupCreate.php:66
+msgid "Proxy group added"
+msgstr "S'ha afegit un grup de proxys"
+
+#: app/controllers/CControllerProxyGroupDelete.php:70
+msgid "Proxy group deleted"
+msgid_plural "Proxy groups deleted"
+msgstr[0] "S'ha esborrat el grup de proxys"
+msgstr[1] "S'han esborrat els grups de proxys"
+
+#: app/controllers/CControllerProxyGroupUpdate.php:74
+msgid "Proxy group updated"
+msgstr "Grup de proxys actualitzat"
+
+#: app/controllers/CControllerPopupGeneric.php:227
+#: app/views/administration.proxygroup.list.php:163
+#: app/views/configuration.host.list.php:177
+#: include/classes/helpers/CMenuHelper.php:378
+#: include/classes/helpers/CRoleHelper.php:512
+msgid "Proxy groups"
+msgstr "Grups de proxys"
+
+#: app/partials/configuration.host.edit.html.php:334
+msgid "Proxy is not assigned yet."
+msgstr "El proxy encara no és assignat."
+
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
 msgstr "Mode del servidor intermediari"
@@ -16569,6 +16833,11 @@ msgstr "Destinataris"
 msgid "Recordset ID"
 msgstr "ID del conjunt de registres"
 
+#: app/views/administration.proxygroup.list.php:57
+#: app/views/administration.proxygroup.list.php:103
+msgid "Recovering"
+msgstr "Recuperant"
+
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
 #: app/views/trigger.prototype.list.php:146
 #: include/classes/screens/CScreenProblem.php:1502
@@ -16608,7 +16877,7 @@ msgstr "Atribut de referència"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
-msgstr ""
+msgstr "El giny referit no és pas disponible. Actualitzeu la configuració."
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -17167,6 +17436,14 @@ msgstr "El resultat és FALS"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "El resultat és CERT"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:197
+#: app/controllers/CControllerPopupItemTestSend.php:377
+#: app/controllers/CControllerPopupItemTestSend.php:425
+#: app/controllers/CControllerPopupItemTestSend.php:456
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr "El resultat s'ha truncat per la seva mida (%1$s)."
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -18582,6 +18859,10 @@ msgstr "Es mostra"
 msgid "Shown as the account name to all MFA users in authenticator apps."
 msgstr "Es mostra com el nom del compte a tots els usuaris d'MFA a les aplicacions d'autenticació."
 
+#: app/views/mfa.edit.php:67
+msgid "Shown as the label to all MFA users in authenticator apps."
+msgstr ""
+
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
 msgstr "Control de la barra lateral"
@@ -18880,6 +19161,10 @@ msgstr "Hora d'inici del servidor Zabbix, marca de temps Unix."
 #: include/views/configuration.host.discovery.list.php:161
 msgid "State"
 msgstr "Estat"
+
+#: include/classes/data/CItemData.php:2912
+msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
+msgstr "Estat del grup de proxys. Retorna un nombre enter: 0 - desconegut; 1 - fora de línia; 2 - recuperant; 3 - en línia; 4 - degradant."
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -19723,6 +20008,12 @@ msgstr "Test d'assumpte"
 #: app/views/administration.script.edit.php:345
 msgid "Test user input"
 msgstr "Provar l'entrada de l'usuari"
+
+#: app/controllers/CControllerPopupItemTestGetValue.php:152
+#: app/controllers/CControllerPopupItemTestSend.php:256
+#: app/views/popup.itemtestedit.view.php:256
+msgid "Test with"
+msgstr "Provar amb"
 
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
@@ -20941,6 +21232,10 @@ msgstr "Voleu desbloquejar l'usuari triat?"
 msgid "Unblock selected users?"
 msgstr "Vols desbloquejar els usuaris triats?"
 
+#: widgets/hostnavigator/Widget.php:38
+msgid "Uncategorized"
+msgstr "Sense categoria"
+
 #: include/forms.inc.php:1475 include/forms.inc.php:1508
 #: include/views/js/item.preprocessing.js.php:139
 #: include/views/js/item.preprocessing.js.php:177
@@ -21408,6 +21703,11 @@ msgstr "Emprar si és greu"
 msgid "Use iframe sandboxing"
 msgstr "Emprar el sandboxing iframe"
 
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Use the filter to display results"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "S'empra en accions"
@@ -21637,6 +21937,10 @@ msgstr "Atribut de cognom d'usuari"
 #: widgets/item/views/widget.edit.php:90
 msgid "User macros"
 msgstr "Macros d'usuari"
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "User media"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22399,6 +22703,13 @@ msgstr "Certificats del cofre"
 msgid "Vault connection failed."
 msgstr "La connexió al cofre ha fallat."
 
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:640
+#: include/classes/setup/CSetupWizard.php:843
+#: include/classes/setup/CSetupWizard.php:863
+msgid "Vault prefix"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
 msgstr "Proveïdor del cofre"
@@ -23124,6 +23435,10 @@ msgstr "Autenticació interna de Zabbix"
 msgid "Zabbix login form"
 msgstr "Formulari d'inici de sessió de Zabbix"
 
+#: app/views/administration.script.edit.php:115
+msgid "Zabbix proxy or server"
+msgstr "Proxy o servidor Zabbix"
+
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
@@ -23395,6 +23710,10 @@ msgstr "s'espera una matriu o una cadena de caràcters"
 #: include/classes/validators/CApiInputValidator.php:2969
 msgid "an array or object is expected"
 msgstr "s'espera una matriu o objecte"
+
+#: include/classes/api/services/CUser.php:990
+msgid "an email address is expected"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -23793,6 +24112,15 @@ msgstr "no es pot pas actualitzar el paràmetre de només lectura \"%1$s\" de l'
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
 msgstr "no es pot pas actualitzar el paràmetre de només lectura \"%1$s\" de l'objecte heretat"
 
+#: include/classes/api/services/CUserGroup.php:501
+#: include/classes/api/services/CUser.php:451
+#: include/classes/api/services/CUser.php:614
+#: include/classes/api/services/CUser.php:794
+#: include/classes/api/services/CUser.php:1066
+#, c-format
+msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr "cbrt() - Arrel cúbica"
@@ -23888,7 +24216,7 @@ msgstr "d.M"
 
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
 msgid "data is missing"
-msgstr ""
+msgstr "hi manquen dades"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -24092,6 +24420,10 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "configuració global de neteja"
 
+#: include/classes/api/services/CScript.php:726
+msgid "global script execution on Zabbix server is disabled by server configuration"
+msgstr "l'execució global d'scripts al servidor Zabbix és desactivada per la configuració del servidor"
+
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
 msgstr "gràfic"
@@ -24155,6 +24487,13 @@ msgstr "ja existeix un grup d'equips amb el mateix UUID"
 #: widgets/svggraph/views/widget.edit.php:287
 msgid "host pattern"
 msgstr "patró d'equips"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:155
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:159
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
+#: widgets/svggraph/views/widget.edit.php:292
+msgid "host patterns"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
@@ -24393,6 +24732,15 @@ msgstr "l'element \"%1$s\" de l'equip \"%2$s\" no es supervisa"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:329
 msgid "item pattern"
 msgstr "patró d'element"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:134
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:172
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:138
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:176
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
+msgid "item patterns"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -24911,6 +25259,11 @@ msgstr "sortida"
 msgid "pattern"
 msgstr "patró"
 
+#: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
+#: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
+msgid "patterns"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentil() - Percentil P d'un període T"
@@ -25029,6 +25382,10 @@ msgstr "right() - Retorna els caràcters de recompte més a la dreta"
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Arrodoneix un valor a decimal"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
+msgid "rows must be unique"
+msgstr "les fileres han d'ésser úniques"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -25172,6 +25529,10 @@ msgstr "les credencials donades no són pas úniques"
 #: include/forms.inc.php:1823
 msgid "tag"
 msgstr "etiqueta"
+
+#: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
+msgid "tag cannot be empty"
+msgstr "l'etiqueta no pot pas ésser buida"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"

@@ -23,7 +23,7 @@
 #include "zbxdbhigh.h"	// for ZBX_CONDITION_EVAL_TYPE_*
 #include "zbxalgo.h"
 
-ZBX_PTR_VECTOR_IMPL(match_tags, zbx_match_tag_t*)
+ZBX_PTR_VECTOR_IMPL(match_tags_ptr, zbx_match_tag_t*)
 
 static int	match_single_tag(const zbx_match_tag_t *mtag, zbx_tag_t * const *tags, int tags_num)
 {
@@ -74,7 +74,7 @@ static int	match_single_tag(const zbx_match_tag_t *mtag, zbx_tag_t * const *tags
  *               FAIL    - no matching tags found                             *
  *                                                                            *
  ******************************************************************************/
-static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags,
+static int	match_tag_range(const zbx_vector_match_tags_ptr_t *mtags, const zbx_vector_tags_ptr_t *etags,
 		int *mt_pos, int *et_pos)
 {
 	const char	*tag_name;
@@ -158,7 +158,7 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	match_tags_andor(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags)
+static int	match_tags_andor(const zbx_vector_match_tags_ptr_t *mtags, const zbx_vector_tags_ptr_t *etags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -185,7 +185,7 @@ static int	match_tags_andor(const zbx_vector_match_tags_t *mtags, const zbx_vect
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	match_tags_or(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags)
+static int	match_tags_or(const zbx_vector_match_tags_ptr_t *mtags, const zbx_vector_tags_ptr_t *etags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -210,7 +210,8 @@ static int	match_tags_or(const zbx_vector_match_tags_t *mtags, const zbx_vector_
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_match_tags(int eval_type, const zbx_vector_match_tags_t *match_tags, const zbx_vector_tags_t *entity_tags)
+int	zbx_match_tags(int eval_type, const zbx_vector_match_tags_ptr_t *match_tags,
+		const zbx_vector_tags_ptr_t *entity_tags)
 {
 	if (ZBX_CONDITION_EVAL_TYPE_AND_OR != eval_type && ZBX_CONDITION_EVAL_TYPE_OR != eval_type)
 	{

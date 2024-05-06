@@ -48,10 +48,6 @@
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
 #endif
 
-#ifdef HAVE_OPENSSL
-extern ZBX_THREAD_LOCAL char	info_buf[256];
-#endif
-
 static int	socket_set_nonblocking(ZBX_SOCKET s);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size, short *events);
@@ -387,6 +383,33 @@ static void	zbx_socket_free(zbx_socket_t *s)
 {
 	if (ZBX_BUF_TYPE_DYN == s->buf_type)
 		zbx_free(s->buffer);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: detach receive buffer                                             *
+ *                                                                            *
+ * Return value: Detached dynamic buffer or copy of static buffer.            *
+ *                                                                            *
+ * Comments: The socket buffer is reset.                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_socket_detach_buffer(zbx_socket_t *s)
+{
+	char	*out;
+
+	if (ZBX_BUF_TYPE_DYN == s->buf_type)
+	{
+		out = s->buffer;
+		s->buf_type = ZBX_BUF_TYPE_STAT;
+		s->buffer = s->buf_stat;
+	}
+	else
+		out = zbx_strdup(NULL, s->buf_stat);
+
+	*s->buffer = '\0';
+
+	return out;
 }
 
 /******************************************************************************

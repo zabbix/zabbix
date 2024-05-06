@@ -28,7 +28,13 @@ $form = (new CForm('GET', 'history.php'))
 	->setName('items')
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 
-$table = (new CTableInfo())->addClass(ZBX_STYLE_LIST_TABLE_FIXED);
+$table = (new CTableInfo())
+	->addClass(ZBX_STYLE_LIST_TABLE_FIXED)
+	->setPageNavigation($data['paging']);
+
+if (!$data['mandatory_filter_set'] && !$data['subfilter_set']) {
+	$table->setNoDataMessage(_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE);
+}
 
 // Latest data header.
 $col_check_all = new CColHeader(
@@ -340,6 +346,6 @@ $button_list = [
 	]
 ];
 
-$form->addItem([$table, $data['paging'], new CActionButtonList('graphtype', 'itemids', $button_list, 'latest')]);
+$form->addItem([$table, new CActionButtonList('graphtype', 'itemids', $button_list, 'latest')]);
 
 echo $form;

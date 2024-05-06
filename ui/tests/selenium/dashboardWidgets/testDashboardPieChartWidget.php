@@ -173,7 +173,8 @@ class testDashboardPieChartWidget extends testWidgets {
 				]
 			]
 		]);
-		self::$item_ids = $response['itemids'];
+		// Get itemids from host self::HOST_NAME_SCREENSHOTS as array item_key => item_value
+		self::$item_ids = array_slice(CDataHelper::getIds('key_'), 2);
 	}
 
 	/**
@@ -249,7 +250,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$this->assertEquals($expected_options, $form->getField($dropdown)->getOptions()->asText());
 		}
 
-		foreach (['id:ds_0_hosts_' => 'host pattern','id:ds_0_items_' => 'item pattern'] as $selector => $placeholder) {
+		foreach (['id:ds_0_hosts_' => 'host patterns','id:ds_0_items_' => 'item patterns'] as $selector => $placeholder) {
 			$this->assertFieldAttributes($form, $selector, ['placeholder' => $placeholder], true);
 		}
 
@@ -293,7 +294,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Space between sectors' => '1',
 			'id:merge' => false,         // 'Merge sectors smaller than' checkbox
 			'id:merge_percent' => '1',   // 'Merge sectors smaller than' input
-			'id:merge_color' => 'B0AF07' // 'Merge sectors smaller than' color picker
+			'id:merge_color' => 'FFD54F' // 'Merge sectors smaller than' color picker
 		];
 		$form->checkValue($expected_values);
 		$expected_labels = ['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than'];
@@ -1023,24 +1024,20 @@ class testDashboardPieChartWidget extends testWidgets {
 	public function preparePieChartDisplayData() {
 		$providedData = $this->getProvidedData();
 		$data = reset($providedData);
-
-		// Delete item history in DB.
-		foreach ([1, 2, 3, 4] as $id) {
-			CDataHelper::removeItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':item-'.$id]);
-		}
+		CDataHelper::removeItemData(array_values(self::$item_ids));
 
 		// Minus 10 seconds for safety.
 		$time = time() - 10;
 
 		// Set item history.
 		foreach($data['item_data'] as $key => $value) {
-			CDataHelper::addItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$key], $value, $time);
+			CDataHelper::addItemData(self::$item_ids[$key], $value, $time);
 		}
 
 		// Fill in Item ids (this only applies to Item list data sets).
 		foreach ($data['widget_fields'] as $id => $field) {
 			if (preg_match('/^ds\.[0-9]\.itemids\.[0-9]$/', $field['name'])) {
-				$field['value'] = self::$item_ids[self::HOST_NAME_SCREENSHOTS.':'.$field['value']];
+				$field['value'] = self::$item_ids[$field['value']];
 				$data['widget_fields'][$id] = $field;
 			}
 		}

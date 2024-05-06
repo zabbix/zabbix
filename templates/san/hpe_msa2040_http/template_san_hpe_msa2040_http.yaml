@@ -12,10 +12,10 @@ zabbix_export:
         It works without any external scripts and uses the script item.
         
         Setup:
-        1. Create user "zabbix" with monitor role on the storage.
+        1. Create a user with a monitor role on the storage, for example "zabbix".
         2. Link the template to a host.
-        3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which API is accessible.
-        4. Change {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
+        3. Set the hostname or IP address of the host in the {$HPE.MSA.API.HOST} macro and configure the username and password in the {$HPE.MSA.API.USERNAME} and {$HPE.MSA.API.PASSWORD} macros.
+        4. Change the {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -218,7 +218,7 @@ zabbix_export:
           timeout: '{$HPE.MSA.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
+              value: '{$HPE.MSA.API.SCHEME}://{$HPE.MSA.API.HOST}:{$HPE.MSA.API.PORT}/'
             - name: password
               value: '{$HPE.MSA.API.PASSWORD}'
             - name: username
@@ -312,7 +312,7 @@ zabbix_export:
               description: 'There are errors in method requests to API.'
               dependencies:
                 - name: 'Service is down or unavailable'
-                  expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0'
+                  expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"],5m)=0'
               tags:
                 - tag: scope
                   value: availability
@@ -650,7 +650,7 @@ zabbix_export:
         - uuid: d1242f5aede14008ae6896123bb944a5
           name: 'HPE MSA: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"]'
+          key: 'net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"]'
           history: 7d
           description: 'Check if HTTP/HTTPS service accepts TCP connections.'
           preprocessing:
@@ -664,7 +664,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: b8d07373a0fb4051a0534891b255994a
-              expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0'
+              expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"],5m)=0'
               name: 'Service is down or unavailable'
               priority: HIGH
               description: 'HTTP/HTTPS service is down or unable to establish TCP connection.'
@@ -1448,7 +1448,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3469,7 +3469,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''dctemp''].first()'
+                    - '$.[''dctemp'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -3808,6 +3808,58 @@ zabbix_export:
                   value: volume
                 - tag: volume
                   value: '{#NAME}'
+            - uuid: 46ab8b0e5feb439c9085e7eb12a6974d
+              name: 'Volume [{#NAME}]: Health'
+              type: DEPENDENT
+              key: 'hpe.msa.volumes["{#DURABLE.ID}",health]'
+              delay: '0'
+              history: 7d
+              description: 'Volume health status.'
+              valuemap:
+                name: Health
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.[''health-numeric'']'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '4'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'hpe.msa.get.volumes["{#NAME}",data]'
+              tags:
+                - tag: component
+                  value: health
+                - tag: component
+                  value: volume
+                - tag: volume
+                  value: '{#NAME}'
+              trigger_prototypes:
+                - uuid: 50c47bfc2b4f43d6990e7d1b81ecc0bf
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=1'
+                  name: 'Volume [{#NAME}]: Volume health is in degraded state'
+                  priority: WARNING
+                  description: 'Volume health is in degraded state.'
+                  tags:
+                    - tag: scope
+                      value: performance
+                - uuid: 2ff830017b814e7ea50313ecbedc9894
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=2'
+                  name: 'Volume [{#NAME}]: Volume health is in fault state'
+                  priority: AVERAGE
+                  description: 'Volume health is in fault state.'
+                  tags:
+                    - tag: scope
+                      value: availability
+                - uuid: 2e8c2a0a40b640d4bf6177171c4af48d
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=3'
+                  name: 'Volume [{#NAME}]: Volume health is in unknown state'
+                  priority: INFO
+                  description: 'Volume health is in unknown state.'
+                  tags:
+                    - tag: scope
+                      value: notice
           graph_prototypes:
             - uuid: 20d2047e3f024e5197362375601415eb
               name: 'Volume [{#NAME}]: Cache usage'
@@ -3880,6 +3932,9 @@ zabbix_export:
         - tag: target
           value: msa-2040
       macros:
+        - macro: '{$HPE.MSA.API.HOST}'
+          value: '<SET API HOST>'
+          description: 'The hostname or IP address of the API host.'
         - macro: '{$HPE.MSA.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Specify password for API.'

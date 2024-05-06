@@ -87,7 +87,7 @@ zabbix_export:
               name: 'MySQL: Server has aborted connections'
               event_name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
               priority: AVERAGE
-              description: 'The number of failed attempts to connect to the MySQL server is more than {$MYSQL.ABORTED_CONN.MAX.WARN} in the last 5 minutes.'
+              description: 'The number of failed attempts to connect to the MySQL server is more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.'
               dependencies:
                 - name: 'MySQL: Refused connections'
                   expression: 'last(/MySQL by Zabbix agent/mysql.connection_errors_max_connections.rate)>0'
@@ -101,7 +101,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than binlog_cache_size.'
+          description: 'Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than `binlog_cache_size`.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -153,7 +153,7 @@ zabbix_export:
               name: 'MySQL: Buffer pool utilization is too low'
               event_name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
               priority: WARNING
-              description: 'The buffer pool utilization is less than {$MYSQL.BUFF_UTIL.MIN.WARN}% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
+              description: 'The buffer pool utilization is less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
               tags:
                 - tag: scope
                   value: notice
@@ -206,7 +206,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The Com_delete counter variable indicates the number of times the delete statement has been executed.'
+          description: 'The `Com_delete` counter variable indicates the number of times the `DELETE` statement has been executed.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -226,7 +226,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The Com_insert counter variable indicates the number of times the insert statement has been executed.'
+          description: 'The `Com_insert` counter variable indicates the number of times the `INSERT` statement has been executed.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -246,7 +246,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The Com_select counter variable indicates the number of times the select statement has been executed.'
+          description: 'The `Com_select` counter variable indicates the number of times the `SELECT` statement has been executed.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -266,7 +266,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The Com_update counter variable indicates the number of times the update statement has been executed.'
+          description: 'The `Com_update` counter variable indicates the number of times the `UPDATE` statement has been executed.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -306,7 +306,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of errors that occurred during calls to accept() on the listening port.'
+          description: 'Number of errors that occurred during calls to `accept()` on the listening port.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -346,7 +346,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of refused connections due to the max_connections limit being reached.'
+          description: 'Number of refused connections due to the `max_connections` limit being reached.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -365,7 +365,7 @@ zabbix_export:
               name: 'MySQL: Refused connections'
               event_name: 'MySQL: Refused connections (max_connections limit reached)'
               priority: AVERAGE
-              description: 'Number of refused connections due to the max_connections limit being reached.'
+              description: 'Number of refused connections due to the `max_connections` limit being reached.'
               tags:
                 - tag: scope
                   value: availability
@@ -376,7 +376,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of errors while searching for the connecting client IP address.'
+          description: 'Number of errors while searching for the connecting client''s IP address.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -396,7 +396,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of errors during calls to select() or poll() on the listening port. The client would not necessarily have been rejected in these cases.'
+          description: 'Number of errors during calls to `select()` or `poll()` on the listening port. The client would not necessarily have been rejected in these cases.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -457,7 +457,7 @@ zabbix_export:
               name: 'MySQL: Number of on-disk temporary tables created per second is high'
               event_name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'Possibly the application using the database is in need of query optimization.'
+              description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
@@ -468,7 +468,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'How many temporary files mysqld has created.'
+          description: 'How many temporary files `mysqld` has created.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -487,7 +487,7 @@ zabbix_export:
               name: 'MySQL: Number of temporary files created per second is high'
               event_name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'Possibly the application using the database is in need of query optimization.'
+              description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
@@ -519,7 +519,7 @@ zabbix_export:
               name: 'MySQL: Number of internal temporary tables created per second is high'
               event_name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'Possibly the application using the database is in need of query optimization.'
+              description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
@@ -529,7 +529,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'The item gets server global status information.'
+          description: 'Gets server global status information.'
           tags:
             - tag: component
               value: raw
@@ -578,7 +578,7 @@ zabbix_export:
           key: mysql.innodb_buffer_pool_reads
           delay: '0'
           history: 7d
-          description: 'Number of logical reads that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.'
+          description: 'Number of logical reads that InnoDB could not satisfy from the buffer pool and had to read directly from the disk.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -597,7 +597,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of logical reads per second that InnoDB could not satisfy from the buffer pool, and had to read directly from the disk.'
+          description: 'Number of logical reads per second that InnoDB could not satisfy from the buffer pool and had to read directly from the disk.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -659,7 +659,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing innodb_buffer_pool_size.'
+          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -681,7 +681,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           params: '(last(//mysql.innodb_os_log_written) - last(//mysql.innodb_os_log_written,#1:now-1h)) / {$MYSQL.INNODB_LOG_FILES}'
-          description: 'Calculated by (innodb_os_log_written-innodb_os_log_written(time shift -1h))/{$MYSQL.INNODB_LOG_FILES} value of the innodb_log_file_size. Innodb_log_file_size is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
+          description: '`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$MYSQL.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -862,6 +862,7 @@ zabbix_export:
           name: 'MySQL: Status'
           key: 'mysql.ping["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           history: 7d
+          description: 'MySQL server status.'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -881,6 +882,7 @@ zabbix_export:
               expression: 'last(/MySQL by Zabbix agent/mysql.ping["{$MYSQL.HOST}","{$MYSQL.PORT}"])=0'
               name: 'MySQL: Service is down'
               priority: HIGH
+              description: 'MySQL is down.'
               tags:
                 - tag: scope
                   value: availability
@@ -891,7 +893,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the Questions variable.'
+          description: 'Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the `Questions` variable.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -911,7 +913,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the Queries variable.'
+          description: 'Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the `Queries` variable.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -931,7 +933,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of queries that have taken more than long_query_time seconds.'
+          description: 'Number of queries that have taken more than `long_query_time` seconds.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -950,7 +952,7 @@ zabbix_export:
               name: 'MySQL: Server has slow queries'
               event_name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'The number of slow queries is more than {$MYSQL.SLOW_QUERIES.MAX.WARN} in the last 5 minutes.'
+              description: 'The number of slow queries is more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.'
               tags:
                 - tag: scope
                   value: performance
@@ -993,7 +995,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of threads created to handle connections. If Threads_created is big, you may want to increase the thread_cache_size value. The cache miss rate can be calculated as Threads_created/Connections.'
+          description: 'Number of threads created to handle connections. If the value of `Threads_created` is large, you may want to increase the `thread_cache_size` value. The cache miss rate can be calculated as `Threads_created`/`Connections`.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -1012,7 +1014,7 @@ zabbix_export:
           key: mysql.threads_running
           delay: '0'
           history: 7d
-          description: 'Number of threads which are not sleeping.'
+          description: 'Number of threads that are not sleeping.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -1029,7 +1031,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: uptime
-          description: 'The amount of seconds that the server has been up.'
+          description: 'Number of seconds that the server has been up.'
           preprocessing:
             - type: XMLPATH
               parameters:
@@ -1068,6 +1070,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
+          description: 'MySQL server version.'
           preprocessing:
             - type: REGEX
               parameters:
@@ -1085,7 +1088,7 @@ zabbix_export:
               name: 'MySQL: Version has changed'
               event_name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'MySQL version has changed. Acknowledge to close the problem manually.'
+              description: 'The MySQL version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1109,6 +1112,7 @@ zabbix_export:
               delay: 5m
               history: 7d
               units: B
+              description: 'Database size.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1133,7 +1137,7 @@ zabbix_export:
           type: DEPENDENT
           key: mysql.extra_metric.discovery
           delay: '0'
-          description: 'Additional metrics if MariaDB is used.'
+          description: 'Used for additional metrics if MariaDB is used.'
           item_prototypes:
             - uuid: 7743cdbaf71c491189ac1a927409e998
               name: 'MySQL: Binlog commits'
@@ -1176,7 +1180,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The number of times MASTER_GTID_WAIT called.'
+              description: 'The number of times `MASTER_GTID_WAIT` called.'
               preprocessing:
                 - type: XMLPATH
                   parameters:
@@ -1196,7 +1200,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of timeouts occurring in MASTER_GTID_WAIT.'
+              description: 'Number of timeouts occurring in `MASTER_GTID_WAIT`.'
               preprocessing:
                 - type: XMLPATH
                   parameters:
@@ -1216,7 +1220,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of time spent in MASTER_GTID_WAIT.'
+              description: 'Total number of time spent in `MASTER_GTID_WAIT`.'
               preprocessing:
                 - type: XMLPATH
                   parameters:
@@ -1275,6 +1279,7 @@ zabbix_export:
                   name: 'MySQL: Replication lag is too high'
                   event_name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
                   priority: WARNING
+                  description: 'Replication delay is too long.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1307,6 +1312,7 @@ zabbix_export:
                   expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1'
                   name: 'MySQL: The slave I/O thread is not connected to a replication master'
                   priority: WARNING
+                  description: 'Whether the slave I/O thread is connected to the master.'
                   dependencies:
                     - name: 'MySQL: The slave I/O thread is not running'
                       expression: 'count(/MySQL by Zabbix agent/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
@@ -1408,34 +1414,34 @@ zabbix_export:
       macros:
         - macro: '{$MYSQL.ABORTED_CONN.MAX.WARN}'
           value: '3'
-          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
+          description: 'Number of failed attempts to connect to the MySQL server for trigger expressions.'
         - macro: '{$MYSQL.BUFF_UTIL.MIN.WARN}'
           value: '50'
-          description: 'The minimum buffer pool utilization in percentage for trigger expression.'
+          description: 'The minimum buffer pool utilization in percentage for trigger expressions.'
         - macro: '{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
           value: '10'
-          description: 'The maximum number of created tmp tables on a disk per second for trigger expressions.'
+          description: 'The maximum number of temporary tables created on a disk per second for trigger expressions.'
         - macro: '{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
           value: '10'
-          description: 'The maximum number of created tmp files on a disk per second for trigger expressions.'
+          description: 'The maximum number of temporary files created on a disk per second for trigger expressions.'
         - macro: '{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
           value: '30'
-          description: 'The maximum number of created tmp tables in memory per second for trigger expressions.'
+          description: 'The maximum number of temporary tables created in memory per second for trigger expressions.'
         - macro: '{$MYSQL.HOST}'
           value: 127.0.0.1
           description: 'Hostname or IP of MySQL host or container.'
         - macro: '{$MYSQL.INNODB_LOG_FILES}'
           value: '2'
-          description: 'Number of physical files in the InnoDB redo log for calculating innodb_log_file_size.'
+          description: 'Number of physical files in the InnoDB redo log for calculating `innodb_log_file_size`.'
         - macro: '{$MYSQL.PORT}'
           value: '3306'
           description: 'MySQL service port.'
         - macro: '{$MYSQL.REPL_LAG.MAX.WARN}'
           value: 30m
-          description: 'The lag of slave from master for trigger expression.'
+          description: 'Amount of time the slave is behind the master for trigger expressions.'
         - macro: '{$MYSQL.SLOW_QUERIES.MAX.WARN}'
           value: '3'
-          description: 'The number of slow queries for trigger expression.'
+          description: 'Number of slow queries for trigger expressions.'
       dashboards:
         - uuid: ce2f9d7bb18e469f97e692baee02841d
           name: 'MySQL performance'
