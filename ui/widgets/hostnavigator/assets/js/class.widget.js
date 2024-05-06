@@ -128,11 +128,7 @@ class CWidgetHostNavigator extends CWidget {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				is_open: is_open,
-				group_identifier: group_identifier,
-				widgetid: widgetid
-			})
+			body: JSON.stringify({is_open, group_identifier, widgetid})
 		})
 			.then((response) => response.json())
 			.then((response) => {
