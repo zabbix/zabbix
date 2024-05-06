@@ -59,7 +59,12 @@
 				is_editable: false,
 				is_edit_mode: false,
 				can_edit_dashboards: false,
-				is_kiosk_mode: true
+				is_kiosk_mode: true,
+				broadcast_options: {
+					[CWidgetsData.DATA_TYPE_HOST_ID]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: {rebroadcast: false}
+				}
 			});
 
 			const dashboard_page_containers = document.querySelectorAll('.<?= ZBX_STYLE_DASHBOARD_GRID ?>');
