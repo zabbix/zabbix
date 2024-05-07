@@ -48,6 +48,34 @@ class WidgetForm extends CWidgetForm {
 	public const COLUMN_HEADER_HORIZONTAL = 1;
 	public const COLUMN_HEADER_VERTICAL = 2;
 
+	protected function normalizeValues(array $values): array {
+		$values = parent::normalizeValues($values);
+
+		// Apply sortable changes to data.
+		if (array_key_exists('sort_order', $values)) {
+			if (array_key_exists('column', $values) && array_key_exists('columns', $values['sort_order'])) {
+				// Fix selected column index when columns were sorted.
+				$values['column'] = array_search($values['column'], $values['sort_order']['columns'], true);
+			}
+
+			foreach ($values['sort_order'] as $key => $sortorder) {
+				if (!array_key_exists($key, $values)) {
+					continue;
+				}
+
+				$sorted = [];
+
+				foreach ($sortorder as $index) {
+					$sorted[] = $values[$key][$index];
+				}
+
+				$values[$key] = $sorted;
+			}
+		}
+
+		return $values;
+	}
+
 	public function addFields(): self {
 		return $this
 			->addField(
