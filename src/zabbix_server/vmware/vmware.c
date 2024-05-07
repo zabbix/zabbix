@@ -3559,8 +3559,8 @@ static int	vmware_v4mask2pefix(const char *mask)
 
 	while (inaddr.s_addr > 0)
 	{
-		inaddr.s_addr = inaddr.s_addr >> 1;
-		p++;
+		p += inaddr.s_addr & 1;
+		inaddr.s_addr >>= 1;
 	}
 
 	return p;
