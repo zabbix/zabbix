@@ -793,8 +793,6 @@ SVGMapElement.prototype.updateImage = function() {
 		else {
 			this.image.update(options);
 		}
-
-
 	}
 	else {
 		this.removeItem('image');
