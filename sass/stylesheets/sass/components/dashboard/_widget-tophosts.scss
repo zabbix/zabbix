@@ -18,8 +18,14 @@ form.dashboard-widget-tophosts {
 div.dashboard-widget-tophosts {
 	$bar-gauge-height: 20px;
 
-	.list-table th.center {
-		text-align: center;
+	.list-table {
+		th.center {
+			text-align: center;
+		}
+
+		tr[data-hostid] {
+			cursor: pointer;
+		}
 	}
 
 	td {

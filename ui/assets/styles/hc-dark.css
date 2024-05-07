@@ -4928,6 +4928,8 @@ form.dashboard-widget-tophosts #column {
 
 div.dashboard-widget-tophosts .list-table th.center {
   text-align: center; }
+div.dashboard-widget-tophosts .list-table tr[data-hostid] {
+  cursor: pointer; }
 div.dashboard-widget-tophosts td {
   line-height: 20px;
   height: 20px; }
