@@ -112,13 +112,27 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'display_as_image' => ZBX_WIDGET_FIELD_TYPE_INT32
 		];
 
+		$column_defaults = [
+			'base_color' => '',
+			'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
+			'min' => '',
+			'max' => '',
+			'max_length' => CWidgetFieldColumnsList::SINGLE_LINE_DEFAULT,
+			'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
+			'monospace_font' => 0,
+			'local_time' => 0,
+			'display_as_image' => 0
+		];
+
 		foreach ($this->getValue() as $column_index => $value) {
 			foreach (array_intersect_key($fields, $value) as $field => $field_type) {
-				$widget_fields[] = [
-					'type' => $field_type,
-					'name' => $this->name.'.'.$column_index.'.'.$field,
-					'value' => $value[$field]
-				];
+				if (!array_key_exists($field, $column_defaults) || $column_defaults[$field] !== $value[$field]) {
+					$widget_fields[] = [
+						'type' => $field_type,
+						'name' => $this->name.'.'.$column_index.'.'.$field,
+						'value' => $value[$field]
+					];
+				}
 			}
 
 			if (array_key_exists('highlights', $value) && $value['highlights']) {
@@ -159,15 +173,15 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		$validation_rules = ['type' => API_OBJECTS, 'fields' => [
 			'name'				=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 			'itemid'			=> ['type' => API_ID, 'flags' => API_REQUIRED],
-			'base_color'		=> ['type' => API_COLOR],
+			'base_color'		=> ['type' => API_COLOR, 'default' => ''],
 			'highlights'		=> ['type' =>  API_OBJECTS, 'uniq' => [['pattern']], 'fields' => [
 				'color'				=> ['type' => API_COLOR],
 				'pattern'			=> ['type' => API_STRING_UTF8, 'length' => 255],
 			]],
-			'display'			=> ['type' => API_INT32, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS, self::DISPLAY_HTML, self::DISPLAY_SINGLE_LINE])],
+			'display'			=> ['type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS, self::DISPLAY_HTML, self::DISPLAY_SINGLE_LINE])],
 			'max_length'		=> ['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'display', 'in' => self::DISPLAY_SINGLE_LINE],
-											'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => self::SINGLE_LINE_MIN.':'.self::SINGLE_LINE_MAX],
+											'type' => API_INT32, 'flags' => API_REQUIRED, 'default' => self::SINGLE_LINE_DEFAULT, 'in' => self::SINGLE_LINE_MIN.':'.self::SINGLE_LINE_MAX],
 										['else' => true,
 											'type' => API_INT32, 'in' => self::SINGLE_LINE_MIN.':'.self::SINGLE_LINE_MAX]
 			]],
@@ -177,10 +191,10 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				'color'				=> ['type' => API_COLOR],
 				'threshold'			=> ['type' => API_NUMERIC]
 			]],
-			'history'				=> ['type' => API_INT32, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
-			'monospace_font' 		=> ['type' => API_INT32, 'in' => '0,1'],
-			'local_time' 			=> ['type' => API_INT32, 'in' => '0,1'],
-			'display_as_image'		=> ['type' => API_INT32, 'in' => '0,1']
+			'history'				=> ['type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
+			'monospace_font' 		=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
+			'local_time' 			=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
+			'display_as_image'		=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1']
 		]];
 
 		if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {

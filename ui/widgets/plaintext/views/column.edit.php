@@ -77,7 +77,7 @@ $parameters += $data['templateid'] === ''
 $item_select = (new CMultiSelect([
 	'name' => 'itemid',
 	'object_name' => 'items',
-	'data' => $data['item'] ? [$data['item']] : '',
+	'data' => $data['ms_item'] ? [$data['ms_item']] : '',
 	'multiple' => false,
 	'popup' => [
 		'parameters' => $parameters
@@ -263,6 +263,7 @@ $form
 				'highlights' => $data['highlights'],
 				'colors' => $data['colors'],
 				'item_value_type' => $data['item_value_type'],
+				'multiselect_item_name' => $data['ms_item'] ? $data['ms_item']['prefix'].$data['ms_item']['name'] : '',
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);

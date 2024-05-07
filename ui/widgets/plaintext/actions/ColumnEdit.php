@@ -138,7 +138,7 @@ class ColumnEdit extends CController {
 			$data = [
 				'action' => $this->getAction(),
 				'colors' => CWidgetFieldColumnsList::DEFAULT_COLOR_PALETTE,
-				'item' => $item_ms,
+				'ms_item' => $item_ms,
 				'item_value_type' => $item_value_type,
 				'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
 				'errors' => hasErrorMessages() ? getMessages() : null,

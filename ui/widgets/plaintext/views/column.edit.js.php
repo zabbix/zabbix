@@ -31,9 +31,10 @@ window.item_history_column_edit = new class {
 	#$thresholds_table;
 	#highlights_table;
 
+	#old_multiselect_item_name;
 	#item_value_type;
 
-	init({form_id, thresholds, highlights, colors, item_value_type}) {
+	init({form_id, thresholds, highlights, colors, item_value_type, multiselect_item_name}) {
 		this.#overlay = overlays_stack.getById('item-history-column-edit-overlay');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form = document.getElementById(form_id);
@@ -42,6 +43,7 @@ window.item_history_column_edit = new class {
 		this.#highlights_table = document.getElementById('highlights_table');
 
 		this.#item_value_type = item_value_type;
+		this.#old_multiselect_item_name = multiselect_item_name.substring(0, 255);
 
 		// Initialize item multiselect
 		$('#itemid').on('change', () => {
@@ -60,9 +62,11 @@ window.item_history_column_edit = new class {
 
 				if (ms_item_data[0].hasOwnProperty('name')) {
 					const name_field = this.#form.querySelector('[name=name]');
+					const name_value = name_field.value.substring(0, 255);
 
-					if (name_field.value === '') {
+					if (name_value === '' || this.#old_multiselect_item_name === name_value) {
 						name_field.value = ms_item_data[0].name;
+						this.#old_multiselect_item_name = ms_item_data[0].name;
 					}
 				}
 			}
