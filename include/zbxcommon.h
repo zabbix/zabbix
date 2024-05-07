@@ -441,6 +441,7 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
+	ZBX_TASK_SET_SERVICE_STARTUP_TYPE,
 #else
 	ZBX_TASK_RUNTIME_CONTROL,
 #endif
@@ -459,12 +460,16 @@ typedef enum
 }
 zbx_httptest_auth_t;
 
-#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
-#define ZBX_TASK_FLAG_FOREGROUND	0x02
-
 typedef struct
 {
 	zbx_task_t	task;
+#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
+#define ZBX_TASK_FLAG_FOREGROUND	0x02
+#ifdef _WINDOWS
+	#define ZBX_TASK_FLAG_SERVICE_ENABLED		0x04
+	#define ZBX_TASK_FLAG_SERVICE_AUTOSTART		0x08
+	#define ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED	0x10
+#endif
 	unsigned int	flags;
 	int		data;
 	char		*opts;
