@@ -20,7 +20,7 @@
 
 
 /**
- * Plain text widget form view.
+ * Item history widget form view.
  *
  * @var CView $this
  * @var array $data
@@ -33,8 +33,7 @@ use Widgets\PlainText\Includes\CWidgetFieldColumnsListView;
 		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
 	)
 	->addField(
-		(new CWidgetFieldColumnsListView($data['fields']['columns']))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])

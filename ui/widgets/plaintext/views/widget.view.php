@@ -20,7 +20,7 @@
 
 
 /**
- * Plain text widget view.
+ * Item history widget view.
  *
  * @var CView $this
  * @var array $data

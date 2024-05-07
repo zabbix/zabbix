@@ -6,8 +6,8 @@
 	"namespace": "PlainText",
 	"version": "1.0",
 	"author": "Zabbix",
-	"description": "Displays the latest data for the selected items in plain text.",
-	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/plain_text",
+	"description": "Displays the latest data for the selected items with an option to add progress bar visualizations, customize report columns, and display images for binary data types.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/item_history",
 	"widget": {
 		"size": {
 			"width": 6,
@@ -18,7 +18,7 @@
 		"widget.plaintext.view": {
 			"class": "WidgetView"
 		},
-		"widget.item_history.column.edit": {
+		"widget.plaintext.column.edit": {
 			"class": "ColumnEdit",
 			"view": "column.edit",
 			"layout": "layout.json"

@@ -89,9 +89,7 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES,
-					ZBX_MAX_WIDGET_LINES
-				))
+				(new CWidgetFieldIntegerBox('show_lines', _('Show lines'), ZBX_MIN_WIDGET_LINES, ZBX_MAX_WIDGET_LINES))
 					->setDefault(ZBX_DEFAULT_WIDGET_LINES)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
