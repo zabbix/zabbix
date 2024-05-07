@@ -4101,6 +4101,8 @@ static int	DBpatch_6050297(void)
 		else
 			index++;
 
+		zabbix_log(LOG_LEVEL_WARNING, "REMOVEME %3lu) widgetid = %lu, value_type = %d, field_name = \"%s\", itemid = %lu, item_name = \"%s\", show_as_html = %d", index, widgetid, value_type, field_name, itemid, item_name, show_as_html);
+
 		zbx_snprintf(buf, sizeof(buf), "columns.%lu.name", index);
 		zbx_db_insert_add_values(&db_insert_str, __UINT64_C(0), widgetid, 1, buf, item_name);
 
