@@ -2357,9 +2357,6 @@ button {
     background-color: #e8f5ff; }
   .list-table tbody tr.row-selected {
     background-color: #fcf7c2; }
-  .list-table tbody tr.sub-row th:first-child,
-  .list-table tbody tr.sub-row td:first-child {
-    padding-left: 20px; }
   .list-table tbody th.table-info,
   .list-table tbody td.table-info {
     color: #768d99; }

@@ -93,63 +93,40 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 
 			if ($is_recent_data && array_key_exists('latest_release', $check_data)) {
 				$latest_release = $check_data['latest_release']['release'];
-				$release_notes = [
-					(new CLink(_('Release notes'),
-						(new CUrl("https://www.zabbix.com/rn/rn{$latest_release}"))->getUrl()
-					))->setTarget('_blank'),
-					new CButtonIcon(ZBX_ICON_REFERENCE)
-				];
+				$release_notes = (new CLink(_('Release notes'),
+					(new CUrl("https://www.zabbix.com/rn/rn{$latest_release}"))->getUrl()
+				))
+					->addClass(ZBX_STYLE_LINK_EXTERNAL)
+					->setTarget('_blank');
 			}
 		}
 	}
 }
 
-$info_table->addRow([
-	_('Zabbix server version'),
-	$server_version['version'],
-	$status['has_status'] ? $server_version['version_details'] : ''
-]);
+$info_table
+	->addRow([
+		_('Zabbix server version'),
+		$server_version['version'],
+		$status['has_status'] ? $server_version['version_details'] : ''
+	])
+	->addRow([
+		_('Zabbix frontend version'),
+		$frontend_version['version'],
+		$frontend_version['version_details']
+	]);
 
 if ($data['show_software_update_check_details']) {
 	$info_table
-		->addRow(
-			(new CRow([
-				_('Software update last checked'),
-				$status['has_status'] ? $last_checked : '',
-				''
-			]))->addClass(ZBX_STYLE_SUB_ROW)
-		)
-		->addRow(
-			(new CRow([
-				_('Latest release'),
-				$status['has_status'] ? $latest_release : '',
-				$status['has_status'] ? $release_notes : ''
-			]))->addClass(ZBX_STYLE_SUB_ROW)
-		);
-}
-
-$info_table->addRow([
-	_('Zabbix frontend version'),
-	$frontend_version['version'],
-	$frontend_version['version_details']
-]);
-
-if ($data['show_software_update_check_details']) {
-	$info_table
-		->addRow(
-			(new CRow([
-				_('Software update last checked'),
-				$last_checked,
-				''
-			]))->addClass(ZBX_STYLE_SUB_ROW)
-		)
-		->addRow(
-			(new CRow([
-				_('Latest release'),
-				$latest_release,
-				$release_notes
-			]))->addClass(ZBX_STYLE_SUB_ROW)
-		);
+		->addRow([
+			_('Software update last checked'),
+			$last_checked,
+			''
+		])
+		->addRow([
+			_('Latest release'),
+			$latest_release,
+			$release_notes
+		]);
 }
 
 $info_table
