@@ -4026,6 +4026,204 @@ static int	DBpatch_6050296(void)
 	return DBrename_field("media_type", "content_type", &field);
 }
 
+static int	DBpatch_6050297(void)
+{
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	zbx_db_insert_t		db_insert_int, db_insert_str, db_insert_itemid;
+	zbx_uint64_t		last_widgetid = 0;
+	size_t			index;
+	zbx_vector_uint64_t	delete_ids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	int			ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_uint64_create(&delete_ids);
+
+	zbx_db_insert_prepare(&db_insert_int, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_int", NULL);
+	zbx_db_insert_prepare(&db_insert_str, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_str", NULL);
+	zbx_db_insert_prepare(&db_insert_itemid, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_itemid", NULL);
+
+	result = zbx_db_select(
+			"select w.widgetid,i.value_type,wf.name,i.itemid,iname.name_resolved,wfs.value_int"
+			" from widget w"
+				" join dashboard_page dp on w.dashboard_pageid = dp.dashboard_pageid"
+				" join dashboard d on dp.dashboardid = d.dashboardid"
+				" join widget_field wf on w.widgetid = wf.widgetid and wf.type = 4"
+				" join items i on wf.value_itemid = i.itemid"
+				" join item_rtname iname on wf.value_itemid = iname.itemid"
+				" left join widget_field wfs on w.widgetid = wfs.widgetid and wfs.name='show_as_html'"
+			" where w.type = 'plaintext'"
+				" and d.templateid is null"
+			" union"
+			" select w.widgetid,i.value_type,wf.name,i.itemid,i.name,wfs.value_int"
+			" from widget w"
+				" join dashboard_page dp on w.dashboard_pageid = dp.dashboard_pageid"
+				" join dashboard d on dp.dashboardid = d.dashboardid"
+				" join widget_field wf on w.widgetid = wf.widgetid and wf.type = 4"
+				" join items i on wf.value_itemid = i.itemid"
+				" left join widget_field wfs on w.widgetid = wfs.widgetid and wfs.name='show_as_html'"
+			" where w.type = 'plaintext'"
+				" and d.templateid is not null"
+			" order by widgetid");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid, itemid;
+		int		value_type, show_as_html;
+		const char	*field_name, *item_name;
+		char		buf[64];
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		value_type = atoi(row[1]);
+		field_name = row[2];
+		ZBX_STR2UINT64(itemid, row[3]);
+		item_name = row[4];
+		show_as_html = atoi(ZBX_NULL2EMPTY_STR(row[5]));
+
+		if (widgetid != last_widgetid)
+			index = 0;
+		else
+			index++;
+
+		zabbix_log(LOG_LEVEL_WARNING, "%3lu) widgetid = %lu, value_type = %d, field_name = \"%s\", itemid = %lu, item_name = \"%s\", show_as_html = %d", index, widgetid, value_type, field_name, itemid, item_name, show_as_html);
+
+		zbx_snprintf(buf, sizeof(buf), "сolumn.%lu.name", index);
+		zbx_db_insert_add_values(&db_insert_str, __UINT64_C(0), widgetid, 1, buf, item_name);
+
+		zbx_snprintf(buf, sizeof(buf), "сolumn.%lu.itemid", index);
+		zbx_db_insert_add_values(&db_insert_itemid, __UINT64_C(0), widgetid, 4, buf, itemid);
+
+		if (1 == value_type || 2 == value_type || 4 == value_type)
+		{
+			zbx_snprintf(buf, sizeof(buf), "сolumn.%lu.monospace_font", index);
+			zbx_db_insert_add_values(&db_insert_int, __UINT64_C(0), widgetid, 0, buf, 1);
+
+			if (1 == show_as_html)
+			{
+				zbx_snprintf(buf, sizeof(buf), "сolumn.%lu.display", index);
+				zbx_db_insert_add_values(&db_insert_int, __UINT64_C(0), widgetid, 0, buf, 4);
+			}
+		}
+
+		last_widgetid = widgetid;
+	}
+	zbx_db_free_result(result);
+
+	result = zbx_db_select(
+			"select distinct wf.widgetid"
+			" from widget w,widget_field wf"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='plaintext'"
+				" and not wf.name='name'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert_str, __UINT64_C(0), widgetid, 1, "name", "Plain text");
+	}
+	zbx_db_free_result(result);
+
+	result = zbx_db_select(
+			"select wf.widget_fieldid"
+			" from widget w,widget_field wf"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='plaintext'"
+				" and wf.name='style'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widget_fieldid;
+
+		ZBX_STR2UINT64(widget_fieldid, row[0]);
+
+		if (ZBX_DB_OK > zbx_db_execute(
+				"update widget_field"
+				" set name='layout'"
+				" where widget_fieldid=" ZBX_FS_UI64, widget_fieldid))
+		{
+			return FAIL;
+		}
+
+	}
+	zbx_db_free_result(result);
+
+	result = zbx_db_select(
+			"select distinct wf.widgetid"
+			" from widget w,widget_field wf"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='plaintext'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert_int, __UINT64_C(0), widgetid, 0, "show_timestamp", 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert_int, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert_int);
+	zbx_db_insert_clean(&db_insert_int);
+
+	if (SUCCEED != ret)
+		return FAIL;
+
+	zbx_db_insert_autoincrement(&db_insert_str, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert_str);
+	zbx_db_insert_clean(&db_insert_str);
+
+	if (SUCCEED != ret)
+		return FAIL;
+
+	zbx_db_insert_autoincrement(&db_insert_itemid, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert_itemid);
+	zbx_db_insert_clean(&db_insert_itemid);
+
+	if (SUCCEED != ret)
+		return FAIL;
+
+	result = zbx_db_select(
+			"select wf.widget_fieldid"
+			" from widget w,widget_field wf"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='plaintext'"
+				" and (wf.name='show_as_html' or wf.name like 'itemids.%%')");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widget_fieldid;
+
+		ZBX_STR2UINT64(widget_fieldid, row[0]);
+
+		zbx_vector_uint64_append(&delete_ids, widget_fieldid);
+	}
+	zbx_db_free_result(result);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from widget_field where");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", delete_ids.values,
+			delete_ids.values_num);
+
+	if (zbx_db_execute("%s", sql) < ZBX_DB_OK)
+		return FAIL;
+
+	zbx_vector_uint64_destroy(&delete_ids);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -4327,5 +4525,6 @@ DBPATCH_ADD(6050293, 0, 1)
 DBPATCH_ADD(6050294, 0, 1)
 DBPATCH_ADD(6050295, 0, 1)
 DBPATCH_ADD(6050296, 0, 1)
+DBPATCH_ADD(6050297, 0, 1)
 
 DBPATCH_END()
