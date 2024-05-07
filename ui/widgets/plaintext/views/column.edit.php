@@ -230,7 +230,7 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Use monospace font'), 'monospace_font'))->addClass('js-monospace-row'),
 	(new CFormField(
-		new CCheckBox('monospace_font', $data['monospace_font'])
+		(new CCheckBox('monospace_font'))->setChecked($data['monospace_font'])
 	))->addClass('js-monospace-row')
 ]);
 
@@ -241,7 +241,7 @@ $form_grid->addItem([
 		makeHelpIcon(_('This setting will display local time instead of the timestamp. "Show timestamp" must also be checked in the advanced configuration.'))
 	], 'local_time'))->addClass('js-local-time-row'),
 	(new CFormField(
-		(new CCheckBox('local_time', $data['local_time'])),
+		(new CCheckBox('local_time'))->setChecked($data['local_time'])
 	))->addClass('js-local-time-row')
 ]);
 
@@ -249,7 +249,7 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Display as image'), 'display_as_image'))->addClass('js-display-as-image-row'),
 	(new CFormField(
-		(new CCheckBox('display_as_image', $data['display_as_image']))
+		(new CCheckBox('display_as_image'))->setChecked($data['display_as_image'])
 	))->addClass('js-display-as-image-row')
 ]);
 

@@ -22,6 +22,7 @@
 ?>
 
 window.widget_plaintext_form = new class {
+
 	#form;
 	#templateid;
 	#list_columns;
