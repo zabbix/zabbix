@@ -148,6 +148,20 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	}
 }
 
+.link-external {
+	position: relative;
+
+	&::after {
+		@extend %icons-font;
+
+		content: $zi-link-external-small;
+		position: absolute;
+		top: 0;
+		right: calc(-#{$icon-small-size} - 2px);
+		font-size: $icon-small-size;
+	}
+}
+
 .disabled {
 	cursor: default !important;
 	opacity: .35;
