@@ -28,8 +28,7 @@ use API,
 	CParser,
 	CProfile,
 	CSettingsHelper,
-	CSeverityHelper,
-	CWebUser;
+	CSeverityHelper;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
