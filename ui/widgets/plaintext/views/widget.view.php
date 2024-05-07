@@ -186,8 +186,6 @@ else {
 		['field' => 'ns', 'order' => $sort_order]
 	]);
 
-	sdff($history_values, '/home/test/work/logs/zabbix.log');
-
 	if (!$columns_names_at_top) {
 		foreach($history_values as $history_item) {
 			$table_row = $data['show_timestamp']
