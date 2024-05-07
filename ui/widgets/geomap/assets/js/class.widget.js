@@ -72,10 +72,7 @@ class CWidgetGeoMap extends CWidget {
 			}
 
 			this._addMarkers(response.geomap.hosts);
-
-			if (this.#selected_hostid !== '') {
-				this.#selectHost(this.#selected_hostid);
-			}
+			this.#updateMarkers();
 		}
 
 		this._initial_load = false;
@@ -127,9 +124,7 @@ class CWidgetGeoMap extends CWidget {
 			},
 			pointToLayer: function (feature, ll) {
 				return L.marker(ll, {
-					icon: feature.properties.hostid === this.#selected_hostid
-						? this._selected_icons[feature.properties.severity]
-						: this._icons[feature.properties.severity]
+					icon: this._icons[feature.properties.severity]
 				});
 			}.bind(this)
 		});
@@ -210,6 +205,9 @@ class CWidgetGeoMap extends CWidget {
 
 		this._markers.on('click keypress', (e) => {
 			const node = e.originalEvent.srcElement;
+
+			this.#selectHost(e.layer.feature.properties.hostid);
+
 			if ('hintBoxItem' in node) {
 				return;
 			}
@@ -220,8 +218,6 @@ class CWidgetGeoMap extends CWidget {
 				}
 				e.originalEvent.preventDefault();
 			}
-
-			this.#selectHost(e.layer.feature.properties.hostid);
 
 			const container = this._map._container;
 			const content = this.makePopupContent([e.layer.feature]);
@@ -292,10 +288,6 @@ class CWidgetGeoMap extends CWidget {
 	 * @param {string} hostid
 	 */
 	#selectHost(hostid) {
-		if (this.#selected_hostid === hostid) {
-			return;
-		}
-
 		this.#selected_hostid = hostid;
 
 		this.broadcast({
