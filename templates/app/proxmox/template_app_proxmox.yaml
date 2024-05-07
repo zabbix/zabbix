@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-14T11:02:00Z'
+  date: '2024-05-03T09:05:36Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -673,15 +673,11 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              units: '%'
               description: 'CPU average load.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.loadavg
-                - type: MULTIPLIER
-                  parameters:
-                    - '100'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
