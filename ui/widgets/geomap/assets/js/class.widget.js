@@ -28,7 +28,7 @@ class CWidgetGeoMap extends CWidget {
 	static SEVERITY_HIGH = 4;
 	static SEVERITY_DISASTER = 5;
 
-	#selected_hostid = null;
+	#selected_hostid = '';
 
 	onInitialize() {
 		this._map = null;
@@ -56,7 +56,6 @@ class CWidgetGeoMap extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			selected_hostid: this.#selected_hostid ?? undefined,
 			initial_load: this._initial_load ? 1 : 0,
 			unique_id: this._unique_id
 		};
@@ -74,8 +73,8 @@ class CWidgetGeoMap extends CWidget {
 
 			this._addMarkers(response.geomap.hosts);
 
-			if ('selected_hostid' in response.geomap) {
-				this.#selectHost(response.geomap.selected_hostid);
+			if (this.#selected_hostid !== '') {
+				this.#selectHost(this.#selected_hostid);
 			}
 		}
 
@@ -118,7 +117,7 @@ class CWidgetGeoMap extends CWidget {
 				marker.on('mouseover', () => marker.setIcon(this._mouseover_icons[feature.properties.severity]));
 				marker.on('mouseout', () => {
 					marker.setIcon(
-						feature.properties.hostid == this.#selected_hostid
+						feature.properties.hostid === this.#selected_hostid
 							? this._selected_icons[feature.properties.severity]
 							: this._icons[feature.properties.severity]
 					)
@@ -126,7 +125,7 @@ class CWidgetGeoMap extends CWidget {
 			},
 			pointToLayer: function (feature, ll) {
 				return L.marker(ll, {
-					icon: feature.properties.hostid == this.#selected_hostid
+					icon: feature.properties.hostid === this.#selected_hostid
 						? this._selected_icons[feature.properties.severity]
 						: this._icons[feature.properties.severity]
 				});
@@ -292,7 +291,7 @@ class CWidgetGeoMap extends CWidget {
 	#selectHost(hostid) {
 		Object.values(this._map._layers).forEach(_layer => {
 			if (_layer.hasOwnProperty('_markers')) {
-				if (_layer._markers.some(marker => marker.feature.properties.hostid == this.#selected_hostid)) {
+				if (_layer._markers.some(marker => marker.feature.properties.hostid === this.#selected_hostid)) {
 					_layer._icon.classList.remove('selected');
 				}
 				if (_layer._markers.some(marker => marker.feature.properties.hostid == hostid)) {
@@ -485,7 +484,7 @@ class CWidgetGeoMap extends CWidget {
 				const hostid = host.properties.hostid;
 
 				rows += `
-					<tr data-hostid="${hostid}" ${hostid == this.#selected_hostid && 'class="row-selected"'}>
+					<tr data-hostid="${hostid}" ${hostid === this.#selected_hostid && 'class="row-selected"'}>
 						<td class="nowrap">${makeHostBtn(host).outerHTML}</td>
 						${makeDataCell(host, CWidgetGeoMap.SEVERITY_DISASTER)}
 						${makeDataCell(host, CWidgetGeoMap.SEVERITY_HIGH)}

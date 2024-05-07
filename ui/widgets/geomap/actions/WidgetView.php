@@ -50,8 +50,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->addValidationRules([
 			'initial_load' => 'in 0,1',
 			'widgetid' => 'db widget.widgetid',
-			'unique_id' => 'required|string',
-			'selected_hostid' => 'db hosts.hostid'
+			'unique_id' => 'required|string'
 		]);
 	}
 
@@ -66,10 +65,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'unique_id' => $this->getInput('unique_id')
 		];
-
-		if ($this->hasInput('selected_hostid')) {
-			$data['selected_hostid'] = $this->getInput('selected_hostid');
-		}
 
 		if ($this->getInput('initial_load', 0)) {
 			$this->geomap_config = self::getMapConfig();

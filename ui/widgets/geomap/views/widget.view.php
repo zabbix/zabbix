@@ -30,5 +30,5 @@
 	->addItem(
 		(new CDiv())->setId($data['unique_id'])
 	)
-	->setVar('geomap', array_intersect_key($data, array_flip(['config', 'hosts', 'selected_hostid'])))
+	->setVar('geomap', array_intersect_key($data, array_flip(['config', 'hosts'])))
 	->show();
