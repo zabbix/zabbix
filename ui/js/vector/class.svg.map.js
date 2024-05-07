@@ -782,17 +782,19 @@ SVGMapElement.prototype.updateImage = function() {
 			const image = this.map.layers.elements.add('image', options);
 			this.removeItem('image');
 			this.image = image;
+
+			if (this.map.can_select_element && (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST
+					|| this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST_GROUP)) {
+				this.image.element.addEventListener('mouseover', e => this.onMouseOver(e));
+				this.image.element.addEventListener('mouseout', e => this.onMouseOut(e));
+				this.image.element.addEventListener('click', () => this.onClick());
+			}
 		}
 		else {
 			this.image.update(options);
 		}
 
-		if (this.map.can_select_element && (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST
-				|| this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST_GROUP)) {
-			this.image.element.addEventListener('mouseover', e => this.onMouseOver(e));
-			this.image.element.addEventListener('mouseout', e => this.onMouseOut(e));
-			this.image.element.addEventListener('click', () => this.onClick());
-		}
+
 	}
 	else {
 		this.removeItem('image');
