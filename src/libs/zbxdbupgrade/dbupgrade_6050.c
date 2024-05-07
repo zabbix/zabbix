@@ -4045,7 +4045,7 @@ static int	DBpatch_6050297(void)
 			"update widget"
 			" set name='Plain text'"
 			" where type='plaintext'"
-				" and name=''"));
+				" and name=''"))
 	{
 		return FAIL;
 	}
@@ -4147,7 +4147,7 @@ static int	DBpatch_6050297(void)
 	zbx_db_free_result(result);
 
 	result = zbx_db_select(
-			"select distinct wf.widgetid"
+			"select distinct w.widgetid"
 			" from widget w,widget_field wf"
 			" where wf.widgetid=w.widgetid"
 				" and w.type='plaintext'");
