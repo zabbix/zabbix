@@ -4045,10 +4045,9 @@ static int	DBpatch_6050297(void)
 			"update widget"
 			" set name='Plain text'"
 			" where type='plaintext'"
-				" and name=''");
-		{
-			return FAIL;
-		}
+				" and name=''"));
+	{
+		return FAIL;
 	}
 
 	zbx_vector_uint64_create(&delete_ids);
