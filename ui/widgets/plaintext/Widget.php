@@ -25,6 +25,8 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	public const DEFAULT_FILL = '#97AAB3';
+
 	public function getDefaultName(): string {
 		return _('Item history');
 	}

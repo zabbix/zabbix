@@ -22,15 +22,13 @@
 namespace Widgets\PlainText\Actions;
 
 use API,
-	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CJsScript,
-	CPre,
-	CViewHelper,
+	CItemHelper,
+	CSettingsHelper,
 	Manager;
 
-use Zabbix\Core\CWidget;
+use	Widgets\PlainText\Includes\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -38,114 +36,179 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$error = null;
 
 		$name = $this->widget->getDefaultName();
-		$same_host = true;
-		$items = [];
-		$histories = [];
 
-		$error = _('No data.');
+		$data = [
+			'name' => $this->getInput('name', $name),
+			'layout' => $this->fields_values['layout'],
+			'columns' => [],
+			'items' => [],
+			'sortorder' => $this->fields_values['sortorder'],
+			'show_lines' => $this->fields_values['show_lines'],
+			'show_timestamp' => $this->fields_values['show_timestamp'],
+			'show_column_header' => $this->fields_values['show_column_header'],
+			'error' => $error,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
 
-		// Editing template dashboard?
-		/*
-		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
-			$error = _('No data.');
+		$db_items = [];
+
+		$override_hostid = $this->fields_values['override_hostid'] ? $this->fields_values['override_hostid'][0] : '';
+
+		if ($override_hostid !== '' && $this->isTemplateDashboard()) {
+			$data['error'] = _('No data.');
+
+			$this->setResponse(new CControllerResponseData($data));
+
+			return;
 		}
-		else {
-			if ($this->fields_values['itemids']) {
-				$items = API::Item()->get([
-					'output' => ['itemid', 'name_resolved', 'key_', 'value_type', 'units', 'valuemapid'],
-					'selectHosts' => ['name'],
+
+		if ($this->fields_values['columns']) {
+			if ($override_hostid === '') {
+				$db_items = API::Item()->get([
+					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
 					'selectValueMap' => ['mappings'],
-					'itemids' => $this->fields_values['itemids'],
+					'itemids' => array_column($this->fields_values['columns'], 'itemid'),
 					'webitems' => true,
 					'preservekeys' => true
 				]);
-
-				if ($items && $this->fields_values['override_hostid']) {
-					$items = API::Item()->get([
-						'output' => ['itemid', 'name_resolved', 'value_type', 'units', 'valuemapid'],
-						'selectHosts' => ['name'],
-						'selectValueMap' => ['mappings'],
-						'filter' => [
-							'hostid' => $this->fields_values['override_hostid'],
-							'key_' => array_keys(array_column($items, null, 'key_'))
-						],
-						'webitems' => true,
-						'preservekeys' => true
-					]);
-				}
-
-				$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
-			}
-
-			if (!$items) {
-				$error = _('No permissions to referred object or it does not exist!');
 			}
 			else {
-				$histories = Manager::History()->getLastValues($items, $this->fields_values['show_lines']);
-
-				if ($histories) {
-					$histories = array_merge(...$histories);
-
-					foreach ($histories as &$history) {
-						if ($items[$history['itemid']]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-							$history['value'] = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
-						}
-						else {
-							$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']],
-								false
-							);
-							$history['value'] = $this->fields_values['show_as_html']
-								? new CJsScript($history['value'])
-								: new CPre($history['value']);
-						}
-					}
-					unset($history);
-				}
-
-				CArrayHelper::sort($histories, [
-					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
-					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				$db_items = API::Item()->get([
+					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
+					'selectValueMap' => ['mappings'],
+					'itemids' => array_column($this->fields_values['columns'], 'itemid'),
+					'hostids' => [$override_hostid],
+					'webitems' => true,
+					'preservekeys' => true
 				]);
-
-				$host_name = '';
-
-				foreach ($items as $item) {
-					if ($host_name === '') {
-						$host_name = $item['hosts'][0]['name'];
-					}
-					elseif ($host_name !== $item['hosts'][0]['name']) {
-						$same_host = false;
-					}
-				}
-
-				$items_count = count($items);
-
-				if ($items_count == 1) {
-					$item = reset($items);
-					$name = $this->isTemplateDashboard()
-						? $item['name']
-						: $host_name.NAME_DELIMITER.$item['name'];
-				}
-				elseif ($same_host && $items_count > 1) {
-					$name = $this->isTemplateDashboard()
-						? _n('%1$s item', '%1$s items', $items_count)
-						: $host_name.NAME_DELIMITER._n('%1$s item', '%1$s items', $items_count);
-				}
 			}
 		}
-		*/
+
+		if (!$db_items) {
+			$data['error'] = _('No permissions to referred object or it does not exist!');
+
+			$this->setResponse(new CControllerResponseData($data));
+
+			return;
+		}
+
+		$columns_config = array_filter($this->fields_values['columns'], static function($column) use ($db_items) {
+			return array_key_exists('itemid', $column) && array_key_exists($column['itemid'], $db_items);
+		});
+
+		$item_values_by_source = $this->getItemValuesByDataSource($db_items, $columns_config);
+
+		if (!$item_values_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]
+				&& !$item_values_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]) {
+			$this->setResponse(new CControllerResponseData($data));
+
+			return;
+		}
+
+		$columns_with_data = [];
+		$items = [];
+
+		foreach ($columns_config as $column) {
+			if (array_key_exists($column['itemid'], $item_values_by_source[$column['history']])) {
+				$column['item_values'] = [...$item_values_by_source[$column['history']][$column['itemid']]];
+
+				if (in_array($column['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+						&& ($column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
+							|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS)) {
+
+					if (!array_key_exists('min', $column) || $column['min'] === '') {
+						$column['min'] = min(array_column($column['item_values'], 'value'));
+					}
+
+					if (!array_key_exists('max', $column) || $column['max'] === '') {
+						$column['max'] = max(array_column($column['item_values'], 'value'));
+					}
+				}
+
+				$items[$column['itemid']] = $db_items[$column['itemid']];
+				$columns_with_data[] = $column;
+			}
+		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
+			'columns' => $columns_with_data,
 			'items' => $items,
-			'histories' => $histories,
 			'layout' => $this->fields_values['layout'],
-			'same_host' => $same_host,
+			'sortorder' => $this->fields_values['sortorder'],
+			'show_timestamp' => (bool) $this->fields_values['show_timestamp'],
+			'show_column_header' => $this->fields_values['show_column_header'],
 			'show_lines' => $this->fields_values['show_lines'],
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
+	}
+
+	private function getItemValuesByDataSource(array $items, array &$columns_config): array {
+		$time_from = time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+
+		$items_by_source = $this->addDataSourceAndPrepareColumns($items, $columns_config, $time_from);
+
+		$result = [
+			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
+			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => []
+		];
+
+		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]) {
+			$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] = Manager::History()->getLastValues(
+				$items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY], $this->fields_values['show_lines'],
+				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
+			);
+		}
+
+		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]) {
+			$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS] = Manager::History()->getAggregatedValues(
+				$items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS], AGGREGATE_LAST, $time_from
+			);
+		}
+
+		return $result;
+	}
+
+	private function addDataSourceAndPrepareColumns(array $items, array &$columns_config, int $time): array {
+		$items_with_source = [
+			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
+			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => []
+		];
+
+		foreach ($columns_config as &$column) {
+			$itemid = $column['itemid'];
+			$item = $items[$itemid];
+			$column['item_value_type'] = $item['value_type'];
+
+			if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+				if ($column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_AUTO) {
+					[$item] = CItemHelper::addDataSource([$item], $time);
+
+					$column['history'] = $item['source'] === 'history'
+						? CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
+						: CWidgetFieldColumnsList::HISTORY_DATA_TRENDS;
+				}
+				else {
+					$item['source'] = $column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
+						? 'history'
+						: 'trends';
+				}
+
+				$items_with_source[$column['history']][$itemid] = $item;
+			}
+			else {
+				$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
+				$item['source'] = 'history';
+				$items_with_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$itemid] = $item;
+			}
+		}
+		unset($column);
+
+		return $items_with_source;
 	}
 }
