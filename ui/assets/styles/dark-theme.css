@@ -4229,9 +4229,9 @@ div.dashboard-widget-gauge {
       display: block; }
 
 :root {
-  --geomap-marker-hover-fill: #e0f7ff;
-  --geomap-marker-selected-fill: #c9e3fc;
-  --geomap-marker-selected-stroke: #ced7db; }
+  --geomap-marker-hover-fill: #3a3a3a;
+  --geomap-marker-selected-fill: #4a4a4a;
+  --geomap-marker-selected-stroke: #383838; }
 
 div.dashboard-widget-geomap .geomap-filter {
   position: absolute;
@@ -4256,10 +4256,10 @@ div.dashboard-widget-geomap .marker-cluster {
     width: 30px;
     padding: 10px; }
   div.dashboard-widget-geomap .marker-cluster:hover > .cluster-outer-shape {
-    background: #e0f7ff; }
+    background: #3a3a3a; }
   div.dashboard-widget-geomap .marker-cluster.selected > .cluster-outer-shape {
-    background: #c9e3fc;
-    outline: 2px solid #ced7db !important; }
+    background: #4a4a4a;
+    outline: 2px solid #383838 !important; }
   div.dashboard-widget-geomap .marker-cluster div {
     text-align: center;
     border-radius: 50%;
