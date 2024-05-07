@@ -22,9 +22,9 @@
 
 #include "zbxsysinc.h"	/* using "config.h" would be better, but it causes warnings when compiled with Net-SNMP */
 
-#define ZBX_MEDIA_CONTENT_TYPE_TEXT	0
-#define ZBX_MEDIA_CONTENT_TYPE_HTML	1
-#define ZBX_MEDIA_CONTENT_TYPE_MULTI	2	/* multipart/mixed message with pre-formatted message body */
+#define ZBX_MEDIA_MESSAGE_FORMAT_TEXT	0
+#define ZBX_MEDIA_MESSAGE_FORMAT_HTML	1
+#define ZBX_MEDIA_MESSAGE_FORMAT_MULTI	2	/* multipart/mixed message with pre-formatted message body */
 
 /* SMTP authentication options */
 #define SMTP_AUTHENTICATION_NONE		0
@@ -41,11 +41,11 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type, int timeout, const char *config_source_ip,
+		unsigned char message_format, int timeout, const char *config_source_ip,
 		const char *config_ssl_ca_location, char **error);
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len);
 
-char	*zbx_email_make_body(const char *message, unsigned char content_type,  const char *attachment_name,
+char	*zbx_email_make_body(const char *message, unsigned char message_format,  const char *attachment_name,
 		const char *attachment_type, const char *attachment, size_t attachment_size);
 
 #endif

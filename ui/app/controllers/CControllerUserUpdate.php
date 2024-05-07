@@ -99,7 +99,10 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function doAction() {
-		$user = ['roleid' => 0];
+		$user = [
+			'roleid' => 0,
+			'medias' => $this->getInputUserMedia()
+		];
 
 		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
@@ -125,7 +128,6 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		}
 		else {
 			$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
-			$user['medias'] = $this->getInputUserMedia();
 		}
 
 		$result = (bool) API::User()->update($user);

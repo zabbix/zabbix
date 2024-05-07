@@ -250,7 +250,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$this->assertEquals($expected_options, $form->getField($dropdown)->getOptions()->asText());
 		}
 
-		foreach (['id:ds_0_hosts_' => 'host pattern','id:ds_0_items_' => 'item pattern'] as $selector => $placeholder) {
+		foreach (['id:ds_0_hosts_' => 'host patterns','id:ds_0_items_' => 'item patterns'] as $selector => $placeholder) {
 			$this->assertFieldAttributes($form, $selector, ['placeholder' => $placeholder], true);
 		}
 

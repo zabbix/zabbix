@@ -89,6 +89,11 @@ msgstr "%1$d overeenkomsten gevonden voor %2$s"
 msgid "%1$d of %1$d+ hosts are shown"
 msgstr ""
 
+#: widgets/itemnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ items are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -2897,6 +2902,11 @@ msgid_plural "Cannot delete user groups"
 msgstr[0] ""
 msgstr[1] ""
 
+#: include/classes/api/services/CUserGroup.php:1397
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
@@ -5659,6 +5669,10 @@ msgstr ""
 #: include/classes/helpers/CSlaHelper.php:39 report4.php:90
 msgid "Daily"
 msgstr "Dagelijks"
+
+#: include/locales.inc.php:40
+msgid "Danish (da_DK)"
+msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -8478,6 +8492,11 @@ msgstr "Filter"
 msgid "Filter deleted"
 msgstr ""
 
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Filter is not set"
+msgstr ""
+
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
 msgstr ""
@@ -9631,6 +9650,10 @@ msgstr ""
 msgid "Host networks"
 msgstr "Host netwerken"
 
+#: widgets/hostnavigator/includes/WidgetForm.php:65
+msgid "Host patterns"
+msgstr ""
+
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
 msgstr ""
@@ -9712,6 +9735,14 @@ msgstr ""
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
 msgstr "Host subnetmasker"
+
+#: widgets/itemnavigator/Widget.php:43
+msgid "Host tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
+msgid "Host tag value"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11791,6 +11822,10 @@ msgstr[1] "Items ingeschakeld"
 msgid "Item in \"not supported\" state"
 msgstr "Item in \"niet ondersteund\" toestand"
 
+#: widgets/itemnavigator/includes/WidgetForm.php:107
+msgid "Item limit"
+msgstr ""
+
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
@@ -11800,6 +11835,10 @@ msgstr ""
 msgid "Item name"
 msgstr ""
 
+#: widgets/itemnavigator/Widget.php:29
+msgid "Item navigator"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Item niet geselecteerd"
@@ -11807,6 +11846,13 @@ msgstr "Item niet geselecteerd"
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
+msgstr ""
+
+#: widgets/honeycomb/includes/WidgetForm.php:90
+#: widgets/itemnavigator/includes/WidgetForm.php:78
+#: widgets/piechart/views/widget.edit.js.php:208
+#: widgets/svggraph/views/widget.edit.js.php:279
+msgid "Item patterns"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:241
@@ -11853,6 +11899,14 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
 msgstr "Item prototypes"
+
+#: widgets/itemnavigator/Widget.php:44
+msgid "Item tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
+msgid "Item tag value"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -13223,6 +13277,10 @@ msgstr "Media types"
 msgid "Media types disabled by Administration."
 msgstr ""
 
+#: app/views/popup.media.php:78
+msgid "Media types disabled in Alerts."
+msgstr ""
+
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
 msgid "Media types used by action \"%1$s\"."
@@ -14185,6 +14243,12 @@ msgstr ""
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
 msgstr "Geen gegevensverzameling"
+
+#: app/views/search.php:48 app/views/search.php:209 app/views/search.php:289
+#: app/views/search.php:394 include/classes/html/CTableInfo.php:72
+#: widgets/hostnavigator/Widget.php:40
+msgid "No data found"
+msgstr ""
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -18820,6 +18884,10 @@ msgstr ""
 msgid "Shown as the account name to all MFA users in authenticator apps."
 msgstr ""
 
+#: app/views/mfa.edit.php:67
+msgid "Shown as the label to all MFA users in authenticator apps."
+msgstr ""
+
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
 msgstr ""
@@ -21662,6 +21730,11 @@ msgstr "Gebruiks als severity"
 msgid "Use iframe sandboxing"
 msgstr ""
 
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Use the filter to display results"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "Gebruikt in acties"
@@ -21890,6 +21963,10 @@ msgstr ""
 #: widgets/gauge/views/widget.edit.php:116
 #: widgets/item/views/widget.edit.php:90
 msgid "User macros"
+msgstr ""
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "User media"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:94
@@ -22651,6 +22728,13 @@ msgstr ""
 #: include/classes/vaults/CVaultCyberArk.php:98
 #: include/classes/vaults/CVaultHashiCorp.php:85 include/config.inc.php:53
 msgid "Vault connection failed."
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:640
+#: include/classes/setup/CSetupWizard.php:843
+#: include/classes/setup/CSetupWizard.php:863
+msgid "Vault prefix"
 msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:100
@@ -23651,6 +23735,10 @@ msgstr ""
 msgid "an array or object is expected"
 msgstr ""
 
+#: include/classes/api/services/CUser.php:990
+msgid "an email address is expected"
+msgstr ""
+
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
 msgid "an empty string is expected"
@@ -24048,6 +24136,15 @@ msgstr ""
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
 msgstr ""
 
+#: include/classes/api/services/CUserGroup.php:501
+#: include/classes/api/services/CUser.php:451
+#: include/classes/api/services/CUser.php:614
+#: include/classes/api/services/CUser.php:794
+#: include/classes/api/services/CUser.php:1066
+#, c-format
+msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr ""
@@ -24415,6 +24512,13 @@ msgstr ""
 msgid "host pattern"
 msgstr ""
 
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:155
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:159
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
+#: widgets/svggraph/views/widget.edit.php:292
+msgid "host patterns"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr ""
@@ -24651,6 +24755,15 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:287
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:329
 msgid "item pattern"
+msgstr ""
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:134
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:172
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:138
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:176
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
+msgid "item patterns"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:545
@@ -25168,6 +25281,11 @@ msgstr ""
 #: include/views/js/item.preprocessing.js.php:322
 #: include/views/js/item.preprocessing.js.php:337
 msgid "pattern"
+msgstr ""
+
+#: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
+#: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
+msgid "patterns"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878

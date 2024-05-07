@@ -568,6 +568,20 @@ void	zbx_set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: set callback variables                                            *
+ *                                                                            *
+ * Parameters: get_zbx_service_name_f - [IN]                                  *
+ *             get_zbx_event_source_f - [IN]                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_service_init(zbx_get_config_str_f get_zbx_service_name_f, zbx_get_config_str_f get_zbx_event_source_f)
+{
+	get_zbx_service_name_cb = get_zbx_service_name_f;
+	get_zbx_event_source_cb = get_zbx_event_source_f;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: sets service startup type flags from command line option argument *
  *                                                                            *
  * Parameters: optarg - [IN]                                                  *
@@ -599,18 +613,4 @@ int	zbx_service_startup_flags_set(const char *optarg, unsigned int *flags) {
 	}
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: set callback variables                                            *
- *                                                                            *
- * Parameters: get_zbx_service_name_f - [IN]                                  *
- *             get_zbx_event_source_f - [IN]                                  *
- *                                                                            *
- ******************************************************************************/
-void	zbx_service_init(zbx_get_config_str_f get_zbx_service_name_f, zbx_get_config_str_f get_zbx_event_source_f)
-{
-	get_zbx_service_name_cb = get_zbx_service_name_f;
-	get_zbx_event_source_cb = get_zbx_event_source_f;
 }

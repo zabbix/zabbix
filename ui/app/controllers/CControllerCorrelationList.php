@@ -81,7 +81,7 @@ class CControllerCorrelationList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['correlations'] = API::Correlation()->get([
 			'output' => ['correlationid', 'name', 'description', 'status'],
-			'selectFilter' => ['formula', 'conditions', 'evaltype', 'eval_formula'],
+			'selectFilter' => ['conditions'],
 			'selectOperations' => ['type'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
@@ -105,8 +105,6 @@ class CControllerCorrelationList extends CController {
 		$groupids = [];
 
 		foreach ($data['correlations'] as &$correlation) {
-			CArrayHelper::sort($correlation['filter']['conditions'], ['formulaid']);
-
 			$groupids += array_column($correlation['filter']['conditions'], 'groupid', 'groupid');
 		}
 		unset($correlation);

@@ -1141,9 +1141,9 @@ class testFormAction extends CLegacyWebTest {
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Tag name does not contain Does not contain Tag',
+						'A' => 'Event name contains trigger',
 						'B' => 'Trigger severity equals Warning',
-						'C' => 'Event name contains trigger'
+						'C' => 'Tag name does not contain Does not contain Tag'
 					],
 					'operations' => [
 						[
@@ -1225,8 +1225,8 @@ class testFormAction extends CLegacyWebTest {
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Host metadata does not contain Zabbix',
-						'B' => 'Host name contains Zabbix'
+						'A' => 'Host name contains Zabbix',
+						'B' => 'Host metadata does not contain Zabbix'
 					],
 					'operations' => [
 						[
@@ -1267,8 +1267,8 @@ class testFormAction extends CLegacyWebTest {
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Tag name does not contain Does not contain Tag',
-						'B' => 'Event type equals Trigger in "unknown" state'
+						'A' => 'Event type equals Trigger in "unknown" state',
+						'B' => 'Tag name does not contain Does not contain Tag'
 					],
 					'operations' => [
 						[
@@ -1321,10 +1321,10 @@ class testFormAction extends CLegacyWebTest {
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Service name contains Part of service name',
-						'B' => 'Service does not equal Reference service',
-						'C' => 'Value of tag Service tag does not contain Service tag value',
-						'D' => 'Tag name contains Service tag name'
+						'A' => 'Service does not equal Reference service',
+						'B' => 'Service name contains Part of service name',
+						'C' => 'Tag name contains Service tag name',
+						'D' => 'Value of tag Service tag does not contain Service tag value'
 					],
 					'operations' => [
 						[
