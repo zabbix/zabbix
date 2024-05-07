@@ -25,6 +25,7 @@ class CNavigationTree {
 	static ZBX_STYLE_NODE =										'navigation-tree-node';
 	static ZBX_STYLE_NODE_IS_GROUP =							'navigation-tree-node-is-group';
 	static ZBX_STYLE_NODE_IS_OPEN =								'navigation-tree-node-is-open';
+	static ZBX_STYLE_NODE_IS_ITEM =								'navigation-tree-node-is-item';
 	static ZBX_STYLE_NODE_IS_SELECTED =							'navigation-tree-node-is-selected';
 	static ZBX_STYLE_NODE_INFO =								'navigation-tree-node-info';
 	static ZBX_STYLE_NODE_INFO_HELPERS =						'navigation-tree-node-info-helpers';
@@ -64,18 +65,11 @@ class CNavigationTree {
 	#container_nodes;
 
 	/**
-	 * Events of navigation tree.
+	 * Listeners of navigation tree.
 	 *
 	 * @type {Object}
 	 */
-	#events;
-
-	/**
-	 * Navigation tree elements (nodes, arrows, names, etc.).
-	 *
-	 * @type {Object}
-	 */
-	#tree_elements;
+	#listeners;
 
 	/**
 	 * ID of selected item.
@@ -92,36 +86,30 @@ class CNavigationTree {
 	#show_problems;
 
 	/**
-	 * Severity names.
+	 * Severities with necessary info.
 	 *
 	 * @type {Array}
 	 */
-	#severity_names;
+	#severities;
 
 	/**
 	 * Create CNavigationTree instance.
 	 *
-	 * @param {Array}   nodes           Array of nodes data.
-	 * @param {string}  selected_id     ID of selected item. Empty string if none selected.
-	 * @param {boolean} show_problems   Whether to show problems or not.
-	 * @param {Array}   severity_names  Severity names.
+	 * @param {Array}   nodes          Array of nodes data.
+	 * @param {string}  selected_id    ID of selected item. Empty string if none selected.
+	 * @param {boolean} show_problems  Whether to show problems or not.
+	 * @param {Array}   severities     Severities with necessary info.
 	 *
 	 * @returns {CNavigationTree}
 	 */
 	constructor(nodes, {
 		selected_id = '',
 		show_problems = true,
-		severity_names = []
+		severities = []
 	} = {}) {
 		this.#selected_id = selected_id;
 		this.#show_problems = show_problems;
-		this.#severity_names = severity_names;
-
-		this.#tree_elements = {
-			nodes: [],
-			items: [],
-			arrows: []
-		};
+		this.#severities = severities;
 
 		this.#container = document.createElement('div');
 		this.#container.classList.add(CNavigationTree.ZBX_STYLE_CLASS);
@@ -135,17 +123,16 @@ class CNavigationTree {
 			this.#container_nodes.appendChild(this.#createNode(node));
 		}
 
-		this.#registerEvents();
-		this.#activateEvents();
+		this.#registerListeners();
+		this.#activateListeners();
 
 		if (this.#selected_id !== '') {
-			const item = this.#container.querySelector(
-				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_id}"]
-					.${CNavigationTree.ZBX_STYLE_NODE_INFO}`
-			);
+			const node = this.#container.querySelector(`
+				.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_id}"]
+			`);
 
-			if (item !== null) {
-				this.#events.itemSelect({target: item});
+			if (node !== null) {
+				this.#selectItem(node);
 			}
 		}
 	}
@@ -157,50 +144,6 @@ class CNavigationTree {
 	 */
 	getContainer() {
 		return this.#container;
-	}
-
-	/**
-	 * Get severity object at provided index.
-	 *
-	 * @param {number} index  Which severity to return.
-	 *
-	 * @returns {Object}  Severity object with necessary info.
-	 */
-	#getSeverity(index) {
-		const severities = {
-			[TRIGGER_SEVERITY_NOT_CLASSIFIED]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_NOT_CLASSIFIED],
-				class: ZBX_STYLE_NA_BG,
-				class_status: ZBX_STYLE_STATUS_NA_BG
-			},
-			[TRIGGER_SEVERITY_INFORMATION]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_INFORMATION],
-				class: ZBX_STYLE_INFO_BG,
-				class_status: ZBX_STYLE_STATUS_INFO_BG
-			},
-			[TRIGGER_SEVERITY_WARNING]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_WARNING],
-				class: ZBX_STYLE_WARNING_BG,
-				class_status: ZBX_STYLE_STATUS_WARNING_BG
-			},
-			[TRIGGER_SEVERITY_AVERAGE]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_AVERAGE],
-				class: ZBX_STYLE_AVERAGE_BG,
-				class_status: ZBX_STYLE_STATUS_AVERAGE_BG
-			},
-			[TRIGGER_SEVERITY_HIGH]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_HIGH],
-				class: ZBX_STYLE_HIGH_BG,
-				class_status: ZBX_STYLE_STATUS_HIGH_BG
-			},
-			[TRIGGER_SEVERITY_DISASTER]: {
-				name: this.#severity_names[TRIGGER_SEVERITY_DISASTER],
-				class: ZBX_STYLE_DISASTER_BG,
-				class_status: ZBX_STYLE_STATUS_DISASTER_BG
-			}
-		};
-
-		return severities[index];
 	}
 
 	/**
@@ -218,14 +161,18 @@ class CNavigationTree {
 		if (node.children?.length > 0) {
 			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_GROUP);
 			container.dataset.group_identifier = JSON.stringify(node.group_identifier);
-		}
 
-		if (node.is_open) {
-			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-		}
+			if (node.is_open) {
+				container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+			}
 
-		if (node.is_uncategorized) {
-			container.classList.add(CNavigationTree.ZBX_STYLE_GROUP_UNCATEGORIZED);
+			if (node.is_uncategorized) {
+				container.classList.add(CNavigationTree.ZBX_STYLE_GROUP_UNCATEGORIZED);
+			}
+		}
+		else {
+			container.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_ITEM);
+			container.dataset.id = node.id;
 		}
 
 		const info = document.createElement('div');
@@ -261,8 +208,6 @@ class CNavigationTree {
 			secondary.appendChild(this.#createProblems(node));
 		}
 
-		this.#tree_elements.nodes.push(container);
-
 		if (node.children?.length > 0) {
 			const children = document.createElement('div');
 			children.classList.add(CNavigationTree.ZBX_STYLE_NODE_CHILDREN);
@@ -272,11 +217,6 @@ class CNavigationTree {
 			for (const child of node.children) {
 				children.appendChild(this.#createNode(child));
 			}
-		}
-		else {
-			container.dataset.id = node.id;
-
-			this.#tree_elements.items.push(info);
 		}
 
 		return container;
@@ -314,8 +254,6 @@ class CNavigationTree {
 
 			button.appendChild(span);
 			arrow.appendChild(button);
-
-			this.#tree_elements.arrows.push(button);
 		}
 
 		return arrow;
@@ -441,7 +379,7 @@ class CNavigationTree {
 
 		for (const severity of problems_data) {
 			const box = document.createElement('span');
-			box.classList.add(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM, severity.class_status);
+			box.classList.add(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM, severity.status_style);
 			box.innerText = severity.count;
 
 			contents.appendChild(box);
@@ -464,12 +402,10 @@ class CNavigationTree {
 			const is_severity_allowed = node.severity_filter !== undefined ? i === node.severity_filter : true;
 
 			if (node.problem_count[i] > 0 && is_severity_allowed) {
-				const severity = this.#getSeverity(i);
-
 				problems.push({
-					severity: severity.name,
-					class: severity.class,
-					class_status: severity.class_status,
+					label: this.#severities[i].label,
+					style: this.#severities[i].style,
+					status_style: this.#severities[i].status_style,
 					count: node.problem_count[i],
 					order: i,
 				});
@@ -499,13 +435,13 @@ class CNavigationTree {
 			hint.appendChild(row);
 
 			const color = document.createElement('span');
-			color.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_PROBLEMS_HINT_SEVERITY_COLOR, severity.class);
+			color.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_PROBLEMS_HINT_SEVERITY_COLOR, severity.style);
 
 			row.appendChild(color);
 
 			const name = document.createElement('span');
 			name.classList.add(CNavigationTree.ZBX_STYLE_NODE_INFO_PROBLEMS_HINT_SEVERITY_NAME);
-			name.innerText = `${severity.severity}: `;
+			name.innerText = `${severity.label}: `;
 
 			row.appendChild(name);
 
@@ -520,78 +456,97 @@ class CNavigationTree {
 	}
 
 	/**
-	 * Register events of navigation tree.
+	 * Register listeners of navigation tree.
 	 */
-	#registerEvents() {
-		this.#events = {
-			itemSelect: (e) => {
+	#registerListeners() {
+		this.#listeners = {
+			containerClick: e => {
 				if (e.target.closest('[data-hintbox="1"]') !== null) {
 					return;
 				}
 
-				const selected_node = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE}`);
-				const selected_id = selected_node.dataset.id;
-
-				this.#selected_id = selected_id;
-
-				for (const node of this.#tree_elements.nodes) {
-					node.classList.toggle(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED, node.dataset.id === selected_id);
-				}
-
-				this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_ITEM_SELECT, {
-					detail: {
-						id: selected_id
-					}
-				}));
-			},
-
-			groupToggle: (e) => {
 				const node = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE}`);
-				const arrow = e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
-				let is_open = false;
 
-				if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN)) {
-					node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-					arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
-
-					const inner_open_nodes = node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPEN}`);
-
-					for (const inner_open_node of inner_open_nodes) {
-						inner_open_node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-
-						const inner_arrow = inner_open_node
-							.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
-
-						inner_arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
-					}
-				}
-				else {
-					node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-					arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_RIGHT, ZBX_STYLE_ARROW_DOWN);
-
-					is_open = true;
+				if (node === null) {
+					return;
 				}
 
-				this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_GROUP_TOGGLE, {
-					detail: {
-						group_identifier: JSON.parse(node.dataset.group_identifier),
-						is_open
-					}
-				}));
+				if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_ITEM)) {
+					this.#selectItem(node);
+				}
+				else if (e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`)) {
+					this.#toggleGroup(node);
+				}
 			}
 		};
 	}
 
 	/**
-	 * Activate events of navigation tree.
+	 * Activate listeners of navigation tree.
 	 */
-	#activateEvents() {
-		for (const item of this.#tree_elements.items) {
-			item.addEventListener('click', this.#events.itemSelect);
+	#activateListeners() {
+		this.#container.addEventListener('click', this.#listeners.containerClick);
+	}
+
+	/**
+	 * Select item of navigation tree.
+	 *
+	 * @param {HTMLElement} node  Node element of item to select.
+	 */
+	#selectItem(node) {
+		this.#selected_id = node.dataset.id;
+
+		const item_nodes = this.#container.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_ITEM}`);
+
+		for (const item_node of item_nodes) {
+			item_node.classList.toggle(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED,
+				item_node.dataset.id === this.#selected_id
+			);
 		}
 
-		for (const arrow of this.#tree_elements.arrows) {
-			arrow.addEventListener('click', this.#events.groupToggle);
+		this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_ITEM_SELECT, {
+			detail: {
+				id: this.#selected_id
+			}
+		}));
+	}
+
+	/**
+	 * Toggle group of navigation tree.
+	 *
+	 * @param {HTMLElement} node  Node element of group to toggle.
+	 */
+	#toggleGroup(node) {
+		const arrow = node.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
+		let is_open = false;
+
+		if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN)) {
+			node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+			arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
+
+			const inner_open_nodes = node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPEN}`);
+
+			for (const inner_open_node of inner_open_nodes) {
+				inner_open_node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+
+				const inner_arrow = inner_open_node
+					.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
+
+				inner_arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
+			}
 		}
+		else {
+			node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+			arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_RIGHT, ZBX_STYLE_ARROW_DOWN);
+
+			is_open = true;
+		}
+
+		this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_GROUP_TOGGLE, {
+			detail: {
+				group_identifier: JSON.parse(node.dataset.group_identifier),
+				is_open
+			}
+		}));
 	}
 }

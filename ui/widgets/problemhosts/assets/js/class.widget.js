@@ -21,9 +21,9 @@
 class CWidgetProblemHosts extends CWidget {
 
 	/**
-	 * Table of problem hosts.
+	 * Table body of problem hosts.
 	 *
-	 * @type {HTMLTableElement|null}
+	 * @type {HTMLElement|null}
 	 */
 	#table_body = null;
 
@@ -51,7 +51,7 @@ class CWidgetProblemHosts extends CWidget {
 				const row = this.#table_body.querySelector(`tr[data-hostgroupid="${this.#selected_host_group_id}"]`);
 
 				if (row !== null) {
-					this.#selectHostGroup(row);
+					this.#selectHostGroup();
 				}
 				else {
 					this.#selected_host_group_id = '';
@@ -65,8 +65,8 @@ class CWidgetProblemHosts extends CWidget {
 
 	#registerListeners() {
 		this.#listeners = {
-			click: e => {
-				if (e.target.closest('a') !== null) {
+			tableBodyClick: e => {
+				if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
 					return;
 				}
 
@@ -75,10 +75,10 @@ class CWidgetProblemHosts extends CWidget {
 				if (row !== null) {
 					const hostgroupid = row.dataset.hostgroupid;
 
-					if (hostgroupid !== undefined && hostgroupid !== this.#selected_host_group_id) {
+					if (hostgroupid !== undefined) {
 						this.#selected_host_group_id = hostgroupid;
 
-						this.#selectHostGroup(row);
+						this.#selectHostGroup();
 
 						this.broadcast({
 							[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: [hostgroupid],
@@ -91,7 +91,7 @@ class CWidgetProblemHosts extends CWidget {
 	}
 
 	#activateListeners() {
-		this.#table_body.addEventListener('click', this.#listeners.click);
+		this.#table_body.addEventListener('click', this.#listeners.tableBodyClick);
 	}
 
 	/**

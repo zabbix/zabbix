@@ -17,7 +17,15 @@
 			"groupids": {
 				"type": "_hostgroupids"
 			}
-		}
+		},
+		"out": [
+			{
+				"type": "_hostgroupid"
+			},
+			{
+				"type": "_hostgroupids"
+			}
+		]
 	},
 	"actions": {
 		"widget.problemsbysv.view": {

@@ -2286,8 +2286,8 @@ class CDashboard {
 			dashboardPageWidgetActions: e => {
 				const menu = e.detail.widget.getActionsContextMenu({
 					can_copy_widget: this._can_edit_dashboards
-						&& (this._data.templateid === null || !this.#broadcast_cache.has('_hostid')
-							|| this.#broadcast_cache.get('_hostid') === null
+						&& (this._data.templateid === null || !this.#broadcast_cache.has(CWidgetsData.DATA_TYPE_HOST_ID)
+							|| this.#broadcast_cache.get(CWidgetsData.DATA_TYPE_HOST_ID) === null
 						),
 					can_paste_widget: this._can_edit_dashboards && this.getStoredWidgetDataCopy() !== null
 				});

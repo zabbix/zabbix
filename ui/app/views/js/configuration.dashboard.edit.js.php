@@ -65,8 +65,9 @@
 				can_edit_dashboards: true,
 				is_kiosk_mode: false,
 				broadcast_options: {
-					_hostid: {rebroadcast: false},
-					_timeperiod: {rebroadcast: true}
+					[CWidgetsData.DATA_TYPE_HOST_ID]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: {rebroadcast: true}
 				}
 			});
 
@@ -85,7 +86,7 @@
 				to_ts: dashboard_time_period.to_ts
 			};
 
-			CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+			CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
 
 			ZABBIX.Dashboard.broadcast({
 				[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),

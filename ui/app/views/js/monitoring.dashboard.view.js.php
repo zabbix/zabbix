@@ -90,8 +90,9 @@
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				broadcast_options: {
-					_hostid: {rebroadcast: false},
-					_timeperiod: {rebroadcast: true}
+					[CWidgetsData.DATA_TYPE_HOST_ID]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: {rebroadcast: true}
 				},
 				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
@@ -111,7 +112,7 @@
 				to_ts: dashboard_time_period.to_ts
 			};
 
-			CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+			CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
 
 			ZABBIX.Dashboard.broadcast({
 				[CWidgetsData.DATA_TYPE_HOST_ID]: dashboard_host !== null
@@ -150,12 +151,13 @@
 			ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, this.events.feedback);
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
-			if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
+			if (CWidgetsData.DATA_TYPE_HOST_ID in broadcast_requirements
+					|| CWidgetsData.DATA_TYPE_HOST_IDS in broadcast_requirements) {
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
 				window.addEventListener('popstate', this.events.popState);
 			}
 
-			if ('_timeperiod' in broadcast_requirements) {
+			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {
 				jQuery.subscribe('timeselector.rangeupdate', this.events.timeSelectorRangeUpdate);
 			}
 
@@ -451,7 +453,7 @@
 					curl.setArgument('dashboardid', view.dashboard.dashboardid);
 				}
 
-				if ('_timeperiod' in view.broadcast_requirements) {
+				if (CWidgetsData.DATA_TYPE_TIME_PERIOD in view.broadcast_requirements) {
 					curl.setArgument('from', view.dashboard_time_period.from);
 					curl.setArgument('to', view.dashboard_time_period.to);
 				}
@@ -525,7 +527,7 @@
 					to_ts: data.to_ts
 				};
 
-				CWidgetsData.setDefault('_timeperiod', time_period, {is_comparable: false});
+				CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
 
 				ZABBIX.Dashboard.broadcast({
 					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
@@ -533,7 +535,7 @@
 			},
 
 			feedback(e) {
-				if (e.detail.type === '_timeperiod' && e.detail.value !== null) {
+				if (e.detail.type === CWidgetsData.DATA_TYPE_TIME_PERIOD && e.detail.value !== null) {
 					view.skip_time_selector_range_update = true;
 
 					$.publish('timeselector.rangechange', {

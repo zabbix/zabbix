@@ -1,0 +1,107 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2024 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+class CWidgetTopHosts extends CWidget {
+
+	/**
+	 * Table body of top hosts.
+	 *
+	 * @type {HTMLElement|null}
+	 */
+	#table_body = null;
+
+	/**
+	 * Listeners of top hosts widget.
+	 *
+	 * @type {Object}
+	 */
+	#listeners = {};
+
+	/**
+	 * ID of selected host.
+	 *
+	 * @type {string}
+	 */
+	#selected_host_id = '';
+
+	setContents(response) {
+		super.setContents(response);
+
+		this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
+
+		if (this.#table_body !== null) {
+			if (this.#selected_host_id !== '') {
+				const row = this.#table_body.querySelector(`tr[data-hostid="${this.#selected_host_id}"]`);
+
+				if (row !== null) {
+					this.#selectHost();
+				}
+				else {
+					this.#selected_host_id = '';
+				}
+			}
+
+			this.#registerListeners();
+			this.#activateListeners();
+		}
+	}
+
+	#registerListeners() {
+		this.#listeners = {
+			tableBodyClick: e => {
+				if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
+					return;
+				}
+
+				const row = e.target.closest('tr');
+
+				if (row !== null) {
+					const hostid = row.dataset.hostid;
+
+					if (hostid !== undefined) {
+						this.#selected_host_id = hostid;
+
+						this.#selectHost();
+
+						this.broadcast({
+							[CWidgetsData.DATA_TYPE_HOST_ID]: [hostid],
+							[CWidgetsData.DATA_TYPE_HOST_IDS]: [hostid]
+						});
+					}
+				}
+			},
+		};
+	}
+
+	#activateListeners() {
+		this.#table_body.addEventListener('click', this.#listeners.tableBodyClick);
+	}
+
+	/**
+	 * Select host row.
+	 */
+	#selectHost() {
+		const rows = this.#table_body.querySelectorAll('tr[data-hostid]');
+
+		for (const row of rows) {
+			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostid === this.#selected_host_id);
+		}
+	}
+}

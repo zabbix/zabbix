@@ -103,11 +103,11 @@ class CWidgetHoneycomb extends CWidget {
 	}
 
 	onFeedback({type, value, descriptor}) {
-		if (type === '_itemid') {
+		if (type === CWidgetsData.DATA_TYPE_ITEM_ID) {
 			return this.#honeycomb.selectCell(value);
 		}
 
-		return super.onFeedback({type, value, descriptor});
+		return false;
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {

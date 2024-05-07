@@ -338,6 +338,10 @@ class C64ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertDashboards(array $dashboards): array {
+		$new_broadcasting_widgets = ['graph', 'graphprototype', 'plaintext', 'problemhosts', 'problems', 'svggraph',
+			'tophosts', 'web'
+		];
+
 		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
 				continue;
@@ -351,7 +355,7 @@ class C64ImportConverter extends CConverter {
 				}
 
 				foreach ($dashboard_page['widgets'] as &$widget) {
-					if (in_array($widget['type'], ['graph', 'svggraph', 'graphprototype'])) {
+					if (in_array($widget['type'], $new_broadcasting_widgets)) {
 						$reference = self::createWidgetReference($reference_index++);
 
 						if (!array_key_exists('fields', $widget)) {

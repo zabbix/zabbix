@@ -131,7 +131,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
 					'data' => $value['items'],
-					'placeholder' => _('item pattern'),
+					'placeholder' => _('item patterns'),
 					'wildcard_allowed' => 1,
 					'popup' => [
 						'parameters' => [
@@ -152,7 +152,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					'name' => $field_name.'['.$row_num.'][hosts][]',
 					'object_name' => 'hosts',
 					'data' => $value['hosts'],
-					'placeholder' => _('host pattern'),
+					'placeholder' => _('host patterns'),
 					'wildcard_allowed' => 1,
 					'popup' => [
 						'parameters' => [
@@ -169,7 +169,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
 					'data' => $value['items'],
-					'placeholder' => _('item pattern'),
+					'placeholder' => _('item patterns'),
 					'wildcard_allowed' => 1,
 					'popup' => [
 						'parameters' => [
