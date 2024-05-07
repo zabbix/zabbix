@@ -32,11 +32,6 @@ const STEP_DB_CONNECTION	= 3;
 const STEP_SETTINGS			= 4;
 
 const view = new class {
-
-	constructor() {
-		this._is_endpoint_default = true;
-	}
-
 	init({step, hashicorp_endpoint_default, cyberark_endpoint_default}) {
 		this._hashicorp_endpoint_default = hashicorp_endpoint_default;
 		this._cyberark_endpoint_default = cyberark_endpoint_default;
@@ -53,6 +48,19 @@ const view = new class {
 						'vault_certificates_toggle', 'vault_url']) {
 					document.getElementById(id).addEventListener('change', () => this._update());
 				}
+
+				form.addEventListener('submit', () => {
+					const input_ids = ['server', 'database', 'schema', 'vault_url', 'vault_prefix_hashicorp',
+						'vault_prefix_cyberark', 'vault_db_path', 'vault_query_string', 'vault_token',
+						'vault_cert_file', 'vault_key_file', 'ca_file', 'key_file', 'cert_file'
+					];
+
+					for (const id of input_ids) {
+						const input = document.getElementById(id);
+
+						input.value = input.value.trim();
+					}
+				});
 
 				this._update();
 				break;
@@ -96,14 +104,16 @@ const view = new class {
 			'db_verify_host_row': encryption_customizable,
 			'db_cipher_row': encryption_customizable && db_type === ZBX_DB_MYSQL,
 			'vault_url_row': vault_enabled,
+			'vault_prefix_hashicorp_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP,
 			'vault_db_path_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP,
 			'vault_token_row': vault_selected == DB_STORE_CREDS_VAULT_HASHICORP,
 			'db_user': !vault_enabled,
 			'db_password': !vault_enabled,
+			'vault_prefix_cyberark_row': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK,
 			'vault_query_string_row': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK,
-			'vault_certificates': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK,
-			'vault_cert_file': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK && vault_certificates_enabled,
-			'vault_key_file': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK && vault_certificates_enabled
+			'vault_certificates_row': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK,
+			'vault_cert_file_row': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK && vault_certificates_enabled,
+			'vault_key_file_row': vault_selected == DB_STORE_CREDS_VAULT_CYBERARK && vault_certificates_enabled
 		};
 
 		for (let id in rows) {
@@ -125,7 +135,7 @@ const view = new class {
 				&& [this._hashicorp_endpoint_default, this._cyberark_endpoint_default].includes(vault_url.value)) {
 			vault_url.value = vault_selected == DB_STORE_CREDS_VAULT_CYBERARK
 				? this._cyberark_endpoint_default
-				: this._hashicorp_endpoint_default
+				: this._hashicorp_endpoint_default;
 		}
 
 		// TLS encryption checkbox and secure connection hint message.

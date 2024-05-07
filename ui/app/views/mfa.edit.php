@@ -64,7 +64,7 @@ $form
 		->addItem([
 			(new CLabel([
 				_('Name'),
-				makeHelpIcon(_('Shown as the account name to all MFA users in authenticator apps.'))
+				makeHelpIcon(_('Shown as the label to all MFA users in authenticator apps.'))
 			], 'name'))->setAsteriskMark(),
 			new CFormField(
 				(new CTextBox('name', $data['name'], false, DB::getFieldLength('mfa', 'name')))

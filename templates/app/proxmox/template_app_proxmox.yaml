@@ -675,15 +675,11 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              units: '%'
               description: 'CPU average load.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.loadavg
-                - type: MULTIPLIER
-                  parameters:
-                    - '100'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m

@@ -394,35 +394,12 @@ class CAction extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-
-			foreach ($result as &$action) {
-				// unset the fields that are returned in the filter
-				unset($action['formula'], $action['evaltype']);
-
-				if ($options['selectFilter'] !== null) {
-					$filter = $this->unsetExtraFields(
-						[$action['filter']],
-						['conditions', 'formula', 'evaltype'],
-						$options['selectFilter']
-					);
-					$filter = reset($filter);
-
-					if (isset($filter['conditions'])) {
-						foreach ($filter['conditions'] as &$condition) {
-							unset($condition['actionid'], $condition['conditionid']);
-						}
-						unset($condition);
-					}
-
-					$action['filter'] = $filter;
-				}
-			}
-			unset($action);
+			$result = $this->unsetExtraFields($result, ['formula', 'evaltype']);
+			$result = $this->unsetExtraFields($result, ['eventsource'], $options['output']);
 		}
 
-		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
 
 		return $result;
@@ -597,11 +574,14 @@ class CAction extends CApiService {
 				continue;
 			}
 
-			$action['filter']['formula'] = ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION)
-				? CConditionHelper::replaceLetterIds($action['filter']['formula'],
-					array_column($action['filter']['conditions'], 'conditionid', 'formulaid')
-				)
-				: '';
+			if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::replaceFormulaIds($action['filter']['formula'],
+					array_column($action['filter']['conditions'], null, 'conditionid')
+				);
+			}
+			else {
+				$action['filter']['formula'] = '';
+			}
 
 			$db_formula = $is_update ? $db_actions[$action['actionid']]['filter']['formula'] : '';
 
@@ -1504,77 +1484,71 @@ class CAction extends CApiService {
 
 		// adding formulas
 		if ($options['selectFilter'] !== null) {
-			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
-			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
-			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
+			$has_evaltype = $this->outputIsRequested('evaltype', $options['selectFilter']);
+			$has_formula = $this->outputIsRequested('formula', $options['selectFilter']);
+			$has_eval_formula = $this->outputIsRequested('eval_formula', $options['selectFilter']);
+			$has_conditions = $this->outputIsRequested('conditions', $options['selectFilter']);
 
-			$filters = [];
-			foreach ($result as $action) {
-				$filters[$action['actionid']] = [
-					'evaltype' => $action['evaltype'],
-					'formula' => isset($action['formula']) ? $action['formula'] : ''
-				];
-			}
-
-			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = API::getApiService()->select('conditions', [
-						'output' => ['actionid', 'conditionid', 'conditiontype', 'operator', 'value', 'value2'],
-						'filter' => ['actionid' => $actionIds],
-					'preservekeys' => true
-				]);
-
-				$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
-				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
-
-				foreach ($filters as &$filter) {
-					// in case of a custom expression - use the given formula
-					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $filter['formula'];
-					}
-					// in other cases - generate the formula automatically
-					else {
-						$conditions = $filter['conditions'];
-
-						// sort conditions
-						$sortFields = [
-							['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN],
-							['field' => 'operator', 'order' => ZBX_SORT_DOWN],
-							['field' => 'value2', 'order' => ZBX_SORT_DOWN],
-							['field' => 'value', 'order' => ZBX_SORT_DOWN]
-						];
-						CArrayHelper::sort($conditions, $sortFields);
-
-						$conditionsForFormula = [];
-						foreach ($conditions as $condition) {
-							$conditionsForFormula[$condition['conditionid']] = $condition['conditiontype'];
-						}
-						$formula = CConditionHelper::getFormula($conditionsForFormula, $filter['evaltype']);
-					}
-
-					// generate formulaids from the effective formula
-					$formulaIds = CConditionHelper::getFormulaIds($formula);
-					foreach ($filter['conditions'] as &$condition) {
-						$condition['formulaid'] = $formulaIds[$condition['conditionid']];
-					}
-					unset($condition);
-
-					// generated a letter based formula only for actions with custom expressions
-					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
-					}
-
-					if ($evalFormulaRequested) {
-						$filter['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
-					}
-				}
-				unset($filter);
-			}
-
-			// add filters to the result
 			foreach ($result as &$action) {
-				$action['filter'] = $filters[$action['actionid']];
+				$action['filter'] = [];
+
+				if ($has_evaltype) {
+					$action['filter']['evaltype'] = $action['evaltype'];
+				}
 			}
 			unset($action);
+
+			if ($has_formula || $has_eval_formula || $has_conditions) {
+				$db_conditions = DBselect(
+					'SELECT c.actionid,c.conditionid,c.conditiontype,c.operator,c.value,c.value2'.
+					' FROM conditions c'.
+					' WHERE '.dbConditionInt('c.actionid', $actionIds)
+				);
+
+				$action_conditions = [];
+
+				while ($db_condition = DBfetch($db_conditions)) {
+					$action_conditions[$db_condition['actionid']][$db_condition['conditionid']] =
+						array_diff_key($db_condition, array_flip(['conditionid', 'actionid']));
+				}
+
+				foreach ($result as &$action) {
+					$eval_formula = '';
+					$conditions = array_key_exists($action['actionid'], $action_conditions)
+						? $action_conditions[$action['actionid']]
+						: [];
+
+					if ($action['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $action['formula']);
+
+						$eval_formula = $action['formula'];
+					}
+					else {
+						CConditionHelper::sortActionConditions($conditions, (int) $action['eventsource']);
+
+						$eval_formula =
+							CConditionHelper::getEvalFormula($conditions, 'conditiontype', (int) $action['evaltype']);
+					}
+
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
+
+					if ($has_formula) {
+						$action['filter']['formula'] = $action['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+							? $eval_formula
+							: '';
+					}
+
+					if ($has_eval_formula) {
+						$action['filter']['eval_formula'] = $eval_formula;
+					}
+
+					if ($has_conditions) {
+						$action['filter']['conditions'] = array_values($conditions);
+					}
+				}
+				unset($action);
+			}
 		}
 
 		// Adding operations.
@@ -2199,6 +2173,7 @@ class CAction extends CApiService {
 				|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
 				|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
 
+				$sqlParts = $this->addQuerySelect('a.eventsource', $sqlParts);
 				$sqlParts = $this->addQuerySelect('a.formula', $sqlParts);
 				$sqlParts = $this->addQuerySelect('a.evaltype', $sqlParts);
 			}
@@ -3469,14 +3444,9 @@ class CAction extends CApiService {
 
 			foreach ($db_actions as &$db_action) {
 				if ($db_action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$formula = $db_action['filter']['formula'];
-
-					$formulaids = CConditionHelper::getFormulaIds($formula);
-
-					foreach ($db_action['filter']['conditions'] as &$db_condition) {
-						$db_condition['formulaid'] = $formulaids[$db_condition['conditionid']];
-					}
-					unset($db_condition);
+					CConditionHelper::addFormulaIds($db_action['filter']['conditions'],
+						$db_action['filter']['formula']
+					);
 				}
 			}
 			unset($db_action);

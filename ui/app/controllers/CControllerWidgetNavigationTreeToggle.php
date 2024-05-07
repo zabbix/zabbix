@@ -62,9 +62,9 @@ class CControllerWidgetNavigationTreeToggle extends CController {
 		$open_group_indexes = [];
 
 		foreach ($open_groupids as $open_groupid) {
-			$open_group = CProfile::get($open_groupid, [], $widgetid);
+			$open_group = CProfile::get($open_groupid, null, $widgetid);
 
-			if ($open_group) {
+			if ($open_group !== null) {
 				$open_group_index = substr($open_groupid, strrpos($open_groupid, '.') + 1);
 				$open_group_indexes[] = (int) $open_group_index;
 

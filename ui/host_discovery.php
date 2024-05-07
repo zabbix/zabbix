@@ -540,6 +540,23 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
 		];
 
+		if ($input['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			foreach ($input['filter']['conditions'] as &$condition) {
+				unset($condition['formulaid']);
+			}
+			unset($condition);
+		}
+
+		foreach ($input['overrides'] as &$override) {
+			if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+				foreach ($override['filter']['conditions'] as &$condition) {
+					unset($condition['formulaid']);
+				}
+				unset($condition);
+			}
+		}
+		unset($override);
+
 		$result = true;
 
 		if ($input['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY) {
@@ -727,7 +744,7 @@ if (hasRequest('form')) {
 
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
-	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
+	$data['conditions'] = getRequest('conditions', []);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $host;
@@ -799,7 +816,7 @@ if (hasRequest('form')) {
 			: ZBX_LLD_RULE_ENABLED_LIFETIME;
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
-		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);
+		$data['conditions'] = $item['filter']['conditions'];
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
