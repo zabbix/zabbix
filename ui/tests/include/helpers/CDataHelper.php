@@ -424,11 +424,26 @@ class CDataHelper extends CAPIHelper {
 	/**
 	 * Remove item data from history and trends tables.
 	 *
-	 * @param string $itemid		item id
+	 * @param string|array $itemids		item id(s)
 	 */
-	public static function removeItemData($itemid) {
-		DBexecute('DELETE FROM history'.self::getItemDataTableSuffix($itemid).' WHERE itemid='.zbx_dbstr($itemid));
-		DBexecute('DELETE FROM trends WHERE itemid='.zbx_dbstr($itemid));
+	public static function removeItemData($itemids) {
+		$groups = [];
+
+		if (!is_array($itemids)) {
+			$itemids = [$itemids];
+		}
+
+		foreach ($itemids as $itemid) {
+			$groups[self::getItemDataTableSuffix($itemid)][] = zbx_dbstr($itemid);
+		}
+
+		foreach (array_keys($groups) as $suffix) {
+			DBexecute('DELETE FROM history'.$suffix.' WHERE itemid IN ('.implode(',', $groups[$suffix]).')');
+
+			if ($suffix === '_uint' || $suffix === '') {
+				DBexecute('DELETE FROM trends'.$suffix.' WHERE itemid IN ('.implode(',', $groups[$suffix]).')');
+			}
+		}
 	}
 
 	/**

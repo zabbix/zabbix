@@ -70,7 +70,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	protected static $host_prototypeid_remove_inherited;
 
 	public $vault_object = 'host prototype';
-	public $hashi_error_field = '/1/macros/6/value';
+	public $hashi_error_field = '/1/macros/7/value';
 	public $cyber_error_field = '/1/macros/4/value';
 	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
 	public $vault_macro_index = 0;

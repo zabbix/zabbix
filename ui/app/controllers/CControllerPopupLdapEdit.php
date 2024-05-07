@@ -207,16 +207,19 @@ class CControllerPopupLdapEdit extends CController {
 	}
 
 	private function validateProvisionMedia(): bool {
-		if (!$this->hasInput('provision_media')) {
-			return true;
-		}
+		$validation_rules = [
+			'mediatypeid' =>	'db media_type.mediatypeid',
+			'name' =>			'required|string|not_empty',
+			'attribute' =>		'required|string|not_empty',
+			'period' =>			'time_periods',
+			'severity' =>		'int32|ge 0|le '.(pow(2, TRIGGER_SEVERITY_COUNT) - 1),
+			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])
+		];
 
-		foreach ($this->getInput('provision_media') as $media) {
-			if (!is_array($media)
-					|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
-					|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
-						|| $media['attribute'] === ''
-					|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
+		foreach ($this->getInput('provision_media', []) as $provision_media) {
+			$validator = new CNewValidator($provision_media, $validation_rules);
+
+			if ($validator->isError()) {
 				return false;
 			}
 		}

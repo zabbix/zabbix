@@ -192,7 +192,7 @@ static int	sql_writer_flush(void)
  *                                                                                                                *
  ******************************************************************************************************************/
 
-static void	add_history_dbl(const zbx_vector_ptr_t *history)
+static void	add_history_dbl(const zbx_vector_dc_history_ptr_t *history)
 {
 	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
@@ -200,7 +200,7 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 
 	for (int i = 0; i < history->values_num; i++)
 	{
-		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
+		const zbx_dc_history_t	*h = history->values[i];
 
 		if (ITEM_VALUE_TYPE_FLOAT != h->value_type)
 			continue;
@@ -211,7 +211,7 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-static void	add_history_uint(const zbx_vector_ptr_t *history)
+static void	add_history_uint(const zbx_vector_dc_history_ptr_t *history)
 {
 	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
@@ -219,7 +219,7 @@ static void	add_history_uint(const zbx_vector_ptr_t *history)
 
 	for (int i = 0; i < history->values_num; i++)
 	{
-		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
+		const zbx_dc_history_t	*h = history->values[i];
 
 		if (ITEM_VALUE_TYPE_UINT64 != h->value_type)
 			continue;
@@ -230,7 +230,7 @@ static void	add_history_uint(const zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-static void	add_history_str(const zbx_vector_ptr_t *history)
+static void	add_history_str(const zbx_vector_dc_history_ptr_t *history)
 {
 	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
@@ -238,7 +238,7 @@ static void	add_history_str(const zbx_vector_ptr_t *history)
 
 	for (int i = 0; i < history->values_num; i++)
 	{
-		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
+		const zbx_dc_history_t	*h = history->values[i];
 
 		if (ITEM_VALUE_TYPE_STR != h->value_type)
 			continue;
@@ -249,7 +249,7 @@ static void	add_history_str(const zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-static void	add_history_text(const zbx_vector_ptr_t *history)
+static void	add_history_text(const zbx_vector_dc_history_ptr_t *history)
 {
 	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
@@ -257,7 +257,7 @@ static void	add_history_text(const zbx_vector_ptr_t *history)
 
 	for (int i = 0; i < history->values_num; i++)
 	{
-		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
+		const zbx_dc_history_t	*h = history->values[i];
 
 		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
 			continue;
@@ -268,7 +268,7 @@ static void	add_history_text(const zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-static void	add_history_log(const zbx_vector_ptr_t *history)
+static void	add_history_log(const zbx_vector_dc_history_ptr_t *history)
 {
 	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
@@ -277,7 +277,7 @@ static void	add_history_log(const zbx_vector_ptr_t *history)
 
 	for (int i = 0; i < history->values_num; i++)
 	{
-		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
+		const zbx_dc_history_t	*h = history->values[i];
 		const zbx_log_value_t	*log;
 
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
@@ -292,7 +292,7 @@ static void	add_history_log(const zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-static void	add_history_bin(const zbx_vector_ptr_t *history)
+static void	add_history_bin(const zbx_vector_dc_history_ptr_t *history)
 {
 	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
@@ -300,7 +300,7 @@ static void	add_history_bin(const zbx_vector_ptr_t *history)
 
 	for (int i = 0; i < history->values_num; i++)
 	{
-		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
+		const zbx_dc_history_t	*h = history->values[i];
 
 		if (ITEM_VALUE_TYPE_BIN != h->value_type)
 			continue;
@@ -655,7 +655,7 @@ static int	sql_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int st
  *                                           compatible with elastic version of _add_values   *
  *                                                                                            *
  *********************************************************************************************/
-static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history,
+static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_history_ptr_t *history,
 		int config_history_storage_pipelines)
 {
 	int	i, h_num = 0;
@@ -664,7 +664,7 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		const zbx_dc_history_t	*h = (zbx_dc_history_t *)history->values[i];
+		const zbx_dc_history_t	*h = history->values[i];
 
 		if (h->value_type == hist->value_type)
 			h_num++;

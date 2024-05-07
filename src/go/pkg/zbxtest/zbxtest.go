@@ -20,7 +20,7 @@
 package zbxtest
 
 import (
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 type MockEmptyCtx struct {

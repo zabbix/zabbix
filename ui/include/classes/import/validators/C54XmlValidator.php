@@ -1989,7 +1989,7 @@ class C54XmlValidator extends CXmlValidatorGeneral {
 					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => $this->SMTP_AUTHENTICATION],
 					'username' =>				['type' => XML_STRING, 'default' => ''],
 					'password' =>				['type' => XML_STRING, 'default' => ''],
-					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
+					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::MESSAGE_FORMAT_HTML, 'in' => [CXmlConstantValue::MESSAGE_FORMAT_TEXT => CXmlConstantName::MESSAGE_FORMAT_TEXT, CXmlConstantValue::MESSAGE_FORMAT_HTML => CXmlConstantName::MESSAGE_FORMAT_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
 					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],

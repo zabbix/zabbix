@@ -230,8 +230,7 @@ class CAuthentication extends CApiService {
 	}
 
 	private static function checkMfaExists(array $auth, array $db_auth): void {
-		if ($auth['mfa_status'] != $db_auth['mfa_status'] || $auth['mfa_status'] == MFA_ENABLED
-				|| $db_auth['mfaid'] != 0) {
+		if ($auth['mfa_status'] == MFA_ENABLED) {
 			$mfa_count = DB::select('mfa', ['countOutput' => true]);
 
 			if ($mfa_count == 0) {

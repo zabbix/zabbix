@@ -306,7 +306,7 @@ class CControllerUsergroupEdit extends CController {
 	 */
 	private function getUsersMs() {
 		$options = [
-			'output' => ['userid', 'username', 'name', 'surname']
+			'output' => ['userid', 'username', 'name', 'surname', 'userdirectoryid']
 		];
 
 		if ($this->hasInput('usrgrpid') && !$this->hasInput('form_refresh')) {
@@ -322,7 +322,9 @@ class CControllerUsergroupEdit extends CController {
 
 		$users_ms = [];
 		foreach ($users as $user) {
-			$users_ms[] = ['id' => $user['userid'], 'name' => getUserFullname($user)];
+			$users_ms[] = ['id' => $user['userid'], 'name' => getUserFullname($user),
+				'disabled' => (bool) $user['userdirectoryid']
+			];
 		}
 
 		CArrayHelper::sort($users_ms, ['name']);

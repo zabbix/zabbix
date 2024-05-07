@@ -433,7 +433,8 @@ class CApiService {
 				$r_table = DB::getSchema($left_join['table']);
 
 				// Increase count when table linked by non-unique column.
-				if ($left_join['using'] !== $r_table['key']) {
+				if ((array_key_exists('using', $left_join) && $left_join['using'] !== $r_table['key'])
+						|| (!array_key_exists('using', $left_join) && $left_join['use_distinct'])) {
 					$count++;
 					break;
 				}
@@ -456,9 +457,11 @@ class CApiService {
 			$l_table = DB::getSchema($sqlParts['left_table']['table']);
 
 			foreach ($sqlParts['left_join'] as $left_join) {
-				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].
-					' ON '.$sqlParts['left_table']['alias'].'.'.$l_table['key'].
-					'='.$left_join['alias'].'.'.$left_join['using'];
+				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].' ON ';
+				$sql_left_join .= array_key_exists('condition', $left_join)
+					? $left_join['condition']
+					: $sqlParts['left_table']['alias'].'.'.$l_table['key'].'='.
+						$left_join['alias'].'.'.$left_join['using'];
 			}
 
 			// Moving a left table to the end.

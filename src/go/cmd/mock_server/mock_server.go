@@ -28,9 +28,9 @@ import (
 	"strconv"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/pkg/zbxcomms"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
 )
 
 type MockServerOptions struct {

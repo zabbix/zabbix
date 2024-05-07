@@ -75,7 +75,11 @@ function disableItemTestForm() {
 		<?php endif ?>
 
 		<?php if ($data['proxies_enabled']): ?>
-			jQuery('#proxyid').prop('disabled', true);
+			for (const element of document.querySelectorAll('#test_with input')) {
+				element.disabled = true;
+			}
+
+			jQuery('#proxyid').multiSelect('disable');
 		<?php endif ?>
 
 	<?php else: ?>
@@ -107,7 +111,11 @@ function enableItemTestForm() {
 		<?php endif ?>
 
 		<?php if ($data['proxies_enabled']): ?>
-			jQuery('#proxyid').prop('disabled', false);
+			for (const element of document.querySelectorAll('#test_with input')) {
+				element.disabled = false;
+			}
+
+			jQuery('#proxyid').multiSelect('enable');
 		<?php endif ?>
 
 	<?php else: ?>
@@ -164,6 +172,7 @@ function itemGetValueTest(overlay) {
 			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
+		test_with: form_data['test_with'],
 		proxyid: form_data['proxyid'],
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
@@ -255,6 +264,7 @@ function itemCompleteTest(overlay) {
 			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
+		test_with: form_data['test_with'],
 		proxyid: form_data['proxyid'],
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
 		test_type: <?= $data['test_type'] ?>,
@@ -438,9 +448,13 @@ function saveItemTestInputs() {
 			input_values.runtime_error = jQuery('#runtime_error').multilineInput('value');
 		}
 
+		const test_with = $form[0].querySelector('[name="test_with"]:checked').value;
+		const proxyid = jQuery('#proxyid', $form).multiSelect('getData').map((proxy) => proxy.id)[0] || 0;
+
 		input_values = jQuery.extend(input_values, {
 			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
-			proxyid: jQuery('#proxyid', $form).val(),
+			test_with,
+			proxyid: test_with == <?= CControllerPopupItemTest::TEST_WITH_PROXY ?> ? proxyid : 0,
 			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val(),
@@ -518,8 +532,15 @@ jQuery(document).ready(function($) {
 	});
 
 	<?php if ($data['is_item_testable']): ?>
+		$('#proxyid').multiSelect();
+
+		document.getElementById('test_with').addEventListener('change', (e) => {
+			document.querySelector('.js-test-with-proxy').style.display =
+				e.target.value == <?= CControllerPopupItemTest::TEST_WITH_SERVER ?> ? 'none' : '';
+		});
+
 		$('#get_value').on('change', function() {
-			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
+			var $rows = $('.js-host-address-row, .js-test-with-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
 				$form = $('#preprocessing-test-form'),
 				$submit_btn = overlays_stack.getById('item-test').$btn_submit,
 				$not_supported = $('[name="not_supported"]', $form);
@@ -537,7 +558,11 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
-					$('#proxyid').prop('disabled', false);
+					for (const element of document.querySelectorAll('#test_with input')) {
+						element.disabled = false;
+					}
+
+					$('#proxyid').multiSelect('enable');
 				<?php endif ?>
 
 				<?php if ($data['interface_address_enabled']): ?>
@@ -614,7 +639,11 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
-					$('#proxyid').prop('disabled', true);
+					for (const element of document.querySelectorAll('#test_with input')) {
+						element.disabled = true;
+					}
+
+					$('#proxyid').multiSelect('disable');
 				<?php endif ?>
 
 				<?php if ($data['interface_address_enabled']): ?>

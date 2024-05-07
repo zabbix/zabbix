@@ -28,7 +28,7 @@ $form = (new CForm())
 	->setId('mediatype-message-form')
 	->addVar('action', 'mediatype.message.edit')
 	->addVar('type', $data['params']['type'])
-	->addVar('content_type', $data['params']['content_type'])
+	->addVar('message_format', $data['params']['message_format'])
 	->addVar('old_message_type', $data['params']['old_message_type'])
 	->addVar('message_types', $data['params']['message_types']);
 

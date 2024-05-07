@@ -433,7 +433,11 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 					'host' =>					['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
 					'description' =>			['type' => XML_STRING, 'default' => ''],
+					'monitored_by' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SERVER, 'in' => [CXmlConstantValue::SERVER => CXmlConstantName::SERVER, CXmlConstantValue::PROXY => CXmlConstantName::PROXY, CXmlConstantValue::PROXY_GROUP => CXmlConstantName::PROXY_GROUP]],
 					'proxy' =>					['type' => XML_ARRAY, 'rules' => [
+						'name' =>					['type' => XML_STRING | XML_REQUIRED]
+					]],
+					'proxy_group' =>			['type' => XML_ARRAY, 'rules' => [
 						'name' =>					['type' => XML_STRING | XML_REQUIRED]
 					]],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
@@ -2027,7 +2031,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => $this->SMTP_AUTHENTICATION],
 					'username' =>				['type' => XML_STRING, 'default' => ''],
 					'password' =>				['type' => XML_STRING, 'default' => ''],
-					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
+					'message_format' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::MESSAGE_FORMAT_HTML, 'in' => [CXmlConstantValue::MESSAGE_FORMAT_TEXT => CXmlConstantName::MESSAGE_FORMAT_TEXT, CXmlConstantValue::MESSAGE_FORMAT_HTML => CXmlConstantName::MESSAGE_FORMAT_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
 					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],

@@ -20,32 +20,27 @@ This template has been tested on:
 
 ## Setup
 
-Create a user to monitor the service:
+1. Create a user to monitor the service. For example, you could create a file `/etc/clickhouse-server/users.d/zabbix.xml` with the following content:
 
 ```
-create file /etc/clickhouse-server/users.d/zabbix.xml
 <yandex>
-    <users>
-      <zabbix>
-        <password>zabbix_pass</password>
-        <networks incl="networks" />
-        <profile>web</profile>
-        <quota>default</quota>
-        <allow_databases>
-          <database>test</database>
-        </allow_databases>
-      </zabbix>
-    </users>
-  </yandex>
-
+  <users>
+    <zabbix>
+      <password>zabbix_pass</password>
+      <networks incl="networks" />
+      <profile>web</profile>
+      <quota>default</quota>
+      <allow_databases>
+        <database>test</database>
+      </allow_databases>
+    </zabbix>
+  </users>
+</yandex>
 ```
 
-Login and password are also set in macros:
+2. Set the hostname or IP address of the ClickHouse HTTP endpoint in the `{$CLICKHOUSE.HOST}` macro. You can also change the port in the `{$CLICKHOUSE.PORT}` macro and scheme in the `{$CLICKHOUSE.SCHEME}` macro if necessary.
 
-- {$CLICKHOUSE.USER}
-- {$CLICKHOUSE.PASSWORD}
-If you don't need authentication - remove headers from HTTP-Agent type items
-
+3. Set the login and password in the macros `{$CLICKHOUSE.USER}` and `{$CLICKHOUSE.PASSWORD}`. If you don't need an authentication - remove headers from HTTP-Agent type items.
 
 ### Macros used
 
@@ -54,6 +49,7 @@ If you don't need authentication - remove headers from HTTP-Agent type items
 |{$CLICKHOUSE.USER}||`zabbix`|
 |{$CLICKHOUSE.PASSWORD}||`zabbix_pass`|
 |{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}|<p>Maximum number of network errors for trigger expression</p>|`5`|
+|{$CLICKHOUSE.HOST}|<p>The hostname or IP address of the ClickHouse HTTP endpoint.</p>|`<SET CLICKHOUSE HOST>`|
 |{$CLICKHOUSE.PORT}|<p>The port of ClickHouse HTTP endpoint</p>|`8123`|
 |{$CLICKHOUSE.SCHEME}|<p>Request scheme which may be http or https</p>|`http`|
 |{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases</p>|`.*`|
@@ -79,7 +75,7 @@ If you don't need authentication - remove headers from HTTP-Agent type items
 |ClickHouse: Get system.asynchronous_metrics|<p>Get metrics that are calculated periodically in the background</p>|HTTP agent|clickhouse.system.asynchronous_metrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p></li></ul>|
 |ClickHouse: Get system.settings|<p>Get information about settings that are currently in use.</p>|HTTP agent|clickhouse.system.settings<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |ClickHouse: Longest currently running query time|<p>Get longest running query.</p>|HTTP agent|clickhouse.process.elapsed|
-|ClickHouse: Check port availability||Simple check|net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|ClickHouse: Check port availability||Simple check|net.tcp.service[{$CLICKHOUSE.SCHEME},"{$CLICKHOUSE.HOST}","{$CLICKHOUSE.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |ClickHouse: Ping||HTTP agent|clickhouse.ping<p>**Preprocessing**</p><ul><li><p>Regular expression: `Ok\. 1`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |ClickHouse: Version|<p>Version of the server</p>|HTTP agent|clickhouse.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |ClickHouse: Revision|<p>Revision of the server.</p>|Dependent item|clickhouse.revision<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "Revision")].value.first()`</p></li></ul>|
@@ -136,8 +132,8 @@ If you don't need authentication - remove headers from HTTP-Agent type items
 |----|-----------|----------|--------|--------------------------------|
 |ClickHouse: Configuration has been changed|<p>ClickHouse configuration has been changed. Acknowledge to close the problem manually.</p>|`last(/ClickHouse by HTTP/clickhouse.system.settings,#1)<>last(/ClickHouse by HTTP/clickhouse.system.settings,#2) and length(last(/ClickHouse by HTTP/clickhouse.system.settings))>0`|Info|**Manual close**: Yes|
 |ClickHouse: There are queries running is long||`last(/ClickHouse by HTTP/clickhouse.process.elapsed)>{$CLICKHOUSE.QUERY_TIME.MAX.WARN}`|Average|**Manual close**: Yes|
-|ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable||`last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"])=0`|Average|**Manual close**: Yes|
-|ClickHouse: Service is down||`last(/ClickHouse by HTTP/clickhouse.ping)=0 or last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{HOST.CONN}","{$CLICKHOUSE.PORT}"]) = 0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable</li></ul>|
+|ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable||`last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{$CLICKHOUSE.HOST}","{$CLICKHOUSE.PORT}"])=0`|Average|**Manual close**: Yes|
+|ClickHouse: Service is down||`last(/ClickHouse by HTTP/clickhouse.ping)=0 or last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{$CLICKHOUSE.HOST}","{$CLICKHOUSE.PORT}"]) = 0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable</li></ul>|
 |ClickHouse: Version has changed|<p>The ClickHouse version has changed. Acknowledge to close the problem manually.</p>|`last(/ClickHouse by HTTP/clickhouse.version,#1)<>last(/ClickHouse by HTTP/clickhouse.version,#2) and length(last(/ClickHouse by HTTP/clickhouse.version))>0`|Info|**Manual close**: Yes|
 |ClickHouse: Host has been restarted|<p>The host uptime is less than 10 minutes.</p>|`last(/ClickHouse by HTTP/clickhouse.uptime)<10m`|Info|**Manual close**: Yes|
 |ClickHouse: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/ClickHouse by HTTP/clickhouse.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>ClickHouse: Service is down</li></ul>|

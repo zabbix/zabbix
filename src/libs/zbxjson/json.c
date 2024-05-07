@@ -1317,3 +1317,26 @@ zbx_json_type_t	zbx_json_valuetype(const char *p)
 {
 	return __zbx_json_type(p);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: creates a copy of the specified JSON structure                    *
+ *                                                                            *
+ * Return value: The copied JSON structure.                                   *
+ *                                                                            *
+ ******************************************************************************/
+struct zbx_json	*zbx_json_clone(const struct zbx_json *src)
+{
+	struct zbx_json	*dst;
+
+	dst = (struct zbx_json *)zbx_malloc(NULL, sizeof(struct zbx_json));
+	*dst = *src;
+
+	if (src->buffer != src->buf_stat)
+	{
+		dst->buffer = (char *)zbx_malloc(NULL, dst->buffer_allocated);
+		memcpy(dst->buffer, src->buffer, src->buffer_size);
+	}
+
+	return dst;
+}

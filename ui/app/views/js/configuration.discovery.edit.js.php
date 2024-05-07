@@ -37,6 +37,8 @@ window.drule_edit_popup = new class {
 
 		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
+		document.getElementById('discovery_by').addEventListener('change', () => this.#updateForm());
+
 		// Append existing discovery checks to check table.
 		if (typeof dchecks === 'object') {
 			dchecks = Object.values(dchecks);
@@ -76,6 +78,12 @@ window.drule_edit_popup = new class {
 	}
 
 	#updateForm() {
+		const discovery_by = this.form.querySelector('[name="discovery_by"]:checked').value;
+
+		this.form.querySelector('.js-field-proxy').style.display = discovery_by == <?= ZBX_DISCOVERY_BY_PROXY ?>
+			? ''
+			: 'none';
+
 		const concurrency_max_type = this.form.querySelector('[name="concurrency_max_type"]:checked').value;
 		const concurrency_max = this.form.querySelector('#concurrency_max');
 		const is_custom = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>;
