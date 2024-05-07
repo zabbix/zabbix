@@ -4939,6 +4939,9 @@ div.dashboard-widget-tophosts z-bar-gauge {
 div.dashboard-widget-url .widget-url {
   display: block; }
 
+div.dashboard-widget-web .list-table tr[data-hostgroupid] {
+  cursor: pointer; }
+
 .link-action {
   color: #000000;
   cursor: pointer; }

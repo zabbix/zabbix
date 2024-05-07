@@ -9,6 +9,7 @@
 	"description": "Displays the status summary of the active web monitoring scenarios.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring",
 	"widget": {
+		"js_class": "CWidgetWeb",
 		"in": {
 			"hostids": {
 				"type": "_hostids"
@@ -17,6 +18,14 @@
 				"type": "_hostgroupids"
 			}
 		},
+		"out": [
+			{
+				"type": "_hostgroupid"
+			},
+			{
+				"type": "_hostgroupids"
+			}
+		],
 		"size": {
 			"width": 6,
 			"height": 3
@@ -26,5 +35,8 @@
 		"widget.web.view": {
 			"class": "WidgetView"
 		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
 	}
 }
