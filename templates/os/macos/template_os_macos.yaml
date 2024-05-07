@@ -664,13 +664,13 @@ zabbix_export:
                 evaltype: AND
                 conditions:
                   - macro: '{#FSOPTIONS}'
-                    operator: EXISTS
+                    value: '(?:^|,)noowners\b'
                     formulaid: A
                   - macro: '{#FSOPTIONS}'
-                    value: '(?:^|,)noowners\b'
+                    value: '(?:^|,)read-only\b'
                     formulaid: B
                   - macro: '{#FSOPTIONS}'
-                    value: '(?:^|,)read-only\b'
+                    operator: EXISTS
                     formulaid: C
                   - macro: '{#FSTYPE}'
                     value: hfs

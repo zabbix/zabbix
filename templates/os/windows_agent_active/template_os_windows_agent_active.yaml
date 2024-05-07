@@ -801,7 +801,7 @@ zabbix_export:
                     1. It can be triggered if the operations status is down.
                     2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important.
                     No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
+                    3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'

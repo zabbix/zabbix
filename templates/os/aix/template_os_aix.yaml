@@ -931,8 +931,8 @@ zabbix_export:
                   
                   result = filesystems.map(function (filesystem) {
                   	return {
-                  	  'fsname': filesystem.fsname,
-                  	  'fstype': filesystem.fstype
+                  		'fsname': filesystem.fsname,
+                  		'fstype': filesystem.fstype
                   	};
                   });
                   

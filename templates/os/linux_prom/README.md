@@ -62,7 +62,7 @@ This template has been tested on:
 |{$MEMORY.AVAILABLE.MIN}|<p>Used as a threshold in the memory available trigger.</p>|`20M`|
 |{$IFCONTROL}|<p>Link status trigger will be fired only for interfaces where the context macro equals "1".</p>|`1`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
-|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, `docker veth` links and `docker0` bridge by default.</p>|`Macro too long. Please see the template.`|
+|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`^.*$`|
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore `notpresent(1)`.</p>|`^notpresent$`|
 |{$NET.IF.IFALIAS.MATCHES}|<p>Used in network interface discovery rule filters.</p>|`^.*$`|
