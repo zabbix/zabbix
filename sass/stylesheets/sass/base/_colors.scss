@@ -335,8 +335,9 @@ $map-selected-fill-color: #c9e3fc !default;
 $map-selected-stroke-color: #ced7db !default;
 
 // Geomap.
-$geomap-highlight-fill: #E9F7FD !default;
-$geomap-highlight-border: #CED7DB !default;
+$geomap-marker-hover-fill: #e0f7ff;
+$geomap-marker-selected-fill: #c9e3fc;
+$geomap-marker-selected-stroke: #ced7db;
 
 // Timeline.
 $timeline-color: #aad7f0;

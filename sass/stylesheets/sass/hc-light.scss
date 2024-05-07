@@ -187,6 +187,11 @@ $map-hover-fill-color: #e8e9ed;
 $map-selected-fill-color: #d9d9d9;
 $map-selected-stroke-color: #747474;
 
+// Geomap.
+$geomap-marker-hover-fill: #e8e9ed;
+$geomap-marker-selected-fill: #d9d9d9;
+$geomap-marker-selected-stroke: #747474;
+
 // Statuses
 $status-disabled-border-color: rgba(#000000, 0.2);
 
@@ -211,10 +216,6 @@ $diff-removed-bg-color: transparent;
 $arrow-fill-up: #000000;
 $arrow-fill-down: #000000;
 $arrow-fill-up-down: #000000;
-
-// Geomap.
-$geomap-highlight-fill: #d9d9d9;
-$geomap-highlight-border: #747474;
 
 // Important! @import string should come after variables
 @import 'screen.scss';

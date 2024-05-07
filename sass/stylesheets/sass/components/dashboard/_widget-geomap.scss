@@ -1,6 +1,7 @@
 :root {
-	--geomap-highlight-border: #{$geomap-highlight-border};
-	--geomap-highlight-fill: #{$geomap-highlight-fill};
+	--geomap-marker-hover-fill: #{$geomap-marker-hover-fill};
+	--geomap-marker-selected-fill: #{$geomap-marker-selected-fill};
+	--geomap-marker-selected-stroke: #{$geomap-marker-selected-stroke};
 }
 
 div.dashboard-widget-geomap {
@@ -31,24 +32,19 @@ div.dashboard-widget-geomap {
 		background: none;
 
 		> .cluster-outer-shape {
-			padding: 10px;
-		}
-
-		&:hover > .cluster-outer-shape,
-		&.selected > .cluster-outer-shape {
 			border-radius: 50%;
 			height: 30px;
 			width: 30px;
+			padding: 10px;
 		}
 
 		&:hover > .cluster-outer-shape {
-			outline: 2px solid $geomap-highlight-fill !important;
-			background: $geomap-highlight-fill;
+			background: $geomap-marker-hover-fill;
 		}
 
 		&.selected > .cluster-outer-shape {
-			outline: 2px solid $geomap-highlight-border;
-			background: $geomap-highlight-fill;
+			background: $geomap-marker-selected-fill;
+			outline: 2px solid $geomap-marker-selected-stroke !important;
 		}
 
 		div {
@@ -93,5 +89,11 @@ div.dashboard-widget-geomap {
 	.leaflet-container {
 		height: 100%;
 		z-index: 1;
+	}
+
+	.geomap-hosts-table {
+		[data-hostid] {
+			cursor: pointer;
+		}
 	}
 }
