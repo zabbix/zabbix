@@ -4094,20 +4094,20 @@ static int	DBpatch_6050297(void)
 
 		zabbix_log(LOG_LEVEL_WARNING, "%3lu) widgetid = %lu, value_type = %d, field_name = \"%s\", itemid = %lu, item_name = \"%s\", show_as_html = %d", index, widgetid, value_type, field_name, itemid, item_name, show_as_html);
 
-		zbx_snprintf(buf, sizeof(buf), "сolumn.%lu.name", index);
+		zbx_snprintf(buf, sizeof(buf), "columns.%lu.name", index);
 		zbx_db_insert_add_values(&db_insert_str, __UINT64_C(0), widgetid, 1, buf, item_name);
 
-		zbx_snprintf(buf, sizeof(buf), "сolumn.%lu.itemid", index);
+		zbx_snprintf(buf, sizeof(buf), "columns.%lu.itemid", index);
 		zbx_db_insert_add_values(&db_insert_itemid, __UINT64_C(0), widgetid, 4, buf, itemid);
 
 		if (1 == value_type || 2 == value_type || 4 == value_type)
 		{
-			zbx_snprintf(buf, sizeof(buf), "сolumn.%lu.monospace_font", index);
+			zbx_snprintf(buf, sizeof(buf), "columns.%lu.monospace_font", index);
 			zbx_db_insert_add_values(&db_insert_int, __UINT64_C(0), widgetid, 0, buf, 1);
 
 			if (1 == show_as_html)
 			{
-				zbx_snprintf(buf, sizeof(buf), "сolumn.%lu.display", index);
+				zbx_snprintf(buf, sizeof(buf), "columns.%lu.display", index);
 				zbx_db_insert_add_values(&db_insert_int, __UINT64_C(0), widgetid, 0, buf, 4);
 			}
 		}
