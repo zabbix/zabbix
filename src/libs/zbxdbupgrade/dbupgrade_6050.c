@@ -4041,6 +4041,16 @@ static int	DBpatch_6050297(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget"
+			" set name='Plain text'"
+			" where type='plaintext'"
+				" and name=''");
+		{
+			return FAIL;
+		}
+	}
+
 	zbx_vector_uint64_create(&delete_ids);
 
 	zbx_db_insert_prepare(&db_insert_int, "widget_field", "widget_fieldid", "widgetid", "type", "name",
@@ -4117,23 +4127,6 @@ static int	DBpatch_6050297(void)
 	zbx_db_free_result(result);
 
 	result = zbx_db_select(
-			"select distinct wf.widgetid"
-			" from widget w,widget_field wf"
-			" where wf.widgetid=w.widgetid"
-				" and w.type='plaintext'"
-				" and not wf.name='name'");
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		zbx_uint64_t	widgetid;
-
-		ZBX_STR2UINT64(widgetid, row[0]);
-
-		zbx_db_insert_add_values(&db_insert_str, __UINT64_C(0), widgetid, 1, "name", "Plain text");
-	}
-	zbx_db_free_result(result);
-
-	result = zbx_db_select(
 			"select wf.widget_fieldid"
 			" from widget w,widget_field wf"
 			" where wf.widgetid=w.widgetid"
@@ -4153,7 +4146,6 @@ static int	DBpatch_6050297(void)
 		{
 			return FAIL;
 		}
-
 	}
 	zbx_db_free_result(result);
 
