@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-18 18:01+0000\n"
+"PO-Revision-Date: 2024-04-30 09:26+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -87,6 +87,11 @@ msgstr "%1$d coincidencias para %2$s encontradas"
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
 msgstr "Se muestran %1$d de %1$d+ equipos"
+
+#: widgets/itemnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ items are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1098,7 +1103,7 @@ msgstr "Dirección"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Dirección para agentes activos"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1565,7 +1570,7 @@ msgstr "Etiqueta del recurso"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Proxy asignado"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -2314,7 +2319,7 @@ msgstr "No se pudo agregar el proxy"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "No se puede agregar el grupo de proxy"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2772,12 +2777,12 @@ msgstr[1] "No es posible eliminar el proxy"
 #: app/controllers/CControllerProxyGroupDelete.php:78
 msgid "Cannot delete proxy group"
 msgid_plural "Cannot delete proxy groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el grupo de proxy"
+msgstr[1] "No se pueden eliminar los grupos de proxy"
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
 msgid "Cannot delete proxy groups"
-msgstr ""
+msgstr "No se pueden eliminar los grupos de proxy"
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -2882,6 +2887,11 @@ msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "No es posible eliminar el grupo de usuarios"
 msgstr[1] "No se pueden eliminar los grupos de usuarios"
+
+#: include/classes/api/services/CUserGroup.php:1397
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -4047,7 +4057,7 @@ msgstr "No se pudo actualizar el proxy del equipo descubierto \"%1$s\"."
 #: app/controllers/CControllerProxyGroupUpdate.php:43
 #: app/controllers/CControllerProxyGroupUpdate.php:82
 msgid "Cannot update proxy group"
-msgstr ""
+msgstr "No se puede actualizar el grupo de proxy"
 
 #: include/classes/api/services/CRole.php:768
 #, c-format
@@ -4787,7 +4797,7 @@ msgstr "Configuración de proxys"
 
 #: app/controllers/CControllerProxyGroupList.php:131
 msgid "Configuration of proxy groups"
-msgstr ""
+msgstr "Configuración de grupos de proxy"
 
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
@@ -5399,7 +5409,7 @@ msgstr "Crear proxy"
 
 #: app/views/administration.proxygroup.list.php:168
 msgid "Create proxy group"
-msgstr ""
+msgstr "Crear un grupo de proxy"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
@@ -5648,6 +5658,10 @@ msgstr "Aviso universal DUO"
 #: include/classes/helpers/CSlaHelper.php:39 report4.php:90
 msgid "Daily"
 msgstr "Diario"
+
+#: include/locales.inc.php:40
+msgid "Danish (da_DK)"
+msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -6068,7 +6082,7 @@ msgstr "Zona horaria por defecto"
 #: app/views/administration.proxygroup.list.php:55
 #: app/views/administration.proxygroup.list.php:111
 msgid "Degrading"
-msgstr ""
+msgstr "Degradado"
 
 #: app/views/popup.lldoperation.php:160 app/views/popup.massupdate.item.php:276
 msgid "Delay"
@@ -6392,11 +6406,11 @@ msgstr "¿Desea eliminar los proxys seleccionados?"
 #: app/views/js/administration.proxygroup.list.js.php:88
 #: app/views/popup.proxygroup.edit.php:147
 msgid "Delete selected proxy group?"
-msgstr ""
+msgstr "¿Eliminar el grupo de proxy seleccionado?"
 
 #: app/views/js/administration.proxygroup.list.js.php:87
 msgid "Delete selected proxy groups?"
-msgstr ""
+msgstr "¿Eliminar los grupos de proxy seleccionados?"
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -6989,7 +7003,7 @@ msgstr "Acciones de descubrimiento"
 
 #: app/views/configuration.discovery.edit.php:52
 msgid "Discovery by"
-msgstr ""
+msgstr "Descubierto por"
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -8286,7 +8300,7 @@ msgstr "No se pudieron actualizar las propiedades del widget."
 #: app/views/administration.proxygroup.list.php:79
 #: app/views/popup.proxygroup.edit.php:51
 msgid "Failover period"
-msgstr ""
+msgstr "Período de conmutación por error"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -8465,6 +8479,11 @@ msgstr "Filtro"
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
 msgstr "Filtro eliminado"
+
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Filter is not set"
+msgstr ""
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -9383,7 +9402,7 @@ msgstr "El equipo \"%1$s\" es monitorizado por el proxy \"%2$s\"."
 #: include/classes/api/services/CProxyGroup.php:456
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy group \"%2$s\"."
-msgstr ""
+msgstr "El equipo \"%1$s\" es monitoreado por el grupo de proxy \"%2$s\"."
 
 #: include/actions.inc.php:57
 msgid "Host IP"
@@ -9616,6 +9635,10 @@ msgstr "Navegador de equipos"
 msgid "Host networks"
 msgstr "Redes del equipo"
 
+#: widgets/hostnavigator/includes/WidgetForm.php:65
+msgid "Host patterns"
+msgstr ""
+
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
 msgstr "Permisos del equipo"
@@ -9695,6 +9718,14 @@ msgstr "Estado del equipo"
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
 msgstr "Máscara de subred del equipo"
+
+#: widgets/itemnavigator/Widget.php:43
+msgid "Host tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
+msgid "Host tag value"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11772,6 +11803,10 @@ msgstr[1] "Métricas activadas"
 msgid "Item in \"not supported\" state"
 msgstr "Métrica en estado \"no soportada\""
 
+#: widgets/itemnavigator/includes/WidgetForm.php:107
+msgid "Item limit"
+msgstr ""
+
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
@@ -11781,6 +11816,10 @@ msgstr "Lista de métricas"
 msgid "Item name"
 msgstr "Nombre de la métrica"
 
+#: widgets/itemnavigator/Widget.php:29
+msgid "Item navigator"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Métrica no seleccionada"
@@ -11789,6 +11828,13 @@ msgstr "Métrica no seleccionada"
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
 msgstr "Patrón de métrica"
+
+#: widgets/honeycomb/includes/WidgetForm.php:90
+#: widgets/itemnavigator/includes/WidgetForm.php:78
+#: widgets/piechart/views/widget.edit.js.php:208
+#: widgets/svggraph/views/widget.edit.js.php:279
+msgid "Item patterns"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11832,6 +11878,14 @@ msgstr "El prototipo de métrica con ID \"%1$s\" no está disponible."
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
 msgstr "Prototipos de métrica"
+
+#: widgets/itemnavigator/Widget.php:44
+msgid "Item tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
+msgid "Item tag value"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12407,11 +12461,11 @@ msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresi�
 
 #: include/classes/data/CItemData.php:2877
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
-msgstr ""
+msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresión, versión, visto por última vez, recuento de equipos, recuento de métricas, valores requeridos por segundo (vps), compatibilidad (actual/obsoleto/no compatible), tiempos de espera, nombre del grupo de proxy si pertenece al proxy. grupo, estado (desconocido/fuera de línea/en línea). Devuelve JSON."
 
 #: include/classes/data/CItemData.php:2905
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
-msgstr ""
+msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresión, versión, visto por última vez, recuento de equipos, recuento de métricas, valores requeridos por segundo (vps), compatibilidad (actual/obsoleto/no compatible), tiempos de espera, nombre del grupo de proxy, estado (desconocido) /fuera de linea en linea). Devuelve JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -13201,6 +13255,10 @@ msgstr "Tipos de medios"
 msgid "Media types disabled by Administration."
 msgstr "Tipos de medio desactivados por el administrador."
 
+#: app/views/popup.media.php:78
+msgid "Media types disabled in Alerts."
+msgstr ""
+
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
 msgid "Media types used by action \"%1$s\"."
@@ -13338,7 +13396,7 @@ msgstr "Min."
 
 #: app/views/popup.proxygroup.edit.php:59
 msgid "Minimum number of proxies"
-msgstr ""
+msgstr "Número mínimo de proxies"
 
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
@@ -13346,7 +13404,7 @@ msgstr "Longitud mínima de la contraseña"
 
 #: app/views/administration.proxygroup.list.php:81
 msgid "Minimum proxies"
-msgstr ""
+msgstr "Proxies mínimos"
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -14034,7 +14092,7 @@ msgstr "Nuevo proxy"
 #: app/views/popup.proxygroup.edit.php:127
 #: app/views/popup.proxygroup.edit.php:156
 msgid "New proxy group"
-msgstr ""
+msgstr "Nuevo grupo de proxy"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14162,6 +14220,12 @@ msgstr "Sin datos"
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
 msgstr "Sin recopilación de datos"
+
+#: app/views/search.php:48 app/views/search.php:209 app/views/search.php:289
+#: app/views/search.php:394 include/classes/html/CTableInfo.php:72
+#: widgets/hostnavigator/Widget.php:40
+msgid "No data found"
+msgstr ""
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -14825,7 +14889,7 @@ msgstr "Número de equipos monitorizados"
 
 #: include/classes/data/CItemData.php:2891
 msgid "Number of online proxies. Returns integer."
-msgstr ""
+msgstr "Número de proxies en línea. Devuelve un número entero."
 
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
@@ -15011,7 +15075,7 @@ msgstr "INACTIVO"
 #: app/views/administration.proxygroup.list.php:99
 #: app/views/administration.proxy.list.php:166
 msgid "Offline"
-msgstr ""
+msgstr "Desconectado"
 
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
@@ -15072,11 +15136,11 @@ msgstr "Sólo una vez"
 #: app/views/administration.proxygroup.list.php:107
 #: app/views/administration.proxy.list.php:170
 msgid "Online"
-msgstr ""
+msgstr "En línea"
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
-msgstr ""
+msgstr "Proxies en línea"
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15863,7 +15927,7 @@ msgstr "Porcentaje de memoria física del equipo que se ha consumido, \"url\": U
 
 #: include/classes/data/CItemData.php:2898
 msgid "Percentage of online proxies. Returns float."
-msgstr ""
+msgstr "Porcentaje de proxies online. Retorna un número flotante."
 
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
@@ -16494,36 +16558,36 @@ msgstr[1] "Proxies borrados"
 #: app/views/popup.proxygroup.edit.php:112
 #: include/views/configuration.host.prototype.edit.php:303
 msgid "Proxy group"
-msgstr ""
+msgstr "Grupo de proxy"
 
 #: include/classes/api/services/CProxyGroup.php:369
 #, c-format
 msgid "Proxy group \"%1$s\" already exists."
-msgstr ""
+msgstr "El grupo de proxy \"%1$s\" ya existe."
 
 #: include/classes/import/importers/CHostImporter.php:348
 #, c-format
 msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "El grupo de proxy \"%1$s\" para el equipo \"%2$s\" no existe."
 
 #: include/classes/api/services/CProxyGroup.php:437
 #, c-format
 msgid "Proxy group \"%1$s\" is used by proxy \"%2$s\"."
-msgstr ""
+msgstr "El grupo de proxy \"%1$s\" lo utiliza el proxy \"%2$s\"."
 
 #: app/controllers/CControllerProxyGroupCreate.php:66
 msgid "Proxy group added"
-msgstr ""
+msgstr "Grupo de proxy agregado"
 
 #: app/controllers/CControllerProxyGroupDelete.php:70
 msgid "Proxy group deleted"
 msgid_plural "Proxy groups deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Grupo de proxy eliminado"
+msgstr[1] "Grupos de proxies eliminados"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
-msgstr ""
+msgstr "Grupo de proxy actualizado"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/views/administration.proxygroup.list.php:163
@@ -16531,11 +16595,11 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:378
 #: include/classes/helpers/CRoleHelper.php:512
 msgid "Proxy groups"
-msgstr ""
+msgstr "Grupos de proxy"
 
 #: app/partials/configuration.host.edit.html.php:334
 msgid "Proxy is not assigned yet."
-msgstr ""
+msgstr "El proxy aún no está asignado."
 
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
@@ -16773,7 +16837,7 @@ msgstr "Recordset ID"
 #: app/views/administration.proxygroup.list.php:57
 #: app/views/administration.proxygroup.list.php:103
 msgid "Recovering"
-msgstr ""
+msgstr "Recuperando"
 
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
 #: app/views/trigger.prototype.list.php:146
@@ -18796,6 +18860,10 @@ msgstr "Se muestra"
 msgid "Shown as the account name to all MFA users in authenticator apps."
 msgstr "Se muestra como el nombre de la cuenta para todos los usuarios de MFA en aplicaciones de autenticación."
 
+#: app/views/mfa.edit.php:67
+msgid "Shown as the label to all MFA users in authenticator apps."
+msgstr ""
+
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
 msgstr "Control de barra lateral"
@@ -19097,7 +19165,7 @@ msgstr "Estado"
 
 #: include/classes/data/CItemData.php:2912
 msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
-msgstr ""
+msgstr "Estado del grupo proxy. Devuelve un número entero: 0 - desconocido; 1 - fuera de línea; 2 - recuperándose; 3 - en línea; 4 - degradado."
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -19946,7 +20014,7 @@ msgstr "Probar la entrada del usuario"
 #: app/controllers/CControllerPopupItemTestSend.php:256
 #: app/views/popup.itemtestedit.view.php:256
 msgid "Test with"
-msgstr ""
+msgstr "Prueba con"
 
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
@@ -21636,6 +21704,11 @@ msgstr "Utilizar si la gravedad"
 msgid "Use iframe sandboxing"
 msgstr "Usar aislamiento en iframe"
 
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Use the filter to display results"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "Utilizado en acciones"
@@ -21865,6 +21938,10 @@ msgstr "Atributo de apellido del usuario"
 #: widgets/item/views/widget.edit.php:90
 msgid "User macros"
 msgstr "Macros de usuario"
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "User media"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22626,6 +22703,13 @@ msgstr "Certificados de Vault"
 #: include/classes/vaults/CVaultHashiCorp.php:85 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Error en la conexión a Vault."
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:640
+#: include/classes/setup/CSetupWizard.php:843
+#: include/classes/setup/CSetupWizard.php:863
+msgid "Vault prefix"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -23628,6 +23712,10 @@ msgstr "se espera una matriz o una cadena de caracteres"
 msgid "an array or object is expected"
 msgstr "se espera una matriz u objeto"
 
+#: include/classes/api/services/CUser.php:990
+msgid "an email address is expected"
+msgstr ""
+
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
 msgid "an empty string is expected"
@@ -24025,6 +24113,15 @@ msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
 msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto heredado"
 
+#: include/classes/api/services/CUserGroup.php:501
+#: include/classes/api/services/CUser.php:451
+#: include/classes/api/services/CUser.php:614
+#: include/classes/api/services/CUser.php:794
+#: include/classes/api/services/CUser.php:1066
+#, c-format
+msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr "cbrt() - Raíz cúbica"
@@ -24392,6 +24489,13 @@ msgstr "ya existe un grupo de equipos con el mismo UUID"
 msgid "host pattern"
 msgstr "patrón de equipo"
 
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:155
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:159
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
+#: widgets/svggraph/views/widget.edit.php:292
+msgid "host patterns"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "ya existe un prototipo de equipo con el mismo UUID"
@@ -24629,6 +24733,15 @@ msgstr "la métrica \"%1$s\" en el equipo \"%2$s\" no está monitorizada"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:329
 msgid "item pattern"
 msgstr "patrón de métrica"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:134
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:172
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:138
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:176
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
+msgid "item patterns"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -25146,6 +25259,11 @@ msgstr "resultado"
 #: include/views/js/item.preprocessing.js.php:337
 msgid "pattern"
 msgstr "patrón"
+
+#: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
+#: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
+msgid "patterns"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"

@@ -59,7 +59,7 @@ void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx
 	zbx_serialize_prepare_value(data_len, mt->maxsessions);
 	zbx_serialize_prepare_value(data_len, mt->maxattempts);
 	zbx_serialize_prepare_str_len(data_len, mt->attempt_interval, attempt_interval_len);
-	zbx_serialize_prepare_value(data_len, mt->content_type);
+	zbx_serialize_prepare_value(data_len, mt->message_format);
 	zbx_serialize_prepare_str_len(data_len, mt->script, script_len);
 	zbx_serialize_prepare_str_len(data_len, mt->timeout, timeout_len);
 
@@ -87,7 +87,7 @@ void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx
 	ptr += zbx_serialize_value(ptr, mt->maxsessions);
 	ptr += zbx_serialize_value(ptr, mt->maxattempts);
 	ptr += zbx_serialize_str(ptr, mt->attempt_interval, attempt_interval_len);
-	ptr += zbx_serialize_value(ptr, mt->content_type);
+	ptr += zbx_serialize_value(ptr, mt->message_format);
 	ptr += zbx_serialize_str(ptr, mt->script, script_len);
 	(void)zbx_serialize_str(ptr, mt->timeout, timeout_len);
 
@@ -117,7 +117,7 @@ zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, zbx_db_mediaty
 	data += zbx_deserialize_value(data, &mt->maxsessions);
 	data += zbx_deserialize_value(data, &mt->maxattempts);
 	data += zbx_deserialize_str(data, &mt->attempt_interval, len);
-	data += zbx_deserialize_value(data, &mt->content_type);
+	data += zbx_deserialize_value(data, &mt->message_format);
 	data += zbx_deserialize_str(data, &mt->script, len);
 	data += zbx_deserialize_str(data, &mt->timeout, len);
 

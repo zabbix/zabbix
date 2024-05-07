@@ -2203,29 +2203,12 @@ function prepareLldMacroPaths(array $macro_paths): array {
  * @return array
  */
 function prepareLldFilter(array $filter): array {
-	foreach ($filter['conditions'] as $i => &$condition) {
-		if ($condition['macro'] === '' && $condition['value'] === '') {
-			unset($filter['conditions'][$i]);
-			continue;
-		}
-
-		$condition['macro'] = mb_strtoupper($condition['macro']);
-
-		if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-			$condition['formulaid'] = '';
-		}
-	}
-	unset($condition);
-
-	$filter['conditions'] = array_values($filter['conditions']);
+	$filter['conditions'] = array_values(array_filter($filter['conditions'], static function (array $condition): bool {
+		return $condition['macro'] !== '' || $condition['value'] !== '';
+	}));
 
 	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
 		$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
-		$filter['formula'] = '';
-
-		if ($filter['conditions']) {
-			$filter['conditions'][0]['formulaid'] = '';
-		}
 	}
 
 	if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
@@ -2238,31 +2221,19 @@ function prepareLldFilter(array $filter): array {
 /**
  * Format LLD rule overrides data received via form for API input.
  *
- * @param array      $overrides             Array of LLD overrides, as received from form submit.
- * @param array|null $db_item
- * @param array      $db_item['overrides']
+ * @param array $overrides  Array of LLD overrides, as received from form submit.
  *
  * @return array
  */
-function prepareLldOverrides(array $overrides, ?array $db_item): array {
-	$db_overrides = $db_item !== null && $overrides ? array_column($db_item['overrides'], null, 'step') : [];
-
+function prepareLldOverrides(array $overrides): array {
 	foreach ($overrides as &$override) {
-		if (!array_key_exists($override['step'], $db_overrides)
-				&& !array_key_exists('conditions', $override['filter'])) {
-			unset($override['filter']);
-		}
-		elseif (!array_key_exists('conditions', $override['filter'])) {
-			$override['filter']['conditions'] = [];
-		}
-
-		if (array_key_exists('filter', $override)) {
-			$override['filter'] = prepareLldFilter([
-				'evaltype' => $override['filter']['evaltype'],
-				'formula' => $override['filter']['formula'],
-				'conditions' => $override['filter']['conditions']
-			]);
-		}
+		$override['filter'] = prepareLldFilter([
+			'evaltype' => $override['filter']['evaltype'],
+			'formula' => $override['filter']['formula'],
+			'conditions' => array_key_exists('conditions', $override['filter'])
+				? $override['filter']['conditions']
+				: []
+		]);
 
 		if (!array_key_exists('operations', $override)) {
 			$override['operations'] = [];
@@ -2568,53 +2539,6 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 
 		return true;
 	});
-}
-
-/**
- * Apply sorting for discovery rule filter or override filter conditions, if appropriate.
- * Prioritization by non/exist operator applied between matching macros.
- *
- * @param array $conditions
- * @param int   $evaltype
- *
- * @return array
- */
-function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
-	switch ($evaltype) {
-		case CONDITION_EVAL_TYPE_AND_OR:
-		case CONDITION_EVAL_TYPE_AND:
-		case CONDITION_EVAL_TYPE_OR:
-			usort($conditions, static function(array $condition_a, array $condition_b): int {
-				$comparison = strnatcasecmp($condition_a['macro'], $condition_b['macro']);
-
-				if ($comparison != 0) {
-					return $comparison;
-				}
-
-				$exist_operators = [CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_EXISTS];
-
-				$comparison = (int) in_array($condition_b['operator'], $exist_operators)
-					- (int) in_array($condition_a['operator'], $exist_operators);
-
-				if ($comparison != 0) {
-					return $comparison;
-				}
-
-				return strnatcasecmp($condition_a['value'], $condition_b['value']);
-			});
-
-			foreach ($conditions as $i => &$condition) {
-				$condition['formulaid'] = num2letter($i);
-			}
-			unset($condition);
-			break;
-
-		case CONDITION_EVAL_TYPE_EXPRESSION:
-			CArrayHelper::sort($conditions, ['formulaid']);
-			break;
-	}
-
-	return array_values($conditions);
 }
 
 /**

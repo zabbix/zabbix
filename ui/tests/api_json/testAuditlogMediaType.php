@@ -40,7 +40,7 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				'smtp_helo' => 'test.com',
 				'smtp_email' => 'test@test.com',
 				'smtp_port' => 587,
-				'content_type' => 1,
+				'message_format' => 1,
 				'message_templates' => [
 					[
 						'eventsource' => 0,
@@ -92,7 +92,7 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				'smtp_helo' => 'updated_test.com',
 				'smtp_email' => 'updated_test@test.com',
 				'smtp_port' => 589,
-				'content_type' => 0,
+				'message_format' => 0,
 				'message_templates' => [
 					[
 						'eventsource' => 1,
