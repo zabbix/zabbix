@@ -45,6 +45,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	protected static $dashboardid;
 	protected static $groupids;
 	protected static $update_widget = 'Update Host navigator widget';
+	const MAINTENANCE_HOSTNAME = 'Host in maintenance';
 	const DEFAULT_WIDGET = 'Default Host navigator widget';
 	const DELETE_WIDGET = 'Widget for delete';
 	const DEFAULT_DASHBOARD = 'Dashboard for Host navigator widget test';
@@ -88,7 +89,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	}
 
 	public static function prepareData() {
-		$response = CDataHelper::call('dashboard.create', [
+		CDataHelper::call('dashboard.create', [
 			[
 				'name' => self::DEFAULT_DASHBOARD,
 				'pages' => [
@@ -144,7 +145,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 		self::$groupids = CDataHelper::getIds('name');
 
 		// Create hosts.
-		CDataHelper::createHosts([
+		$result = CDataHelper::createHosts([
 			[
 				'host' => 'First host for host navigator widget',
 				'interfaces' => [
@@ -176,8 +177,36 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				'groups' => [
 					'groupid' => self::$groupids['Second Group for Host navigator check']
 				]
+			],
+			[
+				'host' => self::MAINTENANCE_HOSTNAME,
+				'groups' => ['groupid' => 4] // Zabbix servers.
 			]
 		]);
+
+		$maintenace_hostid = $result['hostids'][self::MAINTENANCE_HOSTNAME];
+
+		$maintenances = CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance for Host navigator widget',
+				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+				'description' => 'Maintenance for icon check in Host navigator widget',
+				'active_since' => time() - 100,
+				'active_till' => time() + 31536000,
+				'groups' => [['groupid' => 4]], // Zabbix servers.
+				'timeperiods' => [[]]
+			]
+		]);
+		$maintenanceid = $maintenances['maintenanceids'][0];
+
+		DBexecute("INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1000000, ".
+				zbx_dbstr($maintenanceid).",".zbx_dbstr($maintenace_hostid).")"
+		);
+
+		DBexecute("UPDATE hosts SET maintenanceid=".zbx_dbstr($maintenanceid).
+				", maintenance_status=1, maintenance_type=".MAINTENANCE_TYPE_NORMAL.", maintenance_from=".zbx_dbstr(time()-1000).
+				" WHERE hostid=".zbx_dbstr($maintenace_hostid)
+		);
 	}
 
 	public function testDashboardHostNavigatorWidget_Layout() {
@@ -196,7 +225,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 			'Show header' => true,
 			'Refresh interval' => 'Default (1 minute)',
 			'Host groups' => '',
-			'Hosts' => '',
+			'Host patterns' => '',
 			'Host status' => 'Any',
 			'Host tags' => 'And/Or',
 			'id:host_tags_0_tag' => '',
@@ -242,7 +271,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				'placeholder' => 'type here to search'
 			],
 			'id:hosts__ms' => [
-				'placeholder' => 'host pattern'
+				'placeholder' => 'patterns'
 			],
 			'id:host_tags_0_tag' => [
 				'maxlength' => 255,
@@ -458,7 +487,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Hosts' => [
+						'Host patterns' => [
 							'ЗАББИКС Сервер',
 							'First host for host navigator widget'
 						],
@@ -482,8 +511,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Host tags' => 'Or',
-						'Host limit' => '1',
+						'Name' => 'Host status => Disabled',
+						'Host status' => 'Disabled',
 						'Refresh interval' => '10 minutes'
 					]
 				]
@@ -493,8 +522,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Host tags' => 'And/Or',
-						'Host limit' => '9999',
+						'Name' => 'Host status => Any',
+						'Host status' => 'Any',
 						'Refresh interval' => '15 minutes'
 					]
 				]
@@ -504,10 +533,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Random severities check',
-						'id:severities_0' => true,
-						'id:severities_3' => true,
-						'id:severities_5' => true,
+						'Host tags' => 'Or',
+						'Host limit' => '1',
 						'Refresh interval' => 'Default (1 minute)'
 					]
 				]
@@ -517,17 +544,39 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => '📌 All severities check',
-						'id:severities_0' => true,
-						'id:severities_1' => true,
-						'id:severities_2' => true,
-						'id:severities_3' => true,
-						'id:severities_4' => true,
-						'id:severities_5' => true
+						'Host tags' => 'And/Or',
+						'Host limit' => '9999'
 					]
 				]
 			],
 			// #20.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Random severities check',
+						'Not classified' => true,
+						'Average' => true,
+						'Disaster' => true
+					]
+				]
+			],
+			// #21.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '📌 All severities check',
+						'Not classified' => true,
+						'Information' => true,
+						'Warning' => true,
+						'Average' => true,
+						'High' => true,
+						'Disaster' => true
+					]
+				]
+			],
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -538,7 +587,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					]
 				]
 			],
-			// #21.
+			// #23.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -548,7 +597,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					]
 				]
 			],
-			// #22.
+			// #24.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -562,7 +611,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					]
 				]
 			],
-			// #23.
+			// #25.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -573,13 +622,13 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 							'Zabbix servers',
 							'First Group for Host navigator check'
 						],
-						'Hosts' => [
+						'Host patterns' => [
 							'First host for host navigator widget',
 							'Second host for host navigator widget'
 						],
 						'Host status' => 'Enabled',
 						'Host tags' => 'Or',
-						'id:severities_3' => true,
+						'Average' => true,
 						'Show hosts in maintenance' => true,
 						'Show problems' => 'All',
 						'id:host_tags_0_tag' => STRING_255,
@@ -589,7 +638,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					]
 				]
 			],
-			// #24.
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -604,7 +653,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					'trim' => ['Name', 'Host limit', 'id:host_tags_0_tag', 'id:host_tags_0_value']
 				]
 			],
-			// #25.
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -616,7 +665,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					]
 				]
 			],
-			// #26.
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -631,7 +680,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 					]
 				]
 			],
-			// #27 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
+			// #29 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -687,24 +736,20 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	 * @param boolean $update	updating is performed
 	 */
 	protected function checkWidgetForm($data, $update = false) {
-		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-		if ($expected === TEST_BAD) {
+		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
-		if ($data['fields'] === []) {
-			$data['fields']['Name'] = '';
-		}
-		else {
-			$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Host navigator '.microtime());
-		}
+		$data['fields']['Name'] = ($data['fields'] === [])
+			? ''
+			: CTestArrayHelper::get($data, 'fields.Name', 'Host navigator '.microtime());
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
-		$form = ($update)
+		$form = $update
 			? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
 			: $dashboard->edit()->addWidget()->asForm();
 
@@ -719,19 +764,18 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 			$this->getGroupByTable()->fill($data['group_by']);
 		}
 
-		if ($expected === TEST_GOOD) {
+		if ($data['expected'] === TEST_GOOD) {
 			$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		}
 
 		$form->submit();
 
 		// Trim leading and trailing spaces from expected results if necessary.
-		if (array_key_exists('trim', $data)) {
-			foreach ($data['trim'] as $field) {
-				$data['fields'][$field] = trim($data['fields'][$field]);
-			}
+		if (CTestArrayHelper::get($data, 'trim', false)) {
+			$data = CTestArrayHelper::trim($data);
 		}
-		if ($expected === TEST_BAD) {
+
+		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
@@ -835,7 +879,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 			'id:host_tags_0_tag' => 'trigger',
 			'id:host_tags_0_operator' => 'Does not contain',
 			'id:host_tags_0_value' => 'cancel',
-			'id:severities_5' => true,
+			'Disaster' => true,
 			'Show hosts in maintenance' => true,
 			'Show problems' => 'All',
 			'Host limit' => '50'
@@ -898,7 +942,7 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	 */
 	public function testDashboardHostNavigatorWidget_MaintenanceIconHintbox() {
 		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
-				['Hosts' => 'Available host in maintenance', 'Show hosts in maintenance' => true]);
+				['Host patterns' => self::MAINTENANCE_HOSTNAME, 'Show hosts in maintenance' => true]);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->save();
 		$this->page->waitUntilReady();
@@ -907,8 +951,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 		$widget = $dashboard->getWidget(self::DEFAULT_WIDGET);
 		$widget->query('xpath://button['.CXPathHelper::fromClass('zi-wrench-alt-small').']')->waitUntilClickable()->one()->click();
 		$hint = $widget->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
-		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
-				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
+		$hint_text = "Maintenance for Host navigator widget [Maintenance with data collection]\n".
+				"Maintenance for icon check in Host navigator widget";
 		$this->assertEquals($hint_text, $hint);
 	}
 
@@ -917,8 +961,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	 */
 	public function testDashboardHostNavigatorWidget_RowHighlight() {
 		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
-				['Hosts' => 'Second host for host navigator widget']);
-		$this->checkRowHighlight(self::DEFAULT_WIDGET);
+				['Host patterns' => 'Second host for host navigator widget']);
+		$this->checkRowHighlight(self::DEFAULT_WIDGET, true);
 		CDashboardElement::find()->one()->save();
 		$this->checkRowHighlight(self::DEFAULT_WIDGET);
 	}
@@ -927,9 +971,13 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	 * Check if row with host is highlighted on click.
 	 *
 	 * @param string		$widget_name		widget name
+	 * @param boolean 		$edit				edit is performed
 	 */
-	protected function checkRowHighlight($widget_name) {
-		$widget = CDashboardElement::find()->one()->edit()->getWidget($widget_name);
+	protected function checkRowHighlight($widget_name, $edit = false) {
+		$widget = $edit
+			? CDashboardElement::find()->one()->edit()->getWidget($widget_name)
+			: CDashboardElement::find()->one()->getWidget($widget_name);
+
 		$widget->waitUntilReady();
 		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
 		$this->assertFalse($widget->query($locator)->one(false)->isValid());
@@ -947,7 +995,6 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	protected function setWidgetConfiguration($dashboardid, $widget_name, $configuration) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->edit();
-		$widget = $dashboard->getWidget($widget_name);
 		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
 		$form->fill($configuration);
 		$form->submit();
