@@ -109,7 +109,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 //								'name' => 'Awesome map tree',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -132,9 +132,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'map',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -148,9 +148,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 								'type' => 'favgraphs',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 4,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							]
 						]
@@ -163,15 +163,15 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'favgraphs',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							]
 						]
@@ -185,15 +185,15 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'systeminfo',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							]
 						]
@@ -206,15 +206,15 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'emptyWidget',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							]
 						]

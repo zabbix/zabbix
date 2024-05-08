@@ -110,7 +110,7 @@ class testDashboardPieChartWidget extends testWidgets {
 						[
 							'name' => 'Pie chart for cancel',
 							'type' => 'piechart',
-							'x' => 38,
+							'x' => 36,
 							'y' => 0,
 							'width' => 18,
 							'height' => 4,
@@ -804,7 +804,7 @@ class testDashboardPieChartWidget extends testWidgets {
 						[
 							'name' => 'Edit widget',
 							'type' => 'piechart',
-							'width' => 12,
+							'width' => 36,
 							'height' => 8,
 							'fields' => [
 								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
@@ -1052,7 +1052,7 @@ class testDashboardPieChartWidget extends testWidgets {
 							'name' => $data['widget_name'],
 							'view_mode' => CTestArrayHelper::get($data, 'view_mode', 0),
 							'type' => 'piechart',
-							'width' => 8,
+							'width' => 24,
 							'height' => 6,
 							'fields' => $data['widget_fields']
 						]
