@@ -164,6 +164,9 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
+			)
+			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
 					->setDefault('{ITEM.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
@@ -316,9 +319,6 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
-			)
-			->addField(
-				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

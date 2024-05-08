@@ -47,6 +47,10 @@ $form
 	->addField(
 		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(3)
 	)
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
+		: null
+	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addField(
@@ -70,10 +74,6 @@ $form
 			->addFieldsGroup(
 				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-thresholds')
 			)
-	)
-	->addField($data['templateid'] === null
-		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
-		: null
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_gauge_form.init('.json_encode([
