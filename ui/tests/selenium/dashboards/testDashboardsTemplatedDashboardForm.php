@@ -3223,8 +3223,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -3257,8 +3257,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -3278,8 +3278,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],

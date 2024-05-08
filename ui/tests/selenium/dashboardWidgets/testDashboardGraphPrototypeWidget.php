@@ -130,8 +130,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 						'Rows' => '0'
 					],
 					'error' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -146,8 +146,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 						'Rows' => '17'
 					],
 					'error' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			]
