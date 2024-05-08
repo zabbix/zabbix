@@ -73,47 +73,47 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'actionlog',
 								'name' => 'Action log widget',
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'clock',
 								'name' => 'Clock widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'discovery',
 								'name' => 'Discovery status widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'favgraphs',
 								'name' => 'Favorite graphs widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'favmaps',
 								'name' => 'Favorite maps widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'gauge',
 								'name' => 'Gauge widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -138,15 +138,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Geomap widget',
 								'x' => 0,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'graph',
 								'name' => 'Graph (classic) widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -164,9 +164,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'graphprototype',
 								'name' => 'Graph prototype widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -179,9 +179,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'Graph widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -204,17 +204,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'hostavail',
 								'name' => 'Host availability widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'item',
 								'name' => 'Item value widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -244,7 +244,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Map widget',
 								'x' => 0,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -257,9 +257,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'navtree',
 								'name' => 'Map navigation tree widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -272,9 +272,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'piechart',
 								'name' => 'Pie chart widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
@@ -285,9 +285,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'plaintext',
 								'name' => 'Plain text widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -300,17 +300,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'problems',
 								'name' => 'Problems widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -318,15 +318,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Problems by severity widget',
 								'x' => 0,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'slareport',
 								'name' => 'SLA report widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -344,17 +344,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info details widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info HA nodes widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -367,9 +367,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -417,9 +417,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -427,15 +427,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Trigger overview widget',
 								'x' => 0,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -448,17 +448,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'dataover',
 								'name' => 'Data overview widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							]
 						]
@@ -477,7 +477,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Empty navtree widget',
 								'x' => 0,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
@@ -506,15 +506,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Widget for update',
 								'x' => 0,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'clock',
 								'name' => 'Widget 4 duplicate check',
-								'x' => 4,
+								'x' => 12,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -522,7 +522,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Empty navtree widget',
 								'x' => 0,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
@@ -3250,8 +3250,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Graph prototype widget with too much Columns',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
-						'Columns' => 55,
-						'Rows' => 55
+						'Columns' => 73,
+						'Rows' => 65
 					],
 					'swap_expected' => [
 						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
