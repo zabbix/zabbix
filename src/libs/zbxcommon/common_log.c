@@ -45,7 +45,8 @@ void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_pro
 
 void	zbx_this_should_never_happen_backtrace(void)
 {
-	backtrace_cb();
+	if (NULL != backtrace_cb)
+		backtrace_cb();
 }
 
 void	zbx_log_handle(int level, const char *fmt, ...)
