@@ -430,7 +430,7 @@ class CRole extends CApiService {
 			$this->checkUiRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkServicesRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkModulesRules($name, $role['rules']);
-			$this->checkApiRules($name, $role['rules']);
+			$this->checkApiRules($name, $role);
 			$this->checkActionsRules($name, (int) $type, $role['rules']);
 		}
 	}
@@ -711,22 +711,22 @@ class CRole extends CApiService {
 
 	/**
 	 * @param string $name
-	 * @param array  $rules
+	 * @param array  $role
 	 *
 	 * @throws APIException
 	 */
-	private function checkApiRules(string $name, array $rules): void {
-		if (!array_key_exists('api', $rules)) {
+	private function checkApiRules(string $name, array $role): void {
+		if (!array_key_exists('api', $role['rules'])) {
 			return;
 		}
 
-		foreach ($rules['api'] as $rule) {
+		foreach ($role['rules']['api'] as $rule) {
 			if ($rule === ZBX_ROLE_RULE_API_WILDCARD || $rule === ZBX_ROLE_RULE_API_WILDCARD_ALIAS) {
 				continue;
 			}
 
-			if (!in_array($rule, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN), true)
-					&& !in_array($rule, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN), true)) {
+			if (!in_array($rule, CRoleHelper::getApiMethodMasks($role['type']), true)
+					&& !in_array($rule, CRoleHelper::getApiMethods($role['type']), true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid API method "%2$s" for user role "%1$s".', $name, $rule)
 				);
