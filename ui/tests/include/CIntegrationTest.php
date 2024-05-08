@@ -263,13 +263,17 @@ class CIntegrationTest extends CAPITest {
 			}
 		}
 
+		$case_name = strtr($this->getName(true), [' ' => '-']);
+		mkdir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name, 0775, true);
 		if ($this->hasFailed()) {
-			$case_name = strtr($this->getName(true), [' ' => '-']);
 			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
+		}
 
-			foreach ($components as $component) {
-				$log_file = self::getLogPath($component);
-				if (file_exists($log_file)) {
+		foreach (self::getComponents() as $component) {
+			$log_file = self::getLogPath($component);
+			if (file_exists($log_file)) {
+				copy($log_file, PHPUNIT_COMPONENT_DIR.'all/'.$case_name.'/'.basename($log_file));
+				if ($this->hasFailed()) {
 					rename($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
 				}
 			}
