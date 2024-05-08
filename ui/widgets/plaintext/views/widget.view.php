@@ -99,8 +99,7 @@ else {
 			$history_item = [
 				'columnid' => $columnid,
 				'clock' => $item_value['clock'],
-				'ns' => $item_value['ns'],
-				'local_time' => false
+				'ns' => $item_value['ns']
 			];
 
 			$color = $column['base_color'];
@@ -161,7 +160,9 @@ else {
 					break;
 
 				case ITEM_VALUE_TYPE_LOG:
-					$history_item['local_time'] = (bool) $column['local_time'];
+					if (array_key_exists('local_time', $column) && $column['local_time']) {
+						$history_item['clock'] = $item_value['timestamp'];
+					}
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 					if (array_key_exists('highlights', $column)) {
@@ -195,9 +196,7 @@ else {
 
 				case ITEM_VALUE_TYPE_BINARY:
 					$history_item['value'][] = (new CCol((new CButtonLink(_('Show')))
-						->setHint(
-							italic($item_value['value'])->addClass(ZBX_STYLE_GREY)
-						)
+						->setHint(italic($item_value['value'])->addClass(ZBX_STYLE_GREY))
 						->onMouseover('')
 					))
 						->addStyle('height: 56px;');
@@ -260,7 +259,6 @@ else {
 							zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
 						))
 							->addClass(ZBX_STYLE_NOWRAP)
-							->addClass($history_item['local_time'] ? 'js-timestamp-to-local-time' : null)
 					]
 					: [];
 
