@@ -43,7 +43,7 @@ class CSystemInfoHelper {
 		];
 
 		if ($data['is_software_update_check_enabled']) {
-			$data['check_data'] = CSettingsHelper::getSoftwareUpdateCheckData();
+			$data['software_update_check_data'] = static::getSoftwareUpdateCheckData();
 		}
 
 		$db_backend = DB::getDbBackend();
@@ -280,5 +280,48 @@ class CSystemInfoHelper {
 		$status['server_version'] = $server_status['server stats']['version'];
 
 		return $status;
+	}
+
+	private static function getSoftwareUpdateCheckData(): array {
+		$check_data = CSettingsHelper::getSoftwareUpdateCheckData();
+
+		if (!$check_data) {
+			return [];
+		}
+
+		$data = [
+			'lastcheck' => $check_data['lastcheck']
+		];
+
+		// Return basic data if the last successful check for software updates was made more than a week ago.
+		if ($check_data['lastcheck'] - $check_data['lastcheck_success'] > 604800) {
+			return $data;
+		}
+
+		CArrayHelper::sort($check_data['versions'], [['field' => 'version', 'order' => ZBX_SORT_DOWN]]);
+
+		$latest_release = null;
+		$is_lts_version = explode('.', ZABBIX_EXPORT_VERSION)[1] === '0';
+
+		foreach ($check_data['versions'] as $version) {
+			if (version_compare($version['version'], ZABBIX_EXPORT_VERSION, '<')) {
+				break;
+			}
+
+			if ($version['version'] === ZABBIX_EXPORT_VERSION) {
+				$data['end_of_full_support'] = $version['end_of_full_support'];
+				$data['latest_release'] = $latest_release ?? $version['latest_release']['release'];
+
+				break;
+			}
+
+			if ($latest_release === null && !$version['end_of_full_support']) {
+				if (!$is_lts_version || explode('.', $version['version'])[1] === '0') {
+					$latest_release = $version['latest_release']['release'];
+				}
+			}
+		}
+
+		return $data;
 	}
 }

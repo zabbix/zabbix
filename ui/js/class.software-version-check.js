@@ -71,26 +71,19 @@ class CSoftwareVersionCheck {
 		fetch(curl.getUrl(), {mode: 'no-cors'})
 			.then(response => response.json())
 			.then(response => {
-				this.#data.lastcheck = this.#data.now;
 				this.#data.lastcheck_success = this.#data.now;
 				this.#data.nextcheck = this.#data.now + CSoftwareVersionCheck.DELAY;
 
 				if ('versions' in response) {
-					for (const data of response.versions) {
-						if (data.version === this.#data.major_version) {
-							this.#data.end_of_full_support = data.end_of_full_support;
-							this.#data.latest_release = data.latest_release;
-
-							break;
-						}
-					}
+					this.#data.versions = response.versions;
 				}
 			})
 			.catch(() => {
-				this.#data.lastcheck = this.#data.now;
 				this.#data.nextcheck = this.#data.now + CSoftwareVersionCheck.DELAY_ON_FAIL;
 			})
 			.finally(() => {
+				this.#data.lastcheck = this.#data.now;
+
 				this.#update();
 			});
 	}
@@ -104,14 +97,9 @@ class CSoftwareVersionCheck {
 			lastcheck: this.#data.lastcheck,
 			lastcheck_success: this.#data.lastcheck_success,
 			nextcheck: this.#data.nextcheck,
+			versions: this.#data.versions || [],
 			_csrf_token: this.#data._csrf_token
 		};
-
-		for (const field of ['end_of_full_support', 'latest_release']) {
-			if (field in this.#data) {
-				data[field] = this.#data[field];
-			}
-		}
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

@@ -37,68 +37,45 @@ $info_table = (new CTableInfo())
 		$data['system_info']['server_details']
 	]);
 
-$server_version = [
-	'version' => $status['has_status'] ? $status['server_version'] : '',
-	'version_details' => ''
-];
-$frontend_version = [
-	'version' => ZABBIX_VERSION,
-	'version_details' => ''
-];
-$last_checked = '';
+$server_version = $status['has_status'] ? $status['server_version'] : '';
+$server_version_details = '';
+$frontend_version = ZABBIX_VERSION;
+$frontend_version_details = '';
+$last_checked =  '';
 $latest_release = '';
 $release_notes = '';
 
 if ($data['system_info']['is_software_update_check_enabled']) {
-	$check_data = $data['system_info']['check_data'];
+	$check_data = $data['system_info']['software_update_check_data'];
 
-	if ($check_data) {
-		// Display data only if the last successful check for software updates was made no more than a week ago.
-		$is_recent_data = $check_data['lastcheck'] - $check_data['lastcheck_success'] < 604800;
+	if (array_key_exists('end_of_full_support', $check_data) && $check_data['end_of_full_support']) {
+		$version_details = [makeWarningIcon(_('Please upgrade to latest major release.')), ' ', _('Outdated')];
 
-		if ($is_recent_data) {
-			if (array_key_exists('end_of_full_support', $check_data) && $check_data['end_of_full_support']) {
-				$version_details = [makeWarningIcon(_('Please upgrade to latest major release.')), ' ', _('Outdated')];
-
-				$server_version['version_details'] = $version_details;
-				$frontend_version['version_details'] = $version_details;
-			}
-			elseif (array_key_exists('latest_release', $check_data)) {
-				if ($status['has_status']) {
-					if (version_compare($server_version['version'], $check_data['latest_release']['release'], '<')) {
-						$server_version['version_details'] = (new CSpan(_('New update available')))
-							->addClass(ZBX_STYLE_COLOR_WARNING);
-					}
-					else {
-						$server_version['version_details'] = (new CSpan(_('Up to date')))
-							->addClass(ZBX_STYLE_COLOR_POSITIVE);
-					}
-				}
-
-				if (version_compare($frontend_version['version'], $check_data['latest_release']['release'], '<')) {
-					$frontend_version['version_details'] = (new CSpan(_('New update available')))
-						->addClass(ZBX_STYLE_COLOR_WARNING);
-				}
-				else {
-					$frontend_version['version_details'] = (new CSpan(_('Up to date')))
-						->addClass(ZBX_STYLE_COLOR_POSITIVE);
-				}
-			}
+		$server_version_details = $version_details;
+		$frontend_version_details = $version_details;
+	}
+	elseif (array_key_exists('latest_release', $check_data)) {
+		if ($status['has_status']) {
+			$server_version_details = version_compare($server_version, $check_data['latest_release'], '<')
+				? (new CSpan(_('New update available')))->addClass(ZBX_STYLE_COLOR_WARNING)
+				: (new CSpan(_('Up to date')))->addClass(ZBX_STYLE_COLOR_POSITIVE);
 		}
 
-		if ($data['show_software_update_check_details']) {
-			if ($check_data['lastcheck'] > 0) {
-				$last_checked = (new DateTime('@'.$check_data['lastcheck']))->format(ZBX_DATE);
-			}
+		$frontend_version_details = version_compare($frontend_version, $check_data['latest_release'], '<')
+			? (new CSpan(_('New update available')))->addClass(ZBX_STYLE_COLOR_WARNING)
+			: (new CSpan(_('Up to date')))->addClass(ZBX_STYLE_COLOR_POSITIVE);
+	}
 
-			if ($is_recent_data && array_key_exists('latest_release', $check_data)) {
-				$latest_release = $check_data['latest_release']['release'];
-				$release_notes = (new CLink(_('Release notes'),
-					(new CUrl("https://www.zabbix.com/rn/rn{$latest_release}"))->getUrl()
-				))
-					->addClass(ZBX_STYLE_LINK_EXTERNAL)
-					->setTarget('_blank');
-			}
+	if ($data['show_software_update_check_details'] && array_key_exists('lastcheck', $check_data)) {
+		$last_checked = (new DateTime('@'.$check_data['lastcheck']))->format(ZBX_DATE);
+
+		if (array_key_exists('latest_release', $check_data)) {
+			$latest_release = $check_data['latest_release'];
+			$release_notes = (new CLink(_('Release notes'),
+				(new CUrl("https://www.zabbix.com/rn/rn{$latest_release}"))->getUrl()
+			))
+				->addClass(ZBX_STYLE_LINK_EXTERNAL)
+				->setTarget('_blank');
 		}
 	}
 }
@@ -106,16 +83,16 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 $info_table
 	->addRow([
 		_('Zabbix server version'),
-		$server_version['version'],
-		$status['has_status'] ? $server_version['version_details'] : ''
+		$server_version,
+		$server_version_details
 	])
 	->addRow([
 		_('Zabbix frontend version'),
-		$frontend_version['version'],
-		$frontend_version['version_details']
+		$frontend_version,
+		$frontend_version_details
 	]);
 
-if ($data['show_software_update_check_details']) {
+if ($data['system_info']['is_software_update_check_enabled'] && $data['show_software_update_check_details']) {
 	$info_table
 		->addRow([
 			_('Software update last checked'),

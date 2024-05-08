@@ -45,20 +45,11 @@ class CControllerSoftwareVersionCheckGet extends CController {
 				'lastcheck_success' => 0,
 				'nextcheck' => 0
 			];
-			$data['major_version'] = self::getServerMajorVersion();
+			$data['major_version'] = ZABBIX_EXPORT_VERSION;
 			$data['check_hash'] = CSettingsHelper::getPrivate(CSettingsHelper::SOFTWARE_UPDATE_CHECKID);
 			$data['_csrf_token'] = CCsrfTokenHelper::get('softwareversioncheck');
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
-	}
-
-	private static function getServerMajorVersion(): string {
-		$server_status = CSettingsHelper::getServerStatus();
-
-		return array_key_exists('version', $server_status)
-				&& preg_match('/\d+.\d+/', $server_status['version'], $matches)
-			? $matches[0]
-			: '';
 	}
 }

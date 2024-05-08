@@ -27,11 +27,10 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'lastcheck' =>				'required|int32',
-			'lastcheck_success' =>		'required|int32',
-			'nextcheck' =>				'required|int32',
-			'end_of_full_support' =>	'bool',
-			'latest_release' =>			'array'
+			'lastcheck' =>			'required|int32',
+			'lastcheck_success' =>	'required|int32',
+			'nextcheck' =>			'required|int32',
+			'versions' =>			'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,7 +56,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 		$settings = ['software_update_check_data' => []];
 
 		$this->getInputs($settings['software_update_check_data'], ['lastcheck', 'lastcheck_success', 'nextcheck',
-			'end_of_full_support', 'latest_release'
+			'versions'
 		]);
 
 		$output = [];
