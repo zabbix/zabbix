@@ -668,7 +668,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	res_state_local.retrans = retrans;
 	res_state_local.retry = retry;
-	memset(&answer.buffer, 0, sizeof(answer));
+	memset(&answer.buffer, 0, sizeof(answer.buffer));
 	res = res_nsend(&res_state_local, buf, res, answer.buffer, sizeof(answer.buffer));
 
 #	ifdef HAVE_RES_U_EXT	/* Linux */
