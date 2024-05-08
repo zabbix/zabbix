@@ -33,7 +33,7 @@ rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
 rabbitmqctl set_user_tags zbx_monitor monitoring
 ```
 
-3. Set the hostname or IP address of the the RabbitMQ cluster host in the `{$RABBITMQ.API.CLUSTER_HOST}` macro. You can also change the port in the `{$RABBITMQ.API.PORT}` macro and the scheme in the `{$RABBITMQ.API.SCHEME}` macro if necessary.
+3. Set the hostname or IP address of the RabbitMQ cluster host in the `{$RABBITMQ.API.CLUSTER_HOST}` macro. You can also change the port in the `{$RABBITMQ.API.PORT}` macro and the scheme in the `{$RABBITMQ.API.SCHEME}` macro if necessary.
 
 4. Set the user name and password in the macros `{$RABBITMQ.API.USER}` and `{$RABBITMQ.API.PASSWORD}`.
 
@@ -166,7 +166,7 @@ rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
 rabbitmqctl set_user_tags zbx_monitor monitoring
 ```
 
-3. Set the hostname or IP address of the the RabbitMQ node host in the `{$RABBITMQ.API.HOST}` macro. You can also change the port in the `{$RABBITMQ.API.PORT}` macro and the scheme in the `{$RABBITMQ.API.SCHEME}` macro if necessary.
+3. Set the hostname or IP address of the RabbitMQ node host in the `{$RABBITMQ.API.HOST}` macro. You can also change the port in the `{$RABBITMQ.API.PORT}` macro and the scheme in the `{$RABBITMQ.API.SCHEME}` macro if necessary.
 
 4. Set the user name and password in the macros `{$RABBITMQ.API.USER}` and `{$RABBITMQ.API.PASSWORD}`.
 
