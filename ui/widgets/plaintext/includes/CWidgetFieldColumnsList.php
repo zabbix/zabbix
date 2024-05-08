@@ -176,7 +176,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'base_color'		=> ['type' => API_COLOR, 'default' => ''],
 			'highlights'		=> ['type' =>  API_OBJECTS, 'uniq' => [['pattern']], 'fields' => [
 				'color'				=> ['type' => API_COLOR],
-				'pattern'			=> ['type' => API_STRING_UTF8, 'length' => 255],
+				'pattern'			=> ['type' => API_REGEX, 'flags' => API_NOT_EMPTY, 'length' => 255],
 			]],
 			'display'			=> ['type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS, self::DISPLAY_HTML, self::DISPLAY_SINGLE_LINE])],
 			'max_length'		=> ['type' => API_MULTIPLE, 'rules' => [

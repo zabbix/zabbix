@@ -26,6 +26,7 @@ window.widget_plaintext_form = new class {
 	#form;
 	#templateid;
 	#list_columns;
+	#column_index;
 
 	init({templateid}) {
 		this.#form = document.getElementById('widget-dialogue-form');
@@ -48,7 +49,7 @@ window.widget_plaintext_form = new class {
 
 		switch (target.getAttribute('name')) {
 			case 'add':
-				this._column_index = this.#list_columns.querySelectorAll('tr').length;
+				this.#column_index = this.#list_columns.querySelectorAll('tr').length;
 
 				column_popup = PopUp(
 					'widget.plaintext.column.edit',
@@ -65,12 +66,12 @@ window.widget_plaintext_form = new class {
 			case 'edit':
 				const form_fields = getFormFields(this.#form);
 
-				this._column_index = target.closest('tr').querySelector('[name="sort_order[columns][]"]').value;
+				this.#column_index = target.closest('tr').querySelector('[name="sort_order[columns][]"]').value;
 
 				column_popup = PopUp(
 					'widget.plaintext.column.edit',
 					{
-						...form_fields.columns[this._column_index],
+						...form_fields.columns[this.#column_index],
 						edit: 1,
 						templateid: this.#templateid
 					}, {
@@ -97,23 +98,23 @@ window.widget_plaintext_form = new class {
 		input.setAttribute('type', 'hidden');
 
 		if (data.edit) {
-			this.#list_columns.querySelectorAll(`[name^="columns[${this._column_index}][`)
+			this.#list_columns.querySelectorAll(`[name^="columns[${this.#column_index}][`)
 				.forEach((node) => node.remove());
 
 			delete data.edit;
 		}
 		else {
 			input.setAttribute('name', `sort_order[columns][]`);
-			input.setAttribute('value', this._column_index);
+			input.setAttribute('value', this.#column_index);
 			this.#form.appendChild(input.cloneNode());
 		}
 
 		if (data.thresholds) {
 			for (const [key, value] of Object.entries(data.thresholds)) {
-				input.setAttribute('name', `columns[${this._column_index}][thresholds][${key}][color]`);
+				input.setAttribute('name', `columns[${this.#column_index}][thresholds][${key}][color]`);
 				input.setAttribute('value', value.color);
 				this.#form.appendChild(input.cloneNode());
-				input.setAttribute('name', `columns[${this._column_index}][thresholds][${key}][threshold]`);
+				input.setAttribute('name', `columns[${this.#column_index}][thresholds][${key}][threshold]`);
 				input.setAttribute('value', value.threshold);
 				this.#form.appendChild(input.cloneNode());
 			}
@@ -123,10 +124,10 @@ window.widget_plaintext_form = new class {
 
 		if (data.highlights) {
 			for (const [key, value] of Object.entries(data.highlights)) {
-				input.setAttribute('name', `columns[${this._column_index}][highlights][${key}][color]`);
+				input.setAttribute('name', `columns[${this.#column_index}][highlights][${key}][color]`);
 				input.setAttribute('value', value.color);
 				this.#form.appendChild(input.cloneNode());
-				input.setAttribute('name', `columns[${this._column_index}][highlights][${key}][pattern]`);
+				input.setAttribute('name', `columns[${this.#column_index}][highlights][${key}][pattern]`);
 				input.setAttribute('value', value.pattern);
 				this.#form.appendChild(input.cloneNode());
 			}
@@ -135,7 +136,7 @@ window.widget_plaintext_form = new class {
 		}
 
 		for (const [key, value] of Object.entries(data)) {
-			input.setAttribute('name', `columns[${this._column_index}][${key}]`);
+			input.setAttribute('name', `columns[${this.#column_index}][${key}]`);
 			input.setAttribute('value', value);
 			this.#form.appendChild(input.cloneNode());
 		}

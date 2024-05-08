@@ -213,8 +213,8 @@ window.item_history_column_edit = new class {
 		const is_item_text_type = !is_item_numeric_type && text_types.some((type) => type == this.#item_value_type);
 
 		const display_value = document.querySelector('[name=display]:checked').value;
-		const show_min_max = is_item_numeric_type && display_value == <?= CWidgetFieldColumnsList::DISPLAY_BAR ?>
-			|| display_value == <?= CWidgetFieldColumnsList::DISPLAY_INDICATORS?>;
+		const show_min_max = is_item_numeric_type && (display_value == <?= CWidgetFieldColumnsList::DISPLAY_BAR ?>
+			|| display_value == <?= CWidgetFieldColumnsList::DISPLAY_INDICATORS?>);
 
 		// Toggle row visibility
 		const rows = {
