@@ -1115,7 +1115,7 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 	$temp = [];
 	foreach ($macros as $key => $macro) {
-		$temp[$key] = substr($macro[$sortfield], 2, strlen($macro[$sortfield]) - 3);
+		$temp[$key] = substr($macro[$sortfield], 2, -1);
 	}
 	order_result($temp, null, $order);
 
