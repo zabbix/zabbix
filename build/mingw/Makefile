@@ -13,6 +13,7 @@ CC = gcc
 WINDRES = windres.exe
 
 OBJS = \
+	$(OUTPUTDIR)\aux.o \
 	$(OUTPUTDIR)\threads.o \
 	$(OUTPUTDIR)\interval.o \
 	$(OUTPUTDIR)\num.o \
@@ -119,6 +120,9 @@ GOLDFLAGS += -X main.confDefault=zabbix_agent2.win.conf
 GOLDFLAGS += -X main.applicationName=zabbix_agent2
 
 all: $(TARGETBIN)
+
+$(OUTPUTDIR)\aux.o: $(TOPDIR)\src\libs\zbxaux\aux.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\misc.o: $(TOPDIR)\src\libs\zbxcommon\misc.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@

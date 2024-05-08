@@ -31,6 +31,7 @@
 #include "zbxalgo.h"
 #include "zbxcfg.h"
 #include "zbxmutexs.h"
+#include "zbxaux.h"
 
 static char	*config_pid_file = NULL;
 
@@ -566,7 +567,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		default:
 			zbx_error("mutually exclusive options used");
-			zbx_print_usage(usage_message, zbx_progname);
+			zbx_print_usage(zbx_progname, usage_message);
 			ret = FAIL;
 			goto out;
 	}
@@ -1538,7 +1539,7 @@ int	main(int argc, char **argv)
 	argv = zbx_setproctitle_init(argc, argv);
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
@@ -1592,7 +1593,7 @@ int	main(int argc, char **argv)
 	switch (t.task)
 	{
 		case ZBX_TASK_SHOW_USAGE:
-			zbx_print_usage(usage_message, zbx_progname);
+			zbx_print_usage(zbx_progname, usage_message);
 			exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS
@@ -1721,7 +1722,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			zbx_print_help(config_file, help_message, usage_message, zbx_progname);
+			zbx_print_help(zbx_progname, help_message, usage_message, config_file);
 			exit(EXIT_SUCCESS);
 			break;
 		default:

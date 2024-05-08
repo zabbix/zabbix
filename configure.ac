@@ -2000,6 +2000,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxasynchttppoller/Makefile
 	src/libs/zbxaudit/Makefile
 	src/libs/zbxautoreg/Makefile
+	src/libs/zbxaux/Makefile
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
