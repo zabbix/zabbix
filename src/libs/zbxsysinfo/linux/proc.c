@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <linux/version.h>
 #include "proc.h"
+#include <linux/version.h>
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
@@ -427,7 +427,7 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  ******************************************************************************/
 int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *bytes)
 {
-	int 	label_len = strlen(label);
+	int	label_len = strlen(label);
 	char	*p_unit;
 
 	if (0 == strncmp(srcstr, label, label_len))
@@ -448,50 +448,31 @@ int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *bytes)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrive program core memory usage in bytes                        *
+ * Purpose: Retrieves program core memory usage in bytes                      *
  *          ported from getMemStats ps_mem.py v3.14                           *
  *                                                                            *
  * Parameters:                                                                *
- *     pid    - [IN] process id                                               *
+ *     pid    - [IN]                                                          *
  *     bytes  - [OUT] result in bytes                                         *
  *                                                                            *
  ******************************************************************************/
 void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 {
-	int	shared = 0;
-	int 	private = 0;
-	int 	private_huge = 0;
-	int 	shared_huge = 0;
-	int 	psize = (int)getpagesize() / 1024;
-	int 	have_pss = 0;
-	int  	pss = 0;
-	int  	rss = 0;
-	FILE	*f_statm = NULL;
-	FILE	*f_smaps = NULL;
-	FILE	*f_smaps_rollup = NULL;
-	int  	shared_old = 0;
-	char	tmp[MAX_STRING_LEN];
+	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0, pss = 0, rss = 0;
+	int		have_pss = 0, shared_old = 0;
+	FILE		*f_statm = NULL, *f_smaps = NULL;
+	char		*statm_rss_str, tmp[MAX_STRING_LEN];
 
-	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/statm", pid);
-	if (NULL == (f_statm = fopen(tmp, "r")))
-		return;
-
-	fgets(tmp, (int)sizeof(tmp), f_statm);
-	char	*statm_rss_str = strchr(tmp, ' ') + 1;
-	rss = atoi(statm_rss_str) * psize;
-	statm_rss_str = strchr(statm_rss_str, ' ') + 1;
-	shared_old = atoi(statm_rss_str);
-	zbx_fclose(f_statm);
-
-	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps", pid);
-	if (NULL != (f_smaps = fopen(tmp, "r")))
+	*bytes = 0;
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps_rollup", pid);
+	if (NULL == (f_smaps = fopen(tmp, "r")))
 	{
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps_rollup", pid);
-		if (NULL != (f_smaps_rollup = fopen(tmp, "r")))
-		{
-			zbx_fclose(f_smaps);
-			f_smaps = f_smaps_rollup;
-		}
+		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps", pid);
+		f_smaps = fopen(tmp, "r");
+	}
+
+	if(NULL != f_smaps)
+	{
 		while (NULL != fgets(tmp, (int)sizeof(tmp), f_smaps))
 		{
 			zbx_uint64_t num;
@@ -523,19 +504,34 @@ void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		private += private_huge;
 
 		zbx_fclose(f_smaps);
-	} else if ((KERNEL_VERSION(2, 6, 1) >= LINUX_VERSION_CODE) &&
-		(KERNEL_VERSION(2, 6, 9) <= LINUX_VERSION_CODE))
-	{
-		shared = 0;
-		shared_huge = 0;
-		private = rss;
 	} else {
-		shared = shared_old;
-		shared *= psize;
-		shared_huge = 0;
-		private = rss - shared;
-	}
+		int	psize = (int)getpagesize() / 1024;
+		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/statm", pid);
+		if (NULL == (f_statm = fopen(tmp, "r")))
+			return;
+		if(NULL == fgets(tmp, (int)sizeof(tmp), f_statm))
+			return;
+		if(NULL == (statm_rss_str = strchr(tmp, ' ') + 1))
+			return;
+		rss = atoi(statm_rss_str) * psize;
+		if(NULL == (statm_rss_str = strchr(statm_rss_str, ' ') + 1))
+			return;
+		shared_old = atoi(statm_rss_str);
+		zbx_fclose(f_statm);
 
+		if ((KERNEL_VERSION(2, 6, 1) >= LINUX_VERSION_CODE) &&
+			(KERNEL_VERSION(2, 6, 9) <= LINUX_VERSION_CODE))
+		{
+			shared = 0;
+			shared_huge = 0;
+			private = rss;
+		} else {
+			shared = shared_old;
+			shared *= psize;
+			shared_huge = 0;
+			private = rss - shared;
+		}
+	}
 	*bytes = shared + private + shared_huge;
 }
 
