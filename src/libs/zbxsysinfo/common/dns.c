@@ -546,6 +546,13 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		*buffer = '\0';
 	}
 #else	/* !defined(_WINDOWS) && !defined(__MINGW32__) */
+
+#ifdef HAVE_RES_NDESTROY
+#	define zbx_free_res(ptr) res_ndestroy(ptr);
+#else
+#	define zbx_free_res(ptr) res_nclose(ptr);
+#endif
+
 #if defined(HAVE_RES_NINIT) && !defined(_AIX)
 	memset(&res_state_local, 0, sizeof(res_state_local));
 	if (-1 == res_ninit(&res_state_local))	/* initialize always, settings might have changed */
@@ -565,11 +572,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create DNS query: %s", zbx_strerror(errno)));
 
-#ifdef HAVE_RES_NDESTROY
-		res_ndestroy(&res_state_local);
-#else
-		res_nclose(&res_state_local);
-#endif
+		zbx_free_res(&res_state_local);
 
 		return SYSINFO_RET_FAIL;
 	}
@@ -580,11 +583,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IP address."));
 
-#ifdef HAVE_RES_NDESTROY
-			res_ndestroy(&res_state_local);
-#else
-			res_nclose(&res_state_local);
-#endif
+			zbx_free_res(&res_state_local);
 
 			return SYSINFO_RET_FAIL;
 		}
@@ -610,11 +609,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IPv6 address."));
 
-#ifdef HAVE_RES_NDESTROY
-			res_ndestroy(&res_state_local);
-#else
-			res_nclose(&res_state_local);
-#endif
+			zbx_free_res(&res_state_local);
 
 			return SYSINFO_RET_FAIL;
 		}
@@ -680,11 +675,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (NULL != ip && '\0' != *ip && AF_INET6 == ip_type)
 		res_state_local._u._ext.nsaddrs[0] = saved_ns6;
 #	endif
-#	ifdef HAVE_RES_NDESTROY
-	res_ndestroy(&res_state_local);
-#	else
-	res_nclose(&res_state_local);
-#	endif
+	zbx_free_res(&res_state_local);
+
 #else	/* thread-unsafe resolver API */
 	saved_options = _res.options;
 	saved_retrans = _res.retrans;
@@ -730,11 +722,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		SET_UI64_RESULT(result, dns_is_down ? 0 : 1);
 
-#ifdef HAVE_RES_NDESTROY
-		res_ndestroy(&res_state_local);
-#else
-		res_nclose(&res_state_local);
-#endif
+		zbx_free_res(&res_state_local);
 
 		return SYSINFO_RET_OK;
 	}
@@ -750,11 +738,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		{
 			SET_DBL_RESULT(result, 0.0);
 
-#ifdef HAVE_RES_NDESTROY
-			res_ndestroy(&res_state_local);
-#else
-			res_nclose(&res_state_local);
-#endif
+			zbx_free_res(&res_state_local);
 
 			return SYSINFO_RET_OK;
 		}
@@ -767,11 +751,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			SET_DBL_RESULT(result, check_time);
 		}
 
-#ifdef HAVE_RES_NDESTROY
-		res_ndestroy(&res_state_local);
-#else
-		res_nclose(&res_state_local);
-#endif
+		zbx_free_res(&res_state_local);
 
 		return SYSINFO_RET_OK;
 	}
@@ -779,11 +759,9 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (1 == dns_is_down)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot perform DNS query."));
-#ifdef HAVE_RES_NDESTROY
-		res_ndestroy(&res_state_local);
-#else
-		res_nclose(&res_state_local);
-#endif
+
+		zbx_free_res(&res_state_local);
+
 		return SYSINFO_RET_FAIL;
 	}
 
