@@ -210,7 +210,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				new CWidgetFieldCheckBox('interpolation', _('Color interpolation111111'))
+				new CWidgetFieldCheckBox('interpolation', _('Color interpolation'))
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
