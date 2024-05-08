@@ -203,7 +203,6 @@ class CControllerMenuPopup extends CController {
 
 			if (array_key_exists('urls', $data)) {
 				foreach ($data['urls'] as &$url) {
-					$url['new_window'] = ZBX_SCRIPT_URL_NEW_WINDOW_YES;
 					$url['confirmation'] = '';
 					$url['menu_path'] = '';
 					$url['name'] = $url['label'];
@@ -958,10 +957,14 @@ class CControllerMenuPopup extends CController {
 				'confirmation' => $url['confirmation']
 			];
 
+			$target = array_key_exists('new_window', $url) && $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES
+				? '_blank'
+				: '';
+
 			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
 				$menu_data_parameters += [
 					'url' => $url['url'],
-					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : ''
+					'target' => $target
 				];
 			}
 			else {
