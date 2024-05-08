@@ -4028,16 +4028,6 @@ static int	DBpatch_6050296(void)
 
 static int	DBpatch_6050297(void)
 {
-	zbx_db_row_t		row;
-	zbx_db_result_t		result;
-	zbx_db_insert_t		db_insert_int, db_insert_str, db_insert_itemid;
-	zbx_uint64_t		last_widgetid = 0;
-	size_t			index;
-	zbx_vector_uint64_t	delete_ids;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	int			ret;
-
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -4050,7 +4040,87 @@ static int	DBpatch_6050297(void)
 		return FAIL;
 	}
 
-	zbx_vector_uint64_create(&delete_ids);
+	return SUCCEED;
+}
+
+static int	DBpatch_6050298(void)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select(
+			"select wf.widget_fieldid"
+			" from widget w,widget_field wf"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='plaintext'"
+				" and wf.name='style'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widget_fieldid;
+
+		ZBX_STR2UINT64(widget_fieldid, row[0]);
+
+		if (ZBX_DB_OK > zbx_db_execute(
+				"update widget_field"
+				" set name='layout'"
+				" where widget_fieldid=" ZBX_FS_UI64, widget_fieldid))
+		{
+			return FAIL;
+		}
+	}
+	zbx_db_free_result(result);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050299(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_int", NULL);
+
+	result = zbx_db_select(
+			"select distinct w.widgetid"
+			" from widget w,widget_field wf"
+			" where wf.widgetid=w.widgetid"
+				" and w.type='plaintext'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_timestamp", 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050300(void)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_db_insert_t		db_insert_int, db_insert_str, db_insert_itemid;
+	zbx_uint64_t		last_widgetid = 0;
+	size_t			index;
+	int			ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert_int, "widget_field", "widget_fieldid", "widgetid", "type", "name",
 			"value_int", NULL);
@@ -4125,45 +4195,6 @@ static int	DBpatch_6050297(void)
 	}
 	zbx_db_free_result(result);
 
-	result = zbx_db_select(
-			"select wf.widget_fieldid"
-			" from widget w,widget_field wf"
-			" where wf.widgetid=w.widgetid"
-				" and w.type='plaintext'"
-				" and wf.name='style'");
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		zbx_uint64_t	widget_fieldid;
-
-		ZBX_STR2UINT64(widget_fieldid, row[0]);
-
-		if (ZBX_DB_OK > zbx_db_execute(
-				"update widget_field"
-				" set name='layout'"
-				" where widget_fieldid=" ZBX_FS_UI64, widget_fieldid))
-		{
-			return FAIL;
-		}
-	}
-	zbx_db_free_result(result);
-
-	result = zbx_db_select(
-			"select distinct w.widgetid"
-			" from widget w,widget_field wf"
-			" where wf.widgetid=w.widgetid"
-				" and w.type='plaintext'");
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		zbx_uint64_t	widgetid;
-
-		ZBX_STR2UINT64(widgetid, row[0]);
-
-		zbx_db_insert_add_values(&db_insert_int, __UINT64_C(0), widgetid, 0, "show_timestamp", 1);
-	}
-	zbx_db_free_result(result);
-
 	zbx_db_insert_autoincrement(&db_insert_int, "widget_fieldid");
 	ret = zbx_db_insert_execute(&db_insert_int);
 	zbx_db_insert_clean(&db_insert_int);
@@ -4182,8 +4213,19 @@ static int	DBpatch_6050297(void)
 	ret = zbx_db_insert_execute(&db_insert_itemid);
 	zbx_db_insert_clean(&db_insert_itemid);
 
-	if (SUCCEED != ret)
-		return FAIL;
+	return ret;
+}
+
+
+static int	DBpatch_6050301(void)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_vector_uint64_t	ids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zbx_vector_uint64_create(&ids);
 
 	result = zbx_db_select(
 			"select wf.widget_fieldid"
@@ -4198,21 +4240,20 @@ static int	DBpatch_6050297(void)
 
 		ZBX_STR2UINT64(widget_fieldid, row[0]);
 
-		zbx_vector_uint64_append(&delete_ids, widget_fieldid);
+		zbx_vector_uint64_append(&ids, widget_fieldid);
 	}
 	zbx_db_free_result(result);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from widget_field where");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", delete_ids.values,
-			delete_ids.values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", ids.values, ids.values_num);
+
+	zbx_vector_uint64_destroy(&ids);
 
 	if (zbx_db_execute("%s", sql) < ZBX_DB_OK)
 		return FAIL;
 
-	zbx_vector_uint64_destroy(&delete_ids);
-
-	return ret;
+	return SUCCEED;
 }
 
 #endif
@@ -4517,5 +4558,9 @@ DBPATCH_ADD(6050294, 0, 1)
 DBPATCH_ADD(6050295, 0, 1)
 DBPATCH_ADD(6050296, 0, 1)
 DBPATCH_ADD(6050297, 0, 1)
+DBPATCH_ADD(6050298, 0, 1)
+DBPATCH_ADD(6050299, 0, 1)
+DBPATCH_ADD(6050300, 0, 1)
+DBPATCH_ADD(6050301, 0, 1)
 
 DBPATCH_END()
