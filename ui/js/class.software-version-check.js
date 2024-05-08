@@ -121,5 +121,3 @@ class CSoftwareVersionCheck {
 			});
 	}
 }
-
-ZABBIX.SoftwareVersionCheck = new CSoftwareVersionCheck();
