@@ -60,6 +60,8 @@ typedef struct
 
 	char			*last_error_message;
 	zbx_wd_error_t		*error;
+
+	void			*browser;
 }
 zbx_webdriver_t;
 

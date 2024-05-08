@@ -810,3 +810,58 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
 
 	return env;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: call base class prototype with arguments                          *
+ *                                                                            *
+ * Parameters: ctx  - [IN] duktape context                                    *
+ *             base - [IN] base class name                                    *
+ *             args - [IN] number of prototype arguments on stack             *
+ *                                                                            *
+ * Return value: 0                                                            *
+ *                                                                            *
+ ******************************************************************************/
+duk_ret_t	es_super(duk_context *ctx, const char *base, int args)
+{
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	duk_get_global_string(ctx, base);
+	duk_push_this(ctx);
+
+	for (int i = 0; i < args; i++)
+		duk_dup(ctx, i);
+
+	env->constructor_chain = 1;
+	duk_call_method(ctx, args);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the method is called from constructor chain              *
+ *                                                                            *
+ * Parameters: ctx  - [IN] duktape context                                    *
+ *                                                                            *
+ * Return value: !0 - method is called from constructor chain                 *
+ *                0 - otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	es_is_chained_constructor_call(duk_context *ctx)
+{
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	int	constructor_chain = env->constructor_chain;
+
+	env->constructor_chain = 0;
+
+	return constructor_chain || duk_is_constructor_call(env->ctx);
+}
+

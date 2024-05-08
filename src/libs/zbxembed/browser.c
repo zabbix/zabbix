@@ -80,7 +80,7 @@ static duk_ret_t	es_browser_dtor(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_browser_ctor(duk_context *ctx)
 {
-	zbx_webdriver_t	*wd;
+	zbx_webdriver_t	*wd = NULL;
 	zbx_es_env_t	*env;
 	int		err_index = -1;
 	char		*error = NULL, *capabilities = NULL;
@@ -94,20 +94,27 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	duk_pcall_prop(ctx, -3, 1);
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, -1), &capabilities))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR,  "cannot convert browser capabilities to utf8");
+	{
+		err_index = browser_push_error(ctx, NULL, "cannot convert browser capabilities to utf8");
+		goto out;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "browser::browser(%s)", capabilities);
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
-
-	duk_push_this(ctx);
+	{
+		err_index = browser_push_error(ctx, NULL, "cannot access internal environment");
+		goto out;
+	}
 
 	if (NULL == (wd = webdriver_create(env->browser_endpoint, env->config_source_ip, &error)))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot create webdriver: %s", error);
+		err_index = browser_push_error(ctx, NULL, "cannot create webdriver: %s", error);
 		goto out;
 	}
+
+	duk_push_this(ctx);
+	wd->browser = duk_get_heapptr(ctx, -1);
 
 	duk_push_string(ctx, "\xff""\xff""d");
 	duk_push_pointer(ctx, wd);
@@ -124,7 +131,12 @@ out:
 	zbx_free(error);
 
 	if (-1 != err_index)
+	{
+		if (NULL != wd)
+			webdriver_destroy(wd);
+
 		return duk_throw(ctx);
+	}
 
 	return 0;
 }
@@ -205,19 +217,19 @@ static duk_ret_t	es_browser_find_element(duk_context *ctx)
 	char		*error = NULL, *strategy = NULL, *selector = NULL, *element = NULL;
 	int		err_index = -1;
 
+	wd = es_webdriver(ctx);
+
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &strategy))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert strategy parameter to utf8");
+		err_index = browser_push_error(ctx, wd, "cannot convert strategy parameter to utf8");
 		goto out;
 	}
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &selector))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert selector parameter to utf8");
+		err_index = browser_push_error(ctx, wd, "cannot convert selector parameter to utf8");
 		goto out;
 	}
-
-	wd = es_webdriver(ctx);
 
 	if (SUCCEED != webdriver_find_element(wd, strategy, selector, &element, &error))
 	{
@@ -263,19 +275,19 @@ static duk_ret_t	es_browser_find_elements(duk_context *ctx)
 
 	zbx_vector_str_create(&elements);
 
+	wd = es_webdriver(ctx);
+
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &strategy))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert strategy parameter to utf8");
+		err_index = browser_push_error(ctx, wd, "cannot convert strategy parameter to utf8");
 		goto out;
 	}
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &selector))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert selector parameter to utf8");
+		err_index = browser_push_error(ctx, wd, "cannot convert selector parameter to utf8");
 		goto out;
 	}
-
-	wd = es_webdriver(ctx);
 
 	if (SUCCEED != webdriver_find_elements(wd, strategy, selector, &elements, &error))
 	{
@@ -998,7 +1010,7 @@ static int	es_init_browser(zbx_es_t *es, char **error)
 		return FAIL;
 	}
 
-	return SUCCEED;
+	return es_browser_init_errors(es, error);
 }
 
 /******************************************************************************

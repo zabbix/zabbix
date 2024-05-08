@@ -25,6 +25,7 @@
 #include "webdriver.h"
 
 int	browser_push_error(duk_context *ctx, zbx_webdriver_t *wd, const char *format, ...);
+int	es_browser_init_errors(zbx_es_t *es, char **error);
 
 #endif
 
