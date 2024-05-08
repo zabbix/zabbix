@@ -4774,6 +4774,13 @@ form.dashboard-widget-plaintext #list_columns .overflow-ellipsis {
 form.dashboard-widget-plaintext #list_columns .inaccessible {
   color: #525252; }
 
+div.dashboard-widget-plaintext td {
+  line-height: 20px;
+  height: 20px; }
+div.dashboard-widget-plaintext z-bar-gauge {
+  min-width: 64px;
+  height: 20px; }
+
 form.dashboard-widget-svggraph .svg-graph-preview,
 form.dashboard-widget-svggraph .graph-widget-config-tabs {
   grid-column: 1 / -1; }

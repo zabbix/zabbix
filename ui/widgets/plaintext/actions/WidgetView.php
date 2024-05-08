@@ -25,6 +25,7 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CItemHelper,
+	CNumberParser,
 	CSettingsHelper,
 	Manager;
 
@@ -41,7 +42,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getInput('name', $name),
 			'layout' => $this->fields_values['layout'],
 			'columns' => [],
-			'items' => [],
 			'sortorder' => $this->fields_values['sortorder'],
 			'show_lines' => $this->fields_values['show_lines'],
 			'show_timestamp' => $this->fields_values['show_timestamp'],
@@ -107,24 +107,84 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return;
 		}
 
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => false
+		]);
+
+		$number_parser_binary = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => true
+		]);
+
 		$columns_with_data = [];
 		$items = [];
 
 		foreach ($columns_config as $column) {
 			if (array_key_exists($column['itemid'], $item_values_by_source[$column['history']])) {
 				$column['item_values'] = [...$item_values_by_source[$column['history']][$column['itemid']]];
+				$column['has_bar'] = false;
 
-				if (in_array($column['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
-						&& ($column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
-							|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS)) {
+				if (in_array($column['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+					$column['has_binary_units'] = isBinaryUnits($db_items[$column['itemid']]['units']);
 
-					if (!array_key_exists('min', $column) || $column['min'] === '') {
-						$column['min'] = min(array_column($column['item_values'], 'value'));
+					if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
+						|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS) {
+
+						if (!array_key_exists('min', $column) || $column['min'] === '') {
+							$column['min'] = min(array_column($column['item_values'], 'value'));
+						}
+
+						if (!array_key_exists('max', $column) || $column['max'] === '') {
+							$column['max'] = max(array_column($column['item_values'], 'value'));
+						}
+
+						if (array_key_exists('min', $column) && $column['min'] !== '') {
+							$number_parser_binary->parse($column['min']);
+							$column['min_binary'] = $number_parser_binary->calcValue();
+
+							$number_parser->parse($column['min']);
+							$column['min'] = $number_parser->calcValue();
+						}
+						else {
+							$column['min'] = min(array_column($column['item_values'], 'value'));
+							$column['min_binary'] = $column['min'];
+						}
+
+						if (array_key_exists('max', $column) && $column['max'] !== '') {
+							$number_parser_binary->parse($column['max']);
+							$column['max_binary'] = $number_parser_binary->calcValue();
+
+							$number_parser->parse($column['max']);
+							$column['max'] = $number_parser->calcValue();
+						}
+						else {
+							$column['max'] = max(array_column($column['item_values'], 'value'));
+							$column['max_binary'] = $column['max'];
+						}
+
+						if (array_key_exists('thresholds', $column)) {
+							foreach ($column['thresholds'] as &$threshold) {
+								$number_parser_binary->parse($threshold['threshold']);
+								$threshold['threshold_binary'] = $number_parser_binary->calcValue();
+
+								$number_parser->parse($threshold['threshold']);
+								$threshold['threshold'] = $number_parser->calcValue();
+							}
+							unset($threshold);
+						}
+
+						$column['has_bar'] = true;
 					}
 
-					if (!array_key_exists('max', $column) || $column['max'] === '') {
-						$column['max'] = max(array_column($column['item_values'], 'value'));
+					foreach ($column['item_values'] as &$item_value) {
+						$item_value['formatted_value'] = formatHistoryValue($item_value['value'],
+							$db_items[$column['itemid']], false
+						);
 					}
+					unset($item_value);
 				}
 
 				$items[$column['itemid']] = $db_items[$column['itemid']];
@@ -135,7 +195,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
 			'columns' => $columns_with_data,
-			'items' => $items,
 			'layout' => $this->fields_values['layout'],
 			'sortorder' => $this->fields_values['sortorder'],
 			'show_timestamp' => (bool) $this->fields_values['show_timestamp'],

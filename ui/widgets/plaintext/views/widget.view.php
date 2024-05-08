@@ -49,20 +49,44 @@ else {
 							? ZBX_STYLE_TEXT_VERTICAL
 							: null
 						)
-				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				))
+					->addClass(ZBX_STYLE_CELL_WIDTH)
+					->addClass(ZBX_STYLE_NOWRAP)
 			]
 			: [];
 
-		$column_names = $data['layout'] == WidgetForm::LAYOUT_HORIZONTAL
-			? array_column($data['columns'], 'name')
-			: [_x('Name', 'compact table header'), _x('Value', 'compact table header')];
+		if ($data['layout'] == WidgetForm::LAYOUT_HORIZONTAL) {
+			foreach ($data['columns'] as $column) {
+				$table_header[] = (new CColHeader(
+					(new CSpan($column['name']))
+						->addClass($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+							? ZBX_STYLE_TEXT_VERTICAL
+							: null
+						)->setTitle($column['name'])
+				))->setColSpan($column['has_bar'] ? 2 : 1);
+			}
+		}
+		else {
+			$has_bar = array_filter(array_column($data['columns'], 'has_bar'));
 
-		foreach ($column_names as $column_name) {
-			$table_header[] = (new CSpan($column_name))
-				->addClass($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
-					? ZBX_STYLE_TEXT_VERTICAL
-					: null
-				)->setTitle($column_name);
+			$table_header[] = (new CColHeader(
+				(new CSpan(_x('Name', 'compact table header')))
+					->addClass($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+						? ZBX_STYLE_TEXT_VERTICAL
+						: null
+					)
+					->setTitle(_x('Name', 'compact table header'))
+			))
+				->addClass(ZBX_STYLE_NOWRAP)
+				->addClass(ZBX_STYLE_CELL_WIDTH);
+
+			$table_header[] = (new CColHeader(
+				(new CSpan(_x('Value', 'compact table header')))
+					->addClass($data['show_column_header'] == WidgetForm::COLUMN_HEADER_VERTICAL
+						? ZBX_STYLE_TEXT_VERTICAL
+						: null
+					)->setTitle(_x('Value', 'compact table header'))
+			))->setColSpan($has_bar ? 2 : 1);
 		}
 
 		$table->setHeader($table_header);
@@ -84,11 +108,14 @@ else {
 			switch ($column['item_value_type']) {
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
-					if ($column['display'] != CWidgetFieldColumnsList::DISPLAY_BAR
-							|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_INDICATORS) {
+					if (!$column['has_bar']) {
 						if (array_key_exists('threshold', $column)) {
 							foreach ($column['thresholds'] as $threshold) {
-								if ($item_value['value'] < $threshold['threshold']) {
+								$threshold_value = $column['has_binary_units']
+									? $threshold['threshold_binary']
+									: $threshold['threshold'];
+
+								if ($column['value'] < $threshold_value) {
 									break;
 								}
 
@@ -96,12 +123,10 @@ else {
 							}
 						}
 
-						$history_item['value'] = (new CCol())
+						$history_item['value'][] = (new CCol($item_value['formatted_value']))
 							->addStyle($color !== '' ? 'background-color: #' . $color : null)
-							->addItem(
-								(new CPre(formatHistoryValue($item_value['value'], $data['items'][$column['itemid']],
-									false
-								)))
+							->setHint(
+								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							);
 
 						break;
@@ -110,8 +135,8 @@ else {
 					$bar_gauge = (new CBarGauge())
 						->setValue($item_value['value'])
 						->setAttribute('fill', $color !== '' ? '#' . $color : Widget::DEFAULT_FILL)
-						->setAttribute('min',  $column['min'])
-						->setAttribute('max',  $column['max']);
+						->setAttribute('min',  $column['has_binary_units'] ? $column['min_binary'] : $column['min'])
+						->setAttribute('max',  $column['has_binary_units'] ? $column['max_binary'] : $column['max']);
 
 					if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
 						$bar_gauge->setAttribute('solid', 1);
@@ -124,10 +149,13 @@ else {
 					}
 
 					$history_item['value'][] = new CCol($bar_gauge);
-					$history_item['value'][] = (new CCol())
+					$history_item['value'][] = (new CCol(
+						(new CDiv($item_value['formatted_value']))
+					))
 						->addStyle('width: 0;')
-						->addItem(
-							(new CPre($item_value['value']))
+						->addClass(ZBX_STYLE_NOWRAP)
+						->setHint(
+							(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 						);
 
 					break;
@@ -138,7 +166,7 @@ else {
 				case ITEM_VALUE_TYPE_TEXT:
 					if (array_key_exists('highlights', $column)) {
 						foreach ($column['highlights'] as $highlight) {
-							if (preg_match($highlight['pattern'], $item_value['value'])) {
+							if (@preg_match('('.$highlight['pattern'].')', $item_value['value'])) {
 								$color = $highlight['color'];
 								break;
 							}
@@ -149,28 +177,30 @@ else {
 						? substr($item_value['value'], 0, $column['max_length'])
 						: $item_value['value'];
 
-					$history_item['value'] = (new CCol())
+					$history_item['value'][] = (new CCol())
 						->addStyle($color !== '' ? 'background-color: #' . $color : null)
 						->addClass($column['display'] == CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE
 							? ZBX_STYLE_NOWRAP
 							: null
 						)
-						->addClass($column['monospace_font'] ? ZBX_STYLE_MONOSPACE_FONT : null)
-						->addItem($column['display'] != CWidgetFieldColumnsList::DISPLAY_HTML
-							? new CPre($value)
+						->addItem(($column['display'] != CWidgetFieldColumnsList::DISPLAY_HTML
+							? (new CDiv($value))->addClass($column['monospace_font']
+								? ZBX_STYLE_MONOSPACE_FONT
+								: null
+							)
 							: new CJsScript($value)
-						);
+						));
 
 					break;
 
 				case ITEM_VALUE_TYPE_BINARY:
-					$history_item['value'] = (new CCol((new CButtonLink(_('Show')))
+					$history_item['value'][] = (new CCol((new CButtonLink(_('Show')))
 						->setHint(
 							italic($item_value['value'])->addClass(ZBX_STYLE_GREY)
 						)
 						->onMouseover('')
 					))
-						->addStyle('height: 56px;vertical-align: middle; text-align: center;');
+						->addStyle('height: 56px;');
 			}
 
 			$history_values[] = $history_item;
@@ -190,17 +220,26 @@ else {
 		foreach($history_values as $history_item) {
 			$table_row = $data['show_timestamp']
 				? [
-					(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])))
+					(new CCol(
+						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])
+					))
 						->addClass(ZBX_STYLE_NOWRAP)
+						->addClass($history_item['local_time'] ? 'js-timestamp-to-local-time' : null)
 				]
 				: [];
 
 			if ($data['layout'] == WidgetForm::LAYOUT_VERTICAL) {
-				$table->setHeadingColumn($data['show_timestamp'] ? 1 : 0);
-				$table_row[] = $data['columns'][$history_item['columnid']]['name'];
+				$table->setHeadingColumn(0);
+				$table_row[] = (new CCol($data['columns'][$history_item['columnid']]['name']))
+					->addClass(ZBX_STYLE_NOWRAP);
 			}
 
-			$table_row[] = $history_item['value'];
+			$table_row[] = $history_item['value'][0];
+
+			if ($data['columns'][$history_item['columnid']]['has_bar']) {
+				$table_row[] = $history_item['value'][1];
+			}
+
 			$table->addRow($table_row);
 		}
 	}
@@ -217,15 +256,27 @@ else {
 							|| array_key_exists($history_item['columnid'], $row_values)))) {
 				$table_row = $data['show_timestamp']
 					? [
-						(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)))
+						(new CCol(
+							zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
+						))
 							->addClass(ZBX_STYLE_NOWRAP)
+							->addClass($history_item['local_time'] ? 'js-timestamp-to-local-time' : null)
 					]
 					: [];
 
-				foreach (array_keys($data['columns']) as $columnid) {
-					$table_row[] = array_key_exists($columnid, $row_values)
-						? $row_values[$columnid]
-						: '';
+				foreach ($data['columns'] as $columnid => $column) {
+					if (array_key_exists($columnid, $row_values)) {
+						$values = $row_values[$columnid];
+					}
+					else {
+						$values = $column['has_bar']
+							? ['', '']
+							: [''];
+					}
+
+					foreach ($values as $value) {
+						$table_row[] = $value;
+					}
 				}
 
 				$table->addRow($table_row);

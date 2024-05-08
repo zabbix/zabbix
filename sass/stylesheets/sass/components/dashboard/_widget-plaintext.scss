@@ -11,3 +11,18 @@ form.dashboard-widget-plaintext {
 		}
 	}
 }
+
+// Widget view.
+$bar-gauge-height: 20px;
+
+div.dashboard-widget-plaintext {
+	td {
+		line-height: $bar-gauge-height;
+		height: 20px;
+	}
+
+	z-bar-gauge {
+		min-width: 64px;
+		height: $bar-gauge-height;
+	}
+}
