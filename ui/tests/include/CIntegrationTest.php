@@ -184,7 +184,7 @@ class CIntegrationTest extends CAPITest {
 		$result = $this->processAnnotations('class');
 		self::$suite_components = $result['components'];
 		self::$suite_hosts = $result['hosts'];
-		self::$suite_configuration = self::getDefaultComponentConfiguration($this->getName(true));
+		self::$suite_configuration = self::getDefaultComponentConfiguration();
 
 		foreach (self::getComponents() as $component) {
 			if (!array_key_exists($component, $result['configuration'])) {
@@ -267,14 +267,18 @@ class CIntegrationTest extends CAPITest {
 			self::stopComponent($component);
 		}
 
+		$case_name = strtr($this->getName(true), [' ' => '-']);
+		mkdir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name, 0775, true);
 		if ($this->hasFailed()) {
-			$log_dir_name = PHPUNIT_COMPONENT_DIR.'failed/'.strtr($this->getName(true), [' ' => '-']);
-			mkdir($log_dir_name, 0775, true);
+			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
+		}
 
-			foreach (self::getComponents() as $component) {
-				$log_file = self::getLogPath($component);
-				if (file_exists($log_file)) {
-					copy($log_file, $log_dir_name.'/'.basename($log_file));
+		foreach (self::getComponents() as $component) {
+			$log_file = self::getLogPath($component);
+			if (file_exists($log_file)) {
+				copy($log_file, PHPUNIT_COMPONENT_DIR.'all/'.$case_name.'/'.basename($log_file));
+				if ($this->hasFailed()) {
+					rename($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
 				}
 			}
 		}
@@ -464,7 +468,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array
 	 */
-	protected static function getDefaultComponentConfiguration(string $case_name) {
+	protected static function getDefaultComponentConfiguration() {
 		global $DB;
 
 		$db = [
@@ -485,51 +489,48 @@ class CIntegrationTest extends CAPITest {
 			$db['DBSchema'] = $DB['SCHEMA'];
 		}
 
-		$log_dir_name = PHPUNIT_COMPONENT_DIR.'all/'.strtr($case_name, [' ' => '-']);
-		mkdir($log_dir_name, 0775, true);
-
 		$configuration = [
 			self::COMPONENT_SERVER => array_merge($db, [
-				'LogFile' => $log_dir_name.'/zabbix_server.log',
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_SERVER_HANODE1 => array_merge($db, [
-				'LogFile' => $log_dir_name.'/zabbix_server_ha1.log',
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_PROXY => array_merge($db, [
-				'LogFile' => $log_dir_name.'/zabbix_proxy.log',
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_PROXY_HANODE1 => array_merge($db, [
-				'LogFile' => $log_dir_name.'/zabbix_proxy_ha1.log',
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_HANODE1_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_AGENT => [
-				'LogFile' => $log_dir_name.'/zabbix_agent.log',
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
 			],
 			self::COMPONENT_AGENT2 => [
-				'LogFile' => $log_dir_name.'/zabbix_agent2.log',
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
 				'ControlSocket' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.sock',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX
 			],
 			self::COMPONENT_AGENT_3_0 => [
-				'LogFile' => $log_dir_name.'/zabbix_agent_3.0.log',
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_3.0.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_3.0.pid',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_3_0_PORT_SUFFIX
 			]
