@@ -26,11 +26,11 @@
  * Purpose: prints application parameters on stdout with layout suitable for  *
  *          80-column terminal                                                *
  *                                                                            *
- * Parameters:  usage_message - [IN]                                          *
- *              progname      - [IN]                                          *
+ * Parameters:  progname      - [IN]                                          *
+ *              usage_message - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_print_usage(const char **usage_message, const char *progname)
+void	zbx_print_usage(const char *progname, const char **usage_message)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
@@ -96,7 +96,7 @@ void	zbx_print_help(const char *param, const char **help_message, const char **u
 {
 	const char	**p = help_message;
 
-	zbx_print_usage(usage_message, progname);
+	zbx_print_usage(progname, usage_message);
 	printf("\n");
 
 	while (NULL != *p)

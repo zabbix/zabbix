@@ -567,7 +567,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		default:
 			zbx_error("mutually exclusive options used");
-			zbx_print_usage(usage_message, zbx_progname);
+			zbx_print_usage(zbx_progname, usage_message);
 			ret = FAIL;
 			goto out;
 	}
@@ -1593,7 +1593,7 @@ int	main(int argc, char **argv)
 	switch (t.task)
 	{
 		case ZBX_TASK_SHOW_USAGE:
-			zbx_print_usage(usage_message, zbx_progname);
+			zbx_print_usage(zbx_progname, usage_message);
 			exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS

@@ -184,7 +184,7 @@ int	main(int argc, char **argv)
 				ret = SUCCEED;
 				goto clean;
 			default:
-				zbx_print_usage(usage_message, zbx_progname);
+				zbx_print_usage(zbx_progname, usage_message);
 				goto clean;
 		}
 	}
@@ -203,7 +203,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		goto close;
 	}
 
