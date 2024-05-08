@@ -152,7 +152,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, availability\ manager, configuration\ syncer, configuration\ syncer worker, connector\ manager, connector\ worker, discovery\ manager, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, icmp\ pinger, internal\ poller, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, proxy\ group\ manager, proxy\ poller, self\-monitoring, service\ manager, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
+All processes of specified type (alerter, alert\ manager, availability\ manager, browser\ poller, configuration\ syncer, configuration\ syncer worker, connector\ manager, connector\ worker, discovery\ manager, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, icmp\ pinger, internal\ poller, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, proxy\ group\ manager, proxy\ poller, self\-monitoring, service\ manager, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
 .RE
 .RS 4
 .TP 4

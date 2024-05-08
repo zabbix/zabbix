@@ -299,6 +299,10 @@ class C64ImportConverterTest extends CImportConverterTest {
 
 		$source_mediatypes = [
 			[
+				'type' => CXmlConstantName::EMAIL,
+				'content_type' => CXmlConstantName::MESSAGE_FORMAT_HTML
+			],
+			[
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [
 					[
@@ -329,6 +333,10 @@ class C64ImportConverterTest extends CImportConverterTest {
 			]
 		];
 		$expected_mediatypes = [
+			[
+				'type' => CXmlConstantName::EMAIL,
+				'message_format' => CXmlConstantName::MESSAGE_FORMAT_HTML
+			],
 			[
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [

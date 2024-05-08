@@ -25,13 +25,16 @@
  * Valid token must match format:
  * - <namespace>/<path/to/secret>:<key>
  * - <namespace>/<path/to/secret>
+ * - <path/to/secret>:<key>
+ * - <path/to/secret>
  *
- * Mutlibyte strings are supported.
+ * Multibyte strings are supported.
  */
 class CVaultSecretParser extends CParser {
 
 	private $options = [
 		'provider' => ZBX_VAULT_TYPE_UNKNOWN,
+		'with_namespace' => false,
 		'with_key' => true
 	];
 
@@ -40,8 +43,9 @@ class CVaultSecretParser extends CParser {
 
 	/**
 	 * @param array $options
-	 * @param int   $options['provider']  Vault provider.
-	 * @param bool  $options['with_key']  (optional) Validated string must contain key.
+	 * @param int   $options['provider']        Vault provider.
+	 * @param bool  $options['with_namespace']  (optional) Validated string must contain namespace. Only for HashiCorp.
+	 * @param bool  $options['with_key']        (optional) Validated string must contain key.
 	 */
 	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
@@ -66,48 +70,36 @@ class CVaultSecretParser extends CParser {
 	private function parseHashiCorp($source, $pos) {
 		$this->errorClear();
 
-		$src_size = strlen($source);
-		$namespace_sep = strpos($source, '/');
-		if ($namespace_sep === false || $namespace_sep == 0 || $namespace_sep == $src_size - 1) {
-			$this->errorPos($source, 0);
+		$path_pos = 0;
 
-			return self::PARSE_FAIL;
+		if ($this->options['with_namespace']) {
+			if (($namespace_sep = strpos($source, '/')) === false || $namespace_sep == 0) {
+				$this->errorPos($source, 0);
+
+				return self::PARSE_FAIL;
+			}
+
+			$path_pos = $namespace_sep + 1;
 		}
 
 		if ($this->options['with_key']) {
-			$path_pos = $namespace_sep + 1;
-			$key_sep = strpos($source, ':', $path_pos);
-
-			if ($source[$key_sep - 1] === '/') {
-				$this->errorPos($source, $namespace_sep + 1);
+			if (($key_sep = strpos($source, ':', $path_pos)) === false || !isset($source[$key_sep + 1])) {
+				$this->errorPos($source, $key_sep !== false ? $key_sep : $path_pos);
 
 				return self::PARSE_FAIL;
 			}
 
-			if ($key_sep === false || $key_sep == $path_pos || $key_sep == $src_size - 1) {
-				$this->errorPos($source, $path_pos);
-
-				return self::PARSE_FAIL;
-			}
-
-			if (strrpos($source, '//', $key_sep - $src_size) !== false) {
-				$this->errorPos($source, $path_pos);
-
-				return self::PARSE_FAIL;
-			}
+			$path_len = $key_sep - $path_pos;
 		}
 		else {
-			if (strpos($source, '//') !== false) {
-				$this->errorPos($source, $namespace_sep + 1);
+			$path_len = strlen($source) - $path_pos;
+		}
 
-				return self::PARSE_FAIL;
-			}
+		if ($path_len == 0 || $source[$path_pos] === '/' || $source[$path_pos + $path_len - 1] === '/'
+				|| (($pos = strpos($source, '//', $path_pos)) !== false && $pos < $path_pos + $path_len)) {
+			$this->errorPos($source, $path_pos);
 
-			if ($source[$src_size - 1] === '/') {
-				$this->errorPos($source, $namespace_sep + 1);
-
-				return self::PARSE_FAIL;
-			}
+			return self::PARSE_FAIL;
 		}
 
 		return self::PARSE_SUCCESS;

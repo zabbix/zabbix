@@ -98,10 +98,6 @@ class CControllerPopupLldOverride extends CController {
 				'conditions' => $page_options['overrides_filters']
 			]);
 
-			$overrides_filter['conditions'] = sortLldRuleFilterConditions($overrides_filter['conditions'],
-				$overrides_filter['evaltype']
-			);
-
 			if ($overrides_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
 					&& $overrides_filter['formula'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
@@ -133,10 +129,6 @@ class CControllerPopupLldOverride extends CController {
 			);
 		}
 		else {
-			$page_options['overrides_filters'] = sortLldRuleFilterConditions($page_options['overrides_filters'],
-				$page_options['overrides_evaltype']
-			);
-
 			$data = [
 				'title' => _('Override'),
 				'options' => $page_options,

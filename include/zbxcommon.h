@@ -142,7 +142,8 @@ typedef enum
 	ITEM_TYPE_DEPENDENT,
 	ITEM_TYPE_HTTPAGENT,
 	ITEM_TYPE_SNMP,
-	ITEM_TYPE_SCRIPT	/* 21 */
+	ITEM_TYPE_SCRIPT,
+	ITEM_TYPE_BROWSER	/* 22 */
 }
 zbx_item_type_t;
 
@@ -298,7 +299,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
 #define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
 #define ZBX_PROCESS_TYPE_PG_MANAGER		45
-#define ZBX_PROCESS_TYPE_COUNT			46	/* number of process types */
+#define ZBX_PROCESS_TYPE_BROWSERPOLLER		46
+#define ZBX_PROCESS_TYPE_COUNT			47	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -435,6 +437,7 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
+	ZBX_TASK_SET_SERVICE_STARTUP_TYPE,
 #else
 	ZBX_TASK_RUNTIME_CONTROL,
 #endif
@@ -453,12 +456,16 @@ typedef enum
 }
 zbx_httptest_auth_t;
 
-#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
-#define ZBX_TASK_FLAG_FOREGROUND	0x02
-
 typedef struct
 {
 	zbx_task_t	task;
+#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
+#define ZBX_TASK_FLAG_FOREGROUND	0x02
+#ifdef _WINDOWS
+	#define ZBX_TASK_FLAG_SERVICE_ENABLED		0x04
+	#define ZBX_TASK_FLAG_SERVICE_AUTOSTART		0x08
+	#define ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED	0x10
+#endif
 	unsigned int	flags;
 	int		data;
 	char		*opts;

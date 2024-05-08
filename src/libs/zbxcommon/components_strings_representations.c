@@ -129,6 +129,9 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "configuration syncer worker";
 		case ZBX_PROCESS_TYPE_PG_MANAGER:
 			return "proxy group manager";
+		case ZBX_PROCESS_TYPE_BROWSERPOLLER:
+			return "browser poller";
+			break;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

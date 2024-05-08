@@ -443,6 +443,10 @@ static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct
 				{
 					timeout_value = timeouts.script;
 				}
+				else if (0 == strcmp(item_type, "browser"))
+				{
+					timeout_value = timeouts.browser;
+				}
 				else
 				{
 					*error = zbx_dsprintf(*error, "unknown item type timeout field \"%s\"",

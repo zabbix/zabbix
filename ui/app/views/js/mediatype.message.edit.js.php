@@ -59,7 +59,7 @@ window.mediatype_message_popup = new class {
 	#getDefaultMessageTemplate(message_type) {
 		const message_templates = this.message_templates;
 		const media_type = this.form.querySelector('#type').value;
-		const message_format = this.form.querySelector('#content_type').value;
+		const message_format = this.form.querySelector('#message_format').value;
 
 		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
 			return {
@@ -67,7 +67,7 @@ window.mediatype_message_popup = new class {
 			};
 		}
 
-		if (media_type == <?= MEDIA_TYPE_EMAIL ?> && message_format == <?= SMTP_MESSAGE_FORMAT_HTML ?>) {
+		if (media_type == <?= MEDIA_TYPE_EMAIL ?> && message_format == <?= ZBX_MEDIA_MESSAGE_FORMAT_HTML ?>) {
 			return {
 				subject: message_templates[message_type]['template']['subject'],
 				message: message_templates[message_type]['template']['html']

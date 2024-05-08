@@ -35,8 +35,6 @@ use Widgets\HostNavigator\Includes\{
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	private const SHOW_IN_MAINTENANCE_ON = 1;
-
 	protected function init(): void {
 		parent::init();
 
@@ -79,7 +77,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return $no_data;
 		}
 
-		$is_show_in_maintenance_on = $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON;
+		$is_show_in_maintenance_on = $this->fields_values['maintenance'] == 1;
 
 		$output = $is_show_in_maintenance_on
 			? ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status']
@@ -205,7 +203,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$maintenanceids = [];
 
-		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep) {
+		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep || $group_by_host_groups) {
 			foreach ($hosts as &$host) {
 				if ($tags_to_keep) {
 					$host['tags'] = array_values(array_filter($host['tags'], function($tag) use ($tags_to_keep) {
@@ -233,6 +231,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 						unset($host['maintenanceid']);
 					}
 					unset($host['maintenance_status'], $host['status']);
+				}
+
+				if ($group_by_host_groups && $override_hostid === '' && !$this->isTemplateDashboard()
+						&& $groupids !== null) {
+					$host['hostgroups'] = array_values(
+						array_filter($host['hostgroups'], function($group) use ($groupids) {
+							return in_array($group['groupid'], $groupids);
+						})
+					);
 				}
 			}
 			unset($host);
@@ -278,22 +285,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$severity_names = [];
+		$severities = [];
 
 		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE
 				|| in_array(CWidgetFieldHostGrouping::GROUP_BY_SEVERITY,
 					array_column($this->fields_values['group_by'], 'attribute')
 				)) {
-			foreach (CSeverityHelper::getSeverities() as $severity) {
-				$severity_names[$severity['value']] = $severity['label'];
+			$severities = CSeverityHelper::getSeverities();
+
+			foreach ($severities as &$severity) {
+				$severity['status_style'] = CSeverityHelper::getStatusStyle($severity['value']);
 			}
+			unset($severity);
 		}
 
 		return [
 			'group_by' => $this->fields_values['group_by'],
 			'open_groups' => $open_groups,
 			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
-			'severity_names' => $severity_names
+			'severities' => $severities
 		];
 	}
 }
