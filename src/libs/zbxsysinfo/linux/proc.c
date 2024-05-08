@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include <linux/version.h>
 #include "proc.h"
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
@@ -88,6 +89,7 @@ typedef struct
 	zbx_uint64_t	size;
 	zbx_uint64_t	stk;
 	zbx_uint64_t	swap;
+	zbx_uint64_t	memory;
 }
 proc_data_t;
 
@@ -123,6 +125,29 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data->group);
 
 	zbx_free(proc_data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Converts value to bytes according to input string size type       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     srcstr - [IN]                                                          *
+ *     num    - [IN/OUT] value/bytes result                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	convert_to_bytes(char *srcstr, zbx_uint64_t *num)
+{
+	zbx_rtrim(srcstr, "\n");
+
+	if (0 == strcasecmp(srcstr, "kB"))
+		*num <<= 10;
+	else if (0 == strcasecmp(srcstr, "mB"))
+		*num <<= 20;
+	else if (0 == strcasecmp(srcstr, "GB"))
+		*num <<= 30;
+	else if (0 == strcasecmp(srcstr, "TB"))
+		*num <<= 40;
 }
 
 /******************************************************************************
@@ -190,18 +215,7 @@ static int	read_value_from_proc_file(FILE *f, long pos, const char *label, int t
 		}
 
 		if (PROC_VAL_TYPE_BYTE == type)
-		{
-			zbx_rtrim(p_unit, "\n");
-
-			if (0 == strcasecmp(p_unit, "kB"))
-				*num <<= 10;
-			else if (0 == strcasecmp(p_unit, "mB"))
-				*num <<= 20;
-			else if (0 == strcasecmp(p_unit, "GB"))
-				*num <<= 30;
-			else if (0 == strcasecmp(p_unit, "TB"))
-				*num <<= 40;
-		}
+			convert_to_bytes(p_unit, num);
 
 		ret = SUCCEED;
 		break;
@@ -397,6 +411,136 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Reads amount of memory in bytes from a string                     *
+ *          For example, reading "VmSize:   176712 kB" from /proc/1/status    *
+ *          will produce a result 176712*1024 = 180953088 bytes               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     srcstr - [IN] string to read from                                      *
+ *     label  - [IN] label to look for, e.g. "VmData:\t"                      *
+ *     bytes  - [OUT] result in bytes                                         *
+ *                                                                            *
+ * Return value: SUCCEED - successful reading                                 *
+ *               FAIL - The search string was not found or                    *
+ *                      could not be parsed.                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *bytes)
+{
+	int 	label_len = strlen(label);
+	char	*p_unit;
+
+	if (0 == strncmp(srcstr, label, label_len))
+	{
+		if (NULL == (srcstr = strchr(srcstr, ' ')))
+			return FAIL;
+		zbx_ltrim(srcstr, " ");
+		if (NULL == (p_unit = strchr(srcstr, ' ')))
+			return FAIL;
+		*p_unit = '\0';
+		if (FAIL == zbx_is_uint64(srcstr, bytes))
+			return FAIL;
+		convert_to_bytes(p_unit + 1, bytes);
+		return SUCCEED;
+	}
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Retrive program core memory usage in bytes                        *
+ *          ported from getMemStats ps_mem.py v3.14                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pid    - [IN] process id                                               *
+ *     bytes  - [OUT] result in bytes                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
+{
+	int	shared = 0;
+	int 	private = 0;
+	int 	private_huge = 0;
+	int 	shared_huge = 0;
+	int 	psize = (int)getpagesize() / 1024;
+	int 	have_pss = 0;
+	int  	pss = 0;
+	int  	rss = 0;
+	FILE	*f_statm = NULL;
+	FILE	*f_smaps = NULL;
+	FILE	*f_smaps_rollup = NULL;
+	int  	shared_old = 0;
+	char	tmp[MAX_STRING_LEN];
+
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/statm", pid);
+	if (NULL == (f_statm = fopen(tmp, "r")))
+		return;
+
+	fgets(tmp, (int)sizeof(tmp), f_statm);
+	char	*statm_rss_str = strchr(tmp, ' ') + 1;
+	rss = atoi(statm_rss_str) * psize;
+	statm_rss_str = strchr(statm_rss_str, ' ') + 1;
+	shared_old = atoi(statm_rss_str);
+	zbx_fclose(f_statm);
+
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps", pid);
+	if (NULL != (f_smaps = fopen(tmp, "r")))
+	{
+		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps_rollup", pid);
+		if (NULL != (f_smaps_rollup = fopen(tmp, "r")))
+		{
+			zbx_fclose(f_smaps);
+			f_smaps = f_smaps_rollup;
+		}
+		while (NULL != fgets(tmp, (int)sizeof(tmp), f_smaps))
+		{
+			zbx_uint64_t num;
+
+			if(SUCCEED == byte_value_from_str(tmp, "Private_Hugetlb:", &num))
+			{
+				private_huge += num;
+			} else if(SUCCEED == byte_value_from_str(tmp, "Shared_Hugetlb:", &num))
+			{
+				shared_huge += num;
+			} else if(SUCCEED == byte_value_from_str(tmp, "Shared", &num))
+			{
+				shared += num;
+			} else if(SUCCEED == byte_value_from_str(tmp, "Private", &num))
+			{
+				private += num;
+			} else if(SUCCEED == byte_value_from_str(tmp, "Pss:", &num))
+			{
+				have_pss = 1;
+				pss += num;
+				/* add 0.5KiB as this avg error due to truncation */
+				pss += 512;
+			}
+		}
+
+		if(have_pss)
+			shared = pss - private;
+
+		private += private_huge;
+
+		zbx_fclose(f_smaps);
+	} else if ((KERNEL_VERSION(2, 6, 1) >= LINUX_VERSION_CODE) &&
+		(KERNEL_VERSION(2, 6, 9) <= LINUX_VERSION_CODE))
+	{
+		shared = 0;
+		shared_huge = 0;
+		private = rss;
+	} else {
+		shared = shared_old;
+		shared *= psize;
+		shared_huge = 0;
+		private = rss - shared;
+	}
+
+	*bytes = shared + private + shared_huge;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Reads amount of memory in bytes from a string in /proc file.      *
  *          For example, reading "VmSize:   176712 kB" from /proc/1/status    *
  *          will produce a result 176712*1024 = 180953088 bytes               *
@@ -468,17 +612,7 @@ int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx
 			ret = FAIL;
 			break;
 		}
-
-		zbx_rtrim(p_unit, "\n");
-
-		if (0 == strcasecmp(p_unit, "kB"))
-			*bytes <<= 10;
-		else if (0 == strcasecmp(p_unit, "mB"))
-			*bytes <<= 20;
-		else if (0 == strcasecmp(p_unit, "GB"))
-			*bytes <<= 30;
-		else if (0 == strcasecmp(p_unit, "TB"))
-			*bytes <<= 40;
+		convert_to_bytes(p_unit, bytes);
 
 		ret = SUCCEED;
 		break;
@@ -1883,7 +2017,8 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in third parameter: %s", rxp_error));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in third parameter: %s",
+				rxp_error));
 			zbx_free(rxp_error);
 			return SYSINFO_RET_FAIL;
 		}
@@ -2081,6 +2216,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 				cmdline = prname = user = group = NULL;
 			}
 		}
+		get_pid_mem_stats(entries->d_name, &proc_data->memory);
 	}
 	zbx_fclose(f_cmd);
 	zbx_fclose(f_status);
@@ -2124,6 +2260,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 					SUM_PROC_VALUE_DBL(pmem);
 					SUM_PROC_VALUE_DBL(cputime_user);
 					SUM_PROC_VALUE_DBL(cputime_system);
+					SUM_PROC_VALUE(memory);
 
 					proc_data_free(pdata_cmp);
 					zbx_vector_proc_data_ptr_remove(&proc_data_ctx, k--);
@@ -2172,6 +2309,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			JSON_ADD_PROC_VALUE("ctx_switches", pdata->ctx_switches);
 			JSON_ADD_PROC_VALUE("threads", pdata->threads);
 			JSON_ADD_PROC_VALUE("page_faults", pdata->page_faults);
+			JSON_ADD_PROC_VALUE("memory", pdata->memory);
 		}
 		else if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
 		{
@@ -2189,6 +2327,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "state", pdata->state, ZBX_JSON_TYPE_STRING);
 			JSON_ADD_PROC_VALUE("ctx_switches", pdata->ctx_switches);
 			JSON_ADD_PROC_VALUE("page_faults", pdata->page_faults);
+			JSON_ADD_PROC_VALUE("memory", pdata->memory);
 		}
 		else
 		{
@@ -2211,6 +2350,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			JSON_ADD_PROC_VALUE("ctx_switches", pdata->ctx_switches);
 			JSON_ADD_PROC_VALUE("threads", pdata->threads);
 			JSON_ADD_PROC_VALUE("page_faults", pdata->page_faults);
+			JSON_ADD_PROC_VALUE("memory", pdata->memory);
 		}
 
 		zbx_json_close(&j);
