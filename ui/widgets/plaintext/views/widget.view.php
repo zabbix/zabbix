@@ -160,7 +160,7 @@ else {
 					break;
 
 				case ITEM_VALUE_TYPE_LOG:
-					if (array_key_exists('local_time', $column) && $column['local_time']) {
+					if (array_key_exists('local_time', $column) && $column['local_time'] != 0) {
 						$history_item['clock'] = $item_value['timestamp'];
 					}
 				case ITEM_VALUE_TYPE_STR:
