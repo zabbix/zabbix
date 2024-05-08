@@ -459,7 +459,7 @@ int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *bytes)
 void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 {
 	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0, pss = 0, rss = 0;
-	int		have_pss = 0, shared_old = 0;
+	int		have_pss = 0;
 	FILE		*f_statm = NULL, *f_smaps = NULL;
 	char		*statm_rss_str, tmp[MAX_STRING_LEN];
 
@@ -510,14 +510,16 @@ void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		if (NULL == (f_statm = fopen(tmp, "r")))
 			return;
 		if(NULL == fgets(tmp, (int)sizeof(tmp), f_statm))
+		{
+			zbx_fclose(f_statm);
 			return;
+		}
 		if(NULL == (statm_rss_str = strchr(tmp, ' ') + 1))
+		{
+			zbx_fclose(f_statm);
 			return;
+		}
 		rss = atoi(statm_rss_str) * psize;
-		if(NULL == (statm_rss_str = strchr(statm_rss_str, ' ') + 1))
-			return;
-		shared_old = atoi(statm_rss_str);
-		zbx_fclose(f_statm);
 
 		if ((KERNEL_VERSION(2, 6, 1) >= LINUX_VERSION_CODE) &&
 			(KERNEL_VERSION(2, 6, 9) <= LINUX_VERSION_CODE))
@@ -526,11 +528,17 @@ void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 			shared_huge = 0;
 			private = rss;
 		} else {
-			shared = shared_old;
+			if(NULL == (statm_rss_str = strchr(statm_rss_str, ' ') + 1))
+			{
+				zbx_fclose(f_statm);
+				return;
+			}
+			shared = atoi(statm_rss_str);
 			shared *= psize;
 			shared_huge = 0;
 			private = rss - shared;
 		}
+		zbx_fclose(f_statm);
 	}
 	*bytes = shared + private + shared_huge;
 }
