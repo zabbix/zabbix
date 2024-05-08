@@ -38,7 +38,7 @@ frontend stats
     #stats auth Username:Password  # Authentication credentials
 ```
 
-2. Set the hostname or IP address of the the HAProxy stats host or container in the `{$HAPROXY.STATS.HOST}` macro. You can also change the status page port in the `{$HAPROXY.STATS.PORT}` macro, the status page scheme in the `{$HAPROXY.STATS.SCHEME}` macro and the status page path in the `{$HAPROXY.STATS.PATH}` macro if necessary.
+2. Set the hostname or IP address of the HAProxy stats host or container in the `{$HAPROXY.STATS.HOST}` macro. You can also change the status page port in the `{$HAPROXY.STATS.PORT}` macro, the status page scheme in the `{$HAPROXY.STATS.SCHEME}` macro and the status page path in the `{$HAPROXY.STATS.PATH}` macro if necessary.
 
 3. If you have enabled authentication in the HAProxy configuration file in step 1, set the username and password in the `{$HAPROXY.USERNAME}` and `{$HAPROXY.PASSWORD}` macros.
 

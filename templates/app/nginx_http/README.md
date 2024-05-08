@@ -44,7 +44,7 @@ location = /basic_status {
 }
 ```
 
-2. Set the hostname or IP address of the the Nginx host or Nginx container in the `{$NGINX.STUB_STATUS.HOST}` macro. You can also change the status page port in the `{$NGINX.STUB_STATUS.PORT}` macro, the status page scheme in the `{$NGINX.STUB_STATUS.SCHEME}` macro and the status page path in the `{$NGINX.STUB_STATUS.PATH}` macro if necessary.
+2. Set the hostname or IP address of the Nginx host or Nginx container in the `{$NGINX.STUB_STATUS.HOST}` macro. You can also change the status page port in the `{$NGINX.STUB_STATUS.PORT}` macro, the status page scheme in the `{$NGINX.STUB_STATUS.SCHEME}` macro and the status page path in the `{$NGINX.STUB_STATUS.PATH}` macro if necessary.
 
 Example answer from Nginx:
 
