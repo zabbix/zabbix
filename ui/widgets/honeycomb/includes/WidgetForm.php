@@ -210,7 +210,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('interpolation', _('Color interpolation')))->setDefault(1)
+				new CWidgetFieldCheckBox('interpolation', _('Color interpolation111111'))
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
@@ -240,10 +240,10 @@ class WidgetForm extends CWidgetForm {
 	}
 
 	protected function normalizeValues(array $values): array {
-		// Restore the default checked state of the disabled interpolation checkbox.
+		// Restore the default unchecked state of the disabled interpolation checkbox.
 		if (!array_key_exists('thresholds', $values) || !is_array($values['thresholds'])
 				|| count($values['thresholds']) < 2) {
-			$values['interpolation'] = 1;
+			$values['interpolation'] = 0;
 		}
 
 		return parent::normalizeValues($values);
