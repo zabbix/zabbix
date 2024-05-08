@@ -94,25 +94,25 @@ class testDashboardPieChartWidget extends testWidgets {
 							'type' => 'piechart',
 							'x' => 0,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						],
 						[
 							'name' => 'Pie chart for delete',
 							'type' => 'piechart',
-							'x' => 6,
+							'x' => 18,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						],
 						[
 							'name' => 'Pie chart for cancel',
 							'type' => 'piechart',
-							'x' => 12,
+							'x' => 38,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						]
