@@ -722,8 +722,6 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		SET_UI64_RESULT(result, dns_is_down ? 0 : 1);
 
-		zbx_free_res(&res_state_local);
-
 		return SYSINFO_RET_OK;
 	}
 	else if (DNS_QUERY_PERF == short_answer)
@@ -738,8 +736,6 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		{
 			SET_DBL_RESULT(result, 0.0);
 
-			zbx_free_res(&res_state_local);
-
 			return SYSINFO_RET_OK;
 		}
 		else
@@ -751,16 +747,12 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			SET_DBL_RESULT(result, check_time);
 		}
 
-		zbx_free_res(&res_state_local);
-
 		return SYSINFO_RET_OK;
 	}
 
 	if (1 == dns_is_down)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot perform DNS query."));
-
-		zbx_free_res(&res_state_local);
 
 		return SYSINFO_RET_FAIL;
 	}
