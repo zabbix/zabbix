@@ -142,8 +142,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 						'Type' => 'Graph prototype',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => 'testFormGraphPrototype1',
-						'Columns' => '25',
-						'Rows' => '17'
+						'Columns' => '73',
+						'Rows' => '65'
 					],
 					'error' => [
 						'Invalid parameter "Columns": value must be one of 1-72.',
