@@ -348,6 +348,7 @@ clean:
 	zbx_free(script_file);
 	zbx_free(input_file);
 	zbx_free(param);
+	zbx_free(webdriver);
 
 	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

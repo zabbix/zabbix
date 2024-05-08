@@ -83,13 +83,10 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	zbx_webdriver_t	*wd;
 	zbx_es_env_t	*env;
 	int		err_index = -1;
-	char		*error = NULL, *name = NULL, *capabilities = NULL;
+	char		*error = NULL, *capabilities = NULL;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
-
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR,  "cannot convert browser name to utf8");
 
 	duk_get_global_string(ctx, "JSON");
 	duk_push_string(ctx, "stringify");
@@ -123,6 +120,7 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))
 		err_index = browser_push_error(ctx, wd, "cannot open webriver session: %s", error);
 out:
+	zbx_free(capabilities);
 	zbx_free(error);
 
 	if (-1 != err_index)
@@ -659,7 +657,7 @@ static duk_ret_t	es_browser_add_cookie(duk_context *ctx)
  *                                                                            *
  * Purpose: configure automatic screenshot taking functionality               *
  *                                                                            *
- * Return value: base64 encoded screenshot                                    *
+ * Return value: base64 encoded screenshot (string)                           *
  *                                                                            *
  ******************************************************************************/
 static duk_ret_t	es_browser_get_screenshot(duk_context *ctx)
@@ -670,7 +668,7 @@ static duk_ret_t	es_browser_get_screenshot(duk_context *ctx)
 	wd = es_webdriver(ctx);
 	if (SUCCEED != webdriver_get_screenshot(wd, &screenshot, &error))
 	{
-		(void) browser_push_error(ctx, wd, "capture screensdhot: %s", error);
+		(void) browser_push_error(ctx, wd, "cannot capture screenshot: %s", error);
 		zbx_free(error);
 
 		return duk_throw(ctx);
@@ -783,6 +781,34 @@ static duk_ret_t	es_browser_execute_script(duk_context *ctx)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get opened page source                                            *
+ *                                                                            *
+ * Return value: page source (string)                                         *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_browser_get_page_source(duk_context *ctx)
+{
+	zbx_webdriver_t	*wd;
+	char		*source = NULL, *error = NULL;
+
+	wd = es_webdriver(ctx);
+	if (SUCCEED != webdriver_get_page_source(wd, &source, &error))
+	{
+		(void) browser_push_error(ctx, wd, "cannot get page source: %s", error);
+		zbx_free(error);
+
+		return duk_throw(ctx);
+	}
+
+	duk_push_string(ctx, source);
+	zbx_free(source);
+
+	return 1;
+}
+
+
 static const duk_function_list_entry	browser_methods[] = {
 	{"navigate", es_browser_navigate, 1},
 	{"getUrl", es_browser_get_url, 0},
@@ -800,6 +826,7 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"setError", es_browser_set_error, 1},
 	{"discardError", es_browser_discard_error, 0},
 	{"executeScript", es_browser_execute_script, 1},
+	{"getPageSource", es_browser_get_page_source, 0},
 	{0}
 };
 

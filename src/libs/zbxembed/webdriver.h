@@ -96,4 +96,6 @@ void	webdriver_discard_error(zbx_webdriver_t *wd);
 
 int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, char **error);
 
+int	webdriver_get_page_source(zbx_webdriver_t *wd, char **source, char **error);
+
 #endif

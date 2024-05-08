@@ -1049,4 +1049,34 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get page source                                                   *
+ *                                                                            *
+ * Parameters: wd      - [IN] webdriver object                                *
+ *             sopurce - [OUT] page source                                    *
+ *             error   - [OUT] error message                                  *
+ *                                                                            *
+ * Return value: SUCEED - operation was performed successfully                *
+ *               FAIL   - otherwise                                           *
+ *                                                                            *
+ ******************************************************************************/
+int	webdriver_get_page_source(zbx_webdriver_t *wd, char **source, char **error)
+{
+	struct zbx_json_parse	jp;
+	size_t			source_alloc = 0;
+
+	if (SUCCEED != webdriver_session_query(wd, "GET", "source", NULL, &jp, error))
+		return FAIL;
+
+	if (NULL == zbx_json_decodevalue_dyn(jp.start, source, &source_alloc, NULL))
+	{
+		*error = zbx_dsprintf(NULL,  "cannot extract page source from json: %s", zbx_json_strerror());
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
