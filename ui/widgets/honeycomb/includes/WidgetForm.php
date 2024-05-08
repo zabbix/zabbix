@@ -238,14 +238,4 @@ class WidgetForm extends CWidgetForm {
 
 		return $errors;
 	}
-
-	protected function normalizeValues(array $values): array {
-		// Restore the default unchecked state of the disabled interpolation checkbox.
-		if (!array_key_exists('thresholds', $values) || !is_array($values['thresholds'])
-				|| count($values['thresholds']) < 2) {
-			$values['interpolation'] = 0;
-		}
-
-		return parent::normalizeValues($values);
-	}
 }
