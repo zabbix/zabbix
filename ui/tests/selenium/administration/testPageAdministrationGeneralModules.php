@@ -238,14 +238,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'type' => 'clock',
 								// TODO: Uncomment the below line when ZBX-22245 will be resolved.
 //								'name' => 'Default clock',
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'item',
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'fields' => [
 									[
@@ -269,9 +269,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 								'type' => 'clock345',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'fields' => [
 									[
