@@ -390,6 +390,7 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 
 	duk_destroy_heap(es->env->ctx);
 	zbx_es_debug_disable(es);
+	zbx_free(es->env->browser_endpoint);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
@@ -672,7 +673,7 @@ out:
 	duk_gc(es->env->ctx, 0);
 	duk_gc(es->env->ctx, 0);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%.*256s %s allocated memory: " ZBX_FS_SIZE_T
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T
 			" max allocated or requested memory: " ZBX_FS_SIZE_T " max allowed memory: %d",
 			__func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error), (zbx_fs_size_t)es->env->total_alloc,
@@ -805,7 +806,7 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
 		return NULL;
 
 	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
+	duk_pop_2(ctx);
 
 	return env;
 }

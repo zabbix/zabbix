@@ -99,7 +99,7 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 	duk_push_this(ctx);
 	duk_get_prop_string(ctx, -1, "\xff""\xff""d");
 	request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
+	duk_pop_2(ctx);
 
 	return request;
 }

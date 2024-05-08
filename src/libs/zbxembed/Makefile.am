@@ -17,6 +17,15 @@ libzbxembed_a_SOURCES = \
 	embed_xml.c \
 	embed_xml.h \
 	zabbix.c \
-	zabbix.h
+	zabbix.h \
+	browser.c \
+	webdriver.c \
+	webdriver.h \
+	browser_perf.c \
+	browser_perf.h \
+	browser_element.c \
+	browser_element.h \
+	browser_error.c \
+	browser_error.h
 
 libzbxembed_a_CFLAGS = $(LIBXML2_CFLAGS)
