@@ -102,6 +102,11 @@ class CWidgetHoneycomb extends CWidget {
 		});
 	}
 
+	onClearContents() {
+		this.#honeycomb.destroy();
+		this.#honeycomb = null;
+	}
+
 	onFeedback({type, value, descriptor}) {
 		if (type === CWidgetsData.DATA_TYPE_ITEM_ID) {
 			return this.#honeycomb.selectCell(value);

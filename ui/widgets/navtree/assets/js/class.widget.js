@@ -147,12 +147,7 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	processUpdateResponse(response) {
-		if (this.#has_content) {
-			this.#deactivateContentEvents();
-			this.#removeTree();
-
-			this.#has_content = false;
-		}
+		this.clearContents();
 
 		super.processUpdateResponse(response);
 
@@ -173,6 +168,15 @@ class CWidgetNavTree extends CWidget {
 
 			this.#makeTree();
 			this.#activateContentEvents();
+		}
+	}
+
+	onClearContents() {
+		if (this.#has_content) {
+			this.#deactivateContentEvents();
+			this.#removeTree();
+
+			this.#has_content = false;
 		}
 	}
 
