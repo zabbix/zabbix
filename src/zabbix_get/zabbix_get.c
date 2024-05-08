@@ -425,7 +425,7 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_print_version(title_message);

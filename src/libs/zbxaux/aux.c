@@ -86,13 +86,13 @@ static const char	help_message_footer[] =
  * Purpose: prints help of application parameters on stdout by application    *
  *          request with parameter '-h'                                       *
  *                                                                            *
- * Parameters: param         - [IN] pointer to modification parameter         *
+ * Parameters: progname      - [IN]                                           *
  *             help_message  - [IN]                                           *
  *             usage_message - [IN]                                           *
- *             progname      - [IN]                                           *
+ *             param         - [IN] pointer to modification parameter         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname)
+void	zbx_print_help(const char *progname, const char **help_message, const char **usage_message, const char *param)
 {
 	const char	**p = help_message;
 

@@ -1722,7 +1722,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			zbx_print_help(config_file, help_message, usage_message, zbx_progname);
+			zbx_print_help(zbx_progname, help_message, usage_message, config_file);
 			exit(EXIT_SUCCESS);
 			break;
 		default:

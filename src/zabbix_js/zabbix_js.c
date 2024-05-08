@@ -176,7 +176,7 @@ int	main(int argc, char **argv)
 
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				ret = SUCCEED;
 				goto clean;
 			case 'V':

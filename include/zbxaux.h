@@ -22,6 +22,6 @@
 
 void	zbx_print_usage(const char *progname, const char **usage_message);
 
-void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname);
+void	zbx_print_help(const char *progname, const char **help_message, const char **usage_message, const char *param);
 
 #endif
