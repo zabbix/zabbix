@@ -1457,18 +1457,18 @@ zabbix_export:
           delay: '0'
           filter:
             conditions:
-              - macro: '{#SERVICE_NAMESPACE}'
-                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}'
-                formulaid: A
-              - macro: '{#SERVICE_NAMESPACE}'
-                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SERVICE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}'
-                formulaid: C
+                formulaid: A
               - macro: '{#SERVICE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#SERVICE_NAMESPACE}'
+                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}'
+                formulaid: C
+              - macro: '{#SERVICE_NAMESPACE}'
+                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
           description: 'Discover metrics for services that are registered with the local agent.'

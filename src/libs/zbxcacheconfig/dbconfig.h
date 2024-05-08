@@ -224,6 +224,13 @@ typedef struct
 }
 ZBX_DC_SCRIPTITEM;
 
+typedef struct
+{
+	const char		*script;
+	zbx_vector_ptr_t	params;
+}
+ZBX_DC_BROWSERITEM;
+
 typedef union
 {
 	ZBX_DC_TRAPITEM		*trapitem;
@@ -238,6 +245,7 @@ typedef union
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
+	ZBX_DC_BROWSERITEM	*browseritem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -824,7 +832,7 @@ typedef struct
 	const char	*name;
 	const char	*value;
 }
-zbx_dc_scriptitem_param_t;
+zbx_dc_item_param_t;
 
 typedef struct
 {
@@ -1021,7 +1029,7 @@ typedef struct
 	zbx_hashset_t		gmacro_kv;
 	zbx_hashset_t		hmacro_kv;
 	zbx_hashset_t		preprocops;
-	zbx_hashset_t		itemscript_params;
+	zbx_hashset_t		items_params;
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;

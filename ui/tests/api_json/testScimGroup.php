@@ -116,7 +116,7 @@ class testScimGroup extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['user_active'],
-				'userdirectoryid' => self::$data['userdirectoryids']['saml'],
+				'passwd' => 'scimuserPassw0rd',
 				'name' => 'Jim',
 				'surname' => 'Halpert',
 				'usrgrps' => [['usrgrpid' => 7]],
@@ -126,12 +126,16 @@ class testScimGroup extends CAPIScimTest {
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userids']['user_active'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryids']['saml']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create inactive user with newly created userdirectoryid for SAML.
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['user_inactive'],
-				'userdirectoryid' => self::$data['userdirectoryids']['saml'],
+				'passwd' => 'scimuserPassw0rd',
 				'name' => 'Pam',
 				'surname' => 'Beesly',
 				'usrgrps' => [['usrgrpid' => 9]],
@@ -141,6 +145,10 @@ class testScimGroup extends CAPIScimTest {
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userids']['user_inactive'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryids']['saml']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create SCIM group without members.
 		$group_wo_members = DB::insert('scim_group', [['name' => self::$data['scim_group_names']['group_wo_members']]]);
@@ -182,11 +190,15 @@ class testScimGroup extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['ldap_user'],
-				'userdirectoryid' => self::$data['userdirectoryids']['ldap']
+				'passwd' => 'scimuserPassw0rd'
 			]
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userids']['ldap_user'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryids']['ldap']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create authorization token to execute requests.
 		$tokenid = CDataHelper::call('token.create', [

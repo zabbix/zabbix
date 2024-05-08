@@ -334,40 +334,68 @@ class User extends ScimApiService {
 
 		$this->validatePatch($options, $db_user);
 
-		$user_idp_data = [];
+		$ins_attrs = [];
+		$del_attrs = [];
+		$upd_attrs = [];
+
 		foreach ($options['Operations'] as $operation) {
-			if ($operation['op'] === 'remove') {
-				$user_idp_data[$operation['path']] = '';
-			}
-			else {
-				$user_idp_data[$operation['path']] = $operation['value'];
+			switch ($operation['op']) {
+				case 'add':
+					$ins_attrs[$operation['path']] = $operation['value'];
+					break;
+
+				case 'replace':
+					$upd_attrs[$operation['path']] = $operation['value'];
+					break;
+
+				case 'remove':
+					$del_attrs[$operation['path']] = '';
+					break;
 			}
 		}
 
+		$user_idp_data = array_merge($ins_attrs, $upd_attrs, $del_attrs);
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 		$new_user_data = $provisioning->getUserAttributes($user_idp_data);
+		$new_user_data['medias'] = $provisioning->getUserMedias(array_merge($ins_attrs, $upd_attrs));
 		$new_user_data = array_merge($db_user, $new_user_data);
+		$idp_mediaids = array_column($new_user_data['medias'], 'userdirectory_mediaid', 'userdirectory_mediaid');
+		$del_userdirectory_mediaids = [];
 
-		// If user status 'active' is changed to false, user needs to be added to disabled group.
-		if (array_key_exists('active', $user_idp_data) && strtolower($user_idp_data['active']) == false) {
-			$new_user_data['usrgrps'] = [];
-			$user_idp_data['active'] = false;
+		if ($del_attrs) {
+			$del_userdirectory_mediaids = array_column($provisioning->getUserMediaMappingByAttribute($del_attrs),
+				'userdirectory_mediaid', 'userdirectory_mediaid'
+			);
 		}
 
-		// If disabled user is activated again, need to return group mapping.
-		if ($db_user['roleid'] == 0 && array_key_exists('active', $user_idp_data)
-				&& strtolower($user_idp_data['active']) == true) {
+		foreach ($db_user['medias'] as $db_media) {
+			if ($db_media['userdirectory_mediaid'] == 0
+					|| array_key_exists($db_media['userdirectory_mediaid'], $del_userdirectory_mediaids)
+					|| array_key_exists($db_media['userdirectory_mediaid'], $idp_mediaids)) {
+				continue;
+			}
 
-			$group_names = DBfetchColumn(DBselect(
-				'SELECT g.name'.
-				' FROM user_scim_group ug,scim_group g'.
-				' WHERE g.scim_groupid=ug.scim_groupid AND '.dbConditionId('ug.userid', [$options['id']])
-			), 'name');
-
-			$new_user_data = array_merge($new_user_data, $provisioning->getUserGroupsAndRole($group_names));
+			$new_user_data['medias'][] = ['sendto' => (array) $db_media['sendto']] + $db_media;
 		}
 
-		$user= APIRPC::User()->updateProvisionedUser($new_user_data);
+		if (array_key_exists('active', $user_idp_data)) {
+			if ($user_idp_data['active'] === false) {
+				// If user status 'active' is changed to false, user needs to be added to disabled group.
+				$new_user_data['usrgrps'] = [];
+			}
+			elseif (!$db_user['roleid']) {
+				// If disabled user is activated again, need to return group mapping.
+				$group_names = DBfetchColumn(DBselect(
+					'SELECT g.name'.
+					' FROM user_scim_group ug,scim_group g'.
+					' WHERE g.scim_groupid=ug.scim_groupid AND '.dbConditionId('ug.userid', [$options['id']])
+				), 'name');
+
+				$new_user_data = array_merge($new_user_data, $provisioning->getUserGroupsAndRole($group_names));
+			}
+		}
+
+		$user = APIRPC::User()->updateProvisionedUser($new_user_data);
 		$user = $user ?: $new_user_data;
 
 		$this->addScimUserAttributes($user, $user_idp_data);
@@ -408,6 +436,7 @@ class User extends ScimApiService {
 		$db_user = APIRPC::User()->get([
 			'output' => ['userid', 'name', 'surname', 'userdirectoryid', 'roleid'],
 			'userids' => $options['id'],
+			'selectMedias' => ['mediaid', 'mediatypeid', 'sendto', 'userdirectory_mediaid'],
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
@@ -420,6 +449,7 @@ class User extends ScimApiService {
 		foreach ($options['Operations'] as &$operation) {
 			$operation['op'] = strtolower($operation['op']);
 		}
+		unset($operation);
 	}
 
 	/**
@@ -433,13 +463,11 @@ class User extends ScimApiService {
 	public function delete(array $options): array {
 		$this->validateDelete($options);
 
-		$provisioning = CProvisioning::forUserDirectoryId($options['userdirectoryid']);
 		$user_data = [
-			'userid' => $options['id']
+			'userid' => $options['id'],
+			'medias' => [],
+			'usrgrps' => []
 		];
-		$user_data += $provisioning->getUserAttributes($options);
-		$user_data['medias'] = $provisioning->getUserMedias($options);
-		$user_data['usrgrps'] = [];
 
 		DB::delete('user_scim_group', ['userid' => $user_data['userid']]);
 

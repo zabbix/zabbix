@@ -62,7 +62,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: new CWidgetFieldHostPatternSelect('hosts', _('Hosts'))
+				: new CWidgetFieldHostPatternSelect('hosts', _('Host patterns'))
 			)
 			->addField($this->isTemplateDashboard()
 				? null

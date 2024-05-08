@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-25 07:41+0000\n"
+"PO-Revision-Date: 2024-05-01 02:23+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -86,6 +86,11 @@ msgstr "%2$sの%1$d件が見つかりました"
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
 msgstr "%1$d+件中%1$d件のホストが表示されています"
+
+#: widgets/itemnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ items are shown"
+msgstr ""
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1542,7 +1547,7 @@ msgstr "資産タグ"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "割り当てられたプロキシ"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -2265,12 +2270,12 @@ msgstr[0] "モジュールを追加できません: %1$s。"
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "グラフ\"%1$s\"にグラフの合計値は2つ以上設定できません。"
+msgstr "グラフ\"%1$s\"にグラフの合計値を複数は設定できません。"
 
 #: include/classes/api/services/CGraphPrototype.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "グラフのプロトタイプ\"%1$s\"にグラフの合計値は2つ以上設定できません。"
+msgstr "グラフのプロトタイプ\"%1$s\"にグラフの合計値を複数は設定できません。"
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
@@ -2288,7 +2293,7 @@ msgstr "プロキシを追加できません"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "プロキシグループを追加できません"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2726,7 +2731,7 @@ msgstr[0] ""
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
 msgid "Cannot delete proxy groups"
-msgstr ""
+msgstr "プロキシグループを削除できません"
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -2821,6 +2826,11 @@ msgstr "ユーザーディレクトリ\"%1$s\"を削除できません。"
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "ユーザーグループを削除できません"
+
+#: include/classes/api/services/CUserGroup.php:1397
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -3948,7 +3958,7 @@ msgstr "ディスカバリされたホスト\"%1$s\"のプロキシを更新で�
 #: app/controllers/CControllerProxyGroupUpdate.php:43
 #: app/controllers/CControllerProxyGroupUpdate.php:82
 msgid "Cannot update proxy group"
-msgstr ""
+msgstr "プロキシグループを更新できません"
 
 #: include/classes/api/services/CRole.php:768
 #, c-format
@@ -4684,7 +4694,7 @@ msgstr "プロキシの設定"
 
 #: app/controllers/CControllerProxyGroupList.php:131
 msgid "Configuration of proxy groups"
-msgstr ""
+msgstr "プロキシグループの設定"
 
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
@@ -5290,7 +5300,7 @@ msgstr "プロキシの作成"
 
 #: app/views/administration.proxygroup.list.php:168
 msgid "Create proxy group"
-msgstr ""
+msgstr "プロキシグループの作成"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
@@ -5539,6 +5549,10 @@ msgstr ""
 #: include/classes/helpers/CSlaHelper.php:39 report4.php:90
 msgid "Daily"
 msgstr "毎日"
+
+#: include/locales.inc.php:40
+msgid "Danish (da_DK)"
+msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -6282,11 +6296,11 @@ msgstr "選択したプロキシを削除しますか？"
 #: app/views/js/administration.proxygroup.list.js.php:88
 #: app/views/popup.proxygroup.edit.php:147
 msgid "Delete selected proxy group?"
-msgstr ""
+msgstr "選択したプロキシグループを削除しますか？"
 
 #: app/views/js/administration.proxygroup.list.js.php:87
 msgid "Delete selected proxy groups?"
-msgstr ""
+msgstr "選択したプロキシグループを削除しますか？"
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -8349,6 +8363,11 @@ msgstr "フィルター"
 msgid "Filter deleted"
 msgstr "フィルターを削除しました"
 
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Filter is not set"
+msgstr ""
+
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
 msgstr "フィルターのプロパティ"
@@ -9262,7 +9281,7 @@ msgstr "ホスト\"%1$s\"はプロキシ\"%2$s\"によって監視されてい�
 #: include/classes/api/services/CProxyGroup.php:456
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy group \"%2$s\"."
-msgstr ""
+msgstr "ホスト\"%1$s\"はプロキシグループ\"%2$s\"によって監視されています。"
 
 #: include/actions.inc.php:57
 msgid "Host IP"
@@ -9491,6 +9510,10 @@ msgstr ""
 msgid "Host networks"
 msgstr "ホストネットワーク"
 
+#: widgets/hostnavigator/includes/WidgetForm.php:65
+msgid "Host patterns"
+msgstr ""
+
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
 msgstr "ホストへの権限"
@@ -9568,6 +9591,14 @@ msgstr ""
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
 msgstr "ホストのサブネットマスク"
+
+#: widgets/itemnavigator/Widget.php:43
+msgid "Host tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
+msgid "Host tag value"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11638,6 +11669,10 @@ msgstr[0] "アイテムを有効にしました"
 msgid "Item in \"not supported\" state"
 msgstr "アイテムが\"取得不可\"の状態"
 
+#: widgets/itemnavigator/includes/WidgetForm.php:107
+msgid "Item limit"
+msgstr ""
+
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
@@ -11645,6 +11680,10 @@ msgstr "アイテムリスト"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
+msgstr ""
+
+#: widgets/itemnavigator/Widget.php:29
+msgid "Item navigator"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
@@ -11655,6 +11694,13 @@ msgstr "アイテムが選択されていません"
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
 msgstr "アイテムパターン"
+
+#: widgets/honeycomb/includes/WidgetForm.php:90
+#: widgets/itemnavigator/includes/WidgetForm.php:78
+#: widgets/piechart/views/widget.edit.js.php:208
+#: widgets/svggraph/views/widget.edit.js.php:279
+msgid "Item patterns"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11696,6 +11742,14 @@ msgstr "ID \"%1$s\"のアイテムのプロトタイプは使用できません�
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
 msgstr "アイテムのプロトタイプ"
+
+#: widgets/itemnavigator/Widget.php:44
+msgid "Item tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
+msgid "Item tag value"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -13053,6 +13107,10 @@ msgstr "メディアタイプ"
 msgid "Media types disabled by Administration."
 msgstr "管理者によってメディアタイプを無効にされました。"
 
+#: app/views/popup.media.php:78
+msgid "Media types disabled in Alerts."
+msgstr ""
+
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
 msgid "Media types used by action \"%1$s\"."
@@ -13880,7 +13938,7 @@ msgstr "新規プロキシ"
 #: app/views/popup.proxygroup.edit.php:127
 #: app/views/popup.proxygroup.edit.php:156
 msgid "New proxy group"
-msgstr ""
+msgstr "新規プロキシグループ"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14008,6 +14066,12 @@ msgstr "データがありません"
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
 msgstr "データ収集なし"
+
+#: app/views/search.php:48 app/views/search.php:209 app/views/search.php:289
+#: app/views/search.php:394 include/classes/html/CTableInfo.php:72
+#: widgets/hostnavigator/Widget.php:40
+msgid "No data found"
+msgstr ""
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -16338,26 +16402,26 @@ msgstr[0] "プロキシを削除しました"
 #: app/views/popup.proxygroup.edit.php:112
 #: include/views/configuration.host.prototype.edit.php:303
 msgid "Proxy group"
-msgstr ""
+msgstr "プロキシグループ"
 
 #: include/classes/api/services/CProxyGroup.php:369
 #, c-format
 msgid "Proxy group \"%1$s\" already exists."
-msgstr ""
+msgstr "プロキシグループ\"%1$s\"はすでに存在しています。"
 
 #: include/classes/import/importers/CHostImporter.php:348
 #, c-format
 msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "ホスト\"%2$s\"のプロキシグループ\"%1$s\"は存在しません。"
 
 #: include/classes/api/services/CProxyGroup.php:437
 #, c-format
 msgid "Proxy group \"%1$s\" is used by proxy \"%2$s\"."
-msgstr ""
+msgstr "プロキシグループ\"%1$s\"はプロキシ\"%2$s\"で使用されています。"
 
 #: app/controllers/CControllerProxyGroupCreate.php:66
 msgid "Proxy group added"
-msgstr ""
+msgstr "プロキシグループを追加しました"
 
 #: app/controllers/CControllerProxyGroupDelete.php:70
 msgid "Proxy group deleted"
@@ -16366,7 +16430,7 @@ msgstr[0] ""
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
-msgstr ""
+msgstr "プロキシグループを更新しました"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/views/administration.proxygroup.list.php:163
@@ -16374,11 +16438,11 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:378
 #: include/classes/helpers/CRoleHelper.php:512
 msgid "Proxy groups"
-msgstr ""
+msgstr "プロキシグループ"
 
 #: app/partials/configuration.host.edit.html.php:334
 msgid "Proxy is not assigned yet."
-msgstr ""
+msgstr "プロキシはまだ割り当てられていません。"
 
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
@@ -18628,6 +18692,10 @@ msgstr "表示"
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the label to all MFA users in authenticator apps."
 msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
@@ -21457,6 +21525,11 @@ msgstr "指定した深刻度のときに使用"
 msgid "Use iframe sandboxing"
 msgstr "iframeサンドボックスを使用する"
 
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Use the filter to display results"
+msgstr ""
+
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
 msgstr "アクションで使用"
@@ -21683,6 +21756,10 @@ msgstr "ユーザーの姓の属性"
 #: widgets/item/views/widget.edit.php:90
 msgid "User macros"
 msgstr "ユーザーマクロ"
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "User media"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22443,6 +22520,13 @@ msgstr "Vault証明書"
 msgid "Vault connection failed."
 msgstr "Vaultへの接続に失敗しました。"
 
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:640
+#: include/classes/setup/CSetupWizard.php:843
+#: include/classes/setup/CSetupWizard.php:863
+msgid "Vault prefix"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
 msgstr "Vaultプロバイダー"
@@ -23167,7 +23251,7 @@ msgstr "Zabbixのログイン画面"
 
 #: app/views/administration.script.edit.php:115
 msgid "Zabbix proxy or server"
-msgstr ""
+msgstr "Zabbixプロキシまたはサーバー"
 
 #: app/views/administration.script.edit.php:116
 msgid "Zabbix server"
@@ -23229,7 +23313,7 @@ msgstr "[月の値が正しくありません: \"%1$s\"]"
 #: include/views/configuration.item.edit.php:462
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
-msgstr ""
+msgstr "[protocol://][user[:password]@]proxy.example.com[:port]"
 
 #: include/classes/validators/CApiInputValidator.php:2764
 msgid "a DNS name is expected"
@@ -23440,6 +23524,10 @@ msgstr "配列か文字列で指定してください"
 #: include/classes/validators/CApiInputValidator.php:2969
 msgid "an array or object is expected"
 msgstr "配列かオブジェクトで指定してください"
+
+#: include/classes/api/services/CUser.php:990
+msgid "an email address is expected"
+msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -23838,6 +23926,15 @@ msgstr "ディスカバリされたオブジェクトの読み込み専用パラ
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
 msgstr "継承されたオブジェクトの読み込み専用パラメータ\"%1$s\"を更新できません"
 
+#: include/classes/api/services/CUserGroup.php:501
+#: include/classes/api/services/CUser.php:451
+#: include/classes/api/services/CUser.php:614
+#: include/classes/api/services/CUser.php:794
+#: include/classes/api/services/CUser.php:1066
+#, c-format
+msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr "cbrt() - 立方根"
@@ -24205,6 +24302,13 @@ msgstr ""
 msgid "host pattern"
 msgstr "ホストパターン"
 
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:155
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:159
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
+#: widgets/svggraph/views/widget.edit.php:292
+msgid "host patterns"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr ""
@@ -24442,6 +24546,15 @@ msgstr "ホスト\"%2$s\"上のアイテム\"%1$s\"は監視されていませ�
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:329
 msgid "item pattern"
 msgstr "アイテムパターン"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:134
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:172
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:138
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:176
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
+msgid "item patterns"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -24959,6 +25072,11 @@ msgstr "出力"
 #: include/views/js/item.preprocessing.js.php:337
 msgid "pattern"
 msgstr "パターン"
+
+#: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
+#: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
+msgid "patterns"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"

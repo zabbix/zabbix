@@ -169,7 +169,7 @@ class testPageReportsAudit extends CWebTest {
 				'smtp_server' => 'mail.example.com',
 				'smtp_helo' => 'example.com',
 				'smtp_email' => 'zabbix@example.com',
-				'content_type' => 1
+				'message_format' => 1
 			]
 		]);
 		$this->assertArrayHasKey('mediatypeids', $response);

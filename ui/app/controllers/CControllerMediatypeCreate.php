@@ -54,7 +54,7 @@ class CControllerMediatypeCreate extends CController {
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
 			'description' =>			'db media_type.description',
-			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'message_format' =>			'db media_type.message_format|in '.ZBX_MEDIA_MESSAGE_FORMAT_TEXT.','.ZBX_MEDIA_MESSAGE_FORMAT_HTML,
 			'message_templates' =>		'array',
 			'provider' =>				'int32|in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
 		];
@@ -105,7 +105,7 @@ class CControllerMediatypeCreate extends CController {
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_port', 'smtp_helo', 'smtp_security', 'smtp_verify_peer',
-					'smtp_verify_host', 'smtp_authentication', 'content_type'
+					'smtp_verify_host', 'smtp_authentication', 'message_format'
 				]);
 
 				$smtp_email = $this->getInput('smtp_email', '');

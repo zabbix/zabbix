@@ -38,8 +38,8 @@ class CMediatype extends CApiService {
 	public const OUTPUT_FIELDS = ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email',
 		'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
 		'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval', 'content_type',
-		'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
-		'provider', 'parameters'
+		'message_format', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name',
+		'description', 'provider', 'parameters'
 	];
 
 	/**
@@ -86,6 +86,10 @@ class CMediatype extends CApiService {
 		];
 
 		$options = zbx_array_merge($defOptions, $options);
+
+		if (!$options['countOutput'] && is_array($options['output']) && in_array('content_type', $options['output'])) {
+			self::deprecated('Field "content_type" is deprecated.');
+		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'selectActions' =>  ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null]
@@ -147,6 +151,13 @@ class CMediatype extends CApiService {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
+		if (!$options['countOutput']) {
+			$add_content_type = $options['output'] === API_OUTPUT_EXTEND
+				|| in_array('content_type', $options['output']);
+			$remove_message_format = $options['output'] !== API_OUTPUT_EXTEND
+				&& !in_array('message_format', $options['output']);
+		}
+
 		while ($mediatype = DBfetch($res)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -157,6 +168,13 @@ class CMediatype extends CApiService {
 				}
 			}
 			else {
+				if ($add_content_type) {
+					$mediatype['content_type'] = $mediatype['message_format'];
+					if ($remove_message_format) {
+						unset($mediatype['message_format']);
+					}
+				}
+
 				$result[$mediatype['mediatypeid']] = $mediatype;
 			}
 		}
@@ -170,9 +188,8 @@ class CMediatype extends CApiService {
 			$result = $this->unsetExtraFields($result, ['type'], $options['output']);
 		}
 
-		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
 		return $result;
 	}
@@ -237,7 +254,8 @@ class CMediatype extends CApiService {
 			'maxsessions' =>			['type' => API_INT32],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
 			'attempt_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'attempt_interval'), 'in' => '0:'.SEC_PER_HOUR],
-			'content_type' =>			['type' => API_INT32],
+			'content_type' =>			['type' => API_INT32, 'flags' => API_DEPRECATED, 'replacement' => 'message_format'],
+			'message_format' =>			['type' => API_INT32],
 			'script' =>					['type' => API_STRING_UTF8],
 			'timeout' =>				['type' => API_TIME_UNIT],
 			'process_tags' =>			['type' => API_INT32],
@@ -262,8 +280,8 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkDuplicates($mediatypes);
 		self::validateByType($mediatypes);
+		self::checkDuplicates($mediatypes);
 	}
 
 	/**
@@ -340,7 +358,8 @@ class CMediatype extends CApiService {
 			'maxsessions' =>			['type' => API_INT32],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
 			'attempt_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'attempt_interval'), 'in' => '0:'.SEC_PER_HOUR],
-			'content_type' =>			['type' => API_INT32],
+			'content_type' =>			['type' => API_INT32, 'flags' => API_DEPRECATED, 'replacement' => 'message_format'],
+			'message_format' =>			['type' => API_INT32],
 			'script' =>					['type' => API_STRING_UTF8],
 			'timeout' =>				['type' => API_TIME_UNIT],
 			'process_tags' =>			['type' => API_INT32],
@@ -369,7 +388,7 @@ class CMediatype extends CApiService {
 			'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
 				'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
 				'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
-				'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
+				'message_format', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 				'event_menu_name', 'description', 'provider'
 			],
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
@@ -444,7 +463,7 @@ class CMediatype extends CApiService {
 			$type_fields = [
 				MEDIA_TYPE_EMAIL => [
 					'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security', 'smtp_verify_peer',
-					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'content_type', 'provider'
+					'smtp_verify_host', 'smtp_authentication', 'username', 'passwd', 'message_format', 'provider'
 				],
 				MEDIA_TYPE_EXEC => [
 					'exec_path', 'exec_params', 'parameters'
@@ -554,7 +573,7 @@ class CMediatype extends CApiService {
 					'smtp_port' =>				['type' => API_INT32, 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
 					'smtp_security' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_SECURITY_NONE, SMTP_SECURITY_STARTTLS, SMTP_SECURITY_SSL])],
 					'smtp_authentication' =>	['type' => API_INT32, 'in' => implode(',', [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL])],
-					'content_type' =>			['type' => API_INT32, 'in' => implode(',', [SMTP_MESSAGE_FORMAT_PLAIN_TEXT, SMTP_MESSAGE_FORMAT_HTML])],
+					'message_format' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MEDIA_MESSAGE_FORMAT_TEXT, ZBX_MEDIA_MESSAGE_FORMAT_HTML])],
 					'provider' =>				['type' => API_INT32, 'in' => implode(',', array_keys(CMediatypeHelper::getEmailProviders()))]
 				];
 
@@ -661,7 +680,7 @@ class CMediatype extends CApiService {
 			'smtp_verify_host' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_verify_host')],
 			'smtp_authentication' =>	['type' => API_INT32, 'in' => DB::getDefault('media_type', 'smtp_authentication')],
 			'maxsessions' =>			['type' => API_INT32, 'in' => '0:100'],
-			'content_type' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'content_type')],
+			'message_format' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'message_format')],
 			'script' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'script')],
 			'timeout' =>				['type' => API_TIME_UNIT, 'in' => timeUnitToSeconds(DB::getDefault('media_type', 'timeout'))],
 			'process_tags' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'process_tags')],
@@ -881,6 +900,16 @@ class CMediatype extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts): array {
+		if (!$options['countOutput'] && is_array($options['output'])
+				&& ($i = array_search('content_type', $options['output'])) !== false) {
+			if (in_array('message_format', $options['output'])) {
+				unset($options['output'][$i]);
+			}
+			else {
+				$options['output'][$i] = 'message_format';
+			}
+		}
+
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput'] && $this->outputIsRequested('parameters', $options['output'])) {

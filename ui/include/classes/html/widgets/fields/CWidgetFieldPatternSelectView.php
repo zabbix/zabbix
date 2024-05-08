@@ -33,6 +33,7 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldPatternSelect $field) {
 		$this->field = $field;
+		$this->placeholder = _('patterns');
 	}
 
 	abstract protected function getObjectName(): string;
