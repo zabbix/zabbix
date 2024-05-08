@@ -263,7 +263,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 								'type' => 'clock',
 								'name' => 'Clock widget',
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
