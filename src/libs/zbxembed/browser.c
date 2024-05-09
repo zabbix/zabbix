@@ -21,6 +21,7 @@
 #include "webdriver.h"
 #include "browser_element.h"
 #include "browser_error.h"
+#include "browser_alert.h"
 #include "zbxembed.h"
 
 #include "zbxstr.h"
@@ -154,6 +155,7 @@ static duk_ret_t	es_browser_navigate(duk_context *ctx)
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &url))
 	{
 		(void)browser_push_error(ctx, wd, "cannot get url: %s", error);
+
 		return duk_throw(ctx);
 	}
 
@@ -349,7 +351,7 @@ static void	es_browser_get_variant(duk_context *ctx, const zbx_variant_t *var)
 			for (int i = 0; i < var->data.vector->values_num; i++)
 			{
 				es_browser_get_variant(ctx, &var->data.vector->values[i]);
-				duk_put_prop_index(ctx, idx, i);
+				duk_put_prop_index(ctx, idx, (duk_uarridx_t)i);
 			}
 			break;
 		case ZBX_VARIANT_ERR:
@@ -457,13 +459,13 @@ static duk_ret_t	es_browser_get_result(duk_context *ctx)
 			for (int j = 0; j < details->user.values_num; j++)
 			{
 				es_browser_push_performance_entry(ctx, details->user.values[j]);
-				duk_put_prop_index(ctx, idx_user, j);
+				duk_put_prop_index(ctx, idx_user, (duk_uarridx_t)j);
 			}
 
 			duk_put_prop_string(ctx, idx, "user");
 		}
 
-		duk_put_prop_index(ctx, idx_details, i);
+		duk_put_prop_index(ctx, idx_details, (duk_uarridx_t)i);
 	}
 
 	duk_put_prop_string(ctx, idx_perf, "details");
@@ -515,6 +517,7 @@ static duk_ret_t	es_browser_set_bookmark(duk_context *ctx)
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &bookmark))
 	{
 		(void)browser_push_error(ctx, wd, "cannot convert bookmark parameter to utf8");
+
 		return duk_throw(ctx);
 	}
 
@@ -660,6 +663,7 @@ static duk_ret_t	es_browser_add_cookie(duk_context *ctx)
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, -1), &cookie_json))
 	{
 		(void)browser_push_error(ctx, wd, "cannot convert cookie object to JSON format");
+
 		return duk_throw(ctx);
 	}
 
@@ -726,6 +730,7 @@ static duk_ret_t	es_browser_set_screen_size(duk_context *ctx)
 	if (0 > width || width > 8192 || 0 > height || height > 8192)
 	{
 		(void)browser_push_error(ctx, wd, "unsupported screen size");
+
 		return duk_throw(ctx);
 	}
 
@@ -791,6 +796,7 @@ static duk_ret_t	es_browser_set_error(duk_context *ctx)
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &message))
 	{
 		(void)browser_push_error(ctx, wd, "cannot convert message parameter to utf8");
+
 		return duk_throw(ctx);
 	}
 
@@ -816,6 +822,7 @@ static duk_ret_t	es_browser_execute_script(duk_context *ctx)
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &script))
 	{
 		(void)browser_push_error(ctx, wd, "cannot convert bookmark parameter to utf8");
+
 		return duk_throw(ctx);
 	}
 
@@ -1058,6 +1065,7 @@ static int	es_init_browser(zbx_es_t *es, char **error)
 	if (0 != setjmp(es->env->loc))
 	{
 		*error = zbx_strdup(*error, es->env->error);
+
 		return FAIL;
 	}
 
@@ -1084,4 +1092,3 @@ int	zbx_es_env_init_browser(zbx_es_t *es, const char *endpoint, char **error)
 	/* initialize Browser prototype */
 	return es_init_browser(es, error);
 }
-

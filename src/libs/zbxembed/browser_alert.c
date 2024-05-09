@@ -93,6 +93,7 @@ static duk_ret_t	wd_alert_ctor(duk_context *ctx, zbx_webdriver_t *wd, const char
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
 		(void)browser_push_error(ctx, wd, "cannot access internal environment");
+
 		return duk_throw(ctx);
 	}
 

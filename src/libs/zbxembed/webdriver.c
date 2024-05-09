@@ -85,6 +85,7 @@ static int	webdriver_get_value(const char *response, struct zbx_json_parse *jp, 
 	if (SUCCEED != zbx_json_open(response, &jp_resp))
 	{
 		*error = zbx_dsprintf(NULL, "cannot open webdriver response: %s", zbx_json_strerror());
+
 		return FAIL;
 	}
 
@@ -93,6 +94,7 @@ static int	webdriver_get_value(const char *response, struct zbx_json_parse *jp, 
 		if (NULL == (jp->start = jp->end = zbx_json_pair_by_name(&jp_resp, "value")))
 		{
 			*error = zbx_dsprintf(NULL, "cannot parse webdriver response: %s", zbx_json_strerror());
+
 			return FAIL;
 		}
 	}
@@ -185,7 +187,7 @@ static int	webdriver_get_error(zbx_webdriver_t *wd, const struct zbx_json_parse 
 		http_code = 0;
 
 	webdriver_discard_error(wd);
-	wd->error = webdriver_create_error(http_code, error, *info);
+	wd->error = webdriver_create_error((int)http_code, error, *info);
 
 	zbx_free(error);
 
@@ -590,6 +592,7 @@ int	webdriver_get_url(zbx_webdriver_t *wd, char **url, char **error)
 	if (NULL == zbx_json_decodevalue_dyn(jp.start, url, &url_alloc, NULL))
 	{
 		*error = zbx_dsprintf(NULL, "cannot read url: %s", zbx_json_strerror());
+
 		return FAIL;
 	}
 
@@ -690,6 +693,7 @@ int	webdriver_find_elements(zbx_webdriver_t *wd, const char *strategy, const cha
 		/* otherwise log the error and return NULL element */
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot find element with strategy:'%s' and selector:'%s': %s",
 				strategy, selector, *error);
+
 		zbx_free(*error);
 	}
 	else
@@ -927,7 +931,7 @@ int	webdriver_get_cookies(zbx_webdriver_t *wd, char **cookies, char **error)
 	if (SUCCEED != webdriver_session_query(wd, "GET", "cookie", NULL, &jp, error))
 		return FAIL;
 
-	size_t	len = jp.end - jp.start + 1;
+	size_t	len = (size_t)(jp.end - jp.start + 1);
 
 	*cookies = zbx_malloc(NULL, len + 1);
 	memcpy(*cookies, jp.start, len);

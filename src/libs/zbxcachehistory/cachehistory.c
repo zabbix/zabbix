@@ -2033,7 +2033,7 @@ static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_u
 		size_t	maxlen = (ITEM_VALUE_TYPE_BIN == item_value_type ? ZBX_HISTORY_BIN_VALUE_LEN :
 				ZBX_HISTORY_VALUE_LEN);
 
-		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, maxlen) + 1;
+		item_value->value.value_str.len = (size_t)zbx_db_strlen_n(value_orig, maxlen) + 1;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
 
 		item_value->value.value_str.pvalue = string_values_offset;

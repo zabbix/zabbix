@@ -98,6 +98,7 @@ static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const ch
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
 		(void)browser_push_error(ctx, wd, "cannot access internal environment");
+
 		return duk_throw(ctx);
 	}
 
@@ -130,17 +131,18 @@ static duk_ret_t	wd_element_send_keys(duk_context *ctx)
 	char			*error = NULL, *keys = NULL;
 	int			err_index = -1;
 
+	el = wd_element(ctx);
+
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &keys))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert keys parameter to utf8");
+		err_index = browser_push_error(ctx,  el->wd, "cannot convert keys parameter to utf8");
+
 		goto out;
 	}
 
-	el = wd_element(ctx);
-
 	if (SUCCEED != webdriver_send_keys_to_element(el->wd, el->id, keys, &error))
 	{
-		err_index = 	(ctx, el->wd, "cannot send keys to element: %s", error);
+		err_index = browser_push_error(ctx, el->wd, "cannot send keys to element: %s", error);
 		zbx_free(error);
 	}
 out:
@@ -215,14 +217,14 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
 
+	el = wd_element(ctx);
+
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert name parameter to utf8");
+		err_index = browser_push_error(ctx, el->wd, "cannot convert name parameter to utf8");
 
 		goto out;
 	}
-
-	el = wd_element(ctx);
 
 	if (SUCCEED != webdriver_get_element_info(el->wd, el->id, "attribute", name, &value, &error))
 	{
@@ -256,14 +258,14 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
 
+	el = wd_element(ctx);
+
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert name parameter to utf8");
+		err_index = browser_push_error(ctx, el->wd, "cannot convert name parameter to utf8");
 
 		goto out;
 	}
-
-	el = wd_element(ctx);
 
 	if (SUCCEED != webdriver_get_element_info(el->wd, el->id, "property", name, &value, &error))
 	{
@@ -375,6 +377,6 @@ void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_ve
 	for (int i = 0; i < elements->values_num; i++)
 	{
 		wd_element_create(ctx, wd, elements->values[i]);
-		duk_put_prop_index(ctx, arr, i);
+		duk_put_prop_index(ctx, arr, (duk_uarridx_t)i);
 	}
 }

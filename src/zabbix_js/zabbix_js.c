@@ -90,7 +90,8 @@ static char	shortopts[] = "s:i:p:hVl:t:w:";
 static char	*read_file(const char *filename, char **error)
 {
 	char	buffer[4096];
-	int	n, fd;
+	int	fd;
+	ssize_t	n;
 	char	*data = NULL;
 	size_t	data_alloc = 0, data_offset = 0;
 
@@ -115,7 +116,7 @@ static char	*read_file(const char *filename, char **error)
 			*error = zbx_strdup(NULL, zbx_strerror(errno));
 			return NULL;
 		}
-		zbx_strncpy_alloc(&data, &data_alloc, &data_offset, buffer, n);
+		zbx_strncpy_alloc(&data, &data_alloc, &data_offset, buffer, (size_t)n);
 	}
 
 	if (fd != STDIN_FILENO)
@@ -136,13 +137,12 @@ static char	*read_file(const char *filename, char **error)
  *             result           - [OUT] result of an execution                *
  *             error            - [OUT] error message                         *
  *             max_error_len    - [IN] maximum length of an error             *
- *             debug            - [OUT] debug data (optional)                 *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
-int	execute_script(const char *command, const char *param, int timeout, const char *config_source_ip,
+static int	execute_script(const char *command, const char *param, int timeout, const char *config_source_ip,
 		const char *webdriver, char **result, char *error, size_t max_error_len)
 {
 	int		size, ret = SUCCEED;

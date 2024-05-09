@@ -45,7 +45,7 @@ char	*zbx_string_replace(const char *str, const char *sub_str1, const char *sub_
 	diff = (long)strlen(sub_str2) - len;
 
 	/* allocate new memory */
-	new_str = (char *)zbx_malloc(new_str, (size_t)(strlen(str) + count*diff + 1)*sizeof(char));
+	new_str = (char *)zbx_malloc(new_str, (strlen(str) + (size_t)(count * diff) + 1) * sizeof(char));
 
 	for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
 	{
@@ -1601,7 +1601,7 @@ static void	zbx_replace_invalid_utf8_impl(char *text, int replace_nonprintable)
 				*out++ = *text++;
 			}
 
-			mb_len = out - (char *)utf8;
+			mb_len = (size_t)(out - (char *)utf8);
 
 			if (SUCCEED == ret)
 			{
@@ -1734,7 +1734,7 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 		}
 
 		to = *data + offset;
-		memmove(to + sz_from, to + sz_to, *data_len - (to - *data) - sz_from);
+		memmove(to + sz_from, to + sz_to, *data_len - (size_t)(to - *data) - sz_from);
 	}
 
 	memcpy(*data + offset, from, sz_from);

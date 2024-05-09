@@ -65,6 +65,7 @@ int	es_browser_init_errors(zbx_es_t *es, char **error)
 	if (0 != setjmp(es->env->loc))
 	{
 		*error = zbx_strdup(*error, es->env->error);
+
 		return FAIL;
 	}
 

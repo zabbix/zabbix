@@ -74,10 +74,11 @@ static int	wd_perf_init_attribute_from_json(zbx_wd_attr_t *attr, const char *nam
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse attribute \"%s\" value: %s",
 					name, zbx_json_strerror());
+
 			return FAIL;
 		}
 
-		json_raw = zbx_variant_data_bin_create(jp_value.start, jp_value.end - jp_value.start + 1);
+		json_raw = zbx_variant_data_bin_create(jp_value.start, (zbx_uint32_t)(jp_value.end - jp_value.start + 1));
 		zbx_variant_set_bin(&attr->value, json_raw);
 	}
 	else
@@ -104,6 +105,7 @@ static int	wd_perf_init_attribute_from_json(zbx_wd_attr_t *attr, const char *nam
 			default:
 				zabbix_log(LOG_LEVEL_DEBUG, "invalid attribute \"%s\" value \"%s\"", name, value);
 				zbx_free(value);
+
 				return FAIL;
 		}
 	}
@@ -118,7 +120,7 @@ static int	wd_perf_init_attribute_from_json(zbx_wd_attr_t *attr, const char *nam
  * Purpose: initialize attribute of floating point type                       *
  *                                                                            *
  ******************************************************************************/
-void	wd_perf_init_attribute_from_dbl(zbx_wd_attr_t *attr, const char *name, double value)
+static void	wd_perf_init_attribute_from_dbl(zbx_wd_attr_t *attr, const char *name, double value)
 {
 	attr->name = zbx_strdup(NULL, name);
 	zbx_variant_set_dbl(&attr->value, value);
@@ -133,7 +135,7 @@ void	wd_perf_init_attribute_from_dbl(zbx_wd_attr_t *attr, const char *name, doub
  *           (freeing old resources).                                         *
  *                                                                            *
  ******************************************************************************/
-void	wd_perf_entry_set_attribute(zbx_wd_perf_entry_t *entry, zbx_wd_attr_t *attr_local)
+static void	wd_perf_entry_set_attribute(zbx_wd_perf_entry_t *entry, zbx_wd_attr_t *attr_local)
 {
 	zbx_wd_attr_t	*attr;
 
@@ -158,7 +160,7 @@ void	wd_perf_entry_set_attribute(zbx_wd_perf_entry_t *entry, zbx_wd_attr_t *attr
  *           (freeing old resources).                                         *
  *                                                                            *
  ******************************************************************************/
-zbx_wd_attr_t	*wd_perf_entry_get_attribute(zbx_wd_perf_entry_t *entry, const char *name)
+static zbx_wd_attr_t	*wd_perf_entry_get_attribute(zbx_wd_perf_entry_t *entry, const char *name)
 {
 	zbx_wd_attr_t	attr_local;
 
@@ -192,7 +194,6 @@ static int	wd_attr_compare(const void *d1, const void *d2)
  * Purpose: clear attribute freeing its resources                             *
  *                                                                            *
  ******************************************************************************/
-
 static void	wd_attr_clear(void *d)
 {
 	zbx_wd_attr_t	*attr = (zbx_wd_attr_t *)d;
@@ -252,7 +253,7 @@ static char	*wd_convert_attribute_name(char *buf, size_t size)
 	}
 
 	in = out;
-	new_size += out - buf + 1;
+	new_size += (size_t)(out - buf + 1);
 
 	if (new_size > size)
 		buf = (char *)zbx_malloc(NULL, new_size);
@@ -269,7 +270,7 @@ static char	*wd_convert_attribute_name(char *buf, size_t size)
 	{
 		if (0 != isupper((int)*in))
 		{
-			*out = tolower((int)*in);
+			*out = (char)tolower((int)*in);
 
 			if (0 == upper_num++ && 0 != lower_num)
 				*--out = '_';
