@@ -3547,20 +3547,20 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
  * Return value: size of v4 netmask prefix                                    *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_v4mask2pefix(const char *mask)
+static unsigned int	vmware_v4mask2pefix(const char *mask)
 {
 #	define	V4MASK_MAX	32
 
 	struct in_addr	inaddr;
-	int		p = 0;
+	unsigned int	p = 0;
 
 	if (-1 == inet_pton(AF_INET, mask, &inaddr))
 		return V4MASK_MAX;
 
 	while (inaddr.s_addr > 0)
 	{
-		inaddr.s_addr = inaddr.s_addr >> 1;
-		p++;
+		p += inaddr.s_addr & 1;
+		inaddr.s_addr >>= 1;
 	}
 
 	return p;
@@ -3676,7 +3676,7 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 		}
 
 		if (0 == ipv6)
-			zbx_snprintf(buff, sizeof(buff), "%s/%d", ip_hv, vmware_v4mask2pefix(mask));
+			zbx_snprintf(buff, sizeof(buff), "%s/%u", ip_hv, vmware_v4mask2pefix(mask));
 		else
 			zbx_snprintf(buff, sizeof(buff), "%s/%s", ip_hv, mask);
 
