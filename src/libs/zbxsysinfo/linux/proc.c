@@ -435,15 +435,19 @@ static int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *by
 	{
 		if (NULL == (srcstr = strchr(srcstr, ' ')))
 			return FAIL;
+
 		zbx_ltrim(srcstr, " ");
 		if (NULL == (p_unit = strchr(srcstr, ' ')))
 			return FAIL;
+
 		*p_unit = '\0';
 		if (FAIL == zbx_is_uint64(srcstr, bytes))
 			return FAIL;
+
 		convert_to_bytes(p_unit + 1, bytes);
 		return SUCCEED;
 	}
+
 	return FAIL;
 }
 
@@ -461,7 +465,7 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 {
 	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0, rss = 0;
 	FILE		*f;
-	char		*statm_rss_str, *tmp_str, tmp[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN];
 
 	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps_rollup", pid);
 	if (NULL == (f = fopen(tmp, "r")))
@@ -470,14 +474,14 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		f = fopen(tmp, "r");
 	}
 
-	if(NULL != f)
+	if (NULL != f)
 	{
 		zbx_uint64_t	pss = 0, num;
 		int		have_pss = 0;
 
 		while (NULL != fgets(tmp, (int)sizeof(tmp), f))
 		{
-			if(SUCCEED == byte_value_from_str(tmp, "Private_Hugetlb:", &num))
+			if (SUCCEED == byte_value_from_str(tmp, "Private_Hugetlb:", &num))
 			{
 				private_huge += num;
 			}
@@ -502,7 +506,7 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 			}
 		}
 
-		if(have_pss)
+		if (1 == have_pss)
 			shared = pss - private;
 
 		private += private_huge;
@@ -511,6 +515,8 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 	}
 	else
 	{
+		char	*statm_rss_str, *tmp_str;
+
 		zbx_uint64_t	psize = (zbx_uint64_t)getpagesize() / 1024;
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/statm", pid);
 		if (NULL == (f = fopen(tmp, "r")))
@@ -556,7 +562,9 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		}
 
 	}
+
 	*bytes = shared + private + shared_huge;
+
 	return;
 out:
 	*bytes = ZBX_MAX_UINT64;
@@ -2240,7 +2248,6 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 				cmdline = prname = user = group = NULL;
 			}
 		}
-
 	}
 	zbx_fclose(f_cmd);
 	zbx_fclose(f_status);
