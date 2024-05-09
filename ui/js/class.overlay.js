@@ -71,7 +71,7 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.$body.on('submit', 'form', function(e) {
 		if (this.$btn_submit) {
 			e.preventDefault();
-			this.$btn_submit.trigger('click');
+			setTimeout(() => this.$btn_submit.trigger('click'));
 		}
 	}.bind(this));
 
