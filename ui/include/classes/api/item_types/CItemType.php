@@ -379,6 +379,7 @@ abstract class CItemType {
 						return ['type' => API_CALC_FORMULA, 'flags' => ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')];
 
 					case ITEM_TYPE_SCRIPT:
+					case ITEM_TYPE_BROWSER:
 						return ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED];
 
 					default:

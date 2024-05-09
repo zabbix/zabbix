@@ -113,7 +113,7 @@ if (!$data['query_fields'] && !$data['limited']) {
 	];
 }
 
-// Prepare ITEM_TYPE_SCRIPT parameters.
+// Prepare ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER parameters.
 $parameters_data = [];
 
 if ($data['parameters']) {
@@ -200,7 +200,7 @@ $item_tab
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		))->setId('js-item-query-fields-field')
 	])
-	// Append ITEM_TYPE_SCRIPT parameters to form list.
+	// Append ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER parameters to form list.
 	->addItem([
 		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('js-item-parameters-label'),
 		(new CFormField([
@@ -242,6 +242,23 @@ $item_tab
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('js-item-script-field')
+	])
+	->addItem([
+		(new CLabel(_('Script'), 'browser_script'))
+			->setAsteriskMark()
+			->setId('js-item-browser-script-label'),
+		(new CFormField((new CMultilineInput('browser_script', $data['params'], [
+				'title' => _('JavaScript'),
+				'placeholder' => _('script'),
+				'placeholder_textarea' => 'return value',
+				'grow' => 'auto',
+				'rows' => 0,
+				'maxlength' => DB::getFieldLength('items', 'params'),
+				'readonly' => $data['limited']
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-browser-script-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT Request type to form list.
 	->addItem([
@@ -674,7 +691,7 @@ $item_tab->addItem([
 /**
  * Append timeout field to form list for item types:
  * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
- * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
  */
 $edit_source_timeouts_link = null;
 

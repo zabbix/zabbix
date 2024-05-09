@@ -295,6 +295,7 @@ class CXmlConstantName {
 	// const MATCHES_REGEX = 'MATCHES_REGEX'; // Duplicate.
 	// const NOT_MATCHES_REGEX = 'NOT_MATCHES_REGEX'; // Duplicate.
 
+	const BROWSER = 'BROWSER';
 	const EMAIL = 'EMAIL';
 	const SCRIPT = 'SCRIPT';
 	const SMS = 'SMS';

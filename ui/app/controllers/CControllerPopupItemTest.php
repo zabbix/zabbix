@@ -44,7 +44,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 	];
 
 	/**
@@ -94,7 +94,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected $items_support_proxy = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+		ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 	];
 
 	/**
@@ -505,6 +505,7 @@ abstract class CControllerPopupItemTest extends CController {
 				break;
 
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'parameters', 'script', 'timeout']);
 				break;
 		}
@@ -650,7 +651,7 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 		}
 
-		if ($this->item_type == ITEM_TYPE_SCRIPT) {
+		if ($this->item_type == ITEM_TYPE_SCRIPT || $this->item_type == ITEM_TYPE_BROWSER) {
 			return $interface_data;
 		}
 

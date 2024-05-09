@@ -206,6 +206,24 @@ $formgrid = (new CFormGrid())
 		))->setId('js-item-script-field')
 	])
 	->addItem([
+		(new CLabel(_('Script'), 'browser_script'))
+			->setAsteriskMark()
+			->setId('js-item-browser-script-label'),
+		(new CFormField(
+			(new CMultilineInput('browser_script', $item['params'], [
+				'title' => _('JavaScript'),
+				'placeholder' => _('script'),
+				'placeholder_textarea' => 'return value',
+				'grow' => 'auto',
+				'rows' => 0,
+				'maxlength' => DB::getFieldLength('items', 'params'),
+				'readonly' => $readonly
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-browser-script-field')
+	])
+	->addItem([
 		(new CLabel(_('Request type'), 'label-request-method'))->setId('js-item-request-method-label'),
 		(new CFormField(
 			(new CSelect('request_method'))
@@ -667,7 +685,7 @@ $formgrid
 /**
  * Append timeout field to form list for item types:
  * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
- * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
  */
 $edit_source_timeouts_link = null;
 $custom_timeout_enabled = $item['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;

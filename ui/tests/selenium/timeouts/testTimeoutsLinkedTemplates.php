@@ -120,7 +120,15 @@ class testTimeoutsLinkedTemplates extends testTimeoutsDisplay {
 						'key_' => 'script',
 						'type' => ITEM_TYPE_SCRIPT,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'params' => 'test',
+						'params' => 'return JSON.encode({});',
+						'delay' => 5
+					],
+					[
+						'name' => 'Browser',
+						'key_' => 'browser',
+						'type' => ITEM_TYPE_BROWSER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'params' => 'return JSON.encode({});',
 						'delay' => 5
 					]
 				],
@@ -190,7 +198,14 @@ class testTimeoutsLinkedTemplates extends testTimeoutsDisplay {
 						'name' => 'Script',
 						'key_' => 'script_drule',
 						'type' => ITEM_TYPE_SCRIPT,
-						'params' => 'test',
+						'params' => 'return JSON.encode({});',
+						'delay' => 5
+					],
+					[
+						'name' => 'Browser',
+						'key_' => 'browser_drule',
+						'type' => ITEM_TYPE_BROWSER,
+						'params' => 'return JSON.encode({});',
 						'delay' => 5
 					]
 				]
@@ -296,6 +311,16 @@ class testTimeoutsLinkedTemplates extends testTimeoutsDisplay {
 				'type' => ITEM_TYPE_SCRIPT,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'params' => 'test',
+				'delay' => 5
+			],
+			[
+				'name' => 'Browser',
+				'key_' => 'browser_[{#KEY}]',
+				'hostid' => $linked_template,
+				'ruleid' => $template_druleids['Template for linking:zabbix_agent_drule'],
+				'type' => ITEM_TYPE_BROWSER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'params' => 'return JSON.encode({});',
 				'delay' => 5
 			]
 		]);

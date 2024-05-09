@@ -128,7 +128,7 @@ function getItemFormData(array $item = []) {
 		$data['query_fields'] = [];
 	}
 
-	if ($data['type'] == ITEM_TYPE_SCRIPT) {
+	if ($data['type'] == ITEM_TYPE_SCRIPT || $data['type'] == ITEM_TYPE_BROWSER) {
 		CArrayHelper::sort($data['parameters'], ['name']);
 		$data['parameters'] = array_values($data['parameters']);
 	}
@@ -235,7 +235,7 @@ function getItemFormData(array $item = []) {
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
 
-		if ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
+		if (($data['type'] == ITEM_TYPE_SCRIPT || $data['type'] = ITEM_TYPE_BROWSER) && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);
 			$data['parameters'] = array_values($data['parameters']);
 		}

@@ -90,6 +90,9 @@ final class CItemTypeFactory {
 
 			case ITEM_TYPE_SCRIPT:
 				return self::$instances[$type] = new CItemTypeScript();
+
+			case ITEM_TYPE_BROWSER:
+				return self::$instances[$type] = new CItemTypeBrowser();
 		}
 
 		throw new APIException(ZBX_API_ERROR_INTERNAL, 'Incorrect item type.');

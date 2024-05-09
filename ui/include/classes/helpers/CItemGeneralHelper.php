@@ -28,6 +28,7 @@ class CItemGeneralHelper {
 		return [
 			'allow_traps' => DB::getDefault('items', 'allow_traps'),
 			'authtype' => DB::getDefault('items', 'authtype'),
+			'browser_script' => DB::getDefault('items', 'params'),
 			'custom_timeout' => ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED,
 			'delay_flex' => [],
 			'delay' => ZBX_ITEM_DELAY_DEFAULT,
@@ -404,6 +405,7 @@ class CItemGeneralHelper {
 		$input['delay_flex'] = $custom_intervals;
 		$params_field = [
 			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_BROWSER => 'browser_script',
 			ITEM_TYPE_SSH => 'params_es',
 			ITEM_TYPE_TELNET => 'params_es',
 			ITEM_TYPE_DB_MONITOR => 'params_ap',
@@ -435,7 +437,7 @@ class CItemGeneralHelper {
 			CArrayHelper::sort($query_fields, ['sortorder']);
 			CArrayHelper::sort($headers, ['sortorder']);
 		}
-		else if ($input['type'] == ITEM_TYPE_SCRIPT) {
+		else if ($input['type'] == ITEM_TYPE_SCRIPT || $input['type'] == ITEM_TYPE_BROWSER) {
 			$parameters = [];
 
 			foreach ($input['parameters'] as $parameter) {

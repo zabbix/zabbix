@@ -105,7 +105,8 @@ class testDiscoveryRule extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.implode(', ', [
 					ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+					ITEM_TYPE_BROWSER
 				]).'.'
 			],
 			'Test invalid lifetime_type value' => [
@@ -250,7 +251,9 @@ class testDiscoveryRule extends CAPITest {
 			ITEM_TYPE_JMX => '50030',
 			ITEM_TYPE_DEPENDENT => null,
 			ITEM_TYPE_HTTPAGENT => '50022',
-			ITEM_TYPE_SNMP => '50029'
+			ITEM_TYPE_SNMP => '50029',
+			ITEM_TYPE_SCRIPT => null,
+			ITEM_TYPE_BROWSER => null
 		];
 
 		$item_type_tests = [];
@@ -333,10 +336,17 @@ class testDiscoveryRule extends CAPITest {
 					];
 					break;
 
-
 				case ITEM_TYPE_SCRIPT:
 					$params = [
-						'params' => 'script',
+						'params' => 'return JSON.encode({});',
+						'timeout' => '30s',
+						'delay' => '30s'
+					];
+					break;
+
+				case ITEM_TYPE_BROWSER:
+					$params = [
+						'params' => 'return JSON.encode({});',
 						'timeout' => '30s',
 						'delay' => '30s'
 					];

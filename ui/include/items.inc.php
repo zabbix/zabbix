@@ -100,7 +100,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_CALCULATED => _('Calculated'),
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
 		ITEM_TYPE_DEPENDENT => _('Dependent item'),
-		ITEM_TYPE_SCRIPT => _('Script')
+		ITEM_TYPE_SCRIPT => _('Script'),
+		ITEM_TYPE_BROWSER => _('Browser')
 	];
 
 	if ($type === null) {
@@ -1565,6 +1566,8 @@ function getParamFieldNameByType($itemType) {
 	switch ($itemType) {
 		case ITEM_TYPE_SCRIPT:
 			return 'script';
+		case ITEM_TYPE_BROWSER:
+			return 'browser_script';
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_JMX:
@@ -1581,6 +1584,7 @@ function getParamFieldNameByType($itemType) {
 function getParamFieldLabelByType($itemType) {
 	switch ($itemType) {
 		case ITEM_TYPE_SCRIPT:
+		case ITEM_TYPE_BROWSER:
 			return _('Script');
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
@@ -1883,7 +1887,8 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_DEPENDENT,
 		ITEM_TYPE_HTTPAGENT,
 		ITEM_TYPE_SNMP,
-		ITEM_TYPE_SCRIPT
+		ITEM_TYPE_SCRIPT,
+		ITEM_TYPE_BROWSER
 	];
 }
 
@@ -2465,6 +2470,11 @@ function getTypeItemFieldNames(array $input): array {
 				: ['interfaceid', 'delay'];
 
 		case ITEM_TYPE_SCRIPT:
+			return $input['templateid'] == 0
+				? ['parameters', 'params', 'timeout', 'delay']
+				: ['delay'];
+
+		case ITEM_TYPE_BROWSER:
 			return $input['templateid'] == 0
 				? ['parameters', 'params', 'timeout', 'delay']
 				: ['delay'];

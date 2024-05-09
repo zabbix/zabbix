@@ -552,6 +552,11 @@ final class CItemData {
 					'js-filter-delay-field',
 					'filter_delay'
 				],
+				ITEM_TYPE_BROWSER => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
 				ITEM_TYPE_SIMPLE => [
 					'js-filter-delay-label',
 					'js-filter-delay-field',
@@ -793,6 +798,21 @@ final class CItemData {
 					'js-item-parameters-field',
 					'js-item-script-label',
 					'js-item-script-field',
+					'js-item-delay-label',
+					'js-item-delay-field',
+					'delay',
+					'js-item-flex-intervals-label',
+					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
+					['id' => 'key', 'defaultValue' => ''],
+					['id' => 'value_type', 'defaultValue' => '']
+				],
+				ITEM_TYPE_BROWSER => [
+					'js-item-parameters-label',
+					'js-item-parameters-field',
+					'js-item-browser-script-label',
+					'js-item-browser-script-field',
 					'js-item-delay-label',
 					'js-item-delay-field',
 					'delay',
