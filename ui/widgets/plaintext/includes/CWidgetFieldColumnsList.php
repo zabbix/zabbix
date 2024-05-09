@@ -58,13 +58,15 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	}
 
 	public function getItemNames(array $itemids): array {
-		$items = $itemids ? API::Item()->get([
-			'output' => $this->isTemplateDashboard() ? ['name'] : ['name_resolved'],
-			'itemid' => $itemids,
-			'selectHosts' => $this->isTemplateDashboard() ? null : ['name'],
-			'webitems' => true,
-			'preservekeys' => true
-		]) : [];
+		$items = $itemids
+			? API::Item()->get([
+				'output' => $this->isTemplateDashboard() ? ['name'] : ['name_resolved'],
+				'itemid' => $itemids,
+				'selectHosts' => $this->isTemplateDashboard() ? null : ['name'],
+				'webitems' => true,
+				'preservekeys' => true
+			])
+			: [];
 
 		$items_names = [];
 

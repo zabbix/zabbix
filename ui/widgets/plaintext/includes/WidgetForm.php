@@ -94,6 +94,9 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
+			)
+			->addField(
 				(new CWidgetFieldRadioButtonList('sortorder', _('New values'), [
 					self::NEW_VALUES_TOP => _('Top'),
 					self::NEW_VALUES_BOTTOM => _('Bottom')
@@ -108,9 +111,6 @@ class WidgetForm extends CWidgetForm {
 					self::COLUMN_HEADER_HORIZONTAL => _('Horizontal'),
 					self::COLUMN_HEADER_VERTICAL => _('Vertical')
 				]))->setDefault(self::COLUMN_HEADER_VERTICAL)
-			)
-			->addField(
-				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

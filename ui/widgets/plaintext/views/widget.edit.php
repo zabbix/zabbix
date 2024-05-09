@@ -38,6 +38,10 @@ use Widgets\PlainText\Includes\CWidgetFieldColumnsListView;
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 	)
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
+		: null
+	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addField(
@@ -49,10 +53,6 @@ use Widgets\PlainText\Includes\CWidgetFieldColumnsListView;
 			->addField(
 				new CWidgetFieldRadioButtonListView($data['fields']['show_column_header'])
 			)
-	)
-	->addField($data['templateid'] === null
-		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
-		: null
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_plaintext_form.init('.json_encode([

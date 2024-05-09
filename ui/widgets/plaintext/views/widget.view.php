@@ -195,27 +195,26 @@ else {
 					break;
 
 				case ITEM_VALUE_TYPE_BINARY:
-//					if (array_key_exists('display_as_image', $column) && $column['display_as_image'] != 0) {
-//						$image_url = (new CUrl($_SERVER['REQUEST_URI']))
-//							->setArgument('action', 'widget.plaintext.data-image.view')
-//							->setArgument('itemid', $column['itemid'])
-//							->setArgument('clock', $item_value['clock'])
-//							->setArgument('ns', $item_value['ns'])
-//							->setArgument('preview', 1);
+					if (array_key_exists('display_as_image', $column) && $column['display_as_image'] != 0) {
+						$data_url = (new CUrl($_SERVER['REQUEST_URI']))
+							->setArgument('action', 'widget.plaintext.data_binary.get')
+							->setArgument('itemid', $column['itemid'])
+							->setArgument('clock', $item_value['clock'])
+							->setArgument('ns', $item_value['ns']);
 
-//						$history_item['value'][] = (new CCol(
+						$history_item['value'][] = (new CCol(
 //							(new CButton(_('Show')))
 //								->addClass(ZBX_STYLE_BTN_LINK)
 //								->addClass('image-data-preview')
-//								->addStyle('--image-url: url('.$image_url->toString().');'),
-//						));
-//					}
-//					else {
-//						$history_item['value'][] = (new CCol(
-//							(new CButtonLink(_('Show')))
-//								->onMouseover('')
-//						));
-//					}
+//								->addStyle('--image-url: url('.$data_url->toString().');'),
+						))->addClass('js-data-binary');
+					}
+					else {
+						$history_item['value'][] = (new CCol(
+//							(new CButton(_('Show')))
+//								->addClass(ZBX_STYLE_BTN_LINK)
+						))->addClass('js-data-binary');
+					}
 			}
 
 			$history_values[] = $history_item;

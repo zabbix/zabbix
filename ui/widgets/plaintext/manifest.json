@@ -22,6 +22,10 @@
 			"class": "ColumnEdit",
 			"view": "column.edit",
 			"layout": "layout.json"
+		},
+		"widget.plaintext.data_binary.get": {
+			"class": "DataBinary",
+			"layout": "layout.image"
 		}
 	}
 }

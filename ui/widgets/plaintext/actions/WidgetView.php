@@ -101,7 +101,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$item_values_by_source = $this->getItemValuesByDataSource($db_items, $columns_config);
 
 		if (!$item_values_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]
-				&& !$item_values_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]) {
+				&& !$item_values_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]
+					&& !$item_values_by_source['binary_items']) {
 			$this->setResponse(new CControllerResponseData($data));
 
 			return;
@@ -212,7 +213,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$result = [
 			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
-			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => []
+			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
+			'binary_items' => []
 		];
 
 		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]) {
@@ -229,12 +231,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($items_by_source['binary_items']) {
-			$result['binary_items'] = API::History()->get([
+			$db_binary_items_values = API::History()->get([
 				'history' => ITEM_VALUE_TYPE_BINARY,
 				'itemids' => array_keys($items_by_source['binary_items']),
 				'output' => ['itemid', 'clock', 'ns'],
 				'limit' => $this->fields_values['show_lines']
 			]) ?: [];
+
+			foreach ($db_binary_items_values as $binary_items_value) {
+				$result['binary_items'][$binary_items_value['itemid']][] = $binary_items_value;
+			}
 		}
 
 		return $result;
