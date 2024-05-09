@@ -90,7 +90,7 @@ class CWidgetGraph extends CWidget {
 	}
 
 	onFeedback({type, value}) {
-		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD) {
+		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD && this.getFieldsReferredData().has('time_period')) {
 			this._startUpdating();
 
 			this.feedback({time_period: value});
