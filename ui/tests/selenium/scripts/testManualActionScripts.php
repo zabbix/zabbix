@@ -1112,71 +1112,70 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment below test cases when ZBX-24042 will be fixed.
 			// #Event webhook without confirmation message and with input type - string (default).
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'parameters' => [
-//						[
-//							'action' => USER_ACTION_ADD,
-//							'Name' => 'A',
-//							'Value' => '{MANUALINPUT}'
-//						]
-//					],
-//					'fields' => [
-//						'Name' => 'Event webhook without confirmation message and with input type - string',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'Webhook',
-//						'Script' => 'var params = JSON.parse(value); return params.a;',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'Enter value for parameter A',
-//						'Default input string' => '1',
-//						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => '9',
-//					'prompt' => 'Enter value for parameter A',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
-//			// #Event webhook without confirmation message and with input type - dropdown.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'parameters' => [
-//						[
-//							'action' => USER_ACTION_ADD,
-//							'Name' => 'A',
-//							'Value' => '{MANUALINPUT}'
-//						]
-//					],
-//					'fields' => [
-//						'Name' => 'Event webhook without confirmation message and with input type - dropdown',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'Webhook',
-//						'Script' => 'var params = JSON.parse(value); return params.a;',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'Enter value for parameter A',
-//						'Input type' => 'Dropdown',
-//						'Dropdown options' => '1,,2,3',
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => '3',
-//					'prompt' => 'Enter value for parameter A',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'parameters' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'Name' => 'A',
+							'Value' => '{MANUALINPUT}'
+						]
+					],
+					'fields' => [
+						'Name' => 'Event webhook without confirmation message and with input type - string',
+						'Scope' => 'Manual event action',
+						'Type' => 'Webhook',
+						'Script' => 'var params = JSON.parse(value); return params.a;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter value for parameter A',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
+						'Enable confirmation' => false
+					],
+					'manual_input' => '9',
+					'prompt' => 'Enter value for parameter A',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #Event webhook without confirmation message and with input type - dropdown.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'parameters' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'Name' => 'A',
+							'Value' => '{MANUALINPUT}'
+						]
+					],
+					'fields' => [
+						'Name' => 'Event webhook without confirmation message and with input type - dropdown',
+						'Scope' => 'Manual event action',
+						'Type' => 'Webhook',
+						'Script' => 'var params = JSON.parse(value); return params.a;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter value for parameter A',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => '1,,2,3',
+						'Enable confirmation' => false
+					],
+					'manual_input' => '3',
+					'prompt' => 'Enter value for parameter A',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
 			// #34 Host webhook with confirmation message and with input type - string (default).
 			[
 				[
@@ -1429,32 +1428,31 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment when ZBX-24042 will be fixed.
 			// Manual event script without confirmation message and with input type - dropdown.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'Manual event script without confirmation message and with input type - dropdown',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'Script',
-//						'Commands' => 'echo test;',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'Choose supported version',
-//						'Input type' => 'Dropdown',
-//						'Dropdown options' => '6.0,6.4,7.0',
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => '7.0',
-//					'prompt' => 'Choose supported version',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Manual event script without confirmation message and with input type - dropdown',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Commands' => 'echo test;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Choose supported version',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => '6.0,6.4,7.0',
+						'Enable confirmation' => false
+					],
+					'manual_input' => '7.0',
+					'prompt' => 'Choose supported version',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
 			// #42 Manual event script without confirmation message and with input type - string.
 			[
 				[
@@ -1590,59 +1588,58 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment below test cases when ZBX-24042 will be fixed.
 			// Event SSH without confirmation message and with input type - string (default).
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'Event SSH without confirmation message and with input type - string',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'SSH',
-//						'Username' => 'zabbix',
-//						'Commands' => 'ssh zabbix@{MANUALINPUT}',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'Enter hostname',
-//						'Default input string' => 'Aa',
-//						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => 'TestHost',
-//					'prompt' => 'Enter hostname',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
-//			// Event SSH without confirmation message and with input type - dropdown.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'Event SSH without confirmation message and with input type - dropdown',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'SSH',
-//						'Username' => 'zabbix',
-//						'Commands' => 'ssh zabbix@{MANUALINPUT}',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'Choose hostname',
-//						'Input type' => 'Dropdown',
-//						'Dropdown options' => 'AnyHost,,TestHost,TestZabbix',
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => 'TestZabbix',
-//					'prompt' => 'Choose hostname',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event SSH without confirmation message and with input type - string',
+						'Scope' => 'Manual event action',
+						'Type' => 'SSH',
+						'Username' => 'zabbix',
+						'Commands' => 'ssh zabbix@{MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter hostname',
+						'Default input string' => 'Aa',
+						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
+						'Enable confirmation' => false
+					],
+					'manual_input' => 'TestHost',
+					'prompt' => 'Enter hostname',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// Event SSH without confirmation message and with input type - dropdown.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event SSH without confirmation message and with input type - dropdown',
+						'Scope' => 'Manual event action',
+						'Type' => 'SSH',
+						'Username' => 'zabbix',
+						'Commands' => 'ssh zabbix@{MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Choose hostname',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => 'AnyHost,,TestHost,TestZabbix',
+						'Enable confirmation' => false
+					],
+					'manual_input' => 'TestZabbix',
+					'prompt' => 'Choose hostname',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
 			// #47 Host SSH with confirmation message and with input type - string (default).
 			[
 				[
@@ -1816,60 +1813,59 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment below test cases when ZBX-24042 will be fixed.
 			// Event Telnet without confirmation message and with input type - string (default).
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'Event Telnet without confirmation message and with input type - string',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'Telnet',
-//						'Username' => 'zabbix',
-//						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'Enter port',
-//						'Default input string' => '22',
-//						'Input validation rule' => '\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
-//								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => '23',
-//					'prompt' => 'Enter port',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
-//			// Event Telnet without confirmation message and with input type - dropdown.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'Event Telnet without confirmation message and with input type - dropdown',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'Telnet',
-//						'Username' => 'zabbix',
-//						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'Choose port',
-//						'Input type' => 'Dropdown',
-//						'Dropdown options' => '22,23,999,10050',
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => '999',
-//					'prompt' => 'Choose port',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event Telnet without confirmation message and with input type - string',
+						'Scope' => 'Manual event action',
+						'Type' => 'Telnet',
+						'Username' => 'zabbix',
+						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter port',
+						'Default input string' => '22',
+						'Input validation rule' => '\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
+						'Enable confirmation' => false
+					],
+					'manual_input' => '23',
+					'prompt' => 'Enter port',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// Event Telnet without confirmation message and with input type - dropdown.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event Telnet without confirmation message and with input type - dropdown',
+						'Scope' => 'Manual event action',
+						'Type' => 'Telnet',
+						'Username' => 'zabbix',
+						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Choose port',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => '22,23,999,10050',
+						'Enable confirmation' => false
+					],
+					'manual_input' => '999',
+					'prompt' => 'Choose port',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
 			// #53 Host Telnet with confirmation message and with input type - string (default).
 			[
 				[
@@ -2044,59 +2040,58 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment below test cases when ZBX-24042 will be fixed.
 			// Event IPMI without confirmation message and with input type - string (default).
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'Event IPMI without confirmation message and with input type - string',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'IPMI',
-//						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P {MANUALINPUT} -L user sensor',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
-//								'one digit, one special character and minimum eight in length',
-//						'Default input string' => 'Ex@mple7',
-//						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => 'gNuSm@s2',
-//					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
-//							'one digit, one special character and minimum eight in length',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
-//			// Event IPMI without confirmation message and with input type - dropdown.
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'Event IPMI without confirmation message and with input type - dropdown',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'IPMI',
-//						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P test -L sensor get {MANUALINPUT}',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'Choose particular sensor',
-//						'Input type' => 'Dropdown',
-//						'Dropdown options' => 'IPMI Watchdog,CPU Therm Trip,BB +1.05V PCH,',
-//						'Enable confirmation' => false
-//					],
-//					'manual_input' => 'BB +1.05V PCH',
-//					'prompt' => 'Choose particular sensor',
-//					'event' => 'Attention: script execution is needed',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event IPMI without confirmation message and with input type - string',
+						'Scope' => 'Manual event action',
+						'Type' => 'IPMI',
+						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P {MANUALINPUT} -L user sensor',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+								'one digit, one special character and minimum eight in length',
+						'Default input string' => 'Ex@mple7',
+						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+						'Enable confirmation' => false
+					],
+					'manual_input' => 'gNuSm@s2',
+					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+							'one digit, one special character and minimum eight in length',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// Event IPMI without confirmation message and with input type - dropdown.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event IPMI without confirmation message and with input type - dropdown',
+						'Scope' => 'Manual event action',
+						'Type' => 'IPMI',
+						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P test -L sensor get {MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Choose particular sensor',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => 'IPMI Watchdog,CPU Therm Trip,BB +1.05V PCH,',
+						'Enable confirmation' => false
+					],
+					'manual_input' => 'BB +1.05V PCH',
+					'prompt' => 'Choose particular sensor',
+					'event' => 'Attention: script execution is needed',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
 			// #59 Host IPMI with confirmation message and with input type - string (default).
 			[
 				[
@@ -2157,36 +2152,35 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment when ZBX-24042 will be fixed.
 			// Event IPMI with confirmation message and with input type - string (default).
-//			[
-//				[
-//					'expected' => TEST_GOOD,
-//					'fields' => [
-//						'Name' => 'Event IPMI with confirmation message and with input type - string',
-//						'Scope' => 'Manual event action',
-//						'Type' => 'IPMI',
-//						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P {MANUALINPUT} -L user sensor',
-//						'Advanced configuration' => true,
-//						'Enable user input' => true,
-//						'Input prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
-//								'one digit, one special character and minimum eight in length',
-//						'Default input string' => 'Ex@mple7',
-//						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
-//						'Enable confirmation' => true,
-//						'Confirmation text' => 'Are you sure?'
-//					],
-//					'manual_input' => 'gNuSm@s2',
-//					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
-//							'one digit, one special character and minimum eight in length',
-//					'event' => 'Attention: script execution is needed',
-//					'confirmation' => 'Are you sure?',
-//					'urls' => [
-//						'Problems' => 'zabbix.php?action=problem.view',
-//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
-//					]
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event IPMI with confirmation message and with input type - string',
+						'Scope' => 'Manual event action',
+						'Type' => 'IPMI',
+						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P {MANUALINPUT} -L user sensor',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+								'one digit, one special character and minimum eight in length',
+						'Default input string' => 'Ex@mple7',
+						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Are you sure?'
+					],
+					'manual_input' => 'gNuSm@s2',
+					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+							'one digit, one special character and minimum eight in length',
+					'event' => 'Attention: script execution is needed',
+					'confirmation' => 'Are you sure?',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
 			// #61 Event IPMI with confirmation message and with input type - dropdown.
 			[
 				[
