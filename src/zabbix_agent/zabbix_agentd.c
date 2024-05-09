@@ -31,7 +31,7 @@
 #include "zbxalgo.h"
 #include "zbxcfg.h"
 #include "zbxmutexs.h"
-#include "zbxaux.h"
+#include "zbxbincommon.h"
 
 static char	*config_pid_file = NULL;
 

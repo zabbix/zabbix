@@ -30,7 +30,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxfile.h"
-#include "zbxaux.h"
+#include "zbxbincommon.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
