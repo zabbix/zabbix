@@ -731,7 +731,7 @@ class testFormUserMedia extends CWebTest {
 		// Check the value of the "Send to" field.
 		if (array_key_exists('emails', $data)) {
 			$row->getColumn('Send to')->hoverMouse();
-			$get_send_to = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one()->getText();
+			$get_send_to = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one()->getText();
 
 			$media_emails = [];
 			foreach ($data['emails'] as $email) {

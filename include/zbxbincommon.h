@@ -17,24 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxmocktest.h"
-#include "zbxmockdata.h"
-#include "zbxmockutil.h"
+#ifndef ZABBIX_BINCOMMON_H
+#define ZABBIX_BINCOMMON_H
 
-#include "zbxcommon.h"
+void	zbx_print_usage(const char *progname, const char **usage_message);
 
-static void	zbx_log_impl(int level, const char *fmt, va_list args)
-{
-	ZBX_UNUSED(level);
-	ZBX_UNUSED(fmt);
-	ZBX_UNUSED(args);
-}
+void	zbx_print_help(const char *progname, const char **help_message, const char **usage_message, const char *param);
 
-ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_mock_progname")
-
-void	zbx_mock_test_entry(void **state)
-{
-	ZBX_UNUSED(state);
-
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, NULL);
-}
+#endif

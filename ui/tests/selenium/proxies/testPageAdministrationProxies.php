@@ -109,7 +109,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 				// Check version hint.
 				$column->query('xpath:.//button[@data-hintbox="1"]')->one()->waitUntilClickable()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
 				$this->assertEquals($parameters['hint_text'], $hint->getText());
 
 				if (array_key_exists('hint_color', $parameters)) {
