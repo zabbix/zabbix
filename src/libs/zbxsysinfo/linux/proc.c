@@ -18,7 +18,6 @@
 **/
 
 #include "proc.h"
-#include <linux/version.h>
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
@@ -29,6 +28,8 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+
+#include <linux/version.h>
 
 #define PROC_VAL_TYPE_TEXT	0
 #define PROC_VAL_TYPE_NUM	1
@@ -136,7 +137,7 @@ static void	proc_data_free(proc_data_t *proc_data)
  *     num    - [IN/OUT] value/bytes result                                   *
  *                                                                            *
  ******************************************************************************/
-void	convert_to_bytes(char *srcstr, zbx_uint64_t *num)
+static void	convert_to_bytes(char *srcstr, zbx_uint64_t *num)
 {
 	zbx_rtrim(srcstr, "\n");
 
@@ -425,9 +426,9 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
  *                      could not be parsed.                                  *
  *                                                                            *
  ******************************************************************************/
-int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *bytes)
+static int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *bytes)
 {
-	int	label_len = strlen(label);
+	size_t	label_len = strlen(label);
 	char	*p_unit;
 
 	if (0 == strncmp(srcstr, label, label_len))
@@ -449,34 +450,31 @@ int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *bytes)
 /******************************************************************************
  *                                                                            *
  * Purpose: Retrieves program core memory usage in bytes                      *
- *          ported from getMemStats ps_mem.py v3.14                           *
+ *          see getMemStats ps_mem.py v3.14                                   *
  *                                                                            *
  * Parameters:                                                                *
  *     pid    - [IN]                                                          *
  *     bytes  - [OUT] result in bytes                                         *
  *                                                                            *
  ******************************************************************************/
-void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
+static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 {
-	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0, pss = 0, rss = 0;
+	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0, pss = 0, rss = 0, num;
 	int		have_pss = 0;
-	FILE		*f_statm = NULL, *f_smaps = NULL;
-	char		*statm_rss_str, tmp[MAX_STRING_LEN];
+	FILE		*f;
+	char		*statm_rss_str, *tmp_str, tmp[MAX_STRING_LEN];
 
-	*bytes = 0;
-	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps_rollup", pid);
-	if (NULL == (f_smaps = fopen(tmp, "r")))
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps_rollup1", pid);
+	if (NULL == (f = fopen(tmp, "r")))
 	{
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps", pid);
-		f_smaps = fopen(tmp, "r");
+		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps1", pid);
+		f = fopen(tmp, "r");
 	}
 
-	if(NULL != f_smaps)
+	if(NULL != f)
 	{
-		while (NULL != fgets(tmp, (int)sizeof(tmp), f_smaps))
+		while (NULL != fgets(tmp, (int)sizeof(tmp), f))
 		{
-			zbx_uint64_t num;
-
 			if(SUCCEED == byte_value_from_str(tmp, "Private_Hugetlb:", &num))
 			{
 				private_huge += num;
@@ -507,25 +505,33 @@ void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 
 		private += private_huge;
 
-		zbx_fclose(f_smaps);
+		zbx_fclose(f);
 	}
 	else
 	{
-		int	psize = (int)getpagesize() / 1024;
+		zbx_uint64_t	psize = (zbx_uint64_t)getpagesize() / 1024;
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/statm", pid);
-		if (NULL == (f_statm = fopen(tmp, "r")))
-			return;
-		if(NULL == fgets(tmp, (int)sizeof(tmp), f_statm))
+		if (NULL == (f = fopen(tmp, "r")))
+			goto out;
+
+		if(NULL == fgets(tmp, (int)sizeof(tmp), f))
 		{
-			zbx_fclose(f_statm);
-			return;
+			zbx_fclose(f);
+			goto out;
 		}
-		if(NULL == (statm_rss_str = strchr(tmp, ' ') + 1))
-		{
-			zbx_fclose(f_statm);
-			return;
-		}
-		rss = atoi(statm_rss_str) * psize;
+		zbx_fclose(f);
+
+		if(NULL == (statm_rss_str = strchr(tmp, ' ')))
+			goto out;
+
+		statm_rss_str++;
+		if(NULL == (tmp_str = strchr(statm_rss_str, ' ')))
+			goto out;
+
+		*tmp_str = '\0';
+		if (FAIL == zbx_is_uint64(statm_rss_str, &rss))
+			goto out;
+		rss *= psize;
 
 		if ((KERNEL_VERSION(2, 6, 1) >= LINUX_VERSION_CODE) &&
 			(KERNEL_VERSION(2, 6, 9) <= LINUX_VERSION_CODE))
@@ -536,19 +542,22 @@ void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		}
 		else
 		{
-			if(NULL == (statm_rss_str = strchr(statm_rss_str, ' ') + 1))
-			{
-				zbx_fclose(f_statm);
-				return;
-			}
-			shared = atoi(statm_rss_str);
+			tmp_str++;
+			if(NULL == (statm_rss_str = strchr(tmp_str, ' ')))
+				goto out;
+			*statm_rss_str = '\0';
+			if (FAIL == zbx_is_uint64(tmp_str, &shared))
+				goto out;
 			shared *= psize;
 			shared_huge = 0;
 			private = rss - shared;
 		}
-		zbx_fclose(f_statm);
+
 	}
 	*bytes = shared + private + shared_huge;
+	return;
+out:
+	*bytes = ZBX_MAX_UINT64;
 }
 
 /******************************************************************************
@@ -2189,7 +2198,6 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 						proc_data->gid = gid;
 						proc_data->user = zbx_strdup(NULL, user);
 						proc_data->group = zbx_strdup(NULL, group);
-						get_pid_mem_stats(entries->d_name, &proc_data->memory);
 						zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 					}
 				}
@@ -2341,7 +2349,6 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addstring(&j, "state", pdata->state, ZBX_JSON_TYPE_STRING);
 			JSON_ADD_PROC_VALUE("ctx_switches", pdata->ctx_switches);
 			JSON_ADD_PROC_VALUE("page_faults", pdata->page_faults);
-			JSON_ADD_PROC_VALUE("memory", pdata->memory);
 		}
 		else
 		{
