@@ -120,7 +120,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		$columns_with_data = [];
-		$items = [];
 
 		foreach ($columns_config as $column) {
 			if (array_key_exists($column['itemid'], $item_values_by_source[$column['history']])) {
@@ -187,7 +186,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					unset($item_value);
 				}
 
-				$items[$column['itemid']] = $db_items[$column['itemid']];
 				$columns_with_data[] = $column;
 			}
 		}
@@ -230,13 +228,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 			);
 		}
 
+		if ($items_by_source['binary_items']) {
+			$result['binary_items'] = API::History()->get([
+				'history' => ITEM_VALUE_TYPE_BINARY,
+				'itemids' => array_keys($items_by_source['binary_items']),
+				'output' => ['itemid', 'clock', 'ns'],
+				'limit' => $this->fields_values['show_lines']
+			]) ?: [];
+		}
+
 		return $result;
 	}
 
 	private function addDataSourceAndPrepareColumns(array $items, array &$columns_config, int $time): array {
 		$items_with_source = [
 			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
-			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => []
+			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
+			'binary_items' => []
 		];
 
 		foreach ($columns_config as &$column) {
@@ -261,9 +269,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$items_with_source[$column['history']][$itemid] = $item;
 			}
 			else {
-				$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
-				$item['source'] = 'history';
-				$items_with_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$itemid] = $item;
+				if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+					$column['history'] = 'binary_items';
+					$items_with_source['binary_items'][$itemid] = true;
+				}
+				else {
+					$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
+					$item['source'] = 'history';
+					$items_with_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$itemid] = $item;
+				}
 			}
 		}
 		unset($column);

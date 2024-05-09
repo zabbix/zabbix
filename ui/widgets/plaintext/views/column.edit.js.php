@@ -209,8 +209,10 @@ window.item_history_column_edit = new class {
 		const is_item_numeric_type = this.#item_value_type == <?= ITEM_VALUE_TYPE_FLOAT ?>
 			|| this.#item_value_type == <?= ITEM_VALUE_TYPE_UINT64 ?>;
 
-		const text_types = [<?= ITEM_VALUE_TYPE_STR?>, <?= ITEM_VALUE_TYPE_LOG ?>, <?= ITEM_VALUE_TYPE_TEXT ?>];
-		const is_item_text_type = !is_item_numeric_type && text_types.some((type) => type == this.#item_value_type);
+		const is_item_text_type = !is_item_numeric_type
+			&& [<?= ITEM_VALUE_TYPE_STR?>, <?= ITEM_VALUE_TYPE_LOG ?>, <?= ITEM_VALUE_TYPE_TEXT ?>].some(
+				(type) => type == this.#item_value_type
+			);
 
 		const display_value = document.querySelector('[name=display]:checked').value;
 		const show_min_max = is_item_numeric_type && (display_value == <?= CWidgetFieldColumnsList::DISPLAY_BAR ?>

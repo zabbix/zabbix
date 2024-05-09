@@ -59,6 +59,7 @@ window.widget_plaintext_form = new class {
 						dialogue_class: 'modal-popup-generic'
 					}
 				).$dialogue[0];
+
 				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(e));
 				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;

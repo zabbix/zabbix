@@ -195,11 +195,27 @@ else {
 					break;
 
 				case ITEM_VALUE_TYPE_BINARY:
-					$history_item['value'][] = (new CCol((new CButtonLink(_('Show')))
-						->setHint(italic($item_value['value'])->addClass(ZBX_STYLE_GREY))
-						->onMouseover('')
-					))
-						->addStyle('height: 56px;');
+//					if (array_key_exists('display_as_image', $column) && $column['display_as_image'] != 0) {
+//						$image_url = (new CUrl($_SERVER['REQUEST_URI']))
+//							->setArgument('action', 'widget.plaintext.data-image.view')
+//							->setArgument('itemid', $column['itemid'])
+//							->setArgument('clock', $item_value['clock'])
+//							->setArgument('ns', $item_value['ns'])
+//							->setArgument('preview', 1);
+
+//						$history_item['value'][] = (new CCol(
+//							(new CButton(_('Show')))
+//								->addClass(ZBX_STYLE_BTN_LINK)
+//								->addClass('image-data-preview')
+//								->addStyle('--image-url: url('.$image_url->toString().');'),
+//						));
+//					}
+//					else {
+//						$history_item['value'][] = (new CCol(
+//							(new CButtonLink(_('Show')))
+//								->onMouseover('')
+//						));
+//					}
 			}
 
 			$history_values[] = $history_item;
@@ -223,7 +239,6 @@ else {
 						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])
 					))
 						->addClass(ZBX_STYLE_NOWRAP)
-						->addClass($history_item['local_time'] ? 'js-timestamp-to-local-time' : null)
 				]
 				: [];
 

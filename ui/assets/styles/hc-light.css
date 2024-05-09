@@ -4719,11 +4719,22 @@ form.dashboard-widget-plaintext #list_columns .inaccessible {
   color: #9f9f9f; }
 
 div.dashboard-widget-plaintext td {
+  height: 20px;
   line-height: 20px;
-  height: 20px; }
+  vertical-align: middle; }
 div.dashboard-widget-plaintext z-bar-gauge {
   min-width: 64px;
   height: 20px; }
+div.dashboard-widget-plaintext .image-data-preview {
+  display: block;
+  width: 100px;
+  height: 56px;
+  overflow: hidden;
+  background: #ffffff var(--image-url) no-repeat top center;
+  background-size: cover;
+  border: 1px solid #9f9f9f;
+  border-radius: 3px;
+  text-indent: -9999px; }
 
 div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;
