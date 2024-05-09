@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @onBefore prepareData
  */
-class testDashboardPlainTextWidget extends CWebTest {
+class testDashboardItemHistoryWidget extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -45,8 +45,8 @@ class testDashboardPlainTextWidget extends CWebTest {
 	protected static $dashboardid;
 	protected static $dashboard_create;
 	protected static $dashboard_data;
-	protected static $update_widget = 'Update Plain text Widget';
-	const DEFAULT_WIDGET = 'Default Plain text Widget';
+	protected static $update_widget = 'Update Item history Widget';
+	const DEFAULT_WIDGET = 'Default Item history Widget';
 	const DELETE_WIDGET = 'Widget for delete';
 	const DATA_WIDET = 'Widget for data check';
 
@@ -66,7 +66,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		// Create host for widget header and data tests.
 		CDataHelper::createHosts([
 			[
-				'host' => 'Simple host with item for plain text widget',
+				'host' => 'Simple host with item for Item history widget',
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -82,7 +82,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				],
 				'items' => [
 					[
-						'name' => 'Test plain text',
+						'name' => 'Test Item history',
 						'key_' => 'plain_text',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
@@ -95,7 +95,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 		$response = CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'Dashboard for Plain Text Widget test',
+				'name' => 'Dashboard for Item history Widget test',
 				'pages' => [
 					[
 						'name' => 'Page with default widgets',
@@ -109,8 +109,13 @@ class testDashboardPlainTextWidget extends CWebTest {
 								'height' => 5,
 								'fields' => [
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Column_1'
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemids',
+										'name' => 'columns.0.itemid',
 										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									],
 									[
@@ -129,8 +134,13 @@ class testDashboardPlainTextWidget extends CWebTest {
 								'height' => 5,
 								'fields' => [
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Column_1'
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemids',
+										'name' => 'columns.0.itemid',
 										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									]
 								]
@@ -140,7 +150,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				]
 			],
 			[
-				'name' => 'Dashboard for Plain text Widget create/update test',
+				'name' => 'Dashboard for Item history Widget create/update test',
 				'pages' => [
 					[
 						'name' => 'Page with created/updated widgets',
@@ -154,8 +164,13 @@ class testDashboardPlainTextWidget extends CWebTest {
 								'height' => 5,
 								'fields' => [
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Column_1'
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemids',
+										'name' => 'columns.0.itemid',
 										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory'.
 									]
 								]
@@ -168,7 +183,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				'name' => 'Dashboard for checking data',
 				'pages' => [
 					[
-						'name' => 'Page with Plain text widget',
+						'name' => 'Page with Item history widget',
 						'widgets' => [
 							[
 								'type' => 'plaintext',
@@ -179,28 +194,58 @@ class testDashboardPlainTextWidget extends CWebTest {
 								'height' => 6,
 								'fields' => [
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_timestamp',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Host name'
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemids',
+										'name' => 'columns.0.itemid',
 										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									],
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.name',
+										'value' => 'Available memory'
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemids',
+										'name' => 'columns.1.itemid',
 										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory'.
 									],
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.2.name',
+										'value' => 'Available memory in %'
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemids',
+										'name' => 'columns.2.itemid',
 										'value' => '42244' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory in %'.
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemids',
-										'value' => $itemids['Test plain text'] // item name in widget 'Simple host with item for plain text widget: Test plain text'.
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.3.name',
+										'value' => 'Test Item history'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemids',
+										'name' => 'columns.3.itemid',
+										'value' => $itemids['Test Item history'] // item name in widget 'Simple host with item for Item history widget: Test Item history'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.4.name',
+										'value' => 'Master item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.4.itemid',
 										'value' => '99142' // item name in widget 'Test item host: Master item'.
 									],
 									[
@@ -220,30 +265,31 @@ class testDashboardPlainTextWidget extends CWebTest {
 		self::$dashboard_data = $response['dashboardids'][2];
 	}
 
-	public function testDashboardPlainTextWidget_Layout() {
+	public function testDashboardItemHistoryWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dialog = $dashboard->edit()->addWidget();
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form = $dialog->asForm();
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
 
 		// Check default state.
 		$default_state = [
-			'Type' => 'Plain text',
+			'Type' => 'Item history',
 			'Name' => '',
 			'Show header' => true,
 			'Refresh interval' => 'Default (1 minute)',
-			'Items' => '',
-			'Items location' => 'Left',
+			'Columns' => [],
 			'Show lines' => '25',
-			'Show text as HTML' => false,
+			'New values' => 'Top',
+			'Show timestamp' => false,
+			'Show column header' => 'Vertical',
 			'Override host' => ''
 		];
 		$form->checkValue($default_state);
 
 		// Check required fields.
-		$this->assertEquals(['Items', 'Show lines'], $form->getRequiredLabels());
+		$this->assertEquals(['Columns', 'Show lines'], $form->getRequiredLabels());
 
 		// Check attributes of input elements.
 		$inputs = [
@@ -251,19 +297,20 @@ class testDashboardPlainTextWidget extends CWebTest {
 				'maxlength' => '255',
 				'placeholder' => 'default'
 			],
-			'id:itemids__ms' => [
-				'placeholder' => 'type here to search'
-			],
 			'Show lines' => [
 				'maxlength' => '3'
+			],
+			'id:override_hostid_ms' => [
+				'placeholder' => 'type here to search'
 			]
 		];
+
 		foreach ($inputs as $field => $attributes) {
 			$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
 		}
 
 		// Check radio buttons.
-		$this->assertEquals(['Left', 'Top'], $form->getField('Items location')->getLabels()->asText());
+		$this->assertEquals(['Top', 'Bottom'], $form->getField('New values')->getLabels()->asText());
 
 		$refresh_interval = ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
 				'2 minutes', '10 minutes', '15 minutes'];
@@ -288,60 +335,90 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 	public static function getWidgetData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => 'Invalid parameter "Items": cannot be empty.'
+					'error' => 'Invalid parameter "Columns": cannot be empty.'
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Show lines' => ''
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory in %',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => ['Invalid parameter "Show lines": value must be one of 1-100.']
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Show lines' => '0'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory in %',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Show lines' => '101'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory in %',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Show lines' => ' '
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory in %',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -349,88 +426,134 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Show lines' => ''
 					],
 					'error' => [
-						'Invalid parameter "Items": cannot be empty.',
+						'Invalid parameter "Columns": cannot be empty.',
 						'Invalid parameter "Show lines": value must be one of 1-100.'
 					]
 				]
 			],
-			// Test case with items from the same host which name is used as widget header.
+			// #6.
 			[
 				[
+					'flag' => true,
 					'expected' => TEST_GOOD,
 					'same_host' => 'ЗАББИКС Сервер',
 					'fields' => [
-						'Name' => ''
+						'Name' => '2 columns from one host'
+					],
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory in %',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
 						],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory'],
-						['ЗАББИКС Сервер' => 'Linux: Available memory in %']
+						[
+							'Name' => 'Column2',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
-			// Test case with items from two different hosts.
+			// #7 Test case with items from two different hosts.
 			[
 				[
+					'flag' => true,
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => ''
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory in %'],
-						['Simple host with item for plain text widget' => 'Test plain text']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory in %',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						],
+						[
+							'Name' => 'Column2',
+							'Item' => [
+								'values' => 'Test Item history',
+								'context' => ['values' => 'Simple host with item for Item history widget']
+							]
+						]
 					]
 				]
 			],
-			// Test case with items from the same host and with custom name.
+			// #8 Test case with items from the same host and with custom name.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Test custom name'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory'],
-						['ЗАББИКС Сервер' => 'Linux: Available memory in %']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory in %',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						],
+						[
+							'Name' => 'Column2',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
-			// Test case with items from two different hosts and with custom name.
+			// #9 Test case with items from two different hosts and with custom name.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Test custom name2'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory'],
-						['Simple host with item for plain text widget' => 'Test plain text']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory in %',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						],
+						[
+							'Name' => 'Column2',
+							'Item' => [
+								'values' => 'Test Item history',
+								'context' => ['values' => 'Simple host with item for Item history widget']
+							]
+						]
 					]
 				]
 			],
-			// Test case with one item which name is used as widget header.
+			// #10.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => ''
-					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => '',
+						'Name' => 'Custom refresh',
 						'Refresh interval' => 'Default (1 minute)'
 					],
-					'items' => [
-						['Simple host with item for plain text widget' => 'Test plain text']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Test Item history',
+								'context' => ['values' => 'Simple host with item for Item history widget']
+							]
+						]
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -439,11 +562,18 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Show header' => false,
 						'Refresh interval' => 'No refresh'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -452,35 +582,54 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Show header' => true,
 						'Refresh interval' => '10 seconds'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Items location' => 'Top',
 						'Refresh interval' => '30 seconds'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Items location' => 'Left',
 						'Refresh interval' => '1 minute'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -488,11 +637,18 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Show lines' => '1',
 						'Refresh interval' => '2 minutes'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -500,35 +656,54 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Show lines' => '100',
 						'Refresh interval' => '10 minutes'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show text as HTML' => true,
 						'Refresh interval' => '15 minutes'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show text as HTML' => false,
 						'Refresh interval' => '10 minutes'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -536,11 +711,18 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Override host' => 'Dashboard',
 						'Refresh interval' => '2 minutes'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -548,11 +730,18 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Override host' => 'Dashboard',
 						'Refresh interval' => '1 minute'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -561,12 +750,19 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Refresh interval' => '30 seconds',
 						'Show lines' => ' 5 '
 					],
-					'items' => [
-						['Simple host with item for plain text widget' => 'Test plain text']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Test Item history',
+								'context' => ['values' => 'Simple host with item for Item history widget']
+							]
+						]
 					],
 					'trim' => ['Name', 'Show lines']
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -574,13 +770,17 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Show header' => true,
 						'Name' => 'Widget with updated fields',
 						'Refresh interval' => '1 minute',
-						'Items location' => 'Top',
 						'Show lines' => '50',
-						'Show text as HTML' => true,
 						'Override host' => 'Dashboard'
 					],
-					'items' => [
-						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					'Columns' => [
+						[
+							'Name' => 'Column1',
+							'Item' => [
+								'values' => 'Linux: Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							]
+						]
 					]
 				]
 			]
@@ -590,11 +790,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 	/**
 	 * @dataProvider getWidgetData
 	 */
-	public function testDashboardPlainTextWidget_Create($data) {
+	public function testDashboardItemHistoryWidget_Create($data) {
 		$this->checkWidgetForm($data);
 	}
 
-	public function testDashboardPlainTextWidget_SimpleUpdate() {
+	public function testDashboardItemHistoryWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
@@ -610,12 +810,12 @@ class testDashboardPlainTextWidget extends CWebTest {
 	/**
 	 * @dataProvider getWidgetData
 	 */
-	public function testDashboardPlainTextWidget_Update($data) {
+	public function testDashboardItemHistoryWidget_Update($data) {
 		$this->checkWidgetForm($data, true);
 	}
 
 	/**
-	 * Perform Plain text widget creation or update and verify the result.
+	 * Perform Item history widget creation or update and verify the result.
 	 *
 	 * @param boolean $update	updating is performed
 	 */
@@ -624,25 +824,39 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Plain text widget '.microtime());
+		$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Item history widget '.microtime());
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
-		$form = ($update)
+		$form = $update
 			? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
 			: $dashboard->edit()->addWidget()->asForm();
 
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
 
-		// Prepare the data for filling in "Items" field of widget, get item names.
-		if (array_key_exists('items', $data)) {
-			foreach ($data['items'] as $array) {
-				$data['fields']['Items'][] = implode(array_values($array));
+		if ($update) {
+			$table = $form->query('id:list_columns')->asTable()->one();
+			$button_remove = $table->query('button:Remove');
+			$remove_count = $button_remove->count();
+
+			for ($i = 0; $i < $remove_count; $i++) {
+				$button_remove->waitUntilClickable()->one()->click();
+				$form->waitUntilReloaded();
 			}
 		}
-		else {
-			$data['fields']['Items'] = '';
+
+		// Fill Columns field.
+		if (array_key_exists('Columns', $data)) {
+			foreach ($data['Columns'] as $column) {
+				$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
+				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_form = $column_overlay->asForm();
+				$column_form->fill($column);
+				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+				$column_overlay->waitUntilNotVisible();
+				$form->waitUntilReloaded();
+			}
 		}
 
 		$form->fill($data['fields']);
@@ -653,6 +867,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		if (array_key_exists('trim', $data)) {
 			foreach ($data['trim'] as $field) {
 				$data['fields'][$field] = trim($data['fields'][$field]);
+				$values[$field] = trim($data['fields'][$field]);
 			}
 		}
 
@@ -667,24 +882,13 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$this->assertFalse($dashboard->getWidget($data['fields']['Name'], false)->isValid());
 		}
 		else {
-			$items_count = count($data['items']);
-			if ($data['fields']['Name'] === '') {
-				if ($items_count > 1) {
-					$header = (array_key_exists('same_host', $data))
-						? $data['same_host'].': '.$items_count.' items'
-						: 'Plain text';
-				}
-				else {
-					// If name is empty string it is replaced by item name.
-					$header = implode(array_keys($data['items'][0])).': '.implode($data['fields']['Items']);
-				}
+			if (array_key_exists('Name', $data['fields'])) {
+				$header = ($data['fields']['Name'] === '')
+					? 'Item history'
+					: $data['fields']['Name'];
 			}
 			else {
-				$header = $data['fields']['Name'];
-			}
-
-			if ($update) {
-				self::$update_widget = $header;
+				$header = $update ? self::$update_widget : 'Item history';
 			}
 
 			COverlayDialogElement::ensureNotPresent();
@@ -706,13 +910,17 @@ class testDashboardPlainTextWidget extends CWebTest {
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
 			$this->assertEquals($values, $saved_form->getValues());
+			$table = $saved_form->query('id:list_columns')->asTable()->one();
 
-			// Prepare data to check widget "Items" field, should be in the format "Host name: Item name".
-			$data['fields']['Items'] = [];
-			foreach ($data['items'] as $host_item) {
-				foreach ($host_item as $host => $item) {
-					$data['fields']['Items'][] = $host.': '. $item;
-				}
+			// Count is minus one row because of Add button row.
+			$columns_count = $table->getRows()->count() - 1;
+			$this->assertEquals(count($data['Columns']), $columns_count);
+
+			foreach ($data['Columns'] as $i => $column) {
+				$this->assertEquals($column['Name'], $table->getRow($i)->getColumn('Name')->getText());
+				$this->assertEquals($column['Item']['context']['values'].': '.$column['Item']['values'],
+						$table->getRow($i)->getColumn('Data')->getText()
+				);
 			}
 
 			$saved_form->checkValue($data['fields']);
@@ -720,6 +928,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 			// Close widget window and cancel editing the dashboard.
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->cancelEditing();
+
+			if ($update) {
+				self::$update_widget = $header;
+			}
 		}
 	}
 
@@ -759,7 +971,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testDashboardPlainTextWidget_Cancel($data) {
+	public function testDashboardItemHistoryWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 		$new_name = 'Widget to be cancelled';
 
@@ -773,13 +985,25 @@ class testDashboardPlainTextWidget extends CWebTest {
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
 		}
+
 		$form->fill([
 			'Name' => $new_name,
 			'Refresh interval' => '15 minutes',
-			'Items' => 'Linux: Available memory'
 		]);
+
+		$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
+		$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$column_form = $column_overlay->asForm();
+		$column_form->fill([
+			'Item' => [
+				'values' => 'Test Item history',
+				'context' => ['values' => 'Simple host with item for Item history widget']
+		]]);
+		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+		$column_overlay->waitUntilNotVisible();
+		$form->waitUntilReloaded();
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
@@ -814,7 +1038,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testDashboardPlainTextWidget_Delete() {
+	public function testDashboardItemHistoryWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget(self::DELETE_WIDGET);
@@ -832,76 +1056,67 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 	public static function getTableData() {
 		return [
-			// Simple test case with one item and one data entry.
+			// #0 Simple test case with one item and one data entry.
 			[
 				[
 					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => 'Zabbix plain text'
+							'Host name' => 'Zabbix Item history'
 						]
 					],
 					'item_data' => [
-						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => strtotime('Now')]
+						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('Now')]
 					]
 				]
 			],
-			// Simple test case with one item and several data entries.
+			// #1 Simple test case with one item and several data entries.
 			[
 				[
 					'initial_data' => [
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => 'Zabbix plain text'
+							'Host name' => 'Zabbix Item history'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 minute')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => 'Zabbix plain text2'
+							'Host name' => 'Zabbix Item history2'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 minutes')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => 'Zabbix plain ⓣⓔⓧⓣ'
+							'Host name' => 'Zabbix plain ⓣⓔⓧⓣ'
 						]
 					],
 					'item_data' => [
-						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => strtotime('now')],
-						['itemid' => '42227', 'values' => 'Zabbix plain text2', 'time' => strtotime('-1 minute')],
+						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => 'Zabbix Item history2', 'time' => strtotime('-1 minute')],
 						['itemid' => '42227', 'values' => 'Zabbix plain ⓣⓔⓧⓣ', 'time' => strtotime('-2 minutes')]
 					]
 				]
 			],
-			// Test case with two items and several data entries.
+			// #2 Test case with two items and several data entries.
 			[
 				[
 					'initial_data' => [
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
-							'Value' => '9.37 GB' // value rounding is expected.
+							'Available memory' => '9.37 GB' // value rounding is expected.
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-30 seconds')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
-							'Value' => '82.0618 %' // value rounding is expected.
+							'Available memory in %' => '82.0618 %' // value rounding is expected.
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 minute')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
-							'Value' => '72.0618 %' // value rounding is expected.
+							'Available memory in %' => '72.0618 %' // value rounding is expected.
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 hour')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
-							'Value' => '8.44 GB' // value rounding is expected.
+							'Available memory' => '8.44 GB' // value rounding is expected.
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
-							'Value' => '7.51 GB' // value rounding is expected.
+							'Available memory' => '7.51 GB' // value rounding is expected.
 						]
 					],
 					'item_data' => [
@@ -913,29 +1128,27 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case with limited lines to show.
+			// #3 Test case with limited lines to show.
 			[
 				[
 					'fields' => [
-						'Show lines' => '1'
+							'Show lines' => '1'
 						],
 					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
-							'Value' => '9.37 GB' // value rounding is expected.
+							'Available memory' => '9.37 GB' // value rounding is expected.
 						],
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
-							'Value' => '8.44 GB' // value rounding is expected.
-						]
+						// TODO: ZBXNEXT-8316 Sub-issue (11).
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
+//							'Available memory' => '8.44 GB' // value rounding is expected.
+//						]
 					],
 					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
-							'Value' => '9.37 GB' // value rounding is expected.
+							'Available memory' => '9.37 GB' // value rounding is expected.
 						]
 					],
 					'item_data' => [
@@ -944,116 +1157,116 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case for 'Items location' and 'Show text as HTML' options check.
-			[
-				[
-					'fields' => [
-						'Show text as HTML' => true,
-						'Items location' => 'Top'
-					],
-					'initial_data' => [
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Name' => 'Test item host: Master item',
-							'Value' => '1' // value rounding is expected.
-						],
-						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => '<b>'.STRING_128.'</b>'
-						],
-						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
-						],
-						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => STRING_255
-						]
-					],
-					'result' => [
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Test item host: Master item' => '1'
-						],
-						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
-							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_128
-						],
-						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
-							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => 'TEST'
-						],
-						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
-							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_255
-						]
-					],
-					'item_data' => [
-						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
-						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
-								'time' => strtotime('-16 hours')],
-						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
-					]
-				]
-			],
-			// Test case for host selection check.
-			[
-				[
-					'host_select' => [
-						'without_data' => 'Simple host with item for plain text widget',
-						'with_data' =>'ЗАББИКС Сервер'
-						],
-					'initial_data' => [
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => 'Zabbix plain text'
-						],
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
-							'Name' => 'Test item host: Master item',
-							'Value' => '7.7778' // value rounding is expected.
-						],
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => STRING_255
-						],
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
-							'Value' => '82.0618 %' // value rounding is expected.
-						]
-					],
-					'result' => [
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Name' => 'Linux: Host name of Zabbix agent running',
-							'Value' => 'Zabbix plain text'
-						],
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
-							'Name' => 'Linux: Host name of Zabbix agent running',
-							'Value' => STRING_255
-						],
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-							'Name' => 'Linux: Available memory in %',
-							'Value' => '82.0618 %' // value rounding is expected.
-						]
-					],
-					'item_data' => [
-						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => strtotime('now')],
-						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
-						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
-						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
-					]
-				]
-			]
+			// #4 Test case for 'Items location' and 'Show text as HTML' options check.
+//			[
+//				[
+//					'fields' => ['Layout' => 'Vertical'],
+//					'edit_columns' => ['Host name' => ['Display' => 'HTML']],
+//					'initial_data' => [
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+//							'Master item' => '1' // value rounding is expected.
+//						],
+//						[
+//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
+//							'Host name' => '<b>'.STRING_128.'</b>'
+//						],
+//						[
+//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
+//							'Host name' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+//						],
+//                          TODO: ZBXNEXT-8316 Sub-issue (11).
+////						[
+////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
+////							'Host name' => STRING_255
+////						]
+//					],
+//					'result' => [
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+//							'Name' => 'Master item',
+//							'Value' => '1'
+//						],
+//						[
+//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
+//							'Name' => 'Host name',
+//							'Value' => STRING_128
+//						],
+//						[
+//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
+//							'Name' => 'Host name',
+//							'Value' => 'TEST'
+//						],
+//                          TODO: ZBXNEXT-8316 Sub-issue (11).
+////						[
+////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
+////							'Name' => 'Host name',
+////							'Value' => 'STRING_255'
+////						]
+//					],
+//					'item_data' => [
+//						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
+//						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
+//						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+//								'time' => strtotime('-16 hours')],
+//						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
+//					]
+//				]
+//			],
+//			// #5 Test case for host selection check.
+//			[
+//				[
+//					'host_select' => [
+//						'without_data' => 'Simple host with item for Item history widget',
+//						'with_data' =>'ЗАББИКС Сервер'
+//						],
+//					'initial_data' => [
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+//							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+//							'Value' => 'Zabbix Item history'
+//						],
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
+//							'Name' => 'Test item host: Master item',
+//							'Value' => '7.7778' // value rounding is expected.
+//						],
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
+//							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+//							'Value' => STRING_255
+//						],
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
+//							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
+//							'Value' => '82.0618 %' // value rounding is expected.
+//						]
+//					],
+//					'result' => [
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+//							'Name' => 'Linux: Host name of Zabbix agent running',
+//							'Value' => 'Zabbix Item history'
+//						],
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
+//							'Name' => 'Linux: Host name of Zabbix agent running',
+//							'Value' => STRING_255
+//						],
+//						[
+//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
+//							'Name' => 'Linux: Available memory in %',
+//							'Value' => '82.0618 %' // value rounding is expected.
+//						]
+//					],
+//					'item_data' => [
+//						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
+//						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
+//						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
+//						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
+//					]
+//				]
+//			]
 		];
 	}
 
@@ -1062,7 +1275,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 	 *
 	 * @dataProvider getTableData
 	 */
-	public function  testDashboardPlainTextWidget_TableData($data) {
+	public function testDashboardItemHistoryWidget_TableData($data) {
 		foreach ($data['item_data'] as $params) {
 			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
 		}
@@ -1073,10 +1286,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$this->assertTableData($data['initial_data']);
 
 		$default_values = [
-			'Show lines' => '25',
-			'Show text as HTML' => false,
-			'Items location' => 'Left'
+			'Layout' => 'Horizontal',
+			'Show lines' => '25'
 		];
+
 		if (array_key_exists('fields', $data)) {
 			$this->widgetConfigurationChange($data['fields'], $dashboard);
 			$this->assertTableData($data['result']);
@@ -1101,7 +1314,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 	}
 
 	/**
-	 * Change plain text widget configuration.
+	 * Change Item history widget configuration.
 	 *
 	 * @param CDashboardElement		$dashboard			dashboard element
 	 * @param array 				$configuration    	widget parameter(s)
