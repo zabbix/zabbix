@@ -459,8 +459,7 @@ static int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *by
  ******************************************************************************/
 static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 {
-	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0, pss = 0, rss = 0, num;
-	int		have_pss = 0;
+	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0, rss = 0;
 	FILE		*f;
 	char		*statm_rss_str, *tmp_str, tmp[MAX_STRING_LEN];
 
@@ -473,6 +472,9 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 
 	if(NULL != f)
 	{
+		zbx_uint64_t	pss = 0, num;
+		int		have_pss = 0;
+
 		while (NULL != fgets(tmp, (int)sizeof(tmp), f))
 		{
 			if(SUCCEED == byte_value_from_str(tmp, "Private_Hugetlb:", &num))
