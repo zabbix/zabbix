@@ -311,6 +311,9 @@ static char	*config_ssl_ca_location = NULL;
 static char	*config_ssl_cert_location = NULL;
 static char	*config_ssl_key_location = NULL;
 
+/* browser item */
+static char	*config_webdriver_url = NULL;
+
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_dbhigh_t	*zbx_config_dbhigh = NULL;
 static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
@@ -820,6 +823,19 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	err |= (FAIL == zbx_db_validate_config_features(zbx_program_type, zbx_config_dbhigh));
 
+	if (0 != config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER] && NULL == config_webdriver_url)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"WebDriverURL\" configuration parameter must be set when "
+				" setting \"StartBrowserPollers\" configuration parameter");
+		err = 1;
+	}
+
+	if (NULL != config_webdriver_url && 0 != zbx_strncasecmp(config_webdriver_url, "http", 4))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"WebDriverURL\" configuration parameter supports only http(s) protocol");
+		err = 1;
+	}
+
 	if (0 != err)
 		exit(EXIT_FAILURE);
 }
@@ -1091,6 +1107,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	1,			1000},
 		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
+		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1463,7 +1481,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks, config_java_gateway,
 								config_java_gateway_port, config_externalscripts,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location};
+								config_ssh_key_location, config_webdriver_url};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1480,7 +1498,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks, config_java_gateway,
 								config_java_gateway_port, config_externalscripts,
 								zbx_config_enable_remote_commands,
-								config_ssh_key_location};
+								config_ssh_key_location, config_webdriver_url};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
@@ -1501,7 +1519,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_externalscripts,
 								zbx_config_enable_remote_commands,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location, trapper_process_request_proxy,
+								config_ssh_key_location, config_webdriver_url,
+								trapper_process_request_proxy,
 								zbx_autoreg_update_host_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};

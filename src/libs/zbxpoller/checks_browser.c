@@ -34,16 +34,37 @@ void	browseritem_es_engine_destroy(void)
 		zbx_es_destroy(&es_engine);
 }
 
-int	get_value_browser(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, const char *config_source_ip,
+		AGENT_RESULT *result)
 {
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, ret = NOTSUPPORTED;
 
-	if (SUCCEED != zbx_es_is_env_initialized(&es_engine) && SUCCEED != zbx_es_init_env(&es_engine, config_source_ip,
-			&error))
+	if (SUCCEED != zbx_es_is_env_initialized(&es_engine))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize scripting environment: %s", error));
-		return ret;
+		if (SUCCEED != zbx_es_init_env(&es_engine, config_source_ip, &error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize scripting environment: %s",
+					error));
+			zbx_free(error);
+
+			return ret;
+		}
+
+		if (SUCCEED != zbx_es_env_init_browser(&es_engine, config_webdriver_url, &error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize Browser object: %s", error));
+			zbx_free(error);
+
+			if (SUCCEED != zbx_es_destroy_env(&es_engine, &error))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Cannot destroy embedded scripting engine environment:"
+						" %s", error);
+				zbx_free(error);
+			}
+
+			return ret;
+		}
 	}
 
 	if (SUCCEED != zbx_es_compile(&es_engine, item->params, &script_bin, &script_bin_sz, &error))
