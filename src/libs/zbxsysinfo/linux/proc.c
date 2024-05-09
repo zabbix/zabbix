@@ -480,16 +480,20 @@ void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 			if(SUCCEED == byte_value_from_str(tmp, "Private_Hugetlb:", &num))
 			{
 				private_huge += num;
-			} else if(SUCCEED == byte_value_from_str(tmp, "Shared_Hugetlb:", &num))
+			}
+			else if(SUCCEED == byte_value_from_str(tmp, "Shared_Hugetlb:", &num))
 			{
 				shared_huge += num;
-			} else if(SUCCEED == byte_value_from_str(tmp, "Shared", &num))
+			}
+			else if(SUCCEED == byte_value_from_str(tmp, "Shared", &num))
 			{
 				shared += num;
-			} else if(SUCCEED == byte_value_from_str(tmp, "Private", &num))
+			}
+			else if(SUCCEED == byte_value_from_str(tmp, "Private", &num))
 			{
 				private += num;
-			} else if(SUCCEED == byte_value_from_str(tmp, "Pss:", &num))
+			}
+			else if(SUCCEED == byte_value_from_str(tmp, "Pss:", &num))
 			{
 				have_pss = 1;
 				pss += num;
@@ -504,7 +508,9 @@ void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		private += private_huge;
 
 		zbx_fclose(f_smaps);
-	} else {
+	}
+	else
+	{
 		int	psize = (int)getpagesize() / 1024;
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/statm", pid);
 		if (NULL == (f_statm = fopen(tmp, "r")))
@@ -527,7 +533,9 @@ void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 			shared = 0;
 			shared_huge = 0;
 			private = rss;
-		} else {
+		}
+		else
+		{
 			if(NULL == (statm_rss_str = strchr(statm_rss_str, ' ') + 1))
 			{
 				zbx_fclose(f_statm);
