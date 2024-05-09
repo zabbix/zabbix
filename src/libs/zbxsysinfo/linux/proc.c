@@ -2181,6 +2181,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 						proc_data->gid = gid;
 						proc_data->user = zbx_strdup(NULL, user);
 						proc_data->group = zbx_strdup(NULL, group);
+						get_pid_mem_stats(entries->d_name, &proc_data->memory);
 						zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 					}
 				}
@@ -2215,12 +2216,13 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->cmdline = cmdline;
 				proc_data->user = user;
 				proc_data->group = group;
+				get_pid_mem_stats(entries->d_name, &proc_data->memory);
 
 				zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 				cmdline = prname = user = group = NULL;
 			}
 		}
-		get_pid_mem_stats(entries->d_name, &proc_data->memory);
+
 	}
 	zbx_fclose(f_cmd);
 	zbx_fclose(f_status);
