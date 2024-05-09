@@ -20,13 +20,13 @@
 #ifndef ZABBIX_BROWSER_ERROR_H
 #define ZABBIX_BROWSER_ERROR_H
 
-#include "zbxcommon.h"
+#include "config.h"
 
 #ifdef HAVE_LIBCURL
 
-#include "zbxembed.h"
-#include "embed.h"
+#include "duk_config.h"
 #include "webdriver.h"
+#include "zbxembed.h"
 
 int	browser_push_error(duk_context *ctx, zbx_webdriver_t *wd, const char *format, ...);
 int	es_browser_init_errors(zbx_es_t *es, char **error);

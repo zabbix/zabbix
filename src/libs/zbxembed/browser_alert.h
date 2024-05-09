@@ -20,11 +20,11 @@
 #ifndef ZABBIX_BROWSER_ALERT_H
 #define ZABBIX_BROWSER_ALERT_H
 
-#include "zbxcommon.h"
+#include "config.h"
 
 #ifdef HAVE_LIBCURL
 
-#include "zbxembed.h"
+#include "duk_config.h"
 #include "webdriver.h"
 
 void	wd_alert_create(duk_context *ctx, zbx_webdriver_t *wd, const char *text);

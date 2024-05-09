@@ -20,18 +20,13 @@
 
 #include "browser_element.h"
 #include "browser_error.h"
-
+#include "duktape.h"
 #include "embed.h"
 #include "webdriver.h"
-
-#include "zbxstr.h"
-#include "zbxjson.h"
-#include "zbxhttp.h"
-#include "duktape.h"
 #include "zbxalgo.h"
-#include "zbxcurl.h"
-#include "global.h"
-#include "zbxjson.h"
+#include "zbxcommon.h"
+#include "zbxembed.h"
+#include "zbxtypes.h"
 
 #ifdef HAVE_LIBCURL
 

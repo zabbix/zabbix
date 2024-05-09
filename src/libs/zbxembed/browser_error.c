@@ -18,7 +18,10 @@
 **/
 
 #include "browser_error.h"
+#include "duktape.h"
 #include "embed.h"
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 
 #ifdef HAVE_LIBCURL
 

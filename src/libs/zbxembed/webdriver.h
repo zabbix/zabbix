@@ -20,15 +20,12 @@
 #ifndef ZABBIX_WEBDRIVER_H
 #define ZABBIX_WEBDRIVER_H
 
-#include "zbxcommon.h"
+#include "config.h"
 
 #ifdef HAVE_LIBCURL
 
-#include "zbxembed.h"
-#include "embed.h"
 #include "browser_perf.h"
 #include "zbxalgo.h"
-#include "zbxtime.h"
 
 typedef struct
 {

@@ -19,7 +19,10 @@
 
 #include "webdriver.h"
 #include "zbxcommon.h"
+#include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxtypes.h"
 
 #ifdef HAVE_LIBCURL
 

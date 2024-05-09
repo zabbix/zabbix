@@ -20,9 +20,14 @@
 #ifndef ZABBIX_BROWSER_PERF_H
 #define ZABBIX_BROWSER_PERF_H
 
+#include "config.h"
+
+#ifdef HAVE_LIBCURL
+
+#include "zbxalgo.h"
+#include "zbxtypes.h"
 #include "zbxvariant.h"
 #include "zbxjson.h"
-#include "zbxalgo.h"
 
 typedef struct
 {
@@ -73,6 +78,8 @@ zbx_wd_perf_t;
 void	wd_perf_init(zbx_wd_perf_t *perf);
 void	wd_perf_destroy(zbx_wd_perf_t *perf);
 void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp);
+
+#endif
 
 #endif
 

@@ -17,21 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "embed.h"
-#include "webdriver.h"
+#include "browser_alert.h"
 #include "browser_element.h"
 #include "browser_error.h"
-#include "browser_alert.h"
-#include "zbxembed.h"
-
-#include "zbxstr.h"
-#include "zbxjson.h"
-#include "zbxhttp.h"
+#include "browser_perf.h"
+#include "config.h"
 #include "duktape.h"
+#include "embed.h"
+#include "webdriver.h"
 #include "zbxalgo.h"
-#include "zbxcurl.h"
-#include "global.h"
-#include "zbxjson.h"
+#include "zbxcommon.h"
+#include "zbxembed.h"
+#include "zbxtime.h"
+#include "zbxtypes.h"
+#include "zbxvariant.h"
 
 #ifdef HAVE_LIBCURL
 

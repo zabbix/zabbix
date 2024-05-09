@@ -20,12 +20,13 @@
 #ifndef ZABBIX_BROWSER_ELEMENT_H
 #define ZABBIX_BROWSER_ELEMENT_H
 
-#include "zbxcommon.h"
+#include "config.h"
 
 #ifdef HAVE_LIBCURL
 
-#include "zbxembed.h"
+#include "duk_config.h"
 #include "webdriver.h"
+#include "zbxalgo.h"
 
 void	wd_element_create(duk_context *ctx, zbx_webdriver_t *wd, const char *elementid);
 void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_vector_str_t *elements);

@@ -18,10 +18,13 @@
 **/
 
 #include "browser_perf.h"
-
-#include "zbxcommon.h"
 #include "zbxalgo.h"
+#include "zbxcommon.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
 #include "zbxstr.h"
+
+#ifdef HAVE_LIBCURL
 
 #define WD_PERF_TAG_ENTRY_TYPE	"entryType"
 
@@ -784,3 +787,5 @@ void	wd_perf_destroy(zbx_wd_perf_t *perf)
 	wd_perf_entry_free(perf->navigation_summary);
 	wd_perf_entry_free(perf->resource_summary);
 }
+
+#endif
