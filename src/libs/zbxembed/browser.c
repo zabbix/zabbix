@@ -862,6 +862,44 @@ static duk_ret_t	es_browser_get_page_source(duk_context *ctx)
 	return 1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get alert                                                         *
+ *                                                                            *
+ * Return value: Alert object if found or null                                *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_browser_get_alert(duk_context *ctx)
+{
+	zbx_webdriver_t	*wd;
+	char		*error = NULL, *alert = NULL;
+	int		err_index = -1;
+
+	wd = es_webdriver(ctx);
+
+	if (SUCCEED != webdriver_get_alert(wd, &alert, &error))
+	{
+		err_index = browser_push_error(ctx, wd, "cannot get alert: %s", error);
+		zbx_free(error);
+
+		goto out;
+	}
+
+	if (NULL != alert)
+	{
+		wd_alert_create(ctx, wd, alert);
+		zbx_free(alert);
+	}
+	else
+		duk_push_null(ctx);
+out:
+
+	if (-1 != err_index)
+		return duk_throw(ctx);
+
+	return 1;
+}
+
 
 static const duk_function_list_entry	browser_methods[] = {
 	{"navigate", es_browser_navigate, 1},
@@ -882,6 +920,7 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"discardError", es_browser_discard_error, 0},
 	{"executeScript", es_browser_execute_script, 1},
 	{"getPageSource", es_browser_get_page_source, 0},
+	{"getAlert", es_browser_get_alert, 0},
 	{0}
 };
 

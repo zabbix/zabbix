@@ -26,6 +26,8 @@ libzbxembed_a_SOURCES = \
 	browser_element.c \
 	browser_element.h \
 	browser_error.c \
-	browser_error.h
+	browser_error.h \
+	browser_alert.c \
+	browser_alert.h
 
 libzbxembed_a_CFLAGS = $(LIBXML2_CFLAGS)

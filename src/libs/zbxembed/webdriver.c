@@ -23,6 +23,8 @@
 
 #ifdef HAVE_LIBCURL
 
+#define WEBDRIVER_INVALID_SESSIONID_ERROR	"invalid session id"
+
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t		r_size = size * nmemb;
@@ -239,14 +241,14 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 		goto out;
 	}
 
-	if (NULL != data)
+	if (0 == strcmp(method, "POST"))
 	{
-		if (SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_POSTFIELDS, data, error))
+		if (SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(data), error))
 			goto out;
 	}
 	else
 	{
-		if (SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_POST, 0, error))
+		if (SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_POST, 0L, error))
 			goto out;
 	}
 
@@ -605,8 +607,6 @@ int	webdriver_get_url(zbx_webdriver_t *wd, char **url, char **error)
 int	webdriver_find_element(zbx_webdriver_t *wd, const char *strategy, const char *selector, char **element,
 		char **error)
 {
-#define WEBDRIVER_INVALID_SESSIONID_ERROR	"invalid session id"
-
 	struct zbx_json		json;
 	int			ret = FAIL;
 	struct zbx_json_parse	jp;
@@ -647,7 +647,6 @@ out:
 	zbx_json_free(&json);
 
 	return ret;
-#undef WEBDRIVER_INVALID_SESSIONID_ERROR
 }
 
 /******************************************************************************
@@ -1112,6 +1111,61 @@ void	webdriver_set_error(zbx_webdriver_t *wd, char *message)
 
 	zbx_free(wd->last_error_message);
 	wd->last_error_message = message;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get alert text                                                    *
+ *                                                                            *
+ * Parameters: wd    - [IN] webdriver object                                  *
+ *             text  - [OUT] alert text or null if there are no alerts        *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCEED - operation was performed successfully                *
+ *               FAIL   - otherwise                                           *
+ *                                                                            *
+ ******************************************************************************/
+int	webdriver_get_alert(zbx_webdriver_t *wd, char **text, char **error)
+{
+	int			ret = FAIL;
+	struct zbx_json_parse	jp;
+	size_t			text_alloc = 0;
+
+	if (SUCCEED != webdriver_session_query(wd, "GET", "alert/text", NULL, &jp, error))
+	{
+		/* throw exception in the case of connection errors */
+		if (404 != wd->error->http_code || 0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
+			goto out;
+
+		/* otherwise log the error and return NULL alert */
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get alert text: %s", error);
+
+		webdriver_free_error(wd->error);
+		wd->error = NULL;
+		zbx_free(*error);
+		*text = NULL;
+	}
+	else if (NULL == zbx_json_decodevalue_dyn(jp.start, text, &text_alloc, NULL))
+	{
+		*text = NULL;
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot read alert text: %s", zbx_json_strerror());
+
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
+int	webdriver_accept_alert(zbx_webdriver_t *wd, char **error)
+{
+	return webdriver_session_query(wd, "POST", "alert/accept", "{}", NULL, error);
+}
+
+int	webdriver_dismiss_alert(zbx_webdriver_t *wd, char **error)
+{
+	return webdriver_session_query(wd, "POST", "alert/dismiss", "{}", NULL, error);
 }
 
 #endif
