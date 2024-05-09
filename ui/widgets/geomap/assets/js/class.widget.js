@@ -289,7 +289,7 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	onClearContents() {
-		if (this._map) {
+		if (this._map !== null) {
 			this._map.remove();
 			this._map = null;
 		}
