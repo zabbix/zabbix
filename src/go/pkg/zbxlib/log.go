@@ -23,6 +23,11 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
 #include "zbxcommon.h"
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
+#endif
 
 int	zbx_agent_pid;
 
@@ -66,7 +71,7 @@ int	zbx_redirect_stdio(const char *filename)
 
 void	log_init(void)
 {
-	zbx_init_library_common(zbx_log_go_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_go_impl, get_zbx_progname, zbx_backtrace);
 }
 
 */

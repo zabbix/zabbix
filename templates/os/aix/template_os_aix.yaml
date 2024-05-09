@@ -8,7 +8,14 @@ zabbix_export:
       template: 'AIX by Zabbix agent'
       name: 'AIX by Zabbix agent'
       description: |
-        It is an official AIX template. It requires Zabbix agent 7.0 or newer.
+        This is an official AIX template. It requires Zabbix agent 7.0 or newer.
+        
+        Notes on filesystem (FS) discovery:
+          - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
+          - BTRFS allocates a default of 10% of the volume for its own needs.
+          - To mitigate potential disasters, FS usage triggers are based on the maximum available space.
+            - Utilization formula: 'pused = 100 - 100 * (available / total - free + available)'
+          - The FS utilization chart, derived from graph prototypes, reflects FS reserved space as the difference between used and available space from the total volume.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -37,7 +44,7 @@ zabbix_export:
           name: 'AIX: Zabbix agent ping'
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.'
+          description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -61,7 +68,7 @@ zabbix_export:
           name: 'AIX: Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
-          description: 'The number of processes in a running state.'
+          description: 'Number of processes in a running state.'
           tags:
             - tag: component
               value: os
@@ -79,7 +86,7 @@ zabbix_export:
           name: 'AIX: Number of processes'
           key: 'proc.num[]'
           history: 7d
-          description: 'The total number of processes in any state.'
+          description: 'Total number of processes in any state.'
           tags:
             - tag: component
               value: os
@@ -98,6 +105,7 @@ zabbix_export:
           key: system.cpu.intr
           history: 7d
           units: ips
+          description: 'Number of interrupts processed.'
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
@@ -110,7 +118,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             - tag: component
               value: cpu
@@ -127,7 +135,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             - tag: component
               value: cpu
@@ -136,7 +144,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             - tag: component
               value: cpu
@@ -145,6 +153,7 @@ zabbix_export:
           key: system.cpu.switches
           history: 7d
           units: sps
+          description: 'The combined rate at which all processors on the computer are switched from one thread to another.'
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
@@ -159,7 +168,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'A host name of the system.'
+          description: 'The host name of the system.'
           inventory_link: NAME
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -181,6 +190,7 @@ zabbix_export:
           key: system.localtime
           history: 7d
           units: unixtime
+          description: 'The local system time of the host.'
           tags:
             - tag: component
               value: os
@@ -259,7 +269,7 @@ zabbix_export:
               expression: 'avg(/AIX by Zabbix agent/system.stat[cpu,wa],5m)>20'
               name: 'AIX: Disk I/O is overloaded'
               priority: WARNING
-              description: 'The OS spends significant time waiting for the I/O (input/output) operations. It could be an indicator of performance issues with the storage system.'
+              description: 'Extended OS wait times for I/O operations may signal potential performance issues with the storage system.'
               tags:
                 - tag: scope
                   value: performance
@@ -398,7 +408,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The information as normally returned by the ''uname -a''.'
+          description: 'Information as normally returned by `uname -a`.'
           inventory_link: OS
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -468,7 +478,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
             - tag: component
               value: raw
@@ -477,7 +487,7 @@ zabbix_export:
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
-          description: 'The available memory is defined as free+cached+buffers memory.'
+          description: 'Defined as free + cached + buffers.'
           tags:
             - tag: component
               value: memory
@@ -497,6 +507,7 @@ zabbix_export:
           delay: 1h
           history: 7d
           units: B
+          description: 'Total memory expressed in bytes.'
           tags:
             - tag: component
               value: memory
@@ -505,7 +516,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
-          description: 'Monitoring the availability status of the agent.'
+          description: 'Used for monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
           tags:
@@ -517,7 +528,7 @@ zabbix_export:
               name: 'AIX: Zabbix agent is not available'
               event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
-              description: 'For passive checks only the availability of the agent(s) and a host is used with {$AGENT.TIMEOUT} as the time threshold.'
+              description: 'For passive checks only. The availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -532,7 +543,7 @@ zabbix_export:
               - macro: '{#IFNAME}'
                 value: '@Network interfaces for discovery'
                 formulaid: A
-          description: 'The discovery of network interfaces as defined in the global regular expression "Network interfaces for discovery".'
+          description: 'Used for the discovery of network interfaces.'
           item_prototypes:
             - uuid: df9710a48eaa4a72911de3971b37c596
               name: 'Interface {#IFNAME}: Incoming network traffic'
@@ -587,20 +598,33 @@ zabbix_export:
           key: vfs.fs.dependent.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
-              - macro: '{#FSTYPE}'
-                value: '@File systems for discovery'
+              - macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.MATCHES}'
                 formulaid: A
-          description: 'The discovery of different types of file systems as defined in the global regular expression "File systems for discovery".'
+              - macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+          description: 'The discovery of mounted filesystems with different types.'
           item_prototypes:
             - uuid: ee5ae5de6f7b40b4a9b064bdc733de91
-              name: '{#FSNAME}: Free inodes, %'
+              name: 'FS [{#FSNAME}]: Inodes: Free, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              description: 'Free metadata space expressed in %.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -609,26 +633,47 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
               trigger_prototypes:
+                - uuid: 185959350a954c35a08ab6a9bf6c1d46
+                  expression: 'min(/AIX by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Running out of free inodes'
+                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  opdata: 'Free inodes: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Disk writing may fail if index nodes are exhausted, leading to error messages like "No space left on device" or "Disk is full", despite available free space.'
+                  tags:
+                    - tag: scope
+                      value: capacity
+                    - tag: scope
+                      value: performance
                 - uuid: 6ce467d05e8745409a177799bed34bb3
-                  expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree])<20'
-                  name: '{#FSNAME}: Free inodes is less than 20%'
+                  expression: 'min(/AIX by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Running out of free inodes'
+                  event_name: 'FS [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
+                  description: 'Disk writing may fail if index nodes are exhausted, leading to error messages like "No space left on device" or "Disk is full", despite available free space.'
+                  dependencies:
+                    - name: 'FS [{#FSNAME}]: Running out of free inodes'
+                      expression: 'min(/AIX by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     - tag: scope
                       value: capacity
                     - tag: scope
                       value: performance
             - uuid: 13e212598f744a7fa535c23731190c61
-              name: '{#FSNAME}: Free disk space'
+              name: 'FS [{#FSNAME}]: Space: Available'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},free]'
               delay: '0'
               history: 7d
               units: B
+              description: 'Available storage space expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -637,17 +682,22 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: 428b0314dd574df1970dd2cae7e8889b
-              name: '{#FSNAME}: Free disk space, %'
+              name: 'FS [{#FSNAME}]: Space: Available, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              description: |
+                Deprecated metric.
+                Space availability expressed as a percentage, calculated using the current and maximum available spaces.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -656,26 +706,78 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
+                - tag: deprecated
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
+            - uuid: e0c53ff31b8145b5bb887bb61d077fc4
+              name: 'FS [{#FSNAME}]: Space: Used, in %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Calculated as the percentage of currently used space compared to the maximum available space.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.bytes.pused
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: filesystem
+                  value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
               trigger_prototypes:
-                - uuid: 74a1fc62bfe24b7eabe4e244c70dc384
-                  expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pfree])<20'
-                  name: '{#FSNAME}: Free disk space is less than 20%'
-                  priority: WARNING
+                - uuid: 6b3a81f7c4a24307a099c07fb537a8ca
+                  expression: 'min(/AIX by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Space is critically low'
+                  event_name: 'FS [{#FSNAME}]: Space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)'
+                  opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
+                  priority: AVERAGE
+                  description: |
+                    The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%` limit.
+                    The trigger expression is based on the current used and maximum available spaces.
+                    Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.
+                  manual_close: 'YES'
                   tags:
                     - tag: scope
-                      value: capacity
+                      value: availability
                     - tag: scope
-                      value: performance
+                      value: capacity
+                - uuid: 74a1fc62bfe24b7eabe4e244c70dc384
+                  expression: 'min(/AIX by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Space is low'
+                  event_name: 'FS [{#FSNAME}]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)'
+                  opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
+                  priority: WARNING
+                  description: |
+                    The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%` limit.
+                    The trigger expression is based on the current used and maximum available spaces.
+                    Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: 'FS [{#FSNAME}]: Space is critically low'
+                      expression: 'min(/AIX by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: capacity
             - uuid: 6f6c92bc72014612b2efb92d12d8c425
-              name: '{#FSNAME}: Total disk space'
+              name: 'FS [{#FSNAME}]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},total]'
               delay: '0'
               history: 7d
               units: B
+              description: 'Total space expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -684,16 +786,19 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: 915e72271f134684b2d10d05d4035962
-              name: '{#FSNAME}: Used disk space'
+              name: 'FS [{#FSNAME}]: Space: Used'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},used]'
               delay: '0'
               history: 7d
               units: B
+              description: 'Used storage expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -702,17 +807,20 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: 0c21ec9b14884057bdd2080b4871756e
-              name: '{#FSNAME}: Get filesystem data'
+              name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},data]'
               delay: '0'
               history: 1h
               trends: '0'
               value_type: TEXT
+              description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -721,13 +829,15 @@ zabbix_export:
                 key: vfs.fs.get
               tags:
                 - tag: component
-                  value: filesystem
-                - tag: component
                   value: raw
+                - tag: component
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: cd96a2d7e708495cbc5d11a14ea9c876
-              name: '{#FSNAME}: Filesystem is read-only'
+              name: 'FS [{#FSNAME}]: Option: Read-only'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},readonly]'
               delay: '0'
@@ -748,17 +858,19 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
               trigger_prototypes:
                 - uuid: 05ec0e80333d4f7688b71a2865d0365e
                   expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly],#2)=0 and last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=1'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/AIX by Zabbix agent/vfs.fs.dependent[{#FSNAME},readonly])=0'
-                  name: '{#FSNAME}: Filesystem has become read-only'
+                  name: 'FS [{#FSNAME}]: Filesystem has become read-only'
                   priority: AVERAGE
-                  description: 'The filesystem has become read-only. A possible reason is an I/O error. It is available only for Zabbix agents 6.4 and higher.'
+                  description: 'The filesystem has become read-only, possibly due to an I/O error. Available only for Zabbix agents 6.4 and higher.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -766,15 +878,41 @@ zabbix_export:
                     - tag: scope
                       value: performance
           graph_prototypes:
-            - uuid: 460b553fcd924b6abbde0b00a5525445
-              name: '{#FSNAME}: Disk space usage'
+            - uuid: 6649ab6a9568418493be79dfb63b07b4
+              name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
+              width: '600'
+              height: '340'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
               graph_items:
-                - color: 199C0D
+                - drawtype: FILLED_REGION
+                  color: F63100
+                  calc_fnc: LAST
+                  item:
+                    host: 'AIX by Zabbix agent'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
+            - uuid: cfd16b36331145a881249d88e105c731
+              name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                - color: '787878'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
                   item:
                     host: 'AIX by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 - sortorder: '1'
                   color: F63100
+                  calc_fnc: LAST
+                  item:
+                    host: 'AIX by Zabbix agent'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+                - sortorder: '2'
+                  color: 199C09
+                  calc_fnc: LAST
                   item:
                     host: 'AIX by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},free]'
@@ -785,6 +923,23 @@ zabbix_export:
               path: $.fsname
             - lld_macro: '{#FSTYPE}'
               path: $.fstype
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var filesystems = JSON.parse(value);
+                  
+                  result = filesystems.map(function (filesystem) {
+                  	return {
+                  		'fsname': filesystem.fsname,
+                  		'fstype': filesystem.fstype
+                  	};
+                  });
+                  
+                  return JSON.stringify(result);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           overrides:
             - name: 'Skip metadata collection for dynamic FS'
               step: '1'
@@ -796,7 +951,7 @@ zabbix_export:
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
-                  value: inode
+                  value: Inodes
                   discover: NO_DISCOVER
       tags:
         - tag: class
@@ -806,8 +961,68 @@ zabbix_export:
       macros:
         - macro: '{$AGENT.TIMEOUT}'
           value: 3m
-          description: 'The timeout after which agent is considered unavailable. It works only for the agents reachable from Zabbix server/proxy (in passive mode).'
+          description: 'Timeout after which the agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (in passive mode).'
+        - macro: '{$VFS.FS.FSNAME.MATCHES}'
+          value: .+
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+          value: ^(/dev|/sys|/run|/proc|.+/shm$)
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VFS.FS.FSTYPE.MATCHES}'
+          value: ^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+          value: ^\s$
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
+          value: '10'
+          description: 'The critical threshold of the filesystem metadata utilization.'
+        - macro: '{$VFS.FS.INODE.PFREE.MIN.WARN}'
+          value: '20'
+          description: 'The warning threshold of the filesystem metadata utilization.'
+        - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the filesystem utilization.'
+        - macro: '{$VFS.FS.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'The warning threshold of the filesystem utilization.'
       dashboards:
+        - uuid: 5b5e04508ef3402a9432ec9f3d581179
+          name: Filesystems
+          pages:
+            - name: Overview
+              widgets:
+                - type: graphprototype
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '3'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'AIX by Zabbix agent'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+                    - type: STRING
+                      name: reference
+                      value: AAAEB
+                - type: graphprototype
+                  'y': '5'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'AIX by Zabbix agent'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
+                    - type: STRING
+                      name: reference
+                      value: AAAEC
         - uuid: 873e38e16ef94f2b9b743a3251db0fbb
           name: 'System performance'
           pages:
@@ -837,6 +1052,22 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAC
+                - type: graphprototype
+                  'y': '10'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '3'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'AIX by Zabbix agent'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+                    - type: STRING
+                      name: reference
+                      value: AAAEA
                 - type: graph
                   x: '12'
                   width: '12'

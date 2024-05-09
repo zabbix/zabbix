@@ -29,7 +29,7 @@ This template has been tested on:
 
 ## Setup
 
-Set the hostname or IP address of the the CockroachDB node host in the `{$COCKROACHDB.API.HOST}` macro. You can also change the port in the `{$COCKROACHDB.API.PORT}` macro and the scheme in the `{$COCKROACHDB.API.SCHEME}` macro if necessary.
+Set the hostname or IP address of the CockroachDB node host in the `{$COCKROACHDB.API.HOST}` macro. You can also change the port in the `{$COCKROACHDB.API.PORT}` macro and the scheme in the `{$COCKROACHDB.API.SCHEME}` macro if necessary.
 
 Also, see the Macros section for a list of macros used to set trigger values.
 
