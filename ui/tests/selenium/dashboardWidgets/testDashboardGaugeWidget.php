@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup config, widget
  *
- * @dataSource AllItemValueTypes
+ * @dataSource AllItemValueTypes, GlobalMacros
  *
  * @onBefore prepareDashboardData
  */
