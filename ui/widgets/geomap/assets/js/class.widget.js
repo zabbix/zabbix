@@ -618,10 +618,10 @@ class CWidgetGeoMap extends CWidget {
 			color: severity_colors[CWidgetGeoMap.SEVERITY_DISASTER]
 		});
 
-		const styles = getComputedStyle(document.body);
-		const hover_fill = styles.getPropertyValue('--geomap-marker-hover-fill');
-		const selected_fill = styles.getPropertyValue('--geomap-marker-selected-fill');
-		const selected_stroke = styles.getPropertyValue('--geomap-marker-selected-stroke');
+		const styles = getComputedStyle(this._contents);
+		const hover_fill = styles.getPropertyValue('--hover-fill');
+		const selected_fill = styles.getPropertyValue('--selected-fill');
+		const selected_stroke = styles.getPropertyValue('--selected-stroke');
 
 		for (const severity in severity_colors) {
 			const tmpl = `

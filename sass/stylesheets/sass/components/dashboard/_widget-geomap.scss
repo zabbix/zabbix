@@ -1,10 +1,8 @@
-:root {
-	--geomap-marker-hover-fill: #{$geomap-marker-hover-fill};
-	--geomap-marker-selected-fill: #{$geomap-marker-selected-fill};
-	--geomap-marker-selected-stroke: #{$geomap-marker-selected-stroke};
-}
-
 div.dashboard-widget-geomap {
+	--hover-fill: #{$geomap-marker-hover-fill};
+	--selected-fill: #{$geomap-marker-selected-fill};
+	--selected-stroke: #{$geomap-marker-selected-stroke};
+
 	.geomap-filter {
 		position: absolute;
 		right: 0;
@@ -39,12 +37,12 @@ div.dashboard-widget-geomap {
 		}
 
 		&:hover > .cluster-outer-shape {
-			background: $geomap-marker-hover-fill;
+			background: var(--hover-fill);
 		}
 
 		&.selected > .cluster-outer-shape {
-			background: $geomap-marker-selected-fill;
-			outline: 2px solid $geomap-marker-selected-stroke !important;
+			background: var(--selected-fill);
+			outline: 2px solid var(--selected-stroke) !important;
 		}
 
 		div {
