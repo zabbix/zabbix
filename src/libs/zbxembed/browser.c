@@ -131,12 +131,7 @@ out:
 	zbx_free(error);
 
 	if (-1 != err_index)
-	{
-		if (NULL != wd)
-			webdriver_destroy(wd);
-
 		return duk_throw(ctx);
-	}
 
 	return 0;
 }
