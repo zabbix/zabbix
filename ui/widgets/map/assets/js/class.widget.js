@@ -119,7 +119,7 @@ class CWidgetMap extends CWidget {
 	}
 
 	processUpdateResponse(response) {
-		this.#map_svg = null;
+		this.clearContents();
 
 		super.processUpdateResponse(response);
 
@@ -150,6 +150,10 @@ class CWidgetMap extends CWidget {
 				this.setContents({body: sysmap_data.error_msg});
 			}
 		}
+	}
+
+	onClearContents() {
+		this.#map_svg = null;
 	}
 
 	hasPadding() {

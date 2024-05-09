@@ -75,7 +75,7 @@ class CWidgetSvgGraph extends CWidget {
 	}
 
 	processUpdateResponse(response) {
-		this._destroyGraph();
+		this.clearContents();
 
 		super.processUpdateResponse(response);
 
@@ -92,6 +92,14 @@ class CWidgetSvgGraph extends CWidget {
 			});
 		}
 		else {
+			this._has_contents = false;
+		}
+	}
+
+	onClearContents() {
+		if (this._has_contents) {
+			this._deactivateGraph();
+
 			this._has_contents = false;
 		}
 	}
@@ -113,13 +121,6 @@ class CWidgetSvgGraph extends CWidget {
 	_deactivateGraph() {
 		if (this._has_contents) {
 			jQuery(this._svg).svggraph('deactivate');
-		}
-	}
-
-	_destroyGraph() {
-		if (this._has_contents) {
-			this._deactivateGraph();
-			this._body.innerHTML = '';
 		}
 	}
 
