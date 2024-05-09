@@ -463,10 +463,10 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 	FILE		*f;
 	char		*statm_rss_str, *tmp_str, tmp[MAX_STRING_LEN];
 
-	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps_rollup1", pid);
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps_rollup", pid);
 	if (NULL == (f = fopen(tmp, "r")))
 	{
-		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps1", pid);
+		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/smaps", pid);
 		f = fopen(tmp, "r");
 	}
 
