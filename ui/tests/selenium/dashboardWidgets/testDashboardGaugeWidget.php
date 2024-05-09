@@ -1268,8 +1268,8 @@ class testDashboardGaugeWidget extends testWidgets {
 		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$this->page->removeFocus();
 
-		// Sleep waits until the gauge is animated.
-		sleep(1);
+		// Wait until the gauge is animated.
+		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 }

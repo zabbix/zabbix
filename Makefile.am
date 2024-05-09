@@ -210,11 +210,11 @@ endif
 
 build_test_zbxcommon:
 	$(MAKE) $(AM_MAKEFLAGS) && \
-	cd src/libs/test_zbxcommon && \
+	cd tests/test_zbxcommon && \
 	$(MAKE) $(AM_MAKEFLAGS)
 
 build_test_zbxcommon_clean:
-	cd src/libs/test_zbxcommon && $(MAKE) clean
+	cd tests/test_zbxcommon && $(MAKE) clean
 
 sbom: sbom-ui
 

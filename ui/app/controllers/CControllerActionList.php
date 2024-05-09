@@ -126,7 +126,7 @@ class CControllerActionList extends CController {
 
 		$db_actions = API::Action()->get([
 			'output' => [],
-			'selectFilter' => ['formula', 'conditions', 'evaltype'],
+			'selectFilter' => ['conditions'],
 			'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
 				'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
 				'opconditions', 'opmessage_usr', 'opmessage_grp', 'optag'
@@ -137,10 +137,6 @@ class CControllerActionList extends CController {
 
 		foreach ($data['actions'] as &$action) {
 			$db_action = $db_actions[$action['actionid']];
-
-			CArrayHelper::sort($db_action['filter']['conditions'], [
-				['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN]
-			]);
 
 			$action['filter'] = $db_action['filter'];
 			$action['operations'] = $db_action['operations'];

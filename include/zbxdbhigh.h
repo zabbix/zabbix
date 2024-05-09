@@ -366,7 +366,7 @@ typedef struct ZBX_DB_MEDIATYPE
 	unsigned char		smtp_verify_peer;
 	unsigned char		smtp_verify_host;
 	unsigned char		smtp_authentication;
-	unsigned char		content_type;
+	unsigned char		message_format;
 	int			maxsessions;
 	int			maxattempts;
 }

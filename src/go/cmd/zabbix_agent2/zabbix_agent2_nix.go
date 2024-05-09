@@ -30,6 +30,8 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
+const osDependentUsageMessageFormat = ""
+
 func loadOSDependentItems() error {
 	return nil
 }

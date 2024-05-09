@@ -365,6 +365,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Item navigator widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Pie chart widget',
 					'copy to' => 'another page'
 				]
@@ -426,6 +432,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Host navigator widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Item navigator widget',
 					'copy to' => 'another template'
 				]
 			],
