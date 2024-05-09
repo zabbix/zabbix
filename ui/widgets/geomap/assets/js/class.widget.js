@@ -279,7 +279,20 @@ class CWidgetGeoMap extends CWidget {
 		// Close opened hintboxes when moving/zooming/resizing widget.
 		this._map
 			.on('zoomstart movestart resize', () => this.removeHintBoxes())
-			.on('zoomend', () => this.#updateMarkers());
+			.on('zoomend', () => this.#updateMarkers())
+			.on('unload', () => {
+				this._markers.clearLayers();
+				this._clusters.clearLayers();
+
+				this._initial_load = true;
+			});
+	}
+
+	onClearContents() {
+		if (this._map) {
+			this._map.remove();
+			this._map = null;
+		}
 	}
 
 	/**
