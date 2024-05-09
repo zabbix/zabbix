@@ -30,7 +30,7 @@ OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
 	..\..\..\src\libs\zbxalgo\hashset.o \
-	..\..\..\src\libs\zbxaux\aux.o \
+	..\..\..\src\libs\zbxbincommon\bincommon.o \
 	..\..\..\src\libs\zbxcrypto\endian.o \
 	..\..\..\src\libs\zbxip\ip.o \
 	..\..\..\src\libs\zbxip\iprange.o \
