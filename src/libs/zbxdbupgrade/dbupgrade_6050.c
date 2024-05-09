@@ -4084,6 +4084,9 @@ static int	DBpatch_6050299(void)
 	zbx_db_insert_t	db_insert;
 	int		ret;
 
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name",
 			"value_int", NULL);
 
@@ -4225,6 +4228,9 @@ static int	DBpatch_6050301(void)
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	zbx_vector_uint64_create(&ids);
 
 	result = zbx_db_select(
@@ -4252,6 +4258,36 @@ static int	DBpatch_6050301(void)
 
 	if (zbx_db_execute("%s", sql) < ZBX_DB_OK)
 		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050302(void)
+{
+	const char	*sql =
+			"update module"
+			" set id='itemhistory',relative_path='widgets/itemhistory'"
+			" where id='plaintext'"
+				" and relative_path='widgets/plaintext'";
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (zbx_db_execute("%s", sql) < ZBX_DB_OK)
+		return FAIL;
+
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050303(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (zbx_db_execute("update widget set type='itemhistory' where type='plaintext'") < ZBX_DB_OK)
+		return FAIL;
+
 
 	return SUCCEED;
 }
@@ -4562,5 +4598,7 @@ DBPATCH_ADD(6050298, 0, 1)
 DBPATCH_ADD(6050299, 0, 1)
 DBPATCH_ADD(6050300, 0, 1)
 DBPATCH_ADD(6050301, 0, 1)
+DBPATCH_ADD(6050302, 0, 1)
+DBPATCH_ADD(6050303, 0, 1)
 
 DBPATCH_END()
