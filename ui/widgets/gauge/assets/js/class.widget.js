@@ -45,13 +45,21 @@ class CWidgetGauge extends CWidget {
 	}
 
 	getUpdateRequestData() {
+		const with_config = this.gauge === null
+			|| this.isFieldsReferredDataUpdated('itemid')
+			|| this.isFieldsReferredDataUpdated('override_hostid');
+
 		return {
 			...super.getUpdateRequestData(),
-			with_config: this.gauge === null ? 1 : undefined
+			with_config: with_config ? 1 : undefined
 		};
 	}
 
 	setContents(response) {
+		if (this.isFieldsReferredDataUpdated('itemid') || this.isFieldsReferredDataUpdated('override_hostid')) {
+			this.clearContents();
+		}
+
 		if ('body' in response) {
 			if (this.gauge !== null) {
 				this.clearContents();
@@ -90,8 +98,10 @@ class CWidgetGauge extends CWidget {
 	}
 
 	onClearContents() {
-		this.gauge.destroy();
-		this.gauge = null;
+		if (this.gauge !== null) {
+			this.gauge.destroy();
+			this.gauge = null;
+		}
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {

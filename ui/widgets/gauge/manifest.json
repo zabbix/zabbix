@@ -13,7 +13,13 @@
 			"width": 6,
 			"height": 5
 		},
-		"js_class": "CWidgetGauge"
+		"js_class": "CWidgetGauge",
+		"in": {
+			"itemid": {
+				"type": "_itemid",
+				"required": true
+			}
+		}
 	},
 	"actions": {
 		"widget.gauge.view": {
