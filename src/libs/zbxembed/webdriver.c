@@ -1057,7 +1057,7 @@ out:
  *             sopurce - [OUT] page source                                    *
  *             error   - [OUT] error message                                  *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully                *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -1079,4 +1079,40 @@ int	webdriver_get_page_source(zbx_webdriver_t *wd, char **source, char **error)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if webdriver has cached an error                            *
+ *                                                                            *
+ * Parameters: wd - [IN] webdriver object                                     *
+ *                                                                            *
+ * Return value: SUCCEED - webdriver has cached an error                      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	webdriver_has_error(zbx_webdriver_t *wd)
+{
+	return NULL == wd->last_error_message ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set custom error message                                          *
+ *                                                                            *
+ * Parameters: wd      - [IN] webdriver object                                *
+ *             message - [IN] error message                                   *
+ *                                                                            *
+ * Comments: The error message must be preallocated by caller and will be     *
+ *           freed when webdriver custom error message is freed.              *
+ *                                                                            *
+ ******************************************************************************/
+void	webdriver_set_error(zbx_webdriver_t *wd, char *message)
+{
+	if (NULL != wd->error)
+		webdriver_free_error(wd->error);
+
+	zbx_free(wd->last_error_message);
+	wd->last_error_message = message;
+}
+
 #endif
+

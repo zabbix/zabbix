@@ -133,5 +133,5 @@ int	browser_push_error(duk_context *ctx, zbx_webdriver_t *wd, const char *format
 
 	duk_new(ctx, 2);
 
-	return 0;
+	return duk_get_top_index(ctx);
 }

@@ -96,7 +96,10 @@ static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const ch
 	zabbix_log(LOG_LEVEL_TRACE, "element::element()");
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+	{
+		(void)browser_push_error(ctx, wd, "cannot access internal environment");
+		return duk_throw(ctx);
+	}
 
 	el = (zbx_wd_element_t *)zbx_malloc(NULL, sizeof(zbx_wd_element_t));
 	el->wd = webdriver_addref(wd);
