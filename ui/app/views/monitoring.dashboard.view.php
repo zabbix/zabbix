@@ -210,6 +210,7 @@ if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requi
 			->addTimeSelector($data['dashboard_time_period']['from'], $data['dashboard_time_period']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
+			->preventHistoryUpdates()
 	);
 }
 
