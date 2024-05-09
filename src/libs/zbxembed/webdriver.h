@@ -54,7 +54,6 @@ typedef struct
 
 	zbx_wd_perf_t		perf;
 	int			refcount;
-	char			*bookmark;
 
 	double			create_time;
 
@@ -96,8 +95,6 @@ int	webdriver_set_screen_size(zbx_webdriver_t *wd, int width, int height, char *
 
 void	webdriver_discard_error(zbx_webdriver_t *wd);
 
-int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, char **error);
-
 int	webdriver_get_page_source(zbx_webdriver_t *wd, char **source, char **error);
 
 int	webdriver_has_error(zbx_webdriver_t *wd);
@@ -106,5 +103,7 @@ void	webdriver_set_error(zbx_webdriver_t *wd, char *message);
 int	webdriver_get_alert(zbx_webdriver_t *wd, char **text, char **error);
 int	webdriver_accept_alert(zbx_webdriver_t *wd, char **error);
 int	webdriver_dismiss_alert(zbx_webdriver_t *wd, char **error);
+
+int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char **error);
 
 #endif

@@ -284,70 +284,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get performance entries from performance object                   *
- *                                                                            *
- * Parameters: wd      - [IN] webdriver object                                *
- *             jp      - [OUT] performance entries                            *
- *             error   - [OUT] error message                                  *
- *                                                                            *
- * Return value: SUCCEED - query was performed successfully                   *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-static int	webdriver_get_perf_entries(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error)
-{
-	struct zbx_json	json;
-	int		ret = FAIL;
-	const char	*script = "return window.performance.getEntries().filter("
-						"(value, index, array)=>{"
-							"return value.entryType!=='long-animation-frame'"
-						"}"
-					");";
-
-	zbx_json_init(&json, 128);
-	zbx_json_addstring(&json, "script", script,  ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&json, "args");
-	zbx_json_close(&json);
-
-	if (SUCCEED != webdriver_session_query(wd, "POST", "execute/sync", json.buffer, jp, error))
-		goto out;
-
-	ret = SUCCEED;
-out:
-	zbx_json_free(&json);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: perform post navigation operations                                *
- *                                                                            *
- * Parameters: wd - [IN] webdriver object                                     *
- *                                                                            *
- * Comments: Currently only performance entries are gathered                  *
- *                                                                            *
- ******************************************************************************/
-static void	webdriver_post_navigate_event(zbx_webdriver_t *wd)
-{
-	struct zbx_json_parse	jp;
-	char			*error = NULL;
-
-	if (SUCCEED != webdriver_get_perf_entries(wd, &jp, &error))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot get performance entries: %s", error);
-		zbx_free(error);
-
-		goto out;
-	}
-
-	wd_perf_collect(&wd->perf, wd->bookmark, &jp);
-out:
-	zbx_free(wd->bookmark);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: close webdriver session                                           *
  *                                                                            *
  * Parameters: wd - [IN] webdriver object                                     *
@@ -561,8 +497,7 @@ int	webdriver_url(zbx_webdriver_t *wd, const char *url, char **error)
 	zbx_json_init(&json, 128);
 	zbx_json_addstring(&json, "url", url, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == (ret = webdriver_session_query(wd, "POST", "url", json.buffer, NULL, error)))
-		webdriver_post_navigate_event(wd);
+	ret = webdriver_session_query(wd, "POST", "url", json.buffer, NULL, error);
 
 	zbx_json_free(&json);
 
@@ -754,8 +689,7 @@ int	webdriver_send_keys_to_element(zbx_webdriver_t *wd, const char *element, con
 
 	command = zbx_dsprintf(NULL, "element/%s/value", element);
 
-	if (SUCCEED == (ret = webdriver_session_query(wd, "POST", command, json.buffer, NULL, error)))
-		webdriver_post_navigate_event(wd);
+	ret = webdriver_session_query(wd, "POST", command, json.buffer, NULL, error);
 
 	zbx_free(command);
 	zbx_json_free(&json);
@@ -786,8 +720,7 @@ int	webdriver_click_element(zbx_webdriver_t *wd, const char *element, char **err
 
 	command = zbx_dsprintf(NULL, "element/%s/click", element);
 
-	if (SUCCEED == (ret = webdriver_session_query(wd, "POST", command, json.buffer, NULL, error)))
-		webdriver_post_navigate_event(wd);
+	ret = webdriver_session_query(wd, "POST", command, json.buffer, NULL, error);
 
 	zbx_free(command);
 	zbx_json_free(&json);
@@ -818,8 +751,8 @@ int	webdriver_clear_element(zbx_webdriver_t *wd, const char *element, char **err
 
 	command = zbx_dsprintf(NULL, "element/%s/clear", element);
 
-	if (SUCCEED == (ret = webdriver_session_query(wd, "POST", command, json.buffer, NULL, error)))
-		webdriver_post_navigate_event(wd);
+	ret = webdriver_session_query(wd, "POST", command, json.buffer, NULL, error);
+
 
 	zbx_free(command);
 	zbx_json_free(&json);
@@ -1032,13 +965,15 @@ int	webdriver_set_screen_size(zbx_webdriver_t *wd, int width, int height, char *
  *                                                                            *
  * Parameters: wd      - [IN] webdriver object                                *
  *             script  - [IN] script to execute                               *
+ *             jp      - [OUT] script execution result                        *
  *             error   - [OUT] error message                                  *
  *                                                                            *
  * Return value: SUCCEED - query was performed successfully                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, char **error)
+static int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, struct zbx_json_parse *jp,
+		char **error)
 {
 	struct zbx_json	json;
 	int		ret = FAIL;
@@ -1048,7 +983,7 @@ int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, char **err
 	zbx_json_addarray(&json, "args");
 	zbx_json_close(&json);
 
-	if (SUCCEED != webdriver_session_query(wd, "POST", "execute/sync", json.buffer, NULL, error))
+	if (SUCCEED != webdriver_session_query(wd, "POST", "execute/sync", json.buffer, jp, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -1057,6 +992,39 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get performance entries from performance object                   *
+ *                                                                            *
+ * Parameters: wd      - [IN] webdriver object                                *
+ *             jp      - [OUT] performance entries                            *
+ *             error   - [OUT] error message                                  *
+ *                                                                            *
+ * Return value: SUCCEED - query was performed successfully                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char **error)
+{
+	struct zbx_json_parse	jp;
+	int			ret = FAIL;
+	const char		*script = "return window.performance.getEntries().filter("
+							"(value, index, array)=>{"
+								"return value.entryType!=='long-animation-frame'"
+							"}"
+						");";
+
+	if (SUCCEED != webdriver_execute_script(wd, script, &jp, error))
+		goto out;
+
+	wd_perf_collect(&wd->perf, bookmark, &jp);
+
+	ret = SUCCEED;
+out:
+	return ret;
+}
+
 
 /******************************************************************************
  *                                                                            *

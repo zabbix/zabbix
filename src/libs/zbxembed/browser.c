@@ -499,36 +499,6 @@ static duk_ret_t	es_browser_get_result(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set performance data bookmark                                     *
- *                                                                            *
- * Comments: Performance data collected during next navigation will be marked *
- *           with the specified bookmark and will be added to result data in  *
- *           separate section.                                                *
- *           After navigation the bookmark is reset.                          *
- *                                                                            *
- ******************************************************************************/
-static duk_ret_t	es_browser_set_bookmark(duk_context *ctx)
-{
-	zbx_webdriver_t	*wd;
-	char		*bookmark = NULL;
-
-	wd = es_webdriver(ctx);
-
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &bookmark))
-	{
-		(void)browser_push_error(ctx, wd, "cannot convert bookmark parameter to utf8");
-
-		return duk_throw(ctx);
-	}
-
-	zbx_free(wd->bookmark);
-	wd->bookmark = bookmark;
-
-	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: set script timeout                                                *
  *                                                                            *
  ******************************************************************************/
@@ -807,38 +777,6 @@ static duk_ret_t	es_browser_set_error(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute script on browser                                         *
- *                                                                            *
- * Stack 0 - script                                                           *
- *                                                                            *
- ******************************************************************************/
-static duk_ret_t	es_browser_execute_script(duk_context *ctx)
-{
-	zbx_webdriver_t	*wd;
-	char		*script = NULL, *error = NULL;
-
-	wd = es_webdriver(ctx);
-
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &script))
-	{
-		(void)browser_push_error(ctx, wd, "cannot convert bookmark parameter to utf8");
-
-		return duk_throw(ctx);
-	}
-
-	if (SUCCEED != webdriver_execute_script(wd, script, &error))
-	{
-		browser_push_error(ctx, wd, "cannot execute script: %s", error);
-		zbx_free(error);
-
-		return duk_throw(ctx);
-	}
-
-	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: get opened page source                                            *
  *                                                                            *
  * Return value: page source (string)                                         *
@@ -902,6 +840,45 @@ out:
 	return 1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: collect performance data                                          *
+ *                                                                            *
+ * Stack 0 - bookmark (string/null, optional)                                 *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_browser_collect_perf_data(duk_context *ctx)
+{
+	int		err_index = -1;
+	zbx_webdriver_t	*wd;
+	char		*bookmark = NULL, *error = NULL;
+
+	wd = es_webdriver(ctx);
+
+	if (!duk_is_null(ctx, 0))
+	{
+		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &bookmark))
+		{
+			err_index = browser_push_error(ctx, wd, "cannot convert bookmark parameter to utf8");
+
+			goto out;
+		}
+	}
+
+	if (SUCCEED != webdriver_collect_perf_data(wd, bookmark, &error))
+	{
+		err_index = browser_push_error(ctx, wd, "cannot collect performance data: %s", error);
+		zbx_free(error);
+	}
+
+	zbx_free(bookmark);
+out:
+	if (-1 != err_index)
+		return duk_throw(ctx);
+
+	return 0;
+}
+
 
 static const duk_function_list_entry	browser_methods[] = {
 	{"navigate", es_browser_navigate, 1},
@@ -909,7 +886,6 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"findElement", es_browser_find_element, 2},
 	{"findElements", es_browser_find_elements, 2},
 	{"getResult", es_browser_get_result, 0},
-	{"setMark", es_browser_set_bookmark, 1},
 	{"setScriptTimeout", es_browser_set_script_timeout, 1},
 	{"setSessionTimeout", es_browser_set_session_timeout, 1},
 	{"setElementWaitTimeout", es_browser_set_element_wait_timeout, 1},
@@ -920,7 +896,7 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"setError", es_browser_set_error, 1},
 	{"getError", es_browser_get_error, 0},
 	{"discardError", es_browser_discard_error, 0},
-	{"executeScript", es_browser_execute_script, 1},
+	{"collectPerfData", es_browser_collect_perf_data, 1},
 	{"getPageSource", es_browser_get_page_source, 0},
 	{"getAlert", es_browser_get_alert, 0},
 	{0}
