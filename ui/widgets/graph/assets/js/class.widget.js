@@ -111,9 +111,7 @@ class CWidgetGraph extends CWidget {
 		}
 
 		if (this._is_graph_mode) {
-			if (time_period === null
-					|| this.isFieldsReferredDataUpdated('graphid')
-					|| this.isFieldsReferredDataUpdated('itemid')
+			if (this.isFieldsReferredDataUpdated('graphid') || this.isFieldsReferredDataUpdated('itemid')
 					|| this.isFieldsReferredDataUpdated('override_hostid')) {
 				this.clearContents();
 
