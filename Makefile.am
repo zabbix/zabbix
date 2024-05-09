@@ -10,6 +10,7 @@ SUBDIRS = \
 	misc
 
 EXTRA_DIST = \
+	README.md \
 	bin \
 	build \
 	ui \
