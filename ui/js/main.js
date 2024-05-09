@@ -1067,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Software version check initialization.
 
-	if (CSoftwareVersionCheck !== undefined) {
+	if (typeof CSoftwareVersionCheck !== 'undefined') {
 		ZABBIX.SoftwareVersionCheck = new CSoftwareVersionCheck();
 	}
 });
