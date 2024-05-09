@@ -4224,6 +4224,7 @@ static int	DBpatch_6050301(void)
 	zbx_vector_uint64_t	ids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
+	int			ret = SUCCEED;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -4247,16 +4248,23 @@ static int	DBpatch_6050301(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from widget_field where");
+	if (0 != ids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from widget_field where");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", ids.values, ids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", ids.values, ids.values_num);
+
+		if (zbx_db_execute("%s", sql) < ZBX_DB_OK)
+			ret = FAIL;
+		else
+			ret = SUCCEED;
+
+		zbx_free(sql);
+	}
 
 	zbx_vector_uint64_destroy(&ids);
 
-	if (zbx_db_execute("%s", sql) < ZBX_DB_OK)
-		return FAIL;
-
-	return SUCCEED;
+	return ret;
 }
 
 static int	DBpatch_6050302(void)
