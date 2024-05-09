@@ -82,7 +82,7 @@ class testUsersAuthentication extends CWebTest {
 		foreach ($hintboxes as $field => $text) {
 			// Summon the hint-box, assert text and close.
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->close();
 		}
