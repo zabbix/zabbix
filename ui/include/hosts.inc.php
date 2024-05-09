@@ -1154,7 +1154,7 @@ function isReadableHosts(array $hostids) {
  *
  * @return bool
  */
-function isReadableTemplates(array $templateids) {
+function isReadableTemplates(array $templateids) {//TODO:::DELETE
 	return count($templateids) == API::Template()->get([
 		'countOutput' => true,
 		'templateids' => $templateids

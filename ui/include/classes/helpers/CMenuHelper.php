@@ -136,6 +136,9 @@ class CMenuHelper {
 					->setAliases(['scheduledreport.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)
+				? (new CMenuItem(_('NEW Availability report')))->setAction('availabilityreport.list')
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)
 				? (new CMenuItem(_('Availability report')))
 					->setUrl(new CUrl('report2.php'), 'report2.php')
 					->setAliases(['chart4.php'])

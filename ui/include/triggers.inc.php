@@ -1920,7 +1920,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
  *
  * @return bool
  */
-function isReadableTriggers(array $triggerids) {
+function isReadableTriggers(array $triggerids) {//TODO:::DELETE
 	return count($triggerids) == API::Trigger()->get([
 		'triggerids' => $triggerids,
 		'countOutput' => true

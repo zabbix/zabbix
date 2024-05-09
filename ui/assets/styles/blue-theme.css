@@ -5056,6 +5056,9 @@ pre, pre a, pre td, pre span {
       text-overflow: ellipsis;
       overflow: hidden;
       max-width: 250px; }
+      .host-dashboard-header-navigation > ul li > span.wide,
+      .header-navigation > ul li > span.wide {
+        max-width: 580px; }
       .host-dashboard-header-navigation > ul li > span a,
       .header-navigation > ul li > span a {
         margin-top: 2px;

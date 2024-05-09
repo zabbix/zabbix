@@ -26,7 +26,7 @@
  *
  * @return bool
  */
-function isReadableHostGroups(array $groupids) {
+function isReadableHostGroups(array $groupids) {//TODO:::DELETE
 	return count($groupids) == API::HostGroup()->get([
 		'countOutput' => true,
 		'groupids' => $groupids
@@ -40,7 +40,7 @@ function isReadableHostGroups(array $groupids) {
  *
  * @return bool
  */
-function isReadableTemplateGroups(array $groupids) {
+function isReadableTemplateGroups(array $groupids) {//TODO:::DELETE
 	return count($groupids) == API::TemplateGroup()->get([
 		'countOutput' => true,
 		'groupids' => $groupids
