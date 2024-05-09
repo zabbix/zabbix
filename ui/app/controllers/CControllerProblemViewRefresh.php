@@ -85,6 +85,8 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			$data['filter_counters'] = [];
 
 			foreach ($filters as $index => $tabfilter) {
+				$this->getAvailableEntities($tabfilter);
+
 				if (!$tabfilter['filter_custom_time']) {
 					$tabfilter = [
 						'from' => $profile->from,

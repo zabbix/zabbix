@@ -110,6 +110,8 @@ class CControllerProblemView extends CControllerProblem {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
+		$this->getAvailableEntities($filter);
+
 		$refresh_curl = new CUrl('zabbix.php');
 		$filter['action'] = 'problem.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);

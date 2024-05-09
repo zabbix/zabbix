@@ -143,6 +143,7 @@ class CControllerLatestView extends CControllerLatest {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
+		$this->getAvailableEntities($filter);
 
 		$refresh_curl = new CUrl('zabbix.php');
 		$refresh_curl_params = ['action' => 'latest.view.refresh'] + $filter;
@@ -151,6 +152,7 @@ class CControllerLatestView extends CControllerLatest {
 		// data sort and pager
 		$sort_field = $this->getInput('sort', 'name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
+
 		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
 
 		// Prepare subfilter data.

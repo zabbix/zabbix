@@ -36,6 +36,8 @@ class CControllerHostViewRefresh extends CControllerHostView {
 			$filter_counters = [];
 
 			foreach ($filters as $index => $tabfilter) {
+				$this->getAvailableHostGroups($tabfilter);
+
 				$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
 

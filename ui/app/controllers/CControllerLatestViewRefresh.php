@@ -40,6 +40,8 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 					continue;
 				}
 
+				$this->getAvailableEntities($tabfilter);
+
 				$prepared_data = $this->prepareData($tabfilter, $tabfilter['sort'], $tabfilter['sortorder']);
 				$subfilters_fields = self::getSubfilterFields($tabfilter);
 				self::getSubfilters($subfilters_fields, $prepared_data);
@@ -56,6 +58,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$filter = static::FILTER_FIELDS_DEFAULT;
 			$this->getInputs($filter, array_keys($filter));
 			$filter = $this->cleanInput($filter);
+			$this->getAvailableEntities($filter);
 
 			// make data
 			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
