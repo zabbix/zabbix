@@ -4133,25 +4133,25 @@ static int	DBpatch_6050300(void)
 			"value_itemid", NULL);
 
 	result = zbx_db_select(
-			"select w.widgetid,i.value_type,wf.name,i.itemid,iname.name_resolved,wfs.value_int"
+			"select w.widgetid,i.value_type,i.itemid,iname.name_resolved,wfs.value_int"
 			" from widget w"
-				" join dashboard_page dp on w.dashboard_pageid = dp.dashboard_pageid"
-				" join dashboard d on dp.dashboardid = d.dashboardid"
-				" join widget_field wf on w.widgetid = wf.widgetid and wf.type = 4"
-				" join items i on wf.value_itemid = i.itemid"
-				" join item_rtname iname on wf.value_itemid = iname.itemid"
-				" left join widget_field wfs on w.widgetid = wfs.widgetid and wfs.name='show_as_html'"
-			" where w.type = 'plaintext'"
+				" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+				" join dashboard d on dp.dashboardid=d.dashboardid"
+				" join widget_field wf on w.widgetid=wf.widgetid and wf.type=4"
+				" join items i on wf.value_itemid=i.itemid"
+				" join item_rtname iname on wf.value_itemid=iname.itemid"
+				" left join widget_field wfs on w.widgetid=wfs.widgetid and wfs.name='show_as_html'"
+			" where w.type='plaintext'"
 				" and d.templateid is null"
 			" union"
-			" select w.widgetid,i.value_type,wf.name,i.itemid,i.name,wfs.value_int"
+			" select w.widgetid,i.value_type,i.itemid,i.name,wfs.value_int"
 			" from widget w"
-				" join dashboard_page dp on w.dashboard_pageid = dp.dashboard_pageid"
-				" join dashboard d on dp.dashboardid = d.dashboardid"
-				" join widget_field wf on w.widgetid = wf.widgetid and wf.type = 4"
-				" join items i on wf.value_itemid = i.itemid"
-				" left join widget_field wfs on w.widgetid = wfs.widgetid and wfs.name='show_as_html'"
-			" where w.type = 'plaintext'"
+				" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+				" join dashboard d on dp.dashboardid=d.dashboardid"
+				" join widget_field wf on w.widgetid=wf.widgetid and wf.type=4"
+				" join items i on wf.value_itemid=i.itemid"
+				" left join widget_field wfs on w.widgetid=wfs.widgetid and wfs.name='show_as_html'"
+			" where w.type='plaintext'"
 				" and d.templateid is not null"
 			" order by widgetid");
 
@@ -4159,22 +4159,19 @@ static int	DBpatch_6050300(void)
 	{
 		zbx_uint64_t	widgetid, itemid;
 		int		value_type, show_as_html;
-		const char	*field_name, *item_name;
+		const char	*item_name;
 		char		buf[64];
 
 		ZBX_STR2UINT64(widgetid, row[0]);
 		value_type = atoi(row[1]);
-		field_name = row[2];
-		ZBX_STR2UINT64(itemid, row[3]);
-		item_name = row[4];
-		show_as_html = atoi(ZBX_NULL2EMPTY_STR(row[5]));
+		ZBX_STR2UINT64(itemid, row[2]);
+		item_name = row[3];
+		show_as_html = atoi(ZBX_NULL2EMPTY_STR(row[4]));
 
 		if (widgetid != last_widgetid)
 			index = 0;
 		else
 			index++;
-
-		zabbix_log(LOG_LEVEL_WARNING, "REMOVEME %3lu) widgetid = %lu, value_type = %d, field_name = \"%s\", itemid = %lu, item_name = \"%s\", show_as_html = %d", index, widgetid, value_type, field_name, itemid, item_name, show_as_html);
 
 		zbx_snprintf(buf, sizeof(buf), "columns.%lu.name", index);
 		zbx_db_insert_add_values(&db_insert_str, __UINT64_C(0), widgetid, 1, buf, item_name);
