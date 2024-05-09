@@ -147,6 +147,11 @@ $map-hover-fill-color: #3a3a3a;
 $map-selected-fill-color: #4a4a4a;
 $map-selected-stroke-color: #383838;
 
+// Geomap.
+$geomap-marker-hover-fill: #3a3a3a;
+$geomap-marker-selected-fill: #4a4a4a;
+$geomap-marker-selected-stroke: #383838;
+
 // Statuses
 $problem-unack-fg-color: #ff3333;
 $problem-ack-fg-color: #ff3333;
@@ -177,7 +182,6 @@ $compact-view-tag-bg-color: $ui-bg-selected-color;
 // Import compare.
 $toc-title-color: #f2f2f2;
 $toc-title-bg-color: #4f4f4f;
-
 
 // Important! @import string should come after variables
 @import 'screen.scss';
