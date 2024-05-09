@@ -516,9 +516,10 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 	else
 	{
 		char		*statm_rss_str, *tmp_str;
-		zbx_uint64_t	rss = 0;
+		zbx_uint64_t	rss, psize;
 
-		zbx_uint64_t	psize = (zbx_uint64_t)getpagesize() / 1024;
+		psize = (zbx_uint64_t)getpagesize() / 1024;
+
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/statm", pid);
 		if (NULL == (f = fopen(tmp, "r")))
 			goto out;
