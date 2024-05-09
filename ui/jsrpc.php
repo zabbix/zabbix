@@ -926,7 +926,7 @@ switch ($data['method']) {
 				];
 			}
 			elseif ($scripts) {
-				$result = $scripts[$data['eventid']][$data['scriptid']];
+				$result = $scripts[$data['eventid']][0];
 			}
 		}
 		break;

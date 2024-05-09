@@ -1280,9 +1280,9 @@ class CScript extends CApiService {
 					}
 				}
 				unset($script);
-
-				$scripts = array_values($scripts);
 			}
+
+			$scripts = array_values($scripts);
 		}
 		unset($scripts);
 
