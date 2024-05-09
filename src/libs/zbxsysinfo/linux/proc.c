@@ -562,6 +562,8 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 			shared_huge = 0;
 			private = rss - shared;
 		}
+		private <<= 10;
+		shared <<= 10;
 	}
 
 	*bytes = shared + private + shared_huge;
