@@ -1083,11 +1083,15 @@ zabbix_export:
           key: 'mysql.db.discovery["{$MYSQL.DSN}","{$MYSQL.USER}","{$MYSQL.PASSWORD}"]'
           delay: 1h
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#DATABASE}'
-                value: information_schema
-                operator: NOT_MATCHES_REGEX
+                value: '{$MYSQL.DBNAME.MATCHES}'
                 formulaid: A
+              - macro: '{#DATABASE}'
+                value: '{$MYSQL.DBNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Scanning databases in DBMS.'
           item_prototypes:
             - uuid: e3e3c31483e94be2bd24b062bb049027
@@ -1402,6 +1406,12 @@ zabbix_export:
         - macro: '{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
           value: '30'
           description: 'The maximum number of temporary tables created in memory per second for trigger expressions.'
+        - macro: '{$MYSQL.DBNAME.MATCHES}'
+          value: .+
+          description: 'Filter of discoverable databases.'
+        - macro: '{$MYSQL.DBNAME.NOT_MATCHES}'
+          value: information_schema
+          description: 'Filter to exclude discovered databases.'
         - macro: '{$MYSQL.DSN}'
           value: '<Put your DSN>'
           description: 'System data source name such as <tcp://host:port or unix:/path/to/socket)/>.'
