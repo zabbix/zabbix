@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifdef HAVE_LIBCURL
+
 #include "browser_element.h"
 #include "browser_error.h"
 
@@ -38,8 +40,6 @@ typedef struct
 	zbx_webdriver_t	*wd;
 }
 zbx_wd_element_t;
-
-#ifdef HAVE_LIBCURL
 
 /******************************************************************************
  *                                                                            *
@@ -327,21 +327,6 @@ static const duk_function_list_entry	element_methods[] = {
 	{0}
 };
 
-#else
-
-static duk_ret_t	wd_element_ctor(duk_context *ctx)
-{
-	if (!duk_is_constructor_call(ctx))
-		return DUK_RET_EVAL_ERROR;
-
-	return duk_error(ctx, DUK_RET_EVAL_ERROR, "missing cURL library");
-}
-
-static const duk_function_list_entry	element_methods[] = {
-	{NULL, NULL, 0}
-};
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Purpose: create element and push it on stack                               *
@@ -380,3 +365,6 @@ void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_ve
 		duk_put_prop_index(ctx, arr, (duk_uarridx_t)i);
 	}
 }
+
+#endif
+

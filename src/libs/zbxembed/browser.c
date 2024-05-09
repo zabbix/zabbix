@@ -1053,7 +1053,11 @@ static int	es_init_browser(zbx_es_t *es, char **error)
 		return FAIL;
 	}
 
+#ifdef HAVE_LIBCURL
 	return es_browser_init_errors(es, error);
+#else
+	return SUCCEED;
+#endif
 }
 
 /******************************************************************************

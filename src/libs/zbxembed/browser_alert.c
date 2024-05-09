@@ -16,6 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#ifdef HAVE_LIBCURL
 
 #include "browser_alert.h"
 #include "browser_error.h"
@@ -200,3 +201,5 @@ void	wd_alert_create(duk_context *ctx, zbx_webdriver_t *wd, const char *text)
 	wd_alert_ctor(ctx, wd, text);
 	duk_put_function_list(ctx, -1, alert_methods);
 }
+
+#endif

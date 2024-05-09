@@ -20,6 +20,8 @@
 #ifndef ZABBIX_WEBDRIVER_H
 #define ZABBIX_WEBDRIVER_H
 
+#ifdef HAVE_LIBCURL
+
 #include "zbxembed.h"
 #include "embed.h"
 #include "browser_perf.h"
@@ -105,5 +107,7 @@ int	webdriver_accept_alert(zbx_webdriver_t *wd, char **error);
 int	webdriver_dismiss_alert(zbx_webdriver_t *wd, char **error);
 
 int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char **error);
+
+#endif
 
 #endif

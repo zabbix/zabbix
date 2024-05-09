@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifdef HAVE_LIBCURL
+
 #include "browser_error.h"
 #include "embed.h"
 
@@ -136,3 +138,5 @@ int	browser_push_error(duk_context *ctx, zbx_webdriver_t *wd, const char *format
 
 	return duk_get_top_index(ctx);
 }
+
+#endif

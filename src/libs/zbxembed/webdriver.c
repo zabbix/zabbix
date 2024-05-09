@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifdef HAVE_LIBCURL
+
 #include "webdriver.h"
 #include "zbxcommon.h"
 #include "zbxstr.h"
-
-#ifdef HAVE_LIBCURL
 
 #define WEBDRIVER_INVALID_SESSIONID_ERROR	"invalid session id"
 
