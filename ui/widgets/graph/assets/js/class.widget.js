@@ -20,17 +20,11 @@
 
 class CWidgetGraph extends CWidget {
 
-	#override_hostid = null;
-
 	onInitialize() {
 		this._is_graph_mode = false;
 	}
 
 	onStart() {
-		if (this.getFieldsReferredData().has('override_hostid')) {
-			this.#override_hostid = this.getFieldsReferredData().get('override_hostid').value;
-		}
-
 		this.events_handlers = {
 			rangeUpdate: (e) => {
 				if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
@@ -117,24 +111,13 @@ class CWidgetGraph extends CWidget {
 		}
 
 		if (this._is_graph_mode) {
-			if (time_period === null) {
-				this._is_graph_mode = false;
-				this._deactivateGraph();
+			if (time_period === null
+					|| this.isFieldsReferredDataUpdated('graphid')
+					|| this.isFieldsReferredDataUpdated('itemid')
+					|| this.isFieldsReferredDataUpdated('override_hostid')) {
+				this.clearContents();
 
 				return super.promiseUpdate();
-			}
-
-			if (this.getFieldsReferredData().has('override_hostid')) {
-				const override_hostid = this.getFieldsReferredData().get('override_hostid').value;
-
-				if (this.#override_hostid !== override_hostid) {
-					this.#override_hostid = override_hostid;
-
-					this._is_graph_mode = false;
-					this._deactivateGraph();
-
-					return super.promiseUpdate();
-				}
 			}
 
 			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`], time_period);
