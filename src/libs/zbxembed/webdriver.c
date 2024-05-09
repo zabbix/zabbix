@@ -89,7 +89,13 @@ static int	webdriver_get_value(const char *response, struct zbx_json_parse *jp, 
 	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp_resp, "value", jp))
-		jp->start = jp->end = zbx_json_pair_by_name(&jp_resp, "value");
+	{
+		if (NULL == (jp->start = jp->end = zbx_json_pair_by_name(&jp_resp, "value")))
+		{
+			*error = zbx_dsprintf(NULL, "cannot parse webdriver response: %s", zbx_json_strerror());
+			return FAIL;
+		}
+	}
 
 	return SUCCEED;
 }
