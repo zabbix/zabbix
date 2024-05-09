@@ -2553,7 +2553,7 @@ function getInheritedTimeouts(string $proxyid): array {
 		$db_proxies = API::Proxy()->get([
 			'output' => ['custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script'
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			],
 			'proxyids' => $proxyid,
 			'nopermissions' => true
@@ -2574,7 +2574,8 @@ function getInheritedTimeouts(string $proxyid): array {
 					ITEM_TYPE_TELNET => $db_proxy['timeout_telnet_agent'],
 					ITEM_TYPE_HTTPAGENT => $db_proxy['timeout_http_agent'],
 					ITEM_TYPE_SNMP => $db_proxy['timeout_snmp_agent'],
-					ITEM_TYPE_SCRIPT => $db_proxy['timeout_script']
+					ITEM_TYPE_SCRIPT => $db_proxy['timeout_script'],
+					ITEM_TYPE_BROWSER => $db_proxy['timeout_browser']
 				]
 			];
 		}
@@ -2593,7 +2594,8 @@ function getInheritedTimeouts(string $proxyid): array {
 			ITEM_TYPE_TELNET => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
 			ITEM_TYPE_HTTPAGENT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_HTTP_AGENT),
 			ITEM_TYPE_SNMP => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SNMP_AGENT),
-			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
+			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
+			ITEM_TYPE_BROWSER => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
 		]
 	];
 }

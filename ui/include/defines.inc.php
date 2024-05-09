@@ -610,6 +610,7 @@ define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
 define('ITEM_TYPE_SNMP',			20);
 define('ITEM_TYPE_SCRIPT',			21);
+define('ITEM_TYPE_BROWSER',			22);
 
 define('SNMP_V1', 1);
 define('SNMP_V2C', 2);
