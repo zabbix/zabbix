@@ -192,7 +192,7 @@ $formgrid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('js-item-script-label'),
 		(new CFormField(
-			(new CMultilineInput('script', $item['params'], [
+			(new CMultilineInput('script', $item['script'], [
 				'title' => _('JavaScript'),
 				'placeholder' => _('script'),
 				'placeholder_textarea' => 'return value',
@@ -210,7 +210,7 @@ $formgrid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('js-item-browser-script-label'),
 		(new CFormField(
-			(new CMultilineInput('browser_script', $item['params'], [
+			(new CMultilineInput('browser_script', $item['browser_script'], [
 				'title' => _('JavaScript'),
 				'placeholder' => _('script'),
 				'placeholder_textarea' => 'return value',
@@ -593,7 +593,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-executed-script-label'),
 		(new CFormField(
-			(new CTextArea('params_es', $item['params']))
+			(new CTextArea('params_es', $item['params_es']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -606,7 +606,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-sql-query-label'),
 		(new CFormField(
-			(new CTextArea('params_ap', $item['params']))
+			(new CTextArea('params_ap', $item['params_ap']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -619,7 +619,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-formula-label'),
 		(new CFormField(
-			(new CTextArea('params_f', $item['params']))
+			(new CTextArea('params_f', $item['params_f']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()

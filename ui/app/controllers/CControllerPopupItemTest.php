@@ -196,6 +196,10 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
+		'browser_script' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
 		'timeout' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -505,8 +509,11 @@ abstract class CControllerPopupItemTest extends CController {
 				break;
 
 			case ITEM_TYPE_SCRIPT:
-			case ITEM_TYPE_BROWSER:
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'parameters', 'script', 'timeout']);
+				break;
+
+			case ITEM_TYPE_BROWSER:
+				$data_item += CArrayHelper::getByKeys($input, ['key', 'parameters', 'browser_script', 'timeout']);
 				break;
 		}
 
@@ -1189,6 +1196,7 @@ abstract class CControllerPopupItemTest extends CController {
 			'params_es' => 'params',
 			'params_f' => 'params',
 			'script' => 'params',
+			'browser_script' => 'params',
 			'http_username' => 'username',
 			'http_password' => 'password',
 			'http_authtype' => 'authtype',

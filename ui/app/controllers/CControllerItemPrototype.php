@@ -46,6 +46,7 @@ abstract class CControllerItemPrototype extends CController {
 			'query_fields'			=> 'array',
 			'parameters'			=> 'array',
 			'script'				=> 'db items.params',
+			'browser_script'		=> 'db items.params',
 			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'custom_timeout'		=> 'in '.implode(',', [ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
 			'timeout'				=> 'db items.timeout',

@@ -54,6 +54,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
 			'script'				=> 'string',
+			'browser_script'		=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',

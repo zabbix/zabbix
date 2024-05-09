@@ -244,7 +244,7 @@
 				properties = {
 					key: form_data['key'].trim(),
 					parameters: form_data['parameters'],
-					script: form_data['browser_script'],
+					browser_script: form_data['browser_script'],
 					timeout: form_data['timeout']
 				};
 				break;
