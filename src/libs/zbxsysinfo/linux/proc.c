@@ -463,7 +463,7 @@ static int	byte_value_from_str(char *srcstr, const char *label, zbx_uint64_t *by
  ******************************************************************************/
 static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 {
-	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0, rss = 0;
+	zbx_uint64_t	shared = 0, private = 0, private_huge = 0, shared_huge = 0;
 	FILE		*f;
 	char		tmp[MAX_STRING_LEN];
 
@@ -515,7 +515,8 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 	}
 	else
 	{
-		char	*statm_rss_str, *tmp_str;
+		char		*statm_rss_str, *tmp_str;
+		zbx_uint64_t	rss = 0;
 
 		zbx_uint64_t	psize = (zbx_uint64_t)getpagesize() / 1024;
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/statm", pid);
@@ -560,7 +561,6 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 			shared_huge = 0;
 			private = rss - shared;
 		}
-
 	}
 
 	*bytes = shared + private + shared_huge;
