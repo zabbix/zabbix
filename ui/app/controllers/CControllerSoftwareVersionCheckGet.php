@@ -45,6 +45,7 @@ class CControllerSoftwareVersionCheckGet extends CController {
 				'lastcheck_success' => 0,
 				'nextcheck' => 0
 			];
+			unset($data['versions']);
 			$data['major_version'] = ZABBIX_EXPORT_VERSION;
 			$data['check_hash'] = CSettingsHelper::getPrivate(CSettingsHelper::SOFTWARE_UPDATE_CHECKID);
 			$data['_csrf_token'] = CCsrfTokenHelper::get('softwareversioncheck');
