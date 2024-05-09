@@ -847,7 +847,7 @@ out:
  * Stack 0 - bookmark (string/null, optional)                                 *
  *                                                                            *
  ******************************************************************************/
-static duk_ret_t	es_browser_collect_perf_data(duk_context *ctx)
+static duk_ret_t	es_browser_collect_perf_entries(duk_context *ctx)
 {
 	int		err_index = -1;
 	zbx_webdriver_t	*wd;
@@ -896,7 +896,7 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"setError", es_browser_set_error, 1},
 	{"getError", es_browser_get_error, 0},
 	{"discardError", es_browser_discard_error, 0},
-	{"collectPerfData", es_browser_collect_perf_data, 1},
+	{"collectPerfEntries", es_browser_collect_perf_entries, 1},
 	{"getPageSource", es_browser_get_page_source, 0},
 	{"getAlert", es_browser_get_alert, 0},
 	{0}
