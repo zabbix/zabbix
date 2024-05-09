@@ -16,7 +16,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifdef HAVE_LIBCURL
 
 #include "browser_alert.h"
 #include "browser_error.h"
@@ -32,6 +31,8 @@
 #include "zbxcurl.h"
 #include "global.h"
 #include "zbxjson.h"
+
+#ifdef HAVE_LIBCURL
 
 typedef struct
 {

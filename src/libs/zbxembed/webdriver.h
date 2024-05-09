@@ -20,6 +20,8 @@
 #ifndef ZABBIX_WEBDRIVER_H
 #define ZABBIX_WEBDRIVER_H
 
+#include "zbxcommon.h"
+
 #ifdef HAVE_LIBCURL
 
 #include "zbxembed.h"

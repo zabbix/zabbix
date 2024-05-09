@@ -20,6 +20,8 @@
 #ifndef ZABBIX_BROWSER_ALERT_H
 #define ZABBIX_BROWSER_ALERT_H
 
+#include "zbxcommon.h"
+
 #ifdef HAVE_LIBCURL
 
 #include "zbxembed.h"
