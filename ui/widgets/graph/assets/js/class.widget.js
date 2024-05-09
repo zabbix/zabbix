@@ -110,9 +110,14 @@ class CWidgetGraph extends CWidget {
 			});
 		}
 
+		if (this.isFieldsReferredDataUpdated()) {
+			this.clearContents();
+
+			return super.promiseUpdate();
+		}
+
 		if (this._is_graph_mode) {
-			if (this.isFieldsReferredDataUpdated('graphid') || this.isFieldsReferredDataUpdated('itemid')
-					|| this.isFieldsReferredDataUpdated('override_hostid')) {
+			if (this.isFieldsReferredDataUpdated()) {
 				this.clearContents();
 
 				return super.promiseUpdate();
@@ -160,10 +165,6 @@ class CWidgetGraph extends CWidget {
 
 	setContents(response) {
 		super.setContents(response);
-
-		if (this.getFieldsData().time_period === null) {
-			return;
-		}
 
 		if (!this._is_graph_mode && 'async_data' in response) {
 			this._is_graph_mode = true;

@@ -45,18 +45,14 @@ class CWidgetGauge extends CWidget {
 	}
 
 	getUpdateRequestData() {
-		const with_config = this.gauge === null
-			|| this.isFieldsReferredDataUpdated('itemid')
-			|| this.isFieldsReferredDataUpdated('override_hostid');
-
 		return {
 			...super.getUpdateRequestData(),
-			with_config: with_config ? 1 : undefined
+			with_config: (this.gauge === null || this.isFieldsReferredDataUpdated()) ? 1 : undefined
 		};
 	}
 
 	setContents(response) {
-		if (this.isFieldsReferredDataUpdated('itemid') || this.isFieldsReferredDataUpdated('override_hostid')) {
+		if (this.isFieldsReferredDataUpdated()) {
 			this.clearContents();
 		}
 

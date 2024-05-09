@@ -627,9 +627,15 @@ class CWidgetBase {
 	/**
 	 * Check whether the referred fields data has been updated since the last update cycle.
 	 *
+	 * @param   {string|null} path  Null will match any updated referred fields data.
+	 *
 	 * @returns {boolean}
 	 */
-	isFieldsReferredDataUpdated(path) {
+	isFieldsReferredDataUpdated(path = null) {
+		if (path === null) {
+			return this.#fields_referred_data_updated.size > 0;
+		}
+
 		return this.#fields_referred_data_updated.has(path);
 	}
 
