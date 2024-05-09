@@ -684,6 +684,12 @@ void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struc
 
 		if (0 == strcmp(buf, WD_PERF_ENTRY_NAVIGATION))
 		{
+			if (NULL != details.navigation)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "duplicate navigation entry type found in performance"
+						" data");
+				continue;
+			}
 			details.navigation = wd_perf_entry_create_from_json(&jp_entry);
 
 			entry = wd_perf_entry_aggregate_common_data(details.navigation);
