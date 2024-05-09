@@ -58,7 +58,7 @@ static int	webdriver_curl_check_error(CURLcode err, CURLoption opt, char **error
 	if (CURLE_OK == err)
 		return SUCCEED;
 
-	*error = zbx_dsprintf(NULL, "cannot set cURL option %d: %s.", opt, curl_easy_strerror(err));
+	*error = zbx_dsprintf(NULL, "cannot set cURL option %u: %s.", opt, curl_easy_strerror(err));
 
 	return FAIL;
 }
