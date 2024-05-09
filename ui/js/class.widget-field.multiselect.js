@@ -352,6 +352,8 @@ class CWidgetFieldMultiselect {
 			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
 		});
 
+		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));
+
 		const result = [];
 
 		for (const widget of widgets) {
