@@ -293,9 +293,18 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'fields' => [
 						'Columns' => '16',
+						'Rows' => '2'
+					],
+					'screenshot_id' => '48x2'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Columns' => '16',
 						'Rows' => '3'
 					],
-					'screenshot_id' => 'stub16x3'
+					'screenshot_id' => 'stub49x3'
 				]
 			],
 			[
@@ -304,7 +313,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 						'Columns' => '17',
 						'Rows' => '2'
 					],
-					'screenshot_id' => 'stub17x2'
+					'screenshot_id' => 'stub72x2'
 				]
 			]
 		];
