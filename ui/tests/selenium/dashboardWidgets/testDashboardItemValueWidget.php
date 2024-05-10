@@ -271,7 +271,7 @@ class testDashboardItemValueWidget extends testWidgets {
 							$warning_button->click();
 
 							// Check hintbox text.
-							$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+							$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
 							$this->assertEquals($hint_text, $hint_dialog->getText());
 
 							// Close the hintbox.
