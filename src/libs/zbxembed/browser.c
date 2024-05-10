@@ -464,9 +464,13 @@ static duk_ret_t	es_browser_get_result(duk_context *ctx)
 		duk_idx_t		idx;
 		zbx_wd_perf_details_t	*details = &wd->perf.details.values[i];
 
-		idx = duk_push_object(ctx);
-		es_browser_push_performance_entry(ctx, details->navigation);
-		duk_put_prop_string(ctx, idx, "navigation");
+		if (NULL != details->navigation)
+		{
+			idx = duk_push_object(ctx);
+			es_browser_push_performance_entry(ctx, details->navigation);
+			duk_put_prop_string(ctx, idx, "navigation");
+		}
+
 		es_browser_push_performance_entry(ctx, details->resource);
 		duk_put_prop_string(ctx, idx, "resource");
 
@@ -874,7 +878,7 @@ static duk_ret_t	es_browser_collect_perf_entries(duk_context *ctx)
 
 	wd = es_webdriver(ctx);
 
-	if (!duk_is_null(ctx, 0))
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
 	{
 		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &bookmark))
 		{

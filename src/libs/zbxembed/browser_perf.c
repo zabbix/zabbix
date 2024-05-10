@@ -670,8 +670,13 @@ void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struc
 	const char		*p = NULL;
 	zbx_wd_perf_entry_t	*entry, *resource;
 	zbx_wd_perf_details_t	details = {0};
+	zbx_wd_attr_t	attr;
 
 	zbx_vector_wd_perf_entry_ptr_create(&details.user);
+
+	details.resource =  wd_perf_entry_create();
+	wd_perf_init_attribute_from_dbl(&attr, WD_PERF_ATTR_COUNT, 0.0);
+	wd_perf_entry_set_attribute(details.resource, &attr);
 
 	while (NULL != (p = zbx_json_next(jp, p)))
 	{
@@ -710,15 +715,8 @@ void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struc
 			wd_perf_entry_merge(perf->resource_summary, entry);
 			wd_perf_entry_set_min_protocol(perf->resource_summary, resource);
 
-			if (NULL == details.resource)
-			{
-				details.resource = entry;
-			}
-			else
-			{
-				wd_perf_entry_merge(details.resource, entry);
-				wd_perf_entry_free(entry);
-			}
+			wd_perf_entry_merge(details.resource, entry);
+			wd_perf_entry_free(entry);
 
 			wd_perf_entry_set_min_protocol(details.resource, resource);
 			wd_perf_entry_free(resource);
@@ -758,6 +756,13 @@ void	wd_perf_init(zbx_wd_perf_t *perf)
 	perf->navigation_summary = wd_perf_entry_create();
 	perf->resource_summary = wd_perf_entry_create();
 
+	zbx_wd_attr_t	attr;
+
+	wd_perf_init_attribute_from_dbl(&attr, WD_PERF_ATTR_COUNT, 0.0);
+	wd_perf_entry_set_attribute(perf->navigation_summary, &attr);
+
+	wd_perf_init_attribute_from_dbl(&attr, WD_PERF_ATTR_COUNT, 0.0);
+	wd_perf_entry_set_attribute(perf->resource_summary, &attr);
 }
 
 /******************************************************************************
