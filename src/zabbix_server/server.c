@@ -852,12 +852,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != config_webdriver_url && 0 != zbx_strncasecmp(config_webdriver_url, "http", 4))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"WebDriverURL\" configuration parameter supports only http(s) protocol");
-		err = 1;
-	}
-
 	if (0 != err)
 		exit(EXIT_FAILURE);
 }

@@ -23,6 +23,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -347,6 +348,9 @@ zbx_webdriver_t	*webdriver_create(const char *endpoint, const char *sourceip, ch
 	{
 		goto out;
 	}
+
+	if (SUCCEED != zbx_curl_setopt_https(wd->handle, error))
+		goto out;
 
 	wd->refcount = 1;
 	wd->screen_width = 1920;
