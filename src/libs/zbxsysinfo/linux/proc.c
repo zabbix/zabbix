@@ -2343,7 +2343,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			JSON_ADD_PROC_VALUE("ctx_switches", pdata->ctx_switches);
 			JSON_ADD_PROC_VALUE("threads", pdata->threads);
 			JSON_ADD_PROC_VALUE("page_faults", pdata->page_faults);
-			JSON_ADD_PROC_VALUE("memory", pdata->memory);
+			JSON_ADD_PROC_VALUE("pss", pdata->memory);
 		}
 		else if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
 		{
@@ -2383,7 +2383,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			JSON_ADD_PROC_VALUE("ctx_switches", pdata->ctx_switches);
 			JSON_ADD_PROC_VALUE("threads", pdata->threads);
 			JSON_ADD_PROC_VALUE("page_faults", pdata->page_faults);
-			JSON_ADD_PROC_VALUE("memory", pdata->memory);
+			JSON_ADD_PROC_VALUE("pss", pdata->memory);
 		}
 
 		zbx_json_close(&j);
