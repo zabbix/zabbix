@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-use Widgets\PlainText\Includes\CWidgetFieldColumnsList;
+use Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 
 $form = (new CForm())
 	->setId('item_history_column_edit_form')

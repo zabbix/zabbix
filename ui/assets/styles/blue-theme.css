@@ -4761,19 +4761,19 @@ div.dashboard-widget-piechart {
   div.dashboard-widget-piechart .dashboard-grid-widget-body svg {
     display: block; }
 
-form.dashboard-widget-plaintext #list_columns .overflow-ellipsis {
+form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
   max-width: 250px; }
-form.dashboard-widget-plaintext #list_columns .inaccessible {
+form.dashboard-widget-itemhistory #list_columns .inaccessible {
   color: #acbbc2; }
 
-div.dashboard-widget-plaintext td {
+div.dashboard-widget-itemhistory td {
   height: 20px;
   line-height: 20px;
   vertical-align: middle; }
-div.dashboard-widget-plaintext z-bar-gauge {
+div.dashboard-widget-itemhistory z-bar-gauge {
   min-width: 64px;
   height: 20px; }
-div.dashboard-widget-plaintext .image-data-preview {
+div.dashboard-widget-itemhistory .image-data-preview {
   display: block;
   width: 100px;
   height: 56px;

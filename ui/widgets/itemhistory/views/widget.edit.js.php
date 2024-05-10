@@ -21,7 +21,7 @@
 
 ?>
 
-window.widget_plaintext_form = new class {
+window.widget_itemhistory_form = new class {
 
 	#form;
 	#templateid;
@@ -52,7 +52,7 @@ window.widget_plaintext_form = new class {
 				this.#column_index = this.#list_columns.querySelectorAll('tr').length;
 
 				column_popup = PopUp(
-					'widget.plaintext.column.edit',
+					'widget.itemhistory.column.edit',
 					{templateid: this.#templateid},
 					{
 						dialogueid: 'item-history-column-edit-overlay',
@@ -70,7 +70,7 @@ window.widget_plaintext_form = new class {
 				this.#column_index = target.closest('tr').querySelector('[name="sort_order[columns][]"]').value;
 
 				column_popup = PopUp(
-					'widget.plaintext.column.edit',
+					'widget.itemhistory.column.edit',
 					{
 						...form_fields.columns[this.#column_index],
 						edit: 1,

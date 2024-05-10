@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\PlainText\Includes;
+namespace Widgets\ItemHistory\Includes;
 
 use CButton,
 	CCol,

@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\PlainText\Includes\CWidgetFieldColumnsList;
+use Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 
 ?>
 

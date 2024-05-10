@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\PlainText\Actions;
+namespace Widgets\ItemHistory\Actions;
 
 use API,
 	CControllerDashboardWidgetView,
@@ -29,7 +29,7 @@ use API,
 	CSettingsHelper,
 	Manager;
 
-use	Widgets\PlainText\Includes\CWidgetFieldColumnsList;
+use	Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
 

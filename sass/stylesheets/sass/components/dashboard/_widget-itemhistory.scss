@@ -1,6 +1,6 @@
 // Widget configuration.
 
-form.dashboard-widget-plaintext {
+form.dashboard-widget-itemhistory {
 	#list_columns {
 		.overflow-ellipsis {
 			max-width: 250px;
@@ -15,7 +15,7 @@ form.dashboard-widget-plaintext {
 // Widget view.
 $bar-gauge-height: 20px;
 
-div.dashboard-widget-plaintext {
+div.dashboard-widget-itemhistory {
 	td {
 		height: 20px;
 		line-height: $bar-gauge-height;

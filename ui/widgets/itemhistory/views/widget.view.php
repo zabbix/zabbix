@@ -26,8 +26,8 @@
  * @var array $data
  */
 
-use Widgets\PlainText\Widget;
-use Widgets\PlainText\Includes\{
+use Widgets\ItemHistory\Widget;
+use Widgets\ItemHistory\Includes\{
 	WidgetForm,
 	CWidgetFieldColumnsList
 };
@@ -197,7 +197,7 @@ else {
 				case ITEM_VALUE_TYPE_BINARY:
 					if (array_key_exists('display_as_image', $column) && $column['display_as_image'] != 0) {
 						$data_url = (new CUrl($_SERVER['REQUEST_URI']))
-							->setArgument('action', 'widget.plaintext.data_binary.get')
+							->setArgument('action', 'widget.item_history.data_binary.get')
 							->setArgument('itemid', $column['itemid'])
 							->setArgument('clock', $item_value['clock'])
 							->setArgument('ns', $item_value['ns']);

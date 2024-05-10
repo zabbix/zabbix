@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\PlainText;
+namespace Widgets\ItemHistory;
 
 use Zabbix\Core\CWidget;
 

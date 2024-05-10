@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\PlainText\Actions;
+namespace Widgets\ItemHistory\Actions;
 
 use API,
 	CController,
@@ -27,7 +27,7 @@ use API,
 	CNumberParser,
 	CParser;
 
-use Widgets\PlainText\Includes\CWidgetFieldColumnsList;
+use Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 
 class ColumnEdit extends CController {
 

@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\PlainText\Actions;
+namespace Widgets\ItemHistory\Actions;
 
 use API,
 	CController,

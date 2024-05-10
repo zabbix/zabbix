@@ -1,9 +1,9 @@
 {
 	"manifest_version": 2.0,
-	"id": "plaintext",
+	"id": "itemhistory",
 	"type": "widget",
 	"name": "Item history",
-	"namespace": "PlainText",
+	"namespace": "ItemHistory",
 	"version": "1.0",
 	"author": "Zabbix",
 	"description": "Displays the latest data for the selected items with an option to add progress bar visualizations, customize report columns, and display images for binary data types.",
@@ -15,15 +15,15 @@
 		}
 	},
 	"actions": {
-		"widget.plaintext.view": {
+		"widget.itemhistory.view": {
 			"class": "WidgetView"
 		},
-		"widget.plaintext.column.edit": {
+		"widget.itemhistory.column.edit": {
 			"class": "ColumnEdit",
 			"view": "column.edit",
 			"layout": "layout.json"
 		},
-		"widget.plaintext.data_binary.get": {
+		"widget.itemhistory.data_binary.get": {
 			"class": "DataBinary",
 			"layout": "layout.image"
 		}

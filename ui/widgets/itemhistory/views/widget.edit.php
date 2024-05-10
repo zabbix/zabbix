@@ -26,7 +26,7 @@
  * @var array $data
  */
 
-use Widgets\PlainText\Includes\CWidgetFieldColumnsListView;
+use Widgets\ItemHistory\Includes\CWidgetFieldColumnsListView;
 
 (new CWidgetFormView($data))
 	->addField(
@@ -55,7 +55,7 @@ use Widgets\PlainText\Includes\CWidgetFieldColumnsListView;
 			)
 	)
 	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_plaintext_form.init('.json_encode([
+	->addJavaScript('widget_itemhistory_form.init('.json_encode([
 			'templateid' => $data['templateid']
 		], JSON_THROW_ON_ERROR).');')
 	->show();
