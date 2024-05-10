@@ -818,7 +818,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					if ($class !== 'color-positive') {
 						// Click on icon and open hint.
 						$icon->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
+						$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
 								->waitUntilReady()->one();
 						$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
 

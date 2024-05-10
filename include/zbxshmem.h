@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SHMEM_H
 #define ZABBIX_SHMEM_H
 
-#include "zbxtypes.h"
+#include "zbxnix.h"
 
 #define SHMEM_MIN_ALLOC	24		/* should be a multiple of 8 and at least (2 * ZBX_PTR_SIZE) */
 

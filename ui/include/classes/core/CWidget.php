@@ -42,7 +42,7 @@ class CWidget extends CModule {
 
 	public const DEFAULT_FORM_CLASS		= 'WidgetForm';
 	public const DEFAULT_JS_CLASS		= 'CWidget';
-	public const DEFAULT_SIZE			= ['width' => 12, 'height' => 5];
+	public const DEFAULT_SIZE			= ['width' => 36, 'height' => 5];
 	public const DEFAULT_REFRESH_RATE	= 60;
 
 	final public function getForm(array $values, ?string $templateid): CWidgetForm {
@@ -163,12 +163,12 @@ class CWidget extends CModule {
 			$size['width'] = DASHBOARD_MAX_COLUMNS;
 		}
 
-		if ($size['height'] < DASHBOARD_WIDGET_MIN_ROWS) {
-			$size['height'] = DASHBOARD_WIDGET_MIN_ROWS;
+		if ($size['height'] < 1) {
+			$size['height'] = 1;
 		}
 
-		if ($size['height'] > DASHBOARD_WIDGET_MAX_ROWS) {
-			$size['height'] = DASHBOARD_WIDGET_MAX_ROWS;
+		if ($size['height'] > DASHBOARD_MAX_ROWS) {
+			$size['height'] = DASHBOARD_MAX_ROWS;
 		}
 
 		return $size;

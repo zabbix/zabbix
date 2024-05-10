@@ -195,6 +195,8 @@ class C64ImportConverter extends CConverter {
 				}
 				unset($message_template);
 			}
+
+			$media_type = CArrayHelper::renameKeys($media_type, ['content_type' => 'message_format']);
 		}
 		unset($media_type);
 
@@ -385,6 +387,19 @@ class C64ImportConverter extends CConverter {
 							);
 						}
 						unset($field);
+					}
+
+					if (array_key_exists('x', $widget) && is_numeric($widget['x'])) {
+						$widget['x'] = (string) ((int) $widget['x'] * 3);
+					}
+
+					if (array_key_exists('width', $widget)) {
+						if (is_numeric($widget['width'])) {
+							$widget['width'] = (string) ((int) $widget['width'] * 3);
+						}
+					}
+					else {
+						$widget['width'] = '3';
 					}
 				}
 				unset($widget);

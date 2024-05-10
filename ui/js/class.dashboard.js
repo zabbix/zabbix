@@ -59,8 +59,6 @@ class CDashboard {
 		cell_height,
 		max_columns,
 		max_rows,
-		widget_min_rows,
-		widget_max_rows,
 		widget_defaults,
 		widget_last_type = null,
 		configuration_hash = null,
@@ -99,8 +97,6 @@ class CDashboard {
 		this._cell_height = cell_height;
 		this._max_columns = max_columns;
 		this._max_rows = max_rows;
-		this._widget_min_rows = widget_min_rows;
-		this._widget_max_rows = widget_max_rows;
 		this._widget_defaults = {...widget_defaults};
 		this._widget_last_type = widget_last_type;
 		this._configuration_hash = configuration_hash;
@@ -496,7 +492,6 @@ class CDashboard {
 			},
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
-			min_rows: this._widget_min_rows,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
 			csrf_token: this._csrf_token,
@@ -528,7 +523,6 @@ class CDashboard {
 			},
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
-			min_rows: this._widget_min_rows,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
 			csrf_token: this._csrf_token,
@@ -617,8 +611,6 @@ class CDashboard {
 			cell_height: this._cell_height,
 			max_columns: this._max_columns,
 			max_rows: this._max_rows,
-			widget_min_rows: this._widget_min_rows,
-			widget_max_rows: this._widget_max_rows,
 			widget_defaults: this._widget_defaults,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,

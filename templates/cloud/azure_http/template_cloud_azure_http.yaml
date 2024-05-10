@@ -2536,7 +2536,7 @@ zabbix_export:
             - name: 'Storage transactions'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -2553,7 +2553,7 @@ zabbix_export:
             - name: 'Storage engress'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -2570,7 +2570,7 @@ zabbix_export:
             - name: 'Storage ingress'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '20'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -3185,7 +3185,7 @@ zabbix_export:
             - widgets:
                 - type: item
                   name: 'Service Availability'
-                  width: '6'
+                  width: '18'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -3219,7 +3219,7 @@ zabbix_export:
                       value: 66BB6A
                 - type: graph
                   'y': '4'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -3232,7 +3232,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '9'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -3245,7 +3245,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   'y': '14'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -3258,8 +3258,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Provisioned Throughput'
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -3272,8 +3272,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Normalized RU Consumption'
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -3289,8 +3289,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Document Count'
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -4110,7 +4110,7 @@ zabbix_export:
             - name: 'Monthly costs'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -4127,7 +4127,7 @@ zabbix_export:
             - name: 'Monthly costs by service'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -4144,7 +4144,7 @@ zabbix_export:
             - name: 'Monthly costs by location'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -4161,7 +4161,7 @@ zabbix_export:
             - name: 'Monthly costs by resource group'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -4178,7 +4178,7 @@ zabbix_export:
             - name: 'Daily costs by service'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '20'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -5067,7 +5067,7 @@ zabbix_export:
             - widgets:
                 - type: item
                   name: Deadlocks
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: INTEGER
@@ -5087,7 +5087,7 @@ zabbix_export:
                 - type: item
                   name: 'SQL Server process memory percent'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5107,7 +5107,7 @@ zabbix_export:
                 - type: item
                   name: 'CPU limit'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5124,7 +5124,7 @@ zabbix_export:
                 - type: item
                   name: 'Data space allocated'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5141,7 +5141,7 @@ zabbix_export:
                 - type: item
                   name: 'Connections successful'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5157,8 +5157,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Availability state'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5177,9 +5177,9 @@ zabbix_export:
                       value: FF0000
                 - type: item
                   name: 'SQL Server process core percent'
-                  x: '4'
+                  x: '12'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5198,9 +5198,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'CPU used'
-                  x: '4'
+                  x: '12'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5216,9 +5216,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Data space used'
-                  x: '4'
+                  x: '12'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5234,9 +5234,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Connections failed: System errors'
-                  x: '4'
+                  x: '12'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5252,8 +5252,8 @@ zabbix_export:
                       value: '2'
                 - type: plaintext
                   name: 'Availability status detailed'
-                  x: '8'
-                  width: '16'
+                  x: '24'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5266,9 +5266,9 @@ zabbix_export:
                       value: '1'
                 - type: item
                   name: 'Sessions count'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5284,9 +5284,9 @@ zabbix_export:
                       value: '2'
                 - type: graph
                   name: 'Percentage CPU'
-                  x: '8'
+                  x: '24'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -5299,9 +5299,9 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Storage utilization'
-                  x: '8'
+                  x: '24'
                   'y': '9'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -5314,9 +5314,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: Connections
-                  x: '8'
+                  x: '24'
                   'y': '12'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -5329,9 +5329,9 @@ zabbix_export:
                       value: AAAAC
                 - type: item
                   name: 'Workers percentage'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5350,9 +5350,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'Full backup storage size'
-                  x: '16'
+                  x: '48'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -5368,9 +5368,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Data IO percentage'
-                  x: '20'
+                  x: '60'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6235,7 +6235,7 @@ zabbix_export:
             - widgets:
                 - type: item
                   name: Deadlocks
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: INTEGER
@@ -6255,7 +6255,7 @@ zabbix_export:
                 - type: item
                   name: 'SQL Server process memory percent'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6275,7 +6275,7 @@ zabbix_export:
                 - type: item
                   name: 'CPU limit'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6292,7 +6292,7 @@ zabbix_export:
                 - type: item
                   name: 'Data space allocated'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6309,7 +6309,7 @@ zabbix_export:
                 - type: item
                   name: 'Connections successful'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6325,8 +6325,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Availability state'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6345,9 +6345,9 @@ zabbix_export:
                       value: FF0000
                 - type: item
                   name: 'SQL Server process core percent'
-                  x: '4'
+                  x: '12'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6366,9 +6366,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'CPU used'
-                  x: '4'
+                  x: '12'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6384,9 +6384,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Data space used'
-                  x: '4'
+                  x: '12'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6402,9 +6402,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Connections failed: System errors'
-                  x: '4'
+                  x: '12'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6420,8 +6420,8 @@ zabbix_export:
                       value: '2'
                 - type: plaintext
                   name: 'Availability status detailed'
-                  x: '8'
-                  width: '16'
+                  x: '24'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6434,9 +6434,9 @@ zabbix_export:
                       value: '1'
                 - type: item
                   name: 'Sessions percentage'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6452,9 +6452,9 @@ zabbix_export:
                       value: '2'
                 - type: graph
                   name: 'Percentage CPU'
-                  x: '8'
+                  x: '24'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -6467,9 +6467,9 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Storage utilization'
-                  x: '8'
+                  x: '24'
                   'y': '9'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -6482,9 +6482,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: Connections
-                  x: '8'
+                  x: '24'
                   'y': '12'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -6497,9 +6497,9 @@ zabbix_export:
                       value: AAAAC
                 - type: item
                   name: 'Workers percentage'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6518,9 +6518,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'App memory percentage'
-                  x: '16'
+                  x: '48'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -6539,9 +6539,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'Data IO percentage'
-                  x: '20'
+                  x: '60'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7271,7 +7271,7 @@ zabbix_export:
             - widgets:
                 - type: item
                   name: 'Memory utilization'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7291,7 +7291,7 @@ zabbix_export:
                 - type: item
                   name: 'CPU credits consumed'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7308,7 +7308,7 @@ zabbix_export:
                 - type: item
                   name: 'Storage used'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7325,7 +7325,7 @@ zabbix_export:
                 - type: item
                   name: 'Network in'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7342,7 +7342,7 @@ zabbix_export:
                 - type: item
                   name: 'Connections active'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7358,8 +7358,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Percentage CPU'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7378,9 +7378,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'CPU credits remaining'
-                  x: '4'
+                  x: '12'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7396,9 +7396,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Storage limit'
-                  x: '4'
+                  x: '12'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7414,9 +7414,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Network out'
-                  x: '4'
+                  x: '12'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7432,9 +7432,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Connections total'
-                  x: '4'
+                  x: '12'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7450,8 +7450,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Availability state'
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7470,9 +7470,9 @@ zabbix_export:
                       value: FF0000
                 - type: item
                   name: 'Backup storage used'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7488,9 +7488,9 @@ zabbix_export:
                       value: '2'
                 - type: graph
                   name: 'Storage utilization'
-                  x: '8'
+                  x: '24'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -7503,9 +7503,9 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Network traffic'
-                  x: '8'
+                  x: '24'
                   'y': '9'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -7518,9 +7518,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: Connections
-                  x: '8'
+                  x: '24'
                   'y': '12'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -7533,8 +7533,8 @@ zabbix_export:
                       value: AAAAC
                 - type: plaintext
                   name: 'Availability status detailed'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7547,9 +7547,9 @@ zabbix_export:
                       value: '1'
                 - type: item
                   name: Queries
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7565,9 +7565,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'IO consumption percent'
-                  x: '16'
+                  x: '48'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -7586,9 +7586,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'Replication lag'
-                  x: '20'
+                  x: '60'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8314,7 +8314,7 @@ zabbix_export:
             - widgets:
                 - type: item
                   name: 'Memory utilization'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8334,7 +8334,7 @@ zabbix_export:
                 - type: item
                   name: 'Network in'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8351,7 +8351,7 @@ zabbix_export:
                 - type: item
                   name: 'Server log storage limit'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8368,7 +8368,7 @@ zabbix_export:
                 - type: item
                   name: 'Storage limit'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8385,7 +8385,7 @@ zabbix_export:
                 - type: item
                   name: 'Connections active'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8401,8 +8401,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Percentage CPU'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8421,9 +8421,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'Network out'
-                  x: '4'
+                  x: '12'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8439,9 +8439,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Server log storage used'
-                  x: '4'
+                  x: '12'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8457,9 +8457,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Storage used'
-                  x: '4'
+                  x: '12'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8475,9 +8475,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Connections failed'
-                  x: '4'
+                  x: '12'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8493,8 +8493,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Availability state'
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -8513,9 +8513,9 @@ zabbix_export:
                       value: FF0000
                 - type: graph
                   name: 'Network traffic'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -8528,9 +8528,9 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Server log storage utilization'
-                  x: '8'
+                  x: '24'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -8543,9 +8543,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: 'Storage utilization'
-                  x: '8'
+                  x: '24'
                   'y': '9'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -8558,9 +8558,9 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   name: Connections
-                  x: '8'
+                  x: '24'
                   'y': '12'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -8573,8 +8573,8 @@ zabbix_export:
                       value: AAAAD
                 - type: plaintext
                   name: 'Availability status detailed'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9406,7 +9406,7 @@ zabbix_export:
             - widgets:
                 - type: item
                   name: 'Memory utilization'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9426,7 +9426,7 @@ zabbix_export:
                 - type: item
                   name: 'Data disk queue depth'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9443,7 +9443,7 @@ zabbix_export:
                 - type: item
                   name: 'Storage free'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9460,7 +9460,7 @@ zabbix_export:
                 - type: item
                   name: 'Network in'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9477,7 +9477,7 @@ zabbix_export:
                 - type: item
                   name: 'Connections active'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9493,8 +9493,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Percentage CPU'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9513,9 +9513,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'Data disk IOPS'
-                  x: '4'
+                  x: '12'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9531,9 +9531,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Storage used'
-                  x: '4'
+                  x: '12'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9549,9 +9549,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Network out'
-                  x: '4'
+                  x: '12'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9567,9 +9567,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Connections failed'
-                  x: '4'
+                  x: '12'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9585,8 +9585,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Availability state'
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9605,9 +9605,9 @@ zabbix_export:
                       value: FF0000
                 - type: item
                   name: 'Data disk read IOPS'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9623,9 +9623,9 @@ zabbix_export:
                       value: '2'
                 - type: graph
                   name: 'Storage utilization'
-                  x: '8'
+                  x: '24'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -9638,9 +9638,9 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Network traffic'
-                  x: '8'
+                  x: '24'
                   'y': '9'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -9653,9 +9653,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: Connections
-                  x: '8'
+                  x: '24'
                   'y': '12'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -9668,8 +9668,8 @@ zabbix_export:
                       value: AAAAC
                 - type: plaintext
                   name: 'Availability status detailed'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9682,9 +9682,9 @@ zabbix_export:
                       value: '1'
                 - type: item
                   name: 'Data disk write IOPS'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9700,9 +9700,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Data disk read Bps'
-                  x: '16'
+                  x: '48'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -9718,9 +9718,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Data disk write Bps'
-                  x: '20'
+                  x: '60'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10453,7 +10453,7 @@ zabbix_export:
             - widgets:
                 - type: item
                   name: 'Memory utilization'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10473,7 +10473,7 @@ zabbix_export:
                 - type: item
                   name: 'Network in'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10490,7 +10490,7 @@ zabbix_export:
                 - type: item
                   name: 'Server log storage limit'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10507,7 +10507,7 @@ zabbix_export:
                 - type: item
                   name: 'Storage limit'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10524,7 +10524,7 @@ zabbix_export:
                 - type: item
                   name: 'Connections active'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10540,8 +10540,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Percentage CPU'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10560,9 +10560,9 @@ zabbix_export:
                       value: '%'
                 - type: item
                   name: 'Network out'
-                  x: '4'
+                  x: '12'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10578,9 +10578,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Server log storage used'
-                  x: '4'
+                  x: '12'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10596,9 +10596,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Storage used'
-                  x: '4'
+                  x: '12'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10614,9 +10614,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Connections failed'
-                  x: '4'
+                  x: '12'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10632,8 +10632,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Availability state'
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -10652,9 +10652,9 @@ zabbix_export:
                       value: FF0000
                 - type: graph
                   name: 'Network traffic'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -10667,9 +10667,9 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Server log storage utilization'
-                  x: '8'
+                  x: '24'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -10682,9 +10682,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: 'Storage utilization'
-                  x: '8'
+                  x: '24'
                   'y': '9'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -10697,9 +10697,9 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   name: Connections
-                  x: '8'
+                  x: '24'
                   'y': '12'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -10712,8 +10712,8 @@ zabbix_export:
                       value: AAAAD
                 - type: plaintext
                   name: 'Availability status detailed'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12037,12 +12037,12 @@ zabbix_export:
             - widgets:
                 - type: clock
                   name: 'Local time'
-                  width: '4'
+                  width: '12'
                   height: '3'
                 - type: item
                   name: 'CPU credits consumed'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12059,7 +12059,7 @@ zabbix_export:
                 - type: item
                   name: 'Network in'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12076,7 +12076,7 @@ zabbix_export:
                 - type: item
                   name: 'Disk read rate'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12093,7 +12093,7 @@ zabbix_export:
                 - type: item
                   name: 'OS disk read operations/sec'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12110,7 +12110,7 @@ zabbix_export:
                 - type: item
                   name: 'Inbound flows'
                   'y': '15'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12126,8 +12126,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Available memory'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12143,9 +12143,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'CPU credits remaining'
-                  x: '4'
+                  x: '12'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12161,9 +12161,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Network out'
-                  x: '4'
+                  x: '12'
                   'y': '6'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12179,9 +12179,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Disk write rate'
-                  x: '4'
+                  x: '12'
                   'y': '9'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12197,9 +12197,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'OS disk write operations/sec'
-                  x: '4'
+                  x: '12'
                   'y': '12'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12215,9 +12215,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Outbound flows'
-                  x: '4'
+                  x: '12'
                   'y': '15'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12233,8 +12233,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Availability state'
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -12253,9 +12253,9 @@ zabbix_export:
                       value: FF0000
                 - type: graph
                   name: 'Percentage CPU'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -12268,9 +12268,9 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Network traffic'
-                  x: '8'
+                  x: '24'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -12283,9 +12283,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: 'Disk read/write bytes'
-                  x: '8'
+                  x: '24'
                   'y': '9'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -12298,9 +12298,9 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   name: 'OS disk read/write rates'
-                  x: '8'
+                  x: '24'
                   'y': '12'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -12313,9 +12313,9 @@ zabbix_export:
                       value: AAAAD
                 - type: graph
                   name: Flows
-                  x: '8'
+                  x: '24'
                   'y': '15'
-                  width: '16'
+                  width: '48'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -12328,8 +12328,8 @@ zabbix_export:
                       value: AAAAE
                 - type: plaintext
                   name: 'Availability status detailed'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '3'
                   fields:
                     - type: ITEM

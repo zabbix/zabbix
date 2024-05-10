@@ -3921,7 +3921,7 @@ static int	DBpatch_6050293(void)
 static int	DBpatch_6050294(void)
 {
 	zbx_db_row_t	row;
-	zbx_db_result_t	result;
+	zbx_db_result_t	result = NULL;
 	int		ret = SUCCEED;
 
 	if (NULL == (result = zbx_db_select("select userdirectory_mediaid,userdirectoryid,mediatypeid"
@@ -3971,6 +3971,7 @@ static int	DBpatch_6050294(void)
 			{
 				ret = FAIL;
 				zbx_free(select_sql);
+				zbx_db_free_result(result2);
 				goto out;
 			}
 			zbx_free(select_sql);
@@ -3991,6 +3992,8 @@ static int	DBpatch_6050294(void)
 				{
 					ret = FAIL;
 					zbx_free(update_sql);
+					zbx_db_free_result(result3);
+					zbx_db_free_result(result2);
 					goto out;
 				}
 				zbx_free(update_sql);
@@ -4001,9 +4004,9 @@ static int	DBpatch_6050294(void)
 
 		zbx_db_free_result(result2);
 	}
-
-	zbx_db_free_result(result);
 out:
+	zbx_db_free_result(result);
+
 	return ret;
 }
 
@@ -4022,6 +4025,24 @@ static int	DBpatch_6050295(void)
 }
 
 static int	DBpatch_6050296(void)
+{
+	const zbx_db_field_t	field = {"message_format", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("media_type", "content_type", &field);
+}
+
+static int	DBpatch_6050297(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update widget set x=x*3,width=width*3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050298(void)
 {
 	return add_widget_references("'geomap','map','plaintext','problemhosts','problems','problemsbysv','tophosts'"
 			",'web'");
@@ -4328,5 +4349,7 @@ DBPATCH_ADD(6050293, 0, 1)
 DBPATCH_ADD(6050294, 0, 1)
 DBPATCH_ADD(6050295, 0, 1)
 DBPATCH_ADD(6050296, 0, 1)
+DBPATCH_ADD(6050297, 0, 1)
+DBPATCH_ADD(6050298, 0, 1)
 
 DBPATCH_END()

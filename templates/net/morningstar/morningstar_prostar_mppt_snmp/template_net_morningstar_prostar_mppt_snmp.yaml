@@ -1180,7 +1180,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: GRAPH
@@ -1193,7 +1193,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '4'
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: GRAPH
@@ -1206,7 +1206,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   'y': '8'
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: GRAPH

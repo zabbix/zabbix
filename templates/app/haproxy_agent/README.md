@@ -37,7 +37,7 @@ frontend stats
     stats refresh 10s
 ```
 
-2. Set the hostname or IP address of the the HAProxy stats host or container in the `{$HAPROXY.STATS.HOST}` macro. You can also change the status page port in the `{$HAPROXY.STATS.PORT}` macro, the status page scheme in the `{$HAPROXY.STATS.SCHEME}` macro and the status page path in the `{$HAPROXY.STATS.PATH}` macro if necessary.
+2. Set the hostname or IP address of the HAProxy stats host or container in the `{$HAPROXY.STATS.HOST}` macro. You can also change the status page port in the `{$HAPROXY.STATS.PORT}` macro, the status page scheme in the `{$HAPROXY.STATS.SCHEME}` macro and the status page path in the `{$HAPROXY.STATS.PATH}` macro if necessary.
 
 ### Macros used
 

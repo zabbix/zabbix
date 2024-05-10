@@ -365,7 +365,9 @@ $ipmi_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Username'), 'ipmi_username'),
 		new CFormField(
-			(new CTextBox('ipmi_username', $data['host']['ipmi_username'], $host_is_discovered))
+			(new CTextBox('ipmi_username', $data['host']['ipmi_username'], $host_is_discovered,
+				DB::getFieldLength('hosts', 'ipmi_username')
+			))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->disableAutocomplete()
 		)
@@ -373,7 +375,9 @@ $ipmi_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Password'), 'ipmi_password'),
 		new CFormField(
-			(new CTextBox('ipmi_password', $data['host']['ipmi_password'], $host_is_discovered))
+			(new CTextBox('ipmi_password', $data['host']['ipmi_password'], $host_is_discovered,
+				DB::getFieldLength('hosts', 'ipmi_password')
+			))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->disableAutocomplete()
 		)

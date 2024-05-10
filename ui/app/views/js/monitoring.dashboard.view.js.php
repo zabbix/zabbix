@@ -109,8 +109,6 @@
 				cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
 				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
-				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
 				widget_defaults,
 				widget_last_type,
 				configuration_hash,

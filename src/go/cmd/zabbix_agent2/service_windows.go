@@ -34,11 +34,19 @@ import (
 	"golang.zabbix.com/agent2/internal/agent/keyaccess"
 	"golang.zabbix.com/agent2/internal/agent/scheduler"
 	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxflag"
 )
 
 const usageMessageExampleConfPath = `C:\zabbix\zabbix_agent2.conf`
+
+const (
+	startTypeAutomatic = "automatic"
+	startTypeDelayed   = "delayed"
+	startTypeManual    = "manual"
+	startTypeDisabled  = "disabled"
+)
 
 var (
 	serviceName = "Zabbix Agent 2"
@@ -48,6 +56,7 @@ var (
 	svcStartFlag         bool
 	svcStopFlag          bool
 	svcMultipleAgentFlag bool
+	svcStartType         string
 
 	winServiceRun bool
 
@@ -110,11 +119,28 @@ func osDependentFlags() zbxflag.Flags {
 			Default: false,
 			Dest:    &svcStopFlag,
 		},
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:      "startup-type",
+				Shorthand: "S",
+				Description: fmt.Sprintf(
+					"Set startup type of the Zabbix Windows agent service to be installed."+
+						" Allowed values: %s (default), %s, %s, %s",
+					startTypeAutomatic,
+					startTypeDelayed,
+					startTypeManual,
+					startTypeDisabled,
+				),
+			},
+			Default: "",
+			Dest:    &svcStartType,
+		},
 	}
 }
 
 func isWinLauncher() bool {
-	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcMultipleAgentFlag {
+	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcMultipleAgentFlag ||
+		svcStartType != "" {
 		return true
 	}
 	return false
@@ -171,7 +197,9 @@ func eventLogErr(err error) error {
 }
 
 func validateMultipleAgentFlag() bool {
-	if svcMultipleAgentFlag && !(svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag) && !winServiceRun {
+	if svcMultipleAgentFlag &&
+		!(svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcStartType != "") &&
+		!winServiceRun {
 		return false
 	}
 
@@ -256,7 +284,7 @@ func handleWindowsService(confPath string) error {
 		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.FirstHostname)
 	}
 
-	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag {
+	if svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag || svcStartType != "" {
 		absPath, err := filepath.Abs(confPath)
 		if err != nil {
 			return err
@@ -300,6 +328,11 @@ func resolveWindowsService(confPath string) error {
 			return fmt.Errorf("failed to stop %s service: %s", serviceName, err)
 		}
 		msg = fmt.Sprintf("'%s' stopped successfully", serviceName)
+	case svcStartType != "":
+		if err := svcStartupTypeSet(); err != nil {
+			return errs.Wrapf(err, "failed to set service '%s' startup type", serviceName)
+		}
+		msg = fmt.Sprintf("service '%s' startup type configured successfully", serviceName)
 	}
 
 	msg = fmt.Sprintf("zabbix_agent2 [%d]: %s\n", os.Getpid(), msg)
@@ -333,6 +366,30 @@ func getAgentPath() (p string, err error) {
 	return
 }
 
+func svcStartTypeFlagParse() (uint32, bool, error) {
+	var startType uint32
+	var delayedAutoStart bool
+	var err error
+
+	switch svcStartType {
+	case "":
+		startType = mgr.StartAutomatic
+	case startTypeAutomatic:
+		startType = mgr.StartAutomatic
+	case startTypeDelayed:
+		delayedAutoStart = true
+		startType = mgr.StartAutomatic
+	case startTypeManual:
+		startType = mgr.StartManual
+	case startTypeDisabled:
+		startType = mgr.StartDisabled
+	default:
+		err = fmt.Errorf("unknown service start type: '%s'", svcStartType)
+	}
+
+	return startType, delayedAutoStart, err
+}
+
 func svcInstall(conf string) error {
 	exepath, err := getAgentPath()
 	if err != nil {
@@ -351,14 +408,21 @@ func svcInstall(conf string) error {
 		return errors.New("service already exists")
 	}
 
+	startType, delayedAutoStart, err := svcStartTypeFlagParse()
+
+	if err != nil {
+		return errs.Wrap(err, "failed to get new startup type")
+	}
+
 	s, err = m.CreateService(
 		serviceName,
 		exepath,
 		mgr.Config{
-			StartType:      mgr.StartAutomatic,
-			DisplayName:    serviceName,
-			Description:    "Provides system monitoring",
-			BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf),
+			StartType:        startType,
+			DisplayName:      serviceName,
+			Description:      "Provides system monitoring",
+			BinaryPathName:   fmt.Sprintf("%s -c %s -f=false", exepath, conf),
+			DelayedAutoStart: delayedAutoStart,
 		},
 		"-c", conf,
 		"-f=false",
@@ -451,6 +515,45 @@ func svcStop() error {
 		if status, err = s.Query(); err != nil {
 			return fmt.Errorf("failed to get service status: %s", err.Error())
 		}
+	}
+
+	return nil
+}
+
+func svcStartupTypeSet() error {
+
+	m, err := mgr.Connect()
+
+	if err != nil {
+		return errs.Wrap(err, "failed to connect to service manager")
+	}
+
+	defer m.Disconnect()
+
+	s, err := m.OpenService(serviceName)
+
+	if err != nil {
+		return errs.Wrap(err, "failed to open service")
+	}
+
+	defer s.Close()
+
+	c, err := s.Config()
+
+	if err != nil {
+		return errs.Wrap(err, "failed to retrieve service config")
+	}
+
+	c.StartType, c.DelayedAutoStart, err = svcStartTypeFlagParse()
+
+	if err != nil {
+		return errs.Wrap(err, "failed to get new startup type")
+	}
+
+	err = s.UpdateConfig(c)
+
+	if err != nil {
+		return errs.Wrap(err, "failed to update service config")
 	}
 
 	return nil
