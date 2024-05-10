@@ -40,6 +40,8 @@ class CControllerHostViewRefresh extends CControllerHostView {
 			$filter_counters = [];
 
 			foreach ($filters as $index => $tabfilter) {
+				$this->sanitizeFilter($tabfilter);
+
 				$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
 
@@ -52,6 +54,7 @@ class CControllerHostViewRefresh extends CControllerHostView {
 		else {
 			$this->getInputs($filter, array_keys($filter));
 			$filter = $this->cleanInput($filter);
+			$this->sanitizeFilter($filter);
 
 			$view_url = (new CUrl())
 				->setArgument('action', 'host.view')
