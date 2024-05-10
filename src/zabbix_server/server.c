@@ -845,13 +845,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 				" setting \"StartReportWriters\" configuration parameter");
 	}
 
-	if (0 != config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER] && NULL == config_webdriver_url)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"WebDriverURL\" configuration parameter must be set when "
-				" setting \"StartBrowserPollers\" configuration parameter");
-		err = 1;
-	}
-
 	if (0 != err)
 		exit(EXIT_FAILURE);
 }

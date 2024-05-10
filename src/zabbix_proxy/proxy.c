@@ -823,13 +823,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	err |= (FAIL == zbx_db_validate_config_features(zbx_program_type, zbx_config_dbhigh));
 
-	if (0 != config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER] && NULL == config_webdriver_url)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"WebDriverURL\" configuration parameter must be set when "
-				" setting \"StartBrowserPollers\" configuration parameter");
-		err = 1;
-	}
-
 	if (0 != err)
 		exit(EXIT_FAILURE);
 }

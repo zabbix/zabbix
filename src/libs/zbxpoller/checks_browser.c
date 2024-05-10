@@ -40,6 +40,14 @@ int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, con
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, ret = NOTSUPPORTED;
 
+	if (NULL == config_webdriver_url)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Browser item requires WebDriverURL configuration parameter"));
+		zbx_free(error);
+
+		return ret;
+	}
+
 	if (SUCCEED != zbx_es_is_env_initialized(&es_engine))
 	{
 		if (SUCCEED != zbx_es_init_env(&es_engine, config_source_ip, &error))
