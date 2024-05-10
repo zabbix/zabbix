@@ -72,6 +72,8 @@ class CWidgetItemNavigator extends CWidget {
 		}
 
 		if (this.#item_navigator === null) {
+			this.clearContents();
+
 			this.#item_navigator = new CItemNavigator(response.config);
 
 			this.#registerListeners();
@@ -156,5 +158,12 @@ class CWidgetItemNavigator extends CWidget {
 
 	hasPadding() {
 		return false;
+	}
+
+	onClearContents() {
+		if (this.#item_navigator !== null) {
+			this.#item_navigator.destroy();
+			this.#item_navigator = null;
+		}
 	}
 }

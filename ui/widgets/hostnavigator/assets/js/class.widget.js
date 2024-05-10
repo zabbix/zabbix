@@ -72,6 +72,8 @@ class CWidgetHostNavigator extends CWidget {
 		}
 
 		if (this.#host_navigator === null) {
+			this.clearContents();
+
 			this.#host_navigator = new CHostNavigator(response.config);
 
 			this.#registerListeners();
@@ -156,5 +158,12 @@ class CWidgetHostNavigator extends CWidget {
 
 	hasPadding() {
 		return false;
+	}
+
+	onClearContents() {
+		if (this.#host_navigator !== null) {
+			this.#host_navigator.destroy();
+			this.#host_navigator = null;
+		}
 	}
 }
