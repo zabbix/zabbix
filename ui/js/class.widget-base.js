@@ -131,7 +131,6 @@ class CWidgetBase {
 	 *
 	 * @param {number}      cell_width          Dashboard page cell width in percentage.
 	 * @param {number}      cell_height         Dashboard page cell height in pixels.
-	 * @param {number}      min_rows            Minimum number of dashboard cell rows per single widget.
 	 * @param {boolean}     is_editable         Whether to display the "Edit" button.
 	 * @param {boolean}     is_edit_mode        Whether the widget is being created in the editing mode.
 	 * @param {string|null} csrf_token          CSRF token for AJAX requests.
@@ -151,7 +150,6 @@ class CWidgetBase {
 		dashboard_page,
 		cell_width,
 		cell_height,
-		min_rows,
 		is_editable,
 		is_edit_mode,
 		csrf_token = null,
@@ -188,7 +186,6 @@ class CWidgetBase {
 
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
-		this._min_rows = min_rows;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._csrf_token = csrf_token;

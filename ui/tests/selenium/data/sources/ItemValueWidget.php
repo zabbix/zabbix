@@ -152,7 +152,7 @@ class ItemValueWidget {
 								'name' => 'New widget',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'fields' => [
 									[
@@ -212,7 +212,7 @@ class ItemValueWidget {
 								'name' => 'Widget with thresholds',
 								'x' => 0,
 								'y' => 6,
-								'width' => 10,
+								'width' => 30,
 								'height' => 3,
 								'fields' => [
 									[
@@ -245,9 +245,9 @@ class ItemValueWidget {
 							[
 								'type' => 'item',
 								'name' => 'Widget to delete',
-								'x' => 13,
+								'x' => 39,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -288,7 +288,7 @@ class ItemValueWidget {
 								'name' => 'Widget for aggregation function data check',
 								'x' => 0,
 								'y' => 0,
-								'width' => 18,
+								'width' => 54,
 								'height' => 4,
 								'fields' => [
 									[

@@ -933,7 +933,7 @@ zabbix_export:
             - name: 'Resource usage'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -946,7 +946,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -960,7 +960,7 @@ zabbix_export:
             - name: 'Service timing statistics'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH
@@ -974,7 +974,7 @@ zabbix_export:
             - name: 'Other statistics'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -987,7 +987,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1000,7 +1000,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1013,7 +1013,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graph
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1026,7 +1026,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graph
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH

@@ -55,15 +55,15 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System stats view',
-								'width' => 12,
+								'width' => 36,
 								'height' => 8
 							],
 							[
 								'type' => 'systeminfo',
 								'name' => 'High availability nodes view',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 8,
 								'fields' => [
 									[
@@ -91,15 +91,15 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System stats view',
-								'width' => 12,
+								'width' => 36,
 								'height' => 8
 							],
 							[
 								'type' => 'systeminfo',
 								'name' => 'HA nodes view',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 8,
 								'fields' => [
 									[

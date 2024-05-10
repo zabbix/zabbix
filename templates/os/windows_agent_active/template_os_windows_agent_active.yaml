@@ -8,7 +8,7 @@ zabbix_export:
       template: 'Windows by Zabbix agent active'
       name: 'Windows by Zabbix agent active'
       description: |
-        Official Windows template. Requires agent of Zabbix 7.0 and newer.
+        This is an official Windows template. It requires Zabbix agent 7.0 or newer.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows
         
@@ -39,7 +39,7 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -51,7 +51,7 @@ zabbix_export:
               name: 'Windows: Zabbix agent is not available'
               event_name: 'Windows: Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})'
               priority: AVERAGE
-              description: 'For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.'
+              description: 'For active agents, `nodata()` with `agent.ping` is used with `{$AGENT.NODATA_TIMEOUT}` as a time threshold.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -77,10 +77,7 @@ zabbix_export:
           key: 'perf_counter_en["\Memory\Cache Bytes"]'
           history: 7d
           units: B
-          description: |
-            Cache Bytes is the sum of the Memory\\System Cache Resident Bytes, Memory\\System Driver Resident Bytes,
-            Memory\\System Code Resident Bytes, and Memory\\Pool Paged Resident Bytes counters. This counter displays
-            the last observed value only; it is not an average.
+          description: 'Cache Bytes is the sum of the Memory\\System Cache Resident Bytes, Memory\\System Driver Resident Bytes, Memory\\System Code Resident Bytes, and Memory\\Pool Paged Resident Bytes counters. This counter displays the last observed value only; it is not an average.'
           tags:
             - tag: component
               value: memory
@@ -89,9 +86,7 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\Memory\Free System Page Table Entries"]'
           history: 7d
-          description: |
-            This indicates the number of page table entries not currently in use by the system. If the number is less
-            than 5,000, there may well be a memory leak or you running out of memory.
+          description: 'This indicates the number of page table entries not currently in use by the system. If the number is less than 5,000, there may be a memory leak or you running out of memory.'
           tags:
             - tag: component
               value: memory
@@ -101,7 +96,7 @@ zabbix_export:
               name: 'Windows: Number of free system page table entries is too low'
               event_name: 'Windows: Number of free system page table entries is too low (less {$MEM.PAGE_TABLE_CRIT.MIN} for 5m)'
               priority: WARNING
-              description: 'The Memory Free System Page Table Entries is less than {$MEM.PAGE_TABLE_CRIT.MIN} for 5 minutes. If the number is less than 5,000, there may well be a memory leak.'
+              description: '`Memory\Free System Page Table Entries` has been less than `{$MEM.PAGE_TABLE_CRIT.MIN}` for 5 minutes. If the number is less than 5,000, there may be a memory leak.'
               dependencies:
                 - name: 'Windows: High memory utilization'
                   expression: 'min(/Windows by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
@@ -114,13 +109,7 @@ zabbix_export:
           key: 'perf_counter_en["\Memory\Page Faults/sec"]'
           history: 7d
           value_type: FLOAT
-          description: |
-            Page Faults/sec is the average number of pages faulted per second. It is measured in number of pages
-            faulted per second because only one page is faulted in each fault operation, hence this is also equal
-            to the number of page fault operations. This counter includes both hard faults (those that require
-            disk access) and soft faults (where the faulted page is found elsewhere in physical memory.) Most
-            processors can handle large numbers of soft faults without significant consequence. However, hard faults,
-            which require disk access, can cause significant delays.
+          description: 'Page Faults/sec is the average number of pages faulted per second. It is measured in number of pages faulted per second because only one page is faulted in each fault operation, hence this is also equal to the number of page fault operations. This counter includes both hard faults (those that require disk access) and soft faults (where the faulted page is found elsewhere in physical memory.) Most processors can handle large numbers of soft faults without significant consequence. However, hard faults, which require disk access, can cause significant delays.'
           tags:
             - tag: component
               value: memory
@@ -142,7 +131,7 @@ zabbix_export:
               name: 'Windows: The Memory Pages/sec is too high'
               event_name: 'Windows: The Memory Pages/sec is too high (over {$MEM.PAGE_SEC.CRIT.MAX} for 5m)'
               priority: WARNING
-              description: 'The Memory Pages/sec in the last 5 minutes exceeds {$MEM.PAGE_SEC.CRIT.MAX}. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.'
+              description: 'The Memory Pages/sec in the last 5 minutes exceeds `{$MEM.PAGE_SEC.CRIT.MAX}`. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.'
               dependencies:
                 - name: 'Windows: High memory utilization'
                   expression: 'min(/Windows by Zabbix agent active/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
@@ -156,10 +145,8 @@ zabbix_export:
           history: 7d
           units: B
           description: |
-            This measures the size, in bytes, of the non-paged pool. This is an area of system memory for objects
-            that cannot be written to disk but instead must remain in physical memory as long as they are allocated.
-            There is a possible memory leak if the value is greater than 175MB (or 100MB with the /3GB switch).
-            A typical Event ID 2019 is recorded in the system event log.
+            This measures the size, in bytes, of the non-paged pool. This is an area of system memory for objects that cannot be written to disk but instead must remain in physical memory as long as they are allocated.
+            There is a possible memory leak if the value is greater than 175MB (or 100MB with the /3GB switch). Consequently, Event ID 2019 is recorded in the system event log.
           tags:
             - tag: component
               value: memory
@@ -183,12 +170,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: |
-            Processor DPC time is the time that a single processor spent receiving and servicing deferred procedure
-            calls (DPCs). DPCs are interrupts that run at a lower priority than standard interrupts. % DPC Time is a
-            component of % Privileged Time because DPCs are executed in privileged mode. If a high % DPC Time is
-            sustained, there may be a processor bottleneck or an application or hardware related issue that can
-            significantly diminish overall system performance.
+          description: 'Processor DPC time is the time that a single processor spent receiving and servicing deferred procedure calls (DPCs). DPCs are interrupts that run at a lower priority than standard interrupts. `% DPC Time` is a component of `% Privileged Time` because DPCs are executed in privileged mode. If a high `% DPC Time` is sustained, there may be a processor bottleneck or an application or hardware related issue that can significantly diminish overall system performance.'
           tags:
             - tag: component
               value: cpu
@@ -199,12 +181,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: |
-            The Processor Information\% Interrupt Time is the time the processor spends receiving and servicing
-            hardware interrupts during sample intervals. This value is an indirect indicator of the activity of
-            devices that generate interrupts, such as the system clock, the mouse, disk drivers, data communication
-            lines, network interface cards and other peripheral devices. This is an easy way to identify a potential
-            hardware failure. This should never be higher than 20%.
+          description: 'The processor information `% Interrupt Time` counter indicates how much time the processor spends handling hardware interrupts during sample intervals. It reflects the activity of devices like the system clock, mouse, disk drivers, and network cards. A value above 20% suggests possible hardware issues.'
           tags:
             - tag: component
               value: cpu
@@ -214,13 +191,7 @@ zabbix_export:
               name: 'Windows: CPU interrupt time is too high'
               event_name: 'Windows: CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)'
               priority: WARNING
-              description: |
-                "The CPU Interrupt Time in the last 5 minutes exceeds {$CPU.INTERRUPT.CRIT.MAX}%."
-                The Processor Information\% Interrupt Time is the time the processor spends receiving and servicing
-                hardware interrupts during sample intervals. This value is an indirect indicator of the activity of
-                devices that generate interrupts, such as the system clock, the mouse, disk drivers, data communication
-                lines, network interface cards and other peripheral devices. This is an easy way to identify a potential
-                hardware failure. This should never be higher than 20%.
+              description: 'The CPU Interrupt Time in the last 5 minutes exceeds `{$CPU.INTERRUPT.CRIT.MAX}`%.'
               dependencies:
                 - name: 'Windows: High CPU utilization'
                   expression: 'min(/Windows by Zabbix agent active/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
@@ -234,11 +205,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: |
-            The Processor Information\% Privileged Time counter shows the percent of time that the processor is spent
-            executing in Kernel (or Privileged) mode. Privileged mode includes services interrupts inside Interrupt
-            Service Routines (ISRs), executing Deferred Procedure Calls (DPCs), Device Driver calls and other kernel-mode
-            functions of the Windows® Operating System.
+          description: 'The processor information `% Privileged Time` counter shows the percent of time that the processor is spent executing in Kernel (or Privileged) mode. Privileged mode includes services interrupts inside Interrupt Service Routines (ISRs), executing Deferred Procedure Calls (DPCs), Device Driver calls and other kernel-mode functions of the Windows Operating System.'
           tags:
             - tag: component
               value: cpu
@@ -264,9 +231,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: |
-            The Processor Information\% User Time counter shows the percent of time that the processor(s) is spent executing
-            in User mode.
+          description: 'The processor information `% User Time` counter shows the percent of time that the processor(s) is spent executing in User mode.'
           tags:
             - tag: component
               value: cpu
@@ -290,9 +255,7 @@ zabbix_export:
           key: 'perf_counter_en["\System\Processor Queue Length"]'
           history: 7d
           value_type: FLOAT
-          description: |
-            The Processor Queue Length shows the number of threads that are observed as delayed in the processor Ready Queue
-            and are waiting to be executed.
+          description: 'The Processor Queue Length shows the number of threads that are observed as delayed in the processor Ready Queue and are waiting to be executed.'
           tags:
             - tag: component
               value: cpu
@@ -321,7 +284,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The CPU utilization expressed in %.'
+          description: 'CPU utilization expressed in %.'
           tags:
             - tag: component
               value: cpu
@@ -332,7 +295,7 @@ zabbix_export:
               event_name: 'Windows: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
@@ -521,7 +484,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
             - tag: component
               value: raw
@@ -531,7 +494,7 @@ zabbix_export:
           key: 'vm.memory.size[total]'
           history: 7d
           units: B
-          description: 'The total memory expressed in bytes.'
+          description: 'Total memory expressed in bytes.'
           tags:
             - tag: component
               value: memory
@@ -576,7 +539,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Raw data of win32_networkadapter.'
+          description: 'Raw data of `win32_networkadapter.`'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -600,7 +563,7 @@ zabbix_export:
           history: 7d
           description: |
             Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - unknown
             1 - available
             2 - not available
@@ -617,7 +580,7 @@ zabbix_export:
               name: 'Windows: Active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              description: 'Active checks are considered unavailable. Agent has not sent a heartbeat for a prolonged time.'
               tags:
                 - tag: scope
                   value: availability
@@ -836,9 +799,9 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important.
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important.
                     No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1228,7 +1191,7 @@ zabbix_export:
                 value: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          description: 'Discovery of Windows services of different types as defined in template''s macros.'
+          description: 'Used for the discovery of Windows services of different types as defined in the template''s macros.'
           item_prototypes:
             - uuid: d6379e85f1974734abbe60fef1a6ca1d
               name: 'State of service "{#SERVICE.NAME}" ({#SERVICE.DISPLAYNAME})'
@@ -1283,17 +1246,38 @@ zabbix_export:
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-          description: 'Discovery of file systems of different types.'
+          description: 'Discovery of filesystems of different types.'
           item_prototypes:
+            - uuid: 821daa0e25a2456ca637e441a844dfe6
+              name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Available'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},free]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Available storage space expressed in bytes.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.bytes.free
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: filesystem
+                  value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: 8949201f93ab46f0a0ad95ca6ce6124c
-              name: '{#FSLABEL}({#FSNAME}): Space utilization'
+              name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Used, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Space utilization expressed in % for `{#FSNAME}`.'
+              description: 'Calculated as the percentage of currently used space compared to the maximum available space.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1305,14 +1289,52 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
+              trigger_prototypes:
+                - uuid: 5bed682545044584852888d96454df86
+                  expression: 'min(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSLABEL}({#FSNAME})"}'
+                  name: 'FS [{#FSLABEL}({#FSNAME})]: Space is critically low'
+                  event_name: 'FS [{#FSLABEL}({#FSNAME})]: Space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSLABEL}({#FSNAME})"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)'
+                  opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
+                  priority: AVERAGE
+                  description: |
+                    The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%` limit.
+                    The trigger expression is based on the current used and maximum available spaces.
+                    Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: capacity
+                - uuid: 1e5e9718c5a14099b9421ff7956b2f33
+                  expression: 'min(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.WARN:"{#FSLABEL}({#FSNAME})"}'
+                  name: 'FS [{#FSLABEL}({#FSNAME})]: Space is low'
+                  event_name: 'FS [{#FSLABEL}({#FSNAME})]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSLABEL}({#FSNAME})"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)'
+                  opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
+                  priority: WARNING
+                  description: |
+                    The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%` limit.
+                    The trigger expression is based on the current used and maximum available spaces.
+                    Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: 'FS [{#FSLABEL}({#FSNAME})]: Space is critically low'
+                      expression: 'min(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSLABEL}({#FSNAME})"}'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: capacity
             - uuid: d45f2c3469dd424486bdee586e4a61eb
-              name: '{#FSLABEL}({#FSNAME}): Total space'
+              name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},total]'
               delay: '0'
               history: 7d
               units: B
-              description: 'The total space expressed in bytes.'
+              description: 'Total space expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1324,8 +1346,10 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: ddd24d7eaa5742ac9d6cbae42bcfa1ae
-              name: '{#FSLABEL}({#FSNAME}): Used space'
+              name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Used'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},used]'
               delay: '0'
@@ -1343,14 +1367,17 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: b9ad1677ea6841309c7dc3a304b61c37
-              name: '{#FSLABEL}({#FSNAME}): Get filesystem data'
+              name: 'FS [{#FSLABEL}({#FSNAME})]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},data]'
               delay: '0'
               history: 1h
               trends: '0'
               value_type: TEXT
+              description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1364,68 +1391,47 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
-          trigger_prototypes:
-            - uuid: 5bed682545044584852888d96454df86
-              expression: |
-                last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
-              event_name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: AVERAGE
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: capacity
-            - uuid: 1e5e9718c5a14099b9421ff7956b2f33
-              expression: |
-                last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSLABEL}({#FSNAME}): Disk space is low'
-              event_name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: WARNING
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              dependencies:
-                - name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
-                  expression: |
-                    last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.dependent.size[{#FSNAME},pused],1h,100)<1d)
-              tags:
-                - tag: scope
-                  value: capacity
+                - tag: fstype
+                  value: '{#FSTYPE}'
           graph_prototypes:
+            - uuid: 478c7beb397a48318994fc96acc2c4da
+              name: 'FS [{#FSLABEL}({#FSNAME})]: Space usage graph, in %'
+              width: '600'
+              height: '340'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                - drawtype: FILLED_REGION
+                  color: F63100
+                  calc_fnc: LAST
+                  item:
+                    host: 'Windows by Zabbix agent active'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
             - uuid: 8d0581d07b92406aa9f007f6d03ad24e
-              name: '{#FSLABEL}({#FSNAME}): Disk space usage'
+              name: 'FS [{#FSLABEL}({#FSNAME})]: Space utilization chart'
               width: '600'
               height: '340'
               type: PIE
               show_3d: 'YES'
               graph_items:
-                - color: '969696'
+                - color: '787878'
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
                     host: 'Windows by Zabbix agent active'
                     key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 - sortorder: '1'
-                  color: C80000
+                  color: F63100
                   calc_fnc: LAST
                   item:
                     host: 'Windows by Zabbix agent active'
                     key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+                - sortorder: '2'
+                  color: 199C09
+                  calc_fnc: LAST
+                  item:
+                    host: 'Windows by Zabbix agent active'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},free]'
           master_item:
             key: vfs.fs.get
           lld_macro_paths:
@@ -1482,10 +1488,13 @@ zabbix_export:
           description: 'The critical threshold of the CPU utilization expressed in %.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
+          description: 'Used as a threshold in the interface utilization trigger.'
         - macro: '{$IFCONTROL}'
           value: '1'
+          description: 'Macro for the interface operational state for the "link down" trigger. Can be used with interface name as context.'
         - macro: '{$MEM.PAGE_SEC.CRIT.MAX}'
           value: '1000'
           description: 'The warning threshold of the Memory Pages/sec counter.'
@@ -1497,93 +1506,123 @@ zabbix_export:
           description: 'The warning threshold of the Memory util item.'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_THIS
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_THIS
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: Miniport|Virtual|Teredo|Kernel|Loopback|Bluetooth|HTTPS|6to4|QoS|Layer
-          description: 'This macro is used in Network interface discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.NAME.MATCHES}'
           value: '^.*$'
-          description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.NAME.NOT_MATCHES}'
           value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv|edgeupdate|cbdhsvc_.+)$'
-          description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.STARTUPNAME.MATCHES}'
           value: '^(?:automatic|automatic delayed)$'
-          description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
           value: '^(?:manual|disabled)$'
-          description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '20'
           description: 'The warning threshold of the minimum free swap.'
         - macro: '{$SYSTEM.FUZZYTIME.MAX}'
           value: '60'
-          description: 'The threshold for difference of system time in seconds.'
+          description: 'The threshold for the difference of system time in seconds.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in physical disks discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in physical disk discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: _Total
-          description: 'This macro is used in physical disks discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in physical disk discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.DEV.READ.AWAIT.WARN}'
           value: '0.02'
-          description: 'Disk read average response time (in s) before the trigger would fire.'
+          description: 'Disk read average response time (in s) before the trigger fires.'
         - macro: '{$VFS.DEV.UTIL.MAX.WARN}'
           value: '95'
           description: 'The warning threshold of disk time utilization in percent.'
         - macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
           value: '0.02'
-          description: 'Disk write average response time (in s) before the trigger would fire.'
-        - macro: '{$VFS.FS.FREE.MIN.CRIT}'
-          value: 5G
-          description: 'The critical threshold of the filesystem utilization.'
-        - macro: '{$VFS.FS.FREE.MIN.WARN}'
-          value: 10G
-          description: 'The warning threshold of the filesystem utilization.'
+          description: 'Disk write average response time (in s) before the trigger fires.'
         - macro: '{$VFS.FS.FSDRIVETYPE.MATCHES}'
           value: fixed
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSDRIVETYPE.NOT_MATCHES}'
           value: ^\s$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: '^(?:/dev|/sys|/run|/proc|.+/shm$)'
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: ^\s$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
           value: '90'
-          description: 'The critical threshold of the filesystem utilization in percent.'
+          description: 'The critical threshold of the filesystem utilization.'
         - macro: '{$VFS.FS.PUSED.MAX.WARN}'
           value: '80'
-          description: 'The warning threshold of the filesystem utilization in percent.'
+          description: 'The warning threshold of the filesystem utilization.'
       dashboards:
+        - uuid: 681dd7ed662243709a406069f4a4a206
+          name: Filesystems
+          pages:
+            - name: Overview
+              widgets:
+                - type: graphprototype
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '3'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'Windows by Zabbix agent active'
+                        name: 'FS [{#FSLABEL}({#FSNAME})]: Space utilization chart'
+                    - type: STRING
+                      name: reference
+                      value: AAAEB
+                - type: graphprototype
+                  'y': '5'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'Windows by Zabbix agent active'
+                        name: 'FS [{#FSLABEL}({#FSNAME})]: Space usage graph, in %'
+                    - type: STRING
+                      name: reference
+                      value: AAAEC
         - uuid: 59033ebe1b084a86b820fc59049db125
           name: 'Network interfaces'
           pages:
             - name: Overview
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1602,7 +1641,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1615,7 +1654,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1628,23 +1667,23 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
                       name: columns
-                      value: '1'
+                      value: '3'
                     - type: GRAPH_PROTOTYPE
                       name: graphid.0
                       value:
                         host: 'Windows by Zabbix agent active'
-                        name: '{#FSLABEL}({#FSNAME}): Disk space usage'
+                        name: 'FS [{#FSLABEL}({#FSNAME})]: Space utilization chart'
                     - type: STRING
                       name: reference
-                      value: AAAAE
+                      value: AAAEA
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1660,7 +1699,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1676,7 +1715,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graphprototype
                   'y': '25'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1691,8 +1730,8 @@ zabbix_export:
                       name: reference
                       value: AAAAH
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -1707,9 +1746,9 @@ zabbix_export:
                       name: source_type
                       value: '1'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1822,7 +1861,7 @@ zabbix_export:
       name: 'Windows: CPU queue length is too high'
       event_name: 'Windows: CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)'
       priority: WARNING
-      description: 'The CPU Queue Length in the last 5 minutes exceeds {$CPU.QUEUE.CRIT.MAX}. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro {$CPU.QUEUE.CRIT.MAX }.'
+      description: 'The CPU Queue Length in the last 5 minutes exceeds `{$CPU.QUEUE.CRIT.MAX}`. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro `{$CPU.QUEUE.CRIT.MAX }`.'
       dependencies:
         - name: 'Windows: High CPU utilization'
           expression: 'min(/Windows by Zabbix agent active/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'

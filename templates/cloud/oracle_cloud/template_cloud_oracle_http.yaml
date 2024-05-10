@@ -1856,7 +1856,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: State
-                  width: '9'
+                  width: '27'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -1895,7 +1895,7 @@ zabbix_export:
                 - type: graph
                   name: 'CPU utilization'
                   'y': '4'
-                  width: '7'
+                  width: '21'
                   height: '7'
                   fields:
                     - type: GRAPH
@@ -1908,9 +1908,9 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'Storage stats'
-                  x: '7'
+                  x: '21'
                   'y': '4'
-                  width: '7'
+                  width: '21'
                   height: '7'
                   fields:
                     - type: GRAPH
@@ -1923,8 +1923,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: Availability
-                  x: '9'
-                  width: '5'
+                  x: '27'
+                  width: '15'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -1962,8 +1962,8 @@ zabbix_export:
                       value: '20'
                 - type: item
                   name: 'Conenction latency'
-                  x: '14'
-                  width: '10'
+                  x: '42'
+                  width: '30'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -2009,9 +2009,9 @@ zabbix_export:
                       value: '60'
                 - type: gauge
                   name: 'CPU utilization'
-                  x: '14'
+                  x: '42'
                   'y': '2'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2076,9 +2076,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: Sessions
-                  x: '14'
+                  x: '42'
                   'y': '5'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2119,9 +2119,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Running statements'
-                  x: '14'
+                  x: '42'
                   'y': '8'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2162,9 +2162,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: gauge
                   name: 'Storage utilization'
-                  x: '19'
+                  x: '57'
                   'y': '2'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2229,9 +2229,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Execute count'
-                  x: '19'
+                  x: '57'
                   'y': '5'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2272,9 +2272,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Queued statements'
-                  x: '19'
+                  x: '57'
                   'y': '8'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2318,7 +2318,7 @@ zabbix_export:
               widgets:
                 - type: gauge
                   name: 'CPU utilization'
-                  width: '12'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2384,7 +2384,7 @@ zabbix_export:
                 - type: graph
                   name: 'CPU utilization'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -2397,8 +2397,8 @@ zabbix_export:
                       value: AAAAA
                 - type: gauge
                   name: 'CPU time'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2463,9 +2463,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'CPU time'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -2481,7 +2481,7 @@ zabbix_export:
               widgets:
                 - type: gauge
                   name: 'Storage utilization'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2547,7 +2547,7 @@ zabbix_export:
                 - type: graph
                   name: 'Storage utilization'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -2560,8 +2560,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Max storage space'
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2602,9 +2602,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Storage stats'
-                  x: '6'
+                  x: '18'
                   'y': '3'
-                  width: '18'
+                  width: '54'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -2617,8 +2617,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'Allocated Storage Space'
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2659,8 +2659,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Used storage space'
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2704,7 +2704,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Physical reads'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2746,7 +2746,7 @@ zabbix_export:
                 - type: graph
                   name: Read/writes
                   'y': '3'
-                  width: '9'
+                  width: '27'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -2759,8 +2759,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Physical writes'
-                  x: '5'
-                  width: '4'
+                  x: '15'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2801,8 +2801,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Physical read total bytes'
-                  x: '9'
-                  width: '5'
+                  x: '27'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2843,9 +2843,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Physical total read/write bytes'
-                  x: '9'
+                  x: '27'
                   'y': '3'
-                  width: '9'
+                  width: '27'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -2858,8 +2858,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'Physical write total bytes'
-                  x: '14'
-                  width: '4'
+                  x: '42'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2900,8 +2900,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Logical reads session'
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -2942,9 +2942,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Logical reads session'
-                  x: '18'
+                  x: '54'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -2963,7 +2963,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: Sessions
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3005,7 +3005,7 @@ zabbix_export:
                 - type: item
                   name: 'Failed connections'
                   'y': '3'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3047,7 +3047,7 @@ zabbix_export:
                 - type: graph
                   name: 'Session stats'
                   'y': '6'
-                  width: '10'
+                  width: '30'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -3060,8 +3060,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: Logons
-                  x: '5'
-                  width: '5'
+                  x: '15'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3102,9 +3102,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Failed logons'
-                  x: '5'
+                  x: '15'
                   'y': '3'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3145,8 +3145,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Wait time'
-                  x: '10'
-                  width: '5'
+                  x: '30'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3187,9 +3187,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Wait time'
-                  x: '10'
+                  x: '30'
                   'y': '3'
-                  width: '5'
+                  width: '15'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3205,8 +3205,8 @@ zabbix_export:
                       value: '0'
                 - type: item
                   name: 'DB time'
-                  x: '15'
-                  width: '5'
+                  x: '45'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3247,9 +3247,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'DB time'
-                  x: '15'
+                  x: '45'
                   'y': '3'
-                  width: '5'
+                  width: '15'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3265,8 +3265,8 @@ zabbix_export:
                       value: '0'
                 - type: item
                   name: 'Connection latency'
-                  x: '20'
-                  width: '4'
+                  x: '60'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3307,9 +3307,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Connection latency'
-                  x: '20'
+                  x: '60'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3328,7 +3328,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'User calls'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3370,7 +3370,7 @@ zabbix_export:
                 - type: graph
                   name: 'User calls'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3383,8 +3383,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'User commits'
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3425,9 +3425,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'User commits'
-                  x: '6'
+                  x: '18'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3440,8 +3440,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'User rollbacks'
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3482,9 +3482,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'User rollbacks'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3497,8 +3497,8 @@ zabbix_export:
                       value: AAAAC
                 - type: item
                   name: 'Execute count'
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3539,9 +3539,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Execute count'
-                  x: '18'
+                  x: '54'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3557,7 +3557,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Parse count (hard)'
-                  width: '8'
+                  width: '24'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3599,7 +3599,7 @@ zabbix_export:
                 - type: graph
                   name: 'Parse count (hard)'
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3612,8 +3612,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Parse count (failures)'
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3654,9 +3654,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Parse count (failures)'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3669,8 +3669,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'Parse count (total)'
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3711,9 +3711,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Parse count (total)'
-                  x: '16'
+                  x: '48'
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3729,7 +3729,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Bytes received from client'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3771,7 +3771,7 @@ zabbix_export:
                 - type: graph
                   name: 'SQL*Net client bytes'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3784,8 +3784,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Bytes sent to client'
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3826,8 +3826,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Bytes received from DBLink'
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3868,9 +3868,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'SQL*Net DBLink bytes'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3883,8 +3883,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'Bytes sent to DBLink'
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3928,7 +3928,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Query latency'
-                  width: '7'
+                  width: '21'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3970,7 +3970,7 @@ zabbix_export:
                 - type: graph
                   name: 'Query latency'
                   'y': '3'
-                  width: '7'
+                  width: '21'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -3983,8 +3983,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Running statements'
-                  x: '7'
-                  width: '4'
+                  x: '21'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -4025,9 +4025,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: Statements
-                  x: '7'
+                  x: '21'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -4040,8 +4040,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'Queued statements'
-                  x: '11'
-                  width: '4'
+                  x: '33'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -4082,8 +4082,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Transaction count'
-                  x: '15'
-                  width: '4'
+                  x: '45'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -4124,8 +4124,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'DB block changes'
-                  x: '19'
-                  width: '5'
+                  x: '57'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -4166,9 +4166,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Redo generated'
-                  x: '19'
+                  x: '57'
                   'y': '3'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -4922,7 +4922,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: Availability
-                  width: '9'
+                  width: '27'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -4946,7 +4946,7 @@ zabbix_export:
                 - type: item
                   name: 'Volume read operations'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -4988,7 +4988,7 @@ zabbix_export:
                 - type: graph
                   name: Operations
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -5001,9 +5001,9 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Volume write operations'
-                  x: '6'
+                  x: '18'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -5044,8 +5044,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Guaranteed IOPS'
-                  x: '9'
-                  width: '5'
+                  x: '27'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -5086,9 +5086,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Volume read throughput'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -5129,9 +5129,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: Throughput
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -5144,8 +5144,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'Guaranteed throughput'
-                  x: '14'
-                  width: '5'
+                  x: '42'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -5186,9 +5186,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Volume write throughput'
-                  x: '18'
+                  x: '54'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -5229,8 +5229,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Guaranteed VPUs/GB'
-                  x: '19'
-                  width: '5'
+                  x: '57'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -5948,7 +5948,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: Availability
-                  width: '9'
+                  width: '27'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -5972,7 +5972,7 @@ zabbix_export:
                 - type: item
                   name: 'Volume read operations'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -6014,7 +6014,7 @@ zabbix_export:
                 - type: graph
                   name: Operations
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -6027,9 +6027,9 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Volume write operations'
-                  x: '6'
+                  x: '18'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -6070,8 +6070,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Guaranteed IOPS'
-                  x: '9'
-                  width: '5'
+                  x: '27'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -6112,9 +6112,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Volume read throughput'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -6155,9 +6155,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: Throughput
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -6170,8 +6170,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'Guaranteed throughput'
-                  x: '14'
-                  width: '5'
+                  x: '42'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -6212,9 +6212,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Volume write throughput'
-                  x: '18'
+                  x: '54'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -6255,8 +6255,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Guaranteed VPUs/GB'
-                  x: '19'
-                  width: '5'
+                  x: '57'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -9652,7 +9652,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: State
-                  width: '9'
+                  width: '27'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -9691,7 +9691,7 @@ zabbix_export:
                 - type: item
                   name: 'Disk bytes read'
                   'y': '4'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -9733,7 +9733,7 @@ zabbix_export:
                 - type: item
                   name: 'Disk read I/O'
                   'y': '7'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -9774,9 +9774,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Disk bytes written'
-                  x: '5'
+                  x: '15'
                   'y': '4'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -9817,9 +9817,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Disk write I/O'
-                  x: '5'
+                  x: '15'
                   'y': '7'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -9860,8 +9860,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: Availability
-                  x: '9'
-                  width: '5'
+                  x: '27'
+                  width: '15'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -9899,9 +9899,9 @@ zabbix_export:
                       value: '20'
                 - type: item
                   name: 'Net bytes in'
-                  x: '10'
+                  x: '30'
                   'y': '4'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -9942,9 +9942,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Net bytes out'
-                  x: '10'
+                  x: '30'
                   'y': '7'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -9985,8 +9985,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Load average'
-                  x: '14'
-                  width: '10'
+                  x: '42'
+                  width: '30'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -10027,9 +10027,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: gauge
                   name: CPU
-                  x: '16'
+                  x: '48'
                   'y': '4'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10094,9 +10094,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Memory allocation stalls'
-                  x: '16'
+                  x: '48'
                   'y': '7'
-                  width: '8'
+                  width: '24'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10137,9 +10137,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: gauge
                   name: Memory
-                  x: '20'
+                  x: '60'
                   'y': '4'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10207,7 +10207,7 @@ zabbix_export:
               widgets:
                 - type: gauge
                   name: CPU
-                  width: '8'
+                  width: '24'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10273,7 +10273,7 @@ zabbix_export:
                 - type: graph
                   name: 'CPU utilization'
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10286,8 +10286,8 @@ zabbix_export:
                       value: AAAAA
                 - type: gauge
                   name: Memory
-                  x: '8'
-                  width: '16'
+                  x: '24'
+                  width: '48'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10352,9 +10352,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Memory utilization'
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10367,9 +10367,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: 'Memory allocation stalls'
-                  x: '16'
+                  x: '48'
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10385,7 +10385,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Net bytes in'
-                  width: '12'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10427,7 +10427,7 @@ zabbix_export:
                 - type: graph
                   name: 'Network bytes in'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10440,8 +10440,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Net bytes out'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10482,9 +10482,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Network bytes out'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10500,7 +10500,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Disk bytes read'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10542,7 +10542,7 @@ zabbix_export:
                 - type: graph
                   name: 'Disk bytes read'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10555,8 +10555,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Disk bytes written'
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10597,9 +10597,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Disk bytes written'
-                  x: '6'
+                  x: '18'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10612,8 +10612,8 @@ zabbix_export:
                       value: AAAAB
                 - type: item
                   name: 'Disk read i/o'
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10654,9 +10654,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Disk read i/o'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10669,8 +10669,8 @@ zabbix_export:
                       value: AAAAC
                 - type: item
                   name: 'Disk write i/o'
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -10711,9 +10711,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'Disk write i/o'
-                  x: '18'
+                  x: '54'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -10729,7 +10729,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Total bytes in'
-                  width: '2'
+                  width: '6'
                   height: '11'
                   hide_header: 'YES'
                   fields:
@@ -10779,8 +10779,8 @@ zabbix_export:
                       value: '4'
                 - type: graph
                   name: 'Network bytes in'
-                  x: '2'
-                  width: '10'
+                  x: '6'
+                  width: '30'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -10796,9 +10796,9 @@ zabbix_export:
                       value: '0'
                 - type: graphprototype
                   name: 'VNIC bytes in'
-                  x: '2'
+                  x: '6'
                   'y': '3'
-                  width: '10'
+                  width: '30'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -10814,9 +10814,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: 'VNIC packets in'
-                  x: '2'
+                  x: '6'
                   'y': '7'
-                  width: '10'
+                  width: '30'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -10832,8 +10832,8 @@ zabbix_export:
                       value: AAAAC
                 - type: item
                   name: 'Total bytes out'
-                  x: '12'
-                  width: '2'
+                  x: '36'
+                  width: '6'
                   height: '11'
                   hide_header: 'YES'
                   fields:
@@ -10883,8 +10883,8 @@ zabbix_export:
                       value: '4'
                 - type: graph
                   name: 'Network bytes out'
-                  x: '14'
-                  width: '10'
+                  x: '42'
+                  width: '30'
                   height: '3'
                   fields:
                     - type: GRAPH
@@ -10900,9 +10900,9 @@ zabbix_export:
                       value: '0'
                 - type: graphprototype
                   name: 'VNIC bytes out'
-                  x: '14'
+                  x: '42'
                   'y': '3'
-                  width: '10'
+                  width: '30'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -10918,9 +10918,9 @@ zabbix_export:
                       value: AAAAE
                 - type: graphprototype
                   name: 'VNIC packets out'
-                  x: '14'
+                  x: '42'
                   'y': '7'
-                  width: '10'
+                  width: '30'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -10939,7 +10939,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Connection tracking table'
-                  width: '8'
+                  width: '24'
                   height: '11'
                   fields:
                     - type: INTEGER
@@ -10955,8 +10955,8 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   name: 'Security list'
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '11'
                   fields:
                     - type: INTEGER
@@ -10972,8 +10972,8 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: Smartnic
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '11'
                   fields:
                     - type: INTEGER
@@ -12471,7 +12471,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Overall latency time'
-                  width: '10'
+                  width: '30'
                   height: '5'
                   hide_header: 'YES'
                   fields:
@@ -12513,7 +12513,7 @@ zabbix_export:
                 - type: item
                   name: 'Bucket Size'
                   'y': '5'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12555,7 +12555,7 @@ zabbix_export:
                 - type: item
                   name: 'Client-side error count'
                   'y': '8'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12596,9 +12596,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Number of objects'
-                  x: '5'
+                  x: '15'
                   'y': '5'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12639,9 +12639,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Incomplete multipart upload size'
-                  x: '5'
+                  x: '15'
                   'y': '8'
-                  width: '5'
+                  width: '15'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12682,8 +12682,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'First byte latency time'
-                  x: '10'
-                  width: '10'
+                  x: '30'
+                  width: '30'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12724,9 +12724,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'All requests'
-                  x: '10'
+                  x: '30'
                   'y': '3'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12767,9 +12767,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: Requests
-                  x: '10'
+                  x: '30'
                   'y': '6'
-                  width: '14'
+                  width: '42'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -12782,9 +12782,9 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Post object requests'
-                  x: '16'
+                  x: '48'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12825,8 +12825,8 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'OLM status'
-                  x: '20'
-                  width: '4'
+                  x: '60'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12867,9 +12867,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: item
                   name: 'Put object requests'
-                  x: '20'
+                  x: '60'
                   'y': '3'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12913,7 +12913,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Overall latency time'
-                  width: '12'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -12955,7 +12955,7 @@ zabbix_export:
                 - type: graph
                   name: 'Overall latency'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH
@@ -12968,8 +12968,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'First byte latency time'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -13010,9 +13010,9 @@ zabbix_export:
                       value: FFFFFF
                 - type: graph
                   name: 'First byte latency'
-                  x: '12'
+                  x: '36'
                   'y': '3'
-                  width: '12'
+                  width: '36'
                   height: '8'
                   fields:
                     - type: GRAPH

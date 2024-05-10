@@ -73,7 +73,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$default_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -91,9 +91,9 @@ class testDashboardURLWidget extends CWebTest {
 							[
 								'type' => 'url',
 								'name' => self::$frame_widget,
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -108,7 +108,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$delete_widget,
 								'x' => 0,
 								'y' => 5,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -133,7 +133,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[

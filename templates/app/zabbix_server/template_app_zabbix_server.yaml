@@ -1829,7 +1829,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1842,7 +1842,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1855,7 +1855,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1867,8 +1867,8 @@ zabbix_export:
                       name: reference
                       value: AAAAE
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1880,9 +1880,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1894,9 +1894,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1912,7 +1912,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1925,7 +1925,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1937,8 +1937,8 @@ zabbix_export:
                       name: reference
                       value: AAAAI
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1950,9 +1950,9 @@ zabbix_export:
                       name: reference
                       value: AAAAH
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

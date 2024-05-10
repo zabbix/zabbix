@@ -28,7 +28,7 @@ zabbix_export:
             stats uri /stats
             stats refresh 10s
         
-        2. Set the hostname or IP address of the the HAProxy stats host or container in the '{$HAPROXY.STATS.HOST}' macro. You can also change the status page port in the '{$HAPROXY.STATS.PORT}' macro, the status page scheme in the '{$HAPROXY.STATS.SCHEME}' macro and the status page path in the '{$HAPROXY.STATS.PATH}' macro if necessary.
+        2. Set the hostname or IP address of the HAProxy stats host or container in the '{$HAPROXY.STATS.HOST}' macro. You can also change the status page port in the '{$HAPROXY.STATS.PORT}' macro, the status page scheme in the '{$HAPROXY.STATS.SCHEME}' macro and the status page path in the '{$HAPROXY.STATS.PATH}' macro if necessary.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393527-discussion-thread-for-official-zabbix-template-haproxy
         
@@ -2119,7 +2119,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2135,7 +2135,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2151,7 +2151,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2170,7 +2170,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2186,7 +2186,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2202,7 +2202,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2218,7 +2218,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2237,7 +2237,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2253,7 +2253,7 @@ zabbix_export:
                       value: AAAAH
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2269,7 +2269,7 @@ zabbix_export:
                       value: AAAAI
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

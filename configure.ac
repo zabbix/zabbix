@@ -2003,6 +2003,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
+	src/libs/zbxbincommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
