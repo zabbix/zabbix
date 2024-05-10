@@ -22,6 +22,7 @@
 namespace Widgets\ItemHistory\Includes;
 
 use API;
+
 use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldColumnsList extends CWidgetField {

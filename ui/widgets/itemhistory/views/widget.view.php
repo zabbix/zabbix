@@ -27,6 +27,7 @@
  */
 
 use Widgets\ItemHistory\Widget;
+
 use Widgets\ItemHistory\Includes\{
 	WidgetForm,
 	CWidgetFieldColumnsList

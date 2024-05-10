@@ -25,9 +25,7 @@ use API,
 	CController,
 	CControllerResponseData;
 
-class DataBinary extends CController {
-
-	private const BASE64_STRING_LENGTH = 1024;
+class ImageView extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -42,29 +40,15 @@ class DataBinary extends CController {
 			'itemid' =>		'int32|required',
 			'clock' =>		'int32|required',
 			'ns' =>			'int32|required',
-			'preview' =>	'int32|required',
 		];
 
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				], JSON_THROW_ON_ERROR)]))->disableView()
-			);
-		}
-
-		return $ret;
+		return $this->validateInput($fields);
 	}
 
 	protected function doAction() {
 		$itemid = $this->getInput('itemid', '');
 		$clock = $this->getInput('clock', 0);
 		$ns = $this->getInput('ns', 0);
-		$preview = $this->getInput('preview', 0);
 
 		$result = [];
 
@@ -86,31 +70,16 @@ class DataBinary extends CController {
 					'itemids' => [$db_item[0]['itemid']]
 				]);
 
-				If ($preview == 0) {
-					if ($history_value) {
-						$image = imagecreatefromstring(base64_decode($history_value[0]['value']));
+				if ($history_value) {
+					$image = imagecreatefromstring(base64_decode($history_value[0]['value'])) ?: '';
 
-						if ($image) {
-							ob_start();
-
-							imagepng($preview == 1 ? imageThumb($image, 0, 112) : $image);
-
-							$result['thumbnail'] = base64_encode(ob_get_clean());
-						}
-						else {
-							$result['value'] = substr($history_value[0]['value'], 0, self::BASE64_STRING_LENGTH);
-							$result['has_more'] = strlen($history_value[0]['value']) >= self::BASE64_STRING_LENGTH;
-						}
+					if ($image) {
+						$result['image'] = $image;
 					}
-				}
-				else {
-					$result['value'] = $history_value[0]['value'];
 				}
 			}
 		}
 
-		$this->setResponse(
-			(new CControllerResponseData(['main_block' => json_encode($result, JSON_THROW_ON_ERROR)]))->disableView()
-		);
+		$this->setResponse((new CControllerResponseData($result))->disableView());
 	}
 }

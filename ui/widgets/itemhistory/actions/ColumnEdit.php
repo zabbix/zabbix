@@ -190,7 +190,7 @@ class ColumnEdit extends CController {
 	}
 
 	/**
-	 * Retrieve the default configuration values for column in Top hosts widget.
+	 * Retrieve the default configuration values for column in Item history widget.
 	 *
 	 * @return array
 	 */

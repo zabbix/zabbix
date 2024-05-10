@@ -26,6 +26,10 @@
 		"widget.itemhistory.data_binary.get": {
 			"class": "DataBinary",
 			"layout": "layout.json"
+		},
+		"widget.itemhistory.image_view": {
+			"class": "ImageView",
+			"layout": "layout.image"
 		}
 	}
 }

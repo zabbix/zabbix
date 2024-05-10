@@ -26,4 +26,9 @@
 
 header('Content-type: image/png');
 
-echo imagepng($data['image']);
+if ($data['image'] !== '') {
+	echo imagepng($data['image']);
+}
+else {
+	echo $data['image'];
+}
