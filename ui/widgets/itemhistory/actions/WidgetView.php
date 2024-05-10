@@ -53,8 +53,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]
 		];
 
-		$db_items = [];
-
 		$override_hostid = $this->fields_values['override_hostid'] ? $this->fields_values['override_hostid'][0] : '';
 
 		if ($override_hostid === '' && $this->isTemplateDashboard()) {
@@ -65,15 +63,55 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return;
 		}
 
-		if ($this->fields_values['columns']) {
-			$db_items = API::Item()->get([
-				'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
-				'selectValueMap' => ['mappings'],
-				'itemids' => array_column($this->fields_values['columns'], 'itemid'),
-				'hostids' => $override_hostid !== '' ? [$override_hostid] : null,
-				'webitems' => true,
-				'preservekeys' => true
-			]);
+		$columns_config = $this->fields_values['columns'];
+
+		$itemids = array_column($columns_config, 'itemid');
+		$db_items = [];
+
+		if ($columns_config) {
+			if (!$this->isTemplateDashboard()) {
+				$db_items = API::Item()->get([
+					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
+					'selectValueMap' => ['mappings'],
+					'hostids' => $override_hostid !== '' ? [$override_hostid] : null,
+					'itemids' => $itemids,
+					'webitems' => true,
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$db_item_keys = API::Item()->get([
+					'output' => ['key_'],
+					'itemids' => $itemids,
+					'webitems' => true,
+					'preservekeys' => true
+				]);
+
+				if ($db_item_keys) {
+					$db_items = API::Item()->get([
+						'output' => ['itemid', 'key_', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
+						'selectValueMap' => ['mappings'],
+						'hostids' => [$override_hostid],
+						'filter' => [
+							'key_' => array_keys(array_column($db_item_keys, null, 'key_'))
+						],
+						'webitems' => true,
+						'preservekeys' => true
+					]);
+
+					if ($db_items) {
+						$itemid_per_key = array_column($db_items, 'itemid', 'key_');
+
+						foreach ($columns_config as &$column) {
+							if (array_key_exists($column['itemid'], $db_item_keys)
+									&& array_key_exists($db_item_keys[$column['itemid']]['key_'], $itemid_per_key)) {
+								$column['itemid'] = $itemid_per_key[$db_item_keys[$column['itemid']]['key_']];
+							}
+						}
+						unset($column);
+					}
+				}
+			}
 		}
 
 		if (!$db_items) {
@@ -84,8 +122,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return;
 		}
 
-		$columns_config = array_filter($this->fields_values['columns'], static function($column) use ($db_items) {
-			return array_key_exists('itemid', $column) && array_key_exists($column['itemid'], $db_items);
+		$columns_config = array_filter($columns_config, static function($column) use ($db_items) {
+			return array_key_exists($column['itemid'], $db_items);
 		});
 
 		$item_values_by_source = $this->getItemValuesByDataSource($db_items, $columns_config);

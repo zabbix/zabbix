@@ -24,14 +24,39 @@ use Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 ?>
 
 window.item_history_column_edit = new class {
-
+	/**
+	 * @type {Overlay}
+	 */
 	#overlay;
+
+	/**
+	 * @type {HTMLElement}
+	 */
 	#dialogue;
+
+	/**
+	 * @type {HTMLFormElement}
+	 */
 	#form;
+
+	/**
+	 * @type {string}
+	 */
 	#$thresholds_table;
+
+	/**
+	 * @type {string}
+	 */
 	#highlights_table;
 
+	/**
+	 * @type {string}
+	 */
 	#old_multiselect_item_name;
+
+	/**
+	 * @type {number|null}
+	 */
 	#item_value_type;
 
 	init({form_id, thresholds, highlights, colors, item_value_type, multiselect_item_name}) {
@@ -47,6 +72,8 @@ window.item_history_column_edit = new class {
 
 		// Initialize item multiselect
 		$('#itemid').on('change', () => {
+			this.#overlay.setLoading();
+
 			const ms_item_data = jQuery('#itemid').multiSelect('getData');
 
 			if (ms_item_data.length > 0) {
@@ -54,7 +81,6 @@ window.item_history_column_edit = new class {
 					.then((type) => {
 						if (this.#form.isConnected) {
 							this.#item_value_type = type;
-							this.#updateForm();
 						}
 					});
 
@@ -69,6 +95,9 @@ window.item_history_column_edit = new class {
 			else {
 				this.#item_value_type = null;
 			}
+
+			this.#updateForm();
+			this.#overlay.unsetLoading();
 		});
 
 		colorPalette.setThemeColors(colors);
@@ -163,8 +192,9 @@ window.item_history_column_edit = new class {
 	}
 
 	/**
-	 * Fetch type of currently selected item.
+	 * Fetch type of item by itemid.
 	 *
+	 * @param {number|null} itemid
 	 *
 	 * @return {Promise<any>}  Resolved promise will contain item type, or null in case of error or if no item is
 	 *                         currently selected.
@@ -180,8 +210,6 @@ window.item_history_column_edit = new class {
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 		curl.setArgument('itemid', itemid);
 
-		this.#overlay.setLoading();
-
 		return fetch(curl.getUrl())
 			.then((response) => response.json())
 			.then((response) => {
@@ -195,8 +223,6 @@ window.item_history_column_edit = new class {
 				console.log('Could not get item type', exception);
 
 				return null;
-			}).finally(() => {
-				this.#overlay.unsetLoading();
 			});
 	}
 
@@ -236,9 +262,7 @@ window.item_history_column_edit = new class {
 			}
 		}
 
-		// Toggle disable/enable of input fields
-		$(this.#highlights_table).toggleClass('disabled', !is_item_type_text);
-
+		// Toggle visibility and enables/disabled inputs of display radio button list
 		if (is_item_type_numeric || is_item_type_text) {
 			const visible_values = is_item_type_numeric
 				? [<?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>, <?= CWidgetFieldColumnsList::DISPLAY_BAR ?>,
@@ -263,6 +287,8 @@ window.item_history_column_edit = new class {
 			}
 		}
 
+		// Toggle disable/enable of input fields
+		$(this.#highlights_table).toggleClass('disabled', !is_item_type_text);
 		$(this.#$thresholds_table).toggleClass('disabled', !is_item_type_numeric);
 
 		const inputs = {

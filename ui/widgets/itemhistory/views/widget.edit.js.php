@@ -23,9 +23,32 @@
 
 window.widget_itemhistory_form = new class {
 
+	/**
+	 * Widget form.
+	 *
+	 * @type {HTMLFormElement}
+	 */
 	#form;
+
+	/**
+	 * Template id.
+	 *
+	 * @type {string}
+	 */
 	#templateid;
+
+	/**
+	 * Column list container.
+	 *
+	 * @type {HTMLElement}
+	 */
 	#list_columns;
+
+	/**
+	 * Column index.
+	 *
+	 * @type {number}
+	 */
 	#column_index;
 
 	init({templateid}) {
