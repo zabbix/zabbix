@@ -107,6 +107,8 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_TRACE, "Browser::Browser(%s)", capabilities);
+
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
@@ -140,8 +142,6 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 
 	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot open webriver session: %s", error);
-	else
-		zabbix_log(LOG_LEVEL_TRACE, "Browser::Browser(%s)", capabilities);
 out:
 	zbx_free(capabilities);
 	zbx_free(error);
@@ -945,13 +945,22 @@ static const duk_function_list_entry	browser_methods[] = {
  ******************************************************************************/
 static duk_ret_t	es_browser_chrome_options(duk_context *ctx)
 {
-	duk_push_object(ctx);
-	duk_push_object(ctx);
-	duk_push_object(ctx);
+	duk_push_object(ctx);		/* {} */
+	duk_push_object(ctx);		/* capabilities */
+
+	duk_push_object(ctx);		/* alwaysMatch */
 	duk_push_string(ctx, "chrome");
 	duk_put_prop_string(ctx, -2, "browserName");
 	duk_push_string(ctx, "normal");
 	duk_put_prop_string(ctx, -2, "pageLoadStrategy");
+
+	duk_push_object(ctx);		/* goog:chromeOptions */
+	duk_push_array(ctx);		/* args */
+	duk_push_string(ctx, "--headless=new");
+	duk_put_prop_index(ctx, -2, 0);
+	duk_put_prop_string(ctx, -2, "args");
+	duk_put_prop_string(ctx, -2, "goog:chromeOptions");
+
 	duk_put_prop_string(ctx, -2, "alwaysMatch");
 	duk_put_prop_string(ctx, -2, "capabilities");
 
@@ -967,13 +976,22 @@ static duk_ret_t	es_browser_chrome_options(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_browser_firefox_options(duk_context *ctx)
 {
-	duk_push_object(ctx);
-	duk_push_object(ctx);
-	duk_push_object(ctx);
+	duk_push_object(ctx);		/* {} */
+	duk_push_object(ctx);		/* capabilities */
+
+	duk_push_object(ctx);		/* alwaysMatch */
 	duk_push_string(ctx, "firefox");
 	duk_put_prop_string(ctx, -2, "browserName");
 	duk_push_string(ctx, "normal");
 	duk_put_prop_string(ctx, -2, "pageLoadStrategy");
+
+	duk_push_object(ctx);		/* moz:firefoxOptions */
+	duk_push_array(ctx);		/* args */
+	duk_push_string(ctx, "--headless");
+	duk_put_prop_index(ctx, -2, 0);
+	duk_put_prop_string(ctx, -2, "args");
+	duk_put_prop_string(ctx, -2, "moz:firefoxOptions");
+
 	duk_put_prop_string(ctx, -2, "alwaysMatch");
 	duk_put_prop_string(ctx, -2, "capabilities");
 
@@ -1011,13 +1029,23 @@ static duk_ret_t	es_browser_safari_options(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_browser_edge_options(duk_context *ctx)
 {
-	duk_push_object(ctx);
-	duk_push_object(ctx);
-	duk_push_object(ctx);
-	duk_push_string(ctx, "edge");
+	duk_push_object(ctx);		/* {} */
+	duk_push_object(ctx);		/* capabilities */
+
+	duk_push_object(ctx);		/* alwaysMatch */
+
+	duk_push_string(ctx, "MicrosoftEdge");
 	duk_put_prop_string(ctx, -2, "browserName");
 	duk_push_string(ctx, "normal");
 	duk_put_prop_string(ctx, -2, "pageLoadStrategy");
+
+	duk_push_object(ctx);		/* ms:edgeOptions */
+	duk_push_array(ctx);		/* args */
+	duk_push_string(ctx, "--headless=new");
+	duk_put_prop_index(ctx, -2, 0);
+	duk_put_prop_string(ctx, -2, "args");
+	duk_put_prop_string(ctx, -2, "ms:edgeOptions");
+
 	duk_put_prop_string(ctx, -2, "alwaysMatch");
 	duk_put_prop_string(ctx, -2, "capabilities");
 
