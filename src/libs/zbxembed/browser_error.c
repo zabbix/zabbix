@@ -35,8 +35,6 @@ static duk_ret_t	es_browser_error_ctor(duk_context *ctx)
 	if (!es_is_chained_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
 
-	zabbix_log(LOG_LEVEL_WARNING, "BrowserError::BrowserError()");
-
 	duk_push_this(ctx);
 	duk_dup(ctx, 0);
 	duk_put_prop_string(ctx, -2, "message");

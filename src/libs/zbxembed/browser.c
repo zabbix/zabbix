@@ -59,15 +59,20 @@ static duk_ret_t	es_browser_dtor(duk_context *ctx)
 {
 	zbx_webdriver_t	*wd;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "browser::~browser()");
+	zabbix_log(LOG_LEVEL_TRACE, "Browser::~Browser()");
 
 	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
 
 	if (NULL != (wd = (zbx_webdriver_t *)duk_to_pointer(ctx, -1)))
 	{
+		zbx_es_env_t	*env;
+
 		webdriver_release(wd);
 		duk_push_pointer(ctx, NULL);
 		duk_put_prop_string(ctx, 0, "\xff""\xff""d");
+
+		if (NULL != (env = zbx_es_get_env(ctx)))
+			env->browser_objects--;
 	}
 
 	return 0;
@@ -80,6 +85,8 @@ static duk_ret_t	es_browser_dtor(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_browser_ctor(duk_context *ctx)
 {
+#define BROWSER_INSTANCE_LIMIT	4
+
 	zbx_webdriver_t	*wd = NULL;
 	zbx_es_env_t	*env;
 	int		err_index = -1;
@@ -95,17 +102,24 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, -1), &capabilities))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert browser capabilities to utf8");
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
+				"cannot convert browser capabilities to utf8");
 		goto out;
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "browser::browser(%s)", capabilities);
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
 		goto out;
 	}
+
+	if (BROWSER_INSTANCE_LIMIT <= env->browser_objects)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
+				"maximum count of Browser objects was reached");
+		goto out;
+	}
+
 
 	if (NULL == (wd = webdriver_create(env->browser_endpoint, env->config_source_ip, &error)))
 	{
@@ -126,14 +140,20 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 
 	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot open webriver session: %s", error);
+	else
+		zabbix_log(LOG_LEVEL_TRACE, "Browser::Browser(%s)", capabilities);
 out:
 	zbx_free(capabilities);
 	zbx_free(error);
 
 	if (-1 != err_index)
 		return duk_throw(ctx);
+	else
+		env->browser_objects++;
 
 	return 0;
+
+#undef	BROWSER_INSTANCE_LIMIT
 }
 
 /******************************************************************************
@@ -1064,7 +1084,7 @@ static int	es_init_browser(zbx_es_t *es, char **error)
  * Purpose: initialize javascript environment for browser monitoring          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_env_init_browser(zbx_es_t *es, const char *endpoint, char **error)
+int	zbx_es_init_browser_env(zbx_es_t *es, const char *endpoint, char **error)
 {
 	es->env->browser_endpoint = zbx_strdup(NULL, endpoint);
 

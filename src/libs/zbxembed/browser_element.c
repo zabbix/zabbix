@@ -62,7 +62,7 @@ static duk_ret_t	wd_element_dtor(duk_context *ctx)
 {
 	zbx_wd_element_t	*el;
 
-	zabbix_log(LOG_LEVEL_TRACE, "element::~element()");
+	zabbix_log(LOG_LEVEL_TRACE, "Element::~Element()");
 
 	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
 
@@ -89,7 +89,7 @@ static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const ch
 	zbx_wd_element_t	*el;
 	zbx_es_env_t		*env;
 
-	zabbix_log(LOG_LEVEL_TRACE, "element::element()");
+	zabbix_log(LOG_LEVEL_TRACE, "Element::Element()");
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{

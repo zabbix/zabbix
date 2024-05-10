@@ -161,7 +161,7 @@ static int	execute_script(const char *command, const char *param, int timeout, c
 		goto failure;
 	}
 
-	if (NULL != webdriver && FAIL == zbx_es_env_init_browser(&es, webdriver, &errmsg))
+	if (NULL != webdriver && FAIL == zbx_es_init_browser_env(&es, webdriver, &errmsg))
 	{
 		zbx_snprintf(error, max_error_len, "cannot initialize Browser object: %s", errmsg);
 		zbx_free(errmsg);

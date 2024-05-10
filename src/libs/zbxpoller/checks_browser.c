@@ -51,7 +51,7 @@ int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, con
 			return ret;
 		}
 
-		if (SUCCEED != zbx_es_env_init_browser(&es_engine, config_webdriver_url, &error))
+		if (SUCCEED != zbx_es_init_browser_env(&es_engine, config_webdriver_url, &error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize Browser object: %s", error));
 			zbx_free(error);

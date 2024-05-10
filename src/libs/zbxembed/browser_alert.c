@@ -84,7 +84,7 @@ static duk_ret_t	wd_alert_ctor(duk_context *ctx, zbx_webdriver_t *wd, const char
 	zbx_wd_alert_t	*alert;
 	zbx_es_env_t	*env;
 
-	zabbix_log(LOG_LEVEL_TRACE, "alert::alert()");
+	zabbix_log(LOG_LEVEL_TRACE, "Alert::Alert()");
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
