@@ -7,7 +7,7 @@ The template is developed to monitor a single DBMS Oracle Database instance with
 
 ## Supported versions
 
-Oracle Database 12c2 and newer
+Oracle Database 12c2 and newer.
 
 ## Requirements
 
