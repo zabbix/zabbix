@@ -5,6 +5,10 @@
 
 The template is developed to monitor a single DBMS Oracle Database instance with ODBC and can monitor CDB or non-CDB installations.
 
+## Supported versions
+
+Oracle Database 12c2 and newer
+
 ## Requirements
 
 Zabbix version: 6.0 and higher.
@@ -12,7 +16,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Oracle Database 12c2, 18c, 19c
+- Oracle Database 12c2, 18c, 19c, 21c, 23c
 
 ## Configuration
 

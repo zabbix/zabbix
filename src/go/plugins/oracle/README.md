@@ -15,9 +15,7 @@ You can extend it or create your own template to cater specific needs.
 
 ## Supported versions
 
-* Oracle Database 12c2
-* Oracle Database 18c
-* Oracle Database 19c
+* Oracle Database 12c2 and newer
 
 ## Installation
 
