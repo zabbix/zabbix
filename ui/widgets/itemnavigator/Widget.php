@@ -32,12 +32,12 @@ class Widget extends CWidget {
 	public function getTranslationStrings(): array {
 		return [
 			'class.widget.js' => [
+				'No data found' => _('No data found'),
 				'Unexpected server error.' => _('Unexpected server error.')
 			],
 			'class.itemnavigator.js' => [
 				'Uncategorized' => _('Uncategorized'),
 				'%1$d of %1$d+ items are shown' => _('%1$d of %1$d+ items are shown'),
-				'No data found.' => _('No data found.'),
 				'Host group' => _('Host group'),
 				'Host name' => _('Host name'),
 				'Host tag' => _('Host tag'),
