@@ -34,8 +34,6 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$filter_counters = [];
 
 			foreach ($filters as $index => $tabfilter) {
-				$this->sanitizeFilter($tabfilter);
-
 				if (!$tabfilter['filter_show_counter']
 						|| (!self::isMandatoryFilterFieldSet($tabfilter) && !self::isSubfilterSet($tabfilter))) {
 					$filter_counters[$index] = 0;
@@ -59,7 +57,6 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$filter = static::FILTER_FIELDS_DEFAULT;
 			$this->getInputs($filter, array_keys($filter));
 			$filter = $this->cleanInput($filter);
-			$this->sanitizeFilter($filter);
 			$mandatory_filter_set = self::isMandatoryFilterFieldSet($filter);
 			$subfilter_set = self::isSubfilterSet($filter);
 			$prepared_data = [

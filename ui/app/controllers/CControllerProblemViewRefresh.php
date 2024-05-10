@@ -87,8 +87,6 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			$data['filter_counters'] = [];
 
 			foreach ($filters as $index => $tabfilter) {
-				$this->sanitizeFilter($tabfilter);
-
 				if (!$tabfilter['filter_custom_time']) {
 					$tabfilter = [
 						'from' => $profile->from,
@@ -111,49 +109,45 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			);
 		}
 		else {
-			$filter = [
-				'show' => $this->getInput('show', TRIGGERS_OPTION_RECENT_PROBLEM),
-				'groupids' => $this->getInput('groupids', []),
-				'hostids' => $this->getInput('hostids', []),
-				'triggerids' => $this->getInput('triggerids', []),
-				'name' => $this->getInput('name', ''),
-				'severities' => $this->getInput('severities', []),
-				'inventory' => array_filter($this->getInput('inventory', []), function ($filter_inventory) {
-					return $filter_inventory['field'] !== '' && $filter_inventory['value'] !== '';
-				}),
-				'evaltype' => $this->getInput('evaltype', TAG_EVAL_TYPE_AND_OR),
-				'tags' => array_filter($this->getInput('tags', []), function ($filter_tag) {
-					return $filter_tag['tag'] !== '';
-				}),
-				'show_tags' => $this->getInput('show_tags', SHOW_TAGS_3),
-				'tag_name_format' => $this->getInput('tag_name_format', TAG_NAME_FULL),
-				'tag_priority' => $this->getInput('tag_priority', ''),
-				'show_suppressed' => $this->getInput('show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
-				'show_symptoms' => $this->getInput('show_symptoms', 0),
-				'acknowledgement_status' => $this->getInput('acknowledgement_status', ZBX_ACK_STATUS_ALL),
-				'acknowledged_by_me' =>
-					$this->getInput('acknowledgement_status', ZBX_ACK_STATUS_ALL) == ZBX_ACK_STATUS_ACK
-						? $this->getInput('acknowledged_by_me', 0)
-						: 0,
-				'compact_view' => $this->getInput('compact_view', 0),
-				'show_timeline' => $this->getInput('show_timeline', ZBX_TIMELINE_OFF),
-				'details' => $this->getInput('details', 0),
-				'highlight_row' => $this->getInput('highlight_row', 0),
-				'show_opdata' => $this->getInput('show_opdata', OPERATIONAL_DATA_SHOW_NONE),
-				'age_state' => $this->getInput('age_state', 0),
-				'age' => $this->getInput('age_state', 0) ? $this->getInput('age', 14) : null,
-				'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-				'to' => $this->hasInput('to') ? $this->getInput('to') : null
-			];
-
-			$this->sanitizeFilter($filter);
-
 			$data = [
 				'page' => $this->getInput('page', 1),
 				'action' => $this->getInput('action'),
 				'sort' => $this->getInput('sort', 'clock'),
 				'sortorder' => $this->getInput('sortorder', ZBX_SORT_DOWN),
-				'filter' => $filter,
+				'filter' => [
+					'show' => $this->getInput('show', TRIGGERS_OPTION_RECENT_PROBLEM),
+					'groupids' => $this->getInput('groupids', []),
+					'hostids' => $this->getInput('hostids', []),
+					'triggerids' => $this->getInput('triggerids', []),
+					'name' => $this->getInput('name', ''),
+					'severities' => $this->getInput('severities', []),
+					'inventory' => array_filter($this->getInput('inventory', []), function ($filter_inventory) {
+						return $filter_inventory['field'] !== '' && $filter_inventory['value'] !== '';
+					}),
+					'evaltype' => $this->getInput('evaltype', TAG_EVAL_TYPE_AND_OR),
+					'tags' => array_filter($this->getInput('tags', []), function ($filter_tag) {
+						return $filter_tag['tag'] !== '';
+					}),
+					'show_tags' => $this->getInput('show_tags', SHOW_TAGS_3),
+					'tag_name_format' => $this->getInput('tag_name_format', TAG_NAME_FULL),
+					'tag_priority' => $this->getInput('tag_priority', ''),
+					'show_suppressed' => $this->getInput('show_suppressed', ZBX_PROBLEM_SUPPRESSED_FALSE),
+					'show_symptoms' => $this->getInput('show_symptoms', 0),
+					'acknowledgement_status' => $this->getInput('acknowledgement_status', ZBX_ACK_STATUS_ALL),
+					'acknowledged_by_me' =>
+						$this->getInput('acknowledgement_status', ZBX_ACK_STATUS_ALL) == ZBX_ACK_STATUS_ACK
+							? $this->getInput('acknowledged_by_me', 0)
+							: 0,
+					'compact_view' => $this->getInput('compact_view', 0),
+					'show_timeline' => $this->getInput('show_timeline', ZBX_TIMELINE_OFF),
+					'details' => $this->getInput('details', 0),
+					'highlight_row' => $this->getInput('highlight_row', 0),
+					'show_opdata' => $this->getInput('show_opdata', OPERATIONAL_DATA_SHOW_NONE),
+					'age_state' => $this->getInput('age_state', 0),
+					'age' => $this->getInput('age_state', 0) ? $this->getInput('age', 14) : null,
+					'from' => $this->hasInput('from') ? $this->getInput('from') : null,
+					'to' => $this->hasInput('to') ? $this->getInput('to') : null
+				],
 				'tabfilter_idx' => 'web.problem.filter'
 			];
 
