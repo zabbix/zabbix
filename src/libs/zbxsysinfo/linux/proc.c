@@ -485,19 +485,19 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 			{
 				private_huge += num;
 			}
-			else if(SUCCEED == byte_value_from_str(tmp, "Shared_Hugetlb:", &num))
+			else if (SUCCEED == byte_value_from_str(tmp, "Shared_Hugetlb:", &num))
 			{
 				shared_huge += num;
 			}
-			else if(SUCCEED == byte_value_from_str(tmp, "Shared", &num))
+			else if (SUCCEED == byte_value_from_str(tmp, "Shared", &num))
 			{
 				shared += num;
 			}
-			else if(SUCCEED == byte_value_from_str(tmp, "Private", &num))
+			else if (SUCCEED == byte_value_from_str(tmp, "Private", &num))
 			{
 				private += num;
 			}
-			else if(SUCCEED == byte_value_from_str(tmp, "Pss:", &num))
+			else if (SUCCEED == byte_value_from_str(tmp, "Pss:", &num))
 			{
 				have_pss = 1;
 				pss += num;
@@ -524,18 +524,18 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		if (NULL == (f = fopen(tmp, "r")))
 			goto out;
 
-		if(NULL == fgets(tmp, (int)sizeof(tmp), f))
+		if (NULL == fgets(tmp, (int)sizeof(tmp), f))
 		{
 			zbx_fclose(f);
 			goto out;
 		}
 		zbx_fclose(f);
 
-		if(NULL == (statm_rss_str = strchr(tmp, ' ')))
+		if (NULL == (statm_rss_str = strchr(tmp, ' ')))
 			goto out;
 
 		statm_rss_str++;
-		if(NULL == (tmp_str = strchr(statm_rss_str, ' ')))
+		if (NULL == (tmp_str = strchr(statm_rss_str, ' ')))
 			goto out;
 
 		*tmp_str = '\0';
@@ -553,7 +553,7 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		else
 		{
 			tmp_str++;
-			if(NULL == (statm_rss_str = strchr(tmp_str, ' ')))
+			if (NULL == (statm_rss_str = strchr(tmp_str, ' ')))
 				goto out;
 			*statm_rss_str = '\0';
 			if (FAIL == zbx_is_uint64(tmp_str, &shared))
