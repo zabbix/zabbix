@@ -224,7 +224,7 @@ class CWidgetGeoMap extends CWidget {
 			const style = 'left: 0px; top: 0px;';
 
 			node.hintBoxItem = hintBox.createBox(e, node, content, '', true, style, container.parentNode);
-			e.layer.hintbox = node.hintBoxItem;
+			e.layer.hintBoxItem = node.hintBoxItem;
 
 			const marker_bounds = e.originalEvent.target.getBoundingClientRect();
 			const hintbox_bounds = this._target.getBoundingClientRect();
@@ -325,8 +325,8 @@ class CWidgetGeoMap extends CWidget {
 		});
 
 		this._markers.eachLayer((marker) => {
-			if (marker.hintbox !== undefined) {
-				marker.hintbox[0].querySelectorAll('[data-hostid]').forEach((row) => {
+			if (marker.hintBoxItem !== undefined) {
+				marker.hintBoxItem[0].querySelectorAll('[data-hostid]').forEach((row) => {
 					row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostid === this.#selected_hostid);
 				});
 			}
