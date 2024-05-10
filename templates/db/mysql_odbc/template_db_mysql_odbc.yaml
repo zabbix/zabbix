@@ -1485,7 +1485,7 @@ zabbix_export:
             - widgets:
                 - type: graph
                   name: 'MySQL: Operations'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1499,7 +1499,7 @@ zabbix_export:
                 - type: graph
                   name: 'MySQL: Connections'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1513,7 +1513,7 @@ zabbix_export:
                 - type: graph
                   name: 'MySQL: InnoDB buffer pool'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1526,8 +1526,8 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   name: 'MySQL: Queries'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1540,9 +1540,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: 'MySQL: Bandwidth'
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1555,9 +1555,9 @@ zabbix_export:
                       value: AAAAD
                 - type: graph
                   name: 'MySQL: Threads'
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

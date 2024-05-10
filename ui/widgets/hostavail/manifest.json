@@ -11,7 +11,7 @@
 	"widget": {
 		"js_class": "CWidgetHostAvail",
 		"size": {
-			"width": 6,
+			"width": 18,
 			"height": 3
 		},
 		"refresh_rate": 900

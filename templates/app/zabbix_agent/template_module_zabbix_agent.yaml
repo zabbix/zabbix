@@ -94,7 +94,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Agent availability'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -110,8 +110,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Version
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -126,8 +126,8 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -269,7 +269,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Agent availability'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -285,8 +285,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Version
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -301,8 +301,8 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM

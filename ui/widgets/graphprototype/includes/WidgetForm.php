@@ -104,9 +104,7 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('rows', _('Rows'), 1,
-					floor(DASHBOARD_WIDGET_MAX_ROWS / DASHBOARD_WIDGET_MIN_ROWS)
-				))
+				(new CWidgetFieldIntegerBox('rows', _('Rows'), 1, DASHBOARD_MAX_ROWS))
 					->setDefault(self::DEFAULT_ROWS_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)

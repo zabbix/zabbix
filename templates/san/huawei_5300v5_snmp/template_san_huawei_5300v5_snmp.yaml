@@ -1531,7 +1531,7 @@ zabbix_export:
               widgets:
                 - type: graph
                   name: 'OceanStor 5300 V5: Capacity total'
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: GRAPH
@@ -1546,7 +1546,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Controller {#ID}: CPU utilization'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1562,8 +1562,8 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: 'Node {#NODE}: CPU utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1581,7 +1581,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Node {#NODE}: Node I/O'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1597,8 +1597,8 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   name: 'Node {#NODE}: Node traffic'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1616,7 +1616,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'LUN {#NAME}: LUN I/O'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1632,8 +1632,8 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   name: 'LUN {#NAME}: LUN traffic'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER

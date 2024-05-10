@@ -71,7 +71,7 @@ class TopHostsWidget {
 								'name' => 'Top hosts update',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 8,
 								'view_mode' => 0,
 								'fields' => [
@@ -225,7 +225,7 @@ class TopHostsWidget {
 								'name' => 'Top hosts delete',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 8,
 								'view_mode' => 0,
 								'fields' => [
@@ -288,7 +288,7 @@ class TopHostsWidget {
 								'name' => 'Top hosts for remove',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 8,
 								'view_mode' => 0,
 								'fields' => [

@@ -4026,6 +4026,17 @@ static int	DBpatch_6050296(void)
 	return DBrename_field("media_type", "content_type", &field);
 }
 
+static int	DBpatch_6050297(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update widget set x=x*3,width=width*3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -4327,5 +4338,6 @@ DBPATCH_ADD(6050293, 0, 1)
 DBPATCH_ADD(6050294, 0, 1)
 DBPATCH_ADD(6050295, 0, 1)
 DBPATCH_ADD(6050296, 0, 1)
+DBPATCH_ADD(6050297, 0, 1)
 
 DBPATCH_END()

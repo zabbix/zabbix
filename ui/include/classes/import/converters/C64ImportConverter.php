@@ -353,6 +353,19 @@ class C64ImportConverter extends CConverter {
 				}
 
 				foreach ($dashboard_page['widgets'] as &$widget) {
+					if (array_key_exists('x', $widget) && is_numeric($widget['x'])) {
+						$widget['x'] = (string) ((int) $widget['x'] * 3);
+					}
+
+					if (array_key_exists('width', $widget)) {
+						if (is_numeric($widget['width'])) {
+							$widget['width'] = (string) ((int) $widget['width'] * 3);
+						}
+					}
+					else {
+						$widget['width'] = '3';
+					}
+
 					if (in_array($widget['type'], ['graph', 'svggraph', 'graphprototype'])) {
 						$reference = self::createWidgetReference($reference_index++);
 

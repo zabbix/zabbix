@@ -768,7 +768,7 @@ zabbix_export:
             - widgets:
                 - type: graph
                   name: 'CPU load'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -782,7 +782,7 @@ zabbix_export:
                 - type: graph
                   name: 'Memory usage'
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
