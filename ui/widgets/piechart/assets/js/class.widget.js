@@ -105,8 +105,10 @@ class CWidgetPieChart extends CWidget {
 	}
 
 	onClearContents() {
-		this.#pie_chart.destroy();
-		this.#pie_chart = null;
+		if (this.#pie_chart !== null) {
+			this.#pie_chart.destroy();
+			this.#pie_chart = null;
+		}
 	}
 
 	#showLegend(legend, total_item) {

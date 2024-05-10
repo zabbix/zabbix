@@ -103,8 +103,10 @@ class CWidgetHoneycomb extends CWidget {
 	}
 
 	onClearContents() {
-		this.#honeycomb.destroy();
-		this.#honeycomb = null;
+		if (this.#honeycomb !== null) {
+			this.#honeycomb.destroy();
+			this.#honeycomb = null;
+		}
 	}
 
 	onFeedback({type, value, descriptor}) {
