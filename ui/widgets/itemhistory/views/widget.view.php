@@ -179,18 +179,19 @@ else {
 						: $item_value['value'];
 
 					$history_item['value'][] = (new CCol())
-						->addStyle($color !== '' ? 'background-color: #' . $color : null)
+						->addItem(($column['display'] != CWidgetFieldColumnsList::DISPLAY_HTML
+							? new CDiv($value)
+							: new CJsScript($value)
+						))
 						->addClass($column['display'] == CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE
 							? ZBX_STYLE_NOWRAP
 							: null
 						)
-						->addItem(($column['display'] != CWidgetFieldColumnsList::DISPLAY_HTML
-							? (new CDiv($value))->addClass($column['monospace_font']
-								? ZBX_STYLE_MONOSPACE_FONT
-								: null
-							)
-							: new CJsScript($value)
-						));
+						->addClass($column['monospace_font']
+							? ZBX_STYLE_MONOSPACE_FONT
+							: null
+						)
+						->addStyle($color !== '' ? 'background-color: #' . $color : null);
 
 					break;
 
