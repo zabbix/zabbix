@@ -9846,7 +9846,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 	struct zbx_json			json;
-	zbx_vector_ptr_t		*parameters;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
