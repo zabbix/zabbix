@@ -353,9 +353,6 @@ zbx_webdriver_t	*webdriver_create(const char *endpoint, const char *sourceip, ch
 		goto out;
 
 	wd->refcount = 1;
-	wd->screen_width = 1920;
-	wd->screen_height = 1080;
-
 	wd_perf_init(&wd->perf);
 
 	ret = SUCCEED;

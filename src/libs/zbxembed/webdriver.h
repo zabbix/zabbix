@@ -50,9 +50,6 @@ typedef struct
 	char			*endpoint;
 	char			*session;
 
-	int			screen_width;
-	int			screen_height;
-
 	zbx_wd_perf_t		perf;
 	int			refcount;
 
