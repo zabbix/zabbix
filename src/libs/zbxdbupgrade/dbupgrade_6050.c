@@ -4028,23 +4028,6 @@ static int	DBpatch_6050296(void)
 
 static int	DBpatch_6050297(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > zbx_db_execute(
-			"update widget"
-			" set name='Plain text'"
-			" where type='plaintext'"
-				" and name=''"))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-static int	DBpatch_6050298(void)
-{
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 
@@ -4077,7 +4060,7 @@ static int	DBpatch_6050298(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050299(void)
+static int	DBpatch_6050298(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -4113,7 +4096,7 @@ static int	DBpatch_6050299(void)
 	return ret;
 }
 
-static int	DBpatch_6050300(void)
+static int	DBpatch_6050299(void)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -4217,7 +4200,7 @@ static int	DBpatch_6050300(void)
 }
 
 
-static int	DBpatch_6050301(void)
+static int	DBpatch_6050300(void)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -4267,7 +4250,7 @@ static int	DBpatch_6050301(void)
 	return ret;
 }
 
-static int	DBpatch_6050302(void)
+static int	DBpatch_6050301(void)
 {
 	const char	*sql =
 			"update module"
@@ -4285,7 +4268,7 @@ static int	DBpatch_6050302(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050303(void)
+static int	DBpatch_6050302(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -4604,6 +4587,5 @@ DBPATCH_ADD(6050299, 0, 1)
 DBPATCH_ADD(6050300, 0, 1)
 DBPATCH_ADD(6050301, 0, 1)
 DBPATCH_ADD(6050302, 0, 1)
-DBPATCH_ADD(6050303, 0, 1)
 
 DBPATCH_END()
