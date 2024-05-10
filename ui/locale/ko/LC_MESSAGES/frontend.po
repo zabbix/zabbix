@@ -15931,6 +15931,10 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "2개의 요소를 선택하여 주십시오"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16750,6 +16754,10 @@ msgstr ""
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
 msgstr ""
 
 #: app/views/administration.user.edit.php:309
@@ -21078,6 +21086,10 @@ msgstr "장애대응 코멘트 미입력 항목만"
 msgid "Unavailable"
 msgstr ""
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "블록을 해제"
@@ -25177,6 +25189,11 @@ msgstr ""
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "참조된 개체가 존재하지 않습니다"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

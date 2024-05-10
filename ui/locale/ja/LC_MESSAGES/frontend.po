@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-01 02:23+0000\n"
+"PO-Revision-Date: 2024-05-08 06:57+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -90,7 +90,7 @@ msgstr "%1$d+件中%1$d件のホストが表示されています"
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "%1$d+件中%1$d件のアイテムが表示されています"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1935,7 +1935,7 @@ msgstr "バイナリ"
 #: app/controllers/CControllerPopupTriggerExpr.php:1455
 #, c-format
 msgid "Binary item \"%1$s\" cannot be used in trigger"
-msgstr ""
+msgstr "バイナリアイテム\"%1$s\"はトリガーでは使用できません"
 
 #: app/views/popup.ldap.edit.php:85
 msgid "Bind DN"
@@ -2270,16 +2270,16 @@ msgstr[0] "モジュールを追加できません: %1$s。"
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "グラフ\"%1$s\"にグラフの合計値を複数は設定できません。"
+msgstr "グラフ\"%1$s\"にグラフの合計値は1つしか設定できません。"
 
 #: include/classes/api/services/CGraphPrototype.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "グラフのプロトタイプ\"%1$s\"にグラフの合計値を複数は設定できません。"
+msgstr "グラフのプロトタイプ\"%1$s\"にグラフの合計値は1つしか設定できません。"
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "\"合計\"タイプのアイテムはグラフに1つしか追加できません。"
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
@@ -2427,27 +2427,27 @@ msgstr[0] "グラフをコピーできません"
 #: include/classes/helpers/CGraphHelper.php:74
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
-msgstr ""
+msgstr "複数のホストからのアイテムがあるため、グラフ\"%1$s\"をコピーできません。"
 
 #: include/classes/helpers/CGraphGeneralHelper.php:91
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"を持つアイテムがホスト\"%3$s\"に存在しないため、グラフ\"%1$s\"をコピーできません。"
 
 #: include/classes/helpers/CGraphGeneralHelper.php:92
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"を持つアイテムがテンプレート\"%3$s\"に存在しないため、グラフ\"%1$s\"をコピーできません。"
 
 #: include/classes/helpers/CGraphGeneralHelper.php:96
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"を持つアイテムがホスト\"%3$s\"に存在しないため、グラフプロトタイプ\"%1$s\"をコピーできません。"
 
 #: include/classes/helpers/CGraphGeneralHelper.php:97
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"を持つアイテムがテンプレート\"%3$s\"に存在しないため、グラフプロトタイプ\"%1$s\"をコピーできません。"
 
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
@@ -2472,12 +2472,12 @@ msgstr[0] "トリガーをコピーできません"
 #: include/classes/helpers/CTriggerGeneralHelper.php:196
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
-msgstr ""
+msgstr "トリガー\"%1$s\"は、依存するトリガー\"%2$s\"なしではホスト\"%3$s\"にコピーできません。"
 
 #: include/classes/helpers/CTriggerGeneralHelper.php:197
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
-msgstr ""
+msgstr "トリガー\"%1$s\"は、依存するトリガー\"%2$s\"なしではテンプレート\"%3$s\"にコピーできません。"
 
 #: include/classes/helpers/CTriggerHelper.php:76
 #, c-format
@@ -2487,7 +2487,7 @@ msgstr "条件式内に複数のホストがあるため、トリガー\"%1$s\"�
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr ""
+msgstr "式に複数のテンプレートが含まれているため、トリガー\"%1$s\"をコピーできません。"
 
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
@@ -2830,7 +2830,7 @@ msgstr[0] "ユーザーグループを削除できません"
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
-msgstr ""
+msgstr "ユーザー グループ\"%1$s\"はプロビジョニングされたユーザー\"%2$s\"によって使用されているため、削除できません。"
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -2917,7 +2917,7 @@ msgstr "アイテムのキューを表示できません。"
 
 #: chart7.php:93
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr "グラフの合計値は2つ以上表示できません。"
+msgstr "グラフの合計値は1つしか表示できません。"
 
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
@@ -3010,12 +3010,12 @@ msgstr "マクロを展開できません。"
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているSLA\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:241
 #, c-format
 msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているアクション\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
@@ -3125,7 +3125,7 @@ msgstr "ダッシュボード\"%2$s\"内で使用されているアイテム\"%1
 #: include/classes/import/importers/CTemplateDashboardImporter.php:193
 #, c-format
 msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているマップ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
@@ -3135,12 +3135,12 @@ msgstr "マップ\"%2$s\"で使用されているマップ\"%1$s\"が見つか�
 #: include/classes/import/importers/CTemplateDashboardImporter.php:253
 #, c-format
 msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているメディアタイプ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:205
 #, c-format
 msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているサービス\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1458
 #, c-format
@@ -3161,7 +3161,7 @@ msgstr "マップ\"%2$s\"で使用されているトリガー\"%1$s\"が見つ�
 #: include/classes/import/importers/CTemplateDashboardImporter.php:229
 #, c-format
 msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているユーザー\"%1$s\"が見つかりません。"
 
 #: include/classes/api/services/CUser.php:1543
 msgid "Cannot find user directory for LDAP."
@@ -3221,7 +3221,7 @@ msgstr "タイプが\"%4$s\"のホストインターフェースが必要なた�
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "同じキーのLLDルールをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
@@ -3241,7 +3241,7 @@ msgstr "同じキーの検出されたアイテムがすでにあるので、テ
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "同じキーのLLDルールをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
@@ -3256,17 +3256,17 @@ msgstr "同じアイテムキーのアイテムがすでにあるので、テン
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "同じキーを持つアイテム プロトタイプが既にLLD ルール\"%5$s\"に属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLD ルール\"%3$s\"を持つアイテムプロトタイプをホスト\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemPrototype.php:1221
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "同じキーを持つアイテムプロトタイプが既にLLD ルール\"%5$s\"に属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"を持つアイテムプロトタイプをテンプレート\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"を持つアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1234
 #, c-format
@@ -4359,7 +4359,7 @@ msgstr "クリックして表示または変更"
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
-msgstr ""
+msgstr "クライアントID"
 
 #: app/views/mfa.edit.php:120
 msgid "Client secret"
@@ -9306,7 +9306,7 @@ msgstr "ホスト稼働状況"
 
 #: include/classes/api/services/CHostInterface.php:1022
 msgid "Host cannot have more than one default interface of the same type."
-msgstr "ホストに同じタイプのデフォルトインターフェースは2つ以上設定できません。"
+msgstr "ホストに同じタイプのデフォルトインターフェースは1つしか設定できません。"
 
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
@@ -15902,6 +15902,10 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "2つの要素を選択してください"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16721,6 +16725,10 @@ msgstr "リファレンスの属性"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
 msgstr ""
 
 #: app/views/administration.user.edit.php:309
@@ -21043,6 +21051,10 @@ msgstr "未確認のみ"
 msgid "Unavailable"
 msgstr "利用不可"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "ブロックを解除"
@@ -23744,7 +23756,7 @@ msgstr "高精細タイルを読み込むためにURLに\"@2x\"を追加でき�
 
 #: include/classes/api/services/CItemGeneral.php:2624
 msgid "cannot be a value map ID from another host or template"
-msgstr ""
+msgstr "別のホストまたはテンプレートの値マップIDは使用できません"
 
 #: include/classes/api/services/CItemGeneral.php:2179
 msgid "cannot be an item ID from another host or template"
@@ -24528,7 +24540,7 @@ msgstr "{}で括られていないか不正な値です"
 
 #: app/views/item.list.php:175
 msgid "item"
-msgstr ""
+msgstr "アイテム"
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -25141,6 +25153,11 @@ msgstr "存在しないツリー要素への参照です"
 msgid "referred object does not exist"
 msgstr "参照したオブジェクトが存在しません"
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
+
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82
 #: app/controllers/CControllerQueueOverviewProxy.php:73
@@ -25346,7 +25363,7 @@ msgstr "タグ"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
 msgid "tag cannot be empty"
-msgstr ""
+msgstr "タグに空白は指定できません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
@@ -25832,7 +25849,7 @@ msgstr "新しいイベントタグの値"
 
 #: include/classes/api/services/CScript.php:527
 msgid "values must be unique"
-msgstr ""
+msgstr "値は一意である必要があります"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"
