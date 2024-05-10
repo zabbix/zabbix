@@ -1072,13 +1072,14 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 		double			sec1, sec2;
 		int			alerts_num, nextcheck, results_num;
 		time_t			wait_start_time = time(NULL);
-		zbx_ipc_message_t	*message;
+		zbx_ipc_message_t	*message = NULL;
 
 		do
 		{
 			if (0 == sleeptime_after_notify)
 				sleeptime_after_notify = sleeptime;
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+			zbx_ipc_message_free(message);
 			(void)zbx_ipc_async_socket_recv(&amdb.am, sleeptime_after_notify, &message);
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 			sleeptime_after_notify -= (int)(time(NULL) - wait_start_time);
