@@ -75,12 +75,11 @@ class CWidgetItemNavigator extends CWidget {
 			this.clearContents();
 
 			this.#item_navigator = new CItemNavigator(response.config);
+			this._body.appendChild(this.#item_navigator.getContainer());
 
 			this.#registerListeners();
 			this.#activateListeners();
 		}
-
-		this._body.appendChild(this.#item_navigator.getContainer());
 
 		this.#item_navigator.setValue({
 			items: response.items,

@@ -75,12 +75,11 @@ class CWidgetHostNavigator extends CWidget {
 			this.clearContents();
 
 			this.#host_navigator = new CHostNavigator(response.config);
+			this._body.appendChild(this.#host_navigator.getContainer());
 
 			this.#registerListeners();
 			this.#activateListeners();
 		}
-
-		this._body.appendChild(this.#host_navigator.getContainer());
 
 		this.#host_navigator.setValue({
 			hosts: response.hosts,
