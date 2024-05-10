@@ -29,7 +29,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 0518d08edbf2480abf15f4ef0e7a251a
-          name: 'OpenStack: Get access token and service catalog'
+          name: 'Get access token and service catalog'
           type: SCRIPT
           key: openstack.identity.auth
           delay: '{$OPENSTACK.AUTH.INTERVAL}'
@@ -227,7 +227,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 87d263a6f797439c8c7699d96f4305fb
-          name: 'Nova: Get availability zones'
+          name: 'Get availability zones'
           type: HTTP_AGENT
           key: openstack.nova.availability_zone.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.AVAILABILITY_ZONE}'
@@ -251,7 +251,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c4297b412ad54bae85a1219e2d988bcb
-          name: 'Nova: Get hypervisors'
+          name: 'Get hypervisors'
           type: HTTP_AGENT
           key: openstack.nova.hypervisors.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.HYPERVISOR}'
@@ -275,7 +275,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 02698d2fcd2949868013dedb311b8db3
-          name: 'Nova: Get absolute limits'
+          name: 'Get absolute limits'
           type: HTTP_AGENT
           key: openstack.nova.limits.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
@@ -299,7 +299,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: bea005220b704f1fb6ca523647ae24ce
-          name: 'Nova: Instances count, current'
+          name: 'Instances count, current'
           type: DEPENDENT
           key: openstack.nova.limits.instances.current
           delay: '0'
@@ -315,7 +315,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 29898c0cb13d4ccebc3da95c082da29b
-          name: 'Nova: Instances count, free'
+          name: 'Instances count, free'
           type: CALCULATED
           key: openstack.nova.limits.instances.free
           delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
@@ -330,7 +330,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 7526be4743564c32a293f96daf7cb242
-          name: 'Nova: Instances count, max'
+          name: 'Instances count, max'
           type: DEPENDENT
           key: openstack.nova.limits.instances.max
           delay: '0'
@@ -346,7 +346,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 64ae014b201945f299f80080dc63176d
-          name: 'Nova: RAM usage, current'
+          name: 'RAM usage, current'
           type: DEPENDENT
           key: openstack.nova.limits.ram.current
           delay: '0'
@@ -366,7 +366,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: bdc1492bbb5c4bcd844eaa6f6e76c1ff
-          name: 'Nova: RAM usage, free'
+          name: 'RAM usage, free'
           type: CALCULATED
           key: openstack.nova.limits.ram.free
           delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
@@ -382,7 +382,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 50f2128cace04cf5a783e438de813e72
-          name: 'Nova: RAM usage, max'
+          name: 'RAM usage, max'
           type: DEPENDENT
           key: openstack.nova.limits.ram.max
           delay: '0'
@@ -402,7 +402,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 678f2c0017f54d8b827876005f6ca670
-          name: 'Nova: vCPUs usage, current'
+          name: 'vCPUs usage, current'
           type: DEPENDENT
           key: openstack.nova.limits.vcpu.current
           delay: '0'
@@ -418,7 +418,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 97d3b897722d4910aea8e4c3c5f6c9a9
-          name: 'Nova: vCPUs usage, free'
+          name: 'vCPUs usage, free'
           type: CALCULATED
           key: openstack.nova.limits.vcpu.free
           delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
@@ -433,7 +433,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: e0583793b29b4bb195198d196cc1f0cc
-          name: 'Nova: vCPUs usage, max'
+          name: 'vCPUs usage, max'
           type: DEPENDENT
           key: openstack.nova.limits.vcpu.max
           delay: '0'
@@ -449,7 +449,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 85d746d8b6cf404f95eeb7903c2e66e0
-          name: 'Nova: Get servers'
+          name: 'Get servers'
           type: HTTP_AGENT
           key: openstack.nova.servers.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.SERVERS}'
@@ -473,7 +473,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3db93b6116ad416eb10da851cce385a1
-          name: 'Nova: Get compute services'
+          name: 'Get compute services'
           type: HTTP_AGENT
           key: openstack.nova.services.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.SERVICES}'
@@ -497,7 +497,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c258e567922c4f71a4dee9c0d6b88b1e
-          name: 'Nova: Get tenants'
+          name: 'Get tenants'
           type: SCRIPT
           key: openstack.nova.tenant.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.TENANTS}'
@@ -1595,21 +1595,21 @@ zabbix_export:
   triggers:
     - uuid: 3dbae725014d4f289e20f002f2674dc7
       expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'
-      name: 'Nova: Current instances count is high'
-      event_name: 'Nova: Current instances count is high (used >= {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}%)'
+      name: 'Current instances count is high'
+      event_name: 'Current instances count is high (used >= {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}% of the max available instances count.'
       dependencies:
-        - name: 'Nova: Current instances count is too high'
+        - name: 'Current instances count is too high'
           expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'
       tags:
         - tag: scope
           value: capacity
     - uuid: 22592fabc09d416598fb4fb806048040
       expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'
-      name: 'Nova: Current instances count is too high'
-      event_name: 'Nova: Current instances count is too high (used >= {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}%)'
+      name: 'Current instances count is too high'
+      event_name: 'Current instances count is too high (used >= {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: HIGH
       description: 'Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}% of the max available instances count.'
@@ -1618,21 +1618,21 @@ zabbix_export:
           value: capacity
     - uuid: c9d9eca4b3e540f491210b5c2312e1ba
       expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
-      name: 'Nova: Current RAM usage is high'
-      event_name: 'Nova: Current RAM usage is high (used >= {$OPENSTACK.NOVA.RAM.UTIL.WARN}%)'
+      name: 'Current RAM usage is high'
+      event_name: 'Current RAM usage is high (used >= {$OPENSTACK.NOVA.RAM.UTIL.WARN}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.WARN}% of the max available RAM usage.'
       dependencies:
-        - name: 'Nova: Current RAM usage is too high'
+        - name: 'Current RAM usage is too high'
           expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
       tags:
         - tag: scope
           value: capacity
     - uuid: 9dfd643fb555419c9c3200a07cc7647e
       expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
-      name: 'Nova: Current RAM usage is too high'
-      event_name: 'Nova: Current RAM usage is too high (used >= {$OPENSTACK.NOVA.RAM.UTIL.HIGH}%)'
+      name: 'Current RAM usage is too high'
+      event_name: 'Current RAM usage is too high (used >= {$OPENSTACK.NOVA.RAM.UTIL.HIGH}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: HIGH
       description: 'Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.HIGH}% of the max available RAM usage.'
@@ -1641,21 +1641,21 @@ zabbix_export:
           value: capacity
     - uuid: 85b1a132602344e39a50ef10b29fca15
       expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
-      name: 'Nova: Current vCPU usage is high'
-      event_name: 'Nova: Current vCPU usage is high (used >= {$OPENSTACK.NOVA.CPU.UTIL.WARN}%)'
+      name: 'Current vCPU usage is high'
+      event_name: 'Current vCPU usage is high (used >= {$OPENSTACK.NOVA.CPU.UTIL.WARN}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.WARN}% of the max available vCPU usage.'
       dependencies:
-        - name: 'Nova: Current vCPU usage is too high'
+        - name: 'Current vCPU usage is too high'
           expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
       tags:
         - tag: scope
           value: capacity
     - uuid: e62a7fb598b34a0cb5bee6bc0370f7dd
       expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
-      name: 'Nova: Current vCPU usage is too high'
-      event_name: 'Nova: Current vCPU usage is too high (used >= {$OPENSTACK.NOVA.CPU.UTIL.HIGH}%)'
+      name: 'Current vCPU usage is too high'
+      event_name: 'Current vCPU usage is too high (used >= {$OPENSTACK.NOVA.CPU.UTIL.HIGH}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: HIGH
       description: 'Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.HIGH}% of the max available vCPU usage.'

@@ -25,7 +25,7 @@ zabbix_export:
         - name: Templates/Power
       items:
         - uuid: 6e8ed2c349d744a1a07928b32cf574c3
-          name: 'APC Smart-UPS 3000 XLM: Battery capacity'
+          name: 'Battery capacity'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.1.0
           key: 'battery.capacity[upsHighPrecBatteryCapacity]'
@@ -49,15 +49,15 @@ zabbix_export:
           triggers:
             - uuid: 13fe1336e40c4bafb8dbd409497abf8f
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}'
-              name: 'APC Smart-UPS 3000 XLM: Battery has low capacity'
-              event_name: 'APC Smart-UPS 3000 XLM: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
+              name: 'Battery has low capacity'
+              event_name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
               opdata: 'Current capacity: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 86780568c0594469bc7324c68440cbec
-          name: 'APC Smart-UPS 3000 XLM: External battery packs count'
+          name: 'External battery packs count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.5.0
           key: 'battery.external_packs_count[upsAdvBatteryNumOfBattPacks]'
@@ -76,7 +76,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 1928e58e65a34b188916086bad5b8725
-          name: 'APC Smart-UPS 3000 XLM: Battery last replace date'
+          name: 'Battery last replace date'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.3.0
           key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
@@ -99,7 +99,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: b50a17ab043c404990dd088ac9f74078
-          name: 'APC Smart-UPS 3000 XLM: Battery replace indicator'
+          name: 'Battery replace indicator'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.4.0
           key: 'battery.replace_indicator[upsAdvBatteryReplaceIndicator]'
@@ -119,14 +119,14 @@ zabbix_export:
           triggers:
             - uuid: 4590ac935e044c19978fe01d117e2995
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2'
-              name: 'APC Smart-UPS 3000 XLM: Battery needs replacement'
+              name: 'Battery needs replacement'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: d15c36fb66754791b1014f52171efe1c
-          name: 'APC Smart-UPS 3000 XLM: Battery runtime remaining'
+          name: 'Battery runtime remaining'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.3.0
           key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 9fa77fdcbd7343ca904c6282efcb7c72
-          name: 'APC Smart-UPS 3000 XLM: Battery status'
+          name: 'Battery status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.1.0
           key: 'battery.status[upsBasicBatteryStatus]'
@@ -176,7 +176,7 @@ zabbix_export:
           triggers:
             - uuid: e98ba83e63d246408aeeda76da62d5a4
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/battery.status[upsBasicBatteryStatus])=4'
-              name: 'APC Smart-UPS 3000 XLM: Battery has an internal error condition'
+              name: 'Battery has an internal error condition'
               priority: AVERAGE
               description: 'A battery installed has an internal error condition.'
               tags:
@@ -184,14 +184,14 @@ zabbix_export:
                   value: notice
             - uuid: 51e3281c49454cf997561c857a34a803
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/battery.status[upsBasicBatteryStatus])=3'
-              name: 'APC Smart-UPS 3000 XLM: Battery is Low'
+              name: 'Battery is Low'
               priority: AVERAGE
               description: 'The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: bded43c8a4eb4d1b9cf5403d3f3027cd
-          name: 'APC Smart-UPS 3000 XLM: Battery temperature'
+          name: 'Battery temperature'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.2.0
           key: 'battery.temperature[upsHighPrecBatteryTemperature]'
@@ -215,15 +215,15 @@ zabbix_export:
           triggers:
             - uuid: 1c67af712882479bbf7143bd3e16ed77
               expression: 'min(/APC Smart-UPS 3000 XLM by SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
-              name: 'APC Smart-UPS 3000 XLM: Battery has high temperature'
-              event_name: 'APC Smart-UPS 3000 XLM: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+              name: 'Battery has high temperature'
+              event_name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: e478bdaa89674f6792e39ff1a2d9a413
-          name: 'APC Smart-UPS 3000 XLM: Battery voltage'
+          name: 'Battery voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.4.0
           key: 'battery.voltage[upsHighPrecBatteryActualVoltage]'
@@ -244,7 +244,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 7b7d6fdeea2e49c9bb74eb301ecca93a
-          name: 'APC Smart-UPS 3000 XLM: Input fail cause'
+          name: 'Input fail cause'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.2.5.0
           key: 'input.fail[upsAdvInputLineFailCause]'
@@ -285,7 +285,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: ab28b72c192e48b5819079bd386ba8ea
-          name: 'APC Smart-UPS 3000 XLM: Input frequency'
+          name: 'Input frequency'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.4.0
           key: 'input.frequency[upsHighPrecInputFrequency]'
@@ -308,15 +308,15 @@ zabbix_export:
           triggers:
             - uuid: 78e47553d4bb488991067f53cc8f8a01
               expression: 'min(/APC Smart-UPS 3000 XLM by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS 3000 XLM by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS 3000 XLM by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
-              name: 'APC Smart-UPS 3000 XLM: Unacceptable input frequency'
-              event_name: 'APC Smart-UPS 3000 XLM: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
+              name: 'Unacceptable input frequency'
+              event_name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: e90dbc034cc447afb4ac1c8ced484882
-          name: 'APC Smart-UPS 3000 XLM: Input voltage'
+          name: 'Input voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.1.0
           key: 'input.voltage[upsHighPrecInputLineVoltage]'
@@ -339,15 +339,15 @@ zabbix_export:
           triggers:
             - uuid: 28ad85fa6035433f9a7ec45a8393b603
               expression: 'min(/APC Smart-UPS 3000 XLM by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS 3000 XLM by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS 3000 XLM by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
-              name: 'APC Smart-UPS 3000 XLM: Unacceptable input voltage'
-              event_name: 'APC Smart-UPS 3000 XLM: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+              name: 'Unacceptable input voltage'
+              event_name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: a8d017e0fa5d4eca838ad068f0dffcd9
-          name: 'APC Smart-UPS 3000 XLM: Output current'
+          name: 'Output current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.4.0
           key: 'output.current[upsHighPrecOutputCurrent]'
@@ -368,7 +368,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: a2613c8d71864594a0c94064d99e059e
-          name: 'APC Smart-UPS 3000 XLM: Output load'
+          name: 'Output load'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.3.0
           key: 'output.load[upsHighPrecOutputLoad]'
@@ -392,8 +392,8 @@ zabbix_export:
           triggers:
             - uuid: f667172a5cf44ed6b98f2bb38a3f3806
               expression: 'min(/APC Smart-UPS 3000 XLM by SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
-              name: 'APC Smart-UPS 3000 XLM: Output load is high'
-              event_name: 'APC Smart-UPS 3000 XLM: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
+              name: 'Output load is high'
+              event_name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
@@ -401,7 +401,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 107461ac37984a708acf7f55ae248d67
-          name: 'APC Smart-UPS 3000 XLM: Output status'
+          name: 'Output status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.1.1.0
           key: 'output.status[upsBasicOutputStatus]'
@@ -429,83 +429,83 @@ zabbix_export:
           triggers:
             - uuid: 80e30d37b1724c6ba1d58cedbcf6307f
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=16'
-              name: 'APC Smart-UPS 3000 XLM: UPS is Emergency Static Bypass'
+              name: 'UPS is Emergency Static Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 9bb143ada4194c0084eb70af7bb2c5dc
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=10'
-              name: 'APC Smart-UPS 3000 XLM: UPS is Hardware Failure Bypass'
+              name: 'UPS is Hardware Failure Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 7132f256542540acadb0caf90144a29c
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=7'
-              name: 'APC Smart-UPS 3000 XLM: UPS is Off'
+              name: 'UPS is Off'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 737693e5e4274823a9a21ff92a6ca98a
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=3'
-              name: 'APC Smart-UPS 3000 XLM: UPS is on battery'
+              name: 'UPS is on battery'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: c2fd31cfe3b8474f80b52a2340108b6a
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=4'
-              name: 'APC Smart-UPS 3000 XLM: UPS is on Smart Boost'
+              name: 'UPS is on Smart Boost'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 2c3a2e962c1e45f6858e5c1aaecee4a3
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=12'
-              name: 'APC Smart-UPS 3000 XLM: UPS is On Smart Trim'
+              name: 'UPS is On Smart Trim'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 59d415b15bbf43de85453f5b2ffb73d7
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=8'
-              name: 'APC Smart-UPS 3000 XLM: UPS is Rebooting'
+              name: 'UPS is Rebooting'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 6811d34cec57401089af9accfd66ca8f
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=11'
-              name: 'APC Smart-UPS 3000 XLM: UPS is Sleeping Until Power Return'
+              name: 'UPS is Sleeping Until Power Return'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 3c96ce14f54a4a59a2568f1f62117e7b
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=6'
-              name: 'APC Smart-UPS 3000 XLM: UPS is Software Bypass'
+              name: 'UPS is Software Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 60e83c77157741cbb3d24920e87d7d59
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=9'
-              name: 'APC Smart-UPS 3000 XLM: UPS is Switched Bypass'
+              name: 'UPS is Switched Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: da442de0e8874736aaab88f009aabe76
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/output.status[upsBasicOutputStatus])=5'
-              name: 'APC Smart-UPS 3000 XLM: UPS is Timed Sleeping'
+              name: 'UPS is Timed Sleeping'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
         - uuid: ebf71f0afed5460ba4c7f66bb162de9f
-          name: 'APC Smart-UPS 3000 XLM: Output voltage'
+          name: 'Output voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.1.0
           key: 'output.voltage[upsHighPrecOutputVoltage]'
@@ -526,7 +526,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 92c2ef138bf148199cdb6d9684b6fa23
-          name: 'APC Smart-UPS 3000 XLM: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -539,7 +539,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: fbcbe2cffc8c4bb6b11276cdd03376c3
-          name: 'APC Smart-UPS 3000 XLM: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -561,7 +561,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a312df9175ca45528375398f56fa3b3b
-          name: 'APC Smart-UPS 3000 XLM: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -582,7 +582,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ed6ad4e7036548c09b9a61d875aca9e1
-          name: 'APC Smart-UPS 3000 XLM: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -606,7 +606,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a5c6c4c44132439abd0e5fd88e3c90cf
-          name: 'APC Smart-UPS 3000 XLM: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -626,7 +626,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 272883d0a1cd4bb585a6ede50336c873
-          name: 'APC Smart-UPS 3000 XLM: Model'
+          name: Model
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.1.1.0
           key: 'system.model[upsBasicIdentModel]'
@@ -645,7 +645,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 1f591627fea54a9ebdd8f10cbf39b9ed
-          name: 'APC Smart-UPS 3000 XLM: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'system.name[sysName.0]'
@@ -667,8 +667,8 @@ zabbix_export:
           triggers:
             - uuid: c9b1f69a882148a180ec1e2600068671
               expression: 'last(/APC Smart-UPS 3000 XLM by SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS 3000 XLM by SNMP/system.name[sysName.0],#2) and length(last(/APC Smart-UPS 3000 XLM by SNMP/system.name[sysName.0]))>0'
-              name: 'APC Smart-UPS 3000 XLM: System name has changed'
-              event_name: 'APC Smart-UPS 3000 XLM: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -678,7 +678,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 39dd6b9b815a4a838a43d2ebf3fcc8f9
-          name: 'APC Smart-UPS 3000 XLM: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -697,7 +697,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f6922cd0f93a4a4288a978ff8336226b
-          name: 'APC Smart-UPS 3000 XLM: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -716,7 +716,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 0c36d0bb59a44db2b80ae4a4ff2d7c1b
-          name: 'APC Smart-UPS 3000 XLM: Serial number'
+          name: 'Serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.2.3.0
           key: 'system.sn[upsAdvIdentSerialNumber]'
@@ -738,13 +738,13 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: edb39f7236d74c6783e0d4b832e0b94b
-          name: 'APC Smart-UPS 3000 XLM: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -762,7 +762,7 @@ zabbix_export:
           triggers:
             - uuid: 71994587c45546bfb0950606d7f69936
               expression: 'max(/APC Smart-UPS 3000 XLM by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'APC Smart-UPS 3000 XLM: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -1549,13 +1549,13 @@ zabbix_export:
       expression: |
         (last(/APC Smart-UPS 3000 XLM by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC Smart-UPS 3000 XLM by SNMP/system.hw.uptime[hrSystemUptime.0])<10m)
         or (last(/APC Smart-UPS 3000 XLM by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC Smart-UPS 3000 XLM by SNMP/system.net.uptime[sysUpTime.0])<10m)
-      name: 'APC Smart-UPS 3000 XLM: Host has been restarted'
-      event_name: 'APC Smart-UPS 3000 XLM: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'APC Smart-UPS 3000 XLM: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/APC Smart-UPS 3000 XLM by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

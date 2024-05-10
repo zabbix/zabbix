@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 1cd98c8030f14fbca6abee35eb87e45b
-          name: 'Huawei VRP: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -40,14 +40,14 @@ zabbix_export:
           triggers:
             - uuid: 49df55106af2439eb79e66caa2717ec9
               expression: 'max(/Huawei VRP by SNMP/icmpping,#3)=0'
-              name: 'Huawei VRP: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: ee1ee4ce3b3a4545bd407ecc3e428049
-          name: 'Huawei VRP: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -61,11 +61,11 @@ zabbix_export:
           triggers:
             - uuid: b7ca2b5273be4f50b5c20b422a534868
               expression: 'min(/Huawei VRP by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei VRP by SNMP/icmppingloss,5m)<100'
-              name: 'Huawei VRP: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Huawei VRP: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei VRP by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -73,7 +73,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 4f3bda2c7ab84a418bde7602cf0d608d
-          name: 'Huawei VRP: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -87,13 +87,14 @@ zabbix_export:
           triggers:
             - uuid: c322fda29bab4f99a0ea204814390551
               expression: 'avg(/Huawei VRP by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Huawei VRP: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Huawei VRP: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Huawei VRP by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei VRP by SNMP/icmppingloss,5m)<100'
-                - name: 'Huawei VRP: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei VRP by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -101,7 +102,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 023b4403df464029a1493c53a0122d6f
-          name: 'Huawei VRP: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -114,7 +115,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 9aba5f7df03b4904869e0043dc73b9ae
-          name: 'Huawei VRP: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -134,7 +135,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 034cdbc177c346e0b49791250b8bf66d
-          name: 'Huawei VRP: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -155,7 +156,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 202c91a61d644285a0d74d88ae1b1a79
-          name: 'Huawei VRP: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -179,7 +180,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 78041d1a10ed4cb6b89a77bc1478b009
-          name: 'Huawei VRP: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -189,7 +190,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -199,7 +200,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3fad2aa468c2492a89b28bdbffd00c6c
-          name: 'Huawei VRP: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -221,8 +222,8 @@ zabbix_export:
           triggers:
             - uuid: 740f78d69b20405da79525365fdc29fe
               expression: 'last(/Huawei VRP by SNMP/system.name,#1)<>last(/Huawei VRP by SNMP/system.name,#2) and length(last(/Huawei VRP by SNMP/system.name))>0'
-              name: 'Huawei VRP: System name has changed'
-              event_name: 'Huawei VRP: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -232,7 +233,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: e9dd0d849aaa499da9e2ef9e21ccd50e
-          name: 'Huawei VRP: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -242,7 +243,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -251,7 +252,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a5e66466550f44a4b1d2137c751e9009
-          name: 'Huawei VRP: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -270,13 +271,13 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 291fbe54d7c845bb9ec5b080be084612
-          name: 'Huawei VRP: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -290,12 +291,12 @@ zabbix_export:
           triggers:
             - uuid: cefe56d564434018b6a31c196cc7eb55
               expression: 'max(/Huawei VRP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Huawei VRP: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Huawei VRP: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei VRP by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -533,7 +534,7 @@ zabbix_export:
                   description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'Huawei VRP: System name has changed'
+                    - name: 'System name has changed'
                       expression: 'last(/Huawei VRP by SNMP/system.name,#1)<>last(/Huawei VRP by SNMP/system.name,#2) and length(last(/Huawei VRP by SNMP/system.name))>0'
                   tags:
                     - tag: scope
@@ -843,8 +844,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1054,7 +1055,7 @@ zabbix_export:
                   expression: 'last(/Huawei VRP by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
-                  description: 'Please check autonegotiation settings and cabling'
+                  description: 'Please check autonegotiation settings and cabling.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1090,10 +1091,13 @@ zabbix_export:
           value: '2'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
         - macro: '{$IFCONTROL}'
@@ -1129,6 +1133,7 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
         - macro: '{$TEMP_CRIT_LOW}'
@@ -1781,13 +1786,13 @@ zabbix_export:
   triggers:
     - uuid: c8c41677f4ba463b90cea501e9112483
       expression: '(last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei VRP by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei VRP by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Huawei VRP: Host has been restarted'
-      event_name: 'Huawei VRP: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Huawei VRP: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Huawei VRP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

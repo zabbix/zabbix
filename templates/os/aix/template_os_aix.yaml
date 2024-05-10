@@ -27,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: 4c80c15f5741464882aa238f27bec1bd
-          name: 'AIX: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 05849e0fb6504d339f2aebe159427bec
-          name: 'AIX: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
@@ -51,7 +51,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fe4731720ba64eebbf125929e499209b
-          name: 'AIX: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -65,7 +65,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 2c2d08ab5833493ba45ebfe5154f04c1
-          name: 'AIX: Number of running processes'
+          name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
           description: 'Number of processes in a running state.'
@@ -77,13 +77,13 @@ zabbix_export:
           triggers:
             - uuid: 458180bc0f14468386429964f877cce7
               expression: 'avg(/AIX by Zabbix agent/proc.num[,,run],5m)>30'
-              name: 'AIX: Too many processes running'
+              name: 'Too many processes running'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 7c64480f840a4778bde5278e1c0a083f
-          name: 'AIX: Number of processes'
+          name: 'Number of processes'
           key: 'proc.num[]'
           history: 7d
           description: 'Total number of processes in any state.'
@@ -95,13 +95,13 @@ zabbix_export:
           triggers:
             - uuid: 874ef8fe4a6445ff971800d2d9a50541
               expression: 'avg(/AIX by Zabbix agent/proc.num[],5m)>300'
-              name: 'AIX: Too many processes'
+              name: 'Too many processes'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 4a15778222a24f129b8ae7c240a32ded
-          name: 'AIX: Interrupts per second'
+          name: 'Interrupts per second'
           key: system.cpu.intr
           history: 7d
           units: ips
@@ -114,7 +114,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4f8665f48aff4fa39e85639fed7b71c5
-          name: 'AIX: Processor load (1 min average per core)'
+          name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
@@ -125,13 +125,13 @@ zabbix_export:
           triggers:
             - uuid: fdbedf15fe474fd18c045c62cf8cc7d6
               expression: 'avg(/AIX by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
-              name: 'AIX: Processor load is too high'
+              name: 'Processor load is too high'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 6fa2275f1f83456abfe786c8565c7a2d
-          name: 'AIX: Processor load (5 min average per core)'
+          name: 'Processor load (5 min average per core)'
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
@@ -140,7 +140,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 02210ac2faaa4f7bb74e995726706abc
-          name: 'AIX: Processor load (15 min average per core)'
+          name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
@@ -149,7 +149,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 1ad486947da9428abdebcecb83ca3d8b
-          name: 'AIX: Context switches per second'
+          name: 'Context switches per second'
           key: system.cpu.switches
           history: 7d
           units: sps
@@ -162,7 +162,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f4d10d49fa3c4dababf03d2cb80f044c
-          name: 'AIX: Host name'
+          name: 'Host name'
           key: system.hostname
           delay: 1h
           history: 7d
@@ -180,13 +180,13 @@ zabbix_export:
           triggers:
             - uuid: d1e70b7f465447a3ab575b3fd28755a1
               expression: 'last(/AIX by Zabbix agent/system.hostname,#1)<>last(/AIX by Zabbix agent/system.hostname,#2)'
-              name: 'AIX: Hostname was changed'
+              name: 'Hostname was changed'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: aebc5bb0264a4f55985c96445964dfc4
-          name: 'AIX: Host local time'
+          name: 'Host local time'
           key: system.localtime
           history: 7d
           units: unixtime
@@ -195,7 +195,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 081f8986446d43e7a3b72f7084576600
-          name: 'AIX: CPU available physical processors in the shared pool'
+          name: 'CPU available physical processors in the shared pool'
           key: 'system.stat[cpu,app]'
           history: 7d
           value_type: FLOAT
@@ -204,7 +204,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 6a97d56a6c2e45e1b10b97e2395ff30d
-          name: 'AIX: CPU entitled capacity consumed'
+          name: 'CPU entitled capacity consumed'
           key: 'system.stat[cpu,ec]'
           history: 7d
           value_type: FLOAT
@@ -212,7 +212,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 142f33d7b2c3469c9664fedf4f053616
-          name: 'AIX: CPU idle time'
+          name: 'CPU idle time'
           key: 'system.stat[cpu,id]'
           history: 7d
           value_type: FLOAT
@@ -221,7 +221,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 752c952fb18e4a0e8e5e3415b107b9f1
-          name: 'AIX: CPU logical processor utilization'
+          name: 'CPU logical processor utilization'
           key: 'system.stat[cpu,lbusy]'
           history: 7d
           value_type: FLOAT
@@ -230,7 +230,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 748f1316a33b48658b11dca8f45cfcce
-          name: 'AIX: CPU number of physical processors consumed'
+          name: 'CPU number of physical processors consumed'
           key: 'system.stat[cpu,pc]'
           history: 7d
           value_type: FLOAT
@@ -238,7 +238,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2647132edb6647ca9ef43a00ca09ecbd
-          name: 'AIX: CPU system time'
+          name: 'CPU system time'
           key: 'system.stat[cpu,sy]'
           history: 7d
           value_type: FLOAT
@@ -247,7 +247,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e990898ddbb74c7b9a8c1c67cb9544cf
-          name: 'AIX: CPU user time'
+          name: 'CPU user time'
           key: 'system.stat[cpu,us]'
           history: 7d
           value_type: FLOAT
@@ -256,7 +256,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2cd7a00570ad487d9cdf39fd198b2c0b
-          name: 'AIX: CPU iowait time'
+          name: 'CPU iowait time'
           key: 'system.stat[cpu,wa]'
           history: 7d
           value_type: FLOAT
@@ -267,14 +267,14 @@ zabbix_export:
           triggers:
             - uuid: c030cc99975d4fe3911789e58bbd5050
               expression: 'avg(/AIX by Zabbix agent/system.stat[cpu,wa],5m)>20'
-              name: 'AIX: Disk I/O is overloaded'
+              name: 'Disk I/O is overloaded'
               priority: WARNING
               description: 'Extended OS wait times for I/O operations may signal potential performance issues with the storage system.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 6748e4c87589472ca1474f3c7b729e0c
-          name: 'AIX: Amount of data transferred'
+          name: 'Amount of data transferred'
           key: 'system.stat[disk,bps]'
           history: 7d
           value_type: FLOAT
@@ -283,7 +283,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: bf0180d8f109451db616749990a113a6
-          name: 'AIX: Number of transfers'
+          name: 'Number of transfers'
           key: 'system.stat[disk,tps]'
           history: 7d
           value_type: FLOAT
@@ -291,7 +291,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3e1af0261f6a421d8ca554f8eb222716
-          name: 'AIX: Processor units is entitled to receive'
+          name: 'Processor units is entitled to receive'
           key: 'system.stat[ent]'
           delay: 1h
           history: 7d
@@ -300,7 +300,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 0fe71698a3c74c93a8cb3a937dc7226c
-          name: 'AIX: Kernel thread context switches'
+          name: 'Kernel thread context switches'
           key: 'system.stat[faults,cs]'
           history: 7d
           value_type: FLOAT
@@ -308,7 +308,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: a1e13d2dbd8b4086974ea32a2cd743b1
-          name: 'AIX: Device interrupts'
+          name: 'Device interrupts'
           key: 'system.stat[faults,in]'
           history: 7d
           value_type: FLOAT
@@ -316,7 +316,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 883c7a12b1d54f4d8189ca0d9cc43102
-          name: 'AIX: System calls'
+          name: 'System calls'
           key: 'system.stat[faults,sy]'
           history: 7d
           value_type: FLOAT
@@ -324,7 +324,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f027ed1c43464d4ab9a13d4b9f647e7e
-          name: 'AIX: Length of the swap queue'
+          name: 'Length of the swap queue'
           key: 'system.stat[kthr,b]'
           history: 7d
           value_type: FLOAT
@@ -332,7 +332,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 6795c2b6914d4303bf30c71c7405ff7d
-          name: 'AIX: Length of the run queue'
+          name: 'Length of the run queue'
           key: 'system.stat[kthr,r]'
           history: 7d
           value_type: FLOAT
@@ -340,21 +340,21 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 12142f133863448c9c937c671e183bbb
-          name: 'AIX: Active virtual pages'
+          name: 'Active virtual pages'
           key: 'system.stat[memory,avm]'
           history: 7d
           tags:
             - tag: component
               value: memory
         - uuid: 3b4a5ff768654ff5a87b955684a0d7b5
-          name: 'AIX: Free real memory'
+          name: 'Free real memory'
           key: 'system.stat[memory,fre]'
           history: 7d
           tags:
             - tag: component
               value: memory
         - uuid: bf890bf5cd1748a5af9528a111ba43c4
-          name: 'AIX: File page-ins per second'
+          name: 'File page-ins per second'
           key: 'system.stat[page,fi]'
           history: 7d
           value_type: FLOAT
@@ -362,7 +362,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 19c4f7132b6c46aa9522bd46da3e8f03
-          name: 'AIX: File page-outs per second'
+          name: 'File page-outs per second'
           key: 'system.stat[page,fo]'
           history: 7d
           value_type: FLOAT
@@ -370,7 +370,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 9ff3f7faa76c414aae7c5babb91fe065
-          name: 'AIX: Pages freed (page replacement)'
+          name: 'Pages freed (page replacement)'
           key: 'system.stat[page,fr]'
           history: 7d
           value_type: FLOAT
@@ -378,7 +378,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 6009d8a0fc2f486db979b226eb975e78
-          name: 'AIX: Pages paged in from paging space'
+          name: 'Pages paged in from paging space'
           key: 'system.stat[page,pi]'
           history: 7d
           value_type: FLOAT
@@ -386,7 +386,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 26fb1471e08c4c46800e4887d8bccd80
-          name: 'AIX: Pages paged out to paging space'
+          name: 'Pages paged out to paging space'
           key: 'system.stat[page,po]'
           history: 7d
           value_type: FLOAT
@@ -394,7 +394,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 83b1456726d448d6a756e03c0ec02342
-          name: 'AIX: Pages scanned by page-replacement algorithm'
+          name: 'Pages scanned by page-replacement algorithm'
           key: 'system.stat[page,sr]'
           history: 7d
           value_type: FLOAT
@@ -402,7 +402,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d0ef675d313849269890d06c7e003c9e
-          name: 'AIX: System information'
+          name: 'System information'
           key: system.uname
           delay: 1h
           history: 7d
@@ -420,13 +420,13 @@ zabbix_export:
           triggers:
             - uuid: 3a736e64211744aea480a60b2c48a036
               expression: 'last(/AIX by Zabbix agent/system.uname,#1)<>last(/AIX by Zabbix agent/system.uname,#2)'
-              name: 'AIX: Host information was changed'
+              name: 'Host information was changed'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 2e0ff86c992c4a098af8cb1bee0f0001
-          name: 'AIX: System uptime'
+          name: 'System uptime'
           key: system.uptime
           delay: 10m
           history: 7d
@@ -437,13 +437,13 @@ zabbix_export:
           triggers:
             - uuid: 03a2cd88b6a64d3ea4c9bb2abbc4ae2d
               expression: 'change(/AIX by Zabbix agent/system.uptime)<0'
-              name: 'AIX: Server has just been restarted'
+              name: 'Server has just been restarted'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 980a59760ef9481298ed35322841f939
-          name: 'AIX: Number of logged in users'
+          name: 'Number of logged in users'
           key: system.users.num
           history: 7d
           description: 'The number of users who are currently logged in.'
@@ -451,7 +451,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 4771d6d33c2247d6843198152a7065a8
-          name: 'AIX: Checksum of /etc/passwd'
+          name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
           history: 7d
@@ -467,13 +467,13 @@ zabbix_export:
           triggers:
             - uuid: c75ee957fd6c43b2aba9919d5e1af4a1
               expression: 'last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
-              name: 'AIX: /etc/passwd has been changed'
+              name: '/etc/passwd has been changed'
               priority: WARNING
               tags:
                 - tag: scope
                   value: security
         - uuid: 95e14453e9ee4b6ea036fab09bf2b194
-          name: 'AIX: Get filesystems'
+          name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
           trends: '0'
@@ -483,7 +483,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 6d4d9deab17b42f4a953c5210acac6f1
-          name: 'AIX: Available memory'
+          name: 'Available memory'
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
@@ -494,7 +494,7 @@ zabbix_export:
           triggers:
             - uuid: 80b6406fb8474fa9801e9dffb2ccd368
               expression: 'last(/AIX by Zabbix agent/vm.memory.size[available])<20M'
-              name: 'AIX: Lack of available memory on server'
+              name: 'Lack of available memory on server'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -502,7 +502,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 57d30ccd5db64dc8b9498a36efe768e9
-          name: 'AIX: Total memory'
+          name: 'Total memory'
           key: 'vm.memory.size[total]'
           delay: 1h
           history: 7d
@@ -512,7 +512,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 304a3e9bb7594c83b027a32c34aeab28
-          name: 'AIX: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
@@ -525,7 +525,7 @@ zabbix_export:
           triggers:
             - uuid: f0b9ecafede8476b94fd8dcab74cea87
               expression: 'max(/AIX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'AIX: Zabbix agent is not available'
+              name: 'Zabbix agent is not available'
               event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive checks only. The availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.'

@@ -27,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: ace97814969841e9a3e2d8ac6b83aae7
-          name: 'Arista: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -41,14 +41,14 @@ zabbix_export:
           triggers:
             - uuid: 736dc5694fc741e6bcb96e2ba27a0898
               expression: 'max(/Arista by SNMP/icmpping,#3)=0'
-              name: 'Arista: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 643a2c6f8d724bd392dd97bada7d24c2
-          name: 'Arista: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -62,11 +62,11 @@ zabbix_export:
           triggers:
             - uuid: dfa6f280b6304bfdb0063be94f7a4c5e
               expression: 'min(/Arista by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista by SNMP/icmppingloss,5m)<100'
-              name: 'Arista: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Arista: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Arista by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -74,7 +74,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: e731e59672be40fa8ae7aced60ed3efc
-          name: 'Arista: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -88,13 +88,14 @@ zabbix_export:
           triggers:
             - uuid: 18aeec70f72d43ceb4994501fb36d434
               expression: 'avg(/Arista by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Arista: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Arista: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Arista by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista by SNMP/icmppingloss,5m)<100'
-                - name: 'Arista: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Arista by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -102,7 +103,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 8954dfa9dc4445ad987f764e35c7db6e
-          name: 'Arista: Get sensors'
+          name: 'Get sensors'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.2.1.99.1.1.1.1,{#SENSOR_INFO},1.3.6.1.2.1.47.1.1.1.1.2,{#SENSOR_PRECISION},1.3.6.1.2.1.99.1.1.1.3,{#THRESHOLD_LO_WARN},1.3.6.1.4.1.30065.3.12.1.1.1.1,{#THRESHOLD_LO_CRIT},1.3.6.1.4.1.30065.3.12.1.1.1.2,{#THRESHOLD_HI_WARN},1.3.6.1.4.1.30065.3.12.1.1.1.3,{#THRESHOLD_HI_CRIT},1.3.6.1.4.1.30065.3.12.1.1.1.4]'
           key: sensors.get
@@ -132,7 +133,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e2d2516fb77f4e4faf13a69705d6af77
-          name: 'Arista: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -145,7 +146,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 48446cefda57477eb19dfc6db23a5ee1
-          name: 'Arista: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -165,7 +166,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fde390cc8671441194fb274209a8c190
-          name: 'Arista: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CPU.UTIL},1.3.6.1.2.1.25.3.3.1.2]'
           key: system.cpu.util
@@ -186,16 +187,16 @@ zabbix_export:
           triggers:
             - uuid: 6737f0672c244e048509358d220874a6
               expression: 'min(/Arista by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'Arista: High CPU utilization'
-              event_name: 'Arista: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 861f3aef96e64cf0a68e0fc81693f118
-          name: 'Arista: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -216,7 +217,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5bf4c90019ae41688336f83bcbb481bb
-          name: 'Arista: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -240,7 +241,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 55418095abea4f109476530af23e2829
-          name: 'Arista: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -250,7 +251,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -260,7 +261,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d4538fc49f554fb6a1514cd9487a7291
-          name: 'Arista: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -282,8 +283,8 @@ zabbix_export:
           triggers:
             - uuid: 362d455c9d9944cea7c37d58bcabc0a0
               expression: 'last(/Arista by SNMP/system.name,#1)<>last(/Arista by SNMP/system.name,#2) and length(last(/Arista by SNMP/system.name))>0'
-              name: 'Arista: System name has changed'
-              event_name: 'Arista: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -293,7 +294,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: ed9ad1ae7fba4073bb80307dbd6849cd
-          name: 'Arista: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -303,7 +304,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -312,7 +313,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8f2e8b5fa0464e4d964253f361d1e033
-          name: 'Arista: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -331,13 +332,13 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f57ed8cec3144effa6ffb2a4f604ab0b
-          name: 'Arista: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -351,12 +352,12 @@ zabbix_export:
           triggers:
             - uuid: 53501c72392a4bbc8fa0f5ed086d2591
               expression: 'max(/Arista by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Arista: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Arista: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Arista by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -840,8 +841,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1051,7 +1052,7 @@ zabbix_export:
                   expression: 'last(/Arista by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
-                  description: 'Please check autonegotiation settings and cabling'
+                  description: 'Please check autonegotiation settings and cabling.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1346,8 +1347,8 @@ zabbix_export:
               expression: |
                 last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                 ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low'
-              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+              name: 'Disk space is critically low'
+              event_name: 'Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'''
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
@@ -1366,8 +1367,8 @@ zabbix_export:
               expression: |
                 last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
                 ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low'
-              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+              name: 'Disk space is low'
+              event_name: 'Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
@@ -1378,7 +1379,7 @@ zabbix_export:
                 - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
-                - name: '{#FSNAME}: Disk space is critically low'
+                - name: 'Disk space is critically low'
                   expression: |
                     last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
                     ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
@@ -1483,8 +1484,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6b9010e0ad4e4549ac91a91d4bb3983a
                   expression: 'min(/Arista by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: '{#MEMNAME}: High memory utilization'
-                  event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'High memory utilization'
+                  event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -1642,10 +1643,13 @@ zabbix_export:
           value: '3'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
         - macro: '{$IFCONTROL}'
@@ -1696,6 +1700,7 @@ zabbix_export:
           value: '2'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$VFS.FS.FREE.MIN.CRIT}'
           value: 5G
           description: 'The critical threshold of the filesystem utilization.'
@@ -1704,16 +1709,16 @@ zabbix_export:
           description: 'The warning threshold of the filesystem utilization.'
         - macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: '.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$'
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
           value: '90'
         - macro: '{$VFS.FS.PUSED.MAX.WARN}'
@@ -2428,13 +2433,13 @@ zabbix_export:
   triggers:
     - uuid: e3907a8b6aba4512a24a677ed31e4362
       expression: '(last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Arista by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Arista: Host has been restarted'
-      event_name: 'Arista: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Arista: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Arista by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

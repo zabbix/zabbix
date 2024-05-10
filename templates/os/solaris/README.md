@@ -49,52 +49,52 @@ Install Zabbix agent on Solaris OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Solaris: Maximum number of processes|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxproc|
-|Solaris: Number of running processes|<p>The number of processes in a running state.</p>|Zabbix agent|proc.num[,,run]|
-|Solaris: Number of processes|<p>The total number of processes in any state.</p>|Zabbix agent|proc.num[]|
-|Solaris: Host boot time||Zabbix agent|system.boottime|
-|Solaris: Interrupts per second|<p>Number of interrupts processed.</p>|Zabbix agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Solaris: Processor load (1 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg1]|
-|Solaris: Processor load (5 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg5]|
-|Solaris: Processor load (15 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg15]|
-|Solaris: Context switches per second|<p>The combined rate at which all processors on the computer are switched from one thread to another.</p>|Zabbix agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Solaris: CPU idle time|<p>Time the CPU has spent doing nothing.</p>|Zabbix agent|system.cpu.util[,idle]|
-|Solaris: CPU iowait time|<p>Time the CPU has been waiting for the I/O to complete.</p>|Zabbix agent|system.cpu.util[,iowait]|
-|Solaris: CPU system time|<p>Time the CPU has spent running the kernel and its processes.</p>|Zabbix agent|system.cpu.util[,system]|
-|Solaris: CPU user time|<p>Time the CPU has spent running users' processes that are not niced.</p>|Zabbix agent|system.cpu.util[,user]|
-|Solaris: Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Solaris: Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
-|Solaris: Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,free]|
-|Solaris: Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Zabbix agent|system.swap.size[,pfree]|
-|Solaris: Total swap space|<p>Total space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,total]|
-|Solaris: System information|<p>Information as normally returned by `uname -a`.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Solaris: System uptime||Zabbix agent|system.uptime|
-|Solaris: Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
-|Solaris: Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Solaris: Available memory|<p>Defined as free + cached + buffers.</p>|Zabbix agent|vm.memory.size[available]|
-|Solaris: Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent|vm.memory.size[total]|
-|Solaris: Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Solaris: Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Solaris: Zabbix agent availability|<p>Used for monitoring agent availability status</p>|Zabbix internal|zabbix[host,agent,available]|
-|Solaris: Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent|agent.ping|
-|Solaris: Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
+|Maximum number of processes|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxproc|
+|Number of running processes|<p>The number of processes in a running state.</p>|Zabbix agent|proc.num[,,run]|
+|Number of processes|<p>The total number of processes in any state.</p>|Zabbix agent|proc.num[]|
+|Host boot time||Zabbix agent|system.boottime|
+|Interrupts per second|<p>Number of interrupts processed.</p>|Zabbix agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Processor load (1 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg1]|
+|Processor load (5 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg5]|
+|Processor load (15 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg15]|
+|Context switches per second|<p>The combined rate at which all processors on the computer are switched from one thread to another.</p>|Zabbix agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|CPU idle time|<p>Time the CPU has spent doing nothing.</p>|Zabbix agent|system.cpu.util[,idle]|
+|CPU iowait time|<p>Time the CPU has been waiting for the I/O to complete.</p>|Zabbix agent|system.cpu.util[,iowait]|
+|CPU system time|<p>Time the CPU has spent running the kernel and its processes.</p>|Zabbix agent|system.cpu.util[,system]|
+|CPU user time|<p>Time the CPU has spent running users' processes that are not niced.</p>|Zabbix agent|system.cpu.util[,user]|
+|Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
+|Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,free]|
+|Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Zabbix agent|system.swap.size[,pfree]|
+|Total swap space|<p>Total space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,total]|
+|System information|<p>Information as normally returned by `uname -a`.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|System uptime||Zabbix agent|system.uptime|
+|Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
+|Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Available memory|<p>Defined as free + cached + buffers.</p>|Zabbix agent|vm.memory.size[available]|
+|Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent|vm.memory.size[total]|
+|Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Zabbix agent availability|<p>Used for monitoring agent availability status</p>|Zabbix internal|zabbix[host,agent,available]|
+|Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent|agent.ping|
+|Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Solaris: Configured max number of processes is too low||`last(/Solaris by Zabbix agent/kernel.maxproc)<256`|Info||
-|Solaris: Too many processes running||`avg(/Solaris by Zabbix agent/proc.num[,,run],5m)>30`|Warning||
-|Solaris: Too many processes||`avg(/Solaris by Zabbix agent/proc.num[],5m)>300`|Warning||
-|Solaris: Processor load is too high||`avg(/Solaris by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5`|Warning||
-|Solaris: Disk I/O is overloaded|<p>Extended OS wait times for I/O operations may signal potential performance issues with the storage system.</p>|`avg(/Solaris by Zabbix agent/system.cpu.util[,iowait],5m)>20`|Warning||
-|Solaris: Hostname was changed||`last(/Solaris by Zabbix agent/system.hostname,#1)<>last(/Solaris by Zabbix agent/system.hostname,#2)`|Info||
-|Solaris: Lack of free swap space|<p>It probably means that the systems requires more physical memory.</p>|`last(/Solaris by Zabbix agent/system.swap.size[,pfree])<50`|Warning||
-|Solaris: Host information was changed||`last(/Solaris by Zabbix agent/system.uname,#1)<>last(/Solaris by Zabbix agent/system.uname,#2)`|Info||
-|Solaris: Server has just been restarted||`change(/Solaris by Zabbix agent/system.uptime)<0`|Info||
-|Solaris: /etc/passwd has been changed||`last(/Solaris by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
-|Solaris: Lack of available memory on server||`last(/Solaris by Zabbix agent/vm.memory.size[available])<20M`|Average||
-|Solaris: Zabbix agent is not available|<p>For passive checks only; the availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.</p>|`max(/Solaris by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
+|Configured max number of processes is too low||`last(/Solaris by Zabbix agent/kernel.maxproc)<256`|Info||
+|Too many processes running||`avg(/Solaris by Zabbix agent/proc.num[,,run],5m)>30`|Warning||
+|Too many processes||`avg(/Solaris by Zabbix agent/proc.num[],5m)>300`|Warning||
+|Processor load is too high||`avg(/Solaris by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5`|Warning||
+|Disk I/O is overloaded|<p>Extended OS wait times for I/O operations may signal potential performance issues with the storage system.</p>|`avg(/Solaris by Zabbix agent/system.cpu.util[,iowait],5m)>20`|Warning||
+|Hostname was changed||`last(/Solaris by Zabbix agent/system.hostname,#1)<>last(/Solaris by Zabbix agent/system.hostname,#2)`|Info||
+|Lack of free swap space|<p>It probably means that the systems requires more physical memory.</p>|`last(/Solaris by Zabbix agent/system.swap.size[,pfree])<50`|Warning||
+|Host information was changed||`last(/Solaris by Zabbix agent/system.uname,#1)<>last(/Solaris by Zabbix agent/system.uname,#2)`|Info||
+|Server has just been restarted||`change(/Solaris by Zabbix agent/system.uptime)<0`|Info||
+|/etc/passwd has been changed||`last(/Solaris by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
+|Lack of available memory on server||`last(/Solaris by Zabbix agent/vm.memory.size[available])<20M`|Average||
+|Zabbix agent is not available|<p>For passive checks only; the availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.</p>|`max(/Solaris by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
 
 ### LLD rule Network interface discovery
 

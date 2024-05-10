@@ -25,7 +25,7 @@ zabbix_export:
         - name: Templates/Power
       items:
         - uuid: c4f4a85105f24292a3b566d0d1bcc090
-          name: 'APC Smart-UPS SRT 8000: Battery capacity'
+          name: 'Battery capacity'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.1.0
           key: 'battery.capacity[upsHighPrecBatteryCapacity]'
@@ -49,15 +49,15 @@ zabbix_export:
           triggers:
             - uuid: 92e6a65ffc6d4a6bae62303ee2796580
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}'
-              name: 'APC Smart-UPS SRT 8000: Battery has low capacity'
-              event_name: 'APC Smart-UPS SRT 8000: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
+              name: 'Battery has low capacity'
+              event_name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
               opdata: 'Current capacity: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 7d7c2b962e9843b8a6cf72c04ff1e479
-          name: 'APC Smart-UPS SRT 8000: External battery packs count'
+          name: 'External battery packs count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.5.0
           key: 'battery.external_packs_count[upsAdvBatteryNumOfBattPacks]'
@@ -76,7 +76,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 552e030c272d43a0998bc2648f15ae44
-          name: 'APC Smart-UPS SRT 8000: Battery last replace date'
+          name: 'Battery last replace date'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.3.0
           key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
@@ -99,7 +99,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 4cdd4bbff845477194a6d96a31431d23
-          name: 'APC Smart-UPS SRT 8000: Battery replace indicator'
+          name: 'Battery replace indicator'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.4.0
           key: 'battery.replace_indicator[upsAdvBatteryReplaceIndicator]'
@@ -119,14 +119,14 @@ zabbix_export:
           triggers:
             - uuid: 0e8030c0028144728361153c2b47016b
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2'
-              name: 'APC Smart-UPS SRT 8000: Battery needs replacement'
+              name: 'Battery needs replacement'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: ae8a19896d21405ca99a5bfbd5de1f95
-          name: 'APC Smart-UPS SRT 8000: Battery runtime remaining'
+          name: 'Battery runtime remaining'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.3.0
           key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: ceed5ddfc9964aabaebb0b97875b1bd9
-          name: 'APC Smart-UPS SRT 8000: Battery status'
+          name: 'Battery status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.1.0
           key: 'battery.status[upsBasicBatteryStatus]'
@@ -176,7 +176,7 @@ zabbix_export:
           triggers:
             - uuid: cf186014cfd94ccbad3cc4cbd22b6aa1
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/battery.status[upsBasicBatteryStatus])=4'
-              name: 'APC Smart-UPS SRT 8000: Battery has an internal error condition'
+              name: 'Battery has an internal error condition'
               priority: AVERAGE
               description: 'A battery installed has an internal error condition.'
               tags:
@@ -184,14 +184,14 @@ zabbix_export:
                   value: notice
             - uuid: e1957ee82be847e7bfb171560fc59293
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/battery.status[upsBasicBatteryStatus])=3'
-              name: 'APC Smart-UPS SRT 8000: Battery is Low'
+              name: 'Battery is Low'
               priority: AVERAGE
               description: 'The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 533041b6831c451cb72991d3fdeca535
-          name: 'APC Smart-UPS SRT 8000: Battery temperature'
+          name: 'Battery temperature'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.2.0
           key: 'battery.temperature[upsHighPrecBatteryTemperature]'
@@ -215,15 +215,15 @@ zabbix_export:
           triggers:
             - uuid: 1e883961b65e445997c57870734a58ca
               expression: 'min(/APC Smart-UPS SRT 8000 by SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
-              name: 'APC Smart-UPS SRT 8000: Battery has high temperature'
-              event_name: 'APC Smart-UPS SRT 8000: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+              name: 'Battery has high temperature'
+              event_name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: fa8256c826954defa82083ddc742624e
-          name: 'APC Smart-UPS SRT 8000: Battery voltage'
+          name: 'Battery voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.4.0
           key: 'battery.voltage[upsHighPrecBatteryActualVoltage]'
@@ -244,7 +244,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 07754bb421d0435995abbc49d4597908
-          name: 'APC Smart-UPS SRT 8000: Input fail cause'
+          name: 'Input fail cause'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.2.5.0
           key: 'input.fail[upsAdvInputLineFailCause]'
@@ -285,7 +285,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 7574344f67544554804c4c68e39d3d72
-          name: 'APC Smart-UPS SRT 8000: Input frequency'
+          name: 'Input frequency'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.4.0
           key: 'input.frequency[upsHighPrecInputFrequency]'
@@ -308,15 +308,15 @@ zabbix_export:
           triggers:
             - uuid: b9a134c942da46ffba1acdf85a7832e4
               expression: 'min(/APC Smart-UPS SRT 8000 by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS SRT 8000 by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS SRT 8000 by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
-              name: 'APC Smart-UPS SRT 8000: Unacceptable input frequency'
-              event_name: 'APC Smart-UPS SRT 8000: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
+              name: 'Unacceptable input frequency'
+              event_name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: c69418651f75413e95645c62fa3fee7f
-          name: 'APC Smart-UPS SRT 8000: Input voltage'
+          name: 'Input voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.1.0
           key: 'input.voltage[upsHighPrecInputLineVoltage]'
@@ -339,15 +339,15 @@ zabbix_export:
           triggers:
             - uuid: 694ab76079b1447b99ef510d80faab6a
               expression: 'min(/APC Smart-UPS SRT 8000 by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS SRT 8000 by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS SRT 8000 by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
-              name: 'APC Smart-UPS SRT 8000: Unacceptable input voltage'
-              event_name: 'APC Smart-UPS SRT 8000: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+              name: 'Unacceptable input voltage'
+              event_name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: e4d76d857c4e46fd9b0e97405b17988a
-          name: 'APC Smart-UPS SRT 8000: Output current'
+          name: 'Output current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.4.0
           key: 'output.current[upsHighPrecOutputCurrent]'
@@ -368,7 +368,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 0413f6ef89894dc6ba51e42f6a963f94
-          name: 'APC Smart-UPS SRT 8000: Output load'
+          name: 'Output load'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.3.0
           key: 'output.load[upsHighPrecOutputLoad]'
@@ -392,8 +392,8 @@ zabbix_export:
           triggers:
             - uuid: 68f92026e7b345c88bf4aa679f9b642c
               expression: 'min(/APC Smart-UPS SRT 8000 by SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
-              name: 'APC Smart-UPS SRT 8000: Output load is high'
-              event_name: 'APC Smart-UPS SRT 8000: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
+              name: 'Output load is high'
+              event_name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
@@ -401,7 +401,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 11c1742beed041999375e5a1ede42546
-          name: 'APC Smart-UPS SRT 8000: Output status'
+          name: 'Output status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.1.1.0
           key: 'output.status[upsBasicOutputStatus]'
@@ -429,83 +429,83 @@ zabbix_export:
           triggers:
             - uuid: 9952679fada845228bbbf05bcdada305
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=16'
-              name: 'APC Smart-UPS SRT 8000: UPS is Emergency Static Bypass'
+              name: 'UPS is Emergency Static Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: ee306606159f4930bcf580b5084c846a
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=10'
-              name: 'APC Smart-UPS SRT 8000: UPS is Hardware Failure Bypass'
+              name: 'UPS is Hardware Failure Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: c4623dc4c6ae4c5b9ff4bdf4f43ed8b2
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=7'
-              name: 'APC Smart-UPS SRT 8000: UPS is Off'
+              name: 'UPS is Off'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 26c0b9b62d864c1ead7b16e0076a7226
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=3'
-              name: 'APC Smart-UPS SRT 8000: UPS is on battery'
+              name: 'UPS is on battery'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 5c8408069c03421cb60b388451869b6f
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=4'
-              name: 'APC Smart-UPS SRT 8000: UPS is on Smart Boost'
+              name: 'UPS is on Smart Boost'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 156c5260ed4444c19313ba491ce9352c
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=12'
-              name: 'APC Smart-UPS SRT 8000: UPS is On Smart Trim'
+              name: 'UPS is On Smart Trim'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: c233bc86198140659ec3dd609c94ec94
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=8'
-              name: 'APC Smart-UPS SRT 8000: UPS is Rebooting'
+              name: 'UPS is Rebooting'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 944e49d1b6d44adc8d720bd689d8c8cf
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=11'
-              name: 'APC Smart-UPS SRT 8000: UPS is Sleeping Until Power Return'
+              name: 'UPS is Sleeping Until Power Return'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 9b376dbd2d614878b681b42bb2c7fe4d
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=6'
-              name: 'APC Smart-UPS SRT 8000: UPS is Software Bypass'
+              name: 'UPS is Software Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 499ac46836c1454dad3c1ffc5714c073
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=9'
-              name: 'APC Smart-UPS SRT 8000: UPS is Switched Bypass'
+              name: 'UPS is Switched Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 8a0a5af39647494681e52595d179c336
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/output.status[upsBasicOutputStatus])=5'
-              name: 'APC Smart-UPS SRT 8000: UPS is Timed Sleeping'
+              name: 'UPS is Timed Sleeping'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
         - uuid: 07059c625de94e618925249492982fb7
-          name: 'APC Smart-UPS SRT 8000: Output voltage'
+          name: 'Output voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.1.0
           key: 'output.voltage[upsHighPrecOutputVoltage]'
@@ -526,7 +526,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: ae4579b14c424c0492acbfcb5aa5dd67
-          name: 'APC Smart-UPS SRT 8000: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -539,7 +539,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e4995e72f6b442bd9b8c90f09eb54f16
-          name: 'APC Smart-UPS SRT 8000: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -561,7 +561,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 13d3c18413a249d492272a7373ebd772
-          name: 'APC Smart-UPS SRT 8000: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -582,7 +582,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 4e8b6d6a5aa24159b048d1cf28e9418a
-          name: 'APC Smart-UPS SRT 8000: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -606,7 +606,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 25aa469a757347089191eb8e364d4df9
-          name: 'APC Smart-UPS SRT 8000: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -626,7 +626,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 57f3c4c2aff04eef83b7a7a53fa9f95c
-          name: 'APC Smart-UPS SRT 8000: Model'
+          name: Model
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.1.1.0
           key: 'system.model[upsBasicIdentModel]'
@@ -645,7 +645,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 13c26820947442f581c2234c38c052cc
-          name: 'APC Smart-UPS SRT 8000: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'system.name[sysName.0]'
@@ -667,8 +667,8 @@ zabbix_export:
           triggers:
             - uuid: 852083234a55441aa2fa57b202227bef
               expression: 'last(/APC Smart-UPS SRT 8000 by SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS SRT 8000 by SNMP/system.name[sysName.0],#2) and length(last(/APC Smart-UPS SRT 8000 by SNMP/system.name[sysName.0]))>0'
-              name: 'APC Smart-UPS SRT 8000: System name has changed'
-              event_name: 'APC Smart-UPS SRT 8000: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -678,7 +678,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 320bdbfd8076411bb1dd63fccddec126
-          name: 'APC Smart-UPS SRT 8000: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -697,7 +697,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b59b3801f5584321a1fca9bdb466f191
-          name: 'APC Smart-UPS SRT 8000: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -716,7 +716,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 63852531159c44f1beca7facd8f93fa2
-          name: 'APC Smart-UPS SRT 8000: Serial number'
+          name: 'Serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.2.3.0
           key: 'system.sn[upsAdvIdentSerialNumber]'
@@ -738,13 +738,13 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 567996748402435d80aae37818d4125e
-          name: 'APC Smart-UPS SRT 8000: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -762,7 +762,7 @@ zabbix_export:
           triggers:
             - uuid: 9a0cb26712c14045a18a0e86de4cdd54
               expression: 'max(/APC Smart-UPS SRT 8000 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'APC Smart-UPS SRT 8000: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -1549,13 +1549,13 @@ zabbix_export:
       expression: |
         (last(/APC Smart-UPS SRT 8000 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC Smart-UPS SRT 8000 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m)
         or (last(/APC Smart-UPS SRT 8000 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC Smart-UPS SRT 8000 by SNMP/system.net.uptime[sysUpTime.0])<10m)
-      name: 'APC Smart-UPS SRT 8000: Host has been restarted'
-      event_name: 'APC Smart-UPS SRT 8000: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'APC Smart-UPS SRT 8000: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/APC Smart-UPS SRT 8000 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

@@ -23,7 +23,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 28944ee2c0a3478e84612cd5650f3cd5
-          name: 'Kubernetes API: Request terminations, rate'
+          name: 'Request terminations, rate'
           type: DEPENDENT
           key: kubernetes.api.apiserver_request_terminations
           delay: '0'
@@ -46,7 +46,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 1ac74141a4b241b196bc47d0dee37a2c
-          name: 'Kubernetes API: API server requests: 0'
+          name: 'API server requests: 0'
           type: DEPENDENT
           key: kubernetes.api.apiserver_request_total_0.rate
           delay: '0'
@@ -71,7 +71,7 @@ zabbix_export:
             - tag: http-code
               value: '0'
         - uuid: d7f8363e1bc5424f89c7386fcbe6fb06
-          name: 'Kubernetes API: API server requests: 2xx, rate'
+          name: 'API server requests: 2xx, rate'
           type: DEPENDENT
           key: kubernetes.api.apiserver_request_total_200.rate
           delay: '0'
@@ -96,7 +96,7 @@ zabbix_export:
             - tag: http-code
               value: 2xx
         - uuid: 453852b621ca4a7cbc4d80e5327c80da
-          name: 'Kubernetes API: API server requests: 3xx, rate'
+          name: 'API server requests: 3xx, rate'
           type: DEPENDENT
           key: kubernetes.api.apiserver_request_total_300.rate
           delay: '0'
@@ -121,7 +121,7 @@ zabbix_export:
             - tag: http-code
               value: 3xx
         - uuid: 1f72779899f94620bc55870f5e2c2ca0
-          name: 'Kubernetes API: API server requests: 4xx, rate'
+          name: 'API server requests: 4xx, rate'
           type: DEPENDENT
           key: kubernetes.api.apiserver_request_total_400.rate
           delay: '0'
@@ -146,7 +146,7 @@ zabbix_export:
             - tag: http-code
               value: 4xx
         - uuid: 1c24d58b28bc423e868a965d689cf146
-          name: 'Kubernetes API: API server requests: 5xx, rate'
+          name: 'API server requests: 5xx, rate'
           type: DEPENDENT
           key: kubernetes.api.apiserver_request_total_500.rate
           delay: '0'
@@ -173,15 +173,15 @@ zabbix_export:
           triggers:
             - uuid: 0e1ef1630b5d4cb98270564f324f5382
               expression: 'min(/Kubernetes API server by HTTP/kubernetes.api.apiserver_request_total_500.rate,5m)>{$KUBE.API.HTTP.SERVER.ERROR}'
-              name: 'Kubernetes API: Too many server errors'
-              event_name: 'Kubernetes API: Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)'
+              name: 'Too many server errors'
+              event_name: 'Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes API server is experiencing high error rate (with 5xx HTTP code).'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 5bd8b2deaf1142369ba67afc7a41ab11
-          name: 'Kubernetes API: TLS handshake errors, rate'
+          name: 'TLS handshake errors, rate'
           type: DEPENDENT
           key: kubernetes.api.apiserver_tls_handshake_errors_total.rate
           delay: '0'
@@ -201,7 +201,7 @@ zabbix_export:
             - tag: component
               value: tls
         - uuid: 54723f57a20a47a698fbf47cbec0f7a1
-          name: 'Kubernetes API: Audit events, total'
+          name: 'Audit events, total'
           type: DEPENDENT
           key: kubernetes.api.audit_event_total
           delay: '0'
@@ -221,7 +221,7 @@ zabbix_export:
             - tag: component
               value: audit
         - uuid: de87284b8bd644398e4a88a064e206bb
-          name: 'Kubernetes API: CPU'
+          name: CPU
           type: DEPENDENT
           key: kubernetes.api.cpu.util
           delay: '0'
@@ -247,7 +247,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e4e3c570a55a48689c145c4a2310c597
-          name: 'Kubernetes API: Get API instance metrics'
+          name: 'Get API instance metrics'
           type: HTTP_AGENT
           key: kubernetes.api.get_metrics
           history: '0'
@@ -267,7 +267,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 79db985ac8f645999fe8aa73b4073bfb
-          name: 'Kubernetes API: Goroutines'
+          name: Goroutines
           type: DEPENDENT
           key: kubernetes.api.go_goroutines
           delay: '0'
@@ -287,7 +287,7 @@ zabbix_export:
             - tag: component
               value: goroutines
         - uuid: 2022d65c2f7a4f07bc1cba435a2be1e9
-          name: 'Kubernetes API: Go threads'
+          name: 'Go threads'
           type: DEPENDENT
           key: kubernetes.api.go_threads
           delay: '0'
@@ -307,7 +307,7 @@ zabbix_export:
             - tag: component
               value: go-threads
         - uuid: 837c546cb3bc400ab7a62a672792f88b
-          name: 'Kubernetes API: gRPCs messages received, rate'
+          name: 'gRPCs messages received, rate'
           type: DEPENDENT
           key: kubernetes.api.grpc_client_msg_received.rate
           delay: '0'
@@ -330,7 +330,7 @@ zabbix_export:
             - tag: component
               value: grpc
         - uuid: 353559f3b9684647a74bd429d80731b9
-          name: 'Kubernetes API: gRPCs messages sent, rate'
+          name: 'gRPCs messages sent, rate'
           type: DEPENDENT
           key: kubernetes.api.grpc_client_msg_sent.rate
           delay: '0'
@@ -353,7 +353,7 @@ zabbix_export:
             - tag: component
               value: grpc
         - uuid: 0850afe759684950be79135ed4f32c79
-          name: 'Kubernetes API: gRPCs client started, rate'
+          name: 'gRPCs client started, rate'
           type: DEPENDENT
           key: kubernetes.api.grpc_client_started.rate
           delay: '0'
@@ -376,7 +376,7 @@ zabbix_export:
             - tag: component
               value: grpc
         - uuid: 187702b1c3a24d07aaf9cc07fa359095
-          name: 'Kubernetes API: Fds max'
+          name: 'Fds max'
           type: DEPENDENT
           key: kubernetes.api.max_fds
           delay: '0'
@@ -396,7 +396,7 @@ zabbix_export:
             - tag: component
               value: fds
         - uuid: 41f802305a234b1ab9fb0e89d1e40290
-          name: 'Kubernetes API: Fds open'
+          name: 'Fds open'
           type: DEPENDENT
           key: kubernetes.api.open_fds
           delay: '0'
@@ -416,7 +416,7 @@ zabbix_export:
             - tag: component
               value: fds
         - uuid: 53fd5211b6da47d3b3fc87ab8a2d0c33
-          name: 'Kubernetes API: Resident memory, bytes'
+          name: 'Resident memory, bytes'
           type: DEPENDENT
           key: kubernetes.api.process_resident_memory_bytes
           delay: '0'
@@ -437,7 +437,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 010a983426c9407eb4b6bf7822b411ce
-          name: 'Kubernetes API: Virtual memory, bytes'
+          name: 'Virtual memory, bytes'
           type: DEPENDENT
           key: kubernetes.api.process_virtual_memory_bytes
           delay: '0'
@@ -458,7 +458,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 3f15d60ef7cb4a068424d5835d04a817
-          name: 'Kubernetes API: HTTP requests: 2xx, rate'
+          name: 'HTTP requests: 2xx, rate'
           type: DEPENDENT
           key: kubernetes.api.rest_client_requests_total_200.rate
           delay: '0'
@@ -483,7 +483,7 @@ zabbix_export:
             - tag: http-code
               value: 2xx
         - uuid: 450607dda045428fb6d4a96ca8888c19
-          name: 'Kubernetes API: HTTP requests: 3xx, rate'
+          name: 'HTTP requests: 3xx, rate'
           type: DEPENDENT
           key: kubernetes.api.rest_client_requests_total_300.rate
           delay: '0'
@@ -508,7 +508,7 @@ zabbix_export:
             - tag: http-code
               value: 3xx
         - uuid: f11b87e0bc5a41ff956391b6cb7115c5
-          name: 'Kubernetes API: HTTP requests: 4xx, rate'
+          name: 'HTTP requests: 4xx, rate'
           type: DEPENDENT
           key: kubernetes.api.rest_client_requests_total_400.rate
           delay: '0'
@@ -533,7 +533,7 @@ zabbix_export:
             - tag: http-code
               value: 4xx
         - uuid: 2588c2332fea48f8bae414e8b7c42184
-          name: 'Kubernetes API: HTTP requests: 5xx, rate'
+          name: 'HTTP requests: 5xx, rate'
           type: DEPENDENT
           key: kubernetes.api.rest_client_requests_total_500.rate
           delay: '0'
@@ -560,8 +560,8 @@ zabbix_export:
           triggers:
             - uuid: 4c79888da91448738092c86e5f427a6a
               expression: 'min(/Kubernetes API server by HTTP/kubernetes.api.rest_client_requests_total_500.rate,5m)>{$KUBE.API.HTTP.CLIENT.ERROR}'
-              name: 'Kubernetes API: Too many client errors'
-              event_name: 'Kubernetes API: Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)'
+              name: 'Too many client errors'
+              event_name: 'Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes API client is experiencing high error rate (with 5xx HTTP code).'
               tags:
@@ -576,7 +576,7 @@ zabbix_export:
           description: 'Discovery watchers by kind.'
           item_prototypes:
             - uuid: 09d0815f893c42c1b95721f7f908940a
-              name: 'Kubernetes API: Watchers: {#KIND}'
+              name: 'Watchers: {#KIND}'
               type: DEPENDENT
               key: 'kubernetes.api.apiserver_registered_watchers["{#KIND}"]'
               delay: '0'
@@ -628,7 +628,7 @@ zabbix_export:
           description: 'Discovery authentication attempts by name.'
           item_prototypes:
             - uuid: 6950d30d0b1d4162acee45f184453fbd
-              name: 'Kubernetes API: Authenticated requests: {#NAME}, rate'
+              name: 'Authenticated requests: {#NAME}, rate'
               type: DEPENDENT
               key: 'kubernetes.api.authenticated_user_requests.rate["{#NAME}"]'
               delay: '0'
@@ -683,7 +683,7 @@ zabbix_export:
           description: 'Discovery authentication attempts by result.'
           item_prototypes:
             - uuid: d9ddaa016a7c4ca381fbe857959dd0fd
-              name: 'Kubernetes API: Authentication attempts: {#RESULT}, rate'
+              name: 'Authentication attempts: {#RESULT}, rate'
               type: DEPENDENT
               key: 'kubernetes.api.authentication_attempts.rate["{#RESULT}"]'
               delay: '0'
@@ -738,7 +738,7 @@ zabbix_export:
           description: 'Discovery raw data of client certificate expiration'
           item_prototypes:
             - uuid: b69600f22c7b42b48f8601ada06a5a9f
-              name: 'Kubernetes API: Client certificate expiration, p1'
+              name: 'Client certificate expiration, p1'
               type: CALCULATED
               key: 'kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]'
               history: 7d
@@ -753,7 +753,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 1371958c0339430b8a333851766c01c0
                   expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
-                  name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                  name: 'Kubernetes client certificate expires soon'
                   priority: WARNING
                   description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
                   tags:
@@ -761,18 +761,18 @@ zabbix_export:
                       value: availability
                 - uuid: 132d58724bd141afa3f28101326fe922
                   expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < {$KUBE.API.CERT.EXPIRATION}*24*60*60'
-                  name: 'Kubernetes API: Kubernetes client certificate is expiring'
-                  event_name: 'Kubernetes API: Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
+                  name: 'Kubernetes client certificate is expiring'
+                  event_name: 'Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
                   priority: WARNING
                   description: 'A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.'
                   dependencies:
-                    - name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                    - name: 'Kubernetes client certificate expires soon'
                       expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 860cc40806254564bddb3617b8b75e74
-              name: 'Kubernetes API: Certificate expiration seconds bucket, {#LE}'
+              name: 'Certificate expiration seconds bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]'
               delay: '0'
@@ -858,7 +858,7 @@ zabbix_export:
           description: 'Discovery etcd objects by resource.'
           item_prototypes:
             - uuid: 75c15b57189d4cbeb6ed6397fc377e2a
-              name: 'Kubernetes API: etcd objects: {#RESOURCE}'
+              name: 'etcd objects: {#RESOURCE}'
               type: DEPENDENT
               key: 'kubernetes.api.etcd_object_counts["{#RESOURCE}"]'
               delay: '0'
@@ -910,7 +910,7 @@ zabbix_export:
           description: 'Discovery grpc completed requests by grpc code.'
           item_prototypes:
             - uuid: 690dc00ad92d44d0b9bc7db58c07bd8f
-              name: 'Kubernetes API: gRPCs completed: {#GRPC_CODE}, rate'
+              name: 'gRPCs completed: {#GRPC_CODE}, rate'
               type: DEPENDENT
               key: 'kubernetes.api.grpc_client_handled_total.rate["{#GRPC_CODE}"]'
               delay: '0'
@@ -965,7 +965,7 @@ zabbix_export:
           description: 'Discovery requests inflight by kind.'
           item_prototypes:
             - uuid: 5076679154cc464ebab0b678f65c8853
-              name: 'Kubernetes API: Requests current: {#KIND}'
+              name: 'Requests current: {#KIND}'
               type: DEPENDENT
               key: 'kubernetes.api.current_inflight_requests["{#KIND}"]'
               delay: '0'
@@ -1017,7 +1017,7 @@ zabbix_export:
           description: 'Discovery of long-running requests by verb, resource and scope.'
           item_prototypes:
             - uuid: feee53d3fc69401ba359ecd97788e552
-              name: 'Kubernetes API: Long-running ["{#VERB}"] requests ["{#RESOURCE}"]: {#SCOPE}'
+              name: 'Long-running ["{#VERB}"] requests ["{#RESOURCE}"]: {#SCOPE}'
               type: DEPENDENT
               key: 'kubernetes.api.longrunning_gauge["{#RESOURCE}","{#SCOPE}","{#VERB}"]'
               delay: '0'
@@ -1078,7 +1078,7 @@ zabbix_export:
           description: 'Discovery raw data and percentile items of request duration.'
           item_prototypes:
             - uuid: 5135a1bc92514c79965edea9d7d2a47e
-              name: 'Kubernetes API: ["{#VERB}"] Requests bucket: {#LE}'
+              name: '["{#VERB}"] Requests bucket: {#LE}'
               type: DEPENDENT
               key: 'kubernetes.api.request_duration_seconds_bucket[{#LE},"{#VERB}"]'
               delay: '0'
@@ -1101,7 +1101,7 @@ zabbix_export:
                 - tag: verb
                   value: '{#VERB}'
             - uuid: a4f39bb87ef248edbb578c0c89baba46
-              name: 'Kubernetes API: ["{#VERB}"] Requests, p50'
+              name: '["{#VERB}"] Requests, p50'
               type: CALCULATED
               key: 'kubernetes.api.request_duration_seconds_p50["{#VERB}"]'
               history: 7d
@@ -1116,7 +1116,7 @@ zabbix_export:
                 - tag: verb
                   value: '{#VERB}'
             - uuid: 12d65aff584e459586284967e570fc0a
-              name: 'Kubernetes API: ["{#VERB}"] Requests, p90'
+              name: '["{#VERB}"] Requests, p90'
               type: CALCULATED
               key: 'kubernetes.api.request_duration_seconds_p90["{#VERB}"]'
               history: 7d
@@ -1131,7 +1131,7 @@ zabbix_export:
                 - tag: verb
                   value: '{#VERB}'
             - uuid: 3e900f1e4cab4edba4d068f1b6759428
-              name: 'Kubernetes API: ["{#VERB}"] Requests, p95'
+              name: '["{#VERB}"] Requests, p95'
               type: CALCULATED
               key: 'kubernetes.api.request_duration_seconds_p95["{#VERB}"]'
               history: 7d
@@ -1146,7 +1146,7 @@ zabbix_export:
                 - tag: verb
                   value: '{#VERB}'
             - uuid: a34c3c5f5f844c46a4d3f148cacd3fd3
-              name: 'Kubernetes API: ["{#VERB}"] Requests, p99'
+              name: '["{#VERB}"] Requests, p99'
               type: CALCULATED
               key: 'kubernetes.api.request_duration_seconds_p99["{#VERB}"]'
               history: 7d
@@ -1262,7 +1262,7 @@ zabbix_export:
           description: 'Discovery workqueue metrics by name.'
           item_prototypes:
             - uuid: cf58e773a5684eafa74b56ed43490148
-              name: 'Kubernetes API: ["{#NAME}"] Workqueue adds total, rate'
+              name: '["{#NAME}"] Workqueue adds total, rate'
               type: DEPENDENT
               key: 'kubernetes.api.workqueue_adds_total.rate["{#NAME}"]'
               delay: '0'
@@ -1287,7 +1287,7 @@ zabbix_export:
                 - tag: workqueue
                   value: '{#NAME}'
             - uuid: 4fe45ff01cdf4bdf85e74a52d2d3b917
-              name: 'Kubernetes API: ["{#NAME}"] Workqueue depth'
+              name: '["{#NAME}"] Workqueue depth'
               type: DEPENDENT
               key: 'kubernetes.api.workqueue_depth["{#NAME}"]'
               delay: '0'

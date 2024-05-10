@@ -33,7 +33,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 09fada9334444d18b149b2fa0e39ac76
-          name: 'D-Link DES_DGS Switch: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -47,14 +47,14 @@ zabbix_export:
           triggers:
             - uuid: 5d134da7ad044ab591e1b96e1dca1641
               expression: 'max(/D-Link DES_DGS Switch by SNMP/icmpping,#3)=0'
-              name: 'D-Link DES_DGS Switch: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 1c2d54095100404c8e03b179f5df1761
-          name: 'D-Link DES_DGS Switch: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -68,11 +68,11 @@ zabbix_export:
           triggers:
             - uuid: 9c48d97b5d4a4668ad382e1d0d9c8e87
               expression: 'min(/D-Link DES_DGS Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/D-Link DES_DGS Switch by SNMP/icmppingloss,5m)<100'
-              name: 'D-Link DES_DGS Switch: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'D-Link DES_DGS Switch: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES_DGS Switch by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -80,7 +80,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 3f66e84f94254655add99a1152225df7
-          name: 'D-Link DES_DGS Switch: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -94,13 +94,14 @@ zabbix_export:
           triggers:
             - uuid: 3959884457a7420a9a9007c550d9b886
               expression: 'avg(/D-Link DES_DGS Switch by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'D-Link DES_DGS Switch: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'D-Link DES_DGS Switch: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/D-Link DES_DGS Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/D-Link DES_DGS Switch by SNMP/icmppingloss,5m)<100'
-                - name: 'D-Link DES_DGS Switch: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES_DGS Switch by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -108,7 +109,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: c7c836a53c134dcda931ef9dba401f35
-          name: 'D-Link DES_DGS Switch: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -121,7 +122,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 29ee9181892b49a081299688f8c47798
-          name: 'D-Link DES_DGS Switch: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -141,7 +142,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9d265ce34e9344c6875497e7ed0ebc89
-          name: 'D-Link DES_DGS Switch: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.171.12.1.1.6.2.0
           key: 'system.cpu.util[agentCPUutilizationIn1min.0]'
@@ -157,8 +158,8 @@ zabbix_export:
           triggers:
             - uuid: 621c4933fd9c4b78aae1eedada7ffedf
               expression: 'min(/D-Link DES_DGS Switch by SNMP/system.cpu.util[agentCPUutilizationIn1min.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'D-Link DES_DGS Switch: High CPU utilization'
-              event_name: 'D-Link DES_DGS Switch: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -166,7 +167,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 188e1d65459f40a48c3bc0f444024a00
-          name: 'D-Link DES_DGS Switch: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -187,7 +188,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8e6d4c6568c54aeeb745c5ba43945174
-          name: 'D-Link DES_DGS Switch: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.9.1
           key: system.hw.firmware
@@ -206,7 +207,7 @@ zabbix_export:
           triggers:
             - uuid: 40a2ad291ded4bf9bc72adc2b8653b98
               expression: 'last(/D-Link DES_DGS Switch by SNMP/system.hw.firmware,#1)<>last(/D-Link DES_DGS Switch by SNMP/system.hw.firmware,#2) and length(last(/D-Link DES_DGS Switch by SNMP/system.hw.firmware))>0'
-              name: 'D-Link DES_DGS Switch: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -215,7 +216,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: cc6cdf26ee0f4c5682c956c0ac741898
-          name: 'D-Link DES_DGS Switch: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.hw.model
@@ -237,7 +238,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3dd0e86421b5410f9c34680650a0d9a5
-          name: 'D-Link DES_DGS Switch: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.171.12.1.1.12.0
           key: system.hw.serialnumber
@@ -259,8 +260,8 @@ zabbix_export:
           triggers:
             - uuid: 3aa2e47f4b8145b8a5e4f67b0987ca2b
               expression: 'last(/D-Link DES_DGS Switch by SNMP/system.hw.serialnumber,#1)<>last(/D-Link DES_DGS Switch by SNMP/system.hw.serialnumber,#2) and length(last(/D-Link DES_DGS Switch by SNMP/system.hw.serialnumber))>0'
-              name: 'D-Link DES_DGS Switch: Device has been replaced'
-              event_name: 'D-Link DES_DGS Switch: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -268,7 +269,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: e4706d07b0824ccb8f4ee7ccec10a388
-          name: 'D-Link DES_DGS Switch: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -292,7 +293,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 06e2bd7f602140f49685ae8dbfa44660
-          name: 'D-Link DES_DGS Switch: Hardware version(revision)'
+          name: 'Hardware version(revision)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.8.1
           key: system.hw.version
@@ -309,7 +310,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 22473cfba211477ab8fbbb52c814de0d
-          name: 'D-Link DES_DGS Switch: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -319,7 +320,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -329,7 +330,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 38d68b0f6cd4445b966ead7e7301ae86
-          name: 'D-Link DES_DGS Switch: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -351,8 +352,8 @@ zabbix_export:
           triggers:
             - uuid: 91e1a9f579c64954a89b6efbf6b523dd
               expression: 'last(/D-Link DES_DGS Switch by SNMP/system.name,#1)<>last(/D-Link DES_DGS Switch by SNMP/system.name,#2) and length(last(/D-Link DES_DGS Switch by SNMP/system.name))>0'
-              name: 'D-Link DES_DGS Switch: System name has changed'
-              event_name: 'D-Link DES_DGS Switch: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -362,7 +363,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 5ca0653d792d42d1aebba51b36d5cf31
-          name: 'D-Link DES_DGS Switch: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -372,7 +373,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -381,7 +382,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5697ce18530b44f5a7e342344ecfe89a
-          name: 'D-Link DES_DGS Switch: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -400,13 +401,13 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 459f95874d194c7da40752f0336034be
-          name: 'D-Link DES_DGS Switch: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -420,12 +421,12 @@ zabbix_export:
           triggers:
             - uuid: 2b56c7cfef454441863d2f7cc01a330f
               expression: 'max(/D-Link DES_DGS Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'D-Link DES_DGS Switch: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'D-Link DES_DGS Switch: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/D-Link DES_DGS Switch by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -777,8 +778,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -988,7 +989,7 @@ zabbix_export:
                   expression: 'last(/D-Link DES_DGS Switch by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
-                  description: 'Please check autonegotiation settings and cabling'
+                  description: 'Please check autonegotiation settings and cabling.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1139,10 +1140,13 @@ zabbix_export:
           value: '2'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
         - macro: '{$IFCONTROL}'
@@ -1180,6 +1184,7 @@ zabbix_export:
           value: '4'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '75'
         - macro: '{$TEMP_CRIT_LOW}'
@@ -1859,13 +1864,13 @@ zabbix_export:
   triggers:
     - uuid: 7a51877b860a479da9bc9f02ee36e01f
       expression: '(last(/D-Link DES_DGS Switch by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/D-Link DES_DGS Switch by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/D-Link DES_DGS Switch by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/D-Link DES_DGS Switch by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'D-Link DES_DGS Switch: Host has been restarted'
-      event_name: 'D-Link DES_DGS Switch: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'D-Link DES_DGS Switch: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/D-Link DES_DGS Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

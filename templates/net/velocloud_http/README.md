@@ -44,23 +44,23 @@ Set Orchestrator URl for {$VELOCLOUD.URL}. e.g. example.com (where you replace e
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Velocloud: Get data|<p>The JSON with result of Velocloud API requests.</p>|Script|velocloud.get|
-|Velocloud: Clear data|<p>Clear metrics for data without errors.</p>|Dependent item|velocloud.get.clear_metrics<p>**Preprocessing**</p><ul><li><p>Check for error in JSON: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Velocloud: Orchestrator API version|<p>Version of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.api_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.apiVersion`</p></li></ul>|
-|Velocloud: Orchestrator build|<p>Build of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.build<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.build`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Velocloud: Orchestrator version|<p>Version of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Velocloud: Get data collection errors|<p>Errors of aggregate script item.</p>|Dependent item|velocloud.get.error<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Velocloud: System properties|<p>System properties of VMware SD-WAN.</p>|HTTP agent|velocloud.system.properties<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Get data|<p>The JSON with result of Velocloud API requests.</p>|Script|velocloud.get|
+|Clear data|<p>Clear metrics for data without errors.</p>|Dependent item|velocloud.get.clear_metrics<p>**Preprocessing**</p><ul><li><p>Check for error in JSON: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Orchestrator API version|<p>Version of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.api_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.apiVersion`</p></li></ul>|
+|Orchestrator build|<p>Build of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.build<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.build`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Orchestrator version|<p>Version of VMware SD-WAN Orchestrator API.</p>|Dependent item|velocloud.orchestrator.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.info.version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Get data collection errors|<p>Errors of aggregate script item.</p>|Dependent item|velocloud.get.error<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|System properties|<p>System properties of VMware SD-WAN.</p>|HTTP agent|velocloud.system.properties<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Velocloud: Failed to fetch aggregate data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1`|Average|**Manual close**: Yes|
-|Velocloud: Orchestrator build has been changed|<p>Velocloud Orchestrator build has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build))>0`|Info|**Manual close**: Yes|
-|Velocloud: Orchestrator version has been changed|<p>Velocloud Orchestrator version has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version))>0`|Info|**Manual close**: Yes|
-|Velocloud: There are errors in aggregate script item|<p>There are errors in aggregate script item.</p>|`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0`|Warning||
-|Velocloud: System properties have changed|<p>System properties have changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)`|Info|**Manual close**: Yes|
+|Failed to fetch aggregate data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1`|Average|**Manual close**: Yes|
+|Orchestrator build has been changed|<p>Velocloud Orchestrator build has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build))>0`|Info|**Manual close**: Yes|
+|Orchestrator version has been changed|<p>Velocloud Orchestrator version has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version))>0`|Info|**Manual close**: Yes|
+|There are errors in aggregate script item|<p>There are errors in aggregate script item.</p>|`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0`|Warning||
+|System properties have changed|<p>System properties have changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)`|Info|**Manual close**: Yes|
 
 ### LLD rule Edges metrics discovery
 

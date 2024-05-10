@@ -25,7 +25,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 70491bf6b6af401c9dfb10c0cbfddee1
-          name: 'MySQL: Get database'
+          name: 'Get database'
           type: ODBC
           key: 'db.odbc.get[get_database,"{$MYSQL.DSN}"]'
           delay: 1h
@@ -40,7 +40,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e389af9f1d134e028e3b637544c8a265
-          name: 'MySQL: Get replication'
+          name: 'Get replication'
           type: ODBC
           key: 'db.odbc.get[get_replication,"{$MYSQL.DSN}"]'
           history: '0'
@@ -54,7 +54,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 72e0f88741d746bf88e8951ef69681f9
-          name: 'MySQL: Get status variables'
+          name: 'Get status variables'
           type: ODBC
           key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           history: '0'
@@ -68,7 +68,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5b7c14e38799427cb6520f47bf8afe6c
-          name: 'MySQL: Status'
+          name: Status
           type: ODBC
           key: 'db.odbc.select[ping,"{$MYSQL.DSN}"]'
           history: 7d
@@ -90,14 +90,14 @@ zabbix_export:
           triggers:
             - uuid: e664e41d7b4f4336a3e5ef4720f6ee41
               expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
-              name: 'MySQL: Service is down'
+              name: 'Service is down'
               priority: HIGH
               description: 'MySQL is down.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: b9fb80ca366e4d33801472bcd013f881
-          name: 'MySQL: Version'
+          name: Version
           type: ODBC
           key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
           delay: 15m
@@ -118,8 +118,8 @@ zabbix_export:
           triggers:
             - uuid: 4090a1d3d82d47ac85964baeae121b2b
               expression: 'last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"],#1)<>last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"],#2) and length(last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"]))>0'
-              name: 'MySQL: Version has changed'
-              event_name: 'MySQL: Version has changed (new version value received: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'The MySQL version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -127,7 +127,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 73235748ba4742c0aa3c4f29509a162d
-          name: 'MySQL: Aborted clients per second'
+          name: 'Aborted clients per second'
           type: DEPENDENT
           key: mysql.aborted_clients.rate
           delay: '0'
@@ -147,7 +147,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: b6185e79abd744f78ce579a83381ba87
-          name: 'MySQL: Aborted connections per second'
+          name: 'Aborted connections per second'
           type: DEPENDENT
           key: mysql.aborted_connects.rate
           delay: '0'
@@ -169,18 +169,18 @@ zabbix_export:
           triggers:
             - uuid: 5934cb80f9c3442d978c63780b1ebc9f
               expression: 'min(/MySQL by ODBC/mysql.aborted_connects.rate,5m)>{$MYSQL.ABORTED_CONN.MAX.WARN}'
-              name: 'MySQL: Server has aborted connections'
-              event_name: 'MySQL: Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
+              name: 'Server has aborted connections'
+              event_name: 'Server has aborted connections (over {$MYSQL.ABORTED_CONN.MAX.WARN} for 5m)'
               priority: AVERAGE
               description: 'The number of failed attempts to connect to the MySQL server is more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.'
               dependencies:
-                - name: 'MySQL: Refused connections'
+                - name: 'Refused connections'
                   expression: 'last(/MySQL by ODBC/mysql.connection_errors_max_connections.rate)>0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 9db77e72fd9d404a8e1fd4e72c92d75c
-          name: 'MySQL: Binlog cache disk use'
+          name: 'Binlog cache disk use'
           type: DEPENDENT
           key: mysql.binlog_cache_disk_use
           delay: '0'
@@ -200,7 +200,7 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: 05e7e91206bb4138a945ea0de2d8c01d
-          name: 'MySQL: Buffer pool efficiency'
+          name: 'Buffer pool efficiency'
           type: CALCULATED
           key: mysql.buffer_pool_efficiency
           history: 7d
@@ -216,7 +216,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: ad5520e067ea405eb939d319fa9690e9
-          name: 'MySQL: Buffer pool utilization'
+          name: 'Buffer pool utilization'
           type: CALCULATED
           key: mysql.buffer_pool_utilization
           history: 7d
@@ -235,15 +235,15 @@ zabbix_export:
           triggers:
             - uuid: f4c2e4edf0c34bb1856ed392f2bc7c87
               expression: 'max(/MySQL by ODBC/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN}'
-              name: 'MySQL: Buffer pool utilization is too low'
-              event_name: 'MySQL: Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
+              name: 'Buffer pool utilization is too low'
+              event_name: 'Buffer pool utilization is too low (less than {$MYSQL.BUFF_UTIL.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'The buffer pool utilization is less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: f05d592e6ae74e64bc54c649418761a6
-          name: 'MySQL: Bytes received'
+          name: 'Bytes received'
           type: DEPENDENT
           key: mysql.bytes_received.rate
           delay: '0'
@@ -264,7 +264,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: ce737bc186f24014a70c75da2386986d
-          name: 'MySQL: Bytes sent'
+          name: 'Bytes sent'
           type: DEPENDENT
           key: mysql.bytes_sent.rate
           delay: '0'
@@ -285,7 +285,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: a43ec23dad9345a5a1b0ff8bda12ed77
-          name: 'MySQL: Command Delete per second'
+          name: 'Command Delete per second'
           type: DEPENDENT
           key: mysql.com_delete.rate
           delay: '0'
@@ -305,7 +305,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: cd924e3b51074b3baf642a7aa1eeb474
-          name: 'MySQL: Command Insert per second'
+          name: 'Command Insert per second'
           type: DEPENDENT
           key: mysql.com_insert.rate
           delay: '0'
@@ -325,7 +325,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 31e6372d1249442ab3ebdd993f397e26
-          name: 'MySQL: Command Select per second'
+          name: 'Command Select per second'
           type: DEPENDENT
           key: mysql.com_select.rate
           delay: '0'
@@ -345,7 +345,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 0f5f638777284093bcdc5f2dacc8e951
-          name: 'MySQL: Command Update per second'
+          name: 'Command Update per second'
           type: DEPENDENT
           key: mysql.com_update.rate
           delay: '0'
@@ -365,7 +365,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: fad5f4e1885341d1958f653afb85ff07
-          name: 'MySQL: Connections per second'
+          name: 'Connections per second'
           type: DEPENDENT
           key: mysql.connections.rate
           delay: '0'
@@ -385,7 +385,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 4b67e0e6291b4e0c841334ac052d7253
-          name: 'MySQL: Connection errors accept per second'
+          name: 'Connection errors accept per second'
           type: DEPENDENT
           key: mysql.connection_errors_accept.rate
           delay: '0'
@@ -405,7 +405,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 76ad3a39e89e44daad08cc00174d4918
-          name: 'MySQL: Connection errors internal per second'
+          name: 'Connection errors internal per second'
           type: DEPENDENT
           key: mysql.connection_errors_internal.rate
           delay: '0'
@@ -425,7 +425,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 83dfb916c7674e1fbd300be444241e25
-          name: 'MySQL: Connection errors max connections per second'
+          name: 'Connection errors max connections per second'
           type: DEPENDENT
           key: mysql.connection_errors_max_connections.rate
           delay: '0'
@@ -447,15 +447,15 @@ zabbix_export:
           triggers:
             - uuid: ac781c951ac0453a9c1008b2cf801518
               expression: 'last(/MySQL by ODBC/mysql.connection_errors_max_connections.rate)>0'
-              name: 'MySQL: Refused connections'
-              event_name: 'MySQL: Refused connections (max_connections limit reached)'
+              name: 'Refused connections'
+              event_name: 'Refused connections (max_connections limit reached)'
               priority: AVERAGE
               description: 'Number of refused connections due to the `max_connections` limit being reached.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 9be4cb9e209344d0869a56082d16ec53
-          name: 'MySQL: Connection errors peer address per second'
+          name: 'Connection errors peer address per second'
           type: DEPENDENT
           key: mysql.connection_errors_peer_address.rate
           delay: '0'
@@ -475,7 +475,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: e50b9fea89cc440abc0155dc25346f05
-          name: 'MySQL: Connection errors select per second'
+          name: 'Connection errors select per second'
           type: DEPENDENT
           key: mysql.connection_errors_select.rate
           delay: '0'
@@ -495,7 +495,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: a82a7ada012141c6bdff63bc8d615786
-          name: 'MySQL: Connection errors tcpwrap per second'
+          name: 'Connection errors tcpwrap per second'
           type: DEPENDENT
           key: mysql.connection_errors_tcpwrap.rate
           delay: '0'
@@ -515,7 +515,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 84d748ab80444e10bdb60bcfbdfa850a
-          name: 'MySQL: Created tmp tables on disk per second'
+          name: 'Created tmp tables on disk per second'
           type: DEPENDENT
           key: mysql.created_tmp_disk_tables.rate
           delay: '0'
@@ -539,15 +539,15 @@ zabbix_export:
           triggers:
             - uuid: 8aec6a51fa3e4320b3c7c40858ac7f96
               expression: 'min(/MySQL by ODBC/mysql.created_tmp_disk_tables.rate,5m)>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}'
-              name: 'MySQL: Number of on-disk temporary tables created per second is high'
-              event_name: 'MySQL: Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
+              name: 'Number of on-disk temporary tables created per second is high'
+              event_name: 'Number of on-disk temporary tables created per second is high (over {$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: c5f2ae1ef46e4f65842ab4a31625906a
-          name: 'MySQL: Created tmp files on disk per second'
+          name: 'Created tmp files on disk per second'
           type: DEPENDENT
           key: mysql.created_tmp_files.rate
           delay: '0'
@@ -569,15 +569,15 @@ zabbix_export:
           triggers:
             - uuid: c1dbcf829bdf43fda3b4c2add576c8f0
               expression: 'min(/MySQL by ODBC/mysql.created_tmp_files.rate,5m)>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}'
-              name: 'MySQL: Number of temporary files created per second is high'
-              event_name: 'MySQL: Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
+              name: 'Number of temporary files created per second is high'
+              event_name: 'Number of temporary files created per second is high (over {$MYSQL.CREATED_TMP_FILES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 95fa4f4f1db44b2bb65889da246c03b5
-          name: 'MySQL: Created tmp tables on memory per second'
+          name: 'Created tmp tables on memory per second'
           type: DEPENDENT
           key: mysql.created_tmp_tables.rate
           delay: '0'
@@ -601,15 +601,15 @@ zabbix_export:
           triggers:
             - uuid: d65c3ec6cacd41c58f5e2b209ca5a810
               expression: 'min(/MySQL by ODBC/mysql.created_tmp_tables.rate,5m)>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
-              name: 'MySQL: Number of internal temporary tables created per second is high'
-              event_name: 'MySQL: Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
+              name: 'Number of internal temporary tables created per second is high'
+              event_name: 'Number of internal temporary tables created per second is high (over {$MYSQL.CREATED_TMP_TABLES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The application using the database may be in need of query optimization.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: e31f66bbc32b404c92debc4d9367162d
-          name: 'MySQL: InnoDB buffer pool pages free'
+          name: 'InnoDB buffer pool pages free'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_pages_free
           delay: '0'
@@ -627,7 +627,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 41019c084618404db183326c215d71f6
-          name: 'MySQL: InnoDB buffer pool pages total'
+          name: 'InnoDB buffer pool pages total'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_pages_total
           delay: '0'
@@ -648,7 +648,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 441b718148974e289db93299f869feba
-          name: 'MySQL: InnoDB buffer pool reads'
+          name: 'InnoDB buffer pool reads'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_reads
           delay: '0'
@@ -666,7 +666,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 22ae5946fc2548cf8eee39a57ce8512b
-          name: 'MySQL: InnoDB buffer pool reads per second'
+          name: 'InnoDB buffer pool reads per second'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_reads.rate
           delay: '0'
@@ -688,7 +688,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 0a1775a7de33464e9ce8134950527021
-          name: 'MySQL: InnoDB buffer pool read requests'
+          name: 'InnoDB buffer pool read requests'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_read_requests
           delay: '0'
@@ -706,7 +706,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 98684abf32e642bd8784e68e64357dc9
-          name: 'MySQL: InnoDB buffer pool read requests per second'
+          name: 'InnoDB buffer pool read requests per second'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_read_requests.rate
           delay: '0'
@@ -728,7 +728,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 4e829cbb3cc2485dac2757867badd0f4
-          name: 'MySQL: Innodb buffer pool wait free'
+          name: 'Innodb buffer pool wait free'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_wait_free
           delay: '0'
@@ -750,7 +750,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 4680fd31a2514e3f827b0060a6d5bfc4
-          name: 'MySQL: Calculated value of innodb_log_file_size'
+          name: 'Calculated value of innodb_log_file_size'
           type: CALCULATED
           key: mysql.innodb_log_file_size
           history: 7d
@@ -765,7 +765,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 79218a1068394ce69dfc6eeb626e83bc
-          name: 'MySQL: Innodb number open files'
+          name: 'Innodb number open files'
           type: DEPENDENT
           key: mysql.innodb_num_open_files
           delay: '0'
@@ -787,7 +787,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fc561c5392bb43a4842977bdf4b882a8
-          name: 'MySQL: Innodb log written'
+          name: 'Innodb log written'
           type: DEPENDENT
           key: mysql.innodb_os_log_written
           delay: '0'
@@ -808,7 +808,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a62951afcfbd44e595a4d294b24056e5
-          name: 'MySQL: InnoDB row lock time'
+          name: 'InnoDB row lock time'
           type: DEPENDENT
           key: mysql.innodb_row_lock_time
           delay: '0'
@@ -834,7 +834,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: 22277695b7154c019a76ca730e68e833
-          name: 'MySQL: InnoDB row lock time max'
+          name: 'InnoDB row lock time max'
           type: DEPENDENT
           key: mysql.innodb_row_lock_time_max
           delay: '0'
@@ -860,7 +860,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: 17c4270927a74d8388da8c25d9065556
-          name: 'MySQL: InnoDB row lock waits'
+          name: 'InnoDB row lock waits'
           type: DEPENDENT
           key: mysql.innodb_row_lock_waits
           delay: '0'
@@ -878,7 +878,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: 6106ebf4cae842c1a5acc2f13518de4f
-          name: 'MySQL: Max used connections'
+          name: 'Max used connections'
           type: DEPENDENT
           key: mysql.max_used_connections
           delay: '0'
@@ -897,7 +897,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 85e17b6b196e4916838e0318992fe33c
-          name: 'MySQL: Open tables'
+          name: 'Open tables'
           type: DEPENDENT
           key: mysql.open_tables
           delay: '0'
@@ -917,7 +917,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: c23ce7b2689745728465c5b405d7b3ba
-          name: 'MySQL: Open table definitions'
+          name: 'Open table definitions'
           type: DEPENDENT
           key: mysql.open_table_definitions
           delay: '0'
@@ -937,7 +937,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: 2f0ced88c4524455bf790b3bc6512d04
-          name: 'MySQL: Queries per second'
+          name: 'Queries per second'
           type: DEPENDENT
           key: mysql.queries.rate
           delay: '0'
@@ -957,7 +957,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 8d0fc2eb0be94d68966e09fca88e8deb
-          name: 'MySQL: Questions per second'
+          name: 'Questions per second'
           type: DEPENDENT
           key: mysql.questions.rate
           delay: '0'
@@ -977,7 +977,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: b0227399437f4219b65ab1511d5e67c6
-          name: 'MySQL: Slow queries per second'
+          name: 'Slow queries per second'
           type: DEPENDENT
           key: mysql.slow_queries.rate
           delay: '0'
@@ -999,15 +999,15 @@ zabbix_export:
           triggers:
             - uuid: b981c7a2ffed4eddbc9f1d6913c2e4b0
               expression: 'min(/MySQL by ODBC/mysql.slow_queries.rate,5m)>{$MYSQL.SLOW_QUERIES.MAX.WARN}'
-              name: 'MySQL: Server has slow queries'
-              event_name: 'MySQL: Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
+              name: 'Server has slow queries'
+              event_name: 'Server has slow queries (over {$MYSQL.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The number of slow queries is more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: b675fd71138a4845965309dc5d6428d9
-          name: 'MySQL: Threads cached'
+          name: 'Threads cached'
           type: DEPENDENT
           key: mysql.threads_cached
           delay: '0'
@@ -1023,7 +1023,7 @@ zabbix_export:
             - tag: component
               value: threads
         - uuid: af56c636c8b94e4f9976d0d6cf60fcbb
-          name: 'MySQL: Threads connected'
+          name: 'Threads connected'
           type: DEPENDENT
           key: mysql.threads_connected
           delay: '0'
@@ -1039,7 +1039,7 @@ zabbix_export:
             - tag: component
               value: threads
         - uuid: 8a50d5788f8a449b994dbe76536076a2
-          name: 'MySQL: Threads created per second'
+          name: 'Threads created per second'
           type: DEPENDENT
           key: mysql.threads_created.rate
           delay: '0'
@@ -1059,7 +1059,7 @@ zabbix_export:
             - tag: component
               value: threads
         - uuid: c41afa83f6a94efda34d7b41c95c89ac
-          name: 'MySQL: Threads running'
+          name: 'Threads running'
           type: DEPENDENT
           key: mysql.threads_running
           delay: '0'
@@ -1075,7 +1075,7 @@ zabbix_export:
             - tag: component
               value: threads
         - uuid: 8fbad224ebdf46e7b25a0be015f21972
-          name: 'MySQL: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: mysql.uptime
           delay: '0'
@@ -1094,20 +1094,20 @@ zabbix_export:
           triggers:
             - uuid: ba9eb4fc244b41a6a30237e7a382fa54
               expression: 'nodata(/MySQL by ODBC/mysql.uptime,30m)=1'
-              name: 'MySQL: Failed to fetch info data'
-              event_name: 'MySQL: Failed to fetch info data (or no data for 30m)'
+              name: 'Failed to fetch info data'
+              event_name: 'Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
-                - name: 'MySQL: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0'
               tags:
                 - tag: scope
                   value: availability
             - uuid: cd8f5996bd85434998595e041d6b0908
               expression: 'last(/MySQL by ODBC/mysql.uptime)<10m'
-              name: 'MySQL: Service has been restarted'
-              event_name: 'MySQL: Service has been restarted (uptime < 10m)'
+              name: 'Service has been restarted'
+              event_name: 'Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'MySQL uptime is less than 10 minutes.'
               tags:
@@ -1120,19 +1120,15 @@ zabbix_export:
           key: mysql.database.discovery
           delay: '0'
           filter:
-            evaltype: AND
             conditions:
               - macro: '{#DATABASE}'
-                value: '{$MYSQL.DBNAME.MATCHES}'
-                formulaid: A
-              - macro: '{#DATABASE}'
-                value: '{$MYSQL.DBNAME.NOT_MATCHES}'
+                value: information_schema
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           description: 'Used for the discovery of the databases.'
           item_prototypes:
             - uuid: f358179ef78b4a31affa9e049b4048b8
-              name: 'MySQL: Size of database {#DATABASE}'
+              name: 'Size of database {#DATABASE}'
               type: ODBC
               key: 'db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]'
               delay: 5m
@@ -1168,7 +1164,7 @@ zabbix_export:
           description: 'Used for additional metrics if MariaDB is used.'
           item_prototypes:
             - uuid: eb8713584314461488b8769f1081d48d
-              name: 'MySQL: Binlog commits'
+              name: 'Binlog commits'
               type: DEPENDENT
               key: 'mysql.binlog_commits[{#SINGLETON}]'
               delay: '0'
@@ -1185,7 +1181,7 @@ zabbix_export:
                 - tag: component
                   value: transactions
             - uuid: cbb7c1fadd934420b47950f52751795f
-              name: 'MySQL: Binlog group commits'
+              name: 'Binlog group commits'
               type: DEPENDENT
               key: 'mysql.binlog_group_commits[{#SINGLETON}]'
               delay: '0'
@@ -1202,7 +1198,7 @@ zabbix_export:
                 - tag: component
                   value: transactions
             - uuid: 278488a9c0f543f6815a24592766d9bb
-              name: 'MySQL: Master GTID wait count'
+              name: 'Master GTID wait count'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_count[{#SINGLETON}]'
               delay: '0'
@@ -1222,7 +1218,7 @@ zabbix_export:
                 - tag: component
                   value: transactions
             - uuid: 93ad282dc3b24dba9f0351b0d0a59d39
-              name: 'MySQL: Master GTID wait timeouts'
+              name: 'Master GTID wait timeouts'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_timeouts[{#SINGLETON}]'
               delay: '0'
@@ -1242,7 +1238,7 @@ zabbix_export:
                 - tag: component
                   value: transactions
             - uuid: fd8bf7e639af4d3291030cdb9dd37bc9
-              name: 'MySQL: Master GTID wait time'
+              name: 'Master GTID wait time'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_time[{#SINGLETON}]'
               delay: '0'
@@ -1275,7 +1271,7 @@ zabbix_export:
           description: 'Discovery of the replication.'
           item_prototypes:
             - uuid: 15f7b22867f54551afbed139d746e210
-              name: 'MySQL: Replication Seconds Behind Master {#MASTER_HOST}'
+              name: 'Replication Seconds Behind Master {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.seconds_behind_master["{#MASTER_HOST}"]'
               delay: '0'
@@ -1302,15 +1298,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: f2188a73bbf34ffcb95b3e11e2824feb
                   expression: 'min(/MySQL by ODBC/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}'
-                  name: 'MySQL: Replication lag is too high'
-                  event_name: 'MySQL: Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
+                  name: 'Replication lag is too high'
+                  event_name: 'Replication lag is too high (over {$MYSQL.REPL_LAG.MAX.WARN} for 5m)'
                   priority: WARNING
                   description: 'Replication delay is too long.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: e063b116753d4124a88443fe4de20d41
-              name: 'MySQL: Replication Slave IO Running {#MASTER_HOST}'
+              name: 'Replication Slave IO Running {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
               delay: '0'
@@ -1333,25 +1329,25 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6f216036f4f14ae7adc8c70126bb315a
                   expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1'
-                  name: 'MySQL: The slave I/O thread is not connected to a replication master'
+                  name: 'The slave I/O thread is not connected to a replication master'
                   priority: WARNING
                   description: 'Whether the slave I/O thread is connected to the master.'
                   dependencies:
-                    - name: 'MySQL: The slave I/O thread is not running'
+                    - name: 'The slave I/O thread is not running'
                       expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   tags:
                     - tag: scope
                       value: availability
                 - uuid: ba08061a61df4bbb8bac516ecec91b70
                   expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
-                  name: 'MySQL: The slave I/O thread is not running'
+                  name: 'The slave I/O thread is not running'
                   priority: AVERAGE
                   description: 'Whether the I/O thread for reading the master''s binary log is running.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 113be79554c14c2aad08036febb15d71
-              name: 'MySQL: Replication Slave SQL Running {#MASTER_HOST}'
+              name: 'Replication Slave SQL Running {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
               delay: '0'
@@ -1376,17 +1372,17 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 39d229e5e3f34e8b828b4a0e2eaa0026
                   expression: 'count(/MySQL by ODBC/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1'
-                  name: 'MySQL: The SQL thread is not running'
+                  name: 'The SQL thread is not running'
                   priority: WARNING
                   description: 'Whether the SQL thread for executing events in the relay log is running.'
                   dependencies:
-                    - name: 'MySQL: The slave I/O thread is not running'
+                    - name: 'The slave I/O thread is not running'
                       expression: 'count(/MySQL by ODBC/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: a88eb463bb9740a4a4256306f11816bf
-              name: 'MySQL: Replication Slave SQL Running State {#MASTER_HOST}'
+              name: 'Replication Slave SQL Running State {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_sql_running_state["{#MASTER_HOST}"]'
               delay: '0'
@@ -1407,7 +1403,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: d88f65c4bee84e74bb6e00061ab27f0c
-              name: 'MySQL: Replication Slave status {#MASTER_HOST}'
+              name: 'Replication Slave status {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_status["{#MASTER_HOST}"]'
               delay: '0'
@@ -1454,12 +1450,6 @@ zabbix_export:
         - macro: '{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
           value: '30'
           description: 'The maximum number of temporary tables created in memory per second for trigger expressions.'
-        - macro: '{$MYSQL.DBNAME.MATCHES}'
-          value: .+
-          description: 'Filter of discoverable databases.'
-        - macro: '{$MYSQL.DBNAME.NOT_MATCHES}'
-          value: information_schema
-          description: 'Filter to exclude discovered databases.'
         - macro: '{$MYSQL.DSN}'
           value: '<Put your DSN here>'
           description: 'System data source name.'

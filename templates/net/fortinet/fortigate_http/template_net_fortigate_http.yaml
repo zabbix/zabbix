@@ -31,7 +31,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: e74af8e347814085a7d01142c9aae447
-          name: 'FortiGate: API availability status'
+          name: 'API availability status'
           type: DEPENDENT
           key: fgate.api.status
           delay: '0'
@@ -62,17 +62,17 @@ zabbix_export:
           triggers:
             - uuid: 8b8c03f1497f4f18a417d103267d2947
               expression: 'last(/FortiGate by HTTP/fgate.api.status)=0'
-              name: 'FortiGate: Unexpected response from API'
+              name: 'Unexpected response from API'
               priority: AVERAGE
               description: 'Received an unexpected response from API. It may be unavailable.'
               dependencies:
-                - name: 'FortiGate: Port {$FGATE.API.PORT} is unavailable'
+                - name: 'Port {$FGATE.API.PORT} is unavailable'
                   expression: 'last(/FortiGate by HTTP/net.tcp.service["{$FGATE.SCHEME}","{$FGATE.API.FQDN}","{$FGATE.API.PORT}"])=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 3a54a2ef2ad94f0d8df190356ca0ac9b
-          name: 'FortiGate: Number of CPUs'
+          name: 'Number of CPUs'
           type: DEPENDENT
           key: fgate.cpu.num
           delay: '0'
@@ -92,7 +92,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4c83427d66764255be934ea7e2c6084a
-          name: 'FortiGate: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: fgate.cpu.util
           delay: '0'
@@ -113,21 +113,21 @@ zabbix_export:
           triggers:
             - uuid: 4698d35fa5e242ef828ac4e3dba5bc09
               expression: 'min(/FortiGate by HTTP/fgate.cpu.util,5m)>{$CPU.UTIL.WARN}'
-              name: 'FortiGate: CPU utilization is high'
-              event_name: 'FortiGate: High CPU utilization (over {$CPU.UTIL.WARN}% for 5m)'
+              name: 'CPU utilization is high'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.WARN}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is high.'
               dependencies:
-                - name: 'FortiGate: CPU utilization is too high'
+                - name: 'CPU utilization is too high'
                   expression: 'min(/FortiGate by HTTP/fgate.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               tags:
                 - tag: scope
                   value: performance
             - uuid: 170087cd8ebf4fc29093e5c1dbd86fea
               expression: 'min(/FortiGate by HTTP/fgate.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'FortiGate: CPU utilization is too high'
-              event_name: 'FortiGate: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'CPU utilization is too high'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -135,7 +135,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: c29e3336f92f448587e7492c55db8e7c
-          name: 'FortiGate: Device firmware version'
+          name: 'Device firmware version'
           type: DEPENDENT
           key: fgate.device.firmware
           delay: '0'
@@ -161,7 +161,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 75084a08e92042e5869b57e34506849d
-          name: 'FortiGate: Available firmware versions'
+          name: 'Available firmware versions'
           type: DEPENDENT
           key: fgate.device.firmwares_avail
           delay: '0'
@@ -184,7 +184,7 @@ zabbix_export:
           triggers:
             - uuid: da4a8352ffb94c15a62523a0b97460c4
               expression: '{$FIRMWARE.UPDATES.CONTROL}=1 and last(/FortiGate by HTTP/fgate.device.firmwares_avail)>0'
-              name: 'FortiGate: New available firmware found'
+              name: 'New available firmware found'
               priority: INFO
               description: |
                 New available firmware versions found to download.
@@ -197,7 +197,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: d42b5e392a6a468a84b009ff02f77b18
-          name: 'FortiGate: Device model name'
+          name: 'Device model name'
           type: DEPENDENT
           key: fgate.device.model
           delay: '0'
@@ -223,7 +223,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 80bafe55b05f416ebcdde86b58bda1f4
-          name: 'FortiGate: Device serial number'
+          name: 'Device serial number'
           type: DEPENDENT
           key: fgate.device.serialnumber
           delay: '0'
@@ -248,8 +248,8 @@ zabbix_export:
               expression: |
                 last(/FortiGate by HTTP/fgate.device.serialnumber,#1)<>last(/FortiGate by HTTP/fgate.device.serialnumber,#2) and
                 length(last(/FortiGate by HTTP/fgate.device.serialnumber))>0
-              name: 'FortiGate: Device has been replaced'
-              event_name: 'FortiGate: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -257,7 +257,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 07d3dd60460340929288fd21211aa2e0
-          name: 'FortiGate: Current VDOM'
+          name: 'Current VDOM'
           type: DEPENDENT
           key: fgate.device.vdom
           delay: '0'
@@ -278,7 +278,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a6729f9b5da54e67951963a869fab31c
-          name: 'FortiGate: Device firmware info item errors'
+          name: 'Device firmware info item errors'
           type: DEPENDENT
           key: fgate.firmware.data_errors
           delay: '0'
@@ -302,16 +302,16 @@ zabbix_export:
           triggers:
             - uuid: c4ab39fa9c104eaa8f9c5da529e416d8
               expression: 'length(last(/FortiGate by HTTP/fgate.firmware.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.firmware.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.firmware.data_errors,2m)=0'
-              name: 'FortiGate: There are errors in the ''Get firmware info'' metric'
+              name: 'There are errors in the ''Get firmware info'' metric'
               priority: WARNING
               dependencies:
-                - name: 'FortiGate: Unexpected response from API'
+                - name: 'Unexpected response from API'
                   expression: 'last(/FortiGate by HTTP/fgate.api.status)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: bc2ac899ea284703a6a8753ac5abc7c6
-          name: 'FortiGate: Get firmware info'
+          name: 'Get firmware info'
           type: HTTP_AGENT
           key: fgate.firmware.get_data
           history: '0'
@@ -334,7 +334,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3d93f75ee3084a5487814c2175028229
-          name: 'FortiGate: Free disk space'
+          name: 'Free disk space'
           type: DEPENDENT
           key: fgate.fs.free
           delay: '0'
@@ -352,7 +352,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3e595bf084f342ecaf94af97c2751c26
-          name: 'FortiGate: Total disk space'
+          name: 'Total disk space'
           type: DEPENDENT
           key: fgate.fs.total
           delay: '0'
@@ -373,7 +373,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6ddf5a6fc9cd4b7ca6522f8e86a7aac8
-          name: 'FortiGate: Used disk space'
+          name: 'Used disk space'
           type: DEPENDENT
           key: fgate.fs.used
           delay: '0'
@@ -391,7 +391,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 847069b5ceaa417cbd84b1b0d5184771
-          name: 'FortiGate: Disk utilization'
+          name: 'Disk utilization'
           type: DEPENDENT
           key: fgate.fs.util
           delay: '0'
@@ -412,12 +412,12 @@ zabbix_export:
           triggers:
             - uuid: 649a5e3ba39e4e799835cdba8bba8d34
               expression: '(100-last(/FortiGate by HTTP/fgate.fs.util))<{$DISK.FREE.WARN}'
-              name: 'FortiGate: Free disk space is low'
-              event_name: 'FortiGate: Free disk space is less than {$DISK.FREE.WARN}%'
+              name: 'Free disk space is low'
+              event_name: 'Free disk space is less than {$DISK.FREE.WARN}%'
               priority: WARNING
               description: 'Left disk space is not enough.'
               dependencies:
-                - name: 'FortiGate: Free disk space is too low'
+                - name: 'Free disk space is too low'
                   expression: '(100-last(/FortiGate by HTTP/fgate.fs.util))<{$DISK.FREE.CRIT}'
               tags:
                 - tag: scope
@@ -426,8 +426,8 @@ zabbix_export:
                   value: performance
             - uuid: 33c78beb669142baa66befba2456d810
               expression: '(100-last(/FortiGate by HTTP/fgate.fs.util))<{$DISK.FREE.CRIT}'
-              name: 'FortiGate: Free disk space is too low'
-              event_name: 'FortiGate: Free disk space is less than {$DISK.FREE.CRIT}%'
+              name: 'Free disk space is too low'
+              event_name: 'Free disk space is less than {$DISK.FREE.CRIT}%'
               priority: HIGH
               description: 'Left disk space is too low.'
               tags:
@@ -436,7 +436,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 26441b122d1148b6ba1045fcdfd092ad
-          name: 'FortiGate: Firewall data item errors'
+          name: 'Firewall data item errors'
           type: DEPENDENT
           key: fgate.fwp.data_errors
           delay: '0'
@@ -460,16 +460,16 @@ zabbix_export:
           triggers:
             - uuid: a6f52f84c66c4d9b9831be03afc725b5
               expression: 'length(last(/FortiGate by HTTP/fgate.fwp.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.fwp.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.fwp.data_errors,2m)=0'
-              name: 'FortiGate: There are errors in the ''Get firewall policies data'' metric'
+              name: 'There are errors in the ''Get firewall policies data'' metric'
               priority: WARNING
               dependencies:
-                - name: 'FortiGate: Unexpected response from API'
+                - name: 'Unexpected response from API'
                   expression: 'last(/FortiGate by HTTP/fgate.api.status)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: a7f8a7da176040ab8a43618e14944e42
-          name: 'FortiGate: Get firewall data'
+          name: 'Get firewall data'
           type: SCRIPT
           key: fgate.fwp.get_data
           history: '0'
@@ -582,7 +582,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 529076e8494e40f7b823f981e7159fd0
-          name: 'FortiGate: Total memory'
+          name: 'Total memory'
           type: DEPENDENT
           key: fgate.memory.total
           delay: '0'
@@ -603,7 +603,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 51f4b31cc3d045a983843d9a8e534668
-          name: 'FortiGate: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: fgate.memory.util
           delay: '0'
@@ -624,13 +624,13 @@ zabbix_export:
           triggers:
             - uuid: 0f0b467715bb420a80cae7a7df50177d
               expression: 'min(/FortiGate by HTTP/fgate.memory.util,5m)>{$MEMORY.UTIL.WARN}'
-              name: 'FortiGate: Memory utilization is high'
-              event_name: 'FortiGate: High memory utilization (>{$MEMORY.UTIL.WARN}% for 5m)'
+              name: 'Memory utilization is high'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.WARN}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
-                - name: 'FortiGate: Memory utilization is too high'
+                - name: 'Memory utilization is too high'
                   expression: 'min(/FortiGate by HTTP/fgate.memory.util,5m)>{$MEMORY.UTIL.CRIT}'
               tags:
                 - tag: scope
@@ -639,8 +639,8 @@ zabbix_export:
                   value: performance
             - uuid: 4cd6cb4e21154f8489de2ba73f32e62d
               expression: 'min(/FortiGate by HTTP/fgate.memory.util,5m)>{$MEMORY.UTIL.CRIT}'
-              name: 'FortiGate: Memory utilization is too high'
-              event_name: 'FortiGate: High memory utilization (>{$MEMORY.UTIL.CRIT}% for 5m)'
+              name: 'Memory utilization is too high'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Free memory size is too low.'
@@ -650,7 +650,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 562ec5b9dc7f49bb8ee404f05b1c54b7
-          name: 'FortiGate: System name'
+          name: 'System name'
           type: DEPENDENT
           key: fgate.name
           delay: '0'
@@ -673,8 +673,8 @@ zabbix_export:
           triggers:
             - uuid: a522d2cdd55947fabf1c152f6f6dd374
               expression: 'last(/FortiGate by HTTP/fgate.name,#1)<>last(/FortiGate by HTTP/fgate.name,#2) and length(last(/FortiGate by HTTP/fgate.name))>0'
-              name: 'FortiGate: System name has changed'
-              event_name: 'FortiGate: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -684,7 +684,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: c1dbb528c4324b6daa59c4393c3fd178
-          name: 'FortiGate: Device interfaces item errors'
+          name: 'Device interfaces item errors'
           type: DEPENDENT
           key: fgate.netif.data_errors
           delay: '0'
@@ -708,16 +708,16 @@ zabbix_export:
           triggers:
             - uuid: 20b8b33c1a36452ca280da95b8247409
               expression: 'length(last(/FortiGate by HTTP/fgate.netif.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.netif.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.netif.data_errors,2m)=0'
-              name: 'FortiGate: There are errors in the ''Get interfaces data'' metric'
+              name: 'There are errors in the ''Get interfaces data'' metric'
               priority: WARNING
               dependencies:
-                - name: 'FortiGate: Unexpected response from API'
+                - name: 'Unexpected response from API'
                   expression: 'last(/FortiGate by HTTP/fgate.api.status)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 3bf84b70672d4fbca282ce1bf970581d
-          name: 'FortiGate: Get interfaces data'
+          name: 'Get interfaces data'
           type: SCRIPT
           key: fgate.netif.get_data
           history: '0'
@@ -834,7 +834,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1f612317d885472ea8b25ecb99a8debf
-          name: 'FortiGate: Device resources item errors'
+          name: 'Device resources item errors'
           type: DEPENDENT
           key: fgate.resources.data_errors
           delay: '0'
@@ -858,16 +858,16 @@ zabbix_export:
           triggers:
             - uuid: e6ed25293ca64de1ae01e2ab6c92f5c7
               expression: 'length(last(/FortiGate by HTTP/fgate.resources.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.resources.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.resources.data_errors,2m)=0'
-              name: 'FortiGate: There are errors in the ''Get resources data'' metric'
+              name: 'There are errors in the ''Get resources data'' metric'
               priority: WARNING
               dependencies:
-                - name: 'FortiGate: Unexpected response from API'
+                - name: 'Unexpected response from API'
                   expression: 'last(/FortiGate by HTTP/fgate.api.status)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 06199d6a96f2414b976d357cd2c95cb6
-          name: 'FortiGate: Get resources data'
+          name: 'Get resources data'
           type: SCRIPT
           key: fgate.resources.get_data
           history: '0'
@@ -976,7 +976,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1f2885ffb1524d909292aa9e5d1d8c89
-          name: 'FortiGate: Get SD-WAN item errors'
+          name: 'Get SD-WAN item errors'
           type: DEPENDENT
           key: fgate.sdwan.data_errors
           delay: '0'
@@ -1000,16 +1000,16 @@ zabbix_export:
           triggers:
             - uuid: b2ec3a4cf468449388a33f76688dc259
               expression: 'length(last(/FortiGate by HTTP/fgate.sdwan.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.sdwan.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.sdwan.data_errors,2m)=0'
-              name: 'FortiGate: There are errors in the ''Get SD-WAN data'' metric'
+              name: 'There are errors in the ''Get SD-WAN data'' metric'
               priority: WARNING
               dependencies:
-                - name: 'FortiGate: Unexpected response from API'
+                - name: 'Unexpected response from API'
                   expression: 'last(/FortiGate by HTTP/fgate.api.status)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 01814568a3bc4774a37957ff3d8c5e09
-          name: 'FortiGate: Get SD-WAN data'
+          name: 'Get SD-WAN data'
           type: SCRIPT
           key: fgate.sdwan.get_data
           history: '0'
@@ -1162,7 +1162,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 547c3bfa4a2d4b8e8ebfad01b200c4fd
-          name: 'FortiGate: Service licenses item errors'
+          name: 'Service licenses item errors'
           type: DEPENDENT
           key: fgate.service.data_errors
           delay: '0'
@@ -1186,16 +1186,16 @@ zabbix_export:
           triggers:
             - uuid: eeb819b2813f488ea3792a029f25a08d
               expression: 'length(last(/FortiGate by HTTP/fgate.service.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.service.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.service.data_errors,2m)=0'
-              name: 'FortiGate: There are errors in the ''Get service licenses'' metric'
+              name: 'There are errors in the ''Get service licenses'' metric'
               priority: WARNING
               dependencies:
-                - name: 'FortiGate: Unexpected response from API'
+                - name: 'Unexpected response from API'
                   expression: 'last(/FortiGate by HTTP/fgate.api.status)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 90a78cff28d54a1b9b955e9dc94d48c7
-          name: 'FortiGate: Get service licenses'
+          name: 'Get service licenses'
           type: SCRIPT
           key: fgate.service.get_data
           history: '0'
@@ -1323,7 +1323,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8d8d4e7073db4ad497f4ca8dfffa043c
-          name: 'FortiGate: Device system info item errors'
+          name: 'Device system info item errors'
           type: DEPENDENT
           key: fgate.system.data_errors
           delay: '0'
@@ -1347,16 +1347,16 @@ zabbix_export:
           triggers:
             - uuid: 3d1dbc0964db401fa9c10c1b126349e4
               expression: 'length(last(/FortiGate by HTTP/fgate.system.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.system.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.system.data_errors,2m)=0'
-              name: 'FortiGate: There are errors in the ''Get system info'' metric'
+              name: 'There are errors in the ''Get system info'' metric'
               priority: WARNING
               dependencies:
-                - name: 'FortiGate: Unexpected response from API'
+                - name: 'Unexpected response from API'
                   expression: 'last(/FortiGate by HTTP/fgate.api.status)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: a6b831300e7048fbad4502973d0318e7
-          name: 'FortiGate: Get system info'
+          name: 'Get system info'
           type: HTTP_AGENT
           key: fgate.system.get_data
           history: '0'
@@ -1379,7 +1379,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 924a859579bd41a9b26dc83f92100577
-          name: 'FortiGate: System uptime'
+          name: 'System uptime'
           type: DEPENDENT
           key: fgate.uptime
           delay: '0'
@@ -1402,8 +1402,8 @@ zabbix_export:
           triggers:
             - uuid: 183385fa495442bcbd3eb28636ca5bb9
               expression: 'last(/FortiGate by HTTP/fgate.uptime)<10m'
-              name: 'FortiGate: Device has been restarted'
-              event_name: 'FortiGate: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Device has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1411,7 +1411,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 27d30f93ff7c49d89537c43bad5f9453
-          name: 'FortiGate: Check port availability'
+          name: 'Check port availability'
           type: SIMPLE
           key: 'net.tcp.service["{$FGATE.SCHEME}","{$FGATE.API.FQDN}","{$FGATE.API.PORT}"]'
           history: 7d
@@ -1430,7 +1430,7 @@ zabbix_export:
           triggers:
             - uuid: 26abf8698af247d09c325ab1cb3e9903
               expression: 'last(/FortiGate by HTTP/net.tcp.service["{$FGATE.SCHEME}","{$FGATE.API.FQDN}","{$FGATE.API.PORT}"])=0'
-              name: 'FortiGate: Port {$FGATE.API.PORT} is unavailable'
+              name: 'Port {$FGATE.API.PORT} is unavailable'
               priority: AVERAGE
               manual_close: 'YES'
               tags:

@@ -27,7 +27,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 7d9ed576aeb045798b78414c89f3e597
-          name: 'Control-M: Get Control-M servers'
+          name: 'Get Control-M servers'
           type: HTTP_AGENT
           key: controlm.servers
           delay: 10m
@@ -43,7 +43,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2bd2c27b8dc74656a00f6d2006399388
-          name: 'Control-M: Get SLA services'
+          name: 'Get SLA services'
           type: HTTP_AGENT
           key: controlm.services
           history: '0'
@@ -463,7 +463,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 94e45567531543119d6e36b4463684c7
-          name: 'Control-M: Get agents'
+          name: 'Get agents'
           type: HTTP_AGENT
           key: controlm.agents
           history: '0'
@@ -478,7 +478,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1f60be3e3fe543d697047ffcad7b0a7f
-          name: 'Control-M: Get jobs'
+          name: 'Get jobs'
           type: HTTP_AGENT
           key: controlm.jobs
           history: '0'
@@ -496,7 +496,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7ae147724e374857a9a28b604e7af014
-          name: 'Control-M: Jobs statistics'
+          name: 'Jobs statistics'
           type: DEPENDENT
           key: controlm.jobs.statistics
           delay: '0'
@@ -514,7 +514,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: aa085872149047f681f974e672e0c72c
-          name: 'Control-M: Jobs returned'
+          name: 'Jobs returned'
           type: DEPENDENT
           key: controlm.jobs.statistics.returned
           delay: '0'
@@ -533,7 +533,7 @@ zabbix_export:
             - tag: component
               value: job
         - uuid: 8219b115bd5246b6bbb38c7a3b74dfaa
-          name: 'Control-M: Jobs total'
+          name: 'Jobs total'
           type: DEPENDENT
           key: controlm.jobs.statistics.total
           delay: '0'
@@ -552,7 +552,7 @@ zabbix_export:
             - tag: component
               value: job
         - uuid: 67ca527f452b43aab2e3171e49f96194
-          name: 'Control-M: Get Control-M server stats'
+          name: 'Get Control-M server stats'
           type: HTTP_AGENT
           key: controlm.server.stats
           history: '0'
@@ -573,7 +573,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 101afc0212e9410b8954bd1c939aea99
-          name: 'Control-M: Server message'
+          name: 'Server message'
           type: DEPENDENT
           key: server.message
           delay: '0'
@@ -598,7 +598,7 @@ zabbix_export:
           triggers:
             - uuid: 406307967abf4218bebd9428dd8ecb8b
               expression: 'last(/Control-M server by HTTP/server.message,#1)="Disconnected"'
-              name: 'Control-M: Server disconnected'
+              name: 'Server disconnected'
               opdata: 'Triggered message: {ITEM.VALUE}, Current message: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The server is disconnected.'
@@ -610,7 +610,7 @@ zabbix_export:
                 last(/Control-M server by HTTP/server.message,#1)<>"Connected" and
                 last(/Control-M server by HTTP/server.message,#1)<>"Disconnected" and
                 last(/Control-M server by HTTP/server.message,#1)<>""
-              name: 'Control-M: Server error'
+              name: 'Server error'
               opdata: 'Triggered message: {ITEM.VALUE}, Current message: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The server has encountered an error.'
@@ -618,7 +618,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: b37f0aa295be421ab5e7262135930fcd
-          name: 'Control-M: Server state'
+          name: 'Server state'
           type: DEPENDENT
           key: server.state
           delay: '0'
@@ -653,7 +653,7 @@ zabbix_export:
               expression: |
                 last(/Control-M server by HTTP/server.state)=0 or
                 last(/Control-M server by HTTP/server.state)=10
-              name: 'Control-M: Server is down'
+              name: 'Server is down'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The server is down.'
@@ -661,7 +661,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 2c7ba283ea2d4f2d91d0fa7d33551501
-          name: 'Control-M: Server version'
+          name: 'Server version'
           type: DEPENDENT
           key: server.version
           delay: '0'
@@ -689,7 +689,7 @@ zabbix_export:
                 last(/Control-M server by HTTP/server.version,#1)<>last(/Control-M server by HTTP/server.version,#2) and
                 length(last(/Control-M server by HTTP/server.version))>0
               recovery_mode: NONE
-              name: 'Control-M: Server version has changed'
+              name: 'Server version has changed'
               opdata: 'Old version: {ITEM.VALUE}, Current version: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'The server version has changed. Acknowledge to close the problem manually.'
