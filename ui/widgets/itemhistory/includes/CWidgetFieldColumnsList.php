@@ -36,16 +36,18 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	public const DISPLAY_HTML = 4;
 	public const DISPLAY_SINGLE_LINE = 5;
 
-	// Where to select data for aggregation function.
+	// Data source for numeric items.
 	public const HISTORY_DATA_AUTO = 0;
 	public const HISTORY_DATA_HISTORY = 1;
 	public const HISTORY_DATA_TRENDS = 2;
 
-	public const SINGLE_LINE_MIN = 1;
-	public const SINGLE_LINE_MAX = 500;
-	public const SINGLE_LINE_DEFAULT = 100;
+	// Display single line values.
+	public const SINGLE_LINE_LENGTH_MIN = 1;
+	public const SINGLE_LINE_LENGTH_MAX = 500;
+	public const SINGLE_LINE_LENGTH_DEFAULT = 100;
 
-	// Predefined colors for thresholds and highlight. Each next threshold takes next sequential value from palette.
+	// Predefined colors for thresholds and highlights. Each next threshold/highlight takes next sequential value
+	// from palette.
 	public const DEFAULT_COLOR_PALETTE = [
 		'FF465C', 'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
 		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
@@ -119,7 +121,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
 			'min' => '',
 			'max' => '',
-			'max_length' => CWidgetFieldColumnsList::SINGLE_LINE_DEFAULT,
+			'max_length' => CWidgetFieldColumnsList::SINGLE_LINE_LENGTH_DEFAULT,
 			'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
 			'monospace_font' => 0,
 			'local_time' => 0,
@@ -183,9 +185,9 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'display'			=> ['type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS, self::DISPLAY_HTML, self::DISPLAY_SINGLE_LINE])],
 			'max_length'		=> ['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'display', 'in' => self::DISPLAY_SINGLE_LINE],
-											'type' => API_INT32, 'flags' => API_REQUIRED, 'default' => self::SINGLE_LINE_DEFAULT, 'in' => self::SINGLE_LINE_MIN.':'.self::SINGLE_LINE_MAX],
+											'type' => API_INT32, 'flags' => API_REQUIRED, 'default' => self::SINGLE_LINE_LENGTH_DEFAULT, 'in' => self::SINGLE_LINE_LENGTH_MIN.':'.self::SINGLE_LINE_LENGTH_MAX],
 										['else' => true,
-											'type' => API_INT32, 'in' => self::SINGLE_LINE_MIN.':'.self::SINGLE_LINE_MAX]
+											'type' => API_INT32, 'in' => self::SINGLE_LINE_LENGTH_MIN.':'.self::SINGLE_LINE_LENGTH_MAX]
 			]],
 			'min'				=> ['type' => API_NUMERIC],
 			'max'				=> ['type' => API_NUMERIC],

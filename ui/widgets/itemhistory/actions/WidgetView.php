@@ -42,8 +42,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getInput('name', $name),
 			'layout' => $this->fields_values['layout'],
 			'columns' => [],
-			'sortorder' => $this->fields_values['sortorder'],
+			'has_display_as_image' => false,
 			'show_lines' => $this->fields_values['show_lines'],
+			'sortorder' => $this->fields_values['sortorder'],
 			'show_timestamp' => $this->fields_values['show_timestamp'],
 			'show_column_header' => $this->fields_values['show_column_header'],
 			'error' => $error,
@@ -65,25 +66,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($this->fields_values['columns']) {
-			if ($override_hostid === '') {
-				$db_items = API::Item()->get([
-					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
-					'selectValueMap' => ['mappings'],
-					'itemids' => array_column($this->fields_values['columns'], 'itemid'),
-					'webitems' => true,
-					'preservekeys' => true
-				]);
-			}
-			else {
-				$db_items = API::Item()->get([
-					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
-					'selectValueMap' => ['mappings'],
-					'itemids' => array_column($this->fields_values['columns'], 'itemid'),
-					'hostids' => [$override_hostid],
-					'webitems' => true,
-					'preservekeys' => true
-				]);
-			}
+			$db_items = API::Item()->get([
+				'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
+				'selectValueMap' => ['mappings'],
+				'itemids' => array_column($this->fields_values['columns'], 'itemid'),
+				'hostids' => $override_hostid !== '' ? [$override_hostid] : null,
+				'webitems' => true,
+				'preservekeys' => true
+			]);
 		}
 
 		if (!$db_items) {
@@ -121,6 +111,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		$columns_with_data = [];
+
+		$has_display_as_image = false;
 
 		foreach ($columns_config as $column) {
 			if (array_key_exists($column['itemid'], $item_values_by_source[$column['history']])) {
@@ -186,6 +178,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 					unset($item_value);
 				}
+				elseif (!$has_display_as_image && $column['item_value_type'] == ITEM_VALUE_TYPE_BINARY
+						&& array_key_exists('display_as_image', $column) && $column['display_as_image'] == 1) {
+					$has_display_as_image = true;
+				}
 
 				$columns_with_data[] = $column;
 			}
@@ -193,12 +189,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
-			'columns' => $columns_with_data,
 			'layout' => $this->fields_values['layout'],
+			'columns' => $columns_with_data,
+			'show_lines' => $this->fields_values['show_lines'],
+			'has_display_as_image' => $has_display_as_image,
 			'sortorder' => $this->fields_values['sortorder'],
 			'show_timestamp' => (bool) $this->fields_values['show_timestamp'],
 			'show_column_header' => $this->fields_values['show_column_header'],
-			'show_lines' => $this->fields_values['show_lines'],
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -225,9 +222,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]) {
-			$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS] = Manager::History()->getAggregatedValues(
+			$db_trends = Manager::History()->getAggregatedValues(
 				$items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS], AGGREGATE_LAST, $time_from
 			);
+
+			foreach ($db_trends as $db_trend) {
+				$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS][$db_trend['itemid']][] = $db_trend + ['ns' => 0];
+			}
 		}
 
 		if ($items_by_source['binary_items']) {

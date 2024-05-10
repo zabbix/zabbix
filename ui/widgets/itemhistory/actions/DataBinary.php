@@ -31,7 +31,6 @@ class DataBinary extends CController {
 		$this->disableCsrfValidation();
 	}
 
-
 	protected function checkPermissions() {
 		return true;
 	}

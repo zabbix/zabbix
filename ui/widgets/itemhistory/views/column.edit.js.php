@@ -50,24 +50,20 @@ window.item_history_column_edit = new class {
 			const ms_item_data = jQuery('#itemid').multiSelect('getData');
 
 			if (ms_item_data.length > 0) {
-				if (ms_item_data[0].hasOwnProperty('id')) {
-					this.#promiseGetItemType(ms_item_data[0].id)
-						.then((type) => {
-							if (this.#form.isConnected) {
-								this.#item_value_type = type;
-								this.#updateForm();
-							}
-						});
-				}
+				this.#promiseGetItemType(ms_item_data[0].id)
+					.then((type) => {
+						if (this.#form.isConnected) {
+							this.#item_value_type = type;
+							this.#updateForm();
+						}
+					});
 
-				if (ms_item_data[0].hasOwnProperty('name')) {
-					const name_field = this.#form.querySelector('[name=name]');
-					const name_value = name_field.value.substring(0, 255);
+				const name_field = this.#form.querySelector('[name=name]');
+				const name_value = name_field.value.substring(0, 255);
 
-					if (name_value === '' || this.#old_multiselect_item_name === name_value) {
-						name_field.value = ms_item_data[0].name;
-						this.#old_multiselect_item_name = ms_item_data[0].name;
-					}
+				if (name_value === '' || this.#old_multiselect_item_name === name_value) {
+					name_field.value = ms_item_data[0].name;
+					this.#old_multiselect_item_name = ms_item_data[0].name;
 				}
 			}
 			else {
@@ -96,13 +92,7 @@ window.item_history_column_edit = new class {
 					row_data.color = colorPalette.getNextColor(used_colors);
 				}
 			}
-		});
-
-		for (const colorpicker of this.#highlights_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
-			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
-		}
-
-		$(this.#highlights_table)
+		})
 			.on('afteradd.dynamicRows', e => {
 				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
 
@@ -112,9 +102,12 @@ window.item_history_column_edit = new class {
 			})
 			.on('afterremove.dynamicRows', () => this.#updateForm());
 
-		document.getElementById('display').addEventListener('change', () => {
-			this.#updateForm()
-		});
+		for (const colorpicker of this.#highlights_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
+			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
+		}
+
+		// Initialize display event listener
+		document.getElementById('display').addEventListener('change', () => this.#updateForm());
 
 		// Initialize thresholds table
 		$(this.#$thresholds_table).dynamicRows({
@@ -135,13 +128,7 @@ window.item_history_column_edit = new class {
 					row_data.color = colorPalette.getNextColor(used_colors);
 				}
 			}
-		});
-
-		for (const colorpicker of this.#$thresholds_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
-			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
-		}
-
-		$(this.#$thresholds_table)
+		})
 			.on('afteradd.dynamicRows', e => {
 				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
 
@@ -151,6 +138,10 @@ window.item_history_column_edit = new class {
 			})
 			.on('afterremove.dynamicRows', () => this.#updateForm())
 			.on('change', (e) => e.target.value = e.target.value.trim());
+
+		for (const colorpicker of this.#$thresholds_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
+			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
+		}
 
 		// Adding field trimming
 		const fields_to_trim = ['name', 'max_length', 'min', 'max'];
@@ -163,12 +154,10 @@ window.item_history_column_edit = new class {
 		// Initialize form elements accessibility.
 		this.#updateForm();
 
-		this.#form.style.display = '';
-		this.#form.querySelector('[name="name"]').focus();
+		this.#form.removeAttribute('style');
+		this.#overlay.recoverFocus();
 
-		this.#form.addEventListener('submit', () => {
-			this.submit()
-		});
+		this.#form.addEventListener('submit', () => this.submit());
 	}
 
 	/**
@@ -189,6 +178,8 @@ window.item_history_column_edit = new class {
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 		curl.setArgument('itemid', itemid);
 
+		this.#overlay.setLoading();
+
 		return fetch(curl.getUrl())
 			.then((response) => response.json())
 			.then((response) => {
@@ -202,33 +193,35 @@ window.item_history_column_edit = new class {
 				console.log('Could not get item type', exception);
 
 				return null;
+			}).finally(() => {
+				this.#overlay.unsetLoading();
 			});
 	}
 
 	#updateForm() {
-		const is_item_numeric_type = this.#item_value_type == <?= ITEM_VALUE_TYPE_FLOAT ?>
+		const is_item_type_numeric = this.#item_value_type == <?= ITEM_VALUE_TYPE_FLOAT ?>
 			|| this.#item_value_type == <?= ITEM_VALUE_TYPE_UINT64 ?>;
 
-		const is_item_text_type = !is_item_numeric_type
+		const is_item_type_text = !is_item_type_numeric
 			&& [<?= ITEM_VALUE_TYPE_STR?>, <?= ITEM_VALUE_TYPE_LOG ?>, <?= ITEM_VALUE_TYPE_TEXT ?>].some(
 				(type) => type == this.#item_value_type
 			);
 
 		const display_value = document.querySelector('[name=display]:checked').value;
-		const show_min_max = is_item_numeric_type && (display_value == <?= CWidgetFieldColumnsList::DISPLAY_BAR ?>
+		const show_min_max = is_item_type_numeric && (display_value == <?= CWidgetFieldColumnsList::DISPLAY_BAR ?>
 			|| display_value == <?= CWidgetFieldColumnsList::DISPLAY_INDICATORS?>);
 
 		// Toggle row visibility
 		const rows = {
-			'js-highlights-row': is_item_text_type,
-			'js-display-row': is_item_text_type || is_item_numeric_type,
-			'js-single-line-input': is_item_text_type
+			'js-highlights-row': is_item_type_text,
+			'js-display-row': is_item_type_text || is_item_type_numeric,
+			'js-single-line-input': is_item_type_text
 				&& display_value == <?= CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE ?>,
 			'js-min-row': show_min_max,
 			'js-max-row': show_min_max,
-			'js-thresholds-row': is_item_numeric_type,
-			'js-history-row': is_item_numeric_type,
-			'js-monospace-row': is_item_text_type,
+			'js-thresholds-row': is_item_type_numeric,
+			'js-history-row': is_item_type_numeric,
+			'js-monospace-row': is_item_type_text,
 			'js-local-time-row': this.#item_value_type == <?= ITEM_VALUE_TYPE_LOG ?>,
 			'js-display-as-image-row': this.#item_value_type == <?= ITEM_VALUE_TYPE_BINARY ?>
 		}
@@ -242,10 +235,10 @@ window.item_history_column_edit = new class {
 		}
 
 		// Toggle disable/enable of input fields
-		$(this.#highlights_table).toggleClass('disabled', !is_item_text_type);
+		$(this.#highlights_table).toggleClass('disabled', !is_item_type_text);
 
-		if (is_item_numeric_type || is_item_text_type) {
-			const visible_values = is_item_numeric_type
+		if (is_item_type_numeric || is_item_type_text) {
+			const visible_values = is_item_type_numeric
 				? [<?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>, <?= CWidgetFieldColumnsList::DISPLAY_BAR ?>,
 					<?= CWidgetFieldColumnsList::DISPLAY_INDICATORS?>
 				]
@@ -268,14 +261,14 @@ window.item_history_column_edit = new class {
 			}
 		}
 
-		$(this.#$thresholds_table).toggleClass('disabled', !is_item_numeric_type);
+		$(this.#$thresholds_table).toggleClass('disabled', !is_item_type_numeric);
 
 		const inputs = {
-			'max_length': is_item_text_type && display_value == <?= CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE ?>,
+			'max_length': is_item_type_text && display_value == <?= CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE ?>,
 			'min': show_min_max,
 			'max': show_min_max,
-			'history': is_item_numeric_type,
-			'monospace_font': is_item_text_type,
+			'history': is_item_type_numeric,
+			'monospace_font': is_item_type_text,
 			'local_time': this.#item_value_type == <?= ITEM_VALUE_TYPE_LOG ?>,
 			'display_as_image': this.#item_value_type == <?= ITEM_VALUE_TYPE_BINARY ?>
 		}
@@ -291,7 +284,13 @@ window.item_history_column_edit = new class {
 		const curl = new Curl(this.#form.getAttribute('action'));
 		const fields = getFormFields(this.#form);
 
-		fetch(curl.getUrl(), {
+		this.#overlay.setLoading();
+
+		this.#post(curl.getUrl(), fields);
+	}
+
+	#post(url, fields) {
+		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 			body: urlEncodeData(fields)

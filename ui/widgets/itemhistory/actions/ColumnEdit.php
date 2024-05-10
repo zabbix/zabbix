@@ -205,7 +205,7 @@ class ColumnEdit extends CController {
 				'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
 				'min' => '',
 				'max' => '',
-				'max_length' => CWidgetFieldColumnsList::SINGLE_LINE_DEFAULT,
+				'max_length' => CWidgetFieldColumnsList::SINGLE_LINE_LENGTH_DEFAULT,
 				'thresholds' => [],
 				'highlights' => [],
 				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
