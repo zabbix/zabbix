@@ -71,9 +71,6 @@ static duk_ret_t	wd_element_dtor(duk_context *ctx)
 		webdriver_release(el->wd);
 		zbx_free(el->id);
 		zbx_free(el);
-
-		duk_push_pointer(ctx, NULL);
-		duk_put_prop_string(ctx, 0, "\xff""\xff""d");
 	}
 
 	return 0;

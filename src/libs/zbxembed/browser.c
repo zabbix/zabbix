@@ -68,8 +68,6 @@ static duk_ret_t	es_browser_dtor(duk_context *ctx)
 		zbx_es_env_t	*env;
 
 		webdriver_release(wd);
-		duk_push_pointer(ctx, NULL);
-		duk_put_prop_string(ctx, 0, "\xff""\xff""d");
 
 		if (NULL != (env = zbx_es_get_env(ctx)))
 			env->browser_objects--;
