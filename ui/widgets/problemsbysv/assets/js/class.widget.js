@@ -48,29 +48,6 @@ class CWidgetProblemsBySv extends CWidget {
 				if (this._state === WIDGET_STATE_ACTIVE) {
 					this._startUpdating();
 				}
-			},
-
-			tableBodyClick: e => {
-				if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
-					return;
-				}
-
-				const row = e.target.closest('tr');
-
-				if (row !== null) {
-					const hostgroupid = row.dataset.hostgroupid;
-
-					if (hostgroupid !== undefined) {
-						this.#selected_host_group_id = hostgroupid;
-
-						this.#selectHostGroup();
-
-						this.broadcast({
-							[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: [hostgroupid],
-							[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: [hostgroupid]
-						});
-					}
-				}
 			}
 		}
 	}
@@ -83,8 +60,8 @@ class CWidgetProblemsBySv extends CWidget {
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
-	processUpdateResponse(response) {
-		super.processUpdateResponse(response);
+	setContents(response) {
+		super.setContents(response);
 
 		this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
 
@@ -100,27 +77,43 @@ class CWidgetProblemsBySv extends CWidget {
 				}
 			}
 
-			this.#activateListeners();
+			this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 		}
 	}
 
-	hasPadding() {
-		return this._view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL
-			&& this._fields.show_type !== CWidgetProblemsBySv.SHOW_TOTALS;
-	}
-
-	#activateListeners() {
-		this.#table_body.addEventListener('click', this._events.tableBodyClick);
-	}
-
-	/**
-	 * Select host group row.
-	 */
 	#selectHostGroup() {
 		const rows = this.#table_body.querySelectorAll('tr[data-hostgroupid]');
 
 		for (const row of rows) {
 			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostgroupid === this.#selected_host_group_id);
 		}
+	}
+
+	#onTableBodyClick(e) {
+		if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
+			return;
+		}
+
+		const row = e.target.closest('tr');
+
+		if (row !== null) {
+			const hostgroupid = row.dataset.hostgroupid;
+
+			if (hostgroupid !== undefined) {
+				this.#selected_host_group_id = hostgroupid;
+
+				this.#selectHostGroup();
+
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: [hostgroupid],
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: [hostgroupid]
+				});
+			}
+		}
+	}
+
+	hasPadding() {
+		return this._view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL
+			&& this._fields.show_type !== CWidgetProblemsBySv.SHOW_TOTALS;
 	}
 }

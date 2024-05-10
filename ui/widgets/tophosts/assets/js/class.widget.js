@@ -28,13 +28,6 @@ class CWidgetTopHosts extends CWidget {
 	#table_body = null;
 
 	/**
-	 * Listeners of top hosts widget.
-	 *
-	 * @type {Object}
-	 */
-	#listeners = {};
-
-	/**
 	 * ID of selected host.
 	 *
 	 * @type {string}
@@ -58,50 +51,38 @@ class CWidgetTopHosts extends CWidget {
 				}
 			}
 
-			this.#registerListeners();
-			this.#activateListeners();
+			this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 		}
 	}
 
-	#registerListeners() {
-		this.#listeners = {
-			tableBodyClick: e => {
-				if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
-					return;
-				}
-
-				const row = e.target.closest('tr');
-
-				if (row !== null) {
-					const hostid = row.dataset.hostid;
-
-					if (hostid !== undefined) {
-						this.#selected_host_id = hostid;
-
-						this.#selectHost();
-
-						this.broadcast({
-							[CWidgetsData.DATA_TYPE_HOST_ID]: [hostid],
-							[CWidgetsData.DATA_TYPE_HOST_IDS]: [hostid]
-						});
-					}
-				}
-			},
-		};
-	}
-
-	#activateListeners() {
-		this.#table_body.addEventListener('click', this.#listeners.tableBodyClick);
-	}
-
-	/**
-	 * Select host row.
-	 */
 	#selectHost() {
 		const rows = this.#table_body.querySelectorAll('tr[data-hostid]');
 
 		for (const row of rows) {
 			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostid === this.#selected_host_id);
+		}
+	}
+
+	#onTableBodyClick(e) {
+		if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
+			return;
+		}
+
+		const row = e.target.closest('tr');
+
+		if (row !== null) {
+			const hostid = row.dataset.hostid;
+
+			if (hostid !== undefined) {
+				this.#selected_host_id = hostid;
+
+				this.#selectHost();
+
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [hostid]
+				});
+			}
 		}
 	}
 }
