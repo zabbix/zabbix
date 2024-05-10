@@ -22,8 +22,6 @@ class CSoftwareVersionCheck {
 
 	static URL = 'https://services.zabbix.com/updates/v1';
 	static TYPE = 'software_update_check';
-	static DELAY = 28800; // 8 hours
-	static DELAY_ON_FAIL = 259200; // 72 hours
 
 	#data = {};
 
@@ -43,17 +41,21 @@ class CSoftwareVersionCheck {
 					throw {error: response.error};
 				}
 
-				this.#data = response;
+				if (!response.is_software_update_check_enabled) {
+					return;
+				}
 
-				if (this.#data.is_software_update_check_enabled) {
-					if (this.#data.nextcheck <= this.#data.now) {
-						this.#getCurrentData();
-					}
-					else {
-						const delay = this.#data.nextcheck - this.#data.now + Math.floor(Math.random() * 60) + 1;
+				if (response.nextcheck <= response.now) {
+					this.#data.major_version = response.major_version;
+					this.#data.check_hash = response.check_hash;
+					this.#data._csrf_token = response._csrf_token;
 
-						setTimeout(() => this.#getSavedData(), delay * 1000);
-					}
+					this.#getCurrentData();
+				}
+				else {
+					const delay = response.nextcheck - response.now + Math.floor(Math.random() * 60) + 1;
+
+					setTimeout(() => this.#getSavedData(), delay * 1000);
 				}
 			})
 			.catch(exception => {
@@ -68,22 +70,14 @@ class CSoftwareVersionCheck {
 		curl.setArgument('version', this.#data.major_version);
 		curl.setArgument('software_update_check_hash', this.#data.check_hash);
 
-		fetch(curl.getUrl(), {mode: 'no-cors'})
+		fetch(curl.getUrl())
 			.then(response => response.json())
 			.then(response => {
-				this.#data.lastcheck_success = this.#data.now;
-				this.#data.nextcheck = this.#data.now + CSoftwareVersionCheck.DELAY;
-
 				if ('versions' in response) {
 					this.#data.versions = response.versions;
 				}
 			})
-			.catch(() => {
-				this.#data.nextcheck = this.#data.now + CSoftwareVersionCheck.DELAY_ON_FAIL;
-			})
 			.finally(() => {
-				this.#data.lastcheck = this.#data.now;
-
 				this.#update();
 			});
 	}
@@ -94,9 +88,6 @@ class CSoftwareVersionCheck {
 		curl.setArgument('action', 'softwareversioncheck.update');
 
 		const data = {
-			lastcheck: this.#data.lastcheck,
-			lastcheck_success: this.#data.lastcheck_success,
-			nextcheck: this.#data.nextcheck,
 			versions: this.#data.versions || [],
 			_csrf_token: this.#data._csrf_token
 		};
@@ -112,7 +103,7 @@ class CSoftwareVersionCheck {
 					throw {error: response.error};
 				}
 
-				const delay = data.nextcheck + Math.floor(Math.random() * 60) + 1;
+				const delay = response.nextcheck + Math.floor(Math.random() * 60) + 1;
 
 				setTimeout(() => this.#getSavedData(), delay * 1000);
 			})

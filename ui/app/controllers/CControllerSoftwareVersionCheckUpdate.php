@@ -21,16 +21,17 @@
 
 class CControllerSoftwareVersionCheckUpdate extends CController {
 
+	private const NEXTCHECK_DELAY = 28800; // 8 hours
+	private const NEXTCHECK_DELAY_ON_FAIL = 259200; // 72 hours
+	private const MAX_NO_DATA_PERIOD = 604800; // 1 week
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'lastcheck' =>			'required|int32',
-			'lastcheck_success' =>	'required|int32',
-			'nextcheck' =>			'required|int32',
-			'versions' =>			'required|array'
+			'versions' =>	'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -53,15 +54,41 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$settings = ['software_update_check_data' => []];
+		$lastcheck = time();
+		$versions = $this->getInput('versions');
 
-		$this->getInputs($settings['software_update_check_data'], ['lastcheck', 'lastcheck_success', 'nextcheck',
-			'versions'
-		]);
+		if ($versions) {
+			$lastcheck_success = $lastcheck;
+			$nextcheck = $lastcheck + self::NEXTCHECK_DELAY;
+		}
+		else {
+			$previous_check_data = CSettingsHelper::getSoftwareUpdateCheckData() + [
+				'lastcheck_success' => 0,
+				'versions' => []
+			];
+
+			$lastcheck_success = $previous_check_data['lastcheck_success'];
+			$nextcheck = $lastcheck + self::NEXTCHECK_DELAY_ON_FAIL;
+			$versions = $lastcheck - $lastcheck_success <= self::MAX_NO_DATA_PERIOD
+				? $previous_check_data['versions']
+				: [];
+		}
+
+		$settings = ['software_update_check_data' => [
+			'lastcheck' => $lastcheck,
+			'lastcheck_success' => $lastcheck_success,
+			'nextcheck' => $nextcheck,
+			'versions' => $versions
+		]];
+
+		$result = CSettings::updatePrivate($settings);
 
 		$output = [];
 
-		if (!CSettings::updatePrivate($settings)) {
+		if ($result) {
+			$output['nextcheck'] = $nextcheck;
+		}
+		else {
 			$output['error'] = [
 				'title' => 'Cannot update software update check data',
 				'messages' => array_column(get_and_clear_messages(), 'message')

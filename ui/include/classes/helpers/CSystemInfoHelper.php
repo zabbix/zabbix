@@ -293,8 +293,7 @@ class CSystemInfoHelper {
 			'lastcheck' => $check_data['lastcheck']
 		];
 
-		// Return basic data if the last successful check for software updates was made more than a week ago.
-		if ($check_data['lastcheck'] - $check_data['lastcheck_success'] > 604800) {
+		if (!$check_data['versions']) {
 			return $data;
 		}
 
