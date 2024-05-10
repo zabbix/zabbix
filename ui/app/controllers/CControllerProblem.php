@@ -207,7 +207,7 @@ abstract class CControllerProblem extends CController {
 	}
 
 	/**
-	 * Get only existing host, host group and trigger IDs.
+	 * Clean the filter from non-existing host, host group and trigger IDs.
 	 *
 	 * @param array $filter
 	 * @param array $filter['groupids']     Groupids from filter to check.
@@ -216,7 +216,7 @@ abstract class CControllerProblem extends CController {
 	 *
 	 * @return void
 	 */
-	protected function getAvailableEntities(array &$filter): void {
+	protected function sanitizeFilter(array &$filter): void {
 		if ($filter['hostids']) {
 			$hosts = API::Host()->get([
 				'output' => [],

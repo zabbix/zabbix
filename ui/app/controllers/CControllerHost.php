@@ -301,14 +301,14 @@ abstract class CControllerHost extends CController {
 	}
 
 	/**
-	 * Get only existing host group IDs.
+	 * Clean the filter from non-existing host group IDs.
 	 *
 	 * @param array $filter
 	 * @param array $filter['groupids']  Groupids from filter to check.
 	 *
 	 * @return void
 	 */
-	protected function getAvailableHostGroups(array &$filter): void {
+	protected function sanitizeFilter(array &$filter): void {
 		if ($filter['groupids']) {
 			$groups = API::HostGroup()->get([
 				'output' => [],

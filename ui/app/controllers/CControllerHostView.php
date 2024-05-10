@@ -105,7 +105,7 @@ class CControllerHostView extends CControllerHost {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
-		$this->getAvailableHostGroups($filter);
+		$this->sanitizeFilter($filter);
 
 		$refresh_curl = new CUrl('zabbix.php');
 		$filter['action'] = 'host.view.refresh';

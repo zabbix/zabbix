@@ -514,15 +514,16 @@ abstract class CControllerLatest extends CController {
 	}
 
 	/**
-	 * Get only existing host and host group IDs.
+	 * Clean the filter from non-existing hosts and host group IDs.
 	 *
 	 * @param array $filter
-	 * @param array $filter['groupids']  Groupids from filter to check.
-	 * @param array $filter['hostids']   Hostids from filter to check.
+	 * @param array $filter['groupids']           Groupids from filter to check.
+	 * @param array $filter['hostids']            Hostids from filter to check.
+	 * @param array $filter['subfilter_hostids']  Hostids from sub-filter to check.
 	 *
 	 * @return void
 	 */
-	protected function getAvailableEntities(array &$filter): void {
+	protected function sanitizeFilter(array &$filter): void {
 		if ($filter['hostids']) {
 			$hosts = API::Host()->get([
 				'output' => [],
