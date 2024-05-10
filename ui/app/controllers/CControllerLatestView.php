@@ -153,6 +153,8 @@ class CControllerLatestView extends CControllerLatest {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
+		$this->sanitizeFilter($filter);
+
 		$mandatory_filter_set = self::isMandatoryFilterFieldSet($filter);
 		$subfilter_set = self::isSubfilterSet($filter);
 

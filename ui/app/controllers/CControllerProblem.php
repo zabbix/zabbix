@@ -207,4 +207,58 @@ abstract class CControllerProblem extends CController {
 
 		return $ret;
 	}
+
+	/**
+	 * Clean the filter from non-existing host, host group and trigger IDs.
+	 *
+	 * @param array $filter
+	 * @param array $filter['groupids']     Groupids from filter to check.
+	 * @param array $filter['hostids']      Hostids from filter to check.
+	 * @param array $filter['triggerids']   Triggerids from filter to check.
+	 *
+	 * @return void
+	 */
+	protected function sanitizeFilter(array &$filter): void {
+		if ($filter['hostids']) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $filter['hostids'] ?: null,
+				'preservekeys' => true
+			]);
+
+			foreach ($filter['hostids'] as $index => $hostid) {
+				if (!array_key_exists($hostid, $hosts)) {
+					unset($filter['hostids'][$index]);
+				}
+			}
+		}
+
+		if ($filter['triggerids']) {
+			$triggers = API::Trigger()->get([
+				'output' => [],
+				'triggerids' => $filter['triggerids'] ?: null,
+				'preservekeys' => true
+			]);
+
+			foreach ($filter['triggerids'] as $index => $triggerid) {
+				if (!array_key_exists($triggerid, $triggers)) {
+					unset($filter['triggerids'][$index]);
+				}
+			}
+		}
+
+		if ($filter['groupids']) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => $filter['groupids'] ?: null,
+				'preservekeys' => true
+			]);
+
+			foreach ($filter['groupids'] as $index => $groupid) {
+				if (!array_key_exists($groupid, $groups)) {
+					unset($filter['groupids'][$index]);
+				}
+			}
+		}
+	}
 }

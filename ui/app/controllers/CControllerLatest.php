@@ -567,6 +567,60 @@ abstract class CControllerLatest extends CController {
 	}
 
 	/**
+	 * Clean the filter from non-existing hosts and host group IDs.
+	 *
+	 * @param array $filter
+	 * @param array $filter['groupids']           Groupids from filter to check.
+	 * @param array $filter['hostids']            Hostids from filter to check.
+	 * @param array $filter['subfilter_hostids']  Hostids from sub-filter to check.
+	 *
+	 * @return void
+	 */
+	protected function sanitizeFilter(array &$filter): void {
+		if ($filter['hostids']) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $filter['hostids'] ?: null,
+				'preservekeys' => true
+			]);
+
+			foreach ($filter['hostids'] as $index => $hostid) {
+				if (!array_key_exists($hostid, $hosts)) {
+					unset($filter['hostids'][$index]);
+				}
+			}
+		}
+
+		if ($filter['subfilter_hostids']) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $filter['subfilter_hostids'] ?: null,
+				'preservekeys' => true
+			]);
+
+			foreach ($filter['subfilter_hostids'] as $index => $subfilter_hostid) {
+				if (!array_key_exists($subfilter_hostid, $hosts)) {
+					unset($filter['subfilter_hostids'][$index]);
+				}
+			}
+		}
+
+		if ($filter['groupids']) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => $filter['groupids'] ?: null,
+				'preservekeys' => true
+			]);
+
+			foreach ($filter['groupids'] as $index => $groupid) {
+				if (!array_key_exists($groupid, $groups)) {
+					unset($filter['groupids'][$index]);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Calculate which items retrieved using the primary filter matches selected subfilter options. Results are added to
 	 * the array stored with 'matching_subfilters' key for each retrieved item. Additionally 'has_data' flag is added to
 	 * each of retrieved item to indicate either particular item has data.

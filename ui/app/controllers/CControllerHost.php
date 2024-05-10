@@ -324,6 +324,30 @@ abstract class CControllerHost extends CController {
 	}
 
 	/**
+	 * Clean the filter from non-existing host group IDs.
+	 *
+	 * @param array $filter
+	 * @param array $filter['groupids']  Groupids from filter to check.
+	 *
+	 * @return void
+	 */
+	protected function sanitizeFilter(array &$filter): void {
+		if ($filter['groupids']) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => $filter['groupids'] ?: null,
+				'preservekeys' => true
+			]);
+
+			foreach ($filter['groupids'] as $index => $groupid) {
+				if (!array_key_exists($groupid, $groups)) {
+					unset($filter['groupids'][$index]);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Clean and convert passed filter input fields from default values required for HTML presentation.
 	 *
 	 * @param array $input  Filter fields values.
