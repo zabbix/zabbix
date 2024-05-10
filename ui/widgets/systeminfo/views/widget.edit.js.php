@@ -15,26 +15,29 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
-/**
- * System information widget form view.
- *
- * @var CView $this
- * @var array $data
- */
+?>
 
-(new CWidgetFormView($data))
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['info_type'])
-	)
-	->addField(CSettingsHelper::isSoftwareUpdateCheckEnabled()
-		? (new CWidgetFieldCheckBoxView($data['fields']['show_software_update_check_details']))
-			->addRowClass('js-show-software-update-check-details')
-		: null
-	)
-	->includeJsFile('widget.edit.js.php')
-	->addJavaScript('widget_systeminfo_form.init();')
-	->show();
+window.widget_systeminfo_form = new class {
+
+	init() {
+		this._form = document.getElementById('widget-dialogue-form');
+		this._info_type = document.getElementById('info_type');
+
+		this._info_type.addEventListener('change', () => this.#updateForm());
+
+		this.#updateForm();
+	}
+
+	#updateForm() {
+		const show_system_info =
+			this._info_type.querySelector('input:checked').value == <?= ZBX_SYSTEM_INFO_SERVER_STATS ?>;
+
+		for (const element of this._form.querySelectorAll('.js-show-software-update-check-details')) {
+			element.style.display = show_system_info ? '' : 'none';
+		}
+	}
+}
