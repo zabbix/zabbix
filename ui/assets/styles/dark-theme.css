@@ -5047,7 +5047,7 @@ pre, pre a, pre td, pre span {
 
 .host-dashboard-header-navigation,
 .header-navigation {
-  min-height: 24px; }
+  min-height: 29px; }
   .host-dashboard-header-navigation > ul,
   .header-navigation > ul {
     display: flex; }
@@ -5118,15 +5118,11 @@ pre, pre a, pre td, pre span {
         display: inline-block;
         box-sizing: border-box;
         line-height: 22px;
-        margin-bottom: 5px;
         text-align: center; }
-  .host-dashboard-header-navigation + .list-table {
-    margin-top: 4px; }
 
 .header-navigation {
   display: inline-block;
   position: relative;
-  margin: 0 0 5px;
   z-index: 3;
   max-width: calc(100% - 200px); }
   .header-navigation > ul {
