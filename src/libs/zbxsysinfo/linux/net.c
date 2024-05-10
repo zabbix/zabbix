@@ -705,7 +705,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL != strstr(buffer, pattern))
 				listen = 1;
 		}
-		out:
+out:
 		zbx_free(buffer);
 #ifdef HAVE_INET_DIAG
 	}
