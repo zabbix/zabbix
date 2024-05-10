@@ -36,14 +36,14 @@ const ZBX_STYLE_ARROW_RIGHT = 'arrow-right';
 const ZBX_STYLE_COLLAPSIBLE = 'collapsible';
 const ZBX_STYLE_COLLAPSED = 'collapsed';
 const ZBX_STYLE_DRAG_ICON = 'drag-icon';
-const ZBX_STYLE_NOTHING_TO_SHOW = 'nothing-to-show';
 const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
 const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 
+const ZBX_STYLE_ROW_SELECTED = 'row-selected';
+
 const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
-const ZBX_STYLE_NO_DATA_FOUND = 'no-data-found';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 
 const ZBX_ICON_BELL = 'zi-bell';
@@ -73,6 +73,8 @@ const ZBX_ICON_SEARCH_LARGE = 'zi-search-large';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
+const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
+const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
 
 const TRIGGER_SEVERITY_NOT_CLASSIFIED = 0;
@@ -98,6 +100,12 @@ const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
 
 const MAINTENANCE_TYPE_NORMAL = 0;
 const MAINTENANCE_TYPE_NODATA = 1;
+
+const SYSMAP_ELEMENT_TYPE_HOST = 0;
+const SYSMAP_ELEMENT_TYPE_MAP = 1;
+const SYSMAP_ELEMENT_TYPE_TRIGGER = 2;
+const SYSMAP_ELEMENT_TYPE_HOST_GROUP = 3;
+const SYSMAP_ELEMENT_TYPE_IMAGE = 4;
 
 const KEY_ARROW_DOWN = 40;
 const KEY_ARROW_LEFT = 37;

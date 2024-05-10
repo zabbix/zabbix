@@ -61,9 +61,20 @@ class CWidgetHostNavigator extends CWidget {
 	}
 
 	setContents(response) {
-		if (this.#host_navigator === null) {
-			this.#host_navigator = new CHostNavigator(response.config);
+		if (response.hosts.length === 0) {
+			this.clearContents();
+			this.setCoverMessage({
+				message: t('No data found'),
+				icon: ZBX_ICON_SEARCH_LARGE
+			});
 
+			return;
+		}
+
+		if (this.#host_navigator === null) {
+			this.clearContents();
+
+			this.#host_navigator = new CHostNavigator(response.config);
 			this._body.appendChild(this.#host_navigator.getContainer());
 
 			this.#registerListeners();
@@ -80,7 +91,10 @@ class CWidgetHostNavigator extends CWidget {
 	#registerListeners() {
 		this.#listeners = {
 			hostSelect: e => {
-				this.broadcast({_hostid: e.detail._hostid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [e.detail.hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [e.detail.hostid]
+				});
 			},
 
 			groupToggle: e => {
@@ -115,11 +129,7 @@ class CWidgetHostNavigator extends CWidget {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				is_open: is_open,
-				group_identifier: group_identifier,
-				widgetid: widgetid
-			})
+			body: JSON.stringify({is_open, group_identifier, widgetid})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -147,5 +157,12 @@ class CWidgetHostNavigator extends CWidget {
 
 	hasPadding() {
 		return false;
+	}
+
+	onClearContents() {
+		if (this.#host_navigator !== null) {
+			this.#host_navigator.destroy();
+			this.#host_navigator = null;
+		}
 	}
 }

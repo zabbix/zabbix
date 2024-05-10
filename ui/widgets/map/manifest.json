@@ -10,8 +10,25 @@
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/map",
 	"widget": {
 		"in": {
-			"sysmapid": {"type": "_mapid"}
+			"sysmapid": {
+				"type": "_mapid",
+				"required": true
+			}
 		},
+		"out": [
+			{
+				"type": "_hostid"
+			},
+			{
+				"type": "_hostids"
+			},
+			{
+				"type": "_hostgroupid"
+			},
+			{
+				"type": "_hostgroupids"
+			}
+		],
 		"size": {
 			"width": 54,
 			"height": 5

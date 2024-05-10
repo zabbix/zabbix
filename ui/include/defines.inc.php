@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0rc1');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050297);
+define('ZABBIX_DB_VERSION',		6050298);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -2100,10 +2100,9 @@ define('ZBX_STYLE_MSG_GLOBAL_FOOTER', 'msg-global-footer');
 define('ZBX_STYLE_MSG_DETAILS', 'msg-details');
 define('ZBX_STYLE_NA_BG', 'na-bg');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
-define('ZBX_STYLE_NOTHING_TO_SHOW', 'nothing-to-show');
 define('ZBX_STYLE_NO_DATA', 'no-data');
+define('ZBX_STYLE_NO_DATA_WITHOUT_ICON', 'no-data-without-icon');
 define('ZBX_STYLE_NO_DATA_DESCRIPTION', 'no-data-description');
-define('ZBX_STYLE_NO_DATA_FOUND', 'no-data-found');
 define('ZBX_STYLE_NO_DATA_MESSAGE', 'no-data-message');
 define('ZBX_STYLE_NO_INDENT', 'no-indent');
 define('ZBX_STYLE_NOWRAP', 'nowrap');

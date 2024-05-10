@@ -30,22 +30,23 @@ class CTableInfo extends CTable {
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
 	}
 
-	public function setNoDataMessage($message, $description = null, $icon = null) {
-		if ($description === null && $icon === null) {
-			$container = (new CDiv($message))->addClass(ZBX_STYLE_NO_DATA_MESSAGE);
-		}
-		else {
-			$container = new CDiv([
-				(new CDiv($message))
-					->addClass(ZBX_STYLE_NO_DATA_MESSAGE)
-					->addClass($icon),
-				$description !== null ? (new CDiv($description))->addClass(ZBX_STYLE_NO_DATA_DESCRIPTION) : null
-			]);
+	public function setNoDataMessage($message, $description = null, $icon = null): self {
+		$this->addClass(ZBX_STYLE_NO_DATA);
 
-			if ($icon !== null) {
-				$this->addClass(ZBX_STYLE_NO_DATA);
-				$container->addClass(ZBX_STYLE_NO_DATA_FOUND);
-			}
+		if ($icon === null) {
+			$this->addClass(ZBX_STYLE_NO_DATA_WITHOUT_ICON);
+		}
+
+		$container = (new CDiv($message))->addClass(ZBX_STYLE_NO_DATA_MESSAGE);
+
+		if ($icon !== null) {
+			$container->addClass($icon);
+		}
+
+		if ($description !== null) {
+			$container->addItem(
+				(new CDiv($description))->addClass(ZBX_STYLE_NO_DATA_DESCRIPTION)
+			);
 		}
 
 		$this->message = new CCol($container);
@@ -79,7 +80,7 @@ class CTableInfo extends CTable {
 		$ret = '';
 
 		if ($this->rownum == 0) {
-			$ret .= $this->prepareRow($this->message, ZBX_STYLE_NOTHING_TO_SHOW)->toString();
+			$ret .= $this->prepareRow($this->message)->toString();
 		}
 
 		$ret .= parent::endToString();

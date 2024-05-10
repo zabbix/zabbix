@@ -10,7 +10,9 @@
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/map_tree",
 	"widget": {
 		"out": [
-			{"type": "_mapid"}
+			{
+				"type": "_mapid"
+			}
 		],
 		"size": {
 			"width": 18,

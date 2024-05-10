@@ -126,7 +126,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 		$validation_rules = $this->getValidationRules($strict);
 		$value = $this->getValue();
-		$label = $this->label ?? $this->name;
+		$label = $this->getErrorLabel();
 
 		if (!count($value)) {
 			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {

@@ -217,10 +217,15 @@ class CWidget extends CModule {
 			'is_multiple' => $is_multiple
 		] = $data_types[$param['type']];
 
+		/** @var CWidgetField $field */
 		$field = new $field_class($name, $label);
 
 		if ($is_multiple !== null) {
 			$field->setMultiple($is_multiple);
+		}
+
+		if (array_key_exists('required', $param) && $param['required']) {
+			$field->setFlags(CWidgetField::FLAG_LABEL_ASTERISK | CWidgetField::FLAG_NOT_EMPTY);
 		}
 
 		return $field;

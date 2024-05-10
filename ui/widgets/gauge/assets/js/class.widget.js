@@ -47,15 +47,18 @@ class CWidgetGauge extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			with_config: this.gauge === null ? 1 : undefined
+			with_config: (this.gauge === null || this.isFieldsReferredDataUpdated()) ? 1 : undefined
 		};
 	}
 
 	setContents(response) {
+		if (this.isFieldsReferredDataUpdated()) {
+			this.clearContents();
+		}
+
 		if ('body' in response) {
 			if (this.gauge !== null) {
-				this.gauge.destroy();
-				this.gauge = null;
+				this.clearContents();
 			}
 
 			this._body.innerHTML = response.body;
@@ -88,6 +91,13 @@ class CWidgetGauge extends CWidget {
 		this.gauge = new CSVGGauge(this.gauge_link, padding, response.config);
 		this.gauge.setSize(super._getContentsSize());
 		this.gauge.setValue(value_data);
+	}
+
+	onClearContents() {
+		if (this.gauge !== null) {
+			this.gauge.destroy();
+			this.gauge = null;
+		}
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {

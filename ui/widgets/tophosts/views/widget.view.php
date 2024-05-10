@@ -54,7 +54,7 @@ else {
 
 	$table->setHeader($header);
 
-	foreach ($data['rows'] as $columns) {
+	foreach ($data['rows'] as ['columns' => $columns, 'context' => $context]) {
 		$row = [];
 
 		foreach ($columns as $i => $column) {
@@ -193,7 +193,9 @@ else {
 			}
 		}
 
-		$table->addRow($row);
+		$table->addRow(
+			(new CRow($row))->setAttribute('data-hostid', $context['hostid'])
+		);
 	}
 }
 

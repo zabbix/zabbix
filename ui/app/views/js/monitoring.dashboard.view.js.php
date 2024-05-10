@@ -25,11 +25,41 @@
 ?>
 
 <script>
-	const view = {
-		is_busy: false,
-		is_busy_saving: false,
+	const view = new class {
+		/**
+		 * @type {Object}
+		 */
+		#dashboard;
 
-		skip_time_selector_range_update: false,
+		/**
+		 * @type {Object}
+		 */
+		#broadcast_requirements;
+
+		/**
+		 * @type {Object}
+		 */
+		#dashboard_time_period;
+
+		/**
+		 * @type {boolean}
+		 */
+		#clone;
+
+		/**
+		 * @type {boolean}
+		 */
+		#is_busy = false;
+
+		/**
+		 * @type {boolean}
+		 */
+		#is_busy_saving = false;
+
+		/**
+		 * @type {boolean}
+		 */
+		#skip_time_selector_range_update = false;
 
 		init({
 			dashboard,
@@ -42,10 +72,10 @@
 			web_layout_mode,
 			clone
 		}) {
-			this.dashboard = dashboard;
-			this.broadcast_requirements = broadcast_requirements;
-			this.dashboard_time_period = dashboard_time_period;
-			this.clone = clone;
+			this.#dashboard = dashboard;
+			this.#broadcast_requirements = broadcast_requirements;
+			this.#dashboard_time_period = dashboard_time_period;
+			this.#clone = clone;
 
 			timeControl.refreshPage = false;
 
@@ -88,8 +118,9 @@
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				broadcast_options: {
-					_hostid: {rebroadcast: false},
-					_timeperiod: {rebroadcast: true}
+					[CWidgetsData.DATA_TYPE_HOST_ID]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: {rebroadcast: true}
 				},
 				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
@@ -102,29 +133,44 @@
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
 
+			const time_period = {
+				from: dashboard_time_period.from,
+				from_ts: dashboard_time_period.from_ts,
+				to: dashboard_time_period.to,
+				to_ts: dashboard_time_period.to_ts
+			};
+
+			CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
+
 			ZABBIX.Dashboard.broadcast({
-				_hostid: dashboard_host !== null ? dashboard_host.id : null,
-				_hostids: dashboard_host !== null ? [dashboard_host.id] : null,
-				_timeperiod: {
-					from: dashboard_time_period.from,
-					from_ts: dashboard_time_period.from_ts,
-					to: dashboard_time_period.to,
-					to_ts: dashboard_time_period.to_ts
-				}
+				[CWidgetsData.DATA_TYPE_HOST_ID]: dashboard_host !== null
+					? [dashboard_host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+				[CWidgetsData.DATA_TYPE_HOST_IDS]: dashboard_host !== null
+					? [dashboard_host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 
 			ZABBIX.Dashboard.activate();
 
 			if (web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
-				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
-				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
+				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.#edit());
+				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, () => this.#applyProperties());
 
-				if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
-					jQuery('#dashboard_hostid').on('change', this.events.dashboardHostChange);
+				if (CWidgetsData.DATA_TYPE_HOST_ID in broadcast_requirements
+						|| CWidgetsData.DATA_TYPE_HOST_IDS in broadcast_requirements) {
+					jQuery('#dashboard_hostid').on('change', this.#listeners.onDashboardHostChange);
+
+					window.addEventListener('popstate', e => this.#onPopState(e));
+				}
+
+				if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {
+					jQuery.subscribe('timeselector.rangeupdate', (e, data) => this.#onTimeSelectorRangeUpdate(e, data));
 				}
 
 				if (dashboard.dashboardid === null || clone) {
-					this.edit();
+					this.#edit();
 					ZABBIX.Dashboard.editProperties();
 				}
 				else {
@@ -132,31 +178,28 @@
 						.getElementById('dashboard-edit')
 						.addEventListener('click', () => {
 							ZABBIX.Dashboard.setEditMode();
-							this.edit();
+							this.#edit();
 						});
+
+					this.#updateHistory(false);
 				}
 			}
 
-			ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, this.events.feedback);
-			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
+			ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, e => this.#onFeedback(e));
 
-			if ('_hostid' in broadcast_requirements || '_hostids' in broadcast_requirements) {
-				// Perform dynamic host switch when browser back/previous buttons are pressed.
-				window.addEventListener('popstate', this.events.popState);
-			}
-
-			if ('_timeperiod' in broadcast_requirements) {
-				jQuery.subscribe('timeselector.rangeupdate', this.events.timeSelectorRangeUpdate);
-			}
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, () => {
+				location.href = location.href;
+			});
 
 			jqBlink.blink();
-		},
+		}
 
-		edit() {
+		#edit() {
 			timeControl.disableAllSBox();
 
-			if ('_hostid' in this.broadcast_requirements) {
-				jQuery('#dashboard_hostid').off('change', this.events.dashboardHostChange);
+			if (CWidgetsData.DATA_TYPE_HOST_ID in this.#broadcast_requirements
+					|| CWidgetsData.DATA_TYPE_HOST_IDS in this.#broadcast_requirements) {
+				jQuery('#dashboard_hostid').off('change', this.#listeners.onDashboardHostChange);
 			}
 
 			document
@@ -183,35 +226,41 @@
 
 			document
 				.getElementById('dashboard-add')
-				.addEventListener('click', this.events.addClick);
+				.addEventListener('click', e => this.#onAddClick(e));
 
 			document
 				.getElementById('dashboard-save')
-				.addEventListener('click', () => this.save());
+				.addEventListener('click', () => this.#save());
 
 			document
 				.getElementById('dashboard-cancel')
-				.addEventListener('click', (e) => {
-					this.cancelEditing();
+				.addEventListener('click', e => {
+					this.#cancelEditing();
 					e.preventDefault();
-				}
-			);
+				});
 
-			ZABBIX.Dashboard.on(DASHBOARD_EVENT_BUSY, this.events.busy);
-			ZABBIX.Dashboard.on(DASHBOARD_EVENT_IDLE, this.events.idle);
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_BUSY, () => {
+				this.#is_busy = true;
+				this.#updateBusy();
+			});
 
-			this.enableNavigationWarning();
-		},
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_IDLE, () => {
+				this.#is_busy = false;
+				this.#updateBusy();
+			});
 
-		save() {
-			this.is_busy_saving = true;
-			this.updateBusy();
+			this.#enableNavigationWarning();
+		}
+
+		#save() {
+			this.#is_busy_saving = true;
+			this.#updateBusy();
 
 			const request_data = ZABBIX.Dashboard.save();
 
-			request_data.sharing = this.dashboard.sharing;
+			request_data.sharing = this.#dashboard.sharing;
 
-			if (this.clone) {
+			if (this.#clone) {
 				request_data.clone = '1';
 			}
 
@@ -239,7 +288,7 @@
 						postMessageDetails('success', response.success.messages);
 					}
 
-					this.disableNavigationWarning();
+					this.#disableNavigationWarning();
 
 					const curl = new Curl('zabbix.php');
 
@@ -267,7 +316,7 @@
 						messages = exception.error.messages;
 					}
 					else {
-						title = this.dashboard.dashboardid === null || this.clone
+						title = this.#dashboard.dashboardid === null || this.#clone
 							? <?= json_encode(_('Failed to create dashboard')) ?>
 							: <?= json_encode(_('Failed to update dashboard')) ?>;
 					}
@@ -277,137 +326,202 @@
 					addMessage(message_box);
 				})
 				.finally(() => {
-					this.is_busy_saving = false;
-					this.updateBusy();
+					this.#is_busy_saving = false;
+					this.#updateBusy();
 				});
-		},
+		}
 
-		updateBusy() {
-			document.getElementById('dashboard-save').disabled = this.is_busy || this.is_busy_saving;
-		},
+		#applyProperties() {
+			const dashboard_data = ZABBIX.Dashboard.getData();
 
-		cancelEditing() {
-			this.disableNavigationWarning();
+			document.getElementById('<?= CHtmlPage::PAGE_TITLE_ID ?>').textContent = dashboard_data.name;
+			document.getElementById('dashboard-direct-link').textContent = dashboard_data.name;
+		}
+
+		#cancelEditing() {
+			this.#disableNavigationWarning();
 
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
 
-			if (this.dashboard.dashboardid !== null) {
-				curl.setArgument('dashboardid', this.dashboard.dashboardid);
+			if (this.#dashboard.dashboardid !== null) {
+				curl.setArgument('dashboardid', this.#dashboard.dashboardid);
 			}
 			else {
 				curl.setArgument('cancel', '1');
 			}
 
 			location.replace(curl.getUrl());
-		},
+		}
 
-		enableNavigationWarning() {
-			window.addEventListener('beforeunload', this.events.beforeUnload, {passive: false});
-		},
+		#updateBusy() {
+			document.getElementById('dashboard-save').disabled = this.#is_busy || this.#is_busy_saving;
+		}
 
-		disableNavigationWarning() {
-			window.removeEventListener('beforeunload', this.events.beforeUnload);
-		},
+		#updateHistory(is_new = true)  {
+			const curl = new Curl('zabbix.php');
 
-		editItem(target, data) {
-			const overlay = PopUp('item.edit', data, {
-				dialogueid: 'item-edit',
-				dialogue_class: 'modal-popup-large',
-				trigger_element: target
+			curl.setArgument('action', 'dashboard.view');
+			curl.setArgument('dashboardid', this.#dashboard.dashboardid);
+
+			const state = {};
+
+			if (CWidgetsData.DATA_TYPE_HOST_ID in this.#broadcast_requirements
+					|| CWidgetsData.DATA_TYPE_HOST_IDS in this.#broadcast_requirements) {
+				const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
+
+				if (hosts.length > 0) {
+					curl.setArgument('hostid', hosts[0].id);
+
+					state.host = hosts[0];
+				}
+			}
+
+			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in this.#broadcast_requirements) {
+				curl.setArgument('from', this.#dashboard_time_period.from);
+				curl.setArgument('to', this.#dashboard_time_period.to);
+			}
+
+			const page = new Curl().getArgument('page');
+
+			if (page !== null) {
+				curl.setArgument('page', page);
+			}
+
+			if (is_new) {
+				history.pushState(state, '', curl.getUrl());
+			}
+			else {
+				history.replaceState(state, '', curl.getUrl());
+			}
+		}
+
+		#enableNavigationWarning() {
+			window.addEventListener('beforeunload', this.#listeners.onBeforeUnload, {passive: false});
+		}
+
+		#disableNavigationWarning() {
+			window.removeEventListener('beforeunload', this.#listeners.onBeforeUnload);
+		}
+
+		#onAddClick(e) {
+			const menu = [
+				{
+					items: [
+						{
+							label: <?= json_encode(_('Add widget')) ?>,
+							clickCallback: () => ZABBIX.Dashboard.addNewWidget()
+						},
+						{
+							label: <?= json_encode(_('Add page')) ?>,
+							clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
+						}
+					]
+				},
+				{
+					items: [
+						{
+							label: <?= json_encode(_('Paste widget')) ?>,
+							clickCallback: () => ZABBIX.Dashboard.pasteWidget(
+								ZABBIX.Dashboard.getStoredWidgetDataCopy()
+							),
+							disabled: ZABBIX.Dashboard.getStoredWidgetDataCopy() === null
+						},
+						{
+							label: <?= json_encode(_('Paste page')) ?>,
+							clickCallback: () => ZABBIX.Dashboard.pasteDashboardPage(
+								ZABBIX.Dashboard.getStoredDashboardPageDataCopy()
+							),
+							disabled: ZABBIX.Dashboard.getStoredDashboardPageDataCopy() === null
+						}
+					]
+				}
+			];
+
+			jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
+				position: {
+					of: e.target,
+					my: 'left top',
+					at: 'left bottom',
+					within: '.wrapper'
+				}
 			});
+		}
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
+		#onPopState(e) {
+			const host = (e.state !== null && 'host' in e.state) ? e.state.host : null;
 
-		editHost(hostid) {
-			const host_data = {hostid};
+			jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
-			this.openHostPopup(host_data);
-		},
+			this.#updateHistory(false);
 
-		openHostPopup(host_data) {
-			const original_url = location.href;
-
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
+			ZABBIX.Dashboard.broadcast({
+				[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
+					? [host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+				[CWidgetsData.DATA_TYPE_HOST_IDS]: host !== null
+					? [host.id]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS)
 			});
+		}
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
+		#onTimeSelectorRangeUpdate(e, data) {
+			this.#dashboard_time_period = data;
 
-		editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
+			this.#updateHistory(false);
+
+			if (this.#skip_time_selector_range_update) {
+				this.#skip_time_selector_range_update = false;
+
+				return;
+			}
+
+			const time_period = {
+				from: data.from,
+				from_ts: data.from_ts,
+				to: data.to,
+				to_ts: data.to_ts
+			};
+
+			CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
+
+			ZABBIX.Dashboard.broadcast({
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
+		}
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
+		#onFeedback(e) {
+			if (e.detail.type === CWidgetsData.DATA_TYPE_TIME_PERIOD && e.detail.value !== null) {
+				this.#skip_time_selector_range_update = true;
 
-		editTrigger(trigger_data) {
-			const overlay = PopUp('trigger.edit', trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		events: {
-			addClick(e) {
-				const menu = [
-					{
-						items: [
-							{
-								label: <?= json_encode(_('Add widget')) ?>,
-								clickCallback: () => ZABBIX.Dashboard.addNewWidget()
-							},
-							{
-								label: <?= json_encode(_('Add page')) ?>,
-								clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
-							}
-						]
-					},
-					{
-						items: [
-							{
-								label: <?= json_encode(_('Paste widget')) ?>,
-								clickCallback: () => ZABBIX.Dashboard.pasteWidget(
-									ZABBIX.Dashboard.getStoredWidgetDataCopy()
-								),
-								disabled: ZABBIX.Dashboard.getStoredWidgetDataCopy() === null
-							},
-							{
-								label: <?= json_encode(_('Paste page')) ?>,
-								clickCallback: () => ZABBIX.Dashboard.pasteDashboardPage(
-									ZABBIX.Dashboard.getStoredDashboardPageDataCopy()
-								),
-								disabled: ZABBIX.Dashboard.getStoredDashboardPageDataCopy() === null
-							}
-						]
-					}
-				];
-
-				jQuery(e.target).menuPopup(menu, new jQuery.Event(e), {
-					position: {
-						of: e.target,
-						my: 'left top',
-						at: 'left bottom',
-						within: '.wrapper'
-					}
+				$.publish('timeselector.rangechange', {
+					from: e.detail.value.from,
+					to: e.detail.value.to
 				});
+			}
+		}
+
+		#listeners = {
+			onDashboardHostChange: () => {
+				this.#updateHistory();
+
+				const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
+				const host = hosts.length > 0 ? hosts[0] : null;
+
+				ZABBIX.Dashboard.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: host !== null
+						? [host.id]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS)
+				});
+
+				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
 			},
 
-			beforeUnload(e) {
+			onBeforeUnload: e => {
 				if (ZABBIX.Dashboard.isUnsaved()) {
 					// Display confirmation message.
 					e.preventDefault();
@@ -415,69 +529,7 @@
 				}
 			},
 
-			popState(e) {
-				const host = (e.state !== null && 'host' in e.state) ? e.state.host : null;
-
-				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
-
-				ZABBIX.Dashboard.broadcast({
-					_hostid: host !== null ? host.id : null,
-					_hostids: host !== null ? [host.id] : null
-				});
-			},
-
-			dashboardHostChange() {
-				const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
-				const host = hosts.length ? hosts[0] : null;
-				const curl = new Curl('zabbix.php');
-
-				curl.setArgument('action', 'dashboard.view');
-
-				if (view.dashboard.dashboardid !== null) {
-					curl.setArgument('dashboardid', view.dashboard.dashboardid);
-				}
-
-				if ('_timeperiod' in view.broadcast_requirements) {
-					curl.setArgument('from', view.dashboard_time_period.from);
-					curl.setArgument('to', view.dashboard_time_period.to);
-				}
-
-				if (host !== null) {
-					curl.setArgument('hostid', host.id);
-				}
-
-				history.pushState({host: host}, '', curl.getUrl());
-
-				ZABBIX.Dashboard.broadcast({
-					_hostid: host !== null ? host.id : null,
-					_hostids: host !== null ? [host.id] : null
-				});
-
-				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
-			},
-
-			applyProperties() {
-				const dashboard_data = ZABBIX.Dashboard.getData();
-
-				document.getElementById('<?= CHtmlPage::PAGE_TITLE_ID ?>').textContent = dashboard_data.name;
-				document.getElementById('dashboard-direct-link').textContent = dashboard_data.name;
-			},
-
-			configurationOutdated() {
-				location.href = location.href;
-			},
-
-			busy() {
-				view.is_busy = true;
-				view.updateBusy();
-			},
-
-			idle() {
-				view.is_busy = false;
-				view.updateBusy();
-			},
-
-			elementSuccess(e) {
+			elementSuccess: e => {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -489,37 +541,58 @@
 				}
 
 				location.href = location.href;
-			},
-
-			timeSelectorRangeUpdate: (e, data) => {
-				view.dashboard_time_period = data;
-
-				if (view.skip_time_selector_range_update) {
-					view.skip_time_selector_range_update = false;
-
-					return;
-				}
-
-				ZABBIX.Dashboard.broadcast({
-					_timeperiod: {
-						from: data.from,
-						from_ts: data.from_ts,
-						to: data.to,
-						to_ts: data.to_ts
-					}
-				});
-			},
-
-			feedback(e) {
-				if (e.detail.type === '_timeperiod' && e.detail.value !== null) {
-					view.skip_time_selector_range_update = true;
-
-					$.publish('timeselector.rangechange', {
-						from: e.detail.value.from,
-						to: e.detail.value.to
-					});
-				}
 			}
+		};
+
+		editItem(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.#listeners.elementSuccess, {once: true});
+		}
+
+		editHost(hostid) {
+			const host_data = {hostid};
+
+			this.#openHostPopup(host_data);
+		}
+
+		#openHostPopup(host_data) {
+			const original_url = location.href;
+
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.#listeners.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		}
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.#listeners.elementSuccess, {once: true});
+		}
+
+		editTrigger(trigger_data) {
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.#listeners.elementSuccess, {once: true});
 		}
 	}
 </script>

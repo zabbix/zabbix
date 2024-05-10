@@ -66,6 +66,26 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		return parent::preventDefault($default_prevented);
 	}
 
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($strict) {
+			$value = $this->getValue();
+
+			if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value) && $value[self::FOREIGN_REFERENCE_KEY] === '') {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->getErrorLabel(),
+					_('referred widget is unavailable')
+				);
+			}
+		}
+
+		return $errors;
+	}
+
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
@@ -92,10 +112,6 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 			$validation_rules = ['type' => API_OBJECT, 'fields' => [
 				self::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8]
 			]];
-
-			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
-				self::setValidationRuleFlag($validation_rules['fields'][self::FOREIGN_REFERENCE_KEY], API_NOT_EMPTY);
-			}
 		}
 		else {
 			$validation_rules = parent::getValidationRules($strict);
