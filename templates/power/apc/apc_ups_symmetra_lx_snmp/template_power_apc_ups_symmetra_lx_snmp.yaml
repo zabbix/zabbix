@@ -991,7 +991,7 @@ zabbix_export:
             - uuid: 2db30af657574f8f9390002f94b7e249
               name: '{#EXTERNAL_SENSOR1_NAME}: Humidity sensor'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.7.1.1
+              snmp_oid: '1.3.6.1.4.1.318.1.1.25.1.2.1.7.{#SNMPINDEX}'
               key: 'external.sensor.humidity[uioSensorStatusHumidity.1.{#SNMPINDEX}]'
               history: 7d
               value_type: FLOAT
@@ -1013,7 +1013,7 @@ zabbix_export:
             - uuid: 6182750c55f24110b076d95c2cdbd1fa
               name: '{#EXTERNAL_SENSOR1_NAME}: Sensor alarm status'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.9.1.1
+              snmp_oid: '1.3.6.1.4.1.318.1.1.25.1.2.1.9.{#SNMPINDEX}'
               key: 'external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}]'
               history: 7d
               description: |
@@ -1062,7 +1062,7 @@ zabbix_export:
             - uuid: fc394520f4964a86ac93e87da2fc541b
               name: '{#EXTERNAL_SENSOR1_NAME}: Temperature sensor'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.1.6.1.1
+              snmp_oid: '1.3.6.1.4.1.318.1.1.25.1.2.1.6.{#SNMPINDEX}'
               key: 'external.sensor.temperature[uioSensorStatusTemperatureDegC.1.{#SNMPINDEX}]'
               history: 7d
               value_type: FLOAT
@@ -1104,7 +1104,7 @@ zabbix_export:
             - uuid: 5f5df15d6cc4455083f9fa6932d86656
               name: '{#EXTERNAL_SENSOR2_NAME}: Humidity sensor'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.7.1.1
+              snmp_oid: '1.3.6.1.4.1.318.1.1.25.1.2.2.7.{#SNMPINDEX}'
               key: 'external.sensor.humidity[uioSensorStatusHumidity.2.{#SNMPINDEX}]'
               history: 7d
               value_type: FLOAT
@@ -1126,7 +1126,7 @@ zabbix_export:
             - uuid: ecc2e5c49b004027bb9ccd5498e3d169
               name: '{#EXTERNAL_SENSOR2_NAME}: Sensor alarm status'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.9.1.1
+              snmp_oid: '1.3.6.1.4.1.318.1.1.25.1.2.2.9.{#SNMPINDEX}'
               key: 'external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}]'
               history: 7d
               description: |
@@ -1175,7 +1175,7 @@ zabbix_export:
             - uuid: f2cd5bb0c8a64b09868ddff9b14e4cbd
               name: '{#EXTERNAL_SENSOR2_NAME}: Temperature sensor'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.318.1.1.25.1.2.2.6.1.1
+              snmp_oid: '1.3.6.1.4.1.318.1.1.25.1.2.2.6.{#SNMPINDEX}'
               key: 'external.sensor.temperature[uioSensorStatusTemperatureDegC.2.{#SNMPINDEX}]'
               history: 7d
               value_type: FLOAT

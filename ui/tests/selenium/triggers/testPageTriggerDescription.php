@@ -95,7 +95,7 @@ class testPageTriggerDescription extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'description', false)) {
 			$row->query('xpath:.//button['.CXPathHelper::fromClass('zi-alert-with-content').']')->one()->click();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->one()->waitUntilReady();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->one()->waitUntilReady();
 			$this->assertEquals($data['description'], $overlay->getText());
 
 			// Check urls in description.

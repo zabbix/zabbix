@@ -3916,7 +3916,7 @@ static int	DBpatch_6050293(void)
 static int	DBpatch_6050294(void)
 {
 	zbx_db_row_t	row;
-	zbx_db_result_t	result;
+	zbx_db_result_t	result = NULL;
 	int		ret = SUCCEED;
 
 	if (NULL == (result = zbx_db_select("select userdirectory_mediaid,userdirectoryid,mediatypeid"
@@ -3966,6 +3966,7 @@ static int	DBpatch_6050294(void)
 			{
 				ret = FAIL;
 				zbx_free(select_sql);
+				zbx_db_free_result(result2);
 				goto out;
 			}
 			zbx_free(select_sql);
@@ -3986,6 +3987,8 @@ static int	DBpatch_6050294(void)
 				{
 					ret = FAIL;
 					zbx_free(update_sql);
+					zbx_db_free_result(result3);
+					zbx_db_free_result(result2);
 					goto out;
 				}
 				zbx_free(update_sql);
@@ -3996,9 +3999,9 @@ static int	DBpatch_6050294(void)
 
 		zbx_db_free_result(result2);
 	}
-
-	zbx_db_free_result(result);
 out:
+	zbx_db_free_result(result);
+
 	return ret;
 }
 

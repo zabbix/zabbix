@@ -13,7 +13,6 @@ zabbix_js_LDADD = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
@@ -28,6 +27,7 @@ zabbix_js_LDADD = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxbincommon/libzbxbincommon.a \
 	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a
 
 zabbix_js_LDADD += @ZBXJS_LIBS@ $(LIBXML2_LIBS)
