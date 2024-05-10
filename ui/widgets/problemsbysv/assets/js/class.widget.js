@@ -63,21 +63,24 @@ class CWidgetProblemsBySv extends CWidget {
 	setContents(response) {
 		super.setContents(response);
 
-		this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
+		if (this.getFields().show_type !== CWidgetProblemsBySv.SHOW_TOTALS) {
+			this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
 
-		if (this.#table_body !== null) {
-			if (this.#selected_host_group_id !== '') {
-				const row = this.#table_body.querySelector(`tr[data-hostgroupid="${this.#selected_host_group_id}"]`);
+			if (this.#table_body !== null) {
+				if (this.#selected_host_group_id !== '') {
+					const row = this.#table_body
+						.querySelector(`tr[data-hostgroupid="${this.#selected_host_group_id}"]`);
 
-				if (row !== null) {
-					this.#selectHostGroup();
+					if (row !== null) {
+						this.#selectHostGroup();
+					}
+					else {
+						this.#selected_host_group_id = '';
+					}
 				}
-				else {
-					this.#selected_host_group_id = '';
-				}
+
+				this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 			}
-
-			this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 		}
 	}
 
@@ -113,7 +116,7 @@ class CWidgetProblemsBySv extends CWidget {
 	}
 
 	hasPadding() {
-		return this._view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL
-			&& this._fields.show_type !== CWidgetProblemsBySv.SHOW_TOTALS;
+		return this.getViewMode() === ZBX_WIDGET_VIEW_MODE_NORMAL
+			&& this.getFields().show_type !== CWidgetProblemsBySv.SHOW_TOTALS;
 	}
 }
