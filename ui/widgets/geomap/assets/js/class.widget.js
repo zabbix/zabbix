@@ -317,7 +317,7 @@ class CWidgetGeoMap extends CWidget {
 	 */
 	#updateHintboxes() {
 		this._map._container.querySelectorAll('.marker-cluster').forEach((cluster) => {
-			if (cluster.hintBoxItem) {
+			if (cluster.hintBoxItem !== undefined) {
 				cluster.hintBoxItem[0].querySelectorAll('[data-hostid]').forEach((row) => {
 					row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostid === this.#selected_hostid);
 				});
@@ -325,7 +325,7 @@ class CWidgetGeoMap extends CWidget {
 		});
 
 		this._markers.eachLayer((marker) => {
-			if (marker.hintbox) {
+			if (marker.hintbox !== undefined) {
 				marker.hintbox[0].querySelectorAll('[data-hostid]').forEach((row) => {
 					row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostid === this.#selected_hostid);
 				});
