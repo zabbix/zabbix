@@ -308,15 +308,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			outline: none;
 		}
 
-		.filter-btn-container {
-			height: 29px;
-			z-index: 2;
-		}
-
 		.ui-tabs-nav {
-			height: 29px;
-			border-bottom: 0;
-
 			a {
 				display: inline-block;
 				box-sizing: border-box;

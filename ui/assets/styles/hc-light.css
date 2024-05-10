@@ -5060,17 +5060,11 @@ pre, pre a, pre td, pre span {
       vertical-align: top; }
     .host-dashboard-header-navigation .filter-space ul.ui-tabs-nav li:focus {
       outline: none; }
-    .host-dashboard-header-navigation .filter-space .filter-btn-container {
-      height: 29px;
-      z-index: 2; }
-    .host-dashboard-header-navigation .filter-space .ui-tabs-nav {
-      height: 29px;
-      border-bottom: 0; }
-      .host-dashboard-header-navigation .filter-space .ui-tabs-nav a {
-        display: inline-block;
-        box-sizing: border-box;
-        line-height: 22px;
-        text-align: center; }
+    .host-dashboard-header-navigation .filter-space .ui-tabs-nav a {
+      display: inline-block;
+      box-sizing: border-box;
+      line-height: 22px;
+      text-align: center; }
 
 .header-navigation {
   display: inline-block;
