@@ -74,25 +74,26 @@ window.item_history_column_edit = new class {
 		colorPalette.setThemeColors(colors);
 
 		// Initialize highlights table
-		$(this.#highlights_table).dynamicRows({
-			rows: highlights,
-			template: '#highlights-row-tmpl',
-			allow_empty: true,
-			dataCallback: (row_data) => {
-				if (!('color' in row_data)) {
-					const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
-					const used_colors = [];
+		$(this.#highlights_table)
+			.dynamicRows({
+				rows: highlights,
+				template: '#highlights-row-tmpl',
+				allow_empty: true,
+				dataCallback: (row_data) => {
+					if (!('color' in row_data)) {
+						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+						const used_colors = [];
 
-					for (const color of colors) {
-						if (color.value !== '') {
-							used_colors.push(color.value);
+						for (const color of colors) {
+							if (color.value !== '') {
+								used_colors.push(color.value);
+							}
 						}
-					}
 
-					row_data.color = colorPalette.getNextColor(used_colors);
+						row_data.color = colorPalette.getNextColor(used_colors);
+					}
 				}
-			}
-		})
+			})
 			.on('afteradd.dynamicRows', e => {
 				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
 
@@ -110,25 +111,26 @@ window.item_history_column_edit = new class {
 		document.getElementById('display').addEventListener('change', () => this.#updateForm());
 
 		// Initialize thresholds table
-		$(this.#$thresholds_table).dynamicRows({
-			rows: thresholds,
-			template: '#thresholds-row-tmpl',
-			allow_empty: true,
-			dataCallback: (row_data) => {
-				if (!('color' in row_data)) {
-					const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
-					const used_colors = [];
+		$(this.#$thresholds_table)
+			.dynamicRows({
+				rows: thresholds,
+				template: '#thresholds-row-tmpl',
+				allow_empty: true,
+				dataCallback: (row_data) => {
+					if (!('color' in row_data)) {
+						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+						const used_colors = [];
 
-					for (const color of colors) {
-						if (color.value !== '') {
-							used_colors.push(color.value);
+						for (const color of colors) {
+							if (color.value !== '') {
+								used_colors.push(color.value);
+							}
 						}
-					}
 
-					row_data.color = colorPalette.getNextColor(used_colors);
+						row_data.color = colorPalette.getNextColor(used_colors);
+					}
 				}
-			}
-		})
+			})
 			.on('afteradd.dynamicRows', e => {
 				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
 

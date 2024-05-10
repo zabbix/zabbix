@@ -157,18 +157,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 							$column['max_binary'] = $column['max'];
 						}
 
-						if (array_key_exists('thresholds', $column)) {
-							foreach ($column['thresholds'] as &$threshold) {
-								$number_parser_binary->parse($threshold['threshold']);
-								$threshold['threshold_binary'] = $number_parser_binary->calcValue();
-
-								$number_parser->parse($threshold['threshold']);
-								$threshold['threshold'] = $number_parser->calcValue();
-							}
-							unset($threshold);
-						}
-
 						$column['has_bar'] = true;
+					}
+
+					if (array_key_exists('thresholds', $column)) {
+						foreach ($column['thresholds'] as &$threshold) {
+							$number_parser_binary->parse($threshold['threshold']);
+							$threshold['threshold_binary'] = $number_parser_binary->calcValue();
+
+							$number_parser->parse($threshold['threshold']);
+							$threshold['threshold'] = $number_parser->calcValue();
+						}
+						unset($threshold);
 					}
 
 					foreach ($column['item_values'] as &$item_value) {

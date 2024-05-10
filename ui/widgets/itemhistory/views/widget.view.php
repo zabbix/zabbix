@@ -108,13 +108,13 @@ else {
 				case ITEM_VALUE_TYPE_FLOAT:
 				case ITEM_VALUE_TYPE_UINT64:
 					if (!$column['has_bar']) {
-						if (array_key_exists('threshold', $column)) {
+						if (array_key_exists('thresholds', $column)) {
 							foreach ($column['thresholds'] as $threshold) {
 								$threshold_value = $column['has_binary_units']
 									? $threshold['threshold_binary']
 									: $threshold['threshold'];
 
-								if ($column['value'] < $threshold_value) {
+								if ($item_value['value'] < $threshold_value) {
 									break;
 								}
 
