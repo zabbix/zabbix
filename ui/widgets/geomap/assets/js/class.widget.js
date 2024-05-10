@@ -316,14 +316,20 @@ class CWidgetGeoMap extends CWidget {
 	 * Function to update selected row in hintboxes.
 	 */
 	#updateHintboxes() {
-		this._map._container.parentNode.querySelectorAll('.marker-cluster').forEach((cluster) => {
-			$(cluster.hintBoxItem).find('.' + ZBX_STYLE_ROW_SELECTED).removeClass(ZBX_STYLE_ROW_SELECTED);
-			$(cluster.hintBoxItem).find(`[data-hostid="${this.#selected_hostid}"]`).addClass(ZBX_STYLE_ROW_SELECTED);
+		this._map._container.querySelectorAll('.marker-cluster').forEach((cluster) => {
+			if (cluster.hintBoxItem) {
+				cluster.hintBoxItem[0].querySelectorAll('[data-hostid]').forEach((row) => {
+					row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostid === this.#selected_hostid);
+				});
+			}
 		});
 
 		this._markers.eachLayer((marker) => {
-			$(marker.hintbox).find('.'+ZBX_STYLE_ROW_SELECTED).removeClass(ZBX_STYLE_ROW_SELECTED);
-			$(marker.hintbox).find(`[data-hostid="${this.#selected_hostid}"]`).addClass(ZBX_STYLE_ROW_SELECTED);
+			if (marker.hintbox) {
+				marker.hintbox[0].querySelectorAll('[data-hostid]').forEach((row) => {
+					row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostid === this.#selected_hostid);
+				});
+			}
 		});
 	}
 
