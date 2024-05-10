@@ -34,7 +34,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 			'versions' =>	'required|array'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateVersions();
 
 		if (!$ret) {
 			$this->setResponse(
@@ -47,6 +47,58 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 		}
 
 		return $ret;
+	}
+
+	private function validateVersions(): bool {
+		foreach ($this->getInput('versions') as $version) {
+			$validator = new CNewValidator($version, [
+				'version' =>				'required|not_empty|string',
+				'end_of_full_support' =>	'required|bool',
+				'latest_release' =>			'required|array'
+			]);
+
+			foreach ($validator->getAllErrors() as $error) {
+				error($error);
+			}
+
+			if ($validator->isErrorFatal() || $validator->isError()) {
+				return false;
+			}
+
+			if (!preg_match('/^\d+\.\d+$/', $version['version'])) {
+				error('Invalid version.');
+
+				return false;
+			}
+
+			$validator = new CNewValidator($version['latest_release'], [
+				'created' =>	'required|not_empty|string',
+				'release' =>	'required|not_empty|string'
+			]);
+
+			foreach ($validator->getAllErrors() as $error) {
+				error($error);
+			}
+
+			if ($validator->isErrorFatal() || $validator->isError()) {
+				return false;
+			}
+
+			if (!is_numeric($version['latest_release']['created'])
+					|| bccomp($version['latest_release']['created'], ZBX_MAX_DATE) > 0) {
+				error('Invalid timestamp.');
+
+				return false;
+			}
+
+			if (!preg_match('/^\d+\.\d+\.\d+(?:(alpha|beta|rc)\d+)?$/', $version['latest_release']['release'])) {
+				error('Invalid release version.');
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
