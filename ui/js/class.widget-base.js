@@ -1567,7 +1567,7 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Clear widget contents, messages and debug info, prior to displaying specific view defined by the framework.
+	 * Clear widget contents, messages and debug info.
 	 */
 	clearContents() {
 		this.onClearContents();
