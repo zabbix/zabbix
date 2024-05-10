@@ -10029,32 +10029,26 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			zbx_json_free(&json);
 
 			dst_item->timeout = 0;
+
 			break;
 		case ITEM_TYPE_BROWSER:
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
 			dst_item->params = zbx_strdup(NULL, src_item->itemtype.browseritem->script);
 
-			parameters = dc_item_parameters(src_item);
+			for (i = 0; i < src_item->itemtype.browseritem->params.values_num; i++)
+			{
+				zbx_dc_item_param_t	*params;
+
+				params = (zbx_dc_item_param_t*)(src_item->itemtype.browseritem->params.values[i]);
+				zbx_json_addstring(&json, params->name, params->value, ZBX_JSON_TYPE_STRING);
+			}
+
+			dst_item->script_params = zbx_strdup(NULL, json.buffer);
+			zbx_json_free(&json);
+
 			dst_item->timeout = 0;
 
-			if (NULL != parameters && 0 != parameters->values_num)
-			{
-				dst_item->parameters = (zbx_vector_tags_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_tags_ptr_t));
-
-				zbx_vector_tags_ptr_create(dst_item->parameters);
-				zbx_vector_tags_ptr_reserve(dst_item->parameters, parameters->values_num);
-
-				for (i = 0; i < parameters->values_num; i++)
-				{
-					zbx_dc_item_param_t	*param = (zbx_dc_item_param_t*)(parameters->values[i]);
-					zbx_tag_t		*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-
-					tag->tag = zbx_strdup(NULL, param->name);
-					tag->value = zbx_strdup(NULL, param->value);
-					zbx_vector_tags_ptr_append(dst_item->parameters, tag);
-				}
-			}
-			else
-				dst_item->parameters = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
 			zbx_strscpy(dst_item->username_orig, src_item->itemtype.telnetitem->username);
@@ -10105,20 +10099,12 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 
 		switch (items[i].type)
 		{
-			case ITEM_TYPE_BROWSER:
-				zbx_free(items[i].params);
-				if (NULL != items[i].parameters)
-				{
-					zbx_vector_tags_ptr_clear_ext(items[i].parameters, zbx_free_tag);
-					zbx_vector_tags_ptr_destroy(items[i].parameters);
-				}
-				zbx_free(items[i].parameters);
-				break;
 			case ITEM_TYPE_HTTPAGENT:
 				zbx_free(items[i].headers);
 				zbx_free(items[i].posts);
 				break;
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 				zbx_free(items[i].script_params);
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_DB_MONITOR:

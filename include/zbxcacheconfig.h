@@ -208,7 +208,6 @@ typedef struct
 	char			*error;
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;
-	zbx_vector_tags_ptr_t	*parameters;
 }
 zbx_dc_item_t;
 

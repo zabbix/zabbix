@@ -361,6 +361,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						0);
 				break;
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
@@ -369,16 +370,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].script_params,
 						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].params,
-						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				break;
-			case ITEM_TYPE_BROWSER:
-				if (ZBX_MACRO_EXPAND_NO == expand_macros)
-					break;
-
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].params,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
