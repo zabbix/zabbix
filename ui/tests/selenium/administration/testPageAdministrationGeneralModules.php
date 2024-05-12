@@ -68,6 +68,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Host availability' => 'Displays the host count by status (available/unavailable/unknown).',
 		'Host navigator' => 'Displays host hierarchy with ability to control other widgets based on selected host.',
 		'Item navigator' => 'Displays item hierarchy with ability to control other widgets based on selected item.',
+		'Item history' => 'Displays the latest data for the selected items with an option to add progress bar visualizations, '.
+				'customize report columns, and display images for binary data types.',
 		'Item value' => 'Displays the value of a single item prominently.',
 		'Map' => 'Displays either a single configured network map or one of the configured network maps in the map '.
 				'navigation tree.',
