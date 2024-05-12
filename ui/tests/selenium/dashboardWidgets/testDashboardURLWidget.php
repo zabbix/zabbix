@@ -234,7 +234,7 @@ class testDashboardURLWidget extends CWebTest {
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
 		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
-				->query('class:nothing-to-show')->one()->getText());
+				->query('class:no-data-message')->one()->getText());
 		$dashboard->getWidget(self::$default_widget)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
 		$form->fill(['Override host' => ''])->submit();
