@@ -651,19 +651,19 @@ class CWidgetGeoMap extends CWidget {
 			this._icons[severity] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(tmpl),
 				iconSize: [48, 64],
-				iconAnchor: [24, 32]
+				iconAnchor: [22, 44]
 			});
 
 			this._selected_icons[severity] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(selected_tmpl),
 				iconSize: [48, 64],
-				iconAnchor: [24, 32]
+				iconAnchor: [22, 44]
 			});
 
 			this._mouseover_icons[severity] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(mouseover_tmpl),
 				iconSize: [48, 64],
-				iconAnchor: [24, 32]
+				iconAnchor: [22, 44]
 			});
 		}
 	}
