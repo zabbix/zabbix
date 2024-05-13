@@ -63,8 +63,9 @@
 				can_edit_dashboards: true,
 				is_kiosk_mode: false,
 				broadcast_options: {
-					_hostid: {rebroadcast: false},
-					_timeperiod: {rebroadcast: true}
+					[CWidgetsData.DATA_TYPE_HOST_ID]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: {rebroadcast: false},
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: {rebroadcast: true}
 				}
 			});
 
@@ -76,15 +77,19 @@
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
 
+			const time_period = {
+				from: dashboard_time_period.from,
+				from_ts: dashboard_time_period.from_ts,
+				to: dashboard_time_period.to,
+				to_ts: dashboard_time_period.to_ts
+			};
+
+			CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
+
 			ZABBIX.Dashboard.broadcast({
-				_hostid: null,
-				_hostids: null,
-				_timeperiod: {
-					from: dashboard_time_period.from,
-					from_ts: dashboard_time_period.from_ts,
-					to: dashboard_time_period.to,
-					to_ts: dashboard_time_period.to_ts
-				}
+				[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+				[CWidgetsData.DATA_TYPE_HOST_IDS]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 
 			ZABBIX.Dashboard.activate();

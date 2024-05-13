@@ -239,7 +239,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
+		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
 	];
 
 	private $ITEM_TYPE_DRULE = [
@@ -257,7 +258,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
+		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
 	];
 
 	private $ITEM_VALUE_TYPE = [

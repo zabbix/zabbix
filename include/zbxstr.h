@@ -97,6 +97,7 @@ size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
+void	zbx_replace_invalid_utf8_and_nonprintable(char *text);
 
 void	zbx_dos2unix(char *str);
 

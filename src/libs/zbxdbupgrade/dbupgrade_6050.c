@@ -1557,7 +1557,7 @@ static char	*create_widget_reference(const zbx_vector_str_t *references)
 #undef FIRST_LETTER
 #undef REFERENCE_LEN
 
-static int	DBpatch_6050134(void)
+static int	add_widget_references(const char *widget_type_list)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1583,7 +1583,7 @@ static int	DBpatch_6050134(void)
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
 			NULL);
 
-	result = zbx_db_select("select widgetid from widget where type in ('graph','svggraph','graphprototype')");
+	result = zbx_db_select("select widgetid from widget where type in (%s)", widget_type_list);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1605,6 +1605,11 @@ static int	DBpatch_6050134(void)
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
+}
+
+static int	DBpatch_6050134(void)
+{
+	return add_widget_references("'graph','svggraph','graphprototype'");
 }
 
 static int	DBpatch_6050135(void)
@@ -4037,6 +4042,12 @@ static int	DBpatch_6050297(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050298(void)
+{
+	return add_widget_references("'geomap','map','plaintext','problemhosts','problems','problemsbysv','tophosts'"
+			",'web'");
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -4339,5 +4350,6 @@ DBPATCH_ADD(6050294, 0, 1)
 DBPATCH_ADD(6050295, 0, 1)
 DBPATCH_ADD(6050296, 0, 1)
 DBPATCH_ADD(6050297, 0, 1)
+DBPATCH_ADD(6050298, 0, 1)
 
 DBPATCH_END()

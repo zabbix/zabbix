@@ -44,7 +44,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	private static $testable_item_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+		ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 	];
 
 	/**
@@ -94,7 +94,7 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected $items_support_proxy = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-		ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+		ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 	];
 
 	/**
@@ -193,6 +193,10 @@ abstract class CControllerPopupItemTest extends CController {
 		],
 		'params_f' => [],
 		'script' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'browser_script' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
@@ -507,6 +511,10 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SCRIPT:
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'parameters', 'script', 'timeout']);
 				break;
+
+			case ITEM_TYPE_BROWSER:
+				$data_item += CArrayHelper::getByKeys($input, ['key', 'parameters', 'browser_script', 'timeout']);
+				break;
 		}
 
 		if (in_array($this->item_type, $this->items_support_proxy)) {
@@ -650,7 +658,7 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 		}
 
-		if ($this->item_type == ITEM_TYPE_SCRIPT) {
+		if (in_array($this->item_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 			return $interface_data;
 		}
 
@@ -1188,6 +1196,7 @@ abstract class CControllerPopupItemTest extends CController {
 			'params_es' => 'params',
 			'params_f' => 'params',
 			'script' => 'params',
+			'browser_script' => 'params',
 			'http_username' => 'username',
 			'http_password' => 'password',
 			'http_authtype' => 'authtype',

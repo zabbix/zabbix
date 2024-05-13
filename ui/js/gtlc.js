@@ -41,6 +41,7 @@ jQuery(function($) {
 			from: element.from.val(),
 			to: element.to.val()
 		},
+		prevent_history_updates = $container.data('prevent-history-updates') == 1,
 		ui_accessible = ($container.data('accessible') == 1),
 		ui_disabled = false;
 
@@ -247,7 +248,10 @@ jQuery(function($) {
 					delete request_data.fields_errors;
 				}
 				else {
-					updateUrlArguments(request_data.from, request_data.to);
+					if (!prevent_history_updates) {
+						updateUrlArguments(request_data.from, request_data.to);
+					}
+
 					$container
 						.find('.time-input-error')
 						.hide();

@@ -1145,7 +1145,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
-		const char *config_ssh_key_location, zbx_trapper_process_request_func_t trapper_process_request_cb,
+		const char *config_ssh_key_location, const char *config_webdriver_url,
+		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	int	ret = SUCCEED;
@@ -1232,7 +1233,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time,
 						zbx_get_program_type_cb(), progname, get_config_forks,
 						config_java_gateway, config_java_gateway_port, config_externalscripts,
-						zbx_get_value_internal_ext_cb, config_ssh_key_location);
+						zbx_get_value_internal_ext_cb, config_ssh_key_location,
+						config_webdriver_url);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
@@ -1336,7 +1338,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
-		const char *config_ssh_key_location, zbx_trapper_process_request_func_t trapper_process_request_cb,
+		const char *config_ssh_key_location, const char *config_webdriver_url,
+		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	ssize_t	bytes_received;
@@ -1348,7 +1351,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
-			trapper_process_request_cb, autoreg_update_host_cb);
+			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1452,6 +1455,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_enable_global_scripts,
 					trapper_args_in->zbx_get_value_internal_ext_cb,
 					trapper_args_in->config_ssh_key_location,
+					trapper_args_in->config_webdriver_url,
 					trapper_args_in->trapper_process_request_func_cb,
 					trapper_args_in->autoreg_update_host_cb);
 			sec = zbx_time() - sec;

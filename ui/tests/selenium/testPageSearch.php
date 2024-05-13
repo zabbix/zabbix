@@ -498,7 +498,7 @@ class testPageSearch extends CWebTest {
 
 			if ($expected_count === 0) {
 				$this->assertFalse($widget->query('xpath:.//div[@class="section-foot"]')->exists());
-				$this->assertEquals('No data found', $widget->query('class:nothing-to-show')->one()->getText());
+				$this->assertEquals('No data found', $widget->query('class:no-data-message')->one()->getText());
 			}
 			else {
 				$footer_text = $widget->query('xpath:.//div[@class="section-foot"]')->one()->getText();

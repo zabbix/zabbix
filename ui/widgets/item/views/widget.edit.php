@@ -44,6 +44,10 @@ $form
 	->addField(
 		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(2)
 	)
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
+		: null
+	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addFieldsGroup(
@@ -86,10 +90,6 @@ $form
 					)->setId('item-history-data-warning')
 				)
 			)
-	)
-	->addField($data['templateid'] === null
-		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
-		: null
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_item_form.init('.json_encode([

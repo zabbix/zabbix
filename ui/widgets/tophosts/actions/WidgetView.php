@@ -390,7 +390,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 
-			$rows[] = $row;
+			$rows[] = [
+				'columns' => $row,
+				'context' => ['hostid' => $hostid]
+			];
 		}
 
 		return [

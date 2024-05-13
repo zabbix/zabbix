@@ -97,6 +97,7 @@ class CSettingsHelper {
 	public const TIMEOUT_SSH_AGENT = 'timeout_ssh_agent';
 	public const TIMEOUT_TELNET_AGENT = 'timeout_telnet_agent';
 	public const TIMEOUT_SCRIPT = 'timeout_script';
+	public const TIMEOUT_BROWSER = 'timeout_browser';
 	public const SOFTWARE_UPDATE_CHECKID = 'software_update_checkid';
 	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
 
@@ -132,7 +133,7 @@ class CSettingsHelper {
 					'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider',
 					'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
 					'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
-					'timeout_script'
+					'timeout_script', 'timeout_browser'
 				]
 			]);
 

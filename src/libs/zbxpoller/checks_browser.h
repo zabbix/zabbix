@@ -24,6 +24,7 @@
 
 void	browseritem_es_engine_init(void);
 void	browseritem_es_engine_destroy(void);
-int	get_value_browser(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
+int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, const char *config_source_ip,
+		AGENT_RESULT *result);
 
 #endif

@@ -134,8 +134,9 @@
 					can_edit_dashboards: false,
 					is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 					broadcast_options: {
-						_hostid: {rebroadcast: false},
-						_timeperiod: {rebroadcast: true}
+						[CWidgetsData.DATA_TYPE_HOST_ID]: {rebroadcast: false},
+						[CWidgetsData.DATA_TYPE_HOST_IDS]: {rebroadcast: false},
+						[CWidgetsData.DATA_TYPE_TIME_PERIOD]: {rebroadcast: true}
 					},
 					csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 				});
@@ -148,15 +149,19 @@
 					ZABBIX.Dashboard.addDashboardPage(page);
 				}
 
+				const time_period = {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				};
+
+				CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
+
 				ZABBIX.Dashboard.broadcast({
-					_hostid: dashboard_host.hostid,
-					_hostids: [dashboard_host.hostid],
-					_timeperiod: {
-						from: dashboard_time_period.from,
-						from_ts: dashboard_time_period.from_ts,
-						to: dashboard_time_period.to,
-						to_ts: dashboard_time_period.to_ts
-					}
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [dashboard_host.hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [dashboard_host.hostid],
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 				});
 
 				ZABBIX.Dashboard.activate();
@@ -168,7 +173,7 @@
 				});
 			}
 
-			if ('_timeperiod' in broadcast_requirements) {
+			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {
 				jQuery.subscribe('timeselector.rangeupdate', (e, data) => this.#onTimeSelectorRangeUpdate(data));
 			}
 
@@ -317,18 +322,22 @@
 				return;
 			}
 
+			const time_period = {
+				from: data.from,
+				from_ts: data.from_ts,
+				to: data.to,
+				to_ts: data.to_ts
+			};
+
+			CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
+
 			ZABBIX.Dashboard.broadcast({
-				_timeperiod: {
-					from: data.from,
-					from_ts: data.from_ts,
-					to: data.to,
-					to_ts: data.to_ts
-				}
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 		}
 
 		#onFeedback(e) {
-			if (e.detail.type === '_timeperiod' && e.detail.value !== null) {
+			if (e.detail.type === CWidgetsData.DATA_TYPE_TIME_PERIOD && e.detail.value !== null) {
 				this.#skip_time_selector_range_update = true;
 
 				$.publish('timeselector.rangechange', {

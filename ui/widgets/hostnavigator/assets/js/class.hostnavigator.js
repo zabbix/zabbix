@@ -103,46 +103,32 @@ class CHostNavigator {
 			this.#reset();
 		}
 
-		if (hosts.length > 0) {
-			this.#maintenances = maintenances;
+		this.#maintenances = maintenances;
 
-			this.#prepareNodesStructure(hosts);
-			this.#prepareNodesProperties(this.#nodes);
+		this.#prepareNodesStructure(hosts);
+		this.#prepareNodesProperties(this.#nodes);
 
-			this.#navigation_tree = new CNavigationTree(this.#nodes, {
-				selected_id: this.#selected_host_id,
-				show_problems: this.#config.show_problems,
-				severities: this.#config.severities
-			});
+		this.#navigation_tree = new CNavigationTree(this.#nodes, {
+			selected_id: this.#selected_host_id,
+			show_problems: this.#config.show_problems,
+			severities: this.#config.severities
+		});
 
-			this.#container.classList.remove(ZBX_STYLE_NO_DATA);
-			this.#container.appendChild(this.#navigation_tree.getContainer());
+		this.#container.classList.remove(ZBX_STYLE_NO_DATA);
+		this.#container.appendChild(this.#navigation_tree.getContainer());
 
-			if (is_limit_exceeded) {
-				this.#createLimit(hosts.length);
-			}
-
-			this.#activateListeners();
-
-			const first_selected_host = this.#container.querySelector(
-				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
-			);
-
-			if (this.#selected_host_id !== '' && first_selected_host === null) {
-				this.#selected_host_id = '';
-
-				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
-					detail: {
-						_hostid: null
-					}
-				}));
-			}
+		if (is_limit_exceeded) {
+			this.#createLimit(hosts.length);
 		}
-		else {
-			this.#container.classList.add(ZBX_STYLE_NO_DATA);
-			this.#container.appendChild(
-				this.#setNoDataMessage(t('No data found'), null, ZBX_ICON_SEARCH_LARGE)
-			);
+
+		this.#activateListeners();
+
+		const first_selected_host = this.#container.querySelector(
+			`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
+		);
+
+		if (this.#selected_host_id !== '' && first_selected_host === null) {
+			this.#selected_host_id = '';
 		}
 	}
 
@@ -456,15 +442,13 @@ class CHostNavigator {
 	#registerListeners() {
 		this.#listeners = {
 			hostSelect: e => {
-				if (e.detail.id !== this.#selected_host_id) {
-					this.#selected_host_id = e.detail.id;
+				this.#selected_host_id = e.detail.id;
 
-					this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
-						detail: {
-							_hostid: e.detail.id
-						}
-					}));
-				}
+				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
+					detail: {
+						hostid: e.detail.id
+					}
+				}));
 			},
 
 			groupToggle: e => {
@@ -525,30 +509,5 @@ class CHostNavigator {
 		this.#navigation_tree = null;
 		this.#nodes = [];
 		this.#maintenances = {};
-	}
-
-	#setNoDataMessage(message, description = null, icon = null) {
-		const container = document.createElement('div');
-
-		const message_container = document.createElement('div');
-		message_container.classList.add(ZBX_STYLE_NO_DATA_MESSAGE);
-		message_container.innerText = message;
-
-		if (icon !== null) {
-			container.classList.add(ZBX_STYLE_NO_DATA_FOUND);
-			message_container.classList.add(icon);
-		}
-
-		container.appendChild(message_container);
-
-		if (description !== null) {
-			const description_container = document.createElement('div');
-			description_container.classList.add(ZBX_STYLE_NO_DATA_DESCRIPTION);
-			description_container.innerText = description;
-
-			container.appendChild(description_container);
-		}
-
-		return container;
 	}
 }

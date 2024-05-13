@@ -35,10 +35,10 @@ Refer to the vendor documentation.
 |{$PSU_OK_STATUS}||`1`|
 |{$FAN_OK_STATUS}||`1`|
 |{$MEMORY.UTIL.MAX}||`90`|
-|{$SNMP.TIMEOUT}||`5m`|
-|{$ICMP_LOSS_WARN}||`20`|
-|{$ICMP_RESPONSE_TIME_WARN}||`0.15`|
-|{$IF.ERRORS.WARN}||`2`|
+|{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
+|{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
+|{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
+|{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$IF.UTIL.MAX}||`90`|
 |{$IFCONTROL}||`1`|
 |{$NET.IF.IFNAME.MATCHES}||`^.*$`|
@@ -58,15 +58,15 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Dell Force S-Series: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Dell Force S-Series: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>Time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Dell Force S-Series: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Dell Force S-Series: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
-|Dell Force S-Series: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Dell Force S-Series: System location|<p>MIB: SNMPv2-MIB</p><p>Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Dell Force S-Series: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Dell Force S-Series: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Dell Force S-Series: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Dell Force S-Series: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Dell Force S-Series: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
+|Dell Force S-Series: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
 |Dell Force S-Series: ICMP ping||Simple check|icmpping|
 |Dell Force S-Series: ICMP loss||Simple check|icmppingloss|
 |Dell Force S-Series: ICMP response time||Simple check|icmppingsec|
@@ -80,7 +80,7 @@ Refer to the vendor documentation.
 |Dell Force S-Series: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Dell Force S-Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Dell Force S-Series: Unavailable by ICMP ping</li></ul>|
 |Dell Force S-Series: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Dell Force S-Series by SNMP/icmpping,#3)=0`|High||
 |Dell Force S-Series: High ICMP ping loss||`min(/Dell Force S-Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell Force S-Series by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Dell Force S-Series: Unavailable by ICMP ping</li></ul>|
-|Dell Force S-Series: High ICMP ping response time||`avg(/Dell Force S-Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Dell Force S-Series: High ICMP ping loss</li><li>Dell Force S-Series: Unavailable by ICMP ping</li></ul>|
+|Dell Force S-Series: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Dell Force S-Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Dell Force S-Series: High ICMP ping loss</li><li>Dell Force S-Series: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule CPU and Memory and Flash Discovery
 
@@ -190,7 +190,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
+|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
 |Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Dell Force S-Series by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/Dell Force S-Series by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Dell Force S-Series by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Dell Force S-Series by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Dell Force S-Series by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Dell Force S-Series by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Dell Force S-Series by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
@@ -211,7 +211,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling</p>|`last(/Dell Force S-Series by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
+|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/Dell Force S-Series by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

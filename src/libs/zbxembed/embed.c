@@ -390,6 +390,7 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 
 	duk_destroy_heap(es->env->ctx);
 	zbx_es_debug_disable(es);
+	zbx_free(es->env->browser_endpoint);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
@@ -627,7 +628,17 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 					*error = zbx_strdup(*error, "could not convert return value to utf8");
 				}
 				else
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
+				{
+					if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%.*s'", __func__, 512,
+								output);
+					}
+				}
 
 				if (SUCCEED == ret && NULL != script_ret)
 					*script_ret = output;
@@ -662,8 +673,9 @@ out:
 	duk_gc(es->env->ctx, 0);
 	duk_gc(es->env->ctx, 0);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated or requested "
-			"memory: " ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T
+			" max allocated or requested memory: " ZBX_FS_SIZE_T " max allowed memory: %d",
+			__func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error), (zbx_fs_size_t)es->env->total_alloc,
 			(zbx_fs_size_t)es->env->max_total_alloc, ZBX_ES_MEMORY_LIMIT);
 	es->env->max_total_alloc = 0;
@@ -794,7 +806,62 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
 		return NULL;
 
 	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
+	duk_pop_2(ctx);
 
 	return env;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: call base class prototype with arguments                          *
+ *                                                                            *
+ * Parameters: ctx  - [IN] duktape context                                    *
+ *             base - [IN] base class name                                    *
+ *             args - [IN] number of prototype arguments on stack             *
+ *                                                                            *
+ * Return value: 0                                                            *
+ *                                                                            *
+ ******************************************************************************/
+duk_ret_t	es_super(duk_context *ctx, const char *base, int args)
+{
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	duk_get_global_string(ctx, base);
+	duk_push_this(ctx);
+
+	for (int i = 0; i < args; i++)
+		duk_dup(ctx, i);
+
+	env->constructor_chain = 1;
+	duk_call_method(ctx, args);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the method is called from constructor chain              *
+ *                                                                            *
+ * Parameters: ctx  - [IN] duktape context                                    *
+ *                                                                            *
+ * Return value: !0 - method is called from constructor chain                 *
+ *                0 - otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	es_is_chained_constructor_call(duk_context *ctx)
+{
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	int	constructor_chain = env->constructor_chain;
+
+	env->constructor_chain = 0;
+
+	return constructor_chain || duk_is_constructor_call(env->ctx);
+}
+

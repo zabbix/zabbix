@@ -113,16 +113,18 @@ $zi-user: "\ea6e";
 $zi-users-filled: "\ea6f";
 $zi-users: "\ea70";
 $zi-widget-add: "\ea71";
-$zi-widget-resize: "\ea72";
-$zi-wrench-alt: "\ea73";
-$zi-wrench: "\ea74";
+$zi-widget-awaiting-data-large: "\ea72";
+$zi-widget-empty-references-large: "\ea73";
+$zi-widget-resize: "\ea74";
+$zi-wrench-alt: "\ea75";
+$zi-wrench: "\ea76";
 
 @font-face {
 	font-family: "zabbix-icons";
-	src: url("#{$icons-path}zabbix-icons.woff2?t=1715075175395") format("woff2"),
-	url("#{$icons-path}zabbix-icons.woff?t=1715075175395") format("woff"),
-	url('#{$icons-path}zabbix-icons.ttf?t=1715075175395') format('truetype'),
-	url('#{$icons-path}zabbix-icons.svg?t=1715075175395#zabbix-icons') format('svg');
+	src: url("#{$icons-path}zabbix-icons.woff2?t=1715610469019") format("woff2"),
+	url("#{$icons-path}zabbix-icons.woff?t=1715610469019") format("woff"),
+	url('#{$icons-path}zabbix-icons.ttf?t=1715610469019') format('truetype'),
+	url('#{$icons-path}zabbix-icons.svg?t=1715610469019#zabbix-icons') format('svg');
 }
 
 %icons-font {
@@ -263,7 +265,9 @@ $zi-wrench: "\ea74";
 .zi-users-filled:before { content: "\ea6f"; }
 .zi-users:before { content: "\ea70"; }
 .zi-widget-add:before { content: "\ea71"; }
-.zi-widget-resize:before { content: "\ea72"; }
-.zi-wrench-alt:before { content: "\ea73"; }
-.zi-wrench:before { content: "\ea74"; }
+.zi-widget-awaiting-data-large:before { content: "\ea72"; }
+.zi-widget-empty-references-large:before { content: "\ea73"; }
+.zi-widget-resize:before { content: "\ea74"; }
+.zi-wrench-alt:before { content: "\ea75"; }
+.zi-wrench:before { content: "\ea76"; }
 

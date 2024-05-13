@@ -104,6 +104,13 @@ class CWidgetPieChart extends CWidget {
 		});
 	}
 
+	onClearContents() {
+		if (this.#pie_chart !== null) {
+			this.#pie_chart.destroy();
+			this.#pie_chart = null;
+		}
+	}
+
 	#showLegend(legend, total_item) {
 		this.#removeLegend();
 

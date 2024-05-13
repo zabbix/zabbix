@@ -1564,7 +1564,7 @@ zabbix_export:
                 - Green
                 - Yellow
                 - Red
-
+                
               valuemap:
                 name: 'Sensor health status'
               preprocessing:

@@ -192,7 +192,7 @@ $formgrid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('js-item-script-label'),
 		(new CFormField(
-			(new CMultilineInput('script', $item['params'], [
+			(new CMultilineInput('script', $item['script'], [
 				'title' => _('JavaScript'),
 				'placeholder' => _('script'),
 				'placeholder_textarea' => 'return value',
@@ -204,6 +204,24 @@ $formgrid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('js-item-script-field')
+	])
+	->addItem([
+		(new CLabel(_('Script'), 'browser_script'))
+			->setAsteriskMark()
+			->setId('js-item-browser-script-label'),
+		(new CFormField(
+			(new CMultilineInput('browser_script', $item['browser_script'], [
+				'title' => _('JavaScript'),
+				'placeholder' => _('script'),
+				'placeholder_textarea' => 'return value',
+				'grow' => 'auto',
+				'rows' => 0,
+				'maxlength' => DB::getFieldLength('items', 'params'),
+				'readonly' => $readonly
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-browser-script-field')
 	])
 	->addItem([
 		(new CLabel(_('Request type'), 'label-request-method'))->setId('js-item-request-method-label'),
@@ -575,7 +593,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-executed-script-label'),
 		(new CFormField(
-			(new CTextArea('params_es', $item['params']))
+			(new CTextArea('params_es', $item['params_es']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -588,7 +606,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-sql-query-label'),
 		(new CFormField(
-			(new CTextArea('params_ap', $item['params']))
+			(new CTextArea('params_ap', $item['params_ap']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -601,7 +619,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-formula-label'),
 		(new CFormField(
-			(new CTextArea('params_f', $item['params']))
+			(new CTextArea('params_f', $item['params_f']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -667,7 +685,7 @@ $formgrid
 /**
  * Append timeout field to form list for item types:
  * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
- * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
  */
 $edit_source_timeouts_link = null;
 $custom_timeout_enabled = $item['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;

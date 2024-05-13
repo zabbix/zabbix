@@ -149,7 +149,7 @@ window.proxy_edit_popup = new class {
 
 		for (const id of ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script']) {
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser']) {
 			document.getElementById(id).disabled = custom_timeouts_disabled;
 		}
 	}
@@ -216,7 +216,8 @@ window.proxy_edit_popup = new class {
 		for (const name of ['name', 'local_address', 'local_port', 'allowed_addresses', 'address', 'port',
 				'description', 'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'timeout_zabbix_agent',
 				'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script']) {
+				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script',
+				'timeout_browser']) {
 			if (name in fields) {
 				fields[name] = fields[name].trim();
 			}

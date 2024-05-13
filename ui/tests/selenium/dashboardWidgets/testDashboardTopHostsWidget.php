@@ -264,7 +264,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		);
 
 		$thresholds_icon->click();
-		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
 		$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
 		$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint_dialog->waitUntilNotPresent();

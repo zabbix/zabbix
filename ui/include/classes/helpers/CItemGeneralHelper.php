@@ -25,9 +25,23 @@ class CItemGeneralHelper {
 	 * Get item fields default values.
 	 */
 	public static function getDefaults(): array {
+		// Default script value for browser type items.
+		$browser_script = <<<'JAVASCRIPT'
+var browser = new Browser(Browser.chromeOptions());
+
+try {
+	browser.navigate("http://example.com");
+	browser.collectPerfEntries();
+}
+finally {
+	return JSON.stringify(browser.getResult());
+}
+JAVASCRIPT;
+
 		return [
 			'allow_traps' => DB::getDefault('items', 'allow_traps'),
 			'authtype' => DB::getDefault('items', 'authtype'),
+			'browser_script' => $browser_script,
 			'custom_timeout' => ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED,
 			'delay_flex' => [],
 			'delay' => ZBX_ITEM_DELAY_DEFAULT,
@@ -53,7 +67,6 @@ class CItemGeneralHelper {
 			'name' => '',
 			'output_format' => DB::getDefault('items', 'output_format'),
 			'parameters' => [],
-			'params' => [],
 			'params_ap' => DB::getDefault('items', 'params'),
 			'params_es' => DB::getDefault('items', 'params'),
 			'params_f' => DB::getDefault('items', 'params'),
@@ -263,6 +276,23 @@ class CItemGeneralHelper {
 			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
 		}
 
+		$params_field = [
+			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_BROWSER => 'browser_script',
+			ITEM_TYPE_SSH => 'params_es',
+			ITEM_TYPE_TELNET => 'params_es',
+			ITEM_TYPE_DB_MONITOR => 'params_ap',
+			ITEM_TYPE_CALCULATED => 'params_f'
+		];
+
+		if (array_key_exists($item['type'], $params_field)) {
+			$field = $params_field[$item['type']];
+			$item[$field] = $item['params'];
+			$item['params'] = '';
+		}
+
+		$item += static::getDefaults();
+
 		return $item;
 	}
 
@@ -358,6 +388,21 @@ class CItemGeneralHelper {
 			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $input['delay_flex']);
 		}
 
+		$params_field = [
+			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_BROWSER => 'browser_script',
+			ITEM_TYPE_SSH => 'params_es',
+			ITEM_TYPE_TELNET => 'params_es',
+			ITEM_TYPE_DB_MONITOR => 'params_ap',
+			ITEM_TYPE_CALCULATED => 'params_f'
+		];
+		$input['params'] = '';
+
+		if (array_key_exists($input['type'], $params_field)) {
+			$field = $params_field[$input['type']];
+			$input['params'] = $input[$field];
+		}
+
 		return CArrayHelper::renameKeys($input, $field_map);
 	}
 
@@ -402,20 +447,6 @@ class CItemGeneralHelper {
 		};
 
 		$input['delay_flex'] = $custom_intervals;
-		$params_field = [
-			ITEM_TYPE_SCRIPT => 'script',
-			ITEM_TYPE_SSH => 'params_es',
-			ITEM_TYPE_TELNET => 'params_es',
-			ITEM_TYPE_DB_MONITOR => 'params_ap',
-			ITEM_TYPE_CALCULATED => 'params_f'
-		];
-		$input['params'] = '';
-
-		if (array_key_exists($input['type'], $params_field)) {
-			$field = $params_field[$input['type']];
-			$input['params'] = $input[$field];
-		}
-
 		$query_fields = [];
 		$headers = [];
 
@@ -435,7 +466,7 @@ class CItemGeneralHelper {
 			CArrayHelper::sort($query_fields, ['sortorder']);
 			CArrayHelper::sort($headers, ['sortorder']);
 		}
-		else if ($input['type'] == ITEM_TYPE_SCRIPT) {
+		elseif (in_array($input['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 			$parameters = [];
 
 			foreach ($input['parameters'] as $parameter) {

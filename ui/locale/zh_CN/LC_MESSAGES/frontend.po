@@ -15905,6 +15905,10 @@ msgstr "请扫描并填写您的身份验证器app中的验证码。"
 msgid "Please select two elements"
 msgstr "请选择两个组件"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16724,6 +16728,10 @@ msgstr "引用属性"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
 msgstr ""
 
 #: app/views/administration.user.edit.php:309
@@ -21046,6 +21054,10 @@ msgstr "仅未确认的"
 msgid "Unavailable"
 msgstr "不可用"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "解锁"
@@ -25143,6 +25155,11 @@ msgstr "引用不存在的树状元素"
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "引用的对象不存在"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

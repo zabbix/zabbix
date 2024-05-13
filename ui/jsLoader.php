@@ -37,6 +37,7 @@ $available_js = [
 	'class.dashboard.page.js' => '',
 	'class.dashboard.print.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
+	'class.widgets-data.js' => '',
 	'class.widget-base.js' => '',
 	'class.widget.js' => '',
 	'class.widget.inaccessible.js' => '',
@@ -150,7 +151,6 @@ $translate_strings = [
 		'Page %1$d' => _('Page %1$d'),
 		'Paste widget' => _('Paste widget'),
 		'Properties' => _('Properties'),
-		'Referred widget became unavailable. Please update configuration.' => _('Referred widget became unavailable. Please update configuration.'),
 		'Start slideshow' => _('Start slideshow'),
 		'Stop slideshow' => _('Stop slideshow')
 	],
@@ -192,6 +192,8 @@ $translate_strings = [
 			_('Widget is too small for the specified number of columns and rows.')
 	],
 	'class.widget.misconfigured.js' => [
+		'Please update configuration' => _('Please update configuration'),
+		'Referred widget is unavailable' => _('Referred widget is unavailable'),
 		'Refresh interval' => _('Refresh interval')
 	],
 	'class.widget-select.popup.js' => [
@@ -202,8 +204,12 @@ $translate_strings = [
 	'class.widget-field.multiselect.js' => [
 		'Dashboard' => _('Dashboard'),
 		'Widget' => _('Widget'),
+		'Unavailable widget' => _('Unavailable widget'),
 		'Dashboard is used as data source.' => _('Dashboard is used as data source.'),
 		'Another widget is used as data source.' => _('Another widget is used as data source.')
+	],
+	'class.widget-field.time-period.js' => [
+		'Unavailable widget' => _('Unavailable widget')
 	],
 	'functions.js' => [
 		'Error' => _('Error'),
