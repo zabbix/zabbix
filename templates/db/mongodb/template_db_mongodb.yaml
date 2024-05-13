@@ -2848,7 +2848,7 @@ zabbix_export:
             - name: General
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2861,7 +2861,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2874,7 +2874,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2887,7 +2887,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2900,7 +2900,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graph
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2913,7 +2913,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   'y': '25'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2926,7 +2926,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graph
                   'y': '30'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2939,7 +2939,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graph
                   'y': '35'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2952,7 +2952,7 @@ zabbix_export:
                       value: AAAAH
                 - type: graph
                   'y': '40'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2966,7 +2966,7 @@ zabbix_export:
             - name: Collections
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2982,7 +2982,7 @@ zabbix_export:
                       value: AAAAJ
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2998,7 +2998,7 @@ zabbix_export:
                       value: AAAAK
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3014,7 +3014,7 @@ zabbix_export:
                       value: AAAAL
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3031,7 +3031,7 @@ zabbix_export:
             - name: Databases
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3047,7 +3047,7 @@ zabbix_export:
                       value: AAAAN
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3064,7 +3064,7 @@ zabbix_export:
             - name: Replication
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

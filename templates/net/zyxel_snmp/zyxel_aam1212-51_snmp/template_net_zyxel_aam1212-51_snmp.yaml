@@ -1080,7 +1080,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER

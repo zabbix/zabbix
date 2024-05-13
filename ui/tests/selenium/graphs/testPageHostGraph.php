@@ -753,7 +753,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->assertEquals('No data found', $this->query('class:nothing-to-show')->one()->getText());
+			$this->assertEquals('No data found', $this->query('class:no-data-message')->one()->getText());
 		}
 	}
 

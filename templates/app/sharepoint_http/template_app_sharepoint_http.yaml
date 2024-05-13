@@ -497,7 +497,7 @@ zabbix_export:
             - name: General
               widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -513,7 +513,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -528,8 +528,8 @@ zabbix_export:
                       name: source_type
                       value: '1'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM

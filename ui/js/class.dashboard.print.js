@@ -49,8 +49,6 @@ class CDashboardPrint extends CDashboard {
 			cell_height: this._cell_height,
 			max_columns: this._max_columns,
 			max_rows: this._max_rows,
-			widget_min_rows: this._widget_min_rows,
-			widget_max_rows: this._widget_max_rows,
 			widget_defaults: this._widget_defaults,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
@@ -61,10 +59,9 @@ class CDashboardPrint extends CDashboard {
 		this._dashboard_pages.set(dashboard_page, {is_ready: false});
 
 		for (const widget_data of widgets) {
-			dashboard_page.addWidgetFromData({
+			this.addWidgetFromData(dashboard_page, {
 				...widget_data,
-				is_new: false,
-				unique_id: this._createUniqueId()
+				is_new: false
 			});
 		}
 

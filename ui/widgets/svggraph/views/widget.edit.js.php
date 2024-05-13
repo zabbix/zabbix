@@ -935,7 +935,7 @@ window.widget_svggraph_form = new class {
 				context: 'dashboard',
 				event_type: 'broadcast',
 				reference,
-				type: '_timeperiod'
+				type: CWidgetsData.DATA_TYPE_TIME_PERIOD
 			});
 		}
 
@@ -944,7 +944,7 @@ window.widget_svggraph_form = new class {
 				context: 'dashboard',
 				event_type: 'broadcast',
 				reference: CDashboard.REFERENCE_DASHBOARD,
-				type: '_timeperiod'
+				type: CWidgetsData.DATA_TYPE_TIME_PERIOD
 			});
 		}
 
@@ -959,7 +959,7 @@ window.widget_svggraph_form = new class {
 			context: 'dashboard',
 			event_type: 'broadcast',
 			reference: CDashboard.REFERENCE_DASHBOARD,
-			type: '_hostid'
+			type: CWidgetsData.DATA_TYPE_HOST_ID
 		});
 	}
 };

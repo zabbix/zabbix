@@ -39,6 +39,7 @@ class CWidgetsData {
 	public const DATA_TYPE_HOST_ID =			'_hostid';
 	public const DATA_TYPE_HOST_IDS =			'_hostids';
 	public const DATA_TYPE_ITEM_ID =			'_itemid';
+	public const DATA_TYPE_ITEM_IDS =			'_itemids';
 	public const DATA_TYPE_ITEM_PROTOTYPE_ID =	'_itemprototypeid';
 	public const DATA_TYPE_GRAPH_ID =			'_graphid';
 	public const DATA_TYPE_GRAPH_PROTOTYPE_ID =	'_graphprototypeid';
@@ -85,6 +86,12 @@ class CWidgetsData {
 					'field_class' => CWidgetFieldMultiSelectItem::class,
 					'label' => _('Item'),
 					'is_multiple' => false,
+					'accepts_dashboard' => false
+				],
+				self::DATA_TYPE_ITEM_IDS => [
+					'field_class' => CWidgetFieldMultiSelectItem::class,
+					'label' => _('Item'),
+					'is_multiple' => true,
 					'accepts_dashboard' => false
 				],
 				self::DATA_TYPE_ITEM_PROTOTYPE_ID => [

@@ -353,7 +353,6 @@ class CWidgetIterator extends CWidget {
 			dashboard_page: this._dashboard_page,
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
-			min_rows: this._min_rows,
 			is_editable: false,
 			is_edit_mode: false,
 			unique_id: this._createUniqueId()
@@ -428,8 +427,7 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_updateTooSmallState() {
-		const is_too_small = this._pos.width < this._fields.columns
-			|| this._pos.height < this._fields.rows * this._min_rows;
+		const is_too_small = this._pos.width < this._fields.columns || this._pos.height < this._fields.rows;
 
 		this._target.classList.toggle('iterator-too-small', is_too_small);
 	}

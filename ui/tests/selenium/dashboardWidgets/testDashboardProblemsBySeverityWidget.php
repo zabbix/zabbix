@@ -1557,7 +1557,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 		// Check that nothing is returned in the widget if such outcome is expected.
 		if (CTestArrayHelper::get($data, 'check.empty', false)) {
-			$this->assertTrue($widget->query('class:nothing-to-show')->one()->isTextPresent('No data found'));
+			$this->assertTrue($widget->query('class:no-data-message')->one()->isTextPresent('No data found'));
 
 			return;
 		}

@@ -106,10 +106,17 @@ window.popup_import = new class {
 	}
 
 	confirmSubmit(compare_overlay) {
+		const message = document.getElementById('rules_preset').value === 'template'
+			? <?= json_encode(
+				_('Any existing template entities not present in the import file will be deleted. Click OK to proceed.')
+			) ?>
+			: <?= json_encode(
+				_('Any existing host entities not present in the import file will be deleted. Click OK to proceed.')
+			) ?>;
+
 		overlayDialogue({
 			class: 'position-middle',
-			content: document.createElement('span')
-				.innerText = (<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
+			content: document.createElement('span').innerText = message,
 			buttons: [
 				{
 					title: <?= json_encode(_('OK')) ?>,

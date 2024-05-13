@@ -1329,7 +1329,7 @@ zabbix_export:
             - name: Network
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1345,7 +1345,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -1361,7 +1361,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1378,7 +1378,7 @@ zabbix_export:
             - name: Resources
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1394,7 +1394,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1411,7 +1411,7 @@ zabbix_export:
             - name: 'Sessions traffic'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -748,7 +748,7 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -764,7 +764,7 @@ zabbix_export:
                       value: AAAEB
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -784,7 +784,7 @@ zabbix_export:
             - widgets:
                 - type: graph
                   name: 'CPU load'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -798,7 +798,7 @@ zabbix_export:
                 - type: graph
                   name: 'Memory usage'
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -811,7 +811,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -827,8 +827,8 @@ zabbix_export:
                       value: AAAEA
                 - type: graph
                   name: 'CPU utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

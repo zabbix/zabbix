@@ -1731,7 +1731,7 @@ zabbix_export:
               widgets:
                 - type: graph
                   name: 'cpu utilization'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1745,7 +1745,7 @@ zabbix_export:
                 - type: graphprototype
                   name: 'disk space usage'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1761,8 +1761,8 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   name: 'memory utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1778,9 +1778,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: 'network traffic'
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

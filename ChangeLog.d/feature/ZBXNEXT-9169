@@ -1,1 +1,0 @@
-..F....... [ZBXNEXT-9169] changed the default state of the interpolation checkbox and its state when less than two thresholds are present; modified the cell background color when interpolation is enabled and the cell value is below the threshold (epulke)

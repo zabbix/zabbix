@@ -1922,7 +1922,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: Utilization
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1940,7 +1940,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Best loss'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1957,7 +1957,7 @@ zabbix_export:
                 - type: graphprototype
                   name: 'Packets summary'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1973,8 +1973,8 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   name: 'Bytes summary'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1992,7 +1992,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Path overview'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -1389,7 +1389,7 @@ zabbix_export:
               widgets:
                 - type: graph
                   name: Voltage
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1403,7 +1403,7 @@ zabbix_export:
                 - type: graph
                   name: 'Capacity of the UPS batteries'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1416,8 +1416,8 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   name: Output
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

@@ -59,8 +59,6 @@ class CDashboard {
 		cell_height,
 		max_columns,
 		max_rows,
-		widget_min_rows,
-		widget_max_rows,
 		widget_defaults,
 		widget_last_type = null,
 		configuration_hash = null,
@@ -99,8 +97,6 @@ class CDashboard {
 		this._cell_height = cell_height;
 		this._max_columns = max_columns;
 		this._max_rows = max_rows;
-		this._widget_min_rows = widget_min_rows;
-		this._widget_max_rows = widget_max_rows;
 		this._widget_defaults = {...widget_defaults};
 		this._widget_last_type = widget_last_type;
 		this._configuration_hash = configuration_hash;
@@ -476,6 +472,116 @@ class CDashboard {
 		return this._data;
 	}
 
+	addPastePlaceholderWidget(dashboard_page, {type, name, view_mode, pos}) {
+		const widget = new CWidgetPastePlaceholder({
+			type: 'paste-placeholder',
+			name,
+			view_mode,
+			fields: {},
+			defaults: this._widget_defaults[type],
+			widgetid: null,
+			pos,
+			is_new: false,
+			rf_rate: 0,
+			dashboard: {
+				templateid: this._data.templateid,
+				dashboardid: this._data.dashboardid
+			},
+			dashboard_page: {
+				unique_id: dashboard_page.getUniqueId()
+			},
+			cell_width: this._cell_width,
+			cell_height: this._cell_height,
+			is_editable: this._is_editable,
+			is_edit_mode: this._is_edit_mode,
+			csrf_token: this._csrf_token,
+			unique_id: this._createUniqueId()
+		});
+
+		dashboard_page.addWidget(widget, {is_helper: true});
+
+		return widget;
+	}
+
+	addWidgetFromData(dashboard_page, {type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, messages}) {
+		const widget_data = {
+			type,
+			name,
+			view_mode,
+			fields,
+			defaults: this._widget_defaults[type],
+			widgetid,
+			pos,
+			is_new,
+			rf_rate,
+			dashboard: {
+				templateid: this._data.templateid,
+				dashboardid: this._data.dashboardid
+			},
+			dashboard_page: {
+				unique_id: dashboard_page.getUniqueId()
+			},
+			cell_width: this._cell_width,
+			cell_height: this._cell_height,
+			is_editable: this._is_editable,
+			is_edit_mode: this._is_edit_mode,
+			csrf_token: this._csrf_token,
+			unique_id: this._createUniqueId()
+		};
+
+		let widget;
+
+		if (type in this._widget_defaults) {
+			if (messages.length > 0) {
+				widget = new CWidgetMisconfigured(widget_data);
+				widget.setMessages(messages);
+			}
+			else {
+				let has_empty_references = false;
+
+				for (const accessor of CWidgetBase.getFieldsReferencesAccessors(widget_data.fields).values()) {
+					if (accessor.getTypedReference() === '') {
+						has_empty_references = true;
+
+						break;
+					}
+				}
+
+				if (has_empty_references) {
+					widget = new CWidgetMisconfigured(widget_data);
+					widget.setMessageType(CWidgetMisconfigured.MESSAGE_TYPE_EMPTY_REFERENCES);
+				}
+				else {
+					widget = new (eval(this._widget_defaults[type].js_class))(widget_data);
+				}
+			}
+		}
+		else {
+			widget = new CWidgetInaccessible({
+				...widget_data,
+				type: 'inaccessible',
+				name: '',
+				view_mode: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
+				fields: {},
+				defaults: {
+					name: t('Inaccessible widget')
+				},
+				is_new: false,
+				rf_rate: 0
+			});
+		}
+
+		dashboard_page.addWidget(widget);
+
+		return widget;
+	}
+
+	replaceWidgetFromData(dashboard_page, old_widget, new_widget_data) {
+		dashboard_page.deleteWidget(old_widget, {is_batch_mode: true});
+
+		return this.addWidgetFromData(dashboard_page, new_widget_data);
+	}
+
 	addNewDashboardPage() {
 		if (this._dashboard_pages.size >= this._max_dashboard_pages) {
 			this._warnDashboardExhausted();
@@ -505,8 +611,6 @@ class CDashboard {
 			cell_height: this._cell_height,
 			max_columns: this._max_columns,
 			max_rows: this._max_rows,
-			widget_min_rows: this._widget_min_rows,
-			widget_max_rows: this._widget_max_rows,
 			widget_defaults: this._widget_defaults,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
@@ -517,10 +621,9 @@ class CDashboard {
 		this._dashboard_pages.set(dashboard_page, {is_ready: false});
 
 		for (const widget_data of widgets) {
-			dashboard_page.addWidgetFromData({
+			this.addWidgetFromData(dashboard_page, {
 				...widget_data,
-				is_new: false,
-				unique_id: this._createUniqueId()
+				is_new: false
 			});
 		}
 
@@ -761,12 +864,11 @@ class CDashboard {
 			}
 		}
 
-		const paste_placeholder_widget = dashboard_page.addPastePlaceholderWidget({
+		const paste_placeholder_widget = this.addPastePlaceholderWidget(dashboard_page, {
 			type: new_widget_data.type,
 			name: new_widget_data.name,
 			view_mode: new_widget_data.view_mode,
-			pos: new_widget_pos,
-			unique_id: this._createUniqueId()
+			pos: new_widget_pos
 		});
 
 		dashboard_page.resetWidgetPlaceholder();
@@ -793,13 +895,12 @@ class CDashboard {
 					return;
 				}
 
-				const widget_replace = dashboard_page.replaceWidgetFromData(paste_placeholder_widget, {
+				const widget_replace = this.replaceWidgetFromData(dashboard_page, paste_placeholder_widget, {
 					...new_widget_data,
 					fields: response.widgets[0].fields,
 					widgetid: null,
 					pos: new_widget_pos,
 					is_new: true,
-					unique_id: this._createUniqueId(),
 					messages: response.widgets[0].messages
 				});
 
@@ -1503,7 +1604,7 @@ class CDashboard {
 					pos: widget === null ? this.#edit_widget_cache.new_widget_pos_reserved : widget.getPos(),
 					is_new: widget === null,
 					rf_rate: 0,
-					unique_id: this._createUniqueId()
+					messages: []
 				};
 
 				if (widget === null) {
@@ -1514,7 +1615,7 @@ class CDashboard {
 
 					this.#edit_widget_cache.new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
-							this.#edit_widget_cache.new_widget_dashboard_page.addWidgetFromData(widget_data);
+							this.addWidgetFromData(this.#edit_widget_cache.new_widget_dashboard_page, widget_data);
 							this.#edit_widget_cache.new_widget_dashboard_page.resetWidgetPlaceholder();
 						});
 				}
@@ -1525,7 +1626,7 @@ class CDashboard {
 
 					dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
-							const widget_replace = dashboard_page.replaceWidgetFromData(widget, widget_data);
+							const widget_replace = this.replaceWidgetFromData(dashboard_page, widget, widget_data);
 
 							dashboard_page.resetWidgetPlaceholder();
 
@@ -1976,7 +2077,6 @@ class CDashboard {
 			const fields = {...widget.getFields()};
 
 			let is_altered = false;
-			let is_misconfigured = false;
 
 			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
 				if (accessor.getTypedReference() === '') {
@@ -2012,20 +2112,15 @@ class CDashboard {
 				}
 
 				accessor.setTypedReference(CWidgetBase.createTypedReference({reference: ''}));
-
-				is_misconfigured = true;
 			}
 
 			if (is_altered) {
-				dashboard_page.replaceWidgetFromData(widget, {
+				this.replaceWidgetFromData(dashboard_page, widget, {
 					...widget.getDataCopy({is_single_copy: false}),
 					fields,
 					widgetid: widget.getWidgetId(),
 					is_new: false,
-					unique_id: this._createUniqueId(),
-					messages: is_misconfigured
-						? [t('Referred widget became unavailable. Please update configuration.')]
-						: []
+					messages: []
 				});
 			}
 		}
@@ -2183,8 +2278,8 @@ class CDashboard {
 			dashboardPageWidgetActions: e => {
 				const menu = e.detail.widget.getActionsContextMenu({
 					can_copy_widget: this._can_edit_dashboards
-						&& (this._data.templateid === null || !this.#broadcast_cache.has('_hostid')
-							|| this.#broadcast_cache.get('_hostid') === null
+						&& (this._data.templateid === null || !this.#broadcast_cache.has(CWidgetsData.DATA_TYPE_HOST_ID)
+							|| this.#broadcast_cache.get(CWidgetsData.DATA_TYPE_HOST_ID) === null
 						),
 					can_paste_widget: this._can_edit_dashboards && this.getStoredWidgetDataCopy() !== null
 				});

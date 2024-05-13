@@ -716,7 +716,7 @@ zabbix_export:
             - name: 'Monthly costs'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -733,7 +733,7 @@ zabbix_export:
             - name: 'Monthly costs by service'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -750,7 +750,7 @@ zabbix_export:
             - name: 'Daily costs by service'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '20'
                   fields:
                     - type: GRAPH_PROTOTYPE

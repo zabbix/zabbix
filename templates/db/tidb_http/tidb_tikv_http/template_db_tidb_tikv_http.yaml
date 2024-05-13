@@ -1076,7 +1076,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: Uptime
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1091,7 +1091,7 @@ zabbix_export:
                       value: '4'
                 - type: graph
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1103,9 +1103,9 @@ zabbix_export:
                       name: reference
                       value: AAAAA
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

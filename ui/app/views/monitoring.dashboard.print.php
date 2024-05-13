@@ -46,6 +46,7 @@ $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.print.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.geomaps.js');
+$this->addJsFile('class.widgets-data.js');
 $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');

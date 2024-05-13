@@ -1360,7 +1360,7 @@ zabbix_export:
             - name: 'HTTP requests rate'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH
@@ -1374,7 +1374,7 @@ zabbix_export:
             - name: 'Requests duration histogram'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -853,7 +853,7 @@ zabbix_export:
             - name: Operations
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -2971,7 +2971,7 @@ zabbix_export:
             - name: 'YugabyteDB Cluster: Overview'
               widgets:
                 - type: gauge
-                  width: '6'
+                  width: '18'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -3022,7 +3022,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Average latency'
                   'y': '4'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3060,8 +3060,8 @@ zabbix_export:
                       name: simple_triggers
                       value: '1'
                 - type: gauge
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -3110,8 +3110,8 @@ zabbix_export:
                       name: units
                       value: '%'
                 - type: gauge
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -3160,9 +3160,9 @@ zabbix_export:
                       name: units
                       value: '%'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '4'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3186,9 +3186,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3215,9 +3215,9 @@ zabbix_export:
                       name: show.2
                       value: '4'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '8'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3250,8 +3250,8 @@ zabbix_export:
                       name: units_size
                       value: '20'
                 - type: item
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3296,9 +3296,9 @@ zabbix_export:
                       name: thresholds.3.threshold
                       value: '2'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '2'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3319,9 +3319,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '4'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3342,9 +3342,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '6'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3365,9 +3365,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '8'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3403,7 +3403,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Memory utilization'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3440,7 +3440,7 @@ zabbix_export:
                       value: '1'
                 - type: item
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3469,8 +3469,8 @@ zabbix_export:
                       value: B
                 - type: svggraph
                   name: 'YugabyteDB Cluster: CPU utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3506,9 +3506,9 @@ zabbix_export:
                       name: simple_triggers
                       value: '1'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3542,7 +3542,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Disk r\w usage, Bps'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
@@ -3582,7 +3582,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Disk space usage, bytes'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3613,8 +3613,8 @@ zabbix_export:
                       value: '1'
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Disk r\w OPS'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
@@ -3653,9 +3653,9 @@ zabbix_export:
                       value: '1'
                 - type: item
                   name: 'Disk space utilization'
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3690,9 +3690,9 @@ zabbix_export:
                       value: '40'
                 - type: item
                   name: 'Disk space provisioned'
-                  x: '12'
+                  x: '36'
                   'y': '8'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3730,9 +3730,9 @@ zabbix_export:
                       value: '40'
                 - type: piechart
                   name: 'YugabyteDB Cluster: Disk space'
-                  x: '16'
+                  x: '48'
                   'y': '5'
-                  width: '8'
+                  width: '24'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3773,7 +3773,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Received/Transmit, Bps'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3810,7 +3810,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Connections utilization'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3841,8 +3841,8 @@ zabbix_export:
                       value: '1'
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Received/Transmit, error/sec'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3877,9 +3877,9 @@ zabbix_export:
                       name: reference
                       value: AAAAM
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '6'
-                  width: '8'
+                  width: '24'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3903,9 +3903,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '8'
-                  width: '8'
+                  width: '24'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3932,9 +3932,9 @@ zabbix_export:
                       name: show.2
                       value: '4'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '10'
-                  width: '8'
+                  width: '24'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3964,7 +3964,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: YCQL OPS'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -4033,7 +4033,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: YSQL OPS'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -4101,8 +4101,8 @@ zabbix_export:
                       value: AAAAO
                 - type: svggraph
                   name: 'YugabyteDB Cluster: YCQL latency'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -4170,9 +4170,9 @@ zabbix_export:
                       value: AAAAP
                 - type: svggraph
                   name: 'YugabyteDB Cluster: YSQL latency'
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -4242,7 +4242,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'YugabyteDB Cluster: Node Disk IOPS'
-                  width: '12'
+                  width: '36'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -4261,8 +4261,8 @@ zabbix_export:
                       value: '2'
                 - type: graphprototype
                   name: 'YugabyteDB Cluster: Node SST size'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -4283,7 +4283,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'YugabyteDB Cluster: Keyspace size'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH_PROTOTYPE

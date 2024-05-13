@@ -2165,7 +2165,7 @@ zabbix_export:
             - name: Hardware
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2181,7 +2181,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2194,7 +2194,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2210,7 +2210,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2223,7 +2223,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graph
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2236,7 +2236,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   'y': '25'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2252,7 +2252,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '30'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2269,7 +2269,7 @@ zabbix_export:
             - name: Replication
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2285,7 +2285,7 @@ zabbix_export:
                       value: AAAAH
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2304,7 +2304,7 @@ zabbix_export:
                       value: '3'
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2323,7 +2323,7 @@ zabbix_export:
                       value: '3'
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2343,7 +2343,7 @@ zabbix_export:
             - name: Runtime
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2359,7 +2359,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2372,7 +2372,7 @@ zabbix_export:
                       value: AAAAM
                 - type: graph
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2388,7 +2388,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2404,7 +2404,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2420,7 +2420,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '25'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2433,7 +2433,7 @@ zabbix_export:
                       value: AAAAQ
                 - type: graph
                   'y': '30'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2453,7 +2453,7 @@ zabbix_export:
             - name: 'Slow requests'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2472,7 +2472,7 @@ zabbix_export:
                       value: '3'
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2488,7 +2488,7 @@ zabbix_export:
                       value: '1'
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2507,7 +2507,7 @@ zabbix_export:
                       value: '3'
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2530,7 +2530,7 @@ zabbix_export:
             - name: SQL
               widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2546,7 +2546,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2562,7 +2562,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2575,7 +2575,7 @@ zabbix_export:
                       value: AAABA
                 - type: graph
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2591,7 +2591,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2604,7 +2604,7 @@ zabbix_export:
                       value: AAABE
                 - type: graph
                   'y': '25'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2620,7 +2620,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '30'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2635,8 +2635,8 @@ zabbix_export:
                       name: source_type
                       value: '1'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2651,9 +2651,9 @@ zabbix_export:
                       name: source_type
                       value: '1'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2665,9 +2665,9 @@ zabbix_export:
                       name: reference
                       value: AAAAZ
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2682,9 +2682,9 @@ zabbix_export:
                       name: source_type
                       value: '1'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2699,9 +2699,9 @@ zabbix_export:
                       name: source_type
                       value: '1'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '25'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -2721,7 +2721,7 @@ zabbix_export:
             - name: Storage
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2737,7 +2737,7 @@ zabbix_export:
                       value: AAABI
                 - type: graphprototype
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2756,7 +2756,7 @@ zabbix_export:
                       value: '3'
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2768,8 +2768,8 @@ zabbix_export:
                       name: reference
                       value: AAABM
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2784,9 +2784,9 @@ zabbix_export:
                       name: reference
                       value: AAABJ
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2804,9 +2804,9 @@ zabbix_export:
                       name: source_type
                       value: '3'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
