@@ -33,7 +33,7 @@ use Widgets\ItemHistory\Includes\{
 	CWidgetFieldColumnsList
 };
 
-$table = (new CTableInfo())->addClass($data['has_show_thumbnail'] ? 'show_thumbnail' : null);
+$table = (new CTableInfo())->addClass($data['show_thumbnail'] ? 'show-thumbnail' : null);
 
 if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
@@ -197,30 +197,13 @@ else {
 					break;
 
 				case ITEM_VALUE_TYPE_BINARY:
-					if ($data['has_show_thumbnail']) {
-						$data_url = (new CUrl($_SERVER['REQUEST_URI']))
-							->setArgument('action', 'widget.item_history.data_binary.get')
-							->setArgument('itemid', $column['itemid'])
-							->setArgument('clock', $item_value['clock'])
-							->setArgument('ns', $item_value['ns']);
-
-						$history_item['value'][] = (new CCol(
-//							(new CButton(_('Show')))
-//								->addClass(ZBX_STYLE_BTN_LINK)
-//								->addClass('image-data-preview')
-//								->addStyle('--image-url: url('.$data_url->toString().');'),
-						))
-							->addClass('js-data-binary')
-							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null);
-					}
-					else {
-						$history_item['value'][] = (new CCol(
-//							(new CButton(_('Show')))
-//								->addClass(ZBX_STYLE_BTN_LINK)
-						))
-							->addClass('js-data-binary')
-							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null);
-					}
+					$history_item['value'][] = (new CCol(
+						(new CButton(null, _('Show')))->addClass(ZBX_STYLE_BTN)
+					))
+						->addClass('binary-thumbnail')
+						->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
+						->setAttribute('data-itemid', $column['itemid'])
+						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']);
 			}
 
 			$history_values[] = $history_item;
@@ -242,8 +225,7 @@ else {
 				? [
 					(new CCol(
 						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_item['clock'])
-					))
-						->addClass(ZBX_STYLE_NOWRAP)
+					))->addClass(ZBX_STYLE_NOWRAP)
 				]
 				: [];
 
@@ -277,8 +259,7 @@ else {
 					? [
 						(new CCol(
 							zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
-						))
-							->addClass(ZBX_STYLE_NOWRAP)
+						))->addClass(ZBX_STYLE_NOWRAP)
 					]
 					: [];
 
@@ -298,6 +279,7 @@ else {
 				}
 
 				$table->addRow($table_row);
+
 				$row_values = [];
 			}
 

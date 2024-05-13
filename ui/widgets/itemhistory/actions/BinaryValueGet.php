@@ -25,7 +25,7 @@ use API,
 	CController,
 	CControllerResponseData;
 
-class DataBinary extends CController {
+class BinaryValueGet extends CController {
 
 	private const BASE64_STRING_LENGTH = 1024;
 
@@ -42,7 +42,7 @@ class DataBinary extends CController {
 			'itemid' =>		'int32|required',
 			'clock' =>		'int32|required',
 			'ns' =>			'int32|required',
-			'preview' =>	'int32|required',
+			'preview' =>	'in 1',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -86,7 +86,7 @@ class DataBinary extends CController {
 					'itemids' => [$db_item[0]['itemid']]
 				]);
 
-				If ($preview == 0) {
+				If ($preview == 1) {
 					if ($history_value) {
 						$image = imagecreatefromstring(base64_decode($history_value[0]['value']));
 

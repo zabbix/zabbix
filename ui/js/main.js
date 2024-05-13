@@ -355,7 +355,7 @@ var hintBox = {
 		const url = new Curl('zabbix.php');
 		const data = jQuery(target).data('hintbox-preload');
 
-		url.setArgument('action', hintBox.getHintboxAction(data.type));
+		url.setArgument('action', data.action || hintBox.getHintboxAction(data.type));
 
 		const xhr = jQuery.ajax({
 			url: url.getUrl(),
@@ -384,6 +384,10 @@ var hintBox = {
 
 				if (resp.data) {
 					hintbox_contents += resp.data;
+				}
+
+				if (resp.value) {
+					hintbox_contents += resp.value;
 				}
 			}
 

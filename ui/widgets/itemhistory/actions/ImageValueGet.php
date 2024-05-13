@@ -25,7 +25,7 @@ use API,
 	CController,
 	CControllerResponseData;
 
-class ImageView extends CController {
+class ImageValueGet extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();

@@ -12,7 +12,8 @@
 		"size": {
 			"width": 6,
 			"height": 3
-		}
+		},
+		"js_class": "CWidgetItemHistory"
 	},
 	"actions": {
 		"widget.itemhistory.view": {
@@ -23,13 +24,16 @@
 			"view": "column.edit",
 			"layout": "layout.json"
 		},
-		"widget.itemhistory.data_binary.get": {
-			"class": "DataBinary",
+		"widget.itemhistory.binary_value.get": {
+			"class": "BinaryValueGet",
 			"layout": "layout.json"
 		},
-		"widget.itemhistory.image_view": {
-			"class": "ImageView",
+		"widget.itemhistory.image_value.get": {
+			"class": "ImageValueGet",
 			"layout": "layout.image"
 		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
 	}
 }
