@@ -594,7 +594,8 @@ class testItemTimeouts extends CIntegrationTest {
 			'timeout_http_agent' => '9s',
 			'timeout_ssh_agent' => '10s',
 			'timeout_telnet_agent' => '11s',
-			'timeout_script' => '12s'
+			'timeout_script' => '12s',
+			'timeout_browser' => '13s'
 		];
 
 		$request = [
