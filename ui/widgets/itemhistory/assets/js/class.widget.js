@@ -66,7 +66,10 @@ class CWidgetItemHistory extends CWidget {
 					this.#selected_itemid = element.dataset.itemid;
 					this.#selected_clock = element.dataset.clock;
 
-					this.broadcast({_itemid: element.dataset.itemid});
+					this.broadcast({
+						[CWidgetsData.DATA_TYPE_ITEM_ID]: [element.dataset.itemid],
+						[CWidgetsData.DATA_TYPE_ITEM_IDS]: [element.dataset.itemid]
+					});
 				}
 			});
 		}
