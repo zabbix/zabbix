@@ -87,7 +87,7 @@ You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>}
 |IIS: URIs cache hits percentage|<p>The ratio of user-mode URI Cache Hits to total cache requests (since service startup)</p>|Zabbix agent (active)|perf_counter_en["\Web Service Cache\URI Cache Hits %"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |IIS: File cache misses|<p>The total number of unsuccessful lookups in the user-mode file cache since service startup.</p>|Zabbix agent (active)|perf_counter_en["\Web Service Cache\File Cache Misses"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |IIS: URI cache misses|<p>The total number of unsuccessful lookups in the user-mode URI cache since service startup.</p>|Zabbix agent (active)|perf_counter_en["\Web Service Cache\URI Cache Misses"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|IIS: Active agent availability|<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p>|Zabbix internal|zabbix[host,active_agent,available]|
+|IIS: Active agent availability|<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p>|Zabbix internal|zabbix[host,active_agent,available]|
 
 ### Triggers
 

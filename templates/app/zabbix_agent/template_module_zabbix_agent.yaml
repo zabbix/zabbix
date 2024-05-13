@@ -35,7 +35,7 @@ zabbix_export:
           name: 'Zabbix agent: Zabbix agent ping'
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -60,7 +60,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
-          description: 'Monitoring the availability status of the agent.'
+          description: 'Used for monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
           tags:
@@ -72,7 +72,7 @@ zabbix_export:
               name: 'Zabbix agent: Zabbix agent is not available'
               event_name: 'Zabbix agent: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
-              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              description: 'For passive agents only, host availability is used with `{$AGENT.TIMEOUT}` as a time threshold.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -189,7 +189,7 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -201,7 +201,7 @@ zabbix_export:
               name: 'Zabbix agent active: Zabbix agent is not available'
               event_name: 'Zabbix agent active: Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})'
               priority: AVERAGE
-              description: 'For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.'
+              description: 'For active agents, `nodata()` with `agent.ping` is used with `{$AGENT.NODATA_TIMEOUT}` as a time threshold.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -228,7 +228,7 @@ zabbix_export:
           history: 7d
           description: |
             Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - unknown
             1 - available
             2 - not available
@@ -245,7 +245,7 @@ zabbix_export:
               name: 'Zabbix agent active: Active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              description: 'Active checks are considered unavailable. Agent has not sent a heartbeat for a prolonged time.'
               tags:
                 - tag: scope
                   value: availability

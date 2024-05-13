@@ -52,7 +52,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PFSense: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
+|PFSense: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
 |PFSense: Packet filter running status|<p>MIB: BEGEMOT-PF-MIB</p><p>True if packet filter is currently enabled.</p>|SNMP agent|pfsense.pf.status|
 |PFSense: States table current|<p>MIB: BEGEMOT-PF-MIB</p><p>Number of entries in the state table.</p>|SNMP agent|pfsense.state.table.count|
 |PFSense: States table limit|<p>MIB: BEGEMOT-PF-MIB</p><p>Maximum number of 'keep state' rules in the ruleset.</p>|SNMP agent|pfsense.state.table.limit|
