@@ -3149,7 +3149,9 @@ retry_oracle:
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 					decode_and_escape_binary_value_for_sql(&(value->str));
+#endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
