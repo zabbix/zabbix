@@ -114,7 +114,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'monospace_font' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'local_time' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'display_as_image' => ZBX_WIDGET_FIELD_TYPE_INT32
+			'show_thumbnail' => ZBX_WIDGET_FIELD_TYPE_INT32
 		];
 
 		$column_defaults = [
@@ -126,7 +126,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
 			'monospace_font' => 0,
 			'local_time' => 0,
-			'display_as_image' => 0
+			'show_thumbnail' => 0
 		];
 
 		foreach ($this->getValue() as $column_index => $value) {
@@ -196,10 +196,10 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				'color'				=> ['type' => API_COLOR],
 				'threshold'			=> ['type' => API_NUMERIC]
 			]],
-			'history'				=> ['type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
-			'monospace_font' 		=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
-			'local_time' 			=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
-			'display_as_image'		=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1']
+			'history'			=> ['type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
+			'monospace_font' 	=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
+			'local_time' 		=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
+			'show_thumbnail'		=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1']
 		]];
 
 		if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {

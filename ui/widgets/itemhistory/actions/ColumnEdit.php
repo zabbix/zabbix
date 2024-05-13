@@ -50,7 +50,7 @@ class ColumnEdit extends CController {
 			'history' =>			'int32',
 			'monospace_font' =>		'int32',
 			'local_time' =>			'int32',
-			'display_as_image' =>	'int32',
+			'show_thumbnail' =>		'int32',
 			'edit' =>				'in 1',
 			'update' =>				'in 1',
 			'templateid' =>			'string'
@@ -211,7 +211,7 @@ class ColumnEdit extends CController {
 				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
 				'monospace_font' => 0,
 				'local_time' => 0,
-				'display_as_image' => 0
+				'show_thumbnail' => 0
 			];
 		}
 

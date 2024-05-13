@@ -42,7 +42,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getInput('name', $name),
 			'layout' => $this->fields_values['layout'],
 			'columns' => [],
-			'has_display_as_image' => false,
+			'has_show_thumbnail' => false,
 			'show_lines' => $this->fields_values['show_lines'],
 			'sortorder' => $this->fields_values['sortorder'],
 			'show_timestamp' => $this->fields_values['show_timestamp'],
@@ -150,7 +150,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$columns_with_data = [];
 
-		$has_display_as_image = false;
+		$has_show_thumbnail = false;
 
 		foreach ($columns_config as $column) {
 			if (array_key_exists($column['itemid'], $item_values_by_source[$column['history']])) {
@@ -216,9 +216,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 					unset($item_value);
 				}
-				elseif (!$has_display_as_image && $column['item_value_type'] == ITEM_VALUE_TYPE_BINARY
-						&& array_key_exists('display_as_image', $column) && $column['display_as_image'] == 1) {
-					$has_display_as_image = true;
+				elseif (!$has_show_thumbnail && $column['item_value_type'] == ITEM_VALUE_TYPE_BINARY
+						&& array_key_exists('show_thumbnail', $column) && $column['show_thumbnail'] == 1) {
+					$has_show_thumbnail = true;
 				}
 
 				$columns_with_data[] = $column;
@@ -230,7 +230,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'layout' => $this->fields_values['layout'],
 			'columns' => $columns_with_data,
 			'show_lines' => $this->fields_values['show_lines'],
-			'has_display_as_image' => $has_display_as_image,
+			'has_show_thumbnail' => $has_show_thumbnail,
 			'sortorder' => $this->fields_values['sortorder'],
 			'show_timestamp' => (bool) $this->fields_values['show_timestamp'],
 			'show_column_header' => $this->fields_values['show_column_header'],

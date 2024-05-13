@@ -247,9 +247,9 @@ $form_grid->addItem([
 
 // Display as image.
 $form_grid->addItem([
-	(new CLabel(_('Display as image'), 'display_as_image'))->addClass('js-display-as-image-row'),
+	(new CLabel(_('Show thumbnail'), 'show_thumbnail'))->addClass('js-display-as-image-row'),
 	(new CFormField(
-		(new CCheckBox('display_as_image'))->setChecked($data['display_as_image'])
+		(new CCheckBox('show_thumbnail'))->setChecked($data['show_thumbnail'])
 	))->addClass('js-display-as-image-row')
 ]);
 

@@ -81,6 +81,7 @@ window.item_history_column_edit = new class {
 					.then((type) => {
 						if (this.#form.isConnected) {
 							this.#item_value_type = type;
+							this.#updateForm();
 						}
 					});
 
@@ -94,9 +95,9 @@ window.item_history_column_edit = new class {
 			}
 			else {
 				this.#item_value_type = null;
+				this.#updateForm();
 			}
 
-			this.#updateForm();
 			this.#overlay.unsetLoading();
 		});
 
@@ -298,7 +299,7 @@ window.item_history_column_edit = new class {
 			'history': is_item_type_numeric,
 			'monospace_font': is_item_type_text,
 			'local_time': this.#item_value_type == <?= ITEM_VALUE_TYPE_LOG ?>,
-			'display_as_image': this.#item_value_type == <?= ITEM_VALUE_TYPE_BINARY ?>
+			'show_thumbnail': this.#item_value_type == <?= ITEM_VALUE_TYPE_BINARY ?>
 		}
 
 		for (const input_name in inputs) {

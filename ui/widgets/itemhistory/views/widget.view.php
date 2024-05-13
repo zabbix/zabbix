@@ -33,7 +33,7 @@ use Widgets\ItemHistory\Includes\{
 	CWidgetFieldColumnsList
 };
 
-$table = new CTableInfo();
+$table = (new CTableInfo())->addClass($data['has_show_thumbnail'] ? 'show_thumbnail' : 'null');
 
 if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
@@ -124,7 +124,7 @@ else {
 						}
 
 						$history_item['value'][] = (new CCol($item_value['formatted_value']))
-							->addStyle($color !== '' ? 'background-color: #' . $color : null)
+							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 							->setHint(
 								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							);
@@ -134,7 +134,7 @@ else {
 
 					$bar_gauge = (new CBarGauge())
 						->setValue($item_value['value'])
-						->setAttribute('fill', $color !== '' ? '#' . $color : Widget::DEFAULT_FILL)
+						->setAttribute('fill', $color !== '' ? '#'.$color : Widget::DEFAULT_FILL)
 						->setAttribute('min',  $column['has_binary_units'] ? $column['min_binary'] : $column['min'])
 						->setAttribute('max',  $column['has_binary_units'] ? $column['max_binary'] : $column['max']);
 
@@ -192,12 +192,12 @@ else {
 							? ZBX_STYLE_MONOSPACE_FONT
 							: null
 						)
-						->addStyle($color !== '' ? 'background-color: #' . $color : null);
+						->setAttribute('bgcolor', $color !== '' ? '#'.$color : null);
 
 					break;
 
 				case ITEM_VALUE_TYPE_BINARY:
-					if (array_key_exists('display_as_image', $column) && $column['display_as_image'] != 0) {
+					if ($data['has_show_thumbnail']) {
 						$data_url = (new CUrl($_SERVER['REQUEST_URI']))
 							->setArgument('action', 'widget.item_history.data_binary.get')
 							->setArgument('itemid', $column['itemid'])
@@ -209,13 +209,17 @@ else {
 //								->addClass(ZBX_STYLE_BTN_LINK)
 //								->addClass('image-data-preview')
 //								->addStyle('--image-url: url('.$data_url->toString().');'),
-						))->addClass('js-data-binary');
+						))
+							->addClass('js-data-binary')
+							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null);
 					}
 					else {
 						$history_item['value'][] = (new CCol(
 //							(new CButton(_('Show')))
 //								->addClass(ZBX_STYLE_BTN_LINK)
-						))->addClass('js-data-binary');
+						))
+							->addClass('js-data-binary')
+							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null);
 					}
 			}
 
