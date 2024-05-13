@@ -29,11 +29,8 @@
 void	vmware_event_free(zbx_vmware_event_t *event);
 int	vmware_service_get_evt_severity(zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vector_vmware_key_value_t *evt_severities, char **error);
-int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle, zbx_uint64_t last_key,
-		time_t last_ts, unsigned char *skip_old, zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t *alloc_sz,
-		char **error);
-int	vmware_service_get_last_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t *alloc_sz, char **error);
+int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char *config_source_ip,
+		int config_vmware_timeout);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

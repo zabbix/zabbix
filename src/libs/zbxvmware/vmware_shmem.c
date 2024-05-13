@@ -365,6 +365,11 @@ void	vmware_shmem_data_free(zbx_vmware_data_t *data)
 	__vm_shmem_free_func(data);
 }
 
+void	vmware_shmem_eventlog_data_free(zbx_vmware_eventlog_data_t *eventlog_data)
+{
+	__vm_shmem_free_func(eventlog_data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: cleans resources allocated by vmware custom query in vmware       *
@@ -934,7 +939,6 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 			__vm_shmem_realloc_func, __vm_shmem_free_func);
 
 	VMWARE_VECTOR_CREATE(&data->clusters, vmware_cluster_ptr);
-	VMWARE_VECTOR_CREATE(&data->events, vmware_event_ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore_ptr);
 	VMWARE_VECTOR_CREATE(&data->datacenters, vmware_datacenter_ptr);
 	VMWARE_VECTOR_CREATE(&data->resourcepools, vmware_resourcepool_ptr);
@@ -942,7 +946,6 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	VMWARE_VECTOR_CREATE(&data->alarms, vmware_alarm_ptr);
 	VMWARE_VECTOR_CREATE(&data->alarm_ids, str);
 	zbx_vector_vmware_cluster_ptr_reserve(&data->clusters, (size_t)src->clusters.values_num);
-	zbx_vector_vmware_event_ptr_reserve(&data->events, (size_t)src->events.values_alloc);
 	zbx_vector_vmware_datastore_ptr_reserve(&data->datastores, (size_t)src->datastores.values_num);
 	zbx_vector_vmware_datacenter_ptr_reserve(&data->datacenters, (size_t)src->datacenters.values_num);
 	zbx_vector_vmware_resourcepool_ptr_reserve(&data->resourcepools, (size_t)src->resourcepools.values_num);
@@ -960,9 +963,6 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 		zbx_vector_vmware_cluster_ptr_append(&data->clusters,
 				vmware_cluster_shared_dup((zbx_vmware_cluster_t *)src->clusters.values[i]));
 	}
-
-	for (int i = 0; i < src->events.values_num; i++)
-		zbx_vector_vmware_event_ptr_append(&data->events, vmware_shmem_event_dup(src->events.values[i]));
 
 	for (int i = 0; i < src->datastores.values_num; i++)
 	{
@@ -1020,6 +1020,35 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	data->max_query_metrics = src->max_query_metrics;
 
 	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copies vmware event log data object into shared memory            *
+ *                                                                            *
+ * Parameters: src - [IN] vmware event log data object                        *
+ *                                                                            *
+ * Return value: duplicated vmware event log data object                      *
+ *                                                                            *
+ ******************************************************************************/
+zbx_vmware_eventlog_data_t	*vmware_shmem_eventlog_data_dup(zbx_vmware_eventlog_data_t *src)
+{
+	zbx_vmware_eventlog_data_t	*eventlog_data;
+
+	eventlog_data = (zbx_vmware_eventlog_data_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_eventlog_data_t));
+
+	VMWARE_VECTOR_CREATE(&eventlog_data->events, vmware_event_ptr);
+	zbx_vector_vmware_event_ptr_reserve(&eventlog_data->events, (size_t)src->events.values_alloc);
+
+	eventlog_data->error = vmware_shared_strdup(src->error);
+
+	for (int i = 0; i < src->events.values_num; i++)
+	{
+		zbx_vector_vmware_event_ptr_append(&eventlog_data->events,
+				vmware_shmem_event_dup(src->events.values[i]));
+	}
+
+	return eventlog_data;
 }
 
 zbx_vmware_service_t	*vmware_shmem_vmware_service_malloc(void)
