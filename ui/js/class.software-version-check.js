@@ -70,7 +70,7 @@ class CSoftwareVersionCheck {
 		curl.setArgument('version', this.#data.major_version);
 		curl.setArgument('software_update_check_hash', this.#data.check_hash);
 
-		fetch(curl.getUrl())
+		fetch(curl.getUrl(), {cache: 'no-store'})
 			.then(response => response.json())
 			.then(response => {
 				if ('versions' in response) {
