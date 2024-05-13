@@ -51,8 +51,6 @@ $options = [
 
 // fields
 foreach (array_values($data['tags']) as $index  => $tag) {
-	$tag += ['type' => ZBX_PROPERTY_OWN];
-
 	if ($with_automatic) {
 		$tag += ['automatic' => ZBX_TAG_MANUAL];
 	}

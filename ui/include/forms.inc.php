@@ -917,18 +917,16 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 
 	$textarea_options = array_intersect_key($options, array_flip(['readonly', 'add_post_js']));
 
-	if ($options['show_inherited_tags']) {
-		$tag += [
-			'type' => ZBX_PROPERTY_INHERITED,
-			'parent_templates' => []
-		];
-	}
+	$tag += [
+		'type' => $options['show_inherited_tags'] ? ZBX_PROPERTY_INHERITED : ZBX_PROPERTY_OWN,
+		'parent_templates' => []
+	];
 
 	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
 		->setAttribute('placeholder', _('tag'));
 
-	$type_field = $options['show_inherited_tags'] && array_key_exists('type', $tag)
+	$type_field = $options['show_inherited_tags']
 		? new CVar($options['field_name'].'['.$index.'][type]', $tag['type'])
 		: null;
 
