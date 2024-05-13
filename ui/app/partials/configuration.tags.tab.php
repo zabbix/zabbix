@@ -53,7 +53,7 @@ $options = [
 ];
 
 foreach ($data['tags'] as $index => $tag) {
-	$options['readonly'] = $show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED;
+	$options['readonly'] = $data['readonly'] || ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED);
 
 	$table->addItem(renderTagTableRow($index, $tag, $options));
 }
