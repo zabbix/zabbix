@@ -1367,9 +1367,9 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 27e807d840d4474484c2e1f896726b6b
-              name: 'MySQL: Replication Slave SQL Running State {#MASTER_HOST}'
+              name: 'MySQL: Replication Slave SQL Running State {#MASTERHOST}'
               type: DEPENDENT
-              key: 'mysql.slave_sql_running_state["{#MASTER_HOST}"]'
+              key: 'mysql.slave_sql_running_state["{#MASTERHOST}"]'
               delay: '0'
               history: 7d
               trends: '0'
