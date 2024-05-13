@@ -501,8 +501,6 @@ else {
 	/*
 	 * Triggers
 	 */
-	$triggerTable = (new CTableInfo())->setHeader([_('Host'), _('Name'), _('Problems'), _('Ok'), _('Graph')]);
-
 	CArrayHelper::sort($triggers, ['host_name', 'description']);
 
 	// pager
@@ -510,6 +508,10 @@ else {
 	CPagerHelper::savePage($page['file'], $page_num);
 	$paging = CPagerHelper::paginate($page_num, $triggers, ZBX_SORT_UP, new CUrl('report2.php'));
 	$allowed_ui_problems = CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
+
+	$triggerTable = (new CTableInfo())
+		->setHeader([_('Host'), _('Name'), _('Problems'), _('Ok'), _('Graph')])
+		->setPageNavigation($paging);
 
 	foreach ($triggers as $trigger) {
 		$availability = calculateAvailability($trigger['triggerid'], $data['filter']['timeline']['from_ts'],
@@ -549,7 +551,7 @@ else {
 	zbx_add_post_js('timeControl.processObjects();');
 
 	$html_page
-		->addItem([$triggerTable, $paging])
+		->addItem($triggerTable)
 		->show();
 }
 

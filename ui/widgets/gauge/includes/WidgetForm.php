@@ -200,6 +200,9 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
+			)
+			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
 					->setDefault('{ITEM.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
@@ -312,9 +315,6 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldIntegerBox('th_arc_size', _('Arc size'), self::SIZE_PERCENT_MIN,
 					self::SIZE_PERCENT_MAX
 				))->setDefault(self::DEFAULT_TH_ARC_SIZE_PERCENT)
-			)
-			->addField(
-				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

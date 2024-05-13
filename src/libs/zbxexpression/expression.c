@@ -2521,6 +2521,30 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				replace_to = zbx_strdup(replace_to, dc_item->key_orig);
 			}
 		}
+		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_ALERT_EMAIL) &&
+				ZBX_TOKEN_USER_MACRO == token.type)
+		{
+			if ((EVENT_SOURCE_INTERNAL == event->source && EVENT_OBJECT_TRIGGER == event->object) ||
+					EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (NULL != event->trigger.expression && NULL != event->trigger.recovery_expression &&
+						SUCCEED == zbx_db_trigger_get_all_hostids(&event->trigger, &phostids))
+				{
+					zbx_dc_get_user_macro(um_handle, m, phostids->values, phostids->values_num,
+							&replace_to);
+				}
+			}
+			else if (EVENT_SOURCE_INTERNAL == event->source && (EVENT_OBJECT_ITEM == event->object ||
+					EVENT_OBJECT_LLDRULE == event->object))
+			{
+				cache_item_hostid(&hostids, event->objectid);
+				zbx_dc_get_user_macro(um_handle, m, hostids.values, hostids.values_num, &replace_to);
+			}
+			else
+				zbx_dc_get_user_macro(um_handle, m, NULL, 0, &replace_to);
+
+			pos = token.loc.r;
+		}
 		else if (0 == indexed_macro && 0 != (macro_type & ZBX_MACRO_TYPE_JMX_ENDPOINT))
 		{
 			if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_USER_FUNC_MACRO == token.type &&

@@ -108,7 +108,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	hsteps, hstep;
 	zbx_mock_error_t	err;
 	int			i, j;
-	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
+	zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 	ZBX_UNUSED(state);
 

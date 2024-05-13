@@ -1,0 +1,1 @@
+..F....... [ZBX-22090] fixed the message and made entity removal confirmation popup being displayed only if template import comparison finds entities to remove (miks)

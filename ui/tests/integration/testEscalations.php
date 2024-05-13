@@ -836,7 +836,6 @@ HEREDOC;
 					'value' => '{EVENT.SOURCE}'
 				]
 			],
-			'content_type' => 1,
 			'status' => 0
 		]);
 		$this->assertArrayHasKey('mediatypeids', $response['result']);

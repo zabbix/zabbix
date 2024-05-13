@@ -27,27 +27,20 @@ class CVaultHashiCorp extends CVault {
 	public const TYPE					= ZBX_VAULT_TYPE_HASHICORP;
 	public const NAME					= 'HashiCorp';
 	public const API_ENDPOINT_DEFAULT	= 'https://localhost:8200';
+	public const DB_PREFIX_DEFAULT		= '';
+	public const DB_PREFIX_PLACEHOLDER	= '/v1/secret/data/';
 	public const DB_PATH_PLACEHOLDER	= 'path/to/secret';
 
-	/**
-	 * @var string
-	 */
-	private $api_endpoint;
+	private string $api_endpoint;
+	private string $db_prefix;
+	private string $db_path;
+	private string $token;
 
-	/**
-	 * @var string
-	 */
-	private $db_path;
-
-	/**
-	 * @var string
-	 */
-	private $token;
-
-	public function __construct(string $api_endpoint, string $db_path, string $token) {
-		$this->api_endpoint = rtrim(trim($api_endpoint), '/');
-		$this->db_path = trim($db_path);
-		$this->token = trim($token);
+	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, string $token) {
+		$this->api_endpoint = $api_endpoint;
+		$this->db_prefix = $db_prefix;
+		$this->db_path = $db_path;
+		$this->token = $token;
 	}
 
 	public function validateParameters(): bool {
@@ -55,7 +48,12 @@ class CVaultHashiCorp extends CVault {
 			$this->addError(_s('Provided API endpoint "%1$s" is invalid.', $this->api_endpoint));
 		}
 
-		$secret_parser = new CVaultSecretParser(['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false]);
+		$secret_parser = new CVaultSecretParser([
+			'provider' => ZBX_VAULT_TYPE_HASHICORP,
+			'with_namespace' => $this->db_prefix == self::DB_PREFIX_DEFAULT,
+			'with_key' => false
+		]);
+
 		if ($secret_parser->parse($this->db_path) != CParser::PARSE_SUCCESS) {
 			$this->addError(_s('Provided secret path "%1$s" is invalid.', $this->db_path));
 		}
@@ -68,10 +66,15 @@ class CVaultHashiCorp extends CVault {
 	}
 
 	public function getCredentials(): ?array {
-		$path_parts = explode('/', $this->db_path);
-		array_splice($path_parts, 1, 0, 'data');
+		if ($this->db_prefix == self::DB_PREFIX_DEFAULT) {
+			$path_parts = explode('/', $this->db_path);
+			array_splice($path_parts, 1, 0, 'data');
 
-		$url = $this->api_endpoint.'/v1/'.implode('/', $path_parts);
+			$url = $this->api_endpoint.'/v1/'.implode('/', $path_parts);
+		}
+		else {
+			$url = $this->api_endpoint.$this->db_prefix.$this->db_path;
+		}
 
 		$secret = @file_get_contents($url, false, stream_context_create([
 			'http' => [

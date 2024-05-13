@@ -131,7 +131,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 
 		// Check X-Frame-Options hintbox.
 		$form->getLabel('Use X-Frame-Options HTTP header')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
+		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 
 		$hint_text = "X-Frame-Options HTTP header supported values:\n".
 				"SAMEORIGIN or 'self' - allows the page to be displayed only in a frame on the same origin as the page itself\n".

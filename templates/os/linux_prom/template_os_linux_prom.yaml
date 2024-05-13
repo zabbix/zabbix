@@ -8,16 +8,30 @@ zabbix_export:
       template: 'Linux by Prom'
       name: 'Linux by Prom'
       description: |
-        Official Linux template using node exporter.
+        This template collects Linux metrics from node_exporter 0.18 and above. Support for older node_exporter versions is provided as 'best effort'.
+        
+        Setup:
+        
+        1. Set up the node_exporter according to the official documentation:
+        https://prometheus.io/docs/guides/node-exporter/
+        
+        Use node_exporter v0.18.0 or above.
+        
+        2. Set the hostname or IP address of the node_exporter host in the '{$NODE_EXPORTER_HOST}' macro. You can also change the Prometheus endpoint port in the '{$NODE_EXPORTER_PORT}' macro if necessary.
         
         Known Issues:
         
-          Description: node_exporter v0.16.0 renamed many metrics. CPU utilization for 'guest' and 'guest_nice' metrics are not supported in this template with node_exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as 'best effort'.
-        See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
-          Version: below 0.16.0
+          - Node Exporter 0.16.0 renamed many metrics. CPU utilization for "guest" and "guest_nice" metrics are not supported in this template with Node Exporter < 0.16. Disk IO metrics are not supported. Other metrics provided as best effort. See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details.
+            - version: below 0.16.0
+          - metric node_network_info with label 'device' cannot be found, so network discovery is not possible.
+            - version: below 0.18
         
-          Description: metric node_network_info with label 'device' cannot be found, so network discovery is not possible.
-          Version: below 0.18
+        Notes on filesystem (FS) discovery:
+          - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
+          - BTRFS allocates a default of 10% of the volume for its own needs.
+          - To mitigate potential disasters, FS usage triggers are based on the maximum available space.
+            - Utilization formula: 'pused = 100 - 100 * (available / total - free + available)'
+          - The FS utilization chart, derived from graph prototypes, reflects FS reserved space as the difference between used and available space from the total volume.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
@@ -75,7 +89,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'It could be increased by using `sysctl` utility or modifying the file `/etc/sysctl.conf`.'
+          description: 'May be increased by using `sysctl` utility or modifying the file `/etc/sysctl.conf`.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -109,7 +123,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          url: 'http://{HOST.CONN}:{$NODE_EXPORTER_PORT}/metrics'
+          url: 'http://{$NODE_EXPORTER_HOST}:{$NODE_EXPORTER_PORT}/metrics'
           tags:
             - tag: component
               value: raw
@@ -151,7 +165,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Guest time - the time spent on running a virtual CPU for a guest operating system.'
+          description: 'Time spent on running a virtual CPU for a guest operating system.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -161,7 +175,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -192,7 +206,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -213,7 +227,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The time the CPU has spent doing nothing.'
+          description: 'Time the CPU has spent doing nothing.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -223,7 +237,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -244,7 +258,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The amount of time the CPU has been servicing hardware interrupts.'
+          description: 'Time the CPU has spent servicing hardware interrupts.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -254,7 +268,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -274,6 +288,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
+          description: 'Number of interrupts processed.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -296,7 +311,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The amount of time the CPU has been waiting for I/O to complete.'
+          description: 'Time the CPU has been waiting for I/O to complete.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -306,7 +321,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -326,6 +341,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -344,6 +360,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -362,6 +379,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -381,7 +399,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The time the CPU has spent running users'' processes that have been niced.'
+          description: 'Time the CPU has spent running users'' processes that have been niced.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -391,7 +409,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -430,7 +448,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The amount of time the CPU has been servicing software interrupts.'
+          description: 'Time the CPU has spent servicing software interrupts.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -440,7 +458,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -471,7 +489,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -491,6 +509,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
+          description: 'The combined rate at which all processors on the computer are switched from one thread to another.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -513,7 +532,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The time the CPU has spent running the kernel and its processes.'
+          description: 'Time the CPU has spent running the kernel and its processes.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -523,7 +542,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -544,7 +563,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The time the CPU has spent running users'' processes that are not niced.'
+          description: 'Time the CPU has spent running users'' processes that are not niced.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -554,7 +573,7 @@ zabbix_export:
                 - |
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
+                  	return acc + parseFloat(obj['value'])
                   },0)/valueArr.length;
             - type: CHANGE_PER_SECOND
               parameters:
@@ -575,7 +594,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The CPU utilization expressed in %.'
+          description: 'CPU utilization expressed in %.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -706,7 +725,6 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The architecture of the operating system.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -796,7 +814,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The total space of the swap volume/file expressed in bytes.'
+          description: 'Total space of the swap volume/file expressed in bytes.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -877,7 +895,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The total memory expressed in bytes.'
+          description: 'Total memory expressed in bytes.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
@@ -897,7 +915,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: '(last(//vm.memory.total[node_exporter])-last(//vm.memory.available[node_exporter]))/last(//vm.memory.total[node_exporter])*100'
-          description: 'Memory used percentage is calculated as (total-available)/total*100.'
+          description: 'Percentage calculated as (total-available)/total*100.'
           tags:
             - tag: component
               value: memory
@@ -1114,7 +1132,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               units: bps
-              description: 'Sets value to 0 if metric is missing in node_exporter output.'
+              description: 'Sets value to "0" if metric is missing in `node_exporter` output.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1200,9 +1218,9 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
-                              
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
                   tags:
@@ -1586,7 +1604,7 @@ zabbix_export:
               name: '{#DEVNAME}: Disk read/write request responses are too high'
               event_name: '{#DEVNAME}: Disk read/write request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"} ms for 15m or write > {$VFS.DEV.WRITE.AWAIT.WARN:"{#DEVNAME}"} ms for 15m)'
               priority: WARNING
-              description: 'This trigger might indicate the disk {#DEVNAME} saturation.'
+              description: 'This trigger might indicate the disk `{#DEVNAME}` saturation.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1675,13 +1693,14 @@ zabbix_export:
           description: 'Discovery of file systems of different types.'
           item_prototypes:
             - uuid: 3a3edb8bf5a74a63baa27c64d1a44493
-              name: '{#FSNAME}: Free space'
+              name: 'FS [{#FSNAME}]: Space: Available'
               type: DEPENDENT
               key: 'vfs.fs.free[node_exporter,"{#FSNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
+              description: 'Available storage space expressed in bytes.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1695,14 +1714,17 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: ee1dad3677214561baafa6d930358ee0
-              name: '{#FSNAME}: Free inodes in %'
+              name: 'FS [{#FSNAME}]: Inodes: Free, in %'
               type: DEPENDENT
               key: 'vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              description: 'Free metadata space expressed as a percentage.'
               preprocessing:
                 - type: PROMETHEUS_TO_JSON
                   parameters:
@@ -1712,13 +1734,15 @@ zabbix_export:
                     - |
                       var inode_free;
                       var inode_total;
+                      
                       JSON.parse(value).forEach(function (metric) {
                       	if (metric['name'] == 'node_filesystem_files') {
-                      		inode_total = metric['value'];
+                      		inode_total = parseFloat(metric['value']);
                       	} else if (metric['name'] == 'node_filesystem_files_free') {
-                      		inode_free = metric['value'];
+                      		inode_free = parseFloat(metric['value']);
                       	}
                       });
+                      
                       return (inode_free / inode_total) * 100;
               master_item:
                 key: node_exporter.get
@@ -1727,18 +1751,16 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
               trigger_prototypes:
                 - uuid: 27cabcc9d9644ba6b7bd8c92a740e3cc
                   expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes'
-                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  name: 'FS [{#FSNAME}]: Running out of free inodes'
+                  event_name: 'FS [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: |
-                    It may become impossible to write to a disk if there are no index nodes left.
-                    The following error messages may be returned as symptoms, even though the free space is available:
-                    - 'No space left on device';
-                    - 'Disk is full'.
+                  description: 'Disk writing may fail if index nodes are exhausted, leading to error messages like "No space left on device" or "Disk is full", despite available free space.'
                   tags:
                     - tag: scope
                       value: capacity
@@ -1746,17 +1768,13 @@ zabbix_export:
                       value: performance
                 - uuid: c639215f6dd94c71aebf97265a282a0d
                   expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
-                  name: '{#FSNAME}: Running out of free inodes'
-                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  name: 'FS [{#FSNAME}]: Running out of free inodes'
+                  event_name: 'FS [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
                   opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: |
-                    It may become impossible to write to a disk if there are no index nodes left.
-                    The following error messages may be returned as symptoms, even though the free space is available:
-                    - 'No space left on device';
-                    - 'Disk is full'.
+                  description: 'Disk writing may fail if index nodes are exhausted, leading to error messages like "No space left on device" or "Disk is full", despite available free space.'
                   dependencies:
-                    - name: '{#FSNAME}: Running out of free inodes'
+                    - name: 'FS [{#FSNAME}]: Running out of free inodes'
                       expression: 'min(/Linux by Prom/vfs.fs.inode.pfree[node_exporter,"{#FSNAME}"],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     - tag: scope
@@ -1764,28 +1782,93 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: 89afe41bb0d74c579a9cff8b036d30dc
-              name: '{#FSNAME}: Space utilization'
-              type: CALCULATED
+              name: 'FS [{#FSNAME}]: Space: Used, in %'
+              type: DEPENDENT
               key: 'vfs.fs.pused[node_exporter,"{#FSNAME}"]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: '(last(//vfs.fs.used[node_exporter,"{#FSNAME}"])/last(//vfs.fs.total[node_exporter,"{#FSNAME}"]))*100'
-              description: 'The space utilization expressed in % for {#FSNAME}.'
+              description: 'Calculated as the percentage of currently used space compared to the maximum available space.'
+              preprocessing:
+                - type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - '{__name__=~"^node_filesystem_(avail|free|size)(?:_bytes)?$",mountpoint="{#FSNAME}"}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var available,
+                      	free,
+                      	total;
+                      
+                      JSON.parse(value).forEach(function(metric) {
+                      	if (metric['name'] == 'node_filesystem_size_bytes'){
+                      		total = parseFloat(metric['value']);
+                      	} else if (metric['name'] == 'node_filesystem_free_bytes'){
+                      		free = parseFloat(metric['value']);
+                      	} else if (metric['name'] == 'node_filesystem_avail_bytes'){
+                      		available = parseFloat(metric['value']);
+                      	}
+                      });
+                      if ((total - free + available) <= 0){
+                      	return 0;
+                      } else {
+                      	return (100 - 100 * available / (total - free + available));
+                      }
+              master_item:
+                key: node_exporter.get
               tags:
                 - tag: component
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
+              trigger_prototypes:
+                - uuid: d5687d7aa0484b389f0bd168d50ee1e6
+                  expression: 'min(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Space is critically low'
+                  event_name: 'FS [{#FSNAME}]: Space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%, total {{?last(//vfs.fs.total[node_exporter,"{#FSNAME}"])/1024/1024/1024}.fmtnum(1)}GB)'
+                  opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
+                  priority: AVERAGE
+                  description: |
+                    The storage space usage exceeds the '{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%' limit.
+                    The trigger expression is based on the current used and maximum available spaces.
+                    Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: capacity
+                - uuid: 8f765148cfd64d5ebda93f39d0b20e36
+                  expression: 'min(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],5m)>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Space is low'
+                  event_name: 'FS [{#FSNAME}]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%, total {{?last(//vfs.fs.total[node_exporter,"{#FSNAME}"])/1024/1024/1024}.fmtnum(1)}GB)'
+                  opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
+                  priority: WARNING
+                  description: |
+                    The storage space usage exceeds the '{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%' limit.
+                    The trigger expression is based on the current used and maximum available spaces.
+                    Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: 'FS [{#FSNAME}]: Space is critically low'
+                      expression: 'min(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: capacity
             - uuid: acb3d42ae23b48cbacd0e99c27697798
-              name: '{#FSNAME}: Total space'
+              name: 'FS [{#FSNAME}]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.total[node_exporter,"{#FSNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Total space in bytes'
+              description: 'Total space expressed in bytes.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
@@ -1799,101 +1882,165 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: 89e559a7ff364dd78b638454896692c5
-              name: '{#FSNAME}: Used space'
-              type: CALCULATED
+              name: 'FS [{#FSNAME}]: Space: Used'
+              type: DEPENDENT
               key: 'vfs.fs.used[node_exporter,"{#FSNAME}"]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              params: '(last(//vfs.fs.total[node_exporter,"{#FSNAME}"])-last(//vfs.fs.free[node_exporter,"{#FSNAME}"]))'
-              description: 'Used storage in bytes'
+              description: |
+                Used storage expressed in bytes.
+                Reserverd space is not counted in.
+              preprocessing:
+                - type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - '{__name__=~"^node_filesystem_(free|size)(?:_bytes)?$",mountpoint="{#FSNAME}"}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var free;
+                      var total;
+                      
+                      JSON.parse(value).forEach(function(metric) {
+                      	if (metric['name'] == 'node_filesystem_size_bytes'){
+                      		total = parseFloat(metric['value']);
+                      	} else if (metric['name'] == 'node_filesystem_free_bytes'){
+                      		free = parseFloat(metric['value']);
+                      	}
+                      });
+                      
+                      return (total-free);
+              master_item:
+                key: node_exporter.get
               tags:
                 - tag: component
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
-          trigger_prototypes:
-            - uuid: d5687d7aa0484b389f0bd168d50ee1e6
-              expression: |
-                last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low'
-              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: AVERAGE
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
+                - tag: fstype
+                  value: '{#FSTYPE}'
+            - uuid: 3946668d2bbf47ef85ae7fcea639c622
+              name: 'FS [{#FSNAME}]: Filesystem is read-only'
+              type: DEPENDENT
+              key: 'vfs.fs.[node_exporter,"{#FSNAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
+              preprocessing:
+                - type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{__name__=~"^node_filesystem_readonly$", mountpoint="{#FSNAME}"}'
+                    - value
+                    - ''
+              master_item:
+                key: node_exporter.get
               tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: capacity
-            - uuid: 8f765148cfd64d5ebda93f39d0b20e36
-              expression: |
-                last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low'
-              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: WARNING
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              dependencies:
-                - name: '{#FSNAME}: Disk space is critically low'
-                  expression: |
-                    last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: capacity
+                - tag: component
+                  value: storage
+                - tag: filesystem
+                  value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
+              trigger_prototypes:
+                - uuid: a17990454b7e4f96b659e61f426453c8
+                  expression: 'last(/Linux by Prom/vfs.fs.[node_exporter,"{#FSNAME}"],#2)=0 and last(/Linux by Prom/vfs.fs.[node_exporter,"{#FSNAME}"])=1'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/Linux by Prom/vfs.fs.[node_exporter,"{#FSNAME}"])=0'
+                  name: 'FS [{#FSNAME}]: Filesystem has become read-only'
+                  priority: AVERAGE
+                  description: 'The filesystem has become read-only, possibly due to an I/O error. It is available only for Zabbix agents 6.4 and higher.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: performance
           graph_prototypes:
-            - uuid: aa350a426fcd40af96cd15f778cdf62d
-              name: '{#FSNAME}: Disk space usage'
+            - uuid: 4c6237d835a34d458de8cf2c108d1290
+              name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
+              width: '600'
+              height: '340'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                - drawtype: FILLED_REGION
+                  color: F63100
+                  calc_fnc: LAST
+                  item:
+                    host: 'Linux by Prom'
+                    key: 'vfs.fs.pused[node_exporter,"{#FSNAME}"]'
+            - uuid: 1febfc95ae1945b3a620cc49264d0eae
+              name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
               width: '600'
               height: '340'
               type: PIE
               show_3d: 'YES'
               graph_items:
-                - color: '969696'
+                - color: '787878'
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
                     host: 'Linux by Prom'
                     key: 'vfs.fs.total[node_exporter,"{#FSNAME}"]'
                 - sortorder: '1'
-                  color: C80000
+                  color: F63100
                   calc_fnc: LAST
                   item:
                     host: 'Linux by Prom'
                     key: 'vfs.fs.used[node_exporter,"{#FSNAME}"]'
+                - sortorder: '2'
+                  color: 199C09
+                  calc_fnc: LAST
+                  item:
+                    host: 'Linux by Prom'
+                    key: 'vfs.fs.free[node_exporter,"{#FSNAME}"]'
           master_item:
             key: node_exporter.get
           lld_macro_paths:
             - lld_macro: '{#FSDEVICE}'
-              path: $.labels.device
+              path: $.device
             - lld_macro: '{#FSNAME}'
-              path: $.labels.mountpoint
+              path: $.mountpoint
             - lld_macro: '{#FSTYPE}'
-              path: $.labels.fstype
-            - lld_macro: '{#HELP}'
-              path: $.help
+              path: $.fstype
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
                 - '{__name__=~"^node_filesystem_size(?:_bytes)?$", mountpoint=~".+"}'
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var filesystems = JSON.parse(value);
+                  
+                  result = filesystems.map(function (filesystem) {
+                  	return {
+                  		'mountpoint': filesystem.labels.mountpoint,
+                  		'fstype': filesystem.labels.fstype,
+                  		'device': filesystem.labels.device
+                  	};
+                  });
+                  
+                  return JSON.stringify(result);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          overrides:
+            - name: 'Skip metadata collection for dynamic FS'
+              step: '1'
+              filter:
+                conditions:
+                  - macro: '{#FSTYPE}'
+                    value: ^(btrfs|zfs)$
+                    formulaid: A
+              operations:
+                - operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: Inodes
+                  discover: NO_DISCOVER
       tags:
         - tag: class
           value: os
@@ -1902,12 +2049,16 @@ zabbix_export:
       macros:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
+          description: 'Critical threshold of CPU utilization expressed in %.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
+          description: 'Used as a threshold in the interface utilization trigger.'
         - macro: '{$IFCONTROL}'
           value: '1'
+          description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
         - macro: '{$KERNEL.MAXFILES.MIN}'
           value: '256'
         - macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
@@ -1915,80 +2066,125 @@ zabbix_export:
           description: 'Load per CPU considered sustainable. Tune if needed.'
         - macro: '{$MEMORY.AVAILABLE.MIN}'
           value: 20M
+          description: 'Used as a threshold in the memory available trigger.'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
+          description: 'Used as a threshold in the memory utilization trigger.'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '^.*$'
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^.*$'
+          description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9A-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default.'
+          description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^notpresent$
-          description: 'Ignore notpresent(1).'
+          description: 'Ignore `notpresent(1)`.'
+        - macro: '{$NODE_EXPORTER_HOST}'
+          value: '<SET NODE EXPORTER HOST>'
+          description: 'The hostname or IP address of the node_exporter host.'
         - macro: '{$NODE_EXPORTER_PORT}'
           value: '9100'
           description: 'TCP Port node_exporter is listening on.'
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
+          description: 'Warning threshold of the minimum free swap.'
         - macro: '{$SYSTEM.FUZZYTIME.MAX}'
           value: '60'
+          description: 'The threshold for difference of system time in seconds.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
-          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in block device discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
           value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|zram[0-9]*)'
-          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in block device discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.DEV.READ.AWAIT.WARN}'
           value: '20'
-          description: 'Disk read average response time (in ms) before the trigger would fire.'
+          description: 'Disk read average response time (in ms) before the trigger fires.'
         - macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
           value: '20'
-          description: 'Disk write average response time (in ms) before the trigger would fire.'
-        - macro: '{$VFS.FS.FREE.MIN.CRIT}'
-          value: 5G
-          description: 'The critical threshold of the filesystem utilization.'
-        - macro: '{$VFS.FS.FREE.MIN.WARN}'
-          value: 10G
-          description: 'The warning threshold of the filesystem utilization.'
+          description: 'Disk write average response time (in ms) before the trigger fires.'
         - macro: '{$VFS.FS.FSDEVICE.MATCHES}'
           value: ^.+$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSDEVICE.NOT_MATCHES}'
           value: ^\s$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: ^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: ^\s$
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
           value: '10'
+          description: 'The critical threshold of the filesystem metadata utilization.'
         - macro: '{$VFS.FS.INODE.PFREE.MIN.WARN}'
           value: '20'
+          description: 'The warning threshold of the filesystem metadata utilization.'
         - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
           value: '90'
+          description: 'The critical threshold of the filesystem utilization.'
         - macro: '{$VFS.FS.PUSED.MAX.WARN}'
           value: '80'
+          description: 'The warning threshold of the filesystem utilization.'
       dashboards:
+        - uuid: d0966792c5d04c4a92d9422114a09385
+          name: Filesystems
+          pages:
+            - name: Overview
+              widgets:
+                - type: graphprototype
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '3'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'Linux by Prom'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+                    - type: STRING
+                      name: reference
+                      value: AAAEB
+                - type: graphprototype
+                  'y': '5'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'Linux by Prom'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
+                    - type: STRING
+                      name: reference
+                      value: AAAEC
         - uuid: 19dac6b780aa49558bf4a3782ba4b3b6
           name: 'Network interfaces'
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2007,7 +2203,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2020,7 +2216,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2033,23 +2229,23 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
                       name: columns
-                      value: '1'
+                      value: '3'
                     - type: GRAPH_PROTOTYPE
                       name: graphid.0
                       value:
                         host: 'Linux by Prom'
-                        name: '{#FSNAME}: Disk space usage'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
                     - type: STRING
                       name: reference
-                      value: AAAAE
+                      value: AAAEA
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2065,7 +2261,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2081,7 +2277,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graphprototype
                   'y': '25'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2097,7 +2293,7 @@ zabbix_export:
                       value: AAAAH
                 - type: graphprototype
                   'y': '30'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2112,8 +2308,8 @@ zabbix_export:
                       name: reference
                       value: AAAAI
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2125,9 +2321,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

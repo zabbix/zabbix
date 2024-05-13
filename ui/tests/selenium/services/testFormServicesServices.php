@@ -254,7 +254,7 @@ class testFormServicesServices extends CWebTest {
 
 		// Check hint-box.
 		$form->query('id:algorithm-not-applicable-warning')->one()->click();
-		$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+		$hint = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
 		$hintbox = 'Status calculation rule and additional rules are only applicable if child services exist.';
 		$this->assertEquals($hintbox, $hint->one()->getText());
 
@@ -1232,7 +1232,7 @@ class testFormServicesServices extends CWebTest {
 
 		$this->assertMessage(TEST_GOOD, 'Service updated');
 
-		// Check "No data found." text in table under Parent.
+		// Check "No data found" text in table under Parent.
 		$this->assertTableData([]);
 
 		foreach ([$parent, $child] as $name) {

@@ -676,7 +676,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -690,9 +690,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -708,7 +708,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -722,9 +722,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -740,7 +740,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -754,9 +754,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -772,7 +772,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -786,9 +786,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -804,7 +804,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 16,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -818,9 +818,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 16,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -841,7 +841,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -855,9 +855,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -871,9 +871,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -887,9 +887,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 18,
+								'x' => 54,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -910,7 +910,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -929,9 +929,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -957,7 +957,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'SVG Graph history draw = Line',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1011,9 +1011,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'SVG Graph history draw = Points',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1079,7 +1079,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'SVG Graph history draw = Staircase',
 								'x' => 0,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1143,9 +1143,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'SVG Graph history draw = Bar',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1211,7 +1211,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'SVG Graph trends draw = Line',
 								'x' => 0,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1270,9 +1270,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'SVG Graph trends draw = Points',
-								'x' => 12,
+								'x' => 36,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1343,7 +1343,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'SVG Graph trends draw = Staircase',
 								'x' => 0,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1412,9 +1412,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'SVG Graph trends draw = Bar',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1490,7 +1490,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'history, missing data = connected',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1554,9 +1554,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'history, missing data = treat as 0',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1622,7 +1622,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'trends, missing data = connected',
 								'x' => 0,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1691,9 +1691,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'trends, missing data = treat as 0',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1764,7 +1764,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'Axes options + time shift history',
 								'x' => 0,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1858,9 +1858,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'history, axes options + time shift',
-								'x' => 12,
+								'x' => 36,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1961,7 +1961,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'history, no legend',
 								'x' => 0,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -2025,9 +2025,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'trends, Agg func = min + max',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [

@@ -59,5 +59,13 @@ section {
 				padding-right: 10px;
 			}
 		}
+
+		&.no-data {
+			tbody tr:last-child {
+				td {
+					border-bottom: none;
+				}
+			}
+		}
 	}
 }

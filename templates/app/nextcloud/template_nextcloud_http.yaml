@@ -1344,20 +1344,26 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Nextcloud: Version'
-                  width: '2'
+                  width: '6'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: ''
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.version
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '2'
                 - type: graph
                   name: 'Nextcloud: Active users'
                   'y': '2'
-                  width: '24'
+                  width: '72'
                   height: '6'
                   fields:
                     - type: GRAPH
@@ -1371,7 +1377,7 @@ zabbix_export:
                 - type: graph
                   name: 'Nextcloud: CPU load'
                   'y': '8'
-                  width: '24'
+                  width: '72'
                   height: '6'
                   fields:
                     - type: GRAPH
@@ -1385,7 +1391,7 @@ zabbix_export:
                 - type: graph
                   name: 'Nextcloud: Database size'
                   'y': '14'
-                  width: '24'
+                  width: '72'
                   height: '6'
                   fields:
                     - type: GRAPH
@@ -1399,7 +1405,7 @@ zabbix_export:
                 - type: graph
                   name: 'Nextcloud: Memory utilization'
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '6'
                   fields:
                     - type: GRAPH
@@ -1412,48 +1418,66 @@ zabbix_export:
                       value: AAAAD
                 - type: item
                   name: 'Nextcloud: Web server'
-                  x: '2'
-                  width: '6'
+                  x: '6'
+                  width: '18'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: ''
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.apps.webserver
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '2'
                 - type: item
                   name: 'Nextcloud: Free space'
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: ''
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.freespace
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '2'
                 - type: item
                   name: 'Nextcloud: Database'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   fields:
-                    - type: STRING
-                      name: description
-                      value: ''
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.db.version
+                    - type: INTEGER
+                      name: show.0
+                      value: '4'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '2'
             - name: 'Nextcloud: Users'
               widgets:
                 - type: graphprototype
                   name: 'Nextcloud: User quota usage'
-                  width: '24'
+                  width: '72'
                   height: '24'
                   fields:
                     - type: INTEGER

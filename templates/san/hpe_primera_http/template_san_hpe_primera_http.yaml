@@ -12,13 +12,14 @@ zabbix_export:
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create user zabbix on the storage with browse role and enable it for all domains.
+          1. Create a user on the storage with a browse role and enable it for all domains, for example "zabbix".
           2. The WSAPI server does not start automatically.
              - Log in to the CLI as Super, Service, or any role granted the wsapi_set right.
              - Start the WSAPI server by command: `startwsapi`.
              - To check WSAPI state use command: `showwsapi`.
           3. Link template to the host.
-          4. Configure macros {$HPE.PRIMERA.USERNAME} and {$HPE.PRIMERA.PASSWORD}.
+          4. Set the hostname or IP address of the host in the {$HPE.PRIMERA.API.HOST} macro and configure the username and password in the {$HPE.PRIMERA.API.USERNAME} and {$HPE.PRIMERA.API.PASSWORD} macros.
+          5. Change the {$HPE.PRIMERA.API.SCHEME} and {$HPE.PRIMERA.API.PORT} macros if needed.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -234,7 +235,7 @@ zabbix_export:
           timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}:{$HPE.PRIMERA.API.PORT}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{$HPE.PRIMERA.API.HOST}:{$HPE.PRIMERA.API.PORT}'
             - name: password
               value: '{$HPE.PRIMERA.API.PASSWORD}'
             - name: username
@@ -291,7 +292,7 @@ zabbix_export:
               description: 'Zabbix has received errors in requests to WSAPI.'
               dependencies:
                 - name: 'HPE Primera: Service is unavailable'
-                  expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
+                  expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
               tags:
                 - tag: scope
                   value: availability
@@ -689,7 +690,7 @@ zabbix_export:
         - uuid: a0b4fdee38a64c5f82fd051ea74a7b2d
           name: 'HPE Primera: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"]'
+          key: 'net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"]'
           history: 7d
           description: 'Checks if the service is running and accepting TCP connections.'
           valuemap:
@@ -705,7 +706,7 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 8e7aa46322c643878e509461dbb9169d
-              expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
+              expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
               name: 'HPE Primera: Service is unavailable'
               priority: HIGH
               manual_close: 'YES'
@@ -3652,6 +3653,9 @@ zabbix_export:
         - tag: target
           value: primera
       macros:
+        - macro: '{$HPE.PRIMERA.API.HOST}'
+          value: '<SET API HOST>'
+          description: 'The hostname or IP address of the API host.'
         - macro: '{$HPE.PRIMERA.API.PASSWORD}'
           type: SECRET_TEXT
           description: 'Specify password for WSAPI.'
@@ -3699,7 +3703,7 @@ zabbix_export:
             - name: 'System capacity'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -3713,7 +3717,7 @@ zabbix_export:
             - name: 'CPG (common provisioning groups)'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3729,7 +3733,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3745,7 +3749,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3761,7 +3765,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3777,7 +3781,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3793,7 +3797,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   'y': '25'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3810,7 +3814,7 @@ zabbix_export:
             - name: Volumes
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3826,7 +3830,7 @@ zabbix_export:
                       value: AAAAH
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3842,7 +3846,7 @@ zabbix_export:
                       value: AAAAI
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3858,7 +3862,7 @@ zabbix_export:
                       value: AAAAJ
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3874,7 +3878,7 @@ zabbix_export:
                       value: AAAAK
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

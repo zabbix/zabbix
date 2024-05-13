@@ -67,6 +67,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Honeycomb' => 'Displays item values as a honeycomb.',
 		'Host availability' => 'Displays the host count by status (available/unavailable/unknown).',
 		'Host navigator' => 'Displays host hierarchy with ability to control other widgets based on selected host.',
+		'Item navigator' => 'Displays item hierarchy with ability to control other widgets based on selected item.',
 		'Item value' => 'Displays the value of a single item prominently.',
 		'Map' => 'Displays either a single configured network map or one of the configured network maps in the map '.
 				'navigation tree.',
@@ -108,7 +109,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 //								'name' => 'Awesome map tree',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -131,9 +132,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'map',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -147,9 +148,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 								'type' => 'favgraphs',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 4,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							]
 						]
@@ -162,15 +163,15 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'favgraphs',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							]
 						]
@@ -184,15 +185,15 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'systeminfo',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							]
 						]
@@ -205,15 +206,15 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'emptyWidget',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							]
 						]
@@ -237,14 +238,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'type' => 'clock',
 								// TODO: Uncomment the below line when ZBX-22245 will be resolved.
 //								'name' => 'Default clock',
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'item',
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'fields' => [
 									[
@@ -262,15 +263,15 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 								'type' => 'clock',
 								'name' => 'Clock widget',
-								'width' => 6,
+								'width' => 18,
 								'height' => 4
 							],
 							[
 								'type' => 'clock345',
 								'view_mode' => 0,
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'fields' => [
 									[

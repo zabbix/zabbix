@@ -2111,7 +2111,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Service count'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2127,7 +2127,7 @@ zabbix_export:
                       value: '2'
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2140,7 +2140,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graph
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2153,7 +2153,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2166,7 +2166,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2179,8 +2179,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: 'Task count'
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2196,8 +2196,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Container instance count'
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2214,7 +2214,7 @@ zabbix_export:
             - name: Services
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2230,7 +2230,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2246,7 +2246,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -94,7 +94,9 @@ $header = [
 	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url)
 ];
 
-$sla_list = (new CTableInfo())->setHeader($header);
+$sla_list = (new CTableInfo())
+	->setHeader($header)
+	->setPageNavigation($data['paging']);
 
 foreach ($data['slas'] as $slaid => $sla) {
 	if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
@@ -154,7 +156,7 @@ foreach ($data['slas'] as $slaid => $sla) {
 	$sla_list->addRow($row);
 }
 
-$form->addItem([$sla_list, $data['paging']]);
+$form->addItem($sla_list);
 
 if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 	$form->addItem(

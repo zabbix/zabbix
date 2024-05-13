@@ -752,9 +752,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 	public function testFormAdministrationMediaTypeWebhook_Clone() {
 		// SQL for collecting all webhook mediatype parameter values, both from media_type and media_type_param tables.
-		$mediatype_sql = 'SELECT type, status, maxsessions, maxattempts, attempt_interval, content_type, script, timeout, '.
-				'process_tags, show_event_menu, event_menu_name, event_menu_url, description, mtp.name, mtp.value '.
-				'FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid WHERE mt.name=';
+		$mediatype_sql = 'SELECT type,status,maxsessions,maxattempts,attempt_interval,message_format,script,timeout,'.
+				'process_tags,show_event_menu,event_menu_name,event_menu_url,description,mtp.name,mtp.value'.
+				' FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid WHERE mt.name=';
 		$old_hash = CDBHelper::getHash($mediatype_sql.'\'Reference webhook\' ORDER BY mtp.name');
 
 		// Clone the reference media type.

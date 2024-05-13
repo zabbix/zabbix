@@ -26,7 +26,7 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/std"
+	"golang.zabbix.com/sdk/std"
 )
 
 var procStat = `

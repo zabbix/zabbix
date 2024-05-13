@@ -52,6 +52,7 @@ class CImportReferencer {
 	protected $group_prototypes = [];
 	protected $host_prototype_macros = [];
 	protected $proxies = [];
+	protected $proxy_groups = [];
 	protected $host_prototypes = [];
 	protected $httptests = [];
 	protected $httpsteps = [];
@@ -78,6 +79,7 @@ class CImportReferencer {
 	protected $db_group_prototypes;
 	protected $db_host_prototype_macros;
 	protected $db_proxies;
+	protected $db_proxy_groups;
 	protected $db_host_prototypes;
 	protected $db_httptests;
 	protected $db_httpsteps;
@@ -763,6 +765,27 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get proxy group ID by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findProxyGroupIdByName(string $name): ?string {
+		if ($this->db_proxy_groups === null) {
+			$this->selectProxyGroups();
+		}
+
+		foreach ($this->db_proxy_groups as $proxy_groupid => $proxy_group) {
+			if ($proxy_group['name'] === $name) {
+				return $proxy_groupid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get host prototype ID by UUID.
 	 *
 	 * @param string $uuid
@@ -1177,6 +1200,15 @@ class CImportReferencer {
 	 */
 	public function addProxies(array $proxies): void {
 		$this->proxies = $proxies;
+	}
+
+	/**
+	 * Add proxy group names that need association with a database proxy group ID.
+	 *
+	 * @param array $proxy_groups
+	 */
+	public function addProxyGroups(array $proxy_groups): void {
+		$this->proxy_groups = $proxy_groups;
 	}
 
 	/**
@@ -1856,6 +1888,25 @@ class CImportReferencer {
 		]);
 
 		$this->proxies = [];
+	}
+
+	/**
+	 * Select proxy group IDs for previously added proxy group names.
+	 */
+	protected function selectProxyGroups(): void {
+		$this->db_proxy_groups = [];
+
+		if (!$this->proxy_groups) {
+			return;
+		}
+
+		$this->db_proxy_groups = API::ProxyGroup()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->proxy_groups)],
+			'preservekeys' => true
+		]);
+
+		$this->proxy_groups = [];
 	}
 
 	/**

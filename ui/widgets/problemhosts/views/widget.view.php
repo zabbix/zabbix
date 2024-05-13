@@ -156,7 +156,9 @@ else {
 		// Add 'Total' column.
 		$group_row[] = $group['hosts_total_count'];
 
-		$table->addRow($group_row);
+		$table->addRow(
+			(new CRow($group_row))->setAttribute('data-hostgroupid', $group['groupid'])
+		);
 	}
 }
 

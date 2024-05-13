@@ -92,6 +92,10 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertHosts(array $hosts): array {
 		foreach ($hosts as &$host) {
+			if (array_key_exists('proxy', $host)) {
+				$host['monitored_by'] = CXmlConstantName::PROXY;
+			}
+
 			if (array_key_exists('items', $host)) {
 				$host['items'] = self::convertItems($host['items']);
 			}
@@ -191,6 +195,8 @@ class C64ImportConverter extends CConverter {
 				}
 				unset($message_template);
 			}
+
+			$media_type = CArrayHelper::renameKeys($media_type, ['content_type' => 'message_format']);
 		}
 		unset($media_type);
 
@@ -334,6 +340,10 @@ class C64ImportConverter extends CConverter {
 	 * @return array
 	 */
 	private static function convertDashboards(array $dashboards): array {
+		$new_broadcasting_widget_types = ['graph', 'graphprototype', 'plaintext', 'problemhosts', 'problems',
+			'svggraph', 'tophosts', 'web'
+		];
+
 		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
 				continue;
@@ -347,7 +357,7 @@ class C64ImportConverter extends CConverter {
 				}
 
 				foreach ($dashboard_page['widgets'] as &$widget) {
-					if (in_array($widget['type'], ['graph', 'svggraph', 'graphprototype'])) {
+					if (in_array($widget['type'], $new_broadcasting_widget_types)) {
 						$reference = self::createWidgetReference($reference_index++);
 
 						if (!array_key_exists('fields', $widget)) {
@@ -377,6 +387,19 @@ class C64ImportConverter extends CConverter {
 							);
 						}
 						unset($field);
+					}
+
+					if (array_key_exists('x', $widget) && is_numeric($widget['x'])) {
+						$widget['x'] = (string) ((int) $widget['x'] * 3);
+					}
+
+					if (array_key_exists('width', $widget)) {
+						if (is_numeric($widget['width'])) {
+							$widget['width'] = (string) ((int) $widget['width'] * 3);
+						}
+					}
+					else {
+						$widget['width'] = '3';
 					}
 				}
 				unset($widget);

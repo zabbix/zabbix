@@ -1557,7 +1557,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 		// Check that nothing is returned in the widget if such outcome is expected.
 		if (CTestArrayHelper::get($data, 'check.empty', false)) {
-			$this->assertTrue($widget->query('class:nothing-to-show')->one()->isTextPresent('No data found.'));
+			$this->assertTrue($widget->query('class:no-data-message')->one()->isTextPresent('No data found'));
 
 			return;
 		}
@@ -1671,7 +1671,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		else {
 			$widget->query('xpath:.//div[@class="average-bg"]//a[@data-hintbox-static="1"]')->one()->click();
 		}
-		$popup = $this->query('xpath://div[@class="overlay-dialogue"]//table')->asTable()->one();
+		$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]//table')->asTable()->one();
 		$this->assertEquals($rows_count, $popup->getRows()->count());
 
 		$row = $popup->findRow('Problem', $expected_popup['fields']['Problem'])->asTableRow();

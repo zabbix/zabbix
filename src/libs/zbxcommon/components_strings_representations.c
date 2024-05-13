@@ -127,6 +127,11 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "internal poller";
 		case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
 			return "configuration syncer worker";
+		case ZBX_PROCESS_TYPE_PG_MANAGER:
+			return "proxy group manager";
+		case ZBX_PROCESS_TYPE_BROWSERPOLLER:
+			return "browser poller";
+			break;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -212,6 +217,8 @@ const char	*zbx_result_string(int result)
 {
 	switch (result)
 	{
+		case SUCCEED_PARTIAL:
+			return "SUCCEED_PARTIAL";
 		case SUCCEED:
 			return "SUCCEED";
 		case FAIL:
@@ -232,6 +239,12 @@ const char	*zbx_result_string(int result)
 			return "SIG_ERROR";
 		case SYSINFO_RET_FAIL:
 			return "SYSINFO_RET_FAIL";
+		case CONNECT_ERROR:
+			return "CONNECT_ERROR";
+		case SEND_ERROR:
+			return "SEND_ERROR";
+		case RECV_ERROR:
+			return "RECV_ERROR";
 		default:
 			return "unknown";
 	}

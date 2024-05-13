@@ -151,6 +151,9 @@ class CControllerPopupImportCompare extends CController {
 		else {
 			$data['diff'] = $this->blocksToDiff($result, 1);
 			$data['diff_toc'] = $this->normalizeToc($this->toc);
+
+			// Check if at least one entitiy is removed.
+			$data['with_removed_entities'] = array_key_exists('removed', $this->toc);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

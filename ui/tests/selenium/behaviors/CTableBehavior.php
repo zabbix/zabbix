@@ -86,7 +86,7 @@ class CTableBehavior extends CBehavior {
 		$rows = $this->getTable($selector)->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
-			$this->test->assertEquals(['No data found.'], $rows->asText());
+			$this->test->assertEquals(['No data found'], $rows->asText());
 
 			return;
 		}
@@ -122,7 +122,7 @@ class CTableBehavior extends CBehavior {
 
 		if (!$data) {
 			// Check that table contains one row with text "No data found."
-			$this->test->assertEquals(['No data found.'], $table->getRows()->asText());
+			$this->test->assertEquals(['No data found'], $table->getRows()->asText());
 
 			return;
 		}
@@ -207,14 +207,22 @@ class CTableBehavior extends CBehavior {
 	/**
 	 * Assert text of displayed rows amount.
 	 *
-	 * @param integer $count	rows count per page
-	 * @param integer $total	total rows count
+	 * @param integer|string $count		rows count per page
+	 * @param integer $total			total rows count
 	 */
-	public function assertTableStats($count, $total = null) {
+	public function assertTableStats($count = null, $total = null) {
+		if ($count === null || $count === 0) {
+			$this->test->assertFalse($this->test->query('xpath://div[@class="table-stats"]')->one(false)->isValid(),
+					'Table rows amount is visible on page');
+
+			return;
+		}
+
 		if ($total === null) {
 			$total = $count;
 		}
-		$this->test->assertEquals('Displaying '.$count.' of '.$count.' found',
+
+		$this->test->assertEquals('Displaying '.$count.' of '.$total.' found',
 				$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
 	}

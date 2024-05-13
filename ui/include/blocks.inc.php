@@ -400,7 +400,9 @@ function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupu
 			$row[] = getSeverityTableCell($severity, $data, $stat);
 		}
 
-		$table->addRow($row);
+		$table->addRow(
+			(new CRow($row))->setAttribute('data-hostgroupid', $group['groupid'])
+		);
 	}
 
 	return $table;

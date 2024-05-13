@@ -38,7 +38,6 @@ class testPageItems extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
-		$this->zbxTestTextPresent('Displaying');
 
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
 			$this->zbxTestTextPresent('All hosts');

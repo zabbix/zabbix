@@ -21,11 +21,13 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
 }
+
 $this->addJsFile('layout.mode.js');
 
 $this->enableLayoutModes();
@@ -86,7 +88,8 @@ $table = (new CTableInfo())
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
 				->getUrl())
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['dashboards'] as $dashboard) {
 	$tags = [];
@@ -118,7 +121,6 @@ foreach ($data['dashboards'] as $dashboard) {
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'dashboardids', [
 		'dashboard.delete' => [
 			'name' => _('Delete'),

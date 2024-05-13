@@ -999,11 +999,11 @@ zabbix_export:
                 value: '{$FAS3220.NET.PORT.ROLE.MATCHES}'
                 formulaid: C
               - macro: '{#TYPE}'
-                value: '{$FAS3220.NET.PORT.ROLE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
+                value: '{$FAS3220.NET.PORT.TYPE.MATCHES}'
                 formulaid: D
               - macro: '{#TYPE}'
-                value: '{$FAS3220.NET.PORT.TYPE.MATCHES}'
+                value: '{$FAS3220.NET.PORT.ROLE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
                 formulaid: E
               - macro: '{#TYPE}'
                 value: '{$FAS3220.NET.PORT.TYPE.NOT_MATCHES}'
@@ -1489,7 +1489,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1505,7 +1505,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1521,7 +1521,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -28,6 +28,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxexpr/libzbxexpr.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxip/libzbxip.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcomms/libzbxcomms.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxbincommon/libzbxbincommon.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcommon/libzbxcommon.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcrypto/libzbxcrypto.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxthreads/libzbxthreads.a

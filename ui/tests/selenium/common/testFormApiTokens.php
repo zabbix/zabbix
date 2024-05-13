@@ -140,7 +140,7 @@ class testFormApiTokens extends CWebTest {
 		// Check the hintbox text in the Auth token field.
 		$auth_token->query('xpath:./button[@data-hintbox]')->one()->click();
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
-				$this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText()
+				$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible()->getText()
 		);
 		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
 		$dialog->close();
@@ -219,7 +219,7 @@ class testFormApiTokens extends CWebTest {
 				// Check warning in case if token is already expired.
 				if (CTestArrayHelper::get($data, 'already_expired')) {
 					$form->getField('Expires at:')->query('xpath:./button[@data-hintbox]')->one()->click();
-					$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible()->getText();
+					$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible()->getText();
 					$this->assertEquals('The token has expired. Please update the expiry date to use the token.', $hintbox_text);
 				}
 

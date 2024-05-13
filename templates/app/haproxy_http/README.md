@@ -6,9 +6,7 @@
 The template to monitor HAProxy by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `HAProxy by HTTP` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/) with HTTP agent remotely.
-
-Note that this solution supports https and redirects.
+The template collects metrics by polling the HAProxy stats page with HTTP agent.
 
 ## Requirements
 
@@ -25,9 +23,11 @@ This template has been tested on:
 
 ## Setup
 
-Setup [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/).
+1. Set up the [`HAProxy stats page`](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/).
 
-Example configuration of HAProxy:
+If you want to use authentication, set the username and password in the `stats auth` option of the configuration file.
+
+The example configuration of HAProxy:
 
 ```text
 frontend stats
@@ -38,17 +38,16 @@ frontend stats
     #stats auth Username:Password  # Authentication credentials
 ```
 
-If you use another location, don't forget to change the macros {$HAPROXY.STATS.SCHEME},{HOST.CONN},
-{$HAPROXY.STATS.PORT},{$HAPROXY.STATS.PATH}.
+2. Set the hostname or IP address of the HAProxy stats host or container in the `{$HAPROXY.STATS.HOST}` macro. You can also change the status page port in the `{$HAPROXY.STATS.PORT}` macro, the status page scheme in the `{$HAPROXY.STATS.SCHEME}` macro and the status page path in the `{$HAPROXY.STATS.PATH}` macro if necessary.
 
-If you want to use authentication, set the username and password in the "stats auth" option of the configuration file and
-in the macros {$HAPROXY.USERNAME},{$HAPROXY.PASSWORD}.
+3. If you have enabled authentication in the HAProxy configuration file in step 1, set the username and password in the `{$HAPROXY.USERNAME}` and `{$HAPROXY.PASSWORD}` macros.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$HAPROXY.STATS.SCHEME}|<p>The scheme of HAProxy stats page(http/https).</p>|`http`|
+|{$HAPROXY.STATS.SCHEME}|<p>The scheme of HAProxy stats page (http/https).</p>|`http`|
+|{$HAPROXY.STATS.HOST}|<p>The hostname or IP address of the HAProxy stats host or container.</p>|`<SET HAPROXY HOST>`|
 |{$HAPROXY.STATS.PORT}|<p>The port of the HAProxy stats host or container.</p>|`8404`|
 |{$HAPROXY.STATS.PATH}|<p>The path of the HAProxy stats page.</p>|`stats`|
 |{$HAPROXY.USERNAME}|<p>The username of the HAProxy stats page.</p>||
@@ -75,8 +74,8 @@ in the macros {$HAPROXY.USERNAME},{$HAPROXY.PASSWORD}.
 |HAProxy: Get stats page|<p>HAProxy Statistics Report HTML</p>|HTTP agent|haproxy.get_html|
 |HAProxy: Version||Dependent item|haproxy.version<p>**Preprocessing**</p><ul><li><p>Regular expression: `HAProxy version ([^,]*), \1`</p><p>⛔️Custom on fail: Set error to: `HAProxy version is not found`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |HAProxy: Uptime||Dependent item|haproxy.uptime<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|HAProxy: Service status||Simple check|net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|HAProxy: Service response time||Simple check|net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]|
+|HAProxy: Service status||Simple check|net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|HAProxy: Service response time||Simple check|net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"]|
 
 ### Triggers
 
@@ -84,8 +83,8 @@ in the macros {$HAPROXY.USERNAME},{$HAPROXY.PASSWORD}.
 |----|-----------|----------|--------|--------------------------------|
 |HAProxy: Version has changed|<p>HAProxy version has changed. Acknowledge to close the problem manually.</p>|`last(/HAProxy by HTTP/haproxy.version,#1)<>last(/HAProxy by HTTP/haproxy.version,#2) and length(last(/HAProxy by HTTP/haproxy.version))>0`|Info|**Manual close**: Yes|
 |HAProxy: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HAProxy by HTTP/haproxy.uptime)<10m`|Info|**Manual close**: Yes|
-|HAProxy: Service is down||`last(/HAProxy by HTTP/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0`|Average|**Manual close**: Yes|
-|HAProxy: Service response time is too high||`min(/HAProxy by HTTP/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HAProxy: Service is down</li></ul>|
+|HAProxy: Service is down||`last(/HAProxy by HTTP/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"])=0`|Average|**Manual close**: Yes|
+|HAProxy: Service response time is too high||`min(/HAProxy by HTTP/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HAProxy: Service is down</li></ul>|
 
 ### LLD rule Backend discovery
 

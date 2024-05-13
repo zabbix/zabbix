@@ -142,7 +142,8 @@ typedef enum
 	ITEM_TYPE_DEPENDENT,
 	ITEM_TYPE_HTTPAGENT,
 	ITEM_TYPE_SNMP,
-	ITEM_TYPE_SCRIPT	/* 21 */
+	ITEM_TYPE_SCRIPT,
+	ITEM_TYPE_BROWSER	/* 22 */
 }
 zbx_item_type_t;
 
@@ -248,6 +249,9 @@ zbx_log_value_t;
 #define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
 
+#define ZBX_PROGRAM_VARIANT_AGENT	1
+#define ZBX_PROGRAM_VARIANT_AGENT2	2
+
 /* process type */
 #define ZBX_PROCESS_TYPE_POLLER			0
 #define ZBX_PROCESS_TYPE_UNREACHABLE		1
@@ -294,7 +298,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SNMP_POLLER		42
 #define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
 #define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
-#define ZBX_PROCESS_TYPE_COUNT			45	/* number of process types */
+#define ZBX_PROCESS_TYPE_PG_MANAGER		45
+#define ZBX_PROCESS_TYPE_BROWSERPOLLER		46
+#define ZBX_PROCESS_TYPE_COUNT			47	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -394,33 +400,29 @@ do				\
 }				\
 while (0)
 
+void	zbx_this_should_never_happen_backtrace(void);
+
 #define THIS_SHOULD_NEVER_HAPPEN										\
 														\
 do														\
 {														\
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
 			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
-	zbx_backtrace();											\
+	zbx_this_should_never_happen_backtrace();								\
 }														\
 while (0)
 
-/* to avoid dependency on libzbxnix.a */
-#define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
-
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname);
-void	zbx_print_usage(const char **usage_message, const char *progname);
 void	zbx_print_version(const char *title_message);
 
-const char	*get_program_name(const char *path);
+const char		*get_program_name(const char *path);
 typedef unsigned char	(*zbx_get_program_type_f)(void);
 typedef const char	*(*zbx_get_progname_f)(void);
 typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
 typedef int		(*zbx_get_config_int_f)(void);
+typedef void		(*zbx_backtrace_f)(void);
 
 typedef enum
 {
@@ -435,6 +437,7 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
+	ZBX_TASK_SET_SERVICE_STARTUP_TYPE,
 #else
 	ZBX_TASK_RUNTIME_CONTROL,
 #endif
@@ -453,12 +456,16 @@ typedef enum
 }
 zbx_httptest_auth_t;
 
-#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
-#define ZBX_TASK_FLAG_FOREGROUND	0x02
-
 typedef struct
 {
 	zbx_task_t	task;
+#define ZBX_TASK_FLAG_MULTIPLE_AGENTS	0x01
+#define ZBX_TASK_FLAG_FOREGROUND	0x02
+#ifdef _WINDOWS
+	#define ZBX_TASK_FLAG_SERVICE_ENABLED		0x04
+	#define ZBX_TASK_FLAG_SERVICE_AUTOSTART		0x08
+	#define ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED	0x10
+#endif
 	unsigned int	flags;
 	int		data;
 	char		*opts;
@@ -577,8 +584,6 @@ void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 /* misc functions */
 int	zbx_validate_hostname(const char *hostname);
-
-void	zbx_backtrace(void);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
@@ -754,7 +759,7 @@ static	type2	get_##varname(void) \
 
 typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
 
-void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname);
+void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname, zbx_backtrace_f backtrace);
 void	zbx_log_handle(int level, const char *fmt, ...);
 int	zbx_get_log_level(void);
 void	zbx_set_log_level(int level);

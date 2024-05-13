@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CWidgetFieldTimePeriod {
 
 	static DATA_SOURCE_DEFAULT = 0;
@@ -170,7 +171,7 @@ class CWidgetFieldTimePeriod {
 
 			this.#reference_multiselect
 				.multiSelect('getSelectButton').addEventListener('click', () => {
-					const popup = new ClassWidgetSelectPopup(this.#getWidgets());
+					const popup = new CWidgetSelectPopup(this.#getWidgets());
 
 					popup.on('dialogue.submit', (e) => {
 						this.#selectTypedReference(e.detail.reference);
@@ -263,6 +264,16 @@ class CWidgetFieldTimePeriod {
 	}
 
 	#selectTypedReference(typed_reference) {
+		if (typed_reference === '') {
+			this.#reference_multiselect.multiSelect('addData', [{
+				id: '',
+				name: t('Unavailable widget'),
+				inaccessible: true
+			}]);
+
+			return;
+		}
+
 		for (const widget of this.#getWidgets()) {
 			if (widget.id === typed_reference) {
 				this.#reference_multiselect.multiSelect('addData', [widget]);
@@ -276,6 +287,8 @@ class CWidgetFieldTimePeriod {
 			type: this.#in_type,
 			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
 		});
+
+		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));
 
 		const result = [];
 

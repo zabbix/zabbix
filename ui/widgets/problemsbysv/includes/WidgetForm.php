@@ -114,9 +114,7 @@ class WidgetForm extends CWidgetForm {
 					EXTACK_OPTION_ALL => _('All'),
 					EXTACK_OPTION_BOTH => _('Separated'),
 					EXTACK_OPTION_UNACK => _('Unacknowledged only')
-				]))
-					->setDefault(EXTACK_OPTION_ALL)
-					->setFlags(CWidgetField::FLAG_ACKNOWLEDGES)
+				]))->setDefault(EXTACK_OPTION_ALL)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('show_timeline', _('Show timeline')))->setDefault(ZBX_TIMELINE_ON)

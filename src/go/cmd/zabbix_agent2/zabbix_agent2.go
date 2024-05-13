@@ -29,25 +29,25 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin/comms"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"git.zabbix.com/ap/plugin-support/zbxflag"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/agent/runtimecontrol"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/agent/serverconnector"
-	"zabbix.com/internal/agent/serverlistener"
-	"zabbix.com/internal/agent/statuslistener"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/pidfile"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxlib"
-	_ "zabbix.com/plugins"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/agent/runtimecontrol"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/agent/serverconnector"
+	"golang.zabbix.com/agent2/internal/agent/serverlistener"
+	"golang.zabbix.com/agent2/internal/agent/statuslistener"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/pidfile"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	_ "golang.zabbix.com/agent2/plugins"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/zbxerr"
+	"golang.zabbix.com/sdk/zbxflag"
 )
 
 const runtimeCommandSendingTimeout = time.Second
@@ -573,7 +573,7 @@ func parseArgs() (string, *Arguments, error) {
 
 func usageMessage() string {
 	return fmt.Sprintf(
-		usageMessageFormat,
+		usageMessageFormat+osDependentUsageMessageFormat,
 		filepath.Base(os.Args[0]),
 	)
 }

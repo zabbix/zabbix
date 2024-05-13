@@ -32,6 +32,10 @@ $form = (new CForm('post', $form_action))
 	->setId('media-type-mapping-edit-form')
 	->setName('media-type-mapping-edit-form');
 
+if (array_key_exists('userdirectory_mediaid', $data)) {
+	$form->addVar('userdirectory_mediaid', $data['userdirectory_mediaid']);
+}
+
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
@@ -64,6 +68,36 @@ $form
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setId('attribute')
 			)
+		])
+		->addItem([
+			new CLabel(_('User media')),
+			new CFormField((new CFormGrid([
+				[
+					(new CLabel(_('When active'), 'period'))->setAsteriskMark(),
+					new CFormField((new CTextBox('period', $data['period'], false,
+							DB::getFieldLength('userdirectory_media', 'period')
+						))
+							->setAriaRequired()
+							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
+					)
+				],
+				[
+					new CLabel(_('Use if severity')),
+					new CFormField(
+						(new CCheckBoxList('severity'))
+							->setOptions(CSeverityHelper::getSeverities())
+							->setChecked($data['severities'])
+							->setVertical(true)
+					)
+				],
+				[
+					new CLabel(_('Create enabled'), 'active'),
+					new CFormField(
+						(new CCheckBox('active', MEDIA_STATUS_ACTIVE))
+							->setChecked($data['active'] == MEDIA_STATUS_ACTIVE)
+					)
+				]
+			]))->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP))
 		])
 	)
 	->addItem(

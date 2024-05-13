@@ -1,0 +1,7 @@
+// Widget view.
+
+div.dashboard-widget-problems {
+	.list-table tr[data-eventid] {
+		cursor: pointer;
+	}
+}
