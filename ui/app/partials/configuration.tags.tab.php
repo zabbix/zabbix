@@ -47,16 +47,12 @@ $table = (new CTable())
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->setColumns($header_columns);
 
-// fields
+// fields`
 $options = [
 	'show_inherited_tags' => $show_inherited_tags
 ];
 
 foreach ($data['tags'] as $index => $tag) {
-	if (!array_key_exists('type', $tag)) {
-		$tag['type'] = ZBX_PROPERTY_OWN;
-	}
-
 	$options['readonly'] = $show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED;
 
 	$table->addItem(renderTagTableRow($index, $tag, $options));
