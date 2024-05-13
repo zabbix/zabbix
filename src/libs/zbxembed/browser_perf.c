@@ -683,7 +683,11 @@ void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struc
 		struct zbx_json_parse	jp_entry;
 		char			buf[MAX_STRING_LEN];
 
-		zbx_json_brackets_open(p, &jp_entry);
+		if (SUCCEED != zbx_json_brackets_open(p, &jp_entry))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot open performance entry object");
+			continue;
+		}
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_entry, WD_PERF_TAG_ENTRY_TYPE, buf, sizeof(buf), NULL))
 		{
