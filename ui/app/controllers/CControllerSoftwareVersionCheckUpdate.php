@@ -110,8 +110,9 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 		$versions = $this->getInput('versions');
 
 		if ($versions) {
+			$delay = self::NEXTCHECK_DELAY;
 			$lastcheck_success = $lastcheck;
-			$nextcheck = $lastcheck + self::NEXTCHECK_DELAY;
+			$nextcheck = $lastcheck + $delay;
 		}
 		else {
 			$previous_check_data = CSettingsHelper::getSoftwareUpdateCheckData() + [
@@ -119,8 +120,9 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 				'versions' => []
 			];
 
+			$delay = self::NEXTCHECK_DELAY_ON_FAIL;
 			$lastcheck_success = $previous_check_data['lastcheck_success'];
-			$nextcheck = $lastcheck + self::NEXTCHECK_DELAY_ON_FAIL;
+			$nextcheck = $lastcheck + $delay;
 			$versions = $lastcheck - $lastcheck_success <= self::MAX_NO_DATA_PERIOD
 				? $previous_check_data['versions']
 				: [];
@@ -138,7 +140,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['nextcheck'] = $nextcheck;
+			$output['delay'] = $delay + random_int(1, SEC_PER_MIN);
 		}
 		else {
 			$output['error'] = [

@@ -45,17 +45,15 @@ class CSoftwareVersionCheck {
 					return;
 				}
 
-				if (response.nextcheck <= response.now) {
+				if ('delay' in response) {
+					setTimeout(() => this.#getSavedData(), response.delay * 1000);
+				}
+				else {
 					this.#data.major_version = response.major_version;
 					this.#data.check_hash = response.check_hash;
 					this.#data._csrf_token = response._csrf_token;
 
 					this.#getCurrentData();
-				}
-				else {
-					const delay = response.nextcheck - response.now + Math.floor(Math.random() * 60) + 1;
-
-					setTimeout(() => this.#getSavedData(), delay * 1000);
 				}
 			})
 			.catch(exception => {
@@ -103,9 +101,7 @@ class CSoftwareVersionCheck {
 					throw {error: response.error};
 				}
 
-				const delay = response.nextcheck + Math.floor(Math.random() * 60) + 1;
-
-				setTimeout(() => this.#getSavedData(), delay * 1000);
+				setTimeout(() => this.#getSavedData(), response.delay * 1000);
 			})
 			.catch(exception => {
 				console.log('Could not update data', exception);
