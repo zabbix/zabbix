@@ -36,6 +36,7 @@ class CControllerTimeoutsEdit extends CController {
 			'timeout_ssh_agent' =>			'db config.timeout_ssh_agent',
 			'timeout_telnet_agent' =>		'db config.timeout_telnet_agent',
 			'timeout_script' =>				'db config.timeout_script',
+			'timeout_browser' =>			'db config.timeout_browser',
 			'socket_timeout' =>				'db config.socket_timeout',
 			'connect_timeout' =>			'db config.connect_timeout',
 			'media_type_test_timeout' =>	'db config.media_type_test_timeout',
@@ -85,6 +86,9 @@ class CControllerTimeoutsEdit extends CController {
 			)),
 			'timeout_script' => $this->getInput('timeout_script', CSettingsHelper::get(
 				CSettingsHelper::TIMEOUT_SCRIPT
+			)),
+			'timeout_browser' => $this->getInput('timeout_browser', CSettingsHelper::get(
+				CSettingsHelper::TIMEOUT_BROWSER
 			)),
 			'socket_timeout' => $this->getInput('socket_timeout', CSettingsHelper::get(
 				CSettingsHelper::SOCKET_TIMEOUT

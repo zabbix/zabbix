@@ -131,6 +131,16 @@ $form_grid = (new CFormGrid())
 						->setAriaRequired()
 				)
 			])
+			->addItem([
+				(new CLabel(_('Browser'), 'timeout_browser'))->setAsteriskMark(),
+				new CFormField(
+					(new CTextBox('timeout_browser', $data['timeout_browser'], false,
+						DB::getFieldLength('config', 'timeout_browser')
+					))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setAriaRequired()
+				)
+			])
 	)
 	->addItem(
 		(new CFormFieldset(_('Network timeouts for UI')))
@@ -222,6 +232,7 @@ $form->addItem(
 			'timeout_ssh_agent' => DB::getDefault('config', 'timeout_ssh_agent'),
 			'timeout_telnet_agent' => DB::getDefault('config', 'timeout_telnet_agent'),
 			'timeout_script' => DB::getDefault('config', 'timeout_script'),
+			'timeout_browser' => DB::getDefault('config', 'timeout_browser'),
 			'socket_timeout' => DB::getDefault('config', 'socket_timeout'),
 			'connect_timeout' => DB::getDefault('config', 'connect_timeout'),
 			'media_type_test_timeout' => DB::getDefault('config', 'media_type_test_timeout'),

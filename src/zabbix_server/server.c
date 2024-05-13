@@ -354,6 +354,9 @@ static char	*config_ssl_ca_location = NULL;
 static char	*config_ssl_cert_location = NULL;
 static char	*config_ssl_key_location = NULL;
 
+/* browser item */
+static char	*config_webdriver_url = NULL;
+
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
 static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
@@ -1131,8 +1134,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"AllowSoftwareUpdateCheck",	&config_allow_software_update_check,	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
-		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_POLLER], ZBX_CFG_TYPE_INT,
+		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER], ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
+		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1542,14 +1547,15 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_max_concurrent_checks_per_poller, get_config_forks,
 							config_java_gateway, config_java_gateway_port,
 							config_externalscripts, zbx_get_value_internal_ext_server,
-							config_ssh_key_location};
+							config_ssh_key_location, config_webdriver_url};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency, get_config_forks,
 							config_stats_allowed_ip, config_java_gateway,
 							config_java_gateway_port, config_externalscripts,
 							config_enable_global_scripts, zbx_get_value_internal_ext_server,
-							config_ssh_key_location, zbx_trapper_process_request_server,
+							config_ssh_key_location, config_webdriver_url,
+							zbx_trapper_process_request_server,
 							zbx_autoreg_update_host_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,

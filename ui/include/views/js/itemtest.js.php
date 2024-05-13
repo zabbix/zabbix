@@ -239,6 +239,15 @@
 					timeout: form_data['timeout']
 				};
 				break;
+
+			case <?= ITEM_TYPE_BROWSER ?>:
+				properties = {
+					key: form_data['key'].trim(),
+					parameters: form_data['parameters'],
+					browser_script: form_data['browser_script'],
+					timeout: form_data['timeout']
+				};
+				break;
 		}
 
 		// Common properties.

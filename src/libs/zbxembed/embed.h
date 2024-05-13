@@ -20,6 +20,7 @@
 #ifndef ZABBIX_EMBED_H
 #define ZABBIX_EMBED_H
 
+#include "zbxembed.h"
 #include "duktape.h"
 #include "zbxtime.h"
 
@@ -57,10 +58,18 @@ struct zbx_es_env
 	int		logged_msgs;
 
 	const char	*config_source_ip;
+
+	char		*browser_endpoint;
+
+	int		browser_objects;
+	int		constructor_chain;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
 
 int	es_duktape_string_decode(const char *duk_str, char **out_str);
+
+duk_ret_t	es_super(duk_context *ctx, const char *base, int args);
+int	es_is_chained_constructor_call(duk_context *ctx);
 
 #endif /* ZABBIX_EMBED_H */

@@ -67,7 +67,8 @@ $fields = [
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+										ITEM_TYPE_BROWSER
 									]),
 									'isset({add}) || isset({update})'
 								],
@@ -91,8 +92,11 @@ $fields = [
 										' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY
 								],
 	$paramsFieldName =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update}))'.
-									' && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.
-										ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED.','.ITEM_TYPE_SCRIPT, 'type'
+									' && isset({type}) && '.IN([
+											ITEM_TYPE_SSH, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
+											ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+										],
+										'type'
 									),
 									getParamFieldLabelByType(getRequest('type', 0))
 								],
@@ -133,7 +137,7 @@ $fields = [
 									'(isset({add}) || isset({update})) && isset({type})'.
 									' && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE,
 										ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-										ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+										ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 									], 'type'),
 									_('Timeout')
 								],
@@ -236,7 +240,7 @@ $fields = [
 												ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
 												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 												ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
-												ITEM_TYPE_SCRIPT
+												ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 											]),
 											null
 										],

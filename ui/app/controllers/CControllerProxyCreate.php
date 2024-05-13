@@ -60,7 +60,8 @@ class CControllerProxyCreate extends CController {
 			'timeout_http_agent' =>		'db proxy.timeout_http_agent',
 			'timeout_ssh_agent' =>		'db proxy.timeout_ssh_agent',
 			'timeout_telnet_agent' =>	'db proxy.timeout_telnet_agent',
-			'timeout_script' =>			'db proxy.timeout_script'
+			'timeout_script' =>			'db proxy.timeout_script',
+			'timeout_browser' =>		'db proxy.timeout_browser'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -151,7 +152,8 @@ class CControllerProxyCreate extends CController {
 					'timeout_http_agent' =>		'required|not_empty',
 					'timeout_ssh_agent' =>		'required|not_empty',
 					'timeout_telnet_agent' =>	'required|not_empty',
-					'timeout_script' =>			'required|not_empty'
+					'timeout_script' =>			'required|not_empty',
+					'timeout_browser' =>		'required|not_empty'
 				];
 
 				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
@@ -244,7 +246,7 @@ class CControllerProxyCreate extends CController {
 		if ($custom_timeouts == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
 			$this->getInputs($proxy, ['custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
 				'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
-				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			]);
 		}
 

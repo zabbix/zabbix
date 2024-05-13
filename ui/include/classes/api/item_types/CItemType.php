@@ -208,6 +208,12 @@ abstract class CItemType {
 					case  ITEM_TYPE_TRAPPER:
 						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
 				}
+
+			case 'parameters':
+				return ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
+					'value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
+				]];
 		}
 	}
 
@@ -323,6 +329,12 @@ abstract class CItemType {
 					case  ITEM_TYPE_TRAPPER:
 						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
 				}
+
+			case 'parameters':
+				return ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
+					'value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
+				]];
 		}
 	}
 
@@ -379,6 +391,7 @@ abstract class CItemType {
 						return ['type' => API_CALC_FORMULA, 'flags' => ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')];
 
 					case ITEM_TYPE_SCRIPT:
+					case ITEM_TYPE_BROWSER:
 						return ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED];
 
 					default:
@@ -413,6 +426,9 @@ abstract class CItemType {
 					case  ITEM_TYPE_TRAPPER:
 						return ['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')];
 				}
+
+			case 'parameters':
+				return ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED];
 		}
 	}
 
@@ -431,6 +447,7 @@ abstract class CItemType {
 			case 'timeout':
 			case 'delay':
 			case 'trapper_hosts':
+			case 'parameters':
 				return ['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED];
 		}
 	}

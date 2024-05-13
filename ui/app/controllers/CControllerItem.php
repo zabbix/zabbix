@@ -46,6 +46,7 @@ abstract class CControllerItem extends CController {
 			'query_fields'			=> 'array',
 			'parameters'			=> 'array',
 			'script'				=> 'db items.params',
+			'browser_script'		=> 'db items.params',
 			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'custom_timeout'		=> 'in '.implode(',', [ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
 			'timeout'				=> 'db items.timeout',
@@ -143,7 +144,8 @@ abstract class CControllerItem extends CController {
 		}
 
 		$timeout_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT,
+			ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 		];
 
 		if (in_array($type, $timeout_types)

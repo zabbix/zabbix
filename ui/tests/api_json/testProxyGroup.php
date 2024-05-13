@@ -367,7 +367,7 @@ class testProxyGroup extends CAPITest {
 					'selectProxies' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/selectProxies/1": value must be one of "proxyid", "name", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/selectProxies/1": value must be one of "proxyid", "name", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "lastaccess", "version", "compatibility", "state".'
 			]
 		];
 	}
@@ -496,6 +496,7 @@ class testProxyGroup extends CAPITest {
 						'timeout_ssh_agent' => '',
 						'timeout_telnet_agent' => '',
 						'timeout_script' => '',
+						'timeout_browser' => '',
 						'lastaccess' => '0',
 						'version' => '0',
 						'compatibility' => '0',

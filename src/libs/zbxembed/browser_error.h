@@ -17,14 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_BROWSER_H
-#define ZABBIX_CHECKS_BROWSER_H
+#ifndef ZABBIX_BROWSER_ERROR_H
+#define ZABBIX_BROWSER_ERROR_H
 
-#include "zbxcacheconfig.h"
+#include "config.h"
 
-void	browseritem_es_engine_init(void);
-void	browseritem_es_engine_destroy(void);
-int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, const char *config_source_ip,
-		AGENT_RESULT *result);
+#ifdef HAVE_LIBCURL
+
+#include "duk_config.h"
+#include "webdriver.h"
+#include "zbxembed.h"
+
+int	browser_push_error(duk_context *ctx, zbx_webdriver_t *wd, const char *format, ...);
+int	es_browser_init_errors(zbx_es_t *es, char **error);
 
 #endif
+
+#endif
+

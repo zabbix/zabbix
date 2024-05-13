@@ -241,6 +241,8 @@ class CXmlConstantName {
 	const DEPENDENT = 'DEPENDENT';
 	const HTTP_AGENT = 'HTTP_AGENT';
 	const SNMP_AGENT = 'SNMP_AGENT';
+	// const SCRIPT = 'SCRIPT'; // Duplicate.
+	const BROWSER = 'BROWSER';
 
 	const FLOAT = 'FLOAT';
 	const CHAR = 'CHAR';

@@ -342,6 +342,17 @@ $timeouts_tab = (new CFormGrid())
 				->setEnabled($custom_timeouts_enabled)
 				->setAriaRequired()
 		)
+	])
+	->addItem([
+		(new CLabel(_('Browser'), 'timeout_browser'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_browser', $data['form']['timeout_browser'], false,
+				DB::getFieldLength('proxy', 'timeout_browser')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
 	]);
 
 $tabs = (new CTabView(['id' => 'proxy-tabs']))

@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CItemTypeScript extends CItemType {
+class CItemTypeBrowser extends CItemType {
 
 	/**
 	 * @inheritDoc
 	 */
-	const TYPE = ITEM_TYPE_SCRIPT;
+	const TYPE = ITEM_TYPE_BROWSER;
 
 	/**
 	 * @inheritDoc

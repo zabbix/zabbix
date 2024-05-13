@@ -58,7 +58,8 @@ class CItem extends CItemGeneral {
 	public const SUPPORTED_ITEM_TYPES = [
 		ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
-		ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+		ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+		ITEM_TYPE_BROWSER
 	];
 
 	/**
@@ -983,7 +984,7 @@ class CItem extends CItemGeneral {
 		foreach ($db_items as $db_item) {
 			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
 
-			if ($db_item['type'] == ITEM_TYPE_SCRIPT) {
+			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 				$item += ['parameters' => []];
 			}
 
