@@ -39,7 +39,7 @@ if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
 }
 else {
-	$columns_names_at_top = $data['layout'] == WidgetForm::LAYOUT_HORIZONTAL && count($data['columns']) > 1;
+	$columns_names_at_top = $data['layout'] == WidgetForm::LAYOUT_VERTICAL && count($data['columns']) > 1;
 
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
 		$table_header = $data['show_timestamp']
@@ -56,7 +56,7 @@ else {
 			]
 			: [];
 
-		if ($data['layout'] == WidgetForm::LAYOUT_HORIZONTAL) {
+		if ($data['layout'] == WidgetForm::LAYOUT_VERTICAL) {
 			foreach ($data['columns'] as $column) {
 				$table_header[] = (new CColHeader(
 					(new CSpan($column['name']))
@@ -247,7 +247,7 @@ else {
 				]
 				: [];
 
-			if ($data['layout'] == WidgetForm::LAYOUT_VERTICAL) {
+			if ($data['layout'] == WidgetForm::LAYOUT_HORIZONTAL) {
 				$table->setHeadingColumn(0);
 				$table_row[] = (new CCol($data['columns'][$history_item['columnid']]['name']))
 					->addClass(ZBX_STYLE_NOWRAP);
