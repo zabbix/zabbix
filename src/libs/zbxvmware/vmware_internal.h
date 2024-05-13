@@ -25,19 +25,6 @@
 #	include "zbxxml.h"
 #endif
 
-typedef struct
-{
-	time_t			nextcheck;
-#define ZBX_VMWARE_UPDATE_CONF		1
-#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
-#define ZBX_VMWARE_UPDATE_REST_TAGS	3
-#define ZBX_VMWARE_UPDATE_EVENTLOG	4
-	int			type;
-	int			expired;
-	zbx_vmware_service_t	*service;
-}
-zbx_vmware_job_t;
-
 zbx_vmware_t			*zbx_vmware_get_vmware(void);
 zbx_uint64_t			zbx_vmware_get_evt_req_chunk_sz(void);
 

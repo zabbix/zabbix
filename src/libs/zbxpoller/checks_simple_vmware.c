@@ -1216,13 +1216,21 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
-	if (0 == service->jobs_eventlog_num)
+	if (NULL == service->eventlog_job_ref)
 		zbx_vmware_eventlog_job_create(service);
 
 	time_t	lastaccess = time(NULL);
 
 	if (0 != service->eventlog.lastaccess)
+	{
+		time_t	interval_old = service->eventlog.interval;
+
 		service->eventlog.interval = lastaccess - service->eventlog.lastaccess;
+
+		/* force job re-schedule if new interval is less than old */
+		if (service->eventlog.interval + SEC_PER_MIN < interval_old)
+			service->eventlog_job_ref->nextcheck = 0;
+	}
 
 	service->eventlog.lastaccess = lastaccess;
 

@@ -506,6 +506,8 @@ typedef struct
 }
 zbx_vmware_data_tags_t;
 
+typedef struct zbx_vmware_job zbx_vmware_job_t;
+
 /* vmware service data */
 typedef struct
 {
@@ -556,8 +558,8 @@ typedef struct
 	/* linked jobs count */
 	int				jobs_num;
 
-	/* linked eventlog jobs count */
-	int				jobs_eventlog_num;
+	/* linked eventlog job */
+	zbx_vmware_job_t		*eventlog_job_ref;
 
 	/* vmware entity (vm, hv etc) and linked tags */
 	zbx_vmware_data_tags_t		data_tags;
@@ -565,6 +567,18 @@ typedef struct
 zbx_vmware_service_t;
 
 ZBX_PTR_VECTOR_DECL(vmware_service_ptr, zbx_vmware_service_t *)
+
+struct zbx_vmware_job
+{
+	time_t				nextcheck;
+#define ZBX_VMWARE_UPDATE_CONF		1
+#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
+#define ZBX_VMWARE_UPDATE_REST_TAGS	3
+#define ZBX_VMWARE_UPDATE_EVENTLOG	4
+	int				type;
+	int				expired;
+	zbx_vmware_service_t		*service;
+};
 
 /* vmware collector data */
 typedef struct

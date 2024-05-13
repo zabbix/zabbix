@@ -2985,6 +2985,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 	job->type = job_type;
 	job->service = service;
 	service->jobs_num++;
+	service->eventlog_job_ref = ZBX_VMWARE_UPDATE_EVENTLOG == job_type ? job : NULL;
 	job->expired = FAIL;
 	elem_new.data = job;
 	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
@@ -3001,7 +3002,6 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service)
 {
 	zbx_vmware_job_create(zbx_vmware_get_vmware(), service, ZBX_VMWARE_UPDATE_EVENTLOG);
-	service->jobs_eventlog_num++;
 }
 
 /******************************************************************************
@@ -3024,7 +3024,7 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 	{
 		job->service->eventlog.lastaccess = 0;
 		job->service->eventlog.interval = 0;
-		job->service->jobs_eventlog_num--;
+		job->service->eventlog_job_ref = NULL;
 	}
 
 	job->service->jobs_num--;
