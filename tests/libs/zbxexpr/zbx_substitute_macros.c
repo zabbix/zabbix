@@ -139,5 +139,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_str_eq("zbx_substitute_macros() expected error", expected_error, error);
 	}
 
+	zbx_free(result);
+
 	zbx_vector_str_pair_destroy(&resolve_vector);
 }
