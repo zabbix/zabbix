@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -19,13 +19,16 @@
 **/
 
 
-namespace Widgets\PlainText;
+/**
+ * @var CView $this
+ * @var array $data
+ */
 
-use Zabbix\Core\CWidget;
+header('Content-type: image/png');
 
-class Widget extends CWidget {
-
-	public function getDefaultName(): string {
-		return _('Plain text');
-	}
+if ($data['image'] !== '') {
+	echo imagepng($data['image']);
+}
+else {
+	echo $data['image'];
 }

@@ -20,34 +20,42 @@
 
 
 /**
- * Plain text widget form view.
+ * Item history widget form view.
  *
  * @var CView $this
  * @var array $data
  */
 
+use Widgets\ItemHistory\Includes\CWidgetFieldColumnsListView;
+
 (new CWidgetFormView($data))
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids']))
-			->setPopupParameter('value_types', [
-				ITEM_VALUE_TYPE_FLOAT,
-				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_LOG,
-				ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_TEXT
-			])
+		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
 	)
 	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['style'])
+		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
-	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['show_as_html'])
 	)
 	->addField($data['templateid'] === null
 		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
+	->addFieldset(
+		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
+			->addField(
+				new CWidgetFieldRadioButtonListView($data['fields']['sortorder'])
+			)
+			->addField(
+				new CWidgetFieldCheckBoxView($data['fields']['show_timestamp'])
+			)
+			->addField(
+				new CWidgetFieldRadioButtonListView($data['fields']['show_column_header'])
+			)
+	)
+	->includeJsFile('widget.edit.js.php')
+	->addJavaScript('widget_itemhistory_form.init('.json_encode([
+			'templateid' => $data['templateid']
+		], JSON_THROW_ON_ERROR).');')
 	->show();

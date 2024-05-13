@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0rc1');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050298);
+define('ZABBIX_DB_VERSION',		6050304);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1741,7 +1741,7 @@ define('WIDGET_CLOCK',				'clock');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
 define('WIDGET_ITEM',				'item');
-define('WIDGET_PLAIN_TEXT',			'plaintext');
+define('WIDGET_ITEM_HISTORY',		'itemhistory');
 define('WIDGET_URL',				'url');
 
 // Inaccessible widget type.

@@ -4137,7 +4137,7 @@ zabbix_export:
                         name: 'Azure Cost: ["{#AZURE.SERVICE.NAME}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AAAAB
                     - type: INTEGER
                       name: rows
                       value: '6'
@@ -4154,7 +4154,7 @@ zabbix_export:
                         name: 'Azure Cost: ["{#AZURE.RESOURCE.LOCATION}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AAAAC
                     - type: INTEGER
                       name: rows
                       value: '6'
@@ -4171,7 +4171,7 @@ zabbix_export:
                         name: 'Azure Cost: ["{#AZURE.RESOURCE.GROUP}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AAAAD
                     - type: INTEGER
                       name: rows
                       value: '6'
@@ -4188,7 +4188,7 @@ zabbix_export:
                         name: 'Daily Cost: "{#AZURE.SERVICE.NAME}","{#AZURE.BILLING.METER}","{#AZURE.BILLING.METER.SUBCATEGORY}","{#AZURE.RESOURCE.GROUP}"'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AAAAE
                     - type: INTEGER
                       name: rows
                       value: '5'
@@ -5250,19 +5250,31 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                - type: plaintext
+                - type: itemhistory
                   name: 'Availability status detailed'
                   x: '24'
                   width: '48'
                   height: '3'
                   fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '4'
                     - type: ITEM
-                      name: itemids.0
+                      name: columns.0.itemid
                       value:
                         host: 'Azure Microsoft SQL Database by HTTP'
                         key: azure.db.mssql.availability.details
                     - type: INTEGER
-                      name: show_as_html
+                      name: columns.0.monospace_font
+                      value: '1'
+                    - type: STRING
+                      name: columns.0.name
+                      value: 'Azure Microsoft SQL: Availability status detailed'
+                    - type: STRING
+                      name: reference
+                      value: BAAAG
+                    - type: INTEGER
+                      name: show_timestamp
                       value: '1'
                 - type: item
                   name: 'Sessions count'
@@ -6418,19 +6430,31 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                - type: plaintext
+                - type: itemhistory
                   name: 'Availability status detailed'
                   x: '24'
                   width: '48'
                   height: '3'
                   fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '4'
                     - type: ITEM
-                      name: itemids.0
+                      name: columns.0.itemid
                       value:
                         host: 'Azure Microsoft SQL Serverless Database by HTTP'
                         key: azure.db.mssql.availability.details
                     - type: INTEGER
-                      name: show_as_html
+                      name: columns.0.monospace_font
+                      value: '1'
+                    - type: STRING
+                      name: columns.0.name
+                      value: 'Azure Microsoft SQL: Availability status detailed'
+                    - type: STRING
+                      name: reference
+                      value: BAAAF
+                    - type: INTEGER
+                      name: show_timestamp
                       value: '1'
                 - type: item
                   name: 'Sessions percentage'
@@ -7531,19 +7555,31 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAC
-                - type: plaintext
+                - type: itemhistory
                   name: 'Availability status detailed'
                   x: '36'
                   width: '36'
                   height: '3'
                   fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '4'
                     - type: ITEM
-                      name: itemids.0
+                      name: columns.0.itemid
                       value:
                         host: 'Azure MySQL Flexible Server by HTTP'
                         key: azure.db.mysql.availability.details
                     - type: INTEGER
-                      name: show_as_html
+                      name: columns.0.monospace_font
+                      value: '1'
+                    - type: STRING
+                      name: columns.0.name
+                      value: 'Azure MySQL: Availability status detailed'
+                    - type: STRING
+                      name: reference
+                      value: BAAAB
+                    - type: INTEGER
+                      name: show_timestamp
                       value: '1'
                 - type: item
                   name: Queries
@@ -8571,19 +8607,31 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAD
-                - type: plaintext
+                - type: itemhistory
                   name: 'Availability status detailed'
                   x: '36'
                   width: '36'
                   height: '3'
                   fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '4'
                     - type: ITEM
-                      name: itemids.0
+                      name: columns.0.itemid
                       value:
                         host: 'Azure MySQL Single Server by HTTP'
                         key: azure.db.mysql.availability.details
                     - type: INTEGER
-                      name: show_as_html
+                      name: columns.0.monospace_font
+                      value: '1'
+                    - type: STRING
+                      name: columns.0.name
+                      value: 'Azure MySQL: Availability status detailed'
+                    - type: STRING
+                      name: reference
+                      value: BAAAC
+                    - type: INTEGER
+                      name: show_timestamp
                       value: '1'
       valuemaps:
         - uuid: 323a5259fb854724891515767f341540
@@ -9666,19 +9714,31 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAC
-                - type: plaintext
+                - type: itemhistory
                   name: 'Availability status detailed'
                   x: '36'
                   width: '36'
                   height: '3'
                   fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '4'
                     - type: ITEM
-                      name: itemids.0
+                      name: columns.0.itemid
                       value:
                         host: 'Azure PostgreSQL Flexible Server by HTTP'
                         key: azure.db.pgsql.availability.details
                     - type: INTEGER
-                      name: show_as_html
+                      name: columns.0.monospace_font
+                      value: '1'
+                    - type: STRING
+                      name: columns.0.name
+                      value: 'Azure PostgreSQL: Availability status detailed'
+                    - type: STRING
+                      name: reference
+                      value: BAAAD
+                    - type: INTEGER
+                      name: show_timestamp
                       value: '1'
                 - type: item
                   name: 'Data disk write IOPS'
@@ -10710,19 +10770,31 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAD
-                - type: plaintext
+                - type: itemhistory
                   name: 'Availability status detailed'
                   x: '36'
                   width: '36'
                   height: '3'
                   fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '4'
                     - type: ITEM
-                      name: itemids.0
+                      name: columns.0.itemid
                       value:
                         host: 'Azure PostgreSQL Single Server by HTTP'
                         key: azure.db.pgsql.availability.details
                     - type: INTEGER
-                      name: show_as_html
+                      name: columns.0.monospace_font
+                      value: '1'
+                    - type: STRING
+                      name: columns.0.name
+                      value: 'Azure PostgreSQL: Availability status detailed'
+                    - type: STRING
+                      name: reference
+                      value: BAAAE
+                    - type: INTEGER
+                      name: show_timestamp
                       value: '1'
       valuemaps:
         - uuid: 61fc206aaae04abda4012e031f0e27ac
@@ -12326,19 +12398,31 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAE
-                - type: plaintext
+                - type: itemhistory
                   name: 'Availability status detailed'
                   x: '36'
                   width: '36'
                   height: '3'
                   fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '4'
                     - type: ITEM
-                      name: itemids.0
+                      name: columns.0.itemid
                       value:
                         host: 'Azure Virtual Machine by HTTP'
                         key: azure.vm.availability.details
                     - type: INTEGER
-                      name: show_as_html
+                      name: columns.0.monospace_font
+                      value: '1'
+                    - type: STRING
+                      name: columns.0.name
+                      value: 'Azure: Availability status detailed'
+                    - type: STRING
+                      name: reference
+                      value: BAAAA
+                    - type: INTEGER
+                      name: show_timestamp
                       value: '1'
       valuemaps:
         - uuid: 38c8ce1516704ec2a6f1ea9686db56b9

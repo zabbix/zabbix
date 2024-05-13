@@ -284,15 +284,20 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							],
 							[
 								'type' => 'plaintext',
-								'name' => 'Plain text widget',
+								'name' => 'Item history widget',
 								'x' => 36,
 								'y' => 8,
 								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 4,
-										'name' => 'itemids',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Column_1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
 										'value' => self::TEMPLATE_ITEM_ID
 									]
 								]
@@ -1645,10 +1650,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #13 Plain text widget.
+			// #13 Item history widget.
 			[
 				[
-					'type' => CFormElement::RELOADABLE_FILL('Plain text'),
+					'type' => CFormElement::RELOADABLE_FILL('Item history'),
 					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
 						[
@@ -3592,13 +3597,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #56 Plain text widget with empty Items parameter.
+			// #56 Item history widget with empty Items parameter.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with empty Items',
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget with empty Items',
 						'Items' => '',
 						'Show lines' => ''
 					],
@@ -3608,13 +3613,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #57 Plain text widget with too high value of Show lines parameter.
+			// #57 Item history widget with too high value of Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with too much lines',
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget with too much lines',
 						'Items' => self::TEMPLATE_ITEM,
 						'Show lines' => 999
 					],
@@ -3624,13 +3629,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #58 Plain text widget with negative Show lines parameter.
+			// #58 Item history widget with negative Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with negative Show lines',
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget with negative Show lines',
 						'Items' => self::TEMPLATE_ITEM,
 						'Show lines' => -9
 					],
@@ -3640,12 +3645,12 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #59 Plain text widget with Items location = top and text shown as HTML.
+			// #59 Item history widget with Items location = top and text shown as HTML.
 			[
 				[
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget top location HTML',
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget top location HTML',
 						'Items' => self::TEMPLATE_ITEM,
 						'Show lines' => 9,
 						'Items location' => 'Top',
@@ -3656,12 +3661,12 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #60 Plain text widget with Items location = left and text shown as plain text.
+			// #60 Item history widget with Items location = left and text shown as Item history.
 			[
 				[
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget left location no HTML',
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget left location no HTML',
 						'Items' => self::TEMPLATE_ITEM,
 						'Show lines' => 9,
 						'Items location' => 'Left',
@@ -4395,7 +4400,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
 				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator',
-				'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Plain text', 'Problem hosts',
+				'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Item history', 'Problem hosts',
 				'Problems', 'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers',
 				'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];

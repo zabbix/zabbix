@@ -4437,6 +4437,40 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 div.dashboard-widget-item a:link {
   border-bottom: none; }
 
+form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
+  max-width: 250px; }
+form.dashboard-widget-itemhistory #list_columns .inaccessible {
+  color: #9f9f9f; }
+
+div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
+  height: 56px;
+  vertical-align: middle; }
+div.dashboard-widget-itemhistory .list-table .has-broadcast-data {
+  cursor: pointer; }
+div.dashboard-widget-itemhistory .binary-thumbnail .btn {
+  overflow: hidden; }
+  div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link) {
+    width: 100px;
+    height: 56px;
+    background: transparent var(--thumbnail) no-repeat center top;
+    background-size: cover;
+    border-color: transparent;
+    text-indent: -9999px; }
+    div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link):not(.is-loading) {
+      border: 1px solid #9f9f9f;
+      border-radius: 3px; }
+div.dashboard-widget-itemhistory z-bar-gauge {
+  min-width: 64px;
+  height: 20px; }
+
+.dashboard-widget-itemhistory-hintbox {
+  max-height: 90vh;
+  overflow: auto; }
+  .dashboard-widget-itemhistory-hintbox img {
+    display: block;
+    max-width: 80vw;
+    max-height: 80vh; }
+
 form.dashboard-widget-itemnavigator .item-grouping {
   line-height: 1.4em; }
   form.dashboard-widget-itemnavigator .item-grouping tr:not(.form_row):first-child {
@@ -6638,7 +6672,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .ok-ack-fg {
   color: #009900; }
 
-.navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
+.navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-itemhistory .list-table tr.selected td,
+div.dashboard-widget-itemhistory .list-table td.selected, div.dashboard-widget-itemhistory .list-table tr.selected td:hover,
+div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
   background-color: #f4f4f4; }
 
 @keyframes is-loading-kf {
