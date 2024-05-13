@@ -75,7 +75,8 @@ class C64ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('dashboards', $template)) {
-				$template['dashboards'] = self::convertDashboards($template['dashboards']);
+				$items = array_key_exists('items', $template) ? $template['items'] : [];
+				$template['dashboards'] = self::convertDashboards($template['dashboards'], $items);
 			}
 		}
 		unset($template);
@@ -339,10 +340,8 @@ class C64ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private static function convertDashboards(array $dashboards): array {
-		$new_broadcasting_widget_types = ['graph', 'graphprototype', 'plaintext', 'problemhosts', 'problems',
-			'svggraph', 'tophosts', 'web'
-		];
+	private static function convertDashboards(array $dashboards, array $items): array {
+		$items_index = array_flip(array_column($items, 'key'));
 
 		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
@@ -357,7 +356,78 @@ class C64ImportConverter extends CConverter {
 				}
 
 				foreach ($dashboard_page['widgets'] as &$widget) {
-					if (in_array($widget['type'], $new_broadcasting_widget_types)) {
+					if ($widget['type'] === 'plaintext') {
+						$widget['type'] = 'itemhistory';
+
+						$old_fields = array_key_exists('fields', $widget) ? $widget['fields'] : [];
+						$old_fields_by_name = array_column($old_fields, 'name');
+
+						$new_fields = [
+							[
+								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+								'name' => 'show_timestamp',
+								'value' => '1'
+							]
+						];
+
+						foreach ($old_fields as $field) {
+							switch ($field['name']) {
+								case 'itemids':
+									if (array_key_exists($field['value']['key'], $items_index)) {
+										$item = $items[$items_index[$field['value']['key']]];
+
+										$new_fields[] = [
+											'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
+											'name' => 'columns.'.$items_index[$field['value']['key']].'.name',
+											'value' => $item['name']
+										];
+
+										$new_fields[] = [
+											'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
+											'name' => 'columns.'.$items_index[$field['value']['key']].'.itemid',
+											'value' => $field['value']
+										];
+
+										$is_textual = array_key_exists('value_type', $item)
+											&& in_array(
+												$item['value_type'],
+												[CXmlConstantName::CHAR, CXmlConstantName::LOG, CXmlConstantName::TEXT]
+											);
+
+										$show_as_html = array_key_exists('show_as_html', $old_fields_by_name)
+											&& $old_fields_by_name['show_as_html'] === '1';
+
+										if ($is_textual) {
+											$new_fields[] = [
+												'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+												'name' => 'columns.'.$items_index[$field['value']['key']].'.monospace_font',
+												'value' => '1'
+											];
+
+											if ($show_as_html) {
+												$new_fields[] = [
+													'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+													'name' => 'columns.'.$items_index[$field['value']['key']].'.display',
+													'value' => '4'
+												];
+											}
+										}
+									}
+									break;
+
+								case 'style':
+									$new_fields[] = ['name' => 'layout'] + $field;
+									break;
+
+								default:
+									$new_fields[] = $field;
+							}
+						}
+
+						$widget['fields'] = $new_fields;
+					}
+
+					if (in_array($widget['type'], ['graph', 'graphprototype', 'itemhistory'])) {
 						$reference = self::createWidgetReference($reference_index++);
 
 						if (!array_key_exists('fields', $widget)) {
