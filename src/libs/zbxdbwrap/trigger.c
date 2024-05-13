@@ -190,8 +190,7 @@ static int	db_trigger_expand_macros(const zbx_db_trigger *trigger, zbx_eval_cont
 				continue;
 		}
 
-		if (SUCCEED == zbx_substitute_simple_macros(NULL, &db_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, NULL, &value, ZBX_MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0))
+		if (SUCCEED == zbx_substitute_macros(&value, NULL, 0, zbx_macro_event_trigger_expr_resolv, &db_event))
 		{
 			zbx_variant_clear(&token->value);
 			zbx_variant_set_str(&token->value, value);

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBX_MACRO_CONSTANTS_H
 #define ZABBIX_ZBX_MACRO_CONSTANTS_H
 
+#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
+
 #define MVAR_ACTION			"{ACTION."			/* a prefix for all action macros */
 #define MVAR_ACTION_ID			MVAR_ACTION "ID}"
 #define MVAR_ACTION_NAME		MVAR_ACTION "NAME}"

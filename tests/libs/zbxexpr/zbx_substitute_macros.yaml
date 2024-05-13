@@ -1,0 +1,240 @@
+---
+test case: "Empty data"
+in:
+  expression: "empty"
+out:
+  result: "empty"
+  return: SUCCEED
+---
+test case: "Empty macro"
+in:
+  expression: "empty {}"
+out:
+  return: SUCCEED
+  result: "empty {}"
+---
+test case: "Object id {0} should be skipped"
+in:
+  expression: "object id {0}"
+out:
+  result: "object id {0}"
+  return: SUCCEED
+---
+test case: "LLD macro {#} should be skipped"
+in:
+  expression: "lld {#LLD}"
+out:
+  result: "lld {#LLD}"
+  return: SUCCEED
+---
+test case: "LLD function macro {{#LLD}} should be skipped"
+in:
+  expression: "lld {{#LLD}.regsub(\"(.*)_([0-9]+\", \\1)}"
+out:
+  result: "lld {{#LLD}.regsub(\"(.*)_([0-9]+\", \\1)}"
+  return: SUCCEED
+---
+# Normal unindexed
+test case: "Normal unindexed resolved macro {VALUE}"
+in:
+  expression: "normal unindexed macro {VALUE} value"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{VALUE}"
+        value: resolved
+out:
+  result: "normal unindexed macro resolved value"
+  return: SUCCEED
+---
+test case: "Normal unindexed unknown macro {VALUE}"
+in:
+  expression: "normal unindexed macro {VALUE} value"
+  resolve:
+    return: FAIL
+out:
+  result: "normal unindexed macro *UNKNOWN* value"
+  return: SUCCEED
+---
+test case: "Normal unindexed unresolved macro {VALUE}"
+in:
+  expression: "normal unindexed macro {VALUE} value"
+  resolve:
+    return: SUCCEED
+out:
+  result: "normal unindexed macro {VALUE} value"
+  return: SUCCEED
+---
+# Normal indexed
+test case: "Normal indexed resolved macro {ITEM.VALUE}"
+in:
+  expression: "normal macro {ITEM.VALUE1} and {ITEM.VALUE2} value"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{ITEM.VALUE}"
+        value: indexed
+      - name: "{ITEM.VALUE}"
+        value: resolved
+out:
+  result: "normal macro indexed and resolved value"
+  return: SUCCEED
+---
+test case: "Normal indexed unknown macro {ITEM.VALUE}"
+in:
+  expression: "normal macro {ITEM.VALUE1} and {ITEM.VALUE2} value"
+  resolve:
+    return: FAIL
+    data:
+      - name: "{ITEM.VALUE}"
+        value: indexed
+out:
+  result: "normal macro indexed and *UNKNOWN* value"
+  return: SUCCEED
+---
+test case: "Normal indexed unresolved macro {ITEM.VALUE}"
+in:
+  expression: "normal indexed unresolved macro {ITEM.VALUE1} and {ITEM.VALUE2} value"
+  resolve:
+    return: SUCCEED
+out:
+  result: "normal indexed unresolved macro *UNKNOWN* and *UNKNOWN* value"
+  return: SUCCEED
+---
+test case: "Indexing unindexable macro {VALUE1}"
+in:
+  expression: "unindexable macro {VALUE1}"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{VALUE1}"
+        value: "value 1"
+out:
+  result: "unindexable macro value 1"
+  return: SUCCEED
+---
+# Function macro
+test case: "Unindexed resolved function macro {{ITEM.VALUE}.fmtnum(2)}"
+in:
+  expression: "unindexed resolved function macro {{ITEM.VALUE}.fmtnum(2)}"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{ITEM.VALUE}"
+        value: 2.123456
+out:
+  result: "unindexed resolved function macro 2.12"
+  return: SUCCEED
+---
+test case: "Unindexed unresolved function macro {{ITEM.VALUE}.fmtnum(2)}"
+in:
+  expression: "unindexed unresolved function macro {{ITEM.VALUE}.fmtnum(2)}"
+  resolve:
+    return: FAIL
+out:
+  result: "unindexed unresolved function macro *UNKNOWN*"
+  return: SUCCEED
+---
+test case: "Indexed resolved function macro {{ITEM.VALUE}.fmtnum(2)}"
+in:
+  expression: "indexed resolved function macro {{ITEM.VALUE1}.fmtnum(2)} {{ITEM.VALUE2}.fmtnum(2)}"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{ITEM.VALUE}"
+        value: 1.2345
+      - name: "{ITEM.VALUE}"
+        value: 9.8765
+out:
+  result: "indexed resolved function macro 1.23 9.88"
+  return: SUCCEED
+---
+test case: "Indexed unresolved function macro {{ITEM.VALUE1}.fmtnum(2)} {{ITEM.VALUE2}.fmtnum(2)}"
+in:
+  expression: "unindexed unresolved function macro {{ITEM.VALUE1}.fmtnum(2)} {{ITEM.VALUE2}.fmtnum(2)}"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{ITEM.VALUE}"
+        value: 1.2345
+out:
+  result: "unindexed unresolved function macro 1.23 *UNKNOWN*"
+  return: SUCCEED
+---
+test case: Raw value in indexed function macro
+in:
+  expression: "indexed resolved function macro {{ITEM.LOG.TIME1}.fmttime(%H h %M m %S s)} {ITEM.LOG.TIME2}"
+  resolve:
+    return: SUCCEED
+    data:
+    # We assume that raw value has a '@' at beginning
+      - name: "{ITEM.LOG.TIME}"
+        value: "@03:43:56"
+      - name: "{ITEM.LOG.TIME}"
+        value: "@04:34:20"
+out:
+  result: "indexed resolved function macro 03 h 43 m 56 s @04:34:20"
+  return: SUCCEED
+---
+test case: "Unsupported macros in function macro"
+in:
+  expression: "{{ITEM.VALUE1}.fmttime({ITEM.VALUE2} %H h %M m %S s)}"
+  resolve:
+    return: SUCCEED
+    data:
+    # We assume that raw value has a '@' at beginning
+      - name: "{ITEM.VALUE}"
+        value: "@03:43:56"
+      - name: "{ITEM.VALUE}"
+        value: 1
+out:
+  result: "{ITEM.VALUE2} 03 h 43 m 56 s"
+  return: SUCCEED
+---
+test case: "User macro {$VALUE}"
+in:
+  expression: "user macro {$VALUE}"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{$VALUE}"
+        value: "user macro value"
+out:
+  result: "user macro user macro value"
+  return: SUCCEED
+---
+test case: "User macro {$VALUE} should not be indexed"
+in:
+  expression: "user macro {$VALUE1}"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{$VALUE}"
+        value: "value"
+      - name: "{$VALUE1}"
+        value: "value 1"
+out:
+  result: "user macro value 1"
+  return: SUCCEED
+---
+test case: "Expression macros {?} are being ignoreed by basic search"
+in:
+  expression: "user macro {?abc}"
+out:
+  result: "user macro {?abc}"
+  return: SUCCEED
+---
+test case: "Nested macros are not supported {VALUE2{VALUE1}}"
+in:
+  expression: "nested macro {VALUE{VALUE1}}"
+  resolve:
+    return: SUCCEED
+    data:
+      - name: "{VALUE1}"
+        value: 2
+      - name: "{VALUE2}"
+        value: "nested value"
+out:
+  result: "nested macro {VALUE2}"
+  return: SUCCEED
+...

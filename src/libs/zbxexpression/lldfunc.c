@@ -18,7 +18,6 @@
 **/
 
 #include "zbxexpression.h"
-#include "macrofunc.h"
 #include "expression.h"
 
 #include "zbxexpr.h"
@@ -569,7 +568,7 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 					break;
 				case ZBX_TOKEN_USER_FUNC_MACRO:
 				case ZBX_TOKEN_FUNC_MACRO:
-					if (NULL != (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro,
+					if (NULL != (m_ptr = zbx_get_macro_from_func(*data, &token.data.func_macro,
 							NULL)))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, lld_macro_paths,

@@ -881,6 +881,27 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if function is to be evaluated for NOTSUPPORTED items.      *
+ *                                                                            *
+ * Parameters: fn - [IN] function name                                        *
+ *                                                                            *
+ * Return value: SUCCEED - do evaluate the function for NOTSUPPORTED items    *
+ *               FAIL - don't evaluate the function for NOTSUPPORTED items    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_evaluatable_for_notsupported(const char *fn)
+{
+	/* function nodata() are exceptions,                   */
+	/* and should be evaluated for NOTSUPPORTED items, too */
+
+	if (0 == strcmp(fn, "nodata"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: evaluate historical function for one item query.                  *
  *                                                                            *
  * Parameters: eval     - [IN] evaluation data                                *
@@ -963,7 +984,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 
 	if (0 == args_num)
 	{
-		ret = evaluate_function(value, &evaluate_item, func_name, "", ts, error);
+		ret = zbx_evaluate_function(value, &evaluate_item, func_name, "", ts, error);
 		goto out;
 	}
 
@@ -995,7 +1016,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
+	ret = zbx_evaluate_function(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 

@@ -600,27 +600,6 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if function is to be evaluated for NOTSUPPORTED items.      *
- *                                                                            *
- * Parameters: fn - [IN] function name                                        *
- *                                                                            *
- * Return value: SUCCEED - do evaluate the function for NOTSUPPORTED items    *
- *               FAIL - don't evaluate the function for NOTSUPPORTED items    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_evaluatable_for_notsupported(const char *fn)
-{
-	/* function nodata() are exceptions,                   */
-	/* and should be evaluated for NOTSUPPORTED items, too */
-
-	if (0 == strcmp(fn, "nodata"))
-		return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: get last Nth value defined by #num:now-timeshift first parameter. *
  *                                                                            *
  * Parameters: item       - [IN] item (performance metric)                    *
@@ -3451,7 +3430,7 @@ out:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
+int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
 		const char *parameter, const zbx_timespec_t *ts, char **error)
 {
 	int		ret;

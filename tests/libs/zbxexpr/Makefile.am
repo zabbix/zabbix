@@ -10,14 +10,16 @@ BINARIES_tests = \
 	is_double_suffix \
 	zbx_user_macro_parse \
 	zbx_get_report_nextcheck \
-	zbx_function_param_parse_ext
+	macro_fmttime \
+	zbx_function_param_parse_ext \
+	zbx_substitute_macros
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# zbxexpr depends only on zbxnum, zbxstr, zbxtime and zbxcommon
+# zbxexpr depends only on zbxregexp, zbxnum, zbxstr, zbxtime and zbxcommon
 #
 # 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
@@ -28,13 +30,14 @@ MOCK_DATA_DEPS = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 MOCK_TEST_DEPS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
@@ -44,11 +47,13 @@ MOCK_TEST_DEPS = \
 EXPR_LIBS = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(MOCK_TEST_DEPS) \
 	$(MOCK_DATA_DEPS) \
-	$(MOCK_TEST_DEPS)
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 EXPR_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
@@ -220,3 +225,31 @@ zbx_function_param_parse_ext_LDADD += @SERVER_LIBS@
 zbx_function_param_parse_ext_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_function_param_parse_ext_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+macro_fmttime_SOURCES = \
+	macro_fmttime.c \
+	$(COMMON_SRC_FILES)
+
+macro_fmttime_LDADD = \
+	$(EXPR_LIBS)
+
+macro_fmttime_LDADD += @SERVER_LIBS@
+
+macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ -Wl,--wrap=time
+
+macro_fmttime_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+zbx_substitute_macros_SOURCES = \
+	zbx_substitute_macros.c \
+	$(COMMON_SRC_FILES)
+
+zbx_substitute_macros_LDADD = \
+	$(EXPR_LIBS)
+
+zbx_substitute_macros_LDADD += @SERVER_LIBS@
+
+zbx_substitute_macros_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_substitute_macros_CFLAGS = $(EXPR_COMPILER_FLAGS)

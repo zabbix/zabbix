@@ -22,52 +22,41 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxexpression.h"
-#include "macrofunc.h"
+#include "zbxexpr.h"
 #include "zbxlog.h"
 #include "zbxexpr.h"
 #include "zbxcachevalue.h"
-#include "mocks/valuecache/valuecache_mock.h"
 
-int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
-		const zbx_dc_item_t *dc_item, zbx_db_alert *alert, const zbx_db_acknowledge *ack,
-		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
-		int macro_type, char *error, int maxerrlen);
+time_t	__wrap_time(time_t *ptr);
 
-int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
+static zbx_timespec_t	vcmock_ts;
 
-int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
-		const zbx_dc_item_t *dc_item, zbx_db_alert *alert, const zbx_db_acknowledge *ack,
-		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
-		int macro_type, char *error, int maxerrlen)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sets the current time. The key must be present in input data or   *
+ *          the test case will fail                                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	vcmock_set_time(zbx_mock_handle_t hitem, const char *key)
 {
-	ZBX_UNUSED(actionid);
-	ZBX_UNUSED(event);
-	ZBX_UNUSED(r_event);
-	ZBX_UNUSED(userid);
-	ZBX_UNUSED(hostid);
-	ZBX_UNUSED(dc_host);
-	ZBX_UNUSED(dc_item);
-	ZBX_UNUSED(alert);
-	ZBX_UNUSED(ack);
-	ZBX_UNUSED(tz);
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(macro_type);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(maxerrlen);
-	ZBX_UNUSED(service_alarm);
-	ZBX_UNUSED(service);
+	zbx_mock_error_t	err;
+	const char		*data;
 
-	return SUCCEED;
+	data = zbx_mock_get_object_member_string(hitem, key);
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(data, &vcmock_ts)))
+		fail_msg("Cannot read \"%s\" parameter", key);
 }
 
-int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
+/*
+ * time() emulation
+ */
+time_t	__wrap_time(time_t *ptr)
 {
-	ZBX_UNUSED(itemid);
-	*seconds = zbx_vcmock_get_ts().sec - 600;
-	return SUCCEED;
+	if (NULL != ptr)
+		*ptr = vcmock_ts.sec;
+
+	return vcmock_ts.sec;
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -87,7 +76,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot set 'TZ' environment variable: %s", zbx_strerror(errno));
 
 	handle = zbx_mock_get_parameter_handle("in");
-	zbx_vcmock_set_time(handle, "time");
+	vcmock_set_time(handle, "time");
 
 	zbx_snprintf(macro_expr, MAX_STRING_LEN, "{{TIME}.fmttime(%s, %s)}",
 			zbx_mock_get_parameter_string("in.fmt"), zbx_mock_get_parameter_string("in.period"));

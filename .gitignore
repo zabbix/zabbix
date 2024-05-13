@@ -187,6 +187,10 @@ tests/libs/zbxexpr/zbx_interval_preproc
 tests/libs/zbxexpr/zbx_token_find
 tests/libs/zbxexpr/zbx_user_macro_parse
 tests/libs/zbxexpr/zbx_validate_interval
+tests/libs/zbxexpr/macro_fmttime
+tests/libs/zbxexpr/zbx_substitute_macros
+tests/libs/zbxexpression/evaluate
+tests/libs/zbxexpression/evaluate_unknown
 tests/libs/zbxexpression/evaluate_function
 tests/libs/zbxexpression/evaluate_percentage_deviations_in_remainder
 tests/libs/zbxexpression/evaluate_stl

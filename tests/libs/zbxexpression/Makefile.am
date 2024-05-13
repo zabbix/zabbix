@@ -6,7 +6,6 @@ SERVER_tests = \
 	evaluate_stl \
 	evaluate_percentage_deviations_in_remainder \
 	substitute_lld_macros \
-	macro_fmttime \
 	macro_functions \
 	valuemaps
 endif
@@ -65,7 +64,6 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
@@ -99,6 +97,7 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
@@ -162,25 +161,6 @@ substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLA
 
 substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
-
-macro_fmttime_SOURCES = \
-	macro_fmttime.c \
-	$(COMMON_SRC_FILES)
-
-macro_fmttime_LDADD = \
-	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
-
-macro_fmttime_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
-
-macro_fmttime_LDADD += @SERVER_LIBS@
-
-macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
-
-macro_fmttime_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
-	-I@top_srcdir@/src/libs/zbxcacheconfig \
-	-I@top_srcdir@/src/libs/zbxcachehistory \
-	-I@top_srcdir@/src/libs/zbxcachevalue \
-	-I@top_srcdir@/src/libs/zbxexpression
 
 macro_functions_SOURCES = \
 	macro_functions.c \

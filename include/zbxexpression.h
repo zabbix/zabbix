@@ -163,6 +163,9 @@ int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_
 		zbx_vector_str_t *unknown_msgs);
 int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
 double	zbx_evaluate_string_to_double(const char *in);
+int	zbx_evaluatable_for_notsupported(const char *fn);
+int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
+		const char *parameter, const zbx_timespec_t *ts, char **error);
 
 int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len);
@@ -187,8 +190,6 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
-
-int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #endif

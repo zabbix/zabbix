@@ -156,4 +156,7 @@ int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_tim
 int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
 int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
 
+int	zbx_macro_event_trigger_expr_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
+		char **data, char *error, size_t maxerrlen);
+
 #endif /* ZABBIX_DBWRAP_H */

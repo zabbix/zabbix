@@ -19,6 +19,122 @@
 
 #include "zbxexpr.h"
 
+#include "zbxnum.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if a token contains indexed macro.                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_indexed_macro(const char *str, const zbx_token_t *token)
+{
+	const char	*p;
+
+	switch (token->type)
+	{
+		case ZBX_TOKEN_MACRO:
+			p = str + token->loc.r - 1;
+			break;
+		case ZBX_TOKEN_FUNC_MACRO:
+			p = str + token->data.func_macro.macro.r - 1;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	return '1' <= *p && *p <= '9' ? 1 : 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if a macro in string is one of list and extract index.     *
+ *                                                                            *
+ * Parameters: str          - [IN] string containing potential macro          *
+ *             strloc       - [IN] part of the string to check                *
+ *             macros       - [IN] list of allowed macros (without indices)   *
+ *             N_functionid - [OUT] index of the macro in string (if valid)   *
+ *                                                                            *
+ * Return value: unindexed macro from the allowed list or NULL.               *
+ *                                                                            *
+ * Comments: example: N_functionid is untouched if function returns NULL, for *
+ *           a valid unindexed macro N_function is 1.                         *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char **macros, int *N_functionid)
+{
+	const char	**macro, *m;
+	size_t		i;
+
+	for (macro = macros; NULL != *macro; macro++)
+	{
+		for (m = *macro, i = strloc.l; '\0' != *m && i <= strloc.r && str[i] == *m; m++, i++)
+			;
+
+		/* check whether macro has ended while strloc hasn't or vice-versa */
+		if (('\0' == *m && i <= strloc.r) || ('\0' != *m && i > strloc.r))
+			continue;
+
+		/* strloc either fully matches macro... */
+		if ('\0' == *m)
+		{
+			if (NULL != N_functionid)
+				*N_functionid = 1;
+
+			break;
+		}
+
+		/* ...or there is a mismatch, check if it's in a pre-last character and it's an index */
+		if (i == strloc.r - 1 && '1' <= str[i] && str[i] <= '9' && str[i + 1] == *m && '\0' == *(m + 1))
+		{
+			if (NULL != N_functionid)
+				*N_functionid = str[i] - '0';
+
+			break;
+		}
+	}
+
+	return *macro;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets macro from the macro function                                *
+ *                                                                            *
+ * Parameters: str          - [IN] string containing potential macro          *
+ *             fm           - [IN] function macro to check                    *
+ *             N_functionid - [OUT] index of the macro in string (if valid)   *
+ *                                                                            *
+ * Return value: unindexed macro  or NULL.                                    *
+ * Comments: allocates memory                                                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
+{
+	const char	*ptr_l = str + fm->macro.l, *ptr_r;
+	char		*ptr = NULL;
+
+	if (NULL != (ptr_r = strchr(ptr_l, '}')))
+	{
+		size_t	len = (size_t)(ptr_r - ptr_l), fm_len = fm->macro.r - fm->macro.l + 1;
+
+		ptr = zbx_strdup(ptr, ptr_l);
+
+		if ('?' != ptr_l[1] && len != fm_len)
+		{
+			if (SUCCEED == zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
+					sizeof(*N_functionid), 1, 9))
+			{
+				len--;
+				ptr[len] = '}';
+			}
+		}
+		ptr[len + 1] = '\0';
+	}
+
+	return ptr;
+}
+
 /******************************************************************************
  *                                                                            *
  * Return value:  SUCCEED - char is allowed in macro name                     *
