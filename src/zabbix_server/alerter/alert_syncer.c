@@ -77,6 +77,9 @@ static zbx_am_db_alert_t	*am_db_create_alert(zbx_uint64_t alertid, zbx_uint64_t 
 	alert->status = status;
 	alert->retries = retries;
 
+	alert->expression = NULL;
+	alert->recovery_expression = NULL;
+
 	return alert;
 }
 
@@ -218,6 +221,77 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 	return ret;
 }
 
+static void	am_db_get_trigger_expressions(zbx_vector_uint64_t *auth_email_mediatypeids, zbx_vector_ptr_t *alerts)
+{
+	int			i;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_am_db_alert_t	*alert;
+	zbx_vector_uint64_t	triggerids;
+
+	if (0 == auth_email_mediatypeids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&triggerids);
+	zbx_vector_uint64_sort(auth_email_mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (i = 0; i < alerts->values_num; i++)
+	{
+		alert = (zbx_am_db_alert_t *)alerts->values[i];
+
+		if (((EVENT_SOURCE_INTERNAL == alert->source && EVENT_OBJECT_TRIGGER == alert->object) ||
+				EVENT_SOURCE_TRIGGERS == alert->source) &&
+				FAIL != zbx_vector_uint64_bsearch(auth_email_mediatypeids, alert->mediatypeid,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			zbx_vector_uint64_append(&triggerids, alert->objectid);
+		}
+	}
+
+	if (0 == triggerids.values_num)
+	{
+		zbx_vector_uint64_destroy(&triggerids);
+		return;
+	}
+
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids.values,
+			triggerids.values_num);
+
+	result = DBselect(
+			"select triggerid,expression,recovery_expression"
+			" from triggers"
+			" where%s",
+			sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	triggerid;
+
+		ZBX_STR2UINT64(triggerid, row[0]);
+
+		for (i = 0; i < alerts->values_num; i++)
+		{
+			alert = (zbx_am_db_alert_t *)alerts->values[i];
+
+			if (((EVENT_SOURCE_INTERNAL == alert->source && EVENT_OBJECT_TRIGGER == alert->object) ||
+					EVENT_SOURCE_TRIGGERS == alert->source) && triggerid == alert->objectid)
+			{
+				alert->expression = zbx_strdup(alert->expression, row[1]);
+				alert->recovery_expression = zbx_strdup(alert->recovery_expression, row[2]);
+			}
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&triggerids);
+}
+
 #define ZBX_UPDATE_STR(dst, src, ret)			\
 	if (NULL == dst || 0 != strcmp(dst, src))	\
 	{						\
@@ -295,14 +369,17 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
  *                                                                            *
  * Purpose: updates alert manager media types                                 *
  *                                                                            *
- * Parameters: amdb            - [IN] the alert manager cache                 *
- *             mediatypeids    - [IN] the media type identifiers              *
- *             medatypeids_num - [IN] the number of media type identifiers    *
- *             mediatypes      - [OUT] the updated mediatypes                 *
+ * Parameters: amdb                     - [IN] the alert manager cache        *
+ *             mediatypeids             - [IN] the media type identifiers     *
+ *             medatypeids_num          - [IN] the number of media type       *
+ *                                             identifiers                    *
+ *             mediatypes               - [OUT] the updated mediatypes        *
+ *             auth_email_mediatypeids  - [OUT] email media types ids with    *
+ *                                              authentication enabled        *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *mediatypeids, int mediatypeids_num,
-		zbx_vector_ptr_t *mediatypes)
+		zbx_vector_ptr_t *mediatypes, zbx_vector_uint64_t *auth_email_mediatypeids)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -356,6 +433,12 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 
 		if (NULL != mediatype)
 			zbx_vector_ptr_append(mediatypes, mediatype);
+
+		if (NULL != auth_email_mediatypeids && MEDIA_TYPE_EMAIL == type &&
+				SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
+		{
+			zbx_vector_uint64_append(auth_email_mediatypeids, mediatypeid);
+		}
 	}
 	DBfree_result(result);
 
@@ -375,10 +458,11 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 	zbx_vector_ptr_t	alerts, mediatypes;
 	int			i, alerts_num;
 	zbx_am_db_alert_t	*alert;
-	zbx_vector_uint64_t	mediatypeids;
+	zbx_vector_uint64_t	mediatypeids, auth_email_mediatypeids;
 
 	zbx_vector_ptr_create(&alerts);
 	zbx_vector_uint64_create(&mediatypeids);
+	zbx_vector_uint64_create(&auth_email_mediatypeids);
 	zbx_vector_ptr_create(&mediatypes);
 
 	if (FAIL == am_db_get_alerts(&alerts) || 0 == alerts.values_num)
@@ -392,7 +476,10 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 
 	zbx_vector_uint64_sort(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	am_db_update_mediatypes(amdb, mediatypeids.values, mediatypeids.values_num, &mediatypes);
+	am_db_update_mediatypes(amdb, mediatypeids.values, mediatypeids.values_num, &mediatypes,
+			&auth_email_mediatypeids);
+
+	am_db_get_trigger_expressions(&auth_email_mediatypeids, &alerts);
 
 	if (0 != mediatypes.values_num)
 	{
@@ -418,10 +505,10 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 		zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_ALERTS, data, data_len);
 		zbx_free(data);
 	}
-
 out:
 	zbx_vector_ptr_destroy(&mediatypes);
 	zbx_vector_uint64_destroy(&mediatypeids);
+	zbx_vector_uint64_destroy(&auth_email_mediatypeids);
 	alerts_num = alerts.values_num;
 	zbx_vector_ptr_clear_ext(&alerts, (zbx_clean_func_t)zbx_am_db_alert_free);
 	zbx_vector_ptr_destroy(&alerts);
@@ -884,7 +971,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	{
 		zbx_vector_uint64_sort(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&mediatypeids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		am_db_update_mediatypes(amdb, mediatypeids.values, mediatypeids.values_num, &mediatypes);
+		am_db_update_mediatypes(amdb, mediatypeids.values, mediatypeids.values_num, &mediatypes, NULL);
 
 		if (0 != mediatypes.values_num)
 		{

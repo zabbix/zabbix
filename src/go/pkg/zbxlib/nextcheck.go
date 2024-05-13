@@ -34,7 +34,7 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 func GetCheckIntervalSeconds(itemid uint64, delay string, from time.Time, prev time.Time) int {

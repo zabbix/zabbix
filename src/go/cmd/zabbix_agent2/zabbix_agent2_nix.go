@@ -27,7 +27,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 func loadOSDependentItems() error {

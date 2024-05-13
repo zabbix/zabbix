@@ -1,9 +1,8 @@
-module zabbix.com
+module golang.zabbix.com/agent2
 
 go 1.19
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20240408123000-71b4240e2838
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Microsoft/go-winio v0.6.1
@@ -28,6 +27,7 @@ require (
 	golang.org/x/net v0.17.0
 	golang.org/x/sys v0.13.0
 	golang.org/x/text v0.13.0
+	golang.zabbix.com/sdk v1.2.2-0.20240513075743-a538a2449fed
 )
 
 require (

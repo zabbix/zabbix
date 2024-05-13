@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2022-12-20 18:24+0000\n"
+"PO-Revision-Date: 2024-04-20 17:59+0000\n"
 "Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -2424,8 +2424,8 @@ msgstr[1] "Não é possível excluir grupos de usuários"
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
-msgstr[0] "Não é possível excluir a função do usuário"
-msgstr[1] "Não é possível excluir funções de usuário"
+msgstr[0] "Não é possível excluir a atribuição do usuário"
+msgstr[1] "Não é possível excluir atribuições de usuário"
 
 #: httpconf.php:177 httpconf.php:445
 msgid "Cannot delete web scenario"
@@ -3984,7 +3984,7 @@ msgstr "Configuração de grupos de usuários"
 #: app/controllers/CControllerUserroleEdit.php:225
 #: app/controllers/CControllerUserroleList.php:130
 msgid "Configuration of user roles"
-msgstr "Configuração de funções de usuário"
+msgstr "Configuração de atribuições de usuário"
 
 #: app/controllers/CControllerUserEdit.php:243
 #: app/controllers/CControllerUserList.php:170
@@ -5310,7 +5310,7 @@ msgstr "Excluir a função selecionada?"
 
 #: app/views/administration.userrole.list.php:127
 msgid "Delete selected roles?"
-msgstr "Excluir funções selecionadas?"
+msgstr "Excluir as atribuições selecionadas?"
 
 #: app/partials/scheduledreport.formgrid.html.php:234
 msgid "Delete selected scheduled report?"
@@ -11526,7 +11526,7 @@ msgstr "O tipo de mídia com o ID \"%1$s\" não está disponível."
 #: include/classes/helpers/CMenuHelper.php:307
 #: include/classes/helpers/CRoleHelper.php:429
 msgid "Media types"
-msgstr "Tipos de mídias"
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -18057,7 +18057,7 @@ msgstr "URL do Trigger Script"
 #: include/classes/helpers/CMenuHelper.php:199
 #: include/views/configuration.action.list.php:33
 msgid "Trigger actions"
-msgstr "Desabilitar ações?"
+msgstr "Ações de trigger"
 
 #: triggers.php:309
 msgid "Trigger added"
@@ -18894,7 +18894,7 @@ msgstr "Uptime/Downtime"
 
 #: app/views/administration.miscconfig.edit.php:115
 msgid "Use X-Frame-Options HTTP header"
-msgstr ""
+msgstr "Usar o cabeçalho HTTP X-Frame-Options"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -19144,8 +19144,8 @@ msgstr "Regra de usuário criada"
 #: app/controllers/CControllerUserroleDelete.php:56
 msgid "User role deleted"
 msgid_plural "User roles deleted"
-msgstr[0] "Função de usuário excluída"
-msgstr[1] "Funções de usuário excluídas"
+msgstr[0] "Atribuição de usuário excluída"
+msgstr[1] "Atribuições de usuário excluídas"
 
 #: app/controllers/CControllerUserroleUpdate.php:168
 msgid "User role updated"
@@ -19163,7 +19163,7 @@ msgstr "A função de usuário com ID \"%1$s\" não está disponível."
 #: include/classes/helpers/CMenuHelper.php:297
 #: include/classes/helpers/CRoleHelper.php:427
 msgid "User roles"
-msgstr "Funções de usuário"
+msgstr "Atribuições de usuário"
 
 #: app/views/administration.housekeeping.edit.php:108
 msgid "User sessions"
@@ -21052,7 +21052,7 @@ msgstr "degrees() - Converte um valor de radianos para graus"
 
 #: include/forms.inc.php:1415 include/views/js/item.preprocessing.js.php:236
 msgid "delimiter"
-msgstr ""
+msgstr "delimitador"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:31
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:33
@@ -21929,7 +21929,7 @@ msgstr "padrão de incidente"
 
 #: include/forms.inc.php:1419 include/views/js/item.preprocessing.js.php:238
 msgid "qualifier"
-msgstr ""
+msgstr "qualificador"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:874
 msgid "radians() - Converts a value from degrees to radians"

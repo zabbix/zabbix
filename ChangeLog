@@ -1,3 +1,44 @@
+Changes for 6.0.30rc1
+
+New features:
+.........T [ZBXNEXT-8248] added database filter macros to MySQL templates (drasikhov)
+.........T [ZBXNEXT-6698] removed absolute threshold and timeleft from os template triggers of filesystem space (atocko)
+........S. [ZBXNEXT-7930] added user macros support for username and password fields in email media type (asestakovs)
+.........T [ZBXCTR-22] refactored JavaScript filter functions for Kubernetes templates (ebbex)
+.........T [ZBXNEXT-9098] added AWS ELB Network Load Balancer by HTTP template (egordymov)
+.........T [ZBXNEXT-6864] replaced {HOST.CONN} with user macros in templates (drasikhov)
+
+Bug fixes:
+A......... [ZBX-23951] fixed issue of incorrect template matching when no UUID exists in export file (jfreibergs)
+.......PS. [ZBX-23953] fixed CIDR network mask of VMware HV network interface (MVekslers)
+..F....... [ZBX-24195] fixed host IPMI username and password field max length (esekace)
+.........T [ZBX-24451] added tags and changed a item in Proxmox template (abrosimovs)
+..F....... [ZBX-23386] fixed hintbox sizing to fit screen (apoga, Ivo)
+.........T [ZBX-24024] fixed OID's for external sensors in APC UPC by SNMP templates (egordymov)
+.........T [ZBX-21751] fixed node's loadavg item in Proxmox template (abrosimovs)
+........S. [ZBX-24315] fixed linking template to host when some lld macro paths already exist (vso)
+........S. [ZBX-24172] fixed Zabbix server issue with scheduled intervals on Feb 29th of leap year (sboidenko)
+A......... [ZBX-23407] improved performance of retrieving last history values when primary keys are available (jfreibergs, vmaksimovs)
+.........T [ZBX-24246] updated descriptions for family of MySQL and Oracle templates, changed macro in the trigger 'Tablespace utilization is too high' for family of Oracle templates (akotsegubov)
+.......... [ZBX-23988] renamed Agent2 Go module (jxl)
+.........T [ZBX-24222] fixed incorrect item OIDs in the FortiGate by SNMP template (aiantsen)
+.........T [ZBX-24393] updated README in Redis by Agent 2 teamplate (abrosimovs)
+.....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
+.........T [ZBX-19990] separated LLD filter macros in Apache Tomcat by JMX template (drasikhov)
+.........T [ZBX-24364] added preprocessing steps for LLD rules in RabbitMQ templates (egordymov)
+.........T [ZBX-24368] Improved PostgreSQL autovacuum's count query (abrosimovs)
+.......PS. [ZBX-24282] fixed Zabbix proxy to report error for not supported items (sboidenko)
+........S. [ZBX-19507] fixed vmware.eventlog item to recover after event keys are reset (asestakovs)
+........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
+.........T [ZBX-24275] fixed item prototypes JSONPath preprocessing, added missing volumes health metric and triggers in HPE MSA templates (drasikhov)
+.........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.29
+
+6.0.29rc1 was released as 6.0.29 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.29rc1
 
 New features:
@@ -3014,6 +3055,7 @@ Changes for 5.0.43rc1
 New features:
 
 Bug fixes:
+.....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42

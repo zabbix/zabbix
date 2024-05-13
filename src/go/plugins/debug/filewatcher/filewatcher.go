@@ -23,11 +23,11 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
 	"github.com/fsnotify/fsnotify"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/watch"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/watch"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 var impl Plugin

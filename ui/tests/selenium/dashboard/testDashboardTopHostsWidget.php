@@ -1772,7 +1772,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$column_form->query('xpath:'.$warning.'/a')->one()->click();
 
 			// Check hint-box.
-			$hint = $column_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+			$hint = $column_form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
 			$hintbox = ($warning === $info)
 					? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
 					: 'With this setting only numeric items will be displayed in this column.';
