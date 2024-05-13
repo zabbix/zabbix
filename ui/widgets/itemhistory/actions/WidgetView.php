@@ -126,15 +126,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return array_key_exists($column['itemid'], $db_items);
 		});
 
-		$item_values_by_source = $this->getItemValuesByDataSource($db_items, $columns_config);
-
-		if (!$item_values_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]
-				&& !$item_values_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]
-					&& !$item_values_by_source['binary_items']) {
+		if (!$columns_config) {
 			$this->setResponse(new CControllerResponseData($data));
 
 			return;
 		}
+
+		$item_values_by_source = $this->getItemValuesByDataSource($db_items, $columns_config);
 
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
@@ -148,14 +146,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'is_binary_size' => true
 		]);
 
-		$columns_with_data = [];
-
 		$show_thumbnail = false;
 
-		foreach ($columns_config as $column) {
+		foreach ($columns_config as &$column) {
+			$column['has_bar'] = false;
+			$column['item_values'] = [];
+
 			if (array_key_exists($column['itemid'], $item_values_by_source[$column['history']])) {
 				$column['item_values'] = [...$item_values_by_source[$column['history']][$column['itemid']]];
-				$column['has_bar'] = false;
 
 				if (in_array($column['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 					$column['has_binary_units'] = isBinaryUnits($db_items[$column['itemid']]['units']);
@@ -216,19 +214,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 					unset($item_value);
 				}
-
-				$columns_with_data[] = $column;
 			}
 
 			if (array_key_exists('show_thumbnail', $column) && $column['show_thumbnail'] == 1) {
 				$show_thumbnail = true;
 			}
 		}
+		unset($column);
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
 			'layout' => $this->fields_values['layout'],
-			'columns' => $columns_with_data,
+			'columns' => $columns_config,
 			'show_lines' => $this->fields_values['show_lines'],
 			'show_thumbnail' => $show_thumbnail,
 			'sortorder' => $this->fields_values['sortorder'],
@@ -242,7 +239,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getItemValuesByDataSource(array $items, array &$columns_config): array {
-		$time_from = time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		$time_from = time() - $history_period;
 
 		$items_by_source = $this->addDataSourceAndPrepareColumns($items, $columns_config, $time_from);
 
@@ -253,10 +251,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]) {
-			$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] = Manager::History()->getLastValues(
-				$items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY], $this->fields_values['show_lines'],
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
-			);
+			foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] as $item) {
+				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] += Manager::History()->getLastValues(
+					[$item], $this->fields_values['show_lines'], $history_period
+				);
+			}
 		}
 
 		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]) {

@@ -220,6 +220,8 @@ else {
 	]);
 
 	if (!$columns_names_at_top) {
+		$history_values = array_slice($history_values, 0, $data['show_lines']);
+
 		foreach($history_values as $history_item) {
 			$table_row = $data['show_timestamp']
 				? [
