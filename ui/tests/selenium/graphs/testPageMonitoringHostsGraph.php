@@ -221,7 +221,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		}
 
 		// Check that the table is empty by default.
-		$this->assertEquals('Specify host to see the graphs.', $this->query('class:nothing-to-show')->one()->getText());
+		$this->assertEquals('Specify host to see the graphs.', $this->query('class:no-data-message')->one()->getText());
 	}
 
 	public static function getCheckFilterData() {
@@ -905,7 +905,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			$message = (array_key_exists('Hosts', $data['filter']) || array_key_exists('subfilter', $data))
 				? 'No data found'
 				: 'Specify host to see the graphs.';
-			$this->assertEquals($message, $this->query('class:nothing-to-show')->one()->getText());
+			$this->assertEquals($message, $this->query('class:no-data-message')->one()->getText());
 		}
 	}
 

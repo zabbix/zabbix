@@ -61,9 +61,20 @@ class CWidgetItemNavigator extends CWidget {
 	}
 
 	setContents(response) {
-		if (this.#item_navigator === null) {
-			this.#item_navigator = new CItemNavigator(response.config);
+		if (response.items.length === 0) {
+			this.clearContents();
+			this.setCoverMessage({
+				message: t('No data found'),
+				icon: ZBX_ICON_SEARCH_LARGE
+			});
 
+			return;
+		}
+
+		if (this.#item_navigator === null) {
+			this.clearContents();
+
+			this.#item_navigator = new CItemNavigator(response.config);
 			this._body.appendChild(this.#item_navigator.getContainer());
 
 			this.#registerListeners();
@@ -80,7 +91,10 @@ class CWidgetItemNavigator extends CWidget {
 	#registerListeners() {
 		this.#listeners = {
 			itemSelect: e => {
-				this.broadcast({_itemid: e.detail._itemid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_ITEM_ID]: [e.detail.itemid],
+					[CWidgetsData.DATA_TYPE_ITEM_IDS]: [e.detail.itemid]
+				});
 			},
 
 			groupToggle: e => {
@@ -115,11 +129,7 @@ class CWidgetItemNavigator extends CWidget {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				is_open: is_open,
-				group_identifier: group_identifier,
-				widgetid: widgetid
-			})
+			body: JSON.stringify({is_open, group_identifier, widgetid})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -147,5 +157,12 @@ class CWidgetItemNavigator extends CWidget {
 
 	hasPadding() {
 		return false;
+	}
+
+	onClearContents() {
+		if (this.#item_navigator !== null) {
+			this.#item_navigator.destroy();
+			this.#item_navigator = null;
+		}
 	}
 }

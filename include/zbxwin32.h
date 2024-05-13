@@ -136,4 +136,5 @@ GetFileInformationByHandleEx_t	zbx_get_GetFileInformationByHandleEx(void);
 
 void	zbx_import_symbols(void);
 
+void	zbx_backtrace(void);
 #endif /* ZABBIX_WIN32_H */

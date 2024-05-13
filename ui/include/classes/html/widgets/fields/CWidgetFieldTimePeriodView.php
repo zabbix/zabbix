@@ -96,14 +96,14 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 				'label' => (new CLabel(_('Widget'), $field_name.'_reference_ms'))
 					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_name.'-reference')
-					->setAsteriskMark($this->isRequired()),
+					->setAsteriskMark(),
 				'view' =>  (new CMultiSelect([
 					'name' => $field_name.'['.CWidgetField::FOREIGN_REFERENCE_KEY.']',
 					'add_post_js' => false
 				]))
 					->setId($field_name.'_reference')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired($this->isRequired()),
+					->setAriaRequired(),
 				'class' => $style_class.'js-'.$field_name.'-reference'
 			];
 		}

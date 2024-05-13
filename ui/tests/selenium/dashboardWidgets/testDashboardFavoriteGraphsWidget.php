@@ -110,7 +110,7 @@ class testDashboardFavoriteGraphsWidget extends CWebTest {
 			$remove_item->waitUntilNotVisible();
 		}
 
-		$this->assertEquals('No graphs added.', $widget->query('class:nothing-to-show')->one()->getText());
+		$this->assertEquals('No graphs added.', $widget->query('class:no-data-message')->one()->getText());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
 				zbx_dbstr('web.favorite.graphids'))
 		);

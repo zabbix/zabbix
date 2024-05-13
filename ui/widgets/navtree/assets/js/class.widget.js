@@ -111,12 +111,18 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	onFeedback({type, value}) {
+		if (type !== CWidgetsData.DATA_TYPE_MAP_ID) {
+			return;
+		}
+
+		const sysmapid = value[0];
+
 		const item_selected = this.#navtree[this.#navtree_item_selected];
 
 		let new_item_id = 0;
 
 		for (const [id, item] of Object.entries(this.#navtree)) {
-			if (item.sysmapid == value && item.parent == this.#navtree_item_selected) {
+			if (item.sysmapid == sysmapid && item.parent == this.#navtree_item_selected) {
 				new_item_id = id;
 				break;
 			}
@@ -124,7 +130,7 @@ class CWidgetNavTree extends CWidget {
 
 		if (new_item_id == 0) {
 			for (const [id, item] of Object.entries(this.#navtree)) {
-				if (item.sysmapid == value && item_selected.parent == id) {
+				if (item.sysmapid == sysmapid && item_selected.parent == id) {
 					new_item_id = id;
 					break;
 				}
@@ -141,12 +147,7 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	processUpdateResponse(response) {
-		if (this.#has_content) {
-			this.#deactivateContentEvents();
-			this.#removeTree();
-
-			this.#has_content = false;
-		}
+		this.clearContents();
 
 		super.processUpdateResponse(response);
 
@@ -167,6 +168,15 @@ class CWidgetNavTree extends CWidget {
 
 			this.#makeTree();
 			this.#activateContentEvents();
+		}
+	}
+
+	onClearContents() {
+		if (this.#has_content) {
+			this.#deactivateContentEvents();
+			this.#removeTree();
+
+			this.#has_content = false;
 		}
 	}
 
@@ -490,9 +500,9 @@ class CWidgetNavTree extends CWidget {
 			}
 
 			this.broadcast({
-				_mapid: this.#markTreeItemSelected(this.#navtree_item_selected)
-					? this.#navtree[this.#navtree_item_selected].sysmapid
-					: null
+				[CWidgetsData.DATA_TYPE_MAP_ID]: this.#markTreeItemSelected(this.#navtree_item_selected)
+					? [this.#navtree[this.#navtree_item_selected].sysmapid]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_MAP_ID)
 			});
 		}
 	}
@@ -992,7 +1002,9 @@ class CWidgetNavTree extends CWidget {
 						[this.getWidgetId()]
 					);
 
-					this.broadcast({_mapid: this.#navtree[this.#navtree_item_selected].sysmapid});
+					this.broadcast({
+						[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
+					});
 				}
 
 				e.preventDefault();

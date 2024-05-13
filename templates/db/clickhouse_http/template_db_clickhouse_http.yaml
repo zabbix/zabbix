@@ -2037,7 +2037,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Service available'
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2052,7 +2052,7 @@ zabbix_export:
                       value: '2'
                 - type: graph
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2065,7 +2065,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2078,7 +2078,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '12'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2091,7 +2091,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   'y': '17'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2104,7 +2104,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graph
                   'y': '22'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2117,8 +2117,8 @@ zabbix_export:
                       value: AAAAI
                 - type: item
                   name: 'Port available'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2133,8 +2133,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Uptime
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2149,8 +2149,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Version
-                  x: '12'
-                  width: '4'
+                  x: '36'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2164,9 +2164,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2178,9 +2178,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2192,9 +2192,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '12'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2206,9 +2206,9 @@ zabbix_export:
                       name: reference
                       value: AAAAF
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '17'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2220,9 +2220,9 @@ zabbix_export:
                       name: reference
                       value: AAAAH
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '22'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2236,7 +2236,7 @@ zabbix_export:
             - name: Replicas
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER
@@ -2254,8 +2254,8 @@ zabbix_export:
                       name: rows
                       value: '3'
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER

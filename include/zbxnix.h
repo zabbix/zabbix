@@ -132,4 +132,6 @@ void	zbx_set_on_exit_args(void *args);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);
+
+void	zbx_backtrace(void);
 #endif	/* ZABBIX_ZBXNIX_H */

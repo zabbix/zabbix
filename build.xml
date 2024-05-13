@@ -393,6 +393,8 @@
 
 	<target name="init-integration-tsdb" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-postgresql,create-db-tsdb,init-proxy-postgresql"/>
 
+	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
+
 	<target name="make-binaries-mysql">
 		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
@@ -541,6 +543,8 @@
 		</exec>
 	</target>
 
+	<target name="init-dast-mysql" depends="create-frontend-configs,make-dbschema,create-db-mysql"/>
+
 	<target name="test-phpunit" depends="init-common">
 		<exec executable="phpunit" dir="ui/tests/unit" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
@@ -590,6 +594,8 @@
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>
 	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
 	<target name="build-integration-tsdb" depends="init-integration-tsdb,test-integration"/>
+	<target name="build-dast-mysql" depends="init-dast-mysql"/>
+	<target name="build-dast-postgresql" depends="init-dast-postgresql"/>
 
 	<!-- Default target -->
 	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql,build-integration-tsdb"/>

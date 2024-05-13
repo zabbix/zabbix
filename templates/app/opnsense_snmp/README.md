@@ -20,12 +20,12 @@ This template has been tested on:
 
 ## Setup
 
-1. Enable bsnmpd daemon by creating new config file "/etc/rc.conf.d/bsnmpd" with the following content:  
+1. Enable bsnmpd daemon by creating new config file "/etc/rc.conf.d/bsnmpd" with the following content:
 bsnmpd_enable="YES"
-2. Uncomment the following lines in "/etc/snmpd.config" file to enable required SNMP modules:  
-begemotSnmpdModulePath."hostres" = "/usr/lib/snmp_hostres.so"  
+2. Uncomment the following lines in "/etc/snmpd.config" file to enable required SNMP modules:
+begemotSnmpdModulePath."hostres" = "/usr/lib/snmp_hostres.so"
 begemotSnmpdModulePath."pf"     = "/usr/lib/snmp_pf.so"
-3. Start bsnmpd daemon with the following command:  
+3. Start bsnmpd daemon with the following command:
 /etc/rc.d/bsnmpd start
 4. Setup a firewall rule to get access from Zabbix proxy or Zabbix server by SNMP (https://docs.opnsense.org/manual/firewall.html).
 5. Link the template to a host.
@@ -57,7 +57,7 @@ begemotSnmpdModulePath."pf"     = "/usr/lib/snmp_pf.so"
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|OPNsense: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
+|OPNsense: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
 |OPNsense: Packet filter running status|<p>MIB: BEGEMOT-PF-MIB</p><p>True if packet filter is currently enabled.</p>|SNMP agent|opnsense.pf.status|
 |OPNsense: States table current|<p>MIB: BEGEMOT-PF-MIB</p><p>Number of entries in the state table.</p>|SNMP agent|opnsense.state.table.count|
 |OPNsense: States table limit|<p>MIB: BEGEMOT-PF-MIB</p><p>Maximum number of 'keep state' rules in the ruleset.</p>|SNMP agent|opnsense.state.table.limit|

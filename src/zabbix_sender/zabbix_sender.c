@@ -30,9 +30,12 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxfile.h"
+#include "zbxbincommon.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
 #endif
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
@@ -927,7 +930,7 @@ static void	parse_commandline(int argc, char **argv)
 					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_print_version(title_message);
@@ -1052,7 +1055,7 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #endif
 			default:
-				zbx_print_usage(usage_message, zbx_progname);
+				zbx_print_usage(zbx_progname, usage_message);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -1290,7 +1293,7 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		printf("Try '%s --help' for more information.\n", zbx_progname);
 		exit(EXIT_FAILURE);
 	}
@@ -1344,7 +1347,7 @@ static void	parse_commandline(int argc, char **argv)
 					)
 	{
 		zbx_error("too few or mutually exclusive options used");
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1435,7 +1438,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif

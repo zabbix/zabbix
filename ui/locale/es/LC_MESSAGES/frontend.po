@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-30 09:26+0000\n"
+"PO-Revision-Date: 2024-05-05 22:59+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -91,7 +91,7 @@ msgstr "Se muestran %1$d de %1$d+ equipos"
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "Se muestran %1$d de %1$d+ métricas"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -2891,7 +2891,7 @@ msgstr[1] "No se pueden eliminar los grupos de usuarios"
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
-msgstr ""
+msgstr "No se puede eliminar el grupo de usuarios \"%1$s\" porque lo utiliza el usuario aprovisionado \"%2$s\"."
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -5661,7 +5661,7 @@ msgstr "Diario"
 
 #: include/locales.inc.php:40
 msgid "Danish (da_DK)"
-msgstr ""
+msgstr "Danés (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -8483,7 +8483,7 @@ msgstr "Filtro eliminado"
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Filter is not set"
-msgstr ""
+msgstr "El filtro no está configurado"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -9637,7 +9637,7 @@ msgstr "Redes del equipo"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
-msgstr ""
+msgstr "Patrones de equipo"
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
@@ -9721,11 +9721,11 @@ msgstr "Máscara de subred del equipo"
 
 #: widgets/itemnavigator/Widget.php:43
 msgid "Host tag"
-msgstr ""
+msgstr "Etiqueta de equipo"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
 msgid "Host tag value"
-msgstr ""
+msgstr "Valor de etiqueta de equipo"
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11805,7 +11805,7 @@ msgstr "Métrica en estado \"no soportada\""
 
 #: widgets/itemnavigator/includes/WidgetForm.php:107
 msgid "Item limit"
-msgstr ""
+msgstr "Límite de métricas"
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11818,7 +11818,7 @@ msgstr "Nombre de la métrica"
 
 #: widgets/itemnavigator/Widget.php:29
 msgid "Item navigator"
-msgstr ""
+msgstr "Navegador de métricas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -11834,7 +11834,7 @@ msgstr "Patrón de métrica"
 #: widgets/piechart/views/widget.edit.js.php:208
 #: widgets/svggraph/views/widget.edit.js.php:279
 msgid "Item patterns"
-msgstr ""
+msgstr "Patrones de métricas"
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11881,11 +11881,11 @@ msgstr "Prototipos de métrica"
 
 #: widgets/itemnavigator/Widget.php:44
 msgid "Item tag"
-msgstr ""
+msgstr "Etiqueta de métricas"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
 msgid "Item tag value"
-msgstr ""
+msgstr "Valor de la etiqueta de métrica"
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -13257,7 +13257,7 @@ msgstr "Tipos de medio desactivados por el administrador."
 
 #: app/views/popup.media.php:78
 msgid "Media types disabled in Alerts."
-msgstr ""
+msgstr "Tipos de medios deshabilitados en Alertas."
 
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
@@ -14225,7 +14225,7 @@ msgstr "Sin recopilación de datos"
 #: app/views/search.php:394 include/classes/html/CTableInfo.php:72
 #: widgets/hostnavigator/Widget.php:40
 msgid "No data found"
-msgstr ""
+msgstr "No se encontraron datos"
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -16057,6 +16057,10 @@ msgstr "Escanee y muestre su código de verificación en su aplicación de auten
 msgid "Please select two elements"
 msgstr "Por favor, selecciona dos elementos"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16879,6 +16883,10 @@ msgstr "Atributo de referencia"
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr "El widget referido dejó de estar disponible. Por favor actualice la configuración."
+
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr ""
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -18862,7 +18870,7 @@ msgstr "Se muestra como el nombre de la cuenta para todos los usuarios de MFA en
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the label to all MFA users in authenticator apps."
-msgstr ""
+msgstr "Se muestra como etiqueta para todos los usuarios de MFA en las aplicaciones de autenticación."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -21221,6 +21229,10 @@ msgstr "Sólo los no reconocidos"
 msgid "Unavailable"
 msgstr "No disponible"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "Desbloquear"
@@ -21707,7 +21719,7 @@ msgstr "Usar aislamiento en iframe"
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Use the filter to display results"
-msgstr ""
+msgstr "Utilizar el filtro para mostrar resultados"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -21941,7 +21953,7 @@ msgstr "Macros de usuario"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "User media"
-msgstr ""
+msgstr "Medios de usuario"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22709,7 +22721,7 @@ msgstr "Error en la conexión a Vault."
 #: include/classes/setup/CSetupWizard.php:843
 #: include/classes/setup/CSetupWizard.php:863
 msgid "Vault prefix"
-msgstr ""
+msgstr "Prefijo de Vault"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -23714,7 +23726,7 @@ msgstr "se espera una matriz u objeto"
 
 #: include/classes/api/services/CUser.php:990
 msgid "an email address is expected"
-msgstr ""
+msgstr "se espera una dirección de correo electrónico"
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -24120,7 +24132,7 @@ msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del objeto
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr ""
+msgstr "no se puede actualizar el parámetro de solo lectura \"%1$s\" del usuario aprovisionado."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -24494,7 +24506,7 @@ msgstr "patrón de equipo"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "host patterns"
-msgstr ""
+msgstr "patrones de equipo"
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
@@ -24741,7 +24753,7 @@ msgstr "patrón de métrica"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
 msgid "item patterns"
-msgstr ""
+msgstr "patrones de métrica"
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -25263,7 +25275,7 @@ msgstr "patrón"
 #: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
-msgstr ""
+msgstr "patrones"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
@@ -25327,6 +25339,11 @@ msgstr "referencia a un elemento de árbol inexistente"
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "el objeto referido no existe"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

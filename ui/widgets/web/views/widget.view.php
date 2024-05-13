@@ -59,12 +59,14 @@ else {
 			$group_name = $group['name'];
 		}
 
-		$table->addRow([
-			$group_name,
-			$group['ok'] != 0 ? (new CSpan($group['ok']))->addClass(ZBX_STYLE_GREEN) : '',
-			$group['failed'] != 0 ? (new CSpan($group['failed']))->addClass(ZBX_STYLE_RED) : '',
-			$group['unknown'] != 0 ? (new CSpan($group['unknown']))->addClass(ZBX_STYLE_GREY) : ''
-		]);
+		$table->addRow(
+			(new CRow([
+				$group_name,
+				$group['ok'] != 0 ? (new CSpan($group['ok']))->addClass(ZBX_STYLE_GREEN) : '',
+				$group['failed'] != 0 ? (new CSpan($group['failed']))->addClass(ZBX_STYLE_RED) : '',
+				$group['unknown'] != 0 ? (new CSpan($group['unknown']))->addClass(ZBX_STYLE_GREY) : ''
+			]))->setAttribute('data-hostgroupid', $group['groupid'])
+		);
 	}
 }
 

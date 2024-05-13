@@ -893,7 +893,7 @@ class CSVGHoneycomb {
 
 			if (value < curr[threshold_type]) {
 				if (prev === null) {
-					return apply_interpolation ? `#${curr.color}` : bg_color;
+					return bg_color;
 				}
 
 				if (apply_interpolation) {

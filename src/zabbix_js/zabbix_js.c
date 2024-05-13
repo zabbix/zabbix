@@ -23,6 +23,7 @@
 #include "zbxmutexs.h"
 #include "zbxstr.h"
 #include "zbxnix.h"
+#include "zbxbincommon.h"
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
 static const char	title_message[] = "zabbix_js";
@@ -222,7 +223,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
@@ -262,7 +263,7 @@ int	main(int argc, char **argv)
 
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
@@ -270,7 +271,7 @@ int	main(int argc, char **argv)
 				ret = SUCCEED;
 				goto clean;
 			default:
-				zbx_print_usage(usage_message, zbx_progname);
+				zbx_print_usage(zbx_progname, usage_message);
 				goto clean;
 		}
 	}
@@ -289,7 +290,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		goto close;
 	}
 

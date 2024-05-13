@@ -1120,11 +1120,15 @@ zabbix_export:
           key: mysql.database.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#DATABASE}'
-                value: information_schema
-                operator: NOT_MATCHES_REGEX
+                value: '{$MYSQL.DBNAME.MATCHES}'
                 formulaid: A
+              - macro: '{#DATABASE}'
+                value: '{$MYSQL.DBNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Used for the discovery of the databases.'
           item_prototypes:
             - uuid: f358179ef78b4a31affa9e049b4048b8
@@ -1450,6 +1454,12 @@ zabbix_export:
         - macro: '{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}'
           value: '30'
           description: 'The maximum number of temporary tables created in memory per second for trigger expressions.'
+        - macro: '{$MYSQL.DBNAME.MATCHES}'
+          value: .+
+          description: 'Filter of discoverable databases.'
+        - macro: '{$MYSQL.DBNAME.NOT_MATCHES}'
+          value: information_schema
+          description: 'Filter to exclude discovered databases.'
         - macro: '{$MYSQL.DSN}'
           value: '<Put your DSN here>'
           description: 'System data source name.'
@@ -1475,7 +1485,7 @@ zabbix_export:
             - widgets:
                 - type: graph
                   name: 'MySQL: Operations'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1489,7 +1499,7 @@ zabbix_export:
                 - type: graph
                   name: 'MySQL: Connections'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1503,7 +1513,7 @@ zabbix_export:
                 - type: graph
                   name: 'MySQL: InnoDB buffer pool'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1516,8 +1526,8 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   name: 'MySQL: Queries'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1530,9 +1540,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   name: 'MySQL: Bandwidth'
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1545,9 +1555,9 @@ zabbix_export:
                       value: AAAAD
                 - type: graph
                   name: 'MySQL: Threads'
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

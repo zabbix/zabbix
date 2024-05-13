@@ -16212,6 +16212,10 @@ msgstr "Naskenujte prosím svůj ověřovací kód a nechte si jej zobrazit v ap
 msgid "Please select two elements"
 msgstr "Vyberte, prosím, dva prvky"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -17036,6 +17040,10 @@ msgstr "Referenční atribut"
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr "Odkazovaný widget je nedostupný. Aktualizujte prosím konfiguraci."
+
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr ""
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -21399,6 +21407,10 @@ msgstr "Pouze nepotvrzené"
 msgid "Unavailable"
 msgstr "Nedostupné"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "Odblokovat"
@@ -25514,6 +25526,11 @@ msgstr "odkaz na neexistující prvek stromu"
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "odkazovaný objekt neexistuje"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

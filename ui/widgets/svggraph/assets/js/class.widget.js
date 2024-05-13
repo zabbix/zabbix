@@ -44,7 +44,7 @@ class CWidgetSvgGraph extends CWidget {
 	}
 
 	onFeedback({type, value}) {
-		if (type === '_timeperiod') {
+		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD) {
 			this._startUpdating();
 
 			this.feedback({time_period: value});
@@ -52,14 +52,16 @@ class CWidgetSvgGraph extends CWidget {
 			return true;
 		}
 
-		return super.onFeedback({type, value});
+		return false;
 	}
 
 	promiseUpdate() {
 		const time_period = this.getFieldsData().time_period;
 
-		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: time_period});
+		if (!this.hasBroadcast(CWidgetsData.DATA_TYPE_TIME_PERIOD) || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+			});
 		}
 
 		return super.promiseUpdate();
@@ -73,7 +75,7 @@ class CWidgetSvgGraph extends CWidget {
 	}
 
 	processUpdateResponse(response) {
-		this._destroyGraph();
+		this.clearContents();
 
 		super.processUpdateResponse(response);
 
@@ -90,6 +92,14 @@ class CWidgetSvgGraph extends CWidget {
 			});
 		}
 		else {
+			this._has_contents = false;
+		}
+	}
+
+	onClearContents() {
+		if (this._has_contents) {
+			this._deactivateGraph();
+
 			this._has_contents = false;
 		}
 	}
@@ -111,13 +121,6 @@ class CWidgetSvgGraph extends CWidget {
 	_deactivateGraph() {
 		if (this._has_contents) {
 			jQuery(this._svg).svggraph('deactivate');
-		}
-	}
-
-	_destroyGraph() {
-		if (this._has_contents) {
-			this._deactivateGraph();
-			this._body.innerHTML = '';
 		}
 	}
 

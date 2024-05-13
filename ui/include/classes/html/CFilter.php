@@ -337,6 +337,17 @@ class CFilter extends CDiv {
 	}
 
 	/**
+	 * Prevent modifying history URL with time selector parameters.
+	 *
+	 * @return CFilter
+	 */
+	public function preventHistoryUpdates(): CFilter {
+		$this->setAttribute('data-prevent-history-updates', 1);
+
+		return $this;
+	}
+
+	/**
 	 * Add tab.
 	 *
 	 * @param string|CTag $header  Tab header title string or CTag container.

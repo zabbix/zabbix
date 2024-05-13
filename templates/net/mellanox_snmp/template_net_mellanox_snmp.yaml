@@ -306,7 +306,7 @@ zabbix_export:
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -1383,7 +1383,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1403,7 +1403,7 @@ zabbix_export:
             - widgets:
                 - type: graph
                   name: 'CPU utilization'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1417,7 +1417,7 @@ zabbix_export:
                 - type: graphprototype
                   name: '{#MEMNAME}: Memory utilization'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1437,7 +1437,7 @@ zabbix_export:
                 - type: graphprototype
                   name: '{#FSNAME}: Disk space usage'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -40,6 +40,11 @@ class CWidgetMap extends CWidget {
 	 */
 	#event_handlers;
 
+	/**
+	 * @type {string}
+	 */
+	#selected_element_id = '';
+
 	onStart() {
 		this.#registerEvents();
 	}
@@ -59,7 +64,12 @@ class CWidgetMap extends CWidget {
 
 		if (this.#map_svg !== null || this.isFieldsReferredDataUpdated('sysmapid')) {
 			this.#previous_maps = [];
-			this.#sysmapid = fields_data.sysmapid;
+
+			if (this.#sysmapid != fields_data.sysmapid) {
+				this.#sysmapid = fields_data.sysmapid;
+				this.#deselectMapElement();
+			}
+
 			this.#map_svg = null;
 		}
 
@@ -109,26 +119,41 @@ class CWidgetMap extends CWidget {
 	}
 
 	processUpdateResponse(response) {
-		this.#map_svg = null;
+		this.clearContents();
 
 		super.processUpdateResponse(response);
 
 		const sysmap_data = response.sysmap_data;
 
 		if (sysmap_data !== undefined) {
-			this.#sysmapid = sysmap_data.current_sysmapid;
+			if (this.#sysmapid != sysmap_data.current_sysmapid) {
+				this.#sysmapid = sysmap_data.current_sysmapid;
+				this.#deselectMapElement();
+			}
 
 			if (sysmap_data.map_options !== null) {
+				const selected_element_exists = sysmap_data.map_options.elements.some(
+					element => element.selementid == this.#selected_element_id
+				);
+
+				if (!selected_element_exists) {
+					this.#deselectMapElement();
+				}
+
 				this.#makeSvgMap(sysmap_data.map_options);
 				this.#activateContentEvents();
 
-				this.feedback({'sysmapid': this.#sysmapid});
+				this.feedback({'sysmapid': [this.#sysmapid]});
 			}
 
 			if (sysmap_data.error_msg !== undefined) {
 				this.setContents({body: sysmap_data.error_msg});
 			}
 		}
+	}
+
+	onClearContents() {
+		this.#map_svg = null;
 	}
 
 	hasPadding() {
@@ -142,6 +167,8 @@ class CWidgetMap extends CWidget {
 		this.#sysmapid = sysmapid;
 		this.#map_svg = null;
 
+		this.#deselectMapElement();
+
 		this._startUpdating();
 	}
 
@@ -149,19 +176,40 @@ class CWidgetMap extends CWidget {
 		options.canvas.useViewBox = true;
 		options.show_timestamp = false;
 		options.container = this._target.querySelector('.sysmap-widget-container');
+		options.can_select_element = true;
+		options.selected_element_id = this.#selected_element_id;
 
 		this.#map_svg = new SVGMap(options);
 	}
 
+	#deselectMapElement() {
+		if (this.#selected_element_id === '') {
+			return;
+		}
+
+		this.#selected_element_id = '';
+
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_HOST_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+			[CWidgetsData.DATA_TYPE_HOST_IDS]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+			[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_ID),
+			[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_IDS)
+		});
+	}
+
 	#activateContentEvents() {
+		this.#map_svg?.container.addEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
 			link.addEventListener('click', this.#event_handlers.back);
 		});
 	}
 
 	#deactivateContentEvents() {
+		this.#map_svg?.container.removeEventListener(this.#map_svg.EVENT_ELEMENT_SELECT, this.#event_handlers.select);
+
 		this._target.querySelectorAll('.js-previous-map').forEach((link) => {
-			link.addEventListener('click', this.#event_handlers.back);
+			link.removeEventListener('click', this.#event_handlers.back);
 		});
 	}
 
@@ -173,7 +221,27 @@ class CWidgetMap extends CWidget {
 				this.#sysmapid = sysmap.sysmapid;
 				this.#map_svg = null;
 
+				this.#deselectMapElement();
+
 				this._startUpdating();
+			},
+			select: e => {
+				this.#selected_element_id = e.detail.selected_element_id;
+
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: e.detail.hostid !== null
+						? [e.detail.hostid]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID),
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: e.detail.hostid !== null
+						? [e.detail.hostid]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_IDS),
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: e.detail.hostgroupid !== null
+						? [e.detail.hostgroupid]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_ID),
+					[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: e.detail.hostgroupid !== null
+						? [e.detail.hostgroupid]
+						: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_GROUP_IDS)
+				});
 			}
 		};
 	}

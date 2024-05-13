@@ -561,8 +561,11 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		// Get value from host is not checked, yet no value was provided
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_KEY, &key, &key_size, NULL))
 		{
-			*error = zbx_strdup(NULL, "Value was not provided for the preprocessing test.");
-			goto out;
+			if (FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_SNMP_OID, &key, &key_size, NULL))
+			{
+				*error = zbx_strdup(NULL, "Value was not provided for the preprocessing test.");
+				goto out;
+			}
 		}
 
 		zbx_free(key);

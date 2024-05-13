@@ -29,16 +29,24 @@ static int			log_level = LOG_LEVEL_WARNING;
 static ZBX_THREAD_LOCAL int	*plog_level = &log_level;
 static zbx_log_func_t		log_func_callback = NULL;
 static zbx_get_progname_f	get_progname_cb = NULL;
+static zbx_backtrace_f		backtrace_cb = NULL;
 
 #define LOG_COMPONENT_NAME_LEN	64
 static ZBX_THREAD_LOCAL int	log_level_change = LOG_LEVEL_UNCHANGED;
 static ZBX_THREAD_LOCAL char	log_component_name[LOG_COMPONENT_NAME_LEN + 1];
 #undef LOG_COMPONENT_NAME_LEN
 
-void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname)
+void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname, zbx_backtrace_f backtrace)
 {
 	log_func_callback = log_func;
 	get_progname_cb = get_progname;
+	backtrace_cb = backtrace;
+}
+
+void	zbx_this_should_never_happen_backtrace(void)
+{
+	if (NULL != backtrace_cb)
+		backtrace_cb();
 }
 
 void	zbx_log_handle(int level, const char *fmt, ...)

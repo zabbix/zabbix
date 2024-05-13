@@ -2636,7 +2636,7 @@ zabbix_export:
             - name: 'HPE iLO: Computer systems'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -2653,7 +2653,7 @@ zabbix_export:
             - name: 'HPE iLO: Fans'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -2670,7 +2670,7 @@ zabbix_export:
             - name: 'HPE iLO: Thermal sensors'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -2687,7 +2687,7 @@ zabbix_export:
             - name: 'HPE iLO: Power supplies'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2703,7 +2703,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
