@@ -1227,7 +1227,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 
 		service->eventlog.interval = lastaccess - service->eventlog.lastaccess;
 
-		/* force job re-schedule if new interval is less than old */
+		/* force job reschedule if new interval is less than old */
 		if (service->eventlog.interval + SEC_PER_MIN < interval_old)
 			service->eventlog_job_ref->nextcheck = 0;
 	}
@@ -1257,18 +1257,18 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too old events requested."));
 		goto unlock;
 	}
-	else if (NULL != service->eventlog_data->error)
+	else if (NULL != service->data_eventlog->error)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, service->eventlog_data->error));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_eventlog->error));
 		goto unlock;
 	}
-	else if (0 < service->eventlog_data->events.values_num)
+	else if (0 < service->data_eventlog->events.values_num)
 	{
-		vmware_get_events(&service->eventlog_data->events, &service->eventlog, item, add_results);
+		vmware_get_events(&service->data_eventlog->events, &service->eventlog, item, add_results);
 		service->eventlog.last_key =
-				((const zbx_vmware_event_t *)service->eventlog_data->events.values[0])->key;
+				((const zbx_vmware_event_t *)service->data_eventlog->events.values[0])->key;
 		service->eventlog.last_ts =
-				((const zbx_vmware_event_t *)service->eventlog_data->events.values[0])->timestamp;
+				((const zbx_vmware_event_t *)service->data_eventlog->events.values[0])->timestamp;
 	}
 
 	ret = SYSINFO_RET_OK;

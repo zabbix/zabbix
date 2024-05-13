@@ -74,7 +74,7 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error);
 
-void	vmware_eventlog_data_shared_free(zbx_vmware_eventlog_data_t *eventlog_data);
+void	vmware_data_eventlog_shared_free(zbx_vmware_data_eventlog_t *data_eventlog);
 
 #define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)		\
 						xmlFreeDoc(xdoc)

@@ -393,7 +393,7 @@ typedef struct
 	char				*error;
 	zbx_vector_vmware_event_ptr_t	events;
 }
-zbx_vmware_eventlog_data_t;
+zbx_vmware_data_eventlog_t;
 
 /* vmware service data object */
 typedef struct
@@ -547,7 +547,7 @@ typedef struct
 	zbx_vmware_data_t		*data;
 
 	/* service event log data object that is swapped with new one during service event log update */
-	zbx_vmware_eventlog_data_t	*eventlog_data;
+	zbx_vmware_data_eventlog_t	*data_eventlog;
 
 	/* lastlogsize when vmware.eventlog[] item was polled last time and skip old flag*/
 	zbx_vmware_eventlog_state_t	eventlog;
