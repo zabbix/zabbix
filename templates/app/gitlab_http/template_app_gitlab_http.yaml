@@ -279,7 +279,7 @@ zabbix_export:
             - uuid: 7021e3b0b49a4990a1d8ce356b7ae130
               expression: 'min(/GitLab by HTTP/gitlab.http.requests.5xx.rate,5m)>{$GITLAB.HTTP.FAIL.MAX.WARN}'
               name: 'Too many HTTP requests failures'
-              event_name: 'Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)'''
+              event_name: 'Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Too many requests failed on GitLab instance with 5xx HTTP code"'
               tags:

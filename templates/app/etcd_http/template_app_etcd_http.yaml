@@ -574,7 +574,7 @@ zabbix_export:
             - uuid: 1ea623927179489890a5a73eeb8177f7
               expression: '(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}'
               name: 'Instance has seen too many leader changes'
-              event_name: 'Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)'''
+              event_name: 'Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)'
               priority: WARNING
               description: 'Rapid leadership changes impact the performance of `etcd` significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the `etcd cluster`.'
               tags:

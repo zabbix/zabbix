@@ -594,8 +594,8 @@ zabbix_export:
           triggers:
             - uuid: b2fa6148a2b24fa6890b4078c235dcd8
               expression: 'last(/Apache Kafka by JMX/jmx["kafka.server:type=app-info","start-time-ms"])<10m'
-              name: 'has been restarted'
-              event_name: 'has been restarted (uptime < 10m)'
+              name: 'Kafka service has been restarted'
+              event_name: 'Kafka service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'

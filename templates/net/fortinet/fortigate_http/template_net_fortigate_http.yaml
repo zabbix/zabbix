@@ -3873,9 +3873,6 @@ zabbix_export:
                     - type: INTEGER
                       name: acknowledgement_status
                       value: '1'
-                    - type: STRING
-                      name: reference
-                      value: BAAAA
                     - type: INTEGER
                       name: show
                       value: '3'
