@@ -466,7 +466,7 @@ JAVASCRIPT;
 			CArrayHelper::sort($query_fields, ['sortorder']);
 			CArrayHelper::sort($headers, ['sortorder']);
 		}
-		else if ($input['type'] == ITEM_TYPE_SCRIPT || $input['type'] == ITEM_TYPE_BROWSER) {
+		else if (in_array($input['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 			$parameters = [];
 
 			foreach ($input['parameters'] as $parameter) {

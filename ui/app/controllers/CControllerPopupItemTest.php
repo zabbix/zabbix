@@ -658,7 +658,7 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 		}
 
-		if ($this->item_type == ITEM_TYPE_SCRIPT || $this->item_type == ITEM_TYPE_BROWSER) {
+		if (in_array($this->item_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 			return $interface_data;
 		}
 

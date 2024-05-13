@@ -2618,7 +2618,7 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($db_items as $db_item) {
 			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
 
-			if ($db_item['type'] == ITEM_TYPE_SCRIPT || $db_item['type'] == ITEM_TYPE_BROWSER) {
+			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 				$item += ['parameters' => []];
 			}
 

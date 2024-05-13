@@ -1462,7 +1462,7 @@ abstract class CItemGeneral extends CApiService {
 			$update = false;
 
 			if ($db_items === null) {
-				if (($item['type'] == ITEM_TYPE_SCRIPT || $item['type'] == ITEM_TYPE_BROWSER)
+				if (in_array($item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])
 						&& array_key_exists('parameters', $item) && $item['parameters']) {
 					$update = true;
 				}
@@ -1472,15 +1472,11 @@ abstract class CItemGeneral extends CApiService {
 					continue;
 				}
 
-				$db_item = $db_items[$item['itemid']];
-
-				if ($item['type'] == ITEM_TYPE_SCRIPT || $item['type'] == ITEM_TYPE_BROWSER) {
-					if (array_key_exists('parameters', $item)) {
-						$update = true;
-					}
+				if (in_array($item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
+					$update = array_key_exists('parameters', $item);
 				}
-				elseif (($db_item['type'] == ITEM_TYPE_SCRIPT || $db_item['type'] == ITEM_TYPE_BROWSER)
-						&& $db_item['parameters']) {
+				elseif (in_array($db_items[$item['itemid']]['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])
+						&& $db_items[$item['itemid']]['parameters']) {
 					$update = true;
 				}
 			}
@@ -2641,8 +2637,8 @@ abstract class CItemGeneral extends CApiService {
 			$type = $item['type'];
 			$db_type = $db_items[$item['itemid']]['type'];
 
-			if ((array_key_exists('parameters', $item) && ($type == ITEM_TYPE_SCRIPT || $type == ITEM_TYPE_BROWSER))
-					|| ($type != $db_type && ($db_type == ITEM_TYPE_SCRIPT || $db_type == ITEM_TYPE_BROWSER))) {
+			if ((array_key_exists('parameters', $item) && in_array($type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]))
+					|| ($type != $db_type && in_array($db_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]))) {
 				$itemids[] = $item['itemid'];
 				$db_items[$item['itemid']]['parameters'] = [];
 			}

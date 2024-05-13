@@ -241,6 +241,8 @@ class CXmlConstantName {
 	const DEPENDENT = 'DEPENDENT';
 	const HTTP_AGENT = 'HTTP_AGENT';
 	const SNMP_AGENT = 'SNMP_AGENT';
+	// const SCRIPT = 'SCRIPT'; // Duplicate.
+	const BROWSER = 'BROWSER';
 
 	const FLOAT = 'FLOAT';
 	const CHAR = 'CHAR';
@@ -295,7 +297,6 @@ class CXmlConstantName {
 	// const MATCHES_REGEX = 'MATCHES_REGEX'; // Duplicate.
 	// const NOT_MATCHES_REGEX = 'NOT_MATCHES_REGEX'; // Duplicate.
 
-	const BROWSER = 'BROWSER';
 	const EMAIL = 'EMAIL';
 	const SCRIPT = 'SCRIPT';
 	const SMS = 'SMS';
