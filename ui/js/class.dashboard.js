@@ -2278,8 +2278,9 @@ class CDashboard {
 			dashboardPageWidgetActions: e => {
 				const menu = e.detail.widget.getActionsContextMenu({
 					can_copy_widget: this._can_edit_dashboards
-						&& (this._data.templateid === null || !this.#broadcast_cache.has(CWidgetsData.DATA_TYPE_HOST_ID)
-							|| this.#broadcast_cache.get(CWidgetsData.DATA_TYPE_HOST_ID) === null
+						&& (this._data.templateid === null
+							|| this.#broadcast_cache.get(CWidgetsData.DATA_TYPE_HOST_ID)
+								=== CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID)
 						),
 					can_paste_widget: this._can_edit_dashboards && this.getStoredWidgetDataCopy() !== null
 				});

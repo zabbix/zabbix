@@ -99,7 +99,8 @@ class WidgetForm extends CWidgetForm {
 		if (array_key_exists('units', $this->values) && $this->values['units'] !== '') {
 			$this->is_binary_units = isBinaryUnits($this->values['units']);
 		}
-		elseif (array_key_exists('itemid', $this->values)) {
+		elseif (array_key_exists('itemid', $this->values) && is_array($this->values['itemid'])
+				&& !array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $this->values['itemid'])) {
 			$items = API::Item()->get([
 				'output' => ['units'],
 				'itemids' => $this->values['itemid'],
