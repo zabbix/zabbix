@@ -38,7 +38,7 @@ class BinaryValueGet extends CController {
 			'itemid' =>		'int32|required',
 			'clock' =>		'int32|required',
 			'ns' =>			'int32|required',
-			'preview' =>	'in 1',
+			'preview' =>	'in 1'
 		];
 
 		$ret = $this->validateInput($fields);

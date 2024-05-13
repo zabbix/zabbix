@@ -57,7 +57,7 @@ $parameters = [
 	'srctbl' => 'items',
 	'srcfld1' => 'itemid',
 	'dstfrm' => $form->getName(),
-	'dstfld1' => 'itemid',
+	'dstfld1' => 'itemid'
 ];
 
 $parameters += $data['templateid'] === ''
@@ -264,7 +264,7 @@ $form
 				'highlights' => $data['highlights'],
 				'colors' => $data['colors'],
 				'item_value_type' => $data['item_value_type'],
-				'multiselect_item_name' => $data['ms_item'] ? $data['ms_item']['prefix'].$data['ms_item']['name'] : '',
+				'multiselect_item_name' => $data['ms_item'] ? $data['ms_item']['prefix'].$data['ms_item']['name'] : ''
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);

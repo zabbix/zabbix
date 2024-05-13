@@ -33,9 +33,9 @@ class ImageValueGet extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'itemid' =>		'int32|required',
-			'clock' =>		'int32|required',
-			'ns' =>			'int32|required',
+			'itemid' =>	'int32|required',
+			'clock' =>	'int32|required',
+			'ns' =>		'int32|required'
 		];
 
 		return $this->validateInput($fields);

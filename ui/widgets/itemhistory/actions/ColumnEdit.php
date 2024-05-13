@@ -117,7 +117,7 @@ class ColumnEdit extends CController {
 				$item_ms = [
 					'id' => $db_item['itemid'],
 					'prefix' => $db_item['hosts'][0]['name'].NAME_DELIMITER,
-					'name' => $this->hasInput('templateid') ? $db_item['name'] : $db_item['name_resolved'],
+					'name' => $this->hasInput('templateid') ? $db_item['name'] : $db_item['name_resolved']
 				];
 
 				$item_value_type = $db_item['value_type'];
@@ -125,7 +125,7 @@ class ColumnEdit extends CController {
 			else {
 				$item_ms = [
 					'id' => $input['itemid'],
-					'name' => _('Inaccessible item'),
+					'name' => _('Inaccessible item')
 				];
 			}
 		}
