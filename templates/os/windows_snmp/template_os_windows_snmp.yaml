@@ -1216,8 +1216,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: ab4b4ad08664454096f5e2cf3b7da1e9
                   expression: 'min(/Windows by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: 'High memory utilization'
-                  event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#MEMNAME}: High memory utilization'
+                  event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:

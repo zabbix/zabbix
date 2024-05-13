@@ -156,7 +156,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High memory utilization|<p>The system is running out of free memory.</p>|`min(/Windows by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|{#MEMNAME}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Windows by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule Network interfaces discovery
 
