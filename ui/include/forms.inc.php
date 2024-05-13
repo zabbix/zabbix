@@ -2084,7 +2084,8 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		: null;
 
 	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
-			$textarea_options))
+			$textarea_options
+		))
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
