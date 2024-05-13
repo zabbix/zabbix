@@ -51,7 +51,10 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 	if (array_key_exists('end_of_full_support', $check_data) && $check_data['end_of_full_support']) {
 		$version_details = [makeWarningIcon(_('Please upgrade to latest major release.')), ' ', _('Outdated')];
 
-		$server_version_details = $version_details;
+		if ($status['has_status']) {
+			$server_version_details = $version_details;
+		}
+
 		$frontend_version_details = $version_details;
 	}
 	elseif (array_key_exists('latest_release', $check_data)) {
