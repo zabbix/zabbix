@@ -131,9 +131,14 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				->addStyle(getTriggerSeverityCss())
 				->addStyle(getTriggerStatusCss());
 
-			// perform Zabbix server check only for standard pages
-			if ($is_standard_page && CSettingsHelper::getPublic(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
-				$page['scripts'][] = 'servercheck.js';
+			if ($is_standard_page) {
+				if (CSettingsHelper::getPublic(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
+					$page['scripts'][] = 'servercheck.js';
+				}
+
+				if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
+					$page['scripts'][] = 'class.software-version-check.js';
+				}
 			}
 		}
 	}

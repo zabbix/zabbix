@@ -45,6 +45,10 @@ if (!empty($DB['DB'])) {
 	if ($data['config']['server_check_interval']) {
 		$scripts[] = 'servercheck.js';
 	}
+
+	if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
+		$scripts[] = 'class.software-version-check.js';
+	}
 }
 
 // Show GUI messages in pages with menus and in kiosk mode.

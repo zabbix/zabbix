@@ -1084,6 +1084,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Event hub initialization.
 
 	ZABBIX.EventHub = new CEventHub();
+
+	// Software version check initialization.
+
+	if (typeof CSoftwareVersionCheck !== 'undefined') {
+		ZABBIX.SoftwareVersionCheck = new CSoftwareVersionCheck();
+	}
 });
 
 window.addEventListener('load', () => {

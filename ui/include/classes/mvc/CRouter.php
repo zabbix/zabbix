@@ -314,6 +314,8 @@ class CRouter {
 		'sla.list'									=> ['CControllerSlaList',								'layout.htmlpage',		'sla.list'],
 		'sla.update'								=> ['CControllerSlaUpdate',								'layout.json',			null],
 		'slareport.list'							=> ['CControllerSlaReportList',							'layout.htmlpage',		'slareport.list'],
+		'softwareversioncheck.get'					=> ['CControllerSoftwareVersionCheckGet',				'layout.json',			null],
+		'softwareversioncheck.update'				=> ['CControllerSoftwareVersionCheckUpdate',			'layout.json',			null],
 		'system.warning'							=> ['CControllerSystemWarning',							'layout.warning',		'system.warning'],
 		'tabfilter.profile.update'					=> ['CControllerTabFilterProfileUpdate',				'layout.json',			null],
 		'template.create'							=> ['CControllerTemplateCreate',						'layout.json',			null],

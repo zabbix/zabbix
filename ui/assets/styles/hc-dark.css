@@ -41,10 +41,10 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1714638813635") format("woff2"), url("../fonts/zabbix-icons.woff?t=1714638813635") format("woff"), url("../fonts/zabbix-icons.ttf?t=1714638813635") format("truetype"), url("../fonts/zabbix-icons.svg?t=1714638813635#zabbix-icons") format("svg"); }
+  src: url("../fonts/zabbix-icons.woff2?t=1715610469019") format("woff2"), url("../fonts/zabbix-icons.woff?t=1715610469019") format("woff"), url("../fonts/zabbix-icons.ttf?t=1715610469019") format("truetype"), url("../fonts/zabbix-icons.svg?t=1715610469019#zabbix-icons") format("svg"); }
 [class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .color-picker .use-transparent::after,
 .color-picker-dialogue .use-transparent::after, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .z-select .focusable::after,
-z-select .focusable::after, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link .problem-icon-list-item::before,
+z-select .focusable::after, .link-external::after, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link .problem-icon-list-item::before,
 .problem-icon-list .problem-icon-list-item::before {
   font-family: 'zabbix-icons';
   font-size: 18px;
@@ -272,143 +272,149 @@ button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"]
 .zi-inventory:before {
   content: "\ea46"; }
 
-.zi-lock:before {
+.zi-link-external-small:before {
   content: "\ea47"; }
 
-.zi-maximize:before {
+.zi-link-external:before {
   content: "\ea48"; }
 
-.zi-menu:before {
+.zi-lock:before {
   content: "\ea49"; }
 
-.zi-minimize:before {
+.zi-maximize:before {
   content: "\ea4a"; }
 
-.zi-monitoring:before {
+.zi-menu:before {
   content: "\ea4b"; }
 
-.zi-more:before {
+.zi-minimize:before {
   content: "\ea4c"; }
 
-.zi-pause:before {
+.zi-monitoring:before {
   content: "\ea4d"; }
 
-.zi-pencil:before {
+.zi-more:before {
   content: "\ea4e"; }
 
-.zi-picture:before {
+.zi-pause:before {
   content: "\ea4f"; }
 
-.zi-play:before {
+.zi-pencil:before {
   content: "\ea50"; }
 
-.zi-plus:before, .zi-plus-small:before {
+.zi-picture:before {
   content: "\ea51"; }
 
-.zi-reference:before {
+.zi-play:before {
   content: "\ea52"; }
 
-.zi-reload:before {
+.zi-plus:before, .zi-plus-small:before {
   content: "\ea53"; }
 
-.zi-remove:before, .zi-remove-small:before, .zi-remove-smaller:before {
+.zi-reference:before {
   content: "\ea54"; }
 
-.zi-reports:before {
+.zi-reload:before {
   content: "\ea55"; }
 
-.zi-search-large:before {
+.zi-remove:before, .zi-remove-small:before, .zi-remove-smaller:before {
   content: "\ea56"; }
 
-.zi-search:before {
+.zi-reports:before {
   content: "\ea57"; }
 
-.zi-services:before {
+.zi-search-large:before {
   content: "\ea58"; }
 
-.zi-sign-out:before {
+.zi-search:before {
   content: "\ea59"; }
 
-.zi-slash:before {
+.zi-services:before {
   content: "\ea5a"; }
 
-.zi-speaker-off:before {
+.zi-sign-out:before {
   content: "\ea5b"; }
 
-.zi-speaker:before {
+.zi-slash:before {
   content: "\ea5c"; }
 
-.zi-star-filled:before {
+.zi-speaker-off:before {
   content: "\ea5d"; }
 
-.zi-star:before {
+.zi-speaker:before {
   content: "\ea5e"; }
 
-.zi-stop-sign:before {
+.zi-star-filled:before {
   content: "\ea5f"; }
 
-.zi-support:before {
+.zi-star:before {
   content: "\ea60"; }
 
-.zi-text:before {
+.zi-stop-sign:before {
   content: "\ea61"; }
 
-.zi-time-period:before {
+.zi-support:before {
   content: "\ea62"; }
 
-.zi-trash:before {
+.zi-text:before {
   content: "\ea63"; }
 
-.zi-tree-top-bottom:before, .zi-tree-top-bottom-small:before {
+.zi-time-period:before {
   content: "\ea64"; }
 
-.zi-tree-top-right-bottom:before, .zi-tree-top-right-bottom-small:before {
+.zi-trash:before {
   content: "\ea65"; }
 
-.zi-tree-top-right:before, .zi-tree-top-right-small:before {
+.zi-tree-top-bottom:before, .zi-tree-top-bottom-small:before {
   content: "\ea66"; }
 
-.zi-triangle-flipped-warning:before {
+.zi-tree-top-right-bottom:before, .zi-tree-top-right-bottom-small:before {
   content: "\ea67"; }
 
-.zi-triangle-warning:before {
+.zi-tree-top-right:before, .zi-tree-top-right-small:before {
   content: "\ea68"; }
 
-.zi-uncheck:before {
+.zi-triangle-flipped-warning:before {
   content: "\ea69"; }
 
-.zi-user-filled:before, .zi-user-filled-small:before {
+.zi-triangle-warning:before {
   content: "\ea6a"; }
 
-.zi-user-settings:before {
+.zi-uncheck:before {
   content: "\ea6b"; }
 
-.zi-user:before {
+.zi-user-filled:before, .zi-user-filled-small:before {
   content: "\ea6c"; }
 
-.zi-users-filled:before, .zi-users-filled-small:before {
+.zi-user-settings:before {
   content: "\ea6d"; }
 
-.zi-users:before {
+.zi-user:before {
   content: "\ea6e"; }
 
-.zi-widget-add:before {
+.zi-users-filled:before, .zi-users-filled-small:before {
   content: "\ea6f"; }
 
-.zi-widget-awaiting-data-large:before {
+.zi-users:before {
   content: "\ea70"; }
 
-.zi-widget-empty-references-large:before {
+.zi-widget-add:before {
   content: "\ea71"; }
 
-.zi-widget-resize:before {
+.zi-widget-awaiting-data-large:before {
   content: "\ea72"; }
 
-.zi-wrench-alt:before, .zi-wrench-alt-small:before {
+.zi-widget-empty-references-large:before {
   content: "\ea73"; }
 
-.zi-wrench:before {
+.zi-widget-resize:before {
   content: "\ea74"; }
+
+.zi-wrench-alt:before, .zi-wrench-alt-small:before {
+  content: "\ea75"; }
+
+.zi-wrench:before {
+  content: "\ea76"; }
 
 .zabbix-logo {
   width: 114px;
@@ -1338,7 +1344,7 @@ button {
   right: 1px;
   z-index: 1000; }
   .btn-overlay-close::before {
-    content: ""; }
+    content: ""; }
 
 .btn-debug {
   position: fixed;
@@ -1359,7 +1365,7 @@ button {
 .problem-icon-list .problem-icon-list-item::before {
   font-size: 16px; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -1457,7 +1463,7 @@ button {
     line-height: 18px; }
 .color-picker .use-transparent::after,
 .color-picker-dialogue .use-transparent::after {
-  content: "";
+  content: "";
   font-size: 20px;
   color: #d40000; }
 
@@ -1697,7 +1703,7 @@ button {
     bottom: 0;
     text-align: center; }
     .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before {
-      content: "";
+      content: "";
       margin: 0 -4px;
       font-size: 46px; }
     .dashboard-widget-placeholder .dashboard-widget-placeholder-label .hidden {
@@ -1708,7 +1714,7 @@ button {
     background: #020202;
     box-shadow: inset 2px 2px 6px rgba(0, 0, 0, 0.5); }
     .dashboard-widget-placeholder .dashboard-widget-placeholder-resizing .dashboard-widget-placeholder-label::before {
-      content: ""; }
+      content: ""; }
   .dashboard-widget-placeholder.disabled {
     opacity: 1; }
     .dashboard-widget-placeholder.disabled .dashboard-widget-placeholder-box {
@@ -5040,6 +5046,15 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
     color: #f8f8f8;
     border-bottom: 1px solid rgba(248, 248, 248, 0.5); }
 
+.link-external {
+  position: relative; }
+  .link-external::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: calc(-12px - 2px);
+    font-size: 12px; }
+
 .disabled {
   cursor: default !important;
   opacity: .35;
@@ -7806,16 +7821,16 @@ z-select .list:focus, input[type="text"]:focus, input[type="password"]:focus, in
   content: ""; }
 
 .average-bg::before {
-  content: ""; }
+  content: ""; }
 
 .warning-bg::before {
   content: ""; }
 
 .high-bg::before {
-  content: ""; }
+  content: ""; }
 
 .disaster-bg::before {
-  content: ""; }
+  content: ""; }
 
 .log-na-bg::before {
   content: ""; }
@@ -7827,10 +7842,10 @@ z-select .list:focus, input[type="text"]:focus, input[type="password"]:focus, in
   content: ""; }
 
 .log-high-bg::before {
-  content: ""; }
+  content: ""; }
 
 .log-disaster-bg::before {
-  content: ""; }
+  content: ""; }
 
 .na-bg::before,
 .log-na-bg::before,
@@ -7905,7 +7920,7 @@ td.inactive-bg {
   color: #ffffff; }
 
 .inactive-bg::before {
-  content: "";
+  content: "";
   background-color: #e45959; }
 
 .msg-bad button,
@@ -7974,16 +7989,16 @@ td.inactive-bg {
   content: ""; }
 .problem-icon-link .status-average-bg::before,
 .problem-icon-list .status-average-bg::before {
-  content: ""; }
+  content: ""; }
 .problem-icon-link .status-warning-bg::before,
 .problem-icon-list .status-warning-bg::before {
   content: ""; }
 .problem-icon-link .status-high-bg::before,
 .problem-icon-list .status-high-bg::before {
-  content: ""; }
+  content: ""; }
 .problem-icon-link .status-disaster-bg::before,
 .problem-icon-list .status-disaster-bg::before {
-  content: ""; }
+  content: ""; }
 
 .totals-list > div {
   border-top: 1px solid #444444;

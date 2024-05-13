@@ -21,9 +21,13 @@
 
 namespace Widgets\SystemInfo\Includes;
 
+use CSettingsHelper;
 use Zabbix\Widgets\CWidgetForm;
 
-use Zabbix\Widgets\Fields\CWidgetFieldRadioButtonList;
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldRadioButtonList
+};
 
 /**
  * System information widget form.
@@ -37,6 +41,12 @@ class WidgetForm extends CWidgetForm {
 					ZBX_SYSTEM_INFO_SERVER_STATS => _('System stats'),
 					ZBX_SYSTEM_INFO_HAC_STATUS => _('High availability nodes')
 				]))->setDefault(ZBX_SYSTEM_INFO_SERVER_STATS)
+			)
+			->addField(CSettingsHelper::isSoftwareUpdateCheckEnabled()
+				? new CWidgetFieldCheckBox('show_software_update_check_details',
+					_('Show software update check details')
+				)
+				: null
 			);
 	}
 }

@@ -105,6 +105,7 @@ $available_js = [
 	'class.script.js' => '',
 	'class.scrollable.js' => '',
 	'class.sidebar.js' => '',
+	'class.software-version-check.js' => '',
 	'class.sortable.js' => '',
 	'class.svg.canvas.js' => 'vector/',
 	'class.svg.map.js' => 'vector/',

@@ -96,14 +96,26 @@ class CSettings extends CApiService {
 	 * Get the private settings used in UI.
 	 */
 	public static function getPrivate(): array {
-		$output_fields = ['session_key', 'dbversion_status', 'server_status'];
+		$output_fields = ['session_key', 'dbversion_status', 'server_status', 'software_update_checkid',
+			'software_update_check_data'
+		];
 
 		$db_settings = DB::select('config', ['output' => $output_fields])[0];
 
 		$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
 
 		$db_settings['server_status'] = json_decode($db_settings['server_status'], true) ?: [];
-		$db_settings['server_status'] += ['configuration' => ['enable_global_scripts' => true]];
+		$db_settings['server_status'] += ['configuration' => [
+			'enable_global_scripts' => true,
+			'allow_software_update_check' => false
+		]];
+
+		if ($db_settings['software_update_checkid'] !== '') {
+			$db_settings['software_update_checkid'] = hash('sha256', $db_settings['software_update_checkid']);
+		}
+
+		$db_settings['software_update_check_data'] =
+			json_decode($db_settings['software_update_check_data'], true) ?: [];
 
 		return $db_settings;
 	}
@@ -289,5 +301,21 @@ class CSettings extends CApiService {
 		$output_fields[] = 'configid';
 
 		return DB::select('config', ['output' => $output_fields])[0];
+	}
+
+	public static function updatePrivate(array $settings): array {
+		$settings['software_update_check_data'] = json_encode($settings['software_update_check_data']);
+		$db_settings = DB::select('config', ['output' => ['configid', 'software_update_check_data']])[0];
+
+		$upd_config = DB::getUpdatedValues('config', $settings, $db_settings);
+
+		if ($upd_config) {
+			DB::update('config', [
+				'values' => $upd_config,
+				'where' => ['configid' => $db_settings['configid']]
+			]);
+		}
+
+		return array_keys($settings);
 	}
 }
