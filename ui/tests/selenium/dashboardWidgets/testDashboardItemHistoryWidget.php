@@ -101,7 +101,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						'name' => 'Page with default widgets',
 						'widgets' => [
 							[
-								'type' => 'plaintext',
+								'type' => 'itemhistory',
 								'name' => self::DEFAULT_WIDGET,
 								'x' => 0,
 								'y' => 0,
@@ -126,7 +126,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 								]
 							],
 							[
-								'type' => 'plaintext',
+								'type' => 'itemhistory',
 								'name' => self::DELETE_WIDGET,
 								'x' => 0,
 								'y' => 5,
@@ -156,7 +156,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						'name' => 'Page with created/updated widgets',
 						'widgets' => [
 							[
-								'type' => 'plaintext',
+								'type' => 'itemhistory',
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
@@ -186,7 +186,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						'name' => 'Page with Item history widget',
 						'widgets' => [
 							[
-								'type' => 'plaintext',
+								'type' => 'itemhistory',
 								'name' => self::DATA_WIDET,
 								'x' => 0,
 								'y' => 0,
