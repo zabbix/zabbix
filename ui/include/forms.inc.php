@@ -2060,23 +2060,22 @@ function getTriggerFormData(array $data) {
  * @return CRow
  */
 function renderTagTableRow($index, array $tag, array $options = []) {
-	$options = array_merge([
+	$options += [
 		'readonly' => false,
 		'field_name' => 'tags',
 		'show_inherited_tags' => false
-	], $options);
+	];
 
-	if ($options['show_inherited_tags'] && !array_key_exists('type', $tag)) {
-		$tag['type'] = ZBX_PROPERTY_INHERITED;
+	$textarea_options = array_intersect_key($options, array_flip(['readonly', 'add_post_js']));
+
+	if ($options['show_inherited_tags']) {
+		$tag += [
+			'type' => ZBX_PROPERTY_INHERITED,
+			'parent_templates' => []
+		];
 	}
 
-	if ($options['show_inherited_tags'] && !array_key_exists('parent_templates', $tag)) {
-		$tag['parent_templates'] = [];
-	}
-
-	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'],
-			array_intersect_key($options, array_flip(['readonly', 'add_post_js']))
-		))
+	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
 		->setAttribute('placeholder', _('tag'));
 
@@ -2085,8 +2084,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		: null;
 
 	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
-			array_intersect_key($options, array_flip(['readonly', 'add_post_js']))
-		))
+			$textarea_options))
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
