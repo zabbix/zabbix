@@ -38,6 +38,7 @@ import (
 	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/plugins/external"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
@@ -679,87 +680,6 @@ type pluginOptions struct {
 	} `conf:"optional"`
 }
 
-func (m *Manager) init() {
-	m.input = make(chan interface{}, 10)
-	m.pluginQueue = make(pluginHeap, 0, len(plugin.Metrics))
-	m.clients = make(map[uint64]*client)
-	m.plugins = make(map[string]*pluginAgent)
-	m.shutdownSeconds = shutdownInactive
-
-	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
-
-	for _, metric := range plugin.Metrics {
-		metrics = append(metrics, metric)
-	}
-	sort.Slice(metrics, func(i, j int) bool {
-		return metrics[i].Plugin.Name() < metrics[j].Plugin.Name()
-	})
-
-	pagent := &pluginAgent{}
-	for _, metric := range metrics {
-		if metric.Plugin != pagent.impl {
-			capacity, forceActiveChecksOnStart := getPluginOptions(
-				agent.Options.Plugins[metric.Plugin.Name()],
-				metric.Plugin.Name(),
-			)
-			if capacity > metric.Plugin.Capacity() {
-				log.Warningf(
-					"lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
-					metric.Plugin.Name(),
-					metric.Plugin.Capacity(),
-					capacity,
-				)
-
-				capacity = metric.Plugin.Capacity()
-			}
-
-			pagent = &pluginAgent{
-				impl:                     metric.Plugin,
-				tasks:                    make(performerHeap, 0),
-				maxCapacity:              capacity,
-				usedCapacity:             0,
-				forceActiveChecksOnStart: forceActiveChecksOnStart,
-				index:                    -1,
-				refcount:                 0,
-				usrprm:                   metric.UsrPrm,
-			}
-
-			interfaces := ""
-			if _, ok := metric.Plugin.(plugin.Exporter); ok {
-				interfaces += "exporter, "
-			}
-			if _, ok := metric.Plugin.(plugin.Collector); ok {
-				interfaces += "collector, "
-			}
-			if _, ok := metric.Plugin.(plugin.Runner); ok {
-				interfaces += "runner, "
-			}
-			if _, ok := metric.Plugin.(plugin.Watcher); ok {
-				interfaces += "watcher, "
-			}
-			if _, ok := metric.Plugin.(plugin.Configurator); ok {
-				interfaces += "configurator, "
-			}
-			interfaces = interfaces[:len(interfaces)-2]
-
-			if metric.Plugin.IsExternal() {
-				ext := metric.Plugin.(*external.Plugin)
-				metric.Plugin.SetCapacity(1)
-				log.Infof(
-					"using plugin '%s' (%s) providing following interfaces: %s",
-					metric.Plugin.Name(),
-					ext.Path,
-					interfaces,
-				)
-			} else {
-				log.Infof("using plugin '%s' (built-in) providing following interfaces: %s", metric.Plugin.Name(),
-					interfaces)
-			}
-		}
-		m.plugins[metric.Key] = pagent
-	}
-}
-
 func (m *Manager) Start() {
 	log.Infof(
 		"Plugin communication protocol version is %s",
@@ -893,13 +813,96 @@ func (m *Manager) configure(options *agent.AgentOptions) (err error) {
 	return
 }
 
-func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
-	var m Manager
-	m.init()
-	if err = m.validatePlugins(options); err != nil {
-		return
+// NewManager crates a new manager instance.
+func NewManager(options *agent.AgentOptions) (*Manager, error) {
+	m := &Manager{
+		input:           make(chan any, 10),
+		pluginQueue:     make(pluginHeap, 0, len(plugin.Metrics)),
+		clients:         make(map[uint64]*client),
+		plugins:         make(map[string]*pluginAgent),
+		shutdownSeconds: shutdownInactive,
 	}
-	return &m, m.configure(options)
+
+	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
+
+	for _, metric := range plugin.Metrics {
+		metrics = append(metrics, metric)
+	}
+
+	sort.Slice(
+		metrics,
+		func(i, j int) bool {
+			return metrics[i].Plugin.Name() < metrics[j].Plugin.Name()
+		},
+	)
+
+	pagent := &pluginAgent{}
+	for _, metric := range metrics {
+		if metric.Plugin != pagent.impl { //nolint:nestif
+			capacity, forceActiveChecksOnStart := getPluginOptions(
+				agent.Options.Plugins[metric.Plugin.Name()],
+				metric.Plugin.Name(),
+			)
+			if capacity > metric.Plugin.Capacity() {
+				log.Warningf(
+					"lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
+					metric.Plugin.Name(),
+					metric.Plugin.Capacity(),
+					capacity,
+				)
+
+				capacity = metric.Plugin.Capacity()
+			}
+
+			pagent = &pluginAgent{
+				impl:                     metric.Plugin,
+				tasks:                    make(performerHeap, 0),
+				maxCapacity:              capacity,
+				usedCapacity:             0,
+				forceActiveChecksOnStart: forceActiveChecksOnStart,
+				index:                    -1,
+				refcount:                 0,
+				usrprm:                   metric.UsrPrm,
+			}
+
+			if metric.Plugin.IsExternal() {
+				ext, ok := metric.Plugin.(*external.Plugin)
+				if !ok {
+					return nil, errs.Errorf(
+						"unknown external plugin implementation for plugin - %q",
+						metric.Plugin.Name(),
+					)
+				}
+
+				log.Infof(
+					"using plugin '%s' (%s) providing following interfaces: %s",
+					metric.Plugin.Name(),
+					ext.Path,
+					getPluginInterfaceNames(metric.Plugin),
+				)
+			} else {
+				log.Infof(
+					"using plugin '%s' (built-in) providing following interfaces: %s",
+					metric.Plugin.Name(),
+					getPluginInterfaceNames(metric.Plugin),
+				)
+			}
+		}
+
+		m.plugins[metric.Key] = pagent
+	}
+
+	err := m.validatePlugins(options)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to validate plugins")
+	}
+
+	err = m.configure(options)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to configure manager")
+	}
+
+	return m, nil
 }
 
 func (m *Manager) addUserParamsPlugin(key string) {
@@ -1004,4 +1007,30 @@ func getPluginOpts(
 	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
 
 	return
+}
+
+func getPluginInterfaceNames(p plugin.Accessor) string {
+	interfaceNames := make([]string, 0, 5)
+
+	if _, ok := p.(plugin.Exporter); ok {
+		interfaceNames = append(interfaceNames, "exporter")
+	}
+
+	if _, ok := p.(plugin.Collector); ok {
+		interfaceNames = append(interfaceNames, "collector")
+	}
+
+	if _, ok := p.(plugin.Runner); ok {
+		interfaceNames = append(interfaceNames, "runner")
+	}
+
+	if _, ok := p.(plugin.Watcher); ok {
+		interfaceNames = append(interfaceNames, "watcher")
+	}
+
+	if _, ok := p.(plugin.Configurator); ok {
+		interfaceNames = append(interfaceNames, "configurator")
+	}
+
+	return strings.Join(interfaceNames, ", ")
 }
