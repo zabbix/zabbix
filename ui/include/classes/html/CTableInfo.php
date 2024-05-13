@@ -21,35 +21,24 @@
 
 class CTableInfo extends CTable {
 
-	protected $message = null;
+	protected $no_data_message = null;
+	protected $no_data_description = null;
+	protected $no_data_icon = null;
+
 	protected $page_navigation;
 
 	public function __construct() {
 		parent::__construct();
 
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
+
+		$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE);
 	}
 
 	public function setNoDataMessage($message, $description = null, $icon = null): self {
-		$this->addClass(ZBX_STYLE_NO_DATA);
-
-		if ($icon === null) {
-			$this->addClass(ZBX_STYLE_NO_DATA_WITHOUT_ICON);
-		}
-
-		$container = (new CDiv($message))->addClass(ZBX_STYLE_NO_DATA_MESSAGE);
-
-		if ($icon !== null) {
-			$container->addClass($icon);
-		}
-
-		if ($description !== null) {
-			$container->addItem(
-				(new CDiv($description))->addClass(ZBX_STYLE_NO_DATA_DESCRIPTION)
-			);
-		}
-
-		$this->message = new CCol($container);
+		$this->no_data_message = $message;
+		$this->no_data_description = $description;
+		$this->no_data_icon = $icon;
 
 		return $this;
 	}
@@ -69,8 +58,12 @@ class CTableInfo extends CTable {
 			$this->setId($tableid);
 		}
 
-		if ($this->rownum == 0 && $this->message === null) {
-			$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE);
+		if ($this->rownum == 0) {
+			$this->addClass(ZBX_STYLE_NO_DATA);
+
+			if ($this->no_data_icon === null) {
+				$this->addClass(ZBX_STYLE_NO_DATA_WITHOUT_ICON);
+			}
 		}
 
 		return parent::toString($destroy);
@@ -80,7 +73,19 @@ class CTableInfo extends CTable {
 		$ret = '';
 
 		if ($this->rownum == 0) {
-			$ret .= $this->prepareRow($this->message)->toString();
+			$container = (new CDiv($this->no_data_message))->addClass(ZBX_STYLE_NO_DATA_MESSAGE);
+
+			if ($this->no_data_icon !== null) {
+				$container->addClass($this->no_data_icon);
+			}
+
+			if ($this->no_data_description !== null) {
+				$container->addItem(
+					(new CDiv($this->no_data_description))->addClass(ZBX_STYLE_NO_DATA_DESCRIPTION)
+				);
+			}
+
+			$ret .= $this->prepareRow(new CCol($container))->toString();
 		}
 
 		$ret .= parent::endToString();
