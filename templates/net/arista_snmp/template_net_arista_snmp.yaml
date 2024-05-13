@@ -1484,8 +1484,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6b9010e0ad4e4549ac91a91d4bb3983a
                   expression: 'min(/Arista by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: 'High memory utilization'
-                  event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: '{#MEMNAME}: High memory utilization'
+                  event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
