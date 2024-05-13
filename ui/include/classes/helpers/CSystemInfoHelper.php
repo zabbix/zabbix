@@ -308,8 +308,14 @@ class CSystemInfoHelper {
 			}
 
 			if ($version['version'] === ZABBIX_EXPORT_VERSION) {
-				$data['end_of_full_support'] = $version['end_of_full_support'];
-				$data['latest_release'] = $latest_release ?? $version['latest_release']['release'];
+				if (!$version['end_of_full_support']) {
+					$data['end_of_full_support'] = $version['end_of_full_support'];
+					$data['latest_release'] = $version['latest_release']['release'];
+				}
+				elseif ($latest_release !== null) {
+					$data['end_of_full_support'] = $version['end_of_full_support'];
+					$data['latest_release'] = $latest_release;
+				}
 
 				break;
 			}
