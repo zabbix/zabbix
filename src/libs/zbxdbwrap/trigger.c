@@ -20,7 +20,6 @@
 #include "zbxdbwrap.h"
 
 #include "zbxdbhigh.h"
-#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxeval.h"

@@ -19,7 +19,6 @@
 
 #include "zbxexpression.h"
 #include "expression.h"
-#include "evalfunc.h"
 #include "datafunc.h"
 
 #include "zbxvariant.h"

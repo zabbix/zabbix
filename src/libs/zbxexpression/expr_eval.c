@@ -30,6 +30,14 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxtime.h"
+#include "zbxvariant.h"
+#include "zbxstr.h"
+#include "zbxhistory.h"
+#include "zbxexpr.h"
+#include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxcacheconfig.h"
+#include "zbxalgo.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 

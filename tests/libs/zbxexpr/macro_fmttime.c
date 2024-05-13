@@ -23,9 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxexpr.h"
-#include "zbxlog.h"
-#include "zbxexpr.h"
-#include "zbxcachevalue.h"
+#include "zbxtime.h"
 
 time_t	__wrap_time(time_t *ptr);
 

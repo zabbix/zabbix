@@ -24,6 +24,13 @@
 #include "zbxexpression.h"
 #include "zbxcachevalue.h"
 #include "zbxdbwrap.h"
+#include "zbxvariant.h"
+#include "zbxtime.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
+#include "zbxeval.h"
+#include "zbxdbhigh.h"
+#include "zbxalgo.h"
 
 typedef struct
 {

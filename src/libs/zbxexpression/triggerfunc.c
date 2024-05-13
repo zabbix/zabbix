@@ -17,22 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "evalfunc.h"
-#include "expression.h"
-
-#include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
-#include "zbxcachevalue.h"
 #include "zbx_trigger_constants.h"
-#include "zbx_item_constants.h"
-#include "zbx_host_constants.h"
-#include "zbxvariant.h"
 #include "zbxalgo.h"
-#include "zbxexpr.h"
 #include "zbxeval.h"
 #include "zbxexpression.h"
-#include "zbxnum.h"
-#include "zbxtime.h"
 
 typedef struct
 {

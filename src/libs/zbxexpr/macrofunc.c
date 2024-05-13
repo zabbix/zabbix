@@ -26,6 +26,7 @@
 #include "zbxregexp.h"
 #include "zbxtime.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 
 /******************************************************************************
  *                                                                            *
