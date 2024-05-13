@@ -439,7 +439,7 @@ static void	es_browser_push_error(duk_context *ctx, zbx_webdriver_t *wd)
 static duk_ret_t	es_browser_get_result(duk_context *ctx)
 {
 	zbx_webdriver_t	*wd;
-	duk_idx_t	idx_result, idx_perf, idx_details, idx_bookmark, idx_summary, idx_marks;
+	duk_idx_t	idx_result, idx_perf, idx_details, idx_summary, idx_marks;
 
 	wd = es_webdriver(ctx);
 
