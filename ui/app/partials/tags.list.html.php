@@ -29,17 +29,13 @@ $with_automatic = array_key_exists('with_automatic', $data) && $data['with_autom
 $data['readonly'] = array_key_exists('readonly', $data) ? $data['readonly'] : false;
 
 $header_columns = [
-	(new CTableColumn(_('Name')))
-		->addStyle('width: '.ZBX_TEXTAREA_TAG_WIDTH.'px;')
-		->addClass('table-col-handle'),
-	(new CTableColumn(_('Value')))
-		->addStyle('width: '.ZBX_TEXTAREA_TAG_VALUE_WIDTH.'px;')
-		->addClass('table-col-handle'),
-	(new CTableColumn(''))->addClass('table-col-handle')
+	(new CTableColumn(_('Name')))->addStyle('width: '.ZBX_TEXTAREA_TAG_WIDTH.'px;'),
+	(new CTableColumn(_('Value')))->addStyle('width: '.ZBX_TEXTAREA_TAG_VALUE_WIDTH.'px;'),
+	new CTableColumn('')
 ];
 
 if ($show_inherited_tags) {
-	$header_columns[] = (new CTableColumn(_('Parent templates')))->addClass('table-col-handle');
+	$header_columns[] = new CTableColumn(_('Parent templates'));
 }
 
 $table = (new CTable())
