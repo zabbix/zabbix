@@ -31,9 +31,9 @@ import (
 	"strings"
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/unix"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 const (
