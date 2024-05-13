@@ -244,6 +244,7 @@ window.item_history_column_edit = new class {
 		const rows = {
 			'js-highlights-row': is_item_type_text,
 			'js-display-row': is_item_type_text || is_item_type_numeric,
+			'js-display-help-icon': is_item_type_text,
 			'js-single-line-input': is_item_type_text
 				&& display_value == <?= CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE ?>,
 			'js-min-row': show_min_max,

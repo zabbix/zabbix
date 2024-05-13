@@ -139,7 +139,12 @@ $form_grid->addItem([
 
 // Display.
 $form_grid->addItem([
-	(new CLabel(_('Display'), 'display'))->addClass('js-display-row'),
+	(new CLabel([
+		_('Display'),
+		makeHelpIcon(_('Single line - result will be displayed in a single line and truncated to specified length.'))
+			->addStyle('display: none;')
+			->addClass('js-display-help-icon')
+	], 'display'))->addClass('js-display-row'),
 	(new CFormField([
 		(new CRadioButtonList('display', (int) $data['display']))
 			->addValue(_('As is'), CWidgetFieldColumnsList::DISPLAY_AS_IS)

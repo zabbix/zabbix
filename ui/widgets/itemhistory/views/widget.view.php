@@ -33,7 +33,7 @@ use Widgets\ItemHistory\Includes\{
 	CWidgetFieldColumnsList
 };
 
-$table = (new CTableInfo())->addClass($data['has_show_thumbnail'] ? 'show_thumbnail' : 'null');
+$table = (new CTableInfo())->addClass($data['has_show_thumbnail'] ? 'show_thumbnail' : null);
 
 if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
