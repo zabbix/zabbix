@@ -99,6 +99,7 @@ else {
 		foreach ($column['item_values'] as $item_value) {
 			$history_item = [
 				'columnid' => $columnid,
+				'itemid' => $column['itemid'],
 				'clock' => $item_value['clock'],
 				'ns' => $item_value['ns']
 			];
@@ -124,6 +125,9 @@ else {
 						}
 
 						$history_item['value'][] = (new CCol($item_value['formatted_value']))
+							->addClass($data['layout'] == WidgetForm::LAYOUT_VERTICAL ? 'has-broadcast-data' : null)
+							->setAttribute('data-itemid', $column['itemid'])
+							->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 							->setHint(
 								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
@@ -148,10 +152,16 @@ else {
 						}
 					}
 
-					$history_item['value'][] = new CCol($bar_gauge);
+					$history_item['value'][] = (new CCol($bar_gauge))
+						->addClass($data['layout'] == WidgetForm::LAYOUT_VERTICAL ? 'has-broadcast-data' : null)
+						->setAttribute('data-itemid', $column['itemid'])
+						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']);
 					$history_item['value'][] = (new CCol(
 						(new CDiv($item_value['formatted_value']))
 					))
+						->addClass($data['layout'] == WidgetForm::LAYOUT_VERTICAL ? 'has-broadcast-data' : null)
+						->setAttribute('data-itemid', $column['itemid'])
+						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 						->addStyle('width: 0;')
 						->addClass(ZBX_STYLE_NOWRAP)
 						->setHint(
@@ -180,6 +190,9 @@ else {
 						: $item_value['value'];
 
 					$history_item['value'][] = (new CCol())
+						->addClass($data['layout'] == WidgetForm::LAYOUT_VERTICAL ? 'has-broadcast-data' : null)
+						->setAttribute('data-itemid', $column['itemid'])
+						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 						->addItem(($column['display'] != CWidgetFieldColumnsList::DISPLAY_HTML
 							? new CDiv($value)
 							: new CJsScript($value)
@@ -201,6 +214,7 @@ else {
 						(new CButton(null, _('Show')))->addClass(ZBX_STYLE_BTN)
 					))
 						->addClass('binary-thumbnail')
+						->addClass($data['layout'] == WidgetForm::LAYOUT_VERTICAL ? 'has-broadcast-data' : null)
 						->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 						->setAttribute('data-itemid', $column['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']);
@@ -243,7 +257,13 @@ else {
 				$table_row[] = $history_item['value'][1];
 			}
 
-			$table->addRow($table_row);
+			$table->addRow($data['layout'] == WidgetForm::LAYOUT_HORIZONTAL
+				? (new CRow($table_row))
+					->addClass('has-broadcast-data')
+					->setAttribute('data-itemid', $history_item['itemid'])
+					->setAttribute('data-clock', $history_item['clock'].'.'.$history_item['ns'])
+				: $table_row
+			);
 		}
 	}
 	else {

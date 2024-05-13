@@ -13,7 +13,15 @@
 			"width": 6,
 			"height": 3
 		},
-		"js_class": "CWidgetItemHistory"
+		"js_class": "CWidgetItemHistory",
+		"out": [
+			{
+				"type": "_itemid"
+			},
+			{
+				"type": "_itemids"
+			}
+		]
 	},
 	"actions": {
 		"widget.itemhistory.view": {

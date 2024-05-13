@@ -4501,6 +4501,8 @@ form.dashboard-widget-itemhistory #list_columns .inaccessible {
 div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
   height: 56px;
   vertical-align: middle; }
+div.dashboard-widget-itemhistory .list-table .has-broadcast-data {
+  cursor: pointer; }
 div.dashboard-widget-itemhistory .binary-thumbnail .btn {
   overflow: hidden; }
   div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link) {
@@ -6727,7 +6729,9 @@ td[class] + td.disaster-bg {
 .ok-ack-fg {
   color: #00ff00; }
 
-.navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
+.navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-itemhistory .list-table tr.selected td,
+div.dashboard-widget-itemhistory .list-table td.selected, div.dashboard-widget-itemhistory .list-table tr.selected td:hover,
+div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
   background-color: #2f280a; }
 
 @keyframes is-loading-kf {

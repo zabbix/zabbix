@@ -25,6 +25,19 @@ div.dashboard-widget-itemhistory {
 				vertical-align: middle;
 			}
 		}
+
+		.has-broadcast-data {
+			cursor: pointer;
+		}
+
+		tr.selected td,
+		td.selected {
+			@extend %found-bg;
+
+			&:hover {
+				@extend %found-bg;
+			}
+		}
 	}
 
 	.binary-thumbnail {

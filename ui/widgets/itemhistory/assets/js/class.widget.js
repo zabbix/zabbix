@@ -28,6 +28,9 @@ class CWidgetItemHistory extends CWidget {
 
 	#show_thumbnail = false;
 
+	#selected_itemid = null;
+	#selected_clock = null;
+
 	setContents(response) {
 		super.setContents(response);
 
@@ -42,6 +45,30 @@ class CWidgetItemHistory extends CWidget {
 			this.#show_thumbnail = table.classList.contains('show-thumbnail');
 
 			this.#loadThumbnails(this.#makeUrls());
+
+			table.querySelectorAll('.has-broadcast-data').forEach(element => {
+				const data = element.dataset;
+
+				if (data?.itemid === this.#selected_itemid && data?.clock === this.#selected_clock) {
+					element.classList.add('selected');
+				}
+			});
+
+			table.addEventListener('click', (e) => {
+				const element = e.target.closest('.has-broadcast-data');
+
+				if (element !== null) {
+					table.querySelectorAll('.has-broadcast-data.selected').forEach(selected => {
+						selected.classList.remove('selected');
+					});
+
+					element.classList.add('selected');
+					this.#selected_itemid = element.dataset.itemid;
+					this.#selected_clock = element.dataset.clock;
+
+					this.broadcast({_itemid: element.dataset.itemid});
+				}
+			});
 		}
 	}
 
