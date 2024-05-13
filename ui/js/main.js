@@ -472,6 +472,10 @@ var hintBox = {
 			}
 		});
 
+		target.resize_observer = new ResizeObserver(() => {
+			hintBox.onResize(e, target);
+		}).observe(box[0]);
+
 		target.observer.observe(document.body, {
 			attributes: true,
 			attributeFilter: ['style', 'class'],
@@ -623,6 +627,12 @@ var hintBox = {
 			target.observer.disconnect();
 
 			delete target.observer;
+		}
+
+		if (target.resize_observer !== undefined) {
+			target.resize_observer.disconnect();
+
+			delete target.resize_observer;
 		}
 
 		removeEventListener('resize', target.resizeHandler);
