@@ -62,7 +62,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
 #define ATTEMPT_DELAY_MAX	10
-	char			query_fields[] = "", headers[] = "", status_codes[] = "200,201";
+	char			query_fields[] = "", headers[] = "", status_codes[] = "200,201,202,203,204";
 	zbx_http_context_t	context;
 	int			ret, timeout_seconds, attempt_interval_sec;
 
