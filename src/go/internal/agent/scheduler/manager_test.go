@@ -31,6 +31,7 @@ import (
 	"golang.zabbix.com/agent2/internal/agent/alias"
 	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
