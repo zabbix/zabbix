@@ -130,8 +130,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 						'Rows' => '0'
 					],
 					'error' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -142,12 +142,12 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 						'Type' => 'Graph prototype',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => 'testFormGraphPrototype1',
-						'Columns' => '25',
-						'Rows' => '17'
+						'Columns' => '73',
+						'Rows' => '65'
 					],
 					'error' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			]
@@ -293,9 +293,18 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				[
 					'fields' => [
 						'Columns' => '16',
+						'Rows' => '2'
+					],
+					'screenshot_id' => '48x2'
+				]
+			],
+			[
+				[
+					'fields' => [
+						'Columns' => '16',
 						'Rows' => '3'
 					],
-					'screenshot_id' => 'stub16x3'
+					'screenshot_id' => 'stub49x3'
 				]
 			],
 			[
@@ -304,7 +313,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 						'Columns' => '17',
 						'Rows' => '2'
 					],
-					'screenshot_id' => 'stub17x2'
+					'screenshot_id' => 'stub72x2'
 				]
 			]
 		];

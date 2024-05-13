@@ -495,9 +495,16 @@ class testPageSearch extends CWebTest {
 			$expected_count = CTestArrayHelper::get($data, 'count_from_db')
 				? $db_count[$widget_params['key']]
 				: (array_key_exists($widget_params['key'], $data) ? count($data[$widget_params['key']]) : 0);
-			$footer_text = $widget->query('xpath:.//div[@class="section-foot"]')->one()->getText();
-			// Only a maximum of 100 records are displayed at once.
-			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
+
+			if ($expected_count === 0) {
+				$this->assertFalse($widget->query('xpath:.//div[@class="section-foot"]')->exists());
+				$this->assertEquals('No data found', $widget->query('class:no-data-message')->one()->getText());
+			}
+			else {
+				$footer_text = $widget->query('xpath:.//div[@class="section-foot"]')->one()->getText();
+				// Only a maximum of 100 records are displayed at once.
+				$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
+			}
 		}
 	}
 

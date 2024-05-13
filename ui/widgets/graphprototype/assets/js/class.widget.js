@@ -27,8 +27,10 @@ class CWidgetGraphPrototype extends CWidgetIterator {
 	promiseUpdate() {
 		const time_period = this.getFieldsData().time_period;
 
-		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: time_period});
+		if (!this.hasBroadcast(CWidgetsData.DATA_TYPE_TIME_PERIOD) || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+			});
 		}
 
 		return super.promiseUpdate();
@@ -42,13 +44,13 @@ class CWidgetGraphPrototype extends CWidgetIterator {
 	}
 
 	onFeedback({type, value}) {
-		if (type === '_timeperiod') {
+		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD) {
 			this.feedback({time_period: value});
 
 			return true;
 		}
 
-		return super.onFeedback({type, value});
+		return false;
 	}
 
 	_updateWidget(widget) {

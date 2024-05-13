@@ -756,7 +756,7 @@ class testFormItem extends CLegacyWebTest {
 					}
 				}
 				else {
-					$this->assertEquals('No data found.', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
+					$this->assertEquals('No data found', $valuemap_overlay->query('class:nothing-to-show')->one()->getText());
 				}
 				$valuemap_overlay->getFooter()->query('button:Cancel')->one()->click();
 			}
@@ -2106,9 +2106,9 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->item);
 		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak']", 'Overridden by global housekeeping settings (99d)');
 		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
+		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak'][2]", 'Overridden by global housekeeping settings (455d)');
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');
 

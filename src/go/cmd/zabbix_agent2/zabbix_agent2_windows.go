@@ -26,9 +26,23 @@ import (
 	"strings"
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/pkg/pdh"
+	"golang.zabbix.com/agent2/pkg/pdh"
+	"golang.zabbix.com/sdk/log"
 )
+
+const osDependentUsageMessageFormat = //
+`  %[1]s [-c config-file] [-m] [-S automatic]
+  %[1]s [-c config-file] [-m] [-S delayed]
+  %[1]s [-c config-file] [-m] [-S manual]
+  %[1]s [-c config-file] [-m] [-S disabled]
+  %[1]s [-c config-file] -i [-m] [-S automatic]
+  %[1]s [-c config-file] -i [-m] [-S delayed]
+  %[1]s [-c config-file] -i [-m] [-S manual]
+  %[1]s [-c config-file] -i [-m] [-S disabled]
+  %[1]s [-c config-file] -d [-m]
+  %[1]s [-c config-file] -s [-m]
+  %[1]s [-c config-file] -x [-m]
+`
 
 func loadOSDependentItems() error {
 	if err := pdh.LocateObjectsAndDefaultCounters(true); err != nil {

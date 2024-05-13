@@ -21,7 +21,9 @@
 #define ZABBIX_POLLER_PROXY_H
 
 #include "module.h"
+#include "zbxcacheconfig.h"
 
-int	zbx_get_value_internal_ext_proxy(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
+int     zbx_get_value_internal_ext_proxy(const zbx_dc_item_t *item, const char *param1, const AGENT_REQUEST *request,
+		AGENT_RESULT *result);
 
 #endif

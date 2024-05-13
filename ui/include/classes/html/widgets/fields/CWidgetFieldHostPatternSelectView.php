@@ -29,6 +29,7 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldHostPatternSelect $field) {
 		$this->field = $field;
+		$this->placeholder = _('patterns');
 	}
 
 	public function setPlaceholder(string $placeholder): self {

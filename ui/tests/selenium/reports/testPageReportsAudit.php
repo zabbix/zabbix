@@ -169,7 +169,7 @@ class testPageReportsAudit extends CWebTest {
 				'smtp_server' => 'mail.example.com',
 				'smtp_helo' => 'example.com',
 				'smtp_email' => 'zabbix@example.com',
-				'content_type' => 1
+				'message_format' => 1
 			]
 		]);
 		$this->assertArrayHasKey('mediatypeids', $response);
@@ -511,7 +511,7 @@ class testPageReportsAudit extends CWebTest {
 
 		// If there is no result - "No data found" displayed in table.
 		if (CTestArrayHelper::get($data, 'no_data')) {
-			$this->assertEquals(['No data found.'], $table->getRows()->asText());
+			$this->assertEquals(['No data found'], $table->getRows()->asText());
 		}
 		else {
 			foreach ($data['fields'] as $column => $values) {

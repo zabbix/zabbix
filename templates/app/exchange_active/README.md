@@ -67,7 +67,7 @@ Note that template doesn't provide information about Windows services state. Rec
 |MS Exchange [Client Access Server]: Outlook Web App: current unique users|<p>Shows the number of unique users currently logged on to Outlook Web App. This value monitors the number of unique active user sessions, so that users are only removed from this counter after they log off or their session times out. Determines current user load.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange OWA\Current Unique Users", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |MS Exchange [Client Access Server]: Outlook Web App: requests per second|<p>Shows the number of requests handled by Outlook Web App per second. Determines current user load.</p>|Zabbix agent (active)|perf_counter_en["\MSExchange OWA\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
 |MS Exchange [Client Access Server]: MSExchangeWS: requests per second|<p>Shows the number of requests processed each second. Determines current user load.</p>|Zabbix agent (active)|perf_counter_en["\MSExchangeWS\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]|
-|MS Exchange: Active agent availability|<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p>|Zabbix internal|zabbix[host,active_agent,available]|
+|MS Exchange: Active agent availability|<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p>|Zabbix internal|zabbix[host,active_agent,available]|
 
 ### Triggers
 

@@ -850,6 +850,7 @@ zabbix_export:
           type: CALCULATED
           key: 'vm.memory.available[fgSysMemFree.0]'
           history: 7d
+          units: B
           params: 'last(//vm.memory.total[fgSysMemCapacity.0])-last(//vm.memory.used[fgSysMemUsage.0])'
           description: 'Total memory available for utilization.'
           tags:
@@ -864,32 +865,37 @@ zabbix_export:
           units: B
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            Total memory allocated for the tasks.
+            Total physical memory (RAM) installed.
+          preprocessing:
+            - type: MULTIPLIER
+              parameters:
+                - '1000'
           tags:
             - tag: component
               value: memory
         - uuid: 15fb0d4185f04b4fb8e2efc6d0ef514c
           name: 'FortiGate: Used memory'
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.12356.101.4.1.4.0
+          type: CALCULATED
           key: 'vm.memory.used[fgSysMemUsage.0]'
           history: 7d
+          value_type: FLOAT
           units: B
+          params: '(last(//vm.memory.total[fgSysMemCapacity.0])*last(//vm.memory.util[memoryUsedPercentage.0]))/100'
           description: |
             MIB: FORTINET-FORTIGATE-MIB
-            Current memory utilization (percentage).
+            Physical memory (RAM) used calculated based on memory utilization percentage.
           tags:
             - tag: component
               value: memory
         - uuid: 29a7ec8007ef44b0b473f1c16be11059
           name: 'FortiGate: Memory utilization'
-          type: CALCULATED
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12356.101.4.1.4.0
           key: 'vm.memory.util[memoryUsedPercentage.0]'
           history: 7d
           value_type: FLOAT
           units: '%'
-          params: 'last(//vm.memory.used[fgSysMemUsage.0])/last(//vm.memory.total[fgSysMemCapacity.0])*100'
-          description: 'Memory utilization in %.'
+          description: 'Current memory utilization (percentage).'
           tags:
             - tag: component
               value: memory
@@ -3824,7 +3830,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'SNMP state'
-                  width: '4'
+                  width: '12'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3874,7 +3880,7 @@ zabbix_export:
                 - type: item
                   name: 'Number of CPUs'
                   'y': '2'
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: INTEGER
                       name: decimal_places
@@ -3899,7 +3905,7 @@ zabbix_export:
                 - type: gauge
                   name: 'CPU utilization'
                   'y': '4'
-                  width: '8'
+                  width: '24'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -3952,7 +3958,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'Disk usage'
                   'y': '8'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
@@ -3966,7 +3972,7 @@ zabbix_export:
                       value: '1'
                     - type: INTEGER
                       name: ds.0.width
-                      value: '2'
+                      value: '6'
                     - type: STRING
                       name: ds.1.color
                       value: 4CAF50
@@ -3996,8 +4002,8 @@ zabbix_export:
                       value: '1'
                 - type: item
                   name: 'SSL VPN state'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -4046,9 +4052,9 @@ zabbix_export:
                       value: '35'
                 - type: item
                   name: 'Total memory'
-                  x: '4'
+                  x: '12'
                   'y': '2'
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: INTEGER
                       name: decimal_size
@@ -4078,8 +4084,8 @@ zabbix_export:
                       value: '50'
                 - type: item
                   name: Uptime
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -4119,9 +4125,9 @@ zabbix_export:
                       value: '35'
                 - type: item
                   name: 'Total disk space'
-                  x: '8'
+                  x: '24'
                   'y': '2'
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: INTEGER
                       name: decimal_size
@@ -4151,9 +4157,9 @@ zabbix_export:
                       value: '50'
                 - type: gauge
                   name: 'Memory utilization'
-                  x: '8'
+                  x: '24'
                   'y': '4'
-                  width: '8'
+                  width: '24'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -4205,8 +4211,8 @@ zabbix_export:
                       value: '15'
                 - type: item
                   name: 'Serial Number'
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   fields:
                     - type: INTEGER
                       name: decimal_size
@@ -4227,9 +4233,9 @@ zabbix_export:
                       value: '40'
                 - type: item
                   name: Name
-                  x: '12'
+                  x: '36'
                   'y': '2'
-                  width: '6'
+                  width: '18'
                   fields:
                     - type: INTEGER
                       name: decimal_size
@@ -4249,14 +4255,17 @@ zabbix_export:
                       name: value_size
                       value: '40'
                 - type: problems
-                  x: '12'
+                  x: '36'
                   'y': '8'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
                       name: acknowledgement_status
                       value: '1'
+                    - type: STRING
+                      name: reference
+                      value: BAAAA
                     - type: INTEGER
                       name: show
                       value: '3'
@@ -4271,9 +4280,9 @@ zabbix_export:
                       value: scope
                 - type: gauge
                   name: 'Free disk percentage'
-                  x: '16'
+                  x: '48'
                   'y': '4'
-                  width: '8'
+                  width: '24'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -4325,8 +4334,8 @@ zabbix_export:
                       value: '15'
                 - type: item
                   name: Firmware
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   fields:
                     - type: INTEGER
                       name: decimal_size
@@ -4347,9 +4356,9 @@ zabbix_export:
                       value: '40'
                 - type: item
                   name: Model
-                  x: '18'
+                  x: '54'
                   'y': '2'
-                  width: '6'
+                  width: '18'
                   fields:
                     - type: INTEGER
                       name: decimal_size
@@ -4375,7 +4384,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'HA mode'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -4388,8 +4397,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'HA cluster group'
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -4402,8 +4411,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'HA cluster priority'
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -4416,8 +4425,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'HA load-balancing schedule'
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -4431,7 +4440,7 @@ zabbix_export:
             - name: 'HA members'
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4447,7 +4456,7 @@ zabbix_export:
                       value: AAAAM
                 - type: graphprototype
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4463,7 +4472,7 @@ zabbix_export:
                       value: AAAAO
                 - type: graphprototype
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4478,8 +4487,8 @@ zabbix_export:
                       name: reference
                       value: AAAAQ
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4494,9 +4503,9 @@ zabbix_export:
                       name: reference
                       value: AAAAN
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4511,9 +4520,9 @@ zabbix_export:
                       name: reference
                       value: AAAAP
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4533,7 +4542,7 @@ zabbix_export:
             - name: 'System performance'
               widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4546,7 +4555,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4558,8 +4567,8 @@ zabbix_export:
                       name: reference
                       value: AAAAC
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4571,9 +4580,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4587,7 +4596,7 @@ zabbix_export:
             - name: 'SoC3 NP6Lite statistics'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4604,7 +4613,7 @@ zabbix_export:
             - name: 'IPS statistics'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '7'
                   fields:
                     - type: GRAPH
@@ -4618,7 +4627,7 @@ zabbix_export:
             - name: 'Network interfaces'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '7'
                   fields:
                     - type: INTEGER
@@ -4635,7 +4644,7 @@ zabbix_export:
             - name: 'SD-WAN statistics'
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4650,8 +4659,8 @@ zabbix_export:
                       name: reference
                       value: AAAAH
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4668,7 +4677,7 @@ zabbix_export:
             - name: 'Wireless statistics'
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4684,7 +4693,7 @@ zabbix_export:
                       value: AAAAJ
                 - type: graphprototype
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4699,8 +4708,8 @@ zabbix_export:
                       name: reference
                       value: AAAAL
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

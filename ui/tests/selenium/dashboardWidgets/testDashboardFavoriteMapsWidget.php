@@ -90,7 +90,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 			$remove_item->waitUntilNotVisible();
 		}
 
-		$this->assertTrue($widget->query('xpath:.//td[text()="No maps added."]')->waitUntilVisible()->one()->isPresent());
+		$this->assertEquals('No maps added.', $widget->query('class:no-data-message')->waitUntilVisible()->one()->getText());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
 				zbx_dbstr('web.favorite.sysmapids'))
 		);

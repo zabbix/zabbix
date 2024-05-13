@@ -25,8 +25,8 @@ import (
 	"sort"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/plugins/external"
+	"golang.zabbix.com/agent2/plugins/external"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 type pluginMetrics struct {

@@ -38,6 +38,7 @@ OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
 	..\..\..\src\libs\zbxalgo\hashset.o \
+	..\..\..\src\libs\zbxbincommon\bincommon.o \
 	..\..\..\src\libs\zbxcrypto\endian.o \
 	..\..\..\src\libs\zbxcommon\setproctitle.o \
 	..\..\..\src\libs\zbxcommon\common_log.o \
@@ -54,6 +55,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexpr\expr.o \
 	..\..\..\src\libs\zbxexpr\function.o \
 	..\..\..\src\libs\zbxexpr\host.o \
+	..\..\..\src\libs\zbxexpr\interval.o \
 	..\..\..\src\libs\zbxexpr\macro.o \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \

@@ -107,10 +107,10 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#JMXNAME}'
-                value: '{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}'
+                value: '{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.MATCHES}'
                 formulaid: A
               - macro: '{#JMXNAME}'
-                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}'
+                value: '{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Discovery for GlobalRequestProcessor'
@@ -247,10 +247,10 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#JMXHOST}'
-                value: '{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}'
+                value: '{$TOMCAT.LLD.FILTER.MANAGER.MATCHES}'
                 formulaid: A
               - macro: '{#JMXHOST}'
-                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}'
+                value: '{$TOMCAT.LLD.FILTER.MANAGER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Discovery for contexts'
@@ -383,10 +383,10 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#JMXNAME}'
-                value: '{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}'
+                value: '{$TOMCAT.LLD.FILTER.THREAD_POOL.MATCHES}'
                 formulaid: A
               - macro: '{#JMXNAME}'
-                value: '{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}'
+                value: '{$TOMCAT.LLD.FILTER.THREAD_POOL.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Discovery for ThreadPool'
@@ -485,12 +485,24 @@ zabbix_export:
         - tag: target
           value: tomcat
       macros:
-        - macro: '{$TOMCAT.LLD.FILTER.MATCHES}'
+        - macro: '{$TOMCAT.LLD.FILTER.MANAGER.MATCHES}'
           value: '.*'
-          description: 'Filter for discoverable objects. Can be used with following contexts: "GlobalRequestProcessor", "ThreadPool", "Manager"'
-        - macro: '{$TOMCAT.LLD.FILTER.NOT_MATCHES}'
-          value: 'CHANGE IF NEEDED'
-          description: 'Filter to exclude discovered objects. Can be used with following contexts: "GlobalRequestProcessor", "ThreadPool", "Manager"'
+          description: 'Filter for discoverable managers.'
+        - macro: '{$TOMCAT.LLD.FILTER.MANAGER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude managers.'
+        - macro: '{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable global request processors.'
+        - macro: '{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude global request processors.'
+        - macro: '{$TOMCAT.LLD.FILTER.THREAD_POOL.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable thread pools.'
+        - macro: '{$TOMCAT.LLD.FILTER.THREAD_POOL.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude thread pools.'
         - macro: '{$TOMCAT.PASSWORD}'
           description: 'Password for JMX'
         - macro: '{$TOMCAT.THREADS.MAX.PCT}'
@@ -508,7 +520,7 @@ zabbix_export:
             - name: General
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER
@@ -526,8 +538,8 @@ zabbix_export:
                       name: rows
                       value: '3'
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER

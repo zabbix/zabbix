@@ -27,8 +27,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
+
+const osDependentUsageMessageFormat = ""
 
 func loadOSDependentItems() error {
 	return nil

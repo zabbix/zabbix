@@ -102,14 +102,14 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 		const char *gsm_modem, const char *username, const char *passwd, unsigned short smtp_port,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, int maxsessions, int maxattempts, const char *attempt_interval,
-		unsigned char content_type, const char *script, const char *timeout, const char *sendto,
+		unsigned char message_format, const char *script, const char *timeout, const char *sendto,
 		const char *subject, const char *message, const char *params);
 
 void	zbx_alerter_deserialize_result_ext(const unsigned char *data, char **recipient, char **value, int *errcode,
 		char **error, char **debug);
 
 int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *subject, const char *message,
-		const char *content_name, const char *content_type, const char *content, zbx_uint32_t content_size,
+		const char *content_name, const char *message_format, const char *content, zbx_uint32_t content_size,
 		char **error);
 int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_mediatype *mediatype,
 		const zbx_vector_str_t *recipients, char **error);

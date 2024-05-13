@@ -54,7 +54,8 @@ $table = (new CTableInfo())
 		(new CColHeader(_('Root cause')))->addStyle('width: 25%;'),
 		(new CColHeader(_('Created at')))->addStyle('width: 10%;'),
 		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3)
-	]));
+	]))
+	->setPageNavigation($data['paging']);
 
 foreach ($data['services'] as $serviceid => $service) {
 	$row = [];
@@ -113,5 +114,5 @@ foreach ($data['services'] as $serviceid => $service) {
 }
 
 $form
-	->addItem([$table, $data['paging']])
+	->addItem($table)
 	->show();

@@ -179,10 +179,12 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertEquals('No data found', $this->query('class:no-data-message')->one()->getText());
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->exists());
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->assertEquals('No data found', $this->query('class:no-data-message')->one()->getText());
+		$this->assertFalse($this->query('xpath://div[@class="table-stats"]')->exists());
 	}
 
 	public function testPageMaps_FilterReset() {

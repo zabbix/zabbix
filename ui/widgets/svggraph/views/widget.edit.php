@@ -289,7 +289,7 @@ function getProblemsTab(CWidgetFormView $form, array $fields): CFormGrid {
 	$graph_item_problems = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_item_problems']));
 	$problemhosts = array_key_exists('problemhosts', $fields)
 		? $form->registerField(
-			(new CWidgetFieldHostPatternSelectView($fields['problemhosts']))->setPlaceholder(_('host pattern'))
+			(new CWidgetFieldHostPatternSelectView($fields['problemhosts']))->setPlaceholder(_('host patterns'))
 		)
 		: null;
 	$severities = $form->registerField(new CWidgetFieldSeveritiesView($fields['severities']));

@@ -82,6 +82,7 @@ zabbix_export:
               name: 'ICMP: High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
                 - name: 'ICMP: High ICMP ping loss'
                   expression: 'min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100'
@@ -100,8 +101,10 @@ zabbix_export:
       macros:
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
       valuemaps:
         - uuid: bdb5d65d925542eaa61c302dc40fbfe8
           name: 'Service state'

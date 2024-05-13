@@ -53,6 +53,10 @@ class CXmlConstantName {
 	const IPMI = 'IPMI';
 	const JMX = 'JMX';
 
+	const SERVER = 'SERVER';
+	const PROXY = 'PROXY';
+	const PROXY_GROUP = 'PROXY_GROUP';
+
 	// const DISABLED = 'DISABLED'; // Duplicate.
 	const MANUAL = 'MANUAL';
 	const AUTOMATIC = 'AUTOMATIC';
@@ -309,8 +313,8 @@ class CXmlConstantName {
 	const SMTP_AUTHENTICATION_NONE = 'NONE';
 	const SMTP_AUTHENTICATION_PASSWORD = 'PASSWORD';
 
-	const CONTENT_TYPE_TEXT = 'TEXT'; // Duplicate.
-	const CONTENT_TYPE_HTML = 'HTML';
+	const MESSAGE_FORMAT_TEXT = 'TEXT'; // Duplicate.
+	const MESSAGE_FORMAT_HTML = 'HTML';
 
 	const TRIGGERS = 'TRIGGERS';
 	const DISCOVERY = 'DISCOVERY';

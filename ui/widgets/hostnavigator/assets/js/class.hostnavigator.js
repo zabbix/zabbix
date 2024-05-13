@@ -22,7 +22,6 @@ class CHostNavigator {
 
 	static ZBX_STYLE_CLASS =		'host-navigator';
 	static ZBX_STYLE_LIMIT =		'host-navigator-limit';
-	static ZBX_STYLE_NO_DATA =		'host-navigator-no-data';
 
 	static GROUP_BY_HOST_GROUP = 0;
 	static GROUP_BY_TAG_VALUE = 1;
@@ -67,11 +66,11 @@ class CHostNavigator {
 	#maintenances = {};
 
 	/**
-	 * Events of host navigator widget.
+	 * Listeners of host navigator widget.
 	 *
 	 * @type {Object}
 	 */
-	#events = {};
+	#listeners = {};
 
 	/**
 	 * ID of selected host.
@@ -89,7 +88,7 @@ class CHostNavigator {
 		this.#container = document.createElement('div');
 		this.#container.classList.add(CHostNavigator.ZBX_STYLE_CLASS);
 
-		this.#registerEvents();
+		this.#registerListeners();
 	}
 
 	/**
@@ -104,46 +103,32 @@ class CHostNavigator {
 			this.#reset();
 		}
 
-		if (hosts.length > 0) {
-			this.#maintenances = maintenances;
+		this.#maintenances = maintenances;
 
-			this.#prepareNodesStructure(hosts);
-			this.#prepareNodesProperties(this.#nodes);
+		this.#prepareNodesStructure(hosts);
+		this.#prepareNodesProperties(this.#nodes);
 
-			this.#navigation_tree = new CNavigationTree(this.#nodes, {
-				selected_id: this.#selected_host_id,
-				show_problems: this.#config.show_problems,
-				severity_names: this.#config.severity_names
-			});
+		this.#navigation_tree = new CNavigationTree(this.#nodes, {
+			selected_id: this.#selected_host_id,
+			show_problems: this.#config.show_problems,
+			severities: this.#config.severities
+		});
 
-			this.#container.appendChild(this.#navigation_tree.getContainer());
+		this.#container.classList.remove(ZBX_STYLE_NO_DATA);
+		this.#container.appendChild(this.#navigation_tree.getContainer());
 
-			if (is_limit_exceeded) {
-				this.#createLimit(hosts.length);
-			}
-
-			this.#activateEvents();
-
-			const first_selected_host = this.#container.querySelector(
-				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
-			);
-
-			if (this.#selected_host_id !== '' && first_selected_host === null) {
-				this.#selected_host_id = '';
-
-				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
-					detail: {
-						_hostid: null
-					}
-				}));
-			}
+		if (is_limit_exceeded) {
+			this.#createLimit(hosts.length);
 		}
-		else {
-			const no_data = document.createElement('div');
-			no_data.classList.add(CHostNavigator.ZBX_STYLE_NO_DATA);
-			no_data.innerText = t('No data found.');
 
-			this.#container.appendChild(no_data);
+		this.#activateListeners();
+
+		const first_selected_host = this.#container.querySelector(
+			`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
+		);
+
+		if (this.#selected_host_id !== '' && first_selected_host === null) {
+			this.#selected_host_id = '';
 		}
 	}
 
@@ -311,7 +296,7 @@ class CHostNavigator {
 						if (host.problem_count[i] > 0) {
 							const new_group = {
 								...CHostNavigator.#getGroupTemplate(),
-								name: this.#config.severity_names[i],
+								name: this.#config.severities[i].label,
 								group_by: {
 									attribute: CHostNavigator.GROUP_BY_SEVERITY,
 									name: t('Severity')
@@ -452,20 +437,18 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Register events of host navigator widget.
+	 * Register listeners of host navigator widget.
 	 */
-	#registerEvents() {
-		this.#events = {
+	#registerListeners() {
+		this.#listeners = {
 			hostSelect: e => {
-				if (e.detail.id !== this.#selected_host_id) {
-					this.#selected_host_id = e.detail.id;
+				this.#selected_host_id = e.detail.id;
 
-					this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
-						detail: {
-							_hostid: e.detail.id
-						}
-					}));
-				}
+				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
+					detail: {
+						hostid: e.detail.id
+					}
+				}));
 			},
 
 			groupToggle: e => {
@@ -507,14 +490,14 @@ class CHostNavigator {
 	}
 
 	/**
-	 * Activate events of host navigator widget.
+	 * Activate listeners of host navigator widget.
 	 */
-	#activateEvents() {
+	#activateListeners() {
 		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_ITEM_SELECT,
-			this.#events.hostSelect
+			this.#listeners.hostSelect
 		);
 		this.#navigation_tree.getContainer().addEventListener(CNavigationTree.EVENT_GROUP_TOGGLE,
-			this.#events.groupToggle
+			this.#listeners.groupToggle
 		);
 	}
 

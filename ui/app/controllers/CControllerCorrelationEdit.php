@@ -69,7 +69,6 @@ class CControllerCorrelationEdit extends CController {
 			}
 
 			$this->correlation = $correlations[0];
-			CArrayHelper::sort($this->correlation['filter']['conditions'], ['formulaid']);
 
 			$op_types = array_column($this->correlation['operations'], 'type', 'type');
 			$this->correlation['op_close_old'] = array_key_exists(ZBX_CORR_OPERATION_CLOSE_OLD, $op_types);

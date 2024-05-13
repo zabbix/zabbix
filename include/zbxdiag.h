@@ -50,6 +50,8 @@ typedef struct
 }
 zbx_diag_map_t;
 
+ZBX_PTR_VECTOR_DECL(diag_map_ptr, zbx_diag_map_t *)
+
 /* diagnostic information section callback function prototype */
 typedef int (*zbx_diag_add_section_info_func_t)(const char *section, const struct zbx_json_parse *jp,
 		struct zbx_json *json, char **error);
@@ -65,7 +67,7 @@ typedef int (*zbx_diag_add_section_info_func_t)(const char *section, const struc
 
 void	zbx_diag_map_free(zbx_diag_map_t *map);
 int	zbx_diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map, zbx_uint64_t
-		*field_mask, zbx_vector_ptr_t *top_views, char **error);
+		*field_mask, zbx_vector_diag_map_ptr_t *top_views, char **error);
 void	zbx_diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_shmem_stats_t *stats);
 int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 void	zbx_diag_add_locks_info(struct zbx_json *json);

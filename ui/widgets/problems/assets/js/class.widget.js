@@ -20,6 +20,20 @@
 
 class CWidgetProblems extends CWidget {
 
+	/**
+	 * Table body of problems.
+	 *
+	 * @type {HTMLElement|null}
+	 */
+	#table_body = null;
+
+	/**
+	 * ID of selected event.
+	 *
+	 * @type {string}
+	 */
+	#selected_event_id = '';
+
 	onInitialize() {
 		this._opened_eventids = [];
 	}
@@ -42,63 +56,43 @@ class CWidgetProblems extends CWidget {
 					this._startUpdating();
 				}
 			},
-
-			showSymptoms: (e) => {
-				const button = e.target;
-
-				// Disable the button to prevent multiple clicks.
-				button.disabled = true;
-
-				const rows = this._body.querySelectorAll("tr[data-cause-eventid='" + button.dataset.eventid + "']");
-
-				if (rows[0].classList.contains('hidden')) {
-					button.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
-					button.classList.add(ZBX_ICON_CHEVRON_UP);
-					button.title = t('Collapse');
-
-					this._opened_eventids.push(button.dataset.eventid);
-
-					[...rows].forEach(row => row.classList.remove('hidden'));
-				}
-				else {
-					button.classList.remove(ZBX_ICON_CHEVRON_UP);
-					button.classList.add(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
-					button.title = t('Expand');
-
-					this._opened_eventids = this._opened_eventids.filter((id) => id !== button.dataset.eventid);
-
-					[...rows].forEach(row => row.classList.add('hidden'));
-				}
-
-				// When complete enable button again.
-				button.disabled = false;
-			}
 		}
 	}
 
 	onActivate() {
 		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
 		$.subscribe('event.rank_change', this._events.rankChanged);
-
-		this._activateContentsEvents();
 	}
 
 	onDeactivate() {
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 		$.unsubscribe('event.rank_change', this._events.rankChanged);
-
-		this._deactivateContentsEvents();
 	}
 
-	processUpdateResponse(response) {
-		super.processUpdateResponse(response);
+	setContents(response) {
+		super.setContents(response);
 
-		this._activateContentsEvents();
+		this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
+
+		if (this.#table_body !== null) {
+			if (this.#selected_event_id !== '') {
+				const row = this.#table_body.querySelector(`tr[data-eventid="${this.#selected_event_id}"]`);
+
+				if (row !== null) {
+					this.#selectEvent();
+				}
+				else {
+					this.#selected_event_id = '';
+				}
+			}
+		}
+
+		this.#activateContentsEvents();
 	}
 
-	_activateContentsEvents() {
+	#activateContentsEvents() {
 		for (const button of this._body.querySelectorAll("button[data-action='show_symptoms']")) {
-			button.addEventListener('click', this._events.showSymptoms);
+			button.addEventListener('click', e => this.#onShowSymptoms(e));
 
 			// Open the symptom block for previously clicked problems when content is reloaded.
 			if (this._opened_eventids.includes(button.dataset.eventid)) {
@@ -112,11 +106,66 @@ class CWidgetProblems extends CWidget {
 				button.title = t('Collapse');
 			}
 		}
+
+		this.#table_body?.addEventListener('click', e => this.#onTableBodyClick(e));
 	}
 
-	_deactivateContentsEvents() {
-		for (const button of this._body.querySelectorAll("button[data-action='show_symptoms']")) {
-			button.removeEventListener('click', this._events.showSymptoms);
+	#selectEvent() {
+		const rows = this.#table_body.querySelectorAll('tr[data-eventid]');
+
+		for (const row of rows) {
+			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.eventid === this.#selected_event_id);
+		}
+	}
+
+	#onShowSymptoms(e) {
+		const button = e.target;
+
+		// Disable the button to prevent multiple clicks.
+		button.disabled = true;
+
+		const rows = this._body.querySelectorAll("tr[data-cause-eventid='" + button.dataset.eventid + "']");
+
+		if (rows[0].classList.contains('hidden')) {
+			button.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
+			button.classList.add(ZBX_ICON_CHEVRON_UP);
+			button.title = t('Collapse');
+
+			this._opened_eventids.push(button.dataset.eventid);
+
+			[...rows].forEach(row => row.classList.remove('hidden'));
+		}
+		else {
+			button.classList.remove(ZBX_ICON_CHEVRON_UP);
+			button.classList.add(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
+			button.title = t('Expand');
+
+			this._opened_eventids = this._opened_eventids.filter((id) => id !== button.dataset.eventid);
+
+			[...rows].forEach(row => row.classList.add('hidden'));
+		}
+
+		// When complete enable button again.
+		button.disabled = false;
+	}
+
+	#onTableBodyClick(e) {
+		if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
+			return;
+		}
+
+		const row = e.target.closest('tr');
+
+		if (row !== null) {
+			const eventid = row.dataset.eventid;
+
+			if (eventid !== undefined) {
+				this.#selected_event_id = eventid;
+
+				this.#selectEvent();
+
+				this.broadcast({[CWidgetsData.DATA_TYPE_EVENT_ID]: [eventid]});
+			}
 		}
 	}
 }

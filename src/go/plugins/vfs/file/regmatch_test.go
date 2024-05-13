@@ -26,7 +26,7 @@ import (
 	"reflect"
 	"testing"
 
-	"zabbix.com/pkg/zbxtest"
+	"golang.zabbix.com/agent2/pkg/zbxtest"
 )
 
 func TestFileRegmatch(t *testing.T) {

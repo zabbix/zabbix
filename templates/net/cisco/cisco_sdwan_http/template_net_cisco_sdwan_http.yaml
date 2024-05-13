@@ -547,7 +547,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Total devices'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -561,7 +561,7 @@ zabbix_export:
                 - type: item
                   name: 'vManage devices'
                   'y': '4'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -575,7 +575,7 @@ zabbix_export:
                 - type: item
                   name: 'vSmart devices'
                   'y': '8'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -588,8 +588,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Invalid certificates'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -602,9 +602,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'vBond devices'
-                  x: '12'
+                  x: '36'
                   'y': '4'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -617,9 +617,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'vEdge devices'
-                  x: '12'
+                  x: '36'
                   'y': '8'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: ITEM
@@ -2788,7 +2788,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: State
-                  width: '8'
+                  width: '24'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2802,7 +2802,7 @@ zabbix_export:
                 - type: item
                   name: Name
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2816,7 +2816,7 @@ zabbix_export:
                 - type: item
                   name: 'Control connections'
                   'y': '6'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2832,9 +2832,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Reachability
-                  x: '6'
+                  x: '18'
                   'y': '6'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2847,8 +2847,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Model
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2861,9 +2861,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Uptime
-                  x: '8'
+                  x: '24'
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2879,9 +2879,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Certificate
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2894,8 +2894,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Serial Number'
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2908,9 +2908,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Version
-                  x: '16'
+                  x: '48'
                   'y': '3'
-                  width: '8'
+                  width: '24'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2923,9 +2923,9 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Role
-                  x: '18'
+                  x: '54'
                   'y': '6'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -2939,7 +2939,7 @@ zabbix_export:
             - name: 'System performance'
               widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2952,7 +2952,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2965,7 +2965,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2980,8 +2980,8 @@ zabbix_export:
                       name: reference
                       value: AAAAE
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2993,9 +2993,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -3009,7 +3009,7 @@ zabbix_export:
             - name: 'Network interfaces'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '7'
                   fields:
                     - type: INTEGER
@@ -3026,7 +3026,7 @@ zabbix_export:
             - name: Routes
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '8'
                   fields:
                     - type: GRAPH_PROTOTYPE

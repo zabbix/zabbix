@@ -240,6 +240,11 @@ class CUserGroup extends CApiService {
 											['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP])], 'type' => API_ID],
 											['else' => true, 'type' => API_UNEXPECTED]
 			]],
+			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED]), 'default' => DB::getDefault('usrgrp', 'mfa_status')],
+			'mfaid' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'mfa_status', 'in' => implode(',', [GROUP_MFA_ENABLED])], 'type' => API_ID],
+											['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
 			'rights' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'replacement' => 'hostgroup_rights', 'uniq' => [['id']], 'fields' => [
 				'id' =>						['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
@@ -260,11 +265,6 @@ class CUserGroup extends CApiService {
 			'userids' =>				['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED]), 'default' => DB::getDefault('usrgrp', 'mfa_status')],
-			'mfaid' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'mfa_status', 'in' => implode(',', [GROUP_MFA_ENABLED])], 'type' => API_ID],
-											['else' => true, 'type' => API_ID, 'in' => '0']
 			]]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrps, '/', $error)) {
@@ -290,7 +290,7 @@ class CUserGroup extends CApiService {
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
-		$this->checkMfaids($usrgrps);
+		self::checkMfaIds($usrgrps);
 	}
 
 	/**
@@ -358,6 +358,11 @@ class CUserGroup extends CApiService {
 											['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP])], 'type' => API_ID],
 											['else' => true, 'type' => API_UNEXPECTED]
 			]],
+			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED])],
+			'mfaid' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'mfa_status', 'in' => implode(',', [GROUP_MFA_ENABLED])], 'type' => API_ID],
+											['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
 			'rights' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'replacement' => 'hostgroup_rights', 'uniq' => [['id']], 'fields' => [
 				'id' =>						['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
@@ -378,11 +383,6 @@ class CUserGroup extends CApiService {
 			'userids' =>				['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'mfa_status' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED])],
-			'mfaid' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'mfa_status', 'in' => implode(',', [GROUP_MFA_ENABLED])], 'type' => API_ID],
-											['else' => true, 'type' => API_ID, 'in' => '0']
 			]]
 		]];
 
@@ -419,14 +419,14 @@ class CUserGroup extends CApiService {
 		if ($names) {
 			$this->checkDuplicates($names);
 		}
-		$this->checkUsers($usrgrps);
+		$this->checkUsers($usrgrps, $db_usrgrps);
 		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
-		$this->checkMfaids($usrgrps, $db_usrgrps);
+		self::checkMfaIds($usrgrps, $db_usrgrps);
 	}
 
 	/**
@@ -451,38 +451,55 @@ class CUserGroup extends CApiService {
 	/**
 	 * Check for valid users.
 	 *
-	 * @param array  $usrgrps
-	 * @param array  $usrgrps[]['users']              (optional)
-	 * @param string $usrgrps[]['users'][]['userid']
+	 * @param array      $user_groups
+	 * @param array|null $db_user_groups
 	 *
 	 * @throws APIException
 	 */
-	private function checkUsers(array $usrgrps) {
-		$userids = [];
+	private function checkUsers(array $user_groups, array &$db_user_groups = null) {
+		$user_indexes = [];
 
-		foreach ($usrgrps as $usrgrp) {
-			if (array_key_exists('users', $usrgrp)) {
-				foreach ($usrgrp['users'] as $user) {
-					$userids[$user['userid']] = true;
+		foreach ($user_groups as $i1 => $user_group) {
+			if (!array_key_exists('users', $user_group)) {
+				continue;
+			}
+
+			foreach ($user_group['users'] as $i2 => $user) {
+				$db_userids = $db_user_groups !== null
+					? array_column($db_user_groups[$user_group['usrgrpid']]['users'], 'userid')
+					: [];
+
+				if (!in_array($user['userid'], $db_userids)) {
+					$user_indexes[$user['userid']][$i1] = $i2;
 				}
 			}
 		}
 
-		if (!$userids) {
+		if (!$user_indexes) {
 			return;
 		}
 
-		$userids = array_keys($userids);
-
 		$db_users = DB::select('users', [
-			'output' => [],
-			'userids' => $userids,
+			'output' => ['userdirectoryid'],
+			'userids' => array_keys($user_indexes),
 			'preservekeys' => true
 		]);
 
-		foreach ($userids as $userid) {
+		foreach ($user_indexes as $userid => $indexes) {
 			if (!array_key_exists($userid, $db_users)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with ID "%1$s" is not available.', $userid));
+				$i1 = key($indexes);
+				$i2 = reset($indexes);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/users/'.($i2 + 1).'/userid', _('object does not exist')
+				));
+			}
+
+			if ($db_users[$userid]['userdirectoryid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/users/'.($i2 + 1).'/userid',
+					_s('cannot update readonly parameter "%1$s" of provisioned user', 'usrgrps')
+				));
 			}
 		}
 	}
@@ -1206,17 +1223,24 @@ class CUserGroup extends CApiService {
 			}
 
 			$userids = array_column($group['users'], 'userid');
-			$db_userids = $db_groups !== null ? array_column($db_groups[$group['usrgrpid']]['users'], 'userid') : [];
+			$db_users = $db_groups !== null
+				? array_column($db_groups[$group['usrgrpid']]['users'], null, 'userid')
+				: [];
 
-			$del_userids = array_diff($db_userids, $userids);
+			$del_userids = array_diff(array_keys($db_users), $userids);
 
-			if (!array_diff($userids, $db_userids) && !$del_userids) {
+			if (!array_diff($userids, array_keys($db_users)) && !$del_userids) {
 				unset($group['users'], $db_groups[$group['usrgrpid']]['users']);
 				continue;
 			}
 
 			foreach ($del_userids as $del_userid) {
-				$del_user_usrgrpids[$del_userid][] = $group['usrgrpid'];
+				if ($db_users[$del_userid]['userdirectoryid'] != 0) {
+					unset($db_groups[$group['usrgrpid']]['users'][$db_users[$del_userid]['id']]);
+				}
+				else {
+					$del_user_usrgrpids[$del_userid][] = $group['usrgrpid'];
+				}
 			}
 
 			foreach ($group['users'] as $user) {
@@ -1354,7 +1378,27 @@ class CUserGroup extends CApiService {
 			));
 		}
 
+		self::checkProvisionedUsersExist($db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
+	}
+
+	private static function checkProvisionedUsersExist(array $db_user_groups): void {
+		$row = DBfetch(DBselect(
+			'SELECT ug.usrgrpid,u.username'.
+			' FROM users_groups ug,users u'.
+			' WHERE ug.userid=u.userid'.
+				' AND u.userdirectoryid IS NOT NULL'.
+				' AND '.dbConditionId('ug.usrgrpid', array_keys($db_user_groups)),
+			1
+		));
+
+		if ($row) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot delete user group "%1$s", because it is used by provisioned user "%2$s".',
+					$db_user_groups[$row['usrgrpid']]['name'], $row['username']
+				)
+			);
+		}
 	}
 
 	private static function unlinkUsers(array $db_groups): void {
@@ -1582,11 +1626,12 @@ class CUserGroup extends CApiService {
 		}
 
 		if ($usrgrpids['users']) {
-			$options = [
-				'output' => ['id', 'usrgrpid', 'userid'],
-				'filter' => ['usrgrpid' => $usrgrpids['users']]
-			];
-			$db_users = DBselect(DB::makeSql('users_groups', $options));
+			$db_users = DBselect(
+				'SELECT ug.id,ug.usrgrpid,ug.userid,u.userdirectoryid'.
+				' FROM users_groups ug,users u'.
+				' WHERE ug.userid=u.userid'.
+					' AND '.dbConditionId('ug.usrgrpid', $usrgrpids['users'])
+			);
 
 			while ($db_user = DBfetch($db_users)) {
 				$db_usrgrps[$db_user['usrgrpid']]['users'][$db_user['id']] =
@@ -1637,7 +1682,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkMfaids(array $user_groups, array $db_user_groups = null): void {
+	private static function checkMfaIds(array $user_groups, array $db_user_groups = null): void {
 		foreach ($user_groups as $i => $user_group) {
 			if (!array_key_exists('mfaid', $user_group) || $user_group['mfaid'] == 0
 					|| ($db_user_groups !== null

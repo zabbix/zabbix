@@ -50,7 +50,7 @@ See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/s
 
 **Note! Credentials in the `odbc.ini` do not work for MSSQL.**
 
-The `Service's TCP port state` item uses the `{HOST.CONN}` and `{$MSSQL.PORT}` macros to check the availability of the MSSQL instance.
+The `Service's TCP port state` item uses the `{$MSSQL.HOST}` and `{$MSSQL.PORT}` macros to check the availability of the MSSQL instance, change these if necessary.
 
 If your instance uses a non-default TCP port, set the port in your section of `odbc.ini` in the line Server = IP or FQDN name, port.
 
@@ -63,6 +63,7 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |{$MSSQL.DSN}|<p>System data source name.</p>|`<Put your DSN here>`|
 |{$MSSQL.USER}|<p>MSSQL username.</p>|`<Put your username here>`|
 |{$MSSQL.PASSWORD}|<p>MSSQL user password.</p>|`<Put your password here>`|
+|{$MSSQL.HOST}|<p>The hostname or IP address of the MSSQL instance.</p>|`localhost`|
 |{$MSSQL.PORT}|<p>MSSQL TCP port.</p>|`1433`|
 |{$MSSQL.DBNAME.MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`.*`|
 |{$MSSQL.DBNAME.NOT_MATCHES}|<p>This macro is used in database discovery. It can be overridden on the host or linked template level.</p>|`master\|tempdb\|model\|msdb`|
@@ -103,7 +104,7 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|MSSQL: Service's TCP port state|<p>Test the availability of MSSQL Server on a TCP port.</p>|Simple check|net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|MSSQL: Service's TCP port state|<p>Test the availability of MSSQL Server on a TCP port.</p>|Simple check|net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |MSSQL: Get last backup|<p>The item gets information about backup processes.</p>|Database monitor|db.odbc.get[get_last_backup,"{$MSSQL.DSN}"]|
 |MSSQL: Get job status|<p>The item gets the SQL agent job status.</p>|Database monitor|db.odbc.get[get_job_status,"{$MSSQL.DSN}"]|
 |MSSQL: Get performance counters|<p>The item gets server global status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]|
@@ -198,7 +199,7 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MSSQL: Service is unavailable|<p>The TCP port of the MSSQL Server service is currently unavailable.</p>|`last(/MSSQL by ODBC/net.tcp.service[tcp,{HOST.CONN},{$MSSQL.PORT}])=0`|Disaster||
+|MSSQL: Service is unavailable|<p>The TCP port of the MSSQL Server service is currently unavailable.</p>|`last(/MSSQL by ODBC/net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}])=0`|Disaster||
 |MSSQL: Version has changed|<p>MSSQL version has changed. Acknowledge to close the problem manually.</p>|`last(/MSSQL by ODBC/mssql.version,#1)<>last(/MSSQL by ODBC/mssql.version,#2) and length(last(/MSSQL by ODBC/mssql.version))>0`|Info|**Manual close**: Yes|
 |MSSQL: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MSSQL by ODBC/mssql.uptime)<10m`|Info|**Manual close**: Yes|
 |MSSQL: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/MSSQL by ODBC/mssql.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>MSSQL: Service is unavailable</li></ul>|

@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup config, widget
  *
- * @dataSource AllItemValueTypes
+ * @dataSource AllItemValueTypes, GlobalMacros
  *
  * @onBefore prepareDashboardData
  */
@@ -306,8 +306,8 @@ class testDashboardGaugeWidget extends testWidgets {
 
 		// Check fields' labels and required fields.
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colours',
-				'Show', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
-				'Thresholds', 'Override host'],
+				'Show', 'Override host', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
+				'Thresholds'],
 				$form->getLabels()->asText()
 		);
 
@@ -1268,8 +1268,8 @@ class testDashboardGaugeWidget extends testWidgets {
 		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$this->page->removeFocus();
 
-		// Sleep waits until the gauge is animated.
-		sleep(1);
+		// Wait until the gauge is animated.
+		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 }

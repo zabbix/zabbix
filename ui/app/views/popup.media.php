@@ -39,12 +39,13 @@ $email_send_to_table = (new CTable())->setId('email_send_to');
 
 foreach ($options['sendto_emails'] as $i => $email) {
 	$email_send_to_table->addRow([
-		(new CTextBox('sendto_emails['.$i.']', $email))
+		(new CTextBox('sendto_emails['.$i.']', $email, (bool) $options['userdirectory_mediaid']))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CButton('sendto_emails['.$i.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
+				->setEnabled(!$options['userdirectory_mediaid'])
 	], 'form_row dynamic-row');
 }
 
@@ -52,12 +53,14 @@ $email_send_to_table->setFooter(new CCol(
 	(new CButton('email_send_to_add', _('Add')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
+		->setEnabled(!$options['userdirectory_mediaid'])
 ), 'dynamic-row-control');
 
 $type_select = (new CSelect('mediatypeid'))
 	->setId('mediatypeid')
 	->setFocusableElementId('label-mediatypeid')
-	->setValue($options['mediatypeid']);
+	->setValue($options['mediatypeid'])
+	->setReadonly((bool) $options['userdirectory_mediaid']);
 
 foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
 	if ($options['mediatypeid'] == $mediatypeid || $value['status'] != MEDIA_TYPE_STATUS_DISABLED) {
@@ -72,8 +75,7 @@ $disabled_media_types_msg = null;
 if (!in_array(MEDIA_TYPE_STATUS_ACTIVE, array_column($data['db_mediatypes'], 'status'))) {
 	$type_select->addStyle('display: none;');
 
-	$disabled_media_types_msg = (new CDiv(_('Media types disabled by Administration.')))
-		->setId('media_types_disabled')
+	$disabled_media_types_msg = (new CDiv(_('Media types disabled in Alerts.')))
 		->addClass(ZBX_STYLE_RED)
 		->addStyle('margin:1px 0 0 5px;');
 }
@@ -83,7 +85,7 @@ $media_form = (new CFormList(_('Media')))
 	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), [$type_select, $disabled_media_types_msg])
 	->addRow(
 		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
-		(new CTextBox('sendto', $options['sendto'], false, 1024))
+		(new CTextBox('sendto', $options['sendto'], (bool) $options['userdirectory_mediaid'], 1024))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		'mediatype_send_to'

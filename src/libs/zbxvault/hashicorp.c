@@ -24,13 +24,14 @@
 #include "zbxhttp.h"
 #include "zbxstr.h"
 
-int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+int	zbx_hashicorp_kvs_get(const char *vault_url, const char *prefix, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
 		long timeout, zbx_kvs_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);
+	ZBX_UNUSED(prefix);
 	ZBX_UNUSED(token);
 	ZBX_UNUSED(ssl_cert_file);
 	ZBX_UNUSED(ssl_key_file);
@@ -56,16 +57,23 @@ int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *
 		return FAIL;
 	}
 
-	zbx_strsplit_first(path, '/', &left, &right);
-	if (NULL == right)
+	if (NULL == prefix || '\0' == *prefix)
 	{
-		*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
-		free(left);
-		return FAIL;
+		zbx_strsplit_first(path, '/', &left, &right);
+
+		if (NULL == right)
+		{
+			*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
+			free(left);
+			return FAIL;
+		}
+		url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", vault_url, left, right);
+
+		zbx_free(right);
+		zbx_free(left);
 	}
-	url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", vault_url, left, right);
-	zbx_free(right);
-	zbx_free(left);
+	else
+		url = zbx_dsprintf(NULL, "%s%s%s", vault_url, prefix, path);
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
 

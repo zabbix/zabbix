@@ -332,7 +332,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			// Check widget empty content, because the host doesn't match dynamic option criteria.
 			if ($expected['header'] === '' || $expected['header'] === $expected['type']
 					|| CTestArrayHelper::get($expected, 'empty', false)) {
-				$content = $widget_content->query('class:nothing-to-show')->one()->getText();
+				$content = $widget_content->query('class:no-data-message')->one()->getText();
 				$message = ($expected['type'] === 'URL')
 						? 'No host selected.'
 						: 'No permissions to referred object or it does not exist!';
@@ -341,7 +341,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			}
 
 			// Check widget content when the host match dynamic option criteria.
-			$this->assertFalse($widget_content->query('class:nothing-to-show')->one(false)->isValid());
+			$this->assertFalse($widget_content->query('class:no-data-message')->one(false)->isValid());
 			switch ($expected['type']) {
 				case 'Plain text':
 					$data = $widget_content->asTable()->index('Name');

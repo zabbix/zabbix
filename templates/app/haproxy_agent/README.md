@@ -6,9 +6,9 @@
 The template to monitor HAProxy by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `HAProxy by Zabbix agent` collects metrics by polling [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/) with Zabbix agent.
+The template collects metrics by polling the HAProxy stats page with Zabbix agent.
 
-Note that this solution supports https and redirects.
+Note, that this template doesn't support authentication and redirects (limitations of `web.page.get`).
 
 ## Requirements
 
@@ -25,9 +25,9 @@ This template has been tested on:
 
 ## Setup
 
-Setup [HAProxy Stats Page](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/).
+1. Set up the [`HAProxy stats page`](https://www.haproxy.com/blog/exploring-the-haproxy-stats-page/).
 
-Example configuration of HAProxy:
+The example configuration of HAProxy:
 
 ```text
 frontend stats
@@ -37,13 +37,14 @@ frontend stats
     stats refresh 10s
 ```
 
-If you use another location, don't forget to change the macros {$HAPROXY.STATS.SCHEME},{$HAPROXY.STATS.PORT},{$HAPROXY.STATS.PATH}.
+2. Set the hostname or IP address of the HAProxy stats host or container in the `{$HAPROXY.STATS.HOST}` macro. You can also change the status page port in the `{$HAPROXY.STATS.PORT}` macro, the status page scheme in the `{$HAPROXY.STATS.SCHEME}` macro and the status page path in the `{$HAPROXY.STATS.PATH}` macro if necessary.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$HAPROXY.STATS.SCHEME}|<p>The scheme of HAProxy stats page(http/https).</p>|`http`|
+|{$HAPROXY.STATS.HOST}|<p>The hostname or IP address of the HAProxy stats host or container.</p>|`localhost`|
 |{$HAPROXY.STATS.PORT}|<p>The port of the HAProxy stats host or container.</p>|`8404`|
 |{$HAPROXY.STATS.PATH}|<p>The path of HAProxy stats page.</p>|`stats`|
 |{$HAPROXY.RESPONSE_TIME.MAX.WARN}|<p>The HAProxy stats page maximum response time in seconds for trigger expression.</p>|`10s`|
@@ -63,13 +64,13 @@ If you use another location, don't forget to change the macros {$HAPROXY.STATS.S
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|HAProxy: Get stats|<p>HAProxy Statistics Report in CSV format</p>|Zabbix agent|web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `# ([\s\S]*) \1`</p></li><li><p>CSV to JSON</p></li></ul>|
+|HAProxy: Get stats|<p>HAProxy Statistics Report in CSV format</p>|Zabbix agent|web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `# ([\s\S]*) \1`</p></li><li><p>CSV to JSON</p></li></ul>|
 |HAProxy: Get nodes|<p>Array for LLD rules.</p>|Dependent item|haproxy.get.nodes<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HAProxy: Get stats page|<p>HAProxy Statistics Report HTML</p>|Zabbix agent|web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]|
+|HAProxy: Get stats page|<p>HAProxy Statistics Report HTML</p>|Zabbix agent|web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]|
 |HAProxy: Version||Dependent item|haproxy.version<p>**Preprocessing**</p><ul><li><p>Regular expression: `HAProxy version ([^,]*), \1`</p><p>⛔️Custom on fail: Set error to: `HAProxy version is not found`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |HAProxy: Uptime||Dependent item|haproxy.uptime<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|HAProxy: Service status||Zabbix agent|net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|HAProxy: Service response time||Zabbix agent|net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"]|
+|HAProxy: Service status||Zabbix agent|net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|HAProxy: Service response time||Zabbix agent|net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"]|
 
 ### Triggers
 
@@ -77,8 +78,8 @@ If you use another location, don't forget to change the macros {$HAPROXY.STATS.S
 |----|-----------|----------|--------|--------------------------------|
 |HAProxy: Version has changed|<p>HAProxy version has changed. Acknowledge to close the problem manually.</p>|`last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2) and length(last(/HAProxy by Zabbix agent/haproxy.version))>0`|Info|**Manual close**: Yes|
 |HAProxy: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HAProxy by Zabbix agent/haproxy.uptime)<10m`|Info|**Manual close**: Yes|
-|HAProxy: Service is down||`last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"])=0`|Average|**Manual close**: Yes|
-|HAProxy: Service response time is too high||`min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{HOST.CONN}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HAProxy: Service is down</li></ul>|
+|HAProxy: Service is down||`last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"])=0`|Average|**Manual close**: Yes|
+|HAProxy: Service response time is too high||`min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HAProxy: Service is down</li></ul>|
 
 ### LLD rule Backend discovery
 

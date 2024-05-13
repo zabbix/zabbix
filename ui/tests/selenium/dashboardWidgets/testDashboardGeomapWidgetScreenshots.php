@@ -124,7 +124,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 							'name' => 'Geomap for screenshots, 5',
 							'x' => 0,
 							'y' => 0,
-							'width' => 13,
+							'width' => 39,
 							'height' => 7,
 							'view_mode' => 0,
 							'fields' => [
@@ -143,9 +143,9 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 						[
 							'type' => 'geomap',
 							'name' => 'Geomap for screenshots, 10',
-							'x' => 13,
+							'x' => 39,
 							'y' => 0,
-							'width' => 11,
+							'width' => 33,
 							'height' => 7,
 							'view_mode' => 0,
 							'fields' => [
@@ -166,7 +166,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 							'name' => 'Geomap for screenshots, 30',
 							'x' => 0,
 							'y' => 7,
-							'width' => 13,
+							'width' => 39,
 							'height' => 7,
 							'view_mode' => 0,
 							'fields' => [
@@ -185,9 +185,9 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 						[
 							'type' => 'geomap',
 							'name' => 'Geomap for screenshots, no zoom',
-							'x' => 13,
+							'x' => 39,
 							'y' => 7,
-							'width' => 11,
+							'width' => 33,
 							'height' => 7,
 							'view_mode' => 0,
 							'fields' => [
@@ -203,7 +203,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 							'name' => 'Geomap for screenshots, 3',
 							'x' => 0,
 							'y' => 14,
-							'width' => 13,
+							'width' => 39,
 							'height' => 7,
 							'view_mode' => 0,
 							'fields' => [

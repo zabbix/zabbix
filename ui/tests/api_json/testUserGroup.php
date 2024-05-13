@@ -483,7 +483,7 @@ class testUserGroup extends CAPITest {
 						'userid' => '123456'
 					]
 				],
-				'expected_error' => 'User with ID "123456" is not available.'
+				'expected_error' => 'Invalid parameter "/1/users/1/userid": object does not exist.'
 			],
 			// Check user group permissions, host group id.
 			[

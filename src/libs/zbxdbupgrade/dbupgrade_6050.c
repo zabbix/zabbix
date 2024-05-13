@@ -1557,7 +1557,7 @@ static char	*create_widget_reference(const zbx_vector_str_t *references)
 #undef FIRST_LETTER
 #undef REFERENCE_LEN
 
-static int	DBpatch_6050134(void)
+static int	add_widget_references(const char *widget_type_list)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1583,7 +1583,7 @@ static int	DBpatch_6050134(void)
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
 			NULL);
 
-	result = zbx_db_select("select widgetid from widget where type in ('graph','svggraph','graphprototype')");
+	result = zbx_db_select("select widgetid from widget where type in (%s)", widget_type_list);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1605,6 +1605,11 @@ static int	DBpatch_6050134(void)
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
+}
+
+static int	DBpatch_6050134(void)
+{
+	return add_widget_references("'graph','svggraph','graphprototype'");
 }
 
 static int	DBpatch_6050135(void)
@@ -3641,6 +3646,408 @@ static int	DBpatch_6050256(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050257(void)
+{
+	const zbx_db_table_t	table = {"proxy_group", "proxy_groupid", 0,
+			{
+				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"failover_delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"min_online", "1", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050258(void)
+{
+	return DBcreate_changelog_insert_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050259(void)
+{
+	return DBcreate_changelog_update_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050260(void)
+{
+	return DBcreate_changelog_delete_trigger("proxy_group", "proxy_groupid");
+}
+
+static int	DBpatch_6050261(void)
+{
+	const zbx_db_table_t	table = {"host_proxy", "hostproxyid", 0,
+			{
+				{"hostproxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+				{"revision", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0},
+				{"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050262(void)
+{
+	return DBcreate_index("host_proxy", "host_proxy_1", "hostid", 1);
+}
+
+static int	DBpatch_6050263(void)
+{
+	return DBcreate_index("host_proxy", "host_proxy_2", "proxyid", 0);
+}
+
+static int	DBpatch_6050264(void)
+{
+	return DBcreate_index("host_proxy", "host_proxy_3", "revision", 0);
+}
+
+static int	DBpatch_6050265(void)
+{
+	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("host_proxy", 1, &field);
+}
+
+static int	DBpatch_6050266(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("host_proxy", 2, &field);
+}
+
+static int	DBpatch_6050267(void)
+{
+	return DBcreate_changelog_insert_trigger("host_proxy", "hostproxyid");
+}
+
+static int	DBpatch_6050268(void)
+{
+	return DBcreate_changelog_update_trigger("host_proxy", "hostproxyid");
+}
+
+static int	DBpatch_6050269(void)
+{
+	return DBcreate_changelog_delete_trigger("host_proxy", "hostproxyid");
+}
+
+static int	DBpatch_6050270(void)
+{
+	const zbx_db_field_t	field = {"local_address", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050271(void)
+{
+	const zbx_db_field_t	field = {"local_port", "10051", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050272(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050273(void)
+{
+	return DBcreate_index("proxy", "proxy_2", "proxy_groupid", 0);
+}
+
+static int	DBpatch_6050274(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("proxy", 1, &field);
+}
+
+static int	DBpatch_6050275(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6050276(void)
+{
+	return DBcreate_index("hosts", "hosts_8", "proxy_groupid", 0);
+}
+
+static int	DBpatch_6050277(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("hosts", 4, &field);
+}
+
+static int	DBpatch_6050278(void)
+{
+	const zbx_db_field_t	field = {"monitored_by", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6050279(void)
+{
+	const zbx_db_field_t	field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_rtdata", &field);
+}
+
+static int	DBpatch_6050280(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update hosts set monitored_by=1 where proxyid is not null"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050281(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.hosts.filter_monitored_by'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050282(void)
+{
+	const zbx_db_table_t	table = {"proxy_group_rtdata", "proxy_groupid", 0,
+			{
+				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050283(void)
+{
+	const zbx_db_field_t	field = {"proxy_groupid", NULL, "proxy_group", "proxy_groupid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("proxy_group_rtdata", 1, &field);
+}
+
+static int	DBpatch_6050284(void)
+{
+	const zbx_db_field_t	field = {"software_update_checkid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050285(void)
+{
+	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT,
+			ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050286(void)
+{
+	const zbx_db_field_t	field = {"timeout_browser", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6050287(void)
+{
+	const zbx_db_field_t	field = {"timeout_browser", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
+static int	DBpatch_6050288(void)
+{
+	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("media", &field);
+}
+
+static int	DBpatch_6050289(void)
+{
+	return DBcreate_index("media", "media_3", "userdirectory_mediaid", 0);
+}
+
+static int	DBpatch_6050290(void)
+{
+	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, "userdirectory_media", "userdirectory_mediaid",
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("media", 3, &field);
+}
+
+static int	DBpatch_6050291(void)
+{
+	const zbx_db_field_t	field = {"active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_media", &field);
+}
+
+static int	DBpatch_6050292(void)
+{
+	const zbx_db_field_t	field = {"severity", "63", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_media", &field);
+}
+
+static int	DBpatch_6050293(void)
+{
+	const zbx_db_field_t	field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_media", &field);
+}
+
+static int	DBpatch_6050294(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result = NULL;
+	int		ret = SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select userdirectory_mediaid,userdirectoryid,mediatypeid"
+			" from userdirectory_media")))
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_db_row_t	row2;
+		zbx_db_result_t	result2;
+		zbx_uint64_t	userdirectoryid, userdirectory_medeiaid, mediatypeid;
+
+		ZBX_STR2UINT64(userdirectory_medeiaid, row[0]);
+		ZBX_STR2UINT64(userdirectoryid, row[1]);
+		ZBX_STR2UINT64(mediatypeid, row[2]);
+
+		if (NULL == (result2 = zbx_db_select("select u.userid"
+				" from userdirectory ud,users u"
+				" where ud.userdirectoryid=" ZBX_FS_UI64 " and"
+					" u.userdirectoryid=ud.userdirectoryid and"
+					" ud.provision_status=1",
+					userdirectoryid)))
+		{
+			ret = FAIL;
+			goto out;
+		}
+
+		while (NULL != (row2 = zbx_db_fetch(result2)))
+		{
+			zbx_db_row_t	row3;
+			zbx_db_result_t	result3;
+			zbx_uint64_t	userid;
+			char		*select_sql;
+
+			ZBX_STR2UINT64(userid, row2[0]);
+			select_sql = zbx_dsprintf(NULL, "select mediaid"
+					" from media"
+					" where userid=" ZBX_FS_UI64 " and"
+						" mediatypeid=" ZBX_FS_UI64 " and"
+						" userdirectory_mediaid is null"
+					" order by mediaid", userid, mediatypeid);
+
+			if (NULL == (result3 = zbx_db_select_n(select_sql, 1)))
+			{
+				ret = FAIL;
+				zbx_free(select_sql);
+				zbx_db_free_result(result2);
+				goto out;
+			}
+			zbx_free(select_sql);
+
+			while (NULL != (row3 = zbx_db_fetch(result3)))
+			{
+				zbx_uint64_t	mediaid;
+				char		*update_sql;
+
+				ZBX_STR2UINT64(mediaid, row3[0]);
+				update_sql = zbx_dsprintf(NULL,
+						"update media"
+						" set userdirectory_mediaid=" ZBX_FS_UI64
+						" where mediaid=" ZBX_FS_UI64 ";\n",
+						userdirectory_medeiaid, mediaid);
+
+				if (ZBX_DB_OK > zbx_db_execute("%s", update_sql))
+				{
+					ret = FAIL;
+					zbx_free(update_sql);
+					zbx_db_free_result(result3);
+					zbx_db_free_result(result2);
+					goto out;
+				}
+				zbx_free(update_sql);
+			}
+
+			zbx_db_free_result(result3);
+		}
+
+		zbx_db_free_result(result2);
+	}
+out:
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_6050295(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'itemnavigator','widgets/itemnavigator',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050296(void)
+{
+	const zbx_db_field_t	field = {"message_format", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("media_type", "content_type", &field);
+}
+
+static int	DBpatch_6050297(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update widget set x=x*3,width=width*3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050298(void)
+{
+	return add_widget_references("'geomap','map','plaintext','problemhosts','problems','problemsbysv','tophosts'"
+			",'web'");
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -3902,5 +4309,47 @@ DBPATCH_ADD(6050253, 0, 1)
 DBPATCH_ADD(6050254, 0, 1)
 DBPATCH_ADD(6050255, 0, 1)
 DBPATCH_ADD(6050256, 0, 1)
+DBPATCH_ADD(6050257, 0, 1)
+DBPATCH_ADD(6050258, 0, 1)
+DBPATCH_ADD(6050259, 0, 1)
+DBPATCH_ADD(6050260, 0, 1)
+DBPATCH_ADD(6050261, 0, 1)
+DBPATCH_ADD(6050262, 0, 1)
+DBPATCH_ADD(6050263, 0, 1)
+DBPATCH_ADD(6050264, 0, 1)
+DBPATCH_ADD(6050265, 0, 1)
+DBPATCH_ADD(6050266, 0, 1)
+DBPATCH_ADD(6050267, 0, 1)
+DBPATCH_ADD(6050268, 0, 1)
+DBPATCH_ADD(6050269, 0, 1)
+DBPATCH_ADD(6050270, 0, 1)
+DBPATCH_ADD(6050271, 0, 1)
+DBPATCH_ADD(6050272, 0, 1)
+DBPATCH_ADD(6050273, 0, 1)
+DBPATCH_ADD(6050274, 0, 1)
+DBPATCH_ADD(6050275, 0, 1)
+DBPATCH_ADD(6050276, 0, 1)
+DBPATCH_ADD(6050277, 0, 1)
+DBPATCH_ADD(6050278, 0, 1)
+DBPATCH_ADD(6050279, 0, 1)
+DBPATCH_ADD(6050280, 0, 1)
+DBPATCH_ADD(6050281, 0, 1)
+DBPATCH_ADD(6050282, 0, 1)
+DBPATCH_ADD(6050283, 0, 1)
+DBPATCH_ADD(6050284, 0, 1)
+DBPATCH_ADD(6050285, 0, 1)
+DBPATCH_ADD(6050286, 0, 1)
+DBPATCH_ADD(6050287, 0, 1)
+DBPATCH_ADD(6050288, 0, 1)
+DBPATCH_ADD(6050289, 0, 1)
+DBPATCH_ADD(6050290, 0, 1)
+DBPATCH_ADD(6050291, 0, 1)
+DBPATCH_ADD(6050292, 0, 1)
+DBPATCH_ADD(6050293, 0, 1)
+DBPATCH_ADD(6050294, 0, 1)
+DBPATCH_ADD(6050295, 0, 1)
+DBPATCH_ADD(6050296, 0, 1)
+DBPATCH_ADD(6050297, 0, 1)
+DBPATCH_ADD(6050298, 0, 1)
 
 DBPATCH_END()

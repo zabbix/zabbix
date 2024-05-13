@@ -73,7 +73,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$default_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -91,9 +91,9 @@ class testDashboardURLWidget extends CWebTest {
 							[
 								'type' => 'url',
 								'name' => self::$frame_widget,
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -108,7 +108,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$delete_widget,
 								'x' => 0,
 								'y' => 5,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -133,7 +133,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -234,7 +234,7 @@ class testDashboardURLWidget extends CWebTest {
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
 		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
-				->query('class:nothing-to-show')->one()->getText());
+				->query('class:no-data-message')->one()->getText());
 		$dashboard->getWidget(self::$default_widget)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
 		$form->fill(['Override host' => ''])->submit();

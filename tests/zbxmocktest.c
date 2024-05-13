@@ -77,6 +77,7 @@ static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
+	0 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
 };
 
 int	get_config_forks(unsigned char process_type)
@@ -138,7 +139,7 @@ int	main (void)
 	};
 
 	zbx_set_log_level(LOG_LEVEL_INFORMATION);
-	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif

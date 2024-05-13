@@ -29,6 +29,9 @@ class CControllerProxyUpdate extends CController {
 		$fields = [
 			'proxyid' =>				'required|db proxy.proxyid',
 			'name' =>					'required|not_empty|db proxy.name',
+			'proxy_groupid' =>			'db proxy.proxy_groupid',
+			'local_address' =>			'db proxy.local_address',
+			'local_port' =>				'db proxy.local_port',
 			'operating_mode' =>			'required|db proxy.operating_mode|in '.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
 			'address' =>				'db proxy.address',
 			'port' =>					'db proxy.port',
@@ -58,6 +61,24 @@ class CControllerProxyUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			if ($this->getInput('proxy_groupid', 0) != 0) {
+				if ($this->getInput('local_address', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.',
+						_s('%1$s: %2$s', _('Address for active agents'), _('Address')), _('cannot be empty')
+					));
+
+					$ret = false;
+				}
+
+				if ($this->getInput('local_port', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.',
+						_s('%1$s: %2$s', _('Address for active agents'), _('Port')), _('cannot be empty')
+					));
+
+					$ret = false;
+				}
+			}
+
 			switch ($this->getInput('operating_mode')) {
 				case PROXY_OPERATING_MODE_ACTIVE:
 					if (!$this->hasInput('tls_accept_none') && !$this->hasInput('tls_accept_psk')
@@ -73,13 +94,17 @@ class CControllerProxyUpdate extends CController {
 
 				case PROXY_OPERATING_MODE_PASSIVE:
 					if ($this->getInput('address', '') === '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('Address'), _('cannot be empty')));
+						info(_s('Incorrect value for field "%1$s": %2$s.',
+							_s('%1$s: %2$s', _('Interface'), _('Address')), _('cannot be empty')
+						));
 
 						$ret = false;
 					}
 
 					if ($this->getInput('port', '') === '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+						info(_s('Incorrect value for field "%1$s": %2$s.',
+							_s('%1$s: %2$s', _('Interface'), _('Port')), _('cannot be empty')
+						));
 
 						$ret = false;
 					}
@@ -156,12 +181,19 @@ class CControllerProxyUpdate extends CController {
 		]);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$proxy = [];
 
 		$this->getInputs($proxy, ['proxyid', 'name', 'operating_mode', 'description', 'tls_connect',
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject'
 		]);
+
+		$proxy['proxy_groupid'] = $this->getInput('proxy_groupid', 0);
+
+		if ($proxy['proxy_groupid'] != 0) {
+			$proxy['local_address'] = $this->getInput('local_address');
+			$proxy['local_port'] = $this->getInput('local_port');
+		}
 
 		switch ($this->getInput('operating_mode')) {
 			case PROXY_OPERATING_MODE_ACTIVE:

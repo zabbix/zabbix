@@ -818,7 +818,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					if ($class !== 'color-positive') {
 						// Click on icon and open hint.
 						$icon->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
+						$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
 								->waitUntilReady()->one();
 						$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
 
@@ -872,7 +872,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
 				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:zi-more')
 						->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilVisible()->one();
 				$this->assertEquals($ellipsis_text, $hint->getText());
 				$hint->close();
 			}
@@ -882,7 +882,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
 			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
 					->query('class:zi-eye-off')->waitUntilClickable()->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilVisible()->one();
 			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
 			$hint->close();
 		}

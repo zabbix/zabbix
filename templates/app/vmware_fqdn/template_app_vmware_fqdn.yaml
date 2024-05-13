@@ -1540,11 +1540,11 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
-                value: 'VMware Rollup Health State'
-                operator: NOT_MATCHES_REGEX
+                value: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}'
                 formulaid: A
               - macro: '{#NAME}'
-                value: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}'
+                value: 'VMware Rollup Health State'
+                operator: NOT_MATCHES_REGEX
                 formulaid: B
               - macro: '{#NAME}'
                 value: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}'
