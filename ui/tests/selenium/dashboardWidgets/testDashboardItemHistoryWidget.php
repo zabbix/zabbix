@@ -985,7 +985,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 
 		$form->fill([
 			'Name' => $new_name,
-			'Refresh interval' => '15 minutes',
+			'Refresh interval' => '15 minutes'
 		]);
 
 		$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
@@ -1133,7 +1133,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Available memory' => '9.37 GB' // value rounding is expected.
-						],
+						]
 						// TODO: ZBXNEXT-8316 Sub-issue (11).
 //						[
 //							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
@@ -1151,7 +1151,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						['itemid' => '42243', 'values' => '9061078528', 'time' => strtotime('yesterday')]
 					]
 				]
-			],
+			]
 			// #4 Test case for 'Items location' and 'Show text as HTML' options check.
 //			[
 //				[

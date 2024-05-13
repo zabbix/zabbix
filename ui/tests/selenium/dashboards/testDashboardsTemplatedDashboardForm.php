@@ -1031,7 +1031,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									],
 									'value' => 'After value'
 								],
-
 								[
 									'field' => 'Colour',
 									'field_locator' => 'id:lbl_units_color',
@@ -1651,17 +1650,12 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'type' => CFormElement::RELOADABLE_FILL('Item history'),
 					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
-						[
-							'field' => 'Items',
-							'type' => 'multiselect',
-							'mandatory' => true
-						],
-						[
-							'field' => 'Items location',
-							'type' => 'radio_button',
-							'possible_values' => ['Left', 'Top'],
-							'value' => 'Left'
-						],
+						// TODO: fix with DEV-3721.
+//						[
+//							'field' => 'Columns',
+//							'type' => 'complex',
+//							'mandatory' => true
+//						],
 						[
 							'field' => 'Show lines',
 							'value' => 25,
@@ -1669,11 +1663,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'maxlength' => 3
 							],
 							'mandatory' => true
-						],
-						[
-							'field' => 'Show text as HTML',
-							'type' => 'checkbox',
-							'value' => false
 						]
 					]
 				]
@@ -3592,86 +3581,87 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
+			// TODO: fix with DEV-3721.
 			// #56 Item history widget with empty Items parameter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
-						'Name' => 'Item history widget with empty Items',
-						'Items' => '',
-						'Show lines' => ''
-					],
-					'error_message' => [
-						'Invalid parameter "Items": cannot be empty.',
-						'Invalid parameter "Show lines": value must be one of 1-100.'
-					]
-				]
-			],
-			// #57 Item history widget with too high value of Show lines parameter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
-						'Name' => 'Item history widget with too much lines',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => 999
-					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
-					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
-				]
-			],
-			// #58 Item history widget with negative Show lines parameter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
-						'Name' => 'Item history widget with negative Show lines',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => -9
-					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
-					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
-				]
-			],
-			// #59 Item history widget with Items location = top and text shown as HTML.
-			[
-				[
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
-						'Name' => 'Item history widget top location HTML',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => 9,
-						'Items location' => 'Top',
-						'Show text as HTML' => true
-					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
-					]
-				]
-			],
-			// #60 Item history widget with Items location = left and text shown as Item history.
-			[
-				[
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
-						'Name' => 'Item history widget left location no HTML',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => 9,
-						'Items location' => 'Left',
-						'Show text as HTML' => false
-					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
-					]
-				]
-			],
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget with empty Items',
+//						'Items' => '',
+//						'Show lines' => ''
+//					],
+//					'error_message' => [
+//						'Invalid parameter "Items": cannot be empty.',
+//						'Invalid parameter "Show lines": value must be one of 1-100.'
+//					]
+//				]
+//			],
+//			// #57 Item history widget with too high value of Show lines parameter.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget with too much lines',
+//						'Items' => self::TEMPLATE_ITEM,
+//						'Show lines' => 999
+//					],
+//					'swap_expected' => [
+//						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+//					],
+//					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+//				]
+//			],
+//			// #58 Item history widget with negative Show lines parameter.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget with negative Show lines',
+//						'Items' => self::TEMPLATE_ITEM,
+//						'Show lines' => -9
+//					],
+//					'swap_expected' => [
+//						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+//					],
+//					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+//				]
+//			],
+//			// #59 Item history widget with Items location = top and text shown as HTML.
+//			[
+//				[
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget top location HTML',
+//						'Items' => self::TEMPLATE_ITEM,
+//						'Show lines' => 9,
+//						'Items location' => 'Top',
+//						'Show text as HTML' => true
+//					],
+//					'swap_expected' => [
+//						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+//					]
+//				]
+//			],
+//			// #60 Item history widget with Items location = left and text shown as Item history.
+//			[
+//				[
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget left location no HTML',
+//						'Items' => self::TEMPLATE_ITEM,
+//						'Show lines' => 9,
+//						'Items location' => 'Left',
+//						'Show text as HTML' => false
+//					],
+//					'swap_expected' => [
+//						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+//					]
+//				]
+//			],
 			// #61 Problem hosts widget with default parameters.
 			[
 				[
@@ -4394,8 +4384,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
-				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator',
-				'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Item history', 'Problem hosts',
+				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator', 'Item history',
+				'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Problem hosts',
 				'Problems', 'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers',
 				'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
