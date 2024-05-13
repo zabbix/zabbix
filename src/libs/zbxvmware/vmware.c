@@ -3109,16 +3109,16 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 
 	zbx_vmware_unlock();
 }
+
+zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void)
+{
+	return evt_req_chunk_size;
+}
 #endif
 
 zbx_vmware_t	*zbx_vmware_get_vmware(void)
 {
 	return vmware;
-}
-
-zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void)
-{
-	return evt_req_chunk_size;
 }
 
 int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error)

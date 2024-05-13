@@ -26,12 +26,10 @@
 #endif
 
 zbx_vmware_t			*zbx_vmware_get_vmware(void);
-zbx_uint64_t			zbx_vmware_get_evt_req_chunk_sz(void);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
-
 
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 
@@ -74,7 +72,8 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error);
 
-void	vmware_data_eventlog_shared_free(zbx_vmware_data_eventlog_t *data_eventlog);
+void		vmware_data_eventlog_shared_free(zbx_vmware_data_eventlog_t *data_eventlog);
+zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void);
 
 #define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)		\
 						xmlFreeDoc(xdoc)
