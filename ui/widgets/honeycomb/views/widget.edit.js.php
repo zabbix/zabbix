@@ -74,7 +74,13 @@ window.widget_honeycomb_form = new class {
 		this.#updateLabelFields('fields-group-primary-label', show_primary_label);
 		this.#updateLabelFields('fields-group-secondary-label', show_secondary_label);
 
-		document.getElementById('interpolation').disabled = this.#countFilledThresholds() < 2;
+		const interpolation = document.getElementById('interpolation');
+
+		interpolation.disabled = this.#countFilledThresholds() < 2;
+
+		if (this.#countFilledThresholds() < 2) {
+			interpolation.checked = false;
+		}
 	}
 
 	#countFilledThresholds() {

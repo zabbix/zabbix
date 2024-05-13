@@ -1486,7 +1486,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: item
-                  width: '3'
+                  width: '9'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -1515,7 +1515,7 @@ zabbix_export:
                       value: '1'
                 - type: item
                   'y': '3'
-                  width: '3'
+                  width: '9'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -1544,7 +1544,7 @@ zabbix_export:
                       value: '1'
                 - type: item
                   'y': '6'
-                  width: '3'
+                  width: '9'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -1573,7 +1573,7 @@ zabbix_export:
                       value: '1'
                 - type: item
                   'y': '9'
-                  width: '3'
+                  width: '9'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -1602,7 +1602,7 @@ zabbix_export:
                       value: '1'
                 - type: item
                   'y': '12'
-                  width: '3'
+                  width: '9'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -1630,8 +1630,8 @@ zabbix_export:
                       name: show.1
                       value: '1'
                 - type: graph
-                  x: '3'
-                  width: '4'
+                  x: '9'
+                  width: '12'
                   height: '6'
                   fields:
                     - type: GRAPH
@@ -1643,9 +1643,9 @@ zabbix_export:
                       name: reference
                       value: AAAAA
                 - type: graphprototype
-                  x: '3'
+                  x: '9'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '9'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -1660,8 +1660,8 @@ zabbix_export:
                       name: rows
                       value: '2'
                 - type: graphprototype
-                  x: '7'
-                  width: '8'
+                  x: '21'
+                  width: '24'
                   height: '6'
                   fields:
                     - type: ITEM_PROTOTYPE
@@ -1676,8 +1676,8 @@ zabbix_export:
                       name: source_type
                       value: '3'
                 - type: graphprototype
-                  x: '15'
-                  width: '9'
+                  x: '45'
+                  width: '27'
                   height: '7'
                   fields:
                     - type: ITEM_PROTOTYPE
@@ -1692,9 +1692,9 @@ zabbix_export:
                       name: source_type
                       value: '3'
                 - type: graphprototype
-                  x: '15'
+                  x: '45'
                   'y': '7'
-                  width: '9'
+                  width: '27'
                   height: '8'
                   fields:
                     - type: ITEM_PROTOTYPE

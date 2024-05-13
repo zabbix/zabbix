@@ -1557,7 +1557,7 @@ static char	*create_widget_reference(const zbx_vector_str_t *references)
 #undef FIRST_LETTER
 #undef REFERENCE_LEN
 
-static int	DBpatch_6050134(void)
+static int	add_widget_references(const char *widget_type_list)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1583,7 +1583,7 @@ static int	DBpatch_6050134(void)
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
 			NULL);
 
-	result = zbx_db_select("select widgetid from widget where type in ('graph','svggraph','graphprototype')");
+	result = zbx_db_select("select widgetid from widget where type in (%s)", widget_type_list);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1605,6 +1605,11 @@ static int	DBpatch_6050134(void)
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
+}
+
+static int	DBpatch_6050134(void)
+{
+	return add_widget_references("'graph','svggraph','graphprototype'");
 }
 
 static int	DBpatch_6050135(void)
@@ -4028,6 +4033,23 @@ static int	DBpatch_6050296(void)
 
 static int	DBpatch_6050297(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update widget set x=x*3,width=width*3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050298(void)
+{
+	return add_widget_references("'geomap','map','plaintext','problemhosts','problems','problemsbysv','tophosts'"
+			",'web'");
+}
+
+static int	DBpatch_6050299(void)
+{
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 
@@ -4060,7 +4082,7 @@ static int	DBpatch_6050297(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050298(void)
+static int	DBpatch_6050300(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -4096,7 +4118,7 @@ static int	DBpatch_6050298(void)
 	return ret;
 }
 
-static int	DBpatch_6050299(void)
+static int	DBpatch_6050301(void)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -4200,7 +4222,7 @@ static int	DBpatch_6050299(void)
 }
 
 
-static int	DBpatch_6050300(void)
+static int	DBpatch_6050302(void)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -4250,7 +4272,7 @@ static int	DBpatch_6050300(void)
 	return ret;
 }
 
-static int	DBpatch_6050301(void)
+static int	DBpatch_6050303(void)
 {
 	const char	*sql =
 			"update module"
@@ -4268,7 +4290,7 @@ static int	DBpatch_6050301(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050302(void)
+static int	DBpatch_6050304(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -4587,5 +4609,7 @@ DBPATCH_ADD(6050299, 0, 1)
 DBPATCH_ADD(6050300, 0, 1)
 DBPATCH_ADD(6050301, 0, 1)
 DBPATCH_ADD(6050302, 0, 1)
+DBPATCH_ADD(6050303, 0, 1)
+DBPATCH_ADD(6050304, 0, 1)
 
 DBPATCH_END()

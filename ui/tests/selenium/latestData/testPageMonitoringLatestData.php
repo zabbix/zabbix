@@ -129,7 +129,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		// Subfilter is not visible if filter isn't set.
 		$this->assertFalse($this->query('id:latest-data-subfilter')->exists());
 		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-				explode("\n", $this->query('class:nothing-to-show')->one()->getText())
+				explode("\n", $this->query('class:no-data-message')->one()->getText())
 		);
 
 		$form->fill(['Hosts' => self::HOSTNAME]);
@@ -167,7 +167,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->assertFalse($this->query('id:latest-data-subfilter')->waitUntilNotVisible()->exists());
 		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-				explode("\n", $this->query('class:nothing-to-show')->one()->getText())
+				explode("\n", $this->query('class:no-data-message')->one()->getText())
 		);
 
 		// Check filter collapse/expand.
@@ -780,7 +780,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());

@@ -42,9 +42,9 @@ This template has been tested on:
 |{$HUAWEI.5300.LUN.IO.TIME.MAX.WARN}|<p>Maximum average I/O response time of LUN in milliseconds.</p>|`100`|
 |{$HUAWEI.5300.LUN.IO.TIME.MAX.TIME}|<p>The time during which average I/O response time of LUN may exceed the threshold.</p>|`5m`|
 |{$HUAWEI.5300.POOL.CAPACITY.THRESH.TIME}|<p>The time during which free capacity may exceed the {#THRESHOLD} from hwInfoStoragePoolFullThreshold.</p>|`5m`|
-|{$SNMP.TIMEOUT}||`5m`|
-|{$ICMP_LOSS_WARN}||`20`|
-|{$ICMP_RESPONSE_TIME_WARN}||`0.15`|
+|{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
+|{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
+|{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
 
 ### Items
 
@@ -54,15 +54,15 @@ This template has been tested on:
 |OceanStor 5300 V5: Version|<p>The device version.</p>|SNMP agent|huawei.5300.v5[version]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |OceanStor 5300 V5: Capacity total|<p>Total capacity of a device.</p>|SNMP agent|huawei.5300.v5[totalCapacity]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |OceanStor 5300 V5: Capacity used|<p>Used capacity of a device.</p>|SNMP agent|huawei.5300.v5[usedCapacity]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|OceanStor 5300 V5: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|OceanStor 5300 V5: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>Time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |OceanStor 5300 V5: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |OceanStor 5300 V5: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
-|OceanStor 5300 V5: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|OceanStor 5300 V5: System location|<p>MIB: SNMPv2-MIB</p><p>Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |OceanStor 5300 V5: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |OceanStor 5300 V5: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |OceanStor 5300 V5: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |OceanStor 5300 V5: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|OceanStor 5300 V5: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
+|OceanStor 5300 V5: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
 |OceanStor 5300 V5: ICMP ping||Simple check|icmpping|
 |OceanStor 5300 V5: ICMP loss||Simple check|icmppingloss|
 |OceanStor 5300 V5: ICMP response time||Simple check|icmppingsec|
@@ -77,7 +77,7 @@ This template has been tested on:
 |OceanStor 5300 V5: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Huawei OceanStor 5300 V5 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>OceanStor 5300 V5: Unavailable by ICMP ping</li></ul>|
 |OceanStor 5300 V5: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Huawei OceanStor 5300 V5 by SNMP/icmpping,#3)=0`|High||
 |OceanStor 5300 V5: High ICMP ping loss||`min(/Huawei OceanStor 5300 V5 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>OceanStor 5300 V5: Unavailable by ICMP ping</li></ul>|
-|OceanStor 5300 V5: High ICMP ping response time||`avg(/Huawei OceanStor 5300 V5 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>OceanStor 5300 V5: High ICMP ping loss</li><li>OceanStor 5300 V5: Unavailable by ICMP ping</li></ul>|
+|OceanStor 5300 V5: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Huawei OceanStor 5300 V5 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>OceanStor 5300 V5: High ICMP ping loss</li><li>OceanStor 5300 V5: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Controllers discovery
 

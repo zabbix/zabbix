@@ -363,7 +363,7 @@ zabbix_export:
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -1362,7 +1362,7 @@ zabbix_export:
             - name: 'Packet filter'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH
@@ -1376,7 +1376,7 @@ zabbix_export:
             - name: 'Network traffic'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -1392,7 +1392,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -1408,7 +1408,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER

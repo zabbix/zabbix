@@ -50,7 +50,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/form-search";
 @import "components/inline-filter";
 @import "components/list-table";
-@import "components/no-data-found";
+@import "components/no-data-message";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
@@ -74,20 +74,24 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "components/dashboard/widget-clock";
 @import "components/dashboard/widget-gauge";
+@import "components/dashboard/widget-geomap";
 @import "components/dashboard/widget-honeycomb";
 @import "components/dashboard/widget-hostavail";
 @import "components/dashboard/widget-hostnavigator";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
+@import "components/dashboard/widget-itemhistory";
 @import "components/dashboard/widget-itemnavigator";
 @import "components/dashboard/widget-map";
 @import "components/dashboard/widget-navtree";
 @import "components/dashboard/widget-piechart";
-@import "components/dashboard/widget-itemhistory";
+@import "components/dashboard/widget-problemhosts";
+@import "components/dashboard/widget-problems";
 @import "components/dashboard/widget-problemsbysv";
 @import "components/dashboard/widget-svggraph";
 @import "components/dashboard/widget-tophosts";
 @import "components/dashboard/widget-url";
+@import "components/dashboard/widget-web";
 
 .link-action {
 	@extend %link-action-style;
@@ -4005,78 +4009,6 @@ z-select {
 	.audit-show-details-btn-wrapper {
 		margin: 0 5px 0 5px;
 	}
-}
-
-.geomap-filter {
-	position: absolute;
-	right: 0;
-	display: none;
-	padding: 5px 20px 5px 10px;
-	margin-top: 5px;
-	margin-right: -2px;
-	background-color: $ui-bg-color;
-	border: 1px solid $overlay-border-color;
-}
-
-.geomap-filter.collapsed {
-	display: block;
-}
-
-.geomap-filter li {
-	width: calc(100% + 20px);
-}
-
-.geomap-filter label {
-	white-space: nowrap;
-}
-
-.marker-cluster {
-	background: none;
-}
-
-.marker-cluster div {
-	text-align: center;
-	border-radius: 50%;
-	margin-left: 5px;
-	margin-top: 5px;
-	height: 30px;
-	width: 30px;
-}
-
-.leaflet-marker-icon:focus {
-	box-shadow: 0 0 0 2px $btn-focus-outline-color;
-	border-radius: 2px;
-	outline: none;
-}
-
-.marker-cluster span {
-	line-height: 30px;
-}
-
-.leaflet-control {
-	.navigate-home-button,
-	.geomap-filter-button {
-		cursor: pointer;
-
-		&::before {
-			vertical-align: middle;
-		}
-	}
-
-	&.disabled {
-		background-color: $white;
-		opacity: 1;
-
-		.geomap-filter-button {
-			cursor: default;
-			opacity: .4;
-		}
-	}
-}
-
-.leaflet-container {
-	height: 100%;
-	z-index: 1;
 }
 
 // Dynamically generated classes:

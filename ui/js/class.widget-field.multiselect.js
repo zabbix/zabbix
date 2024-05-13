@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CWidgetFieldMultiselect {
 
 	static #reference_icon_template = `
@@ -240,7 +241,7 @@ class CWidgetFieldMultiselect {
 	}
 
 	#selectWidgetPopup() {
-		const popup = new ClassWidgetSelectPopup(this.#getWidgets());
+		const popup = new CWidgetSelectPopup(this.#getWidgets());
 
 		popup.on('dialogue.submit', (e) => {
 			this.#selectTypedReference(e.detail.reference);
@@ -248,17 +249,25 @@ class CWidgetFieldMultiselect {
 	}
 
 	#selectTypedReference(typed_reference) {
-		let caption = null;
-		let hint_text = null;
-
 		const typed_reference_dashboard = CWidgetBase.createTypedReference({
 			reference: CDashboard.REFERENCE_DASHBOARD,
 			type: this.#in_type
 		});
 
+		let caption = null;
+		let hint_text = null;
+
 		if (typed_reference === typed_reference_dashboard) {
 			caption = {id: typed_reference_dashboard, name: t('Dashboard')}
 			hint_text = t('Dashboard is used as data source.');
+		}
+		else if (typed_reference === '') {
+			caption = {
+				id: '',
+				name: t('Unavailable widget'),
+				inaccessible: true
+			};
+			hint_text = t('Another widget is used as data source.');
 		}
 		else {
 			for (const widget of this.#getWidgets()) {
@@ -342,6 +351,8 @@ class CWidgetFieldMultiselect {
 			type: this.#in_type,
 			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
 		});
+
+		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));
 
 		const result = [];
 

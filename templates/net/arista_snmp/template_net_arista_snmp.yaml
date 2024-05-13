@@ -91,6 +91,7 @@ zabbix_export:
               name: 'Arista: High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
                 - name: 'Arista: High ICMP ping loss'
                   expression: 'min(/Arista by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista by SNMP/icmppingloss,5m)<100'
@@ -190,7 +191,7 @@ zabbix_export:
               event_name: 'Arista: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
@@ -250,7 +251,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -303,7 +304,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -337,7 +338,7 @@ zabbix_export:
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -840,8 +841,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1051,7 +1052,7 @@ zabbix_export:
                   expression: 'last(/Arista by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
-                  description: 'Please check autonegotiation settings and cabling'
+                  description: 'Please check autonegotiation settings and cabling.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1642,10 +1643,13 @@ zabbix_export:
           value: '3'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
         - macro: '{$IFCONTROL}'
@@ -1696,6 +1700,7 @@ zabbix_export:
           value: '2'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$VFS.FS.FREE.MIN.CRIT}'
           value: 5G
           description: 'The critical threshold of the filesystem utilization.'
@@ -1704,16 +1709,16 @@ zabbix_export:
           description: 'The warning threshold of the filesystem utilization.'
         - macro: '{$VFS.FS.FSNAME.MATCHES}'
           value: .+
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSTYPE.MATCHES}'
           value: '.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$'
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'
+          description: 'Used in filesystem discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
           value: '90'
         - macro: '{$VFS.FS.PUSED.MAX.WARN}'
@@ -1726,7 +1731,7 @@ zabbix_export:
               widgets:
                 - type: graph
                   name: 'cpu utilization'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1740,7 +1745,7 @@ zabbix_export:
                 - type: graphprototype
                   name: 'disk space usage'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1756,8 +1761,8 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   name: 'memory utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1773,9 +1778,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: 'network traffic'
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

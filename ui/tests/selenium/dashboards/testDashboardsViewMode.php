@@ -74,9 +74,9 @@ class testDashboardsViewMode extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestCheckHeader('Global view');
 		if ($data['username'] !== 'Admin') {
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//tr[@class='nothing-to-show']/td",
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//div[contains(@class, 'no-data-message')]",
 					'No data found');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[3]//tr[@class='nothing-to-show']/td",
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[3]//div[@class='no-data-message']",
 					'No permissions to referred object or it does not exist!');
 		}
 		else {

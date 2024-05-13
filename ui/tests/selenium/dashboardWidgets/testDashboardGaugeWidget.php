@@ -306,8 +306,8 @@ class testDashboardGaugeWidget extends testWidgets {
 
 		// Check fields' labels and required fields.
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colours',
-				'Show', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
-				'Thresholds', 'Override host'],
+				'Show', 'Override host', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
+				'Thresholds'],
 				$form->getLabels()->asText()
 		);
 

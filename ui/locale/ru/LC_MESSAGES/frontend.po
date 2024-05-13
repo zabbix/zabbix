@@ -16221,6 +16221,10 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "Пожалуйста, выберите два элемента"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -17044,6 +17048,10 @@ msgstr "Атрибут ссылки"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
 msgstr ""
 
 #: app/views/administration.user.edit.php:309
@@ -21413,6 +21421,10 @@ msgstr "Только неподтвержденные"
 msgid "Unavailable"
 msgstr "Недоступен"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "Разблокировать"
@@ -25529,6 +25541,11 @@ msgstr "ссылка на несуществующий элемент дерев
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "указанный объект не существует"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82
