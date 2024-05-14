@@ -53,7 +53,7 @@ AC_PROG_EGREP
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
-  fcntl.h sys/param.h arpa/inet.h \
+  fcntl.h sys/param.h arpa/inet.h linux/version.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h sys/statfs.h \
   sys/loadavg.h sys/vmmeter.h strings.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
