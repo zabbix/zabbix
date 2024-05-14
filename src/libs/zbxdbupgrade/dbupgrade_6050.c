@@ -4129,7 +4129,7 @@ static int	DBpatch_6050301(void)
 			" from widget w"
 				" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
 				" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is null"
-				" join widget_field wf on w.widgetid=wf.widgetid and wf.name='itemids'"
+				" join widget_field wf on w.widgetid=wf.widgetid and wf.name like 'itemids%%'"
 				" join items i on wf.value_itemid=i.itemid"
 				" join item_rtname irn on wf.value_itemid=irn.itemid"
 				" left join widget_field wfs on w.widgetid=wfs.widgetid and wfs.name='show_as_html'"
@@ -4139,7 +4139,7 @@ static int	DBpatch_6050301(void)
 			" from widget w"
 				" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
 				" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is not null"
-				" join widget_field wf on w.widgetid=wf.widgetid and wf.name='itemids'"
+				" join widget_field wf on w.widgetid=wf.widgetid and wf.name like 'itemids%%'"
 				" join items i on wf.value_itemid=i.itemid"
 				" left join widget_field wfs on w.widgetid=wfs.widgetid and wfs.name='show_as_html'"
 			" where w.type='plaintext'"
@@ -4232,7 +4232,7 @@ static int	DBpatch_6050302(void)
 			" from widget w,widget_field wf"
 			" where w.widgetid=wf.widgetid"
 				" and w.type='plaintext'"
-				" and wf.name in ('show_as_html','itemids')");
+				" and (wf.name='show_as_html' or wf.name like 'itemids%%')");
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
