@@ -71,7 +71,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 		'timeout_ssh_agent' => '3s',
 		'timeout_telnet_agent' => '3s',
 		'timeout_script' => '3s',
-		'timeout_browser' => '1m',
+		'timeout_browser' => '60s',
 		'socket_timeout' => '3s',
 		'connect_timeout' => '3s',
 		'media_type_test_timeout' => '65s',
