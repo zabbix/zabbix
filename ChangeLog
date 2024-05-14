@@ -9,6 +9,7 @@ New features:
 .........T [ZBXNEXT-6864] replaced {HOST.CONN} with user macros in templates (drasikhov)
 
 Bug fixes:
+...G...... [ZBX-24210] improve Zabbix agent 2 loadable plugin capacity code style (rzvejs)
 A......... [ZBX-23951] fixed issue of incorrect template matching when no UUID exists in export file (jfreibergs)
 .......PS. [ZBX-23953] fixed CIDR network mask of VMware HV network interface (MVekslers)
 ..F....... [ZBX-24195] fixed host IPMI username and password field max length (esekace)
