@@ -121,4 +121,74 @@ files:
   /proc/1/statm: |
     31246 1241219447 4416 5492 0 25529 0
 
+---
+test case: "valid smaps_rollup big value"
+out:
+  expected: '102236160512'
+
+files:
+  /proc/1/smaps_rollup: |
+    Rss:               97760 kB
+    Pss:               97500 mB
+    Pss_Dirty:         80064 kB
+    Pss_Anon:          80064 kB
+    Pss_File:          17436 kB
+    Pss_Shmem:             0 kB
+    Shared_Clean:        516 kB
+    Shared_Dirty:          0 kB
+    Private_Clean:     17180 kB
+    Private_Dirty:     80064 kB
+    Referenced:        97760 kB
+    Anonymous:         80064 kB
+    LazyFree:              0 kB
+    AnonHugePages:         0 kB
+    ShmemPmdMapped:        0 kB
+    FilePmdMapped:         0 kB
+    Shared_Hugetlb:        0 kB
+    Private_Hugetlb:       0 kB
+    Swap:                  0 kB
+    SwapPss:               0 kB
+    Locked:                0 kB
+
+---
+test case: "smaps_rollup Private_Hugetlb only"
+out:
+  expected: '1048576'
+
+files:
+  /proc/1/smaps_rollup: |
+    Private_Hugetlb:       1 mB
+
+---
+test case: "smaps_rollup Shared_Hugetlb only"
+out:
+  expected: '1048576'
+
+files:
+  /proc/1/smaps_rollup: |
+    Shared_Hugetlb:        1 mB
+
+---
+test case: "smaps_rollup unused values"
+out:
+  expected: '0'
+
+files:
+  /proc/1/smaps_rollup: |
+    Rss:               97760 kB
+    Pss_Dirty:         80064 kB
+    Pss_Anon:          80064 kB
+    Pss_File:          17436 kB
+    Pss_Shmem:         97760 kB
+    Referenced:        97760 kB
+    Anonymous:         80064 kB
+    LazyFree:          97760 kB
+    AnonHugePages:     97760 kB
+    ShmemPmdMapped:    97760 kB
+    FilePmdMapped:     97760 kB
+    Swap:              97760 kB
+    SwapPss:           97760 kB
+    Locked:            97760 kB
+
+
 ...
