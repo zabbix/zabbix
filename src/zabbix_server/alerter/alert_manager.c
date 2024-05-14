@@ -2239,6 +2239,28 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	am_check_dbstatus()
+{
+	int		ret = ZBX_DB_OK;
+	DB_RESULT	res;
+
+#ifdef HAVE_ORACLE
+	res = DBselect_once("select null from dual");
+#else
+	res = DBselect_once("select null");
+#endif
+
+	if (res == (DB_RESULT)ZBX_DB_DOWN)
+	{
+		DBclose();
+		ret = DBconnect(ZBX_DB_CONNECT_ONCE);
+	}
+	else
+		DBfree_result(res);
+
+	return ret;
+}
+
 ZBX_THREAD_ENTRY(alert_manager_thread, args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -2272,7 +2294,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	manager.dbstatus = ZBX_DB_OK;
+	manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -2286,8 +2308,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 
 		if (time_ping + ZBX_DB_PING_FREQUENCY < now)
 		{
-			manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
-			DBclose();
+			manager.dbstatus = am_check_dbstatus();
 			time_ping = now;
 		}
 		if (ZBX_DB_DOWN == manager.dbstatus)
