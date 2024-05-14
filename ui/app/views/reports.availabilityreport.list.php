@@ -95,6 +95,10 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 						'multiple' => false,
 						'data' => $data['filter']['templates'],
 						'popup' => [
+							'filter_preselect' => [
+								'id' => 'filter_template_groups_',
+								'submit_as' => 'templategroupid'
+							],
 							'parameters' => [
 								'srctbl' => 'templates',
 								'srcfld1' => 'hostid',
@@ -114,9 +118,12 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 					(new CMultiSelect([
 						'name' => 'filter_triggers[]',
 						'object_name' => 'triggers',
-						'multiple' => false,
 						'data' => $data['filter']['triggers'],
 						'popup' => [
+							'filter_preselect' => [
+								'id' => 'filter_templates_',
+								'submit_as' => 'templateid'
+							],
 							'parameters' => [
 								'srctbl' => 'template_triggers',
 								'srcfld1' => 'triggerid',
