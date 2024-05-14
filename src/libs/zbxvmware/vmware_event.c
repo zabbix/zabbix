@@ -465,7 +465,7 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 		"*[local-name()='arguments'][*[local-name()='key'][text()='" key "']]/*[local-name()='value']"
 
 	zbx_vmware_event_t		*event = NULL;
-	char				*message, *ip, *type;
+	char				*message, *ip, *type, *username, *info;
 	int				nodes_det = 0;
 	unsigned int			i;
 	zbx_uint64_t			sz;
@@ -492,6 +492,8 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 	if (NULL == (type = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("eventTypeId"))))
 		type = zbx_xml_node_read_prop(xml_event.xml_node, "type");
 
+	info = zbx_strdup(NULL, "");
+
 	if (NULL != type)
 	{
 		zbx_vmware_key_value_t	*severity, evt_cmp = {.key=type};
@@ -499,15 +501,17 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 
 		if (NULL != (value = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("severity"))))
 		{
-			message = zbx_dsprintf(message, "%s\n\ntype: %s/%s", message, value, type);
+			info = zbx_dsprintf(info, "\ntype: %s/%s", value, type);
 			zbx_str_free(value);
 		}
 		else if (NULL != (severity = (zbx_vmware_key_value_t *)zbx_hashset_search(evt_severities, &evt_cmp)))
 		{
-			message = zbx_dsprintf(message, "%s\n\ntype: %s/%s", message, severity->value, type);
+			info = zbx_dsprintf(info, "\ntype: %s/%s", severity->value, type);
 		}
 		else
-			message = zbx_dsprintf(message, "%s\n\ntype: %s", message, type);
+			info = zbx_dsprintf(info, "\ntype: %s", type);
+
+		zbx_free(type);
 	}
 
 	for (i = 0; i < ARRSIZE(host_nodes); i++)
@@ -540,14 +544,14 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 
 	if (0 != (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
 	{
-		message = zbx_dsprintf(message, "%s%s\nsource", message, NULL == type ? "\n" : "");
+		info = zbx_dsprintf(info, "%s\nsource", info);
 
 		for (i = 0; i < ARRSIZE(host_nodes); i++)
 		{
 			if (NULL == host_nodes[i].name)
 				continue;
 
-			message = zbx_dsprintf(message, "%s%s", message, host_nodes[i].name);
+			info = zbx_dsprintf(info, "%s%s", info, host_nodes[i].name);
 			zbx_free(host_nodes[i].name);
 		}
 	}
@@ -558,12 +562,21 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 
 		if (NULL != (ip = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("ipAddress"))))
 		{
-			message = zbx_dsprintf(message, "%s%s\nsource: %s", message, NULL == type ? "\n" : "", ip);
+			info = zbx_dsprintf(info, "%s\nsource: %s", info, ip);
 			zbx_free(ip);
 		}
 	}
 
-	zbx_free(type);
+	if (NULL != (username = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("userName"))))
+	{
+		info = zbx_dsprintf(info, "%s\nuser: %s", info, username);
+		zbx_free(username);
+	}
+
+	if ('\0' != *info)
+		message = zbx_dsprintf(message, "%s\n%s", message, info);
+
+	zbx_free(info);
 	zbx_replace_invalid_utf8(message);
 
 	event = (zbx_vmware_event_t *)zbx_malloc(event, sizeof(zbx_vmware_event_t));
