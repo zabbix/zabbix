@@ -3860,7 +3860,7 @@ static int	DBpatch_6050285(void)
 
 static int	DBpatch_6050286(void)
 {
-	const zbx_db_field_t	field = {"timeout_browser", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"timeout_browser", "60s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
