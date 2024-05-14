@@ -35,7 +35,6 @@ static void	get_test_param(const char *name, const char **value)
 	else if (ZBX_MOCK_SUCCESS == error && ZBX_MOCK_SUCCESS != (error = zbx_mock_string(handle, value)))
 		GET_TEST_PARAM_FAIL(name, error);
 }
-void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes);
 
 void	zbx_mock_test_entry(void **state)
 {
