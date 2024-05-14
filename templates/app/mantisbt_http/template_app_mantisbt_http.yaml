@@ -22,7 +22,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: bf1b74b98d5b4311afeb721059c01da9
-          name: 'Mantis BT: Get projects'
+          name: 'Get projects'
           type: HTTP_AGENT
           key: mantisbt.get.projects
           delay: 1h

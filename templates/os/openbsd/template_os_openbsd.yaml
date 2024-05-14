@@ -27,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: 390a1b2080e842f3985b0076509cc550
-          name: 'OpenBSD: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 99dbf8825c0d4e1f9ae433bcb786d7c7
-          name: 'OpenBSD: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
@@ -51,7 +51,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c65db5a2b42c46dc90cf4891ad1ecc83
-          name: 'OpenBSD: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -65,7 +65,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 56a83dc0e14e47339e13a451adcefef7
-          name: 'OpenBSD: Maximum number of opened files'
+          name: 'Maximum number of opened files'
           key: kernel.maxfiles
           delay: 1h
           history: 7d
@@ -76,7 +76,7 @@ zabbix_export:
           triggers:
             - uuid: aab96e16dd194d72b9b049ffa8b41b02
               expression: 'last(/OpenBSD by Zabbix agent/kernel.maxfiles)<1024'
-              name: 'OpenBSD: Configured max number of opened files is too low on {HOST.NAME}'
+              name: 'Configured max number of opened files is too low on {HOST.NAME}'
               priority: INFO
               tags:
                 - tag: scope
@@ -84,7 +84,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: e55f8256dd2d48fd9e7fd786f872b4bc
-          name: 'OpenBSD: Maximum number of processes'
+          name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
           history: 7d
@@ -95,7 +95,7 @@ zabbix_export:
           triggers:
             - uuid: 149b9b77d17543fba253666ccbd6a607
               expression: 'last(/OpenBSD by Zabbix agent/kernel.maxproc)<256'
-              name: 'OpenBSD: Configured max number of processes is too low on {HOST.NAME}'
+              name: 'Configured max number of processes is too low on {HOST.NAME}'
               priority: INFO
               tags:
                 - tag: scope
@@ -103,7 +103,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 7f8fdbc74cf14fa2afda3b57c548c751
-          name: 'OpenBSD: Number of running processes'
+          name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
           description: 'The number of processes in a running state.'
@@ -113,13 +113,13 @@ zabbix_export:
           triggers:
             - uuid: d67740bc103348ab8ab11df2bdb0ad8f
               expression: 'avg(/OpenBSD by Zabbix agent/proc.num[,,run],5m)>30'
-              name: 'OpenBSD: Too many processes running on {HOST.NAME}'
+              name: 'Too many processes running on {HOST.NAME}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 966acafb928b43f8a63ee673b1716d28
-          name: 'OpenBSD: Number of processes'
+          name: 'Number of processes'
           key: 'proc.num[]'
           history: 7d
           description: 'The total number of processes in any state.'
@@ -129,13 +129,13 @@ zabbix_export:
           triggers:
             - uuid: dd1b0c14e6dd439ea8f7323cdcc607de
               expression: 'avg(/OpenBSD by Zabbix agent/proc.num[],5m)>300'
-              name: 'OpenBSD: Too many processes on {HOST.NAME}'
+              name: 'Too many processes on {HOST.NAME}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 4e06c5b504c04c169ea1a0d6a7951eeb
-          name: 'OpenBSD: Host boot time'
+          name: 'Host boot time'
           key: system.boottime
           delay: 10m
           history: 7d
@@ -144,7 +144,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: f6ed0de8cbb545298b174b19938a527e
-          name: 'OpenBSD: Interrupts per second'
+          name: 'Interrupts per second'
           key: system.cpu.intr
           history: 7d
           units: ips
@@ -157,7 +157,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 7e4eab397cfd43d2a4aef7e2aa8c3a37
-          name: 'OpenBSD: Processor load (1 min average per core)'
+          name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
@@ -168,13 +168,13 @@ zabbix_export:
           triggers:
             - uuid: 1128bfb41f5f420c81feffb1d395cf9f
               expression: 'avg(/OpenBSD by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
-              name: 'OpenBSD: Processor load is too high on {HOST.NAME}'
+              name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 55ad1da5b20c465f8db86701dcf3e974
-          name: 'OpenBSD: Processor load (5 min average per core)'
+          name: 'Processor load (5 min average per core)'
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
@@ -183,7 +183,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 0403d3b318a649d4aa0da97e18546bcb
-          name: 'OpenBSD: Processor load (15 min average per core)'
+          name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
@@ -192,7 +192,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2226fac821fe4928a9d727770e0af4d0
-          name: 'OpenBSD: Context switches per second'
+          name: 'Context switches per second'
           key: system.cpu.switches
           history: 7d
           units: sps
@@ -205,7 +205,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4689c51946c845e5b31cb7ca5b58fbe3
-          name: 'OpenBSD: CPU idle time'
+          name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
           history: 7d
           value_type: FLOAT
@@ -215,7 +215,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ad032417f6de4e03a4f956bea65d8ce0
-          name: 'OpenBSD: CPU interrupt time'
+          name: 'CPU interrupt time'
           key: 'system.cpu.util[,interrupt]'
           history: 7d
           value_type: FLOAT
@@ -225,7 +225,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 84030949a4d545b59db4aa3b38402174
-          name: 'OpenBSD: CPU nice time'
+          name: 'CPU nice time'
           key: 'system.cpu.util[,nice]'
           history: 7d
           value_type: FLOAT
@@ -235,7 +235,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 63121eb34bc94eeabd7352992b67befb
-          name: 'OpenBSD: CPU system time'
+          name: 'CPU system time'
           key: 'system.cpu.util[,system]'
           history: 7d
           value_type: FLOAT
@@ -245,7 +245,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: c9adb1a7c2fd4db9b176f9008483f2d7
-          name: 'OpenBSD: CPU user time'
+          name: 'CPU user time'
           key: 'system.cpu.util[,user]'
           history: 7d
           value_type: FLOAT
@@ -255,7 +255,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: a80cd7ca70954cd1b6b89a686f642b9d
-          name: 'OpenBSD: Host name'
+          name: 'Host name'
           key: system.hostname
           delay: 1h
           history: 7d
@@ -273,13 +273,13 @@ zabbix_export:
           triggers:
             - uuid: d6927a9b74eb4cb8b15400baf784fc36
               expression: 'last(/OpenBSD by Zabbix agent/system.hostname,#1)<>last(/OpenBSD by Zabbix agent/system.hostname,#2)'
-              name: 'OpenBSD: Hostname was changed on {HOST.NAME}'
+              name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: cfff34f2374c410492b89cce1c6b5198
-          name: 'OpenBSD: Host local time'
+          name: 'Host local time'
           key: system.localtime
           history: 7d
           units: unixtime
@@ -288,7 +288,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: e758448d5ec242e6a7a17f67c8f62874
-          name: 'OpenBSD: Free swap space'
+          name: 'Free swap space'
           key: 'system.swap.size[,free]'
           history: 7d
           units: B
@@ -297,7 +297,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 43648a7f2c79443781a0ad500e7a9e6c
-          name: 'OpenBSD: Free swap space in %'
+          name: 'Free swap space in %'
           key: 'system.swap.size[,pfree]'
           history: 7d
           value_type: FLOAT
@@ -309,7 +309,7 @@ zabbix_export:
           triggers:
             - uuid: 0efa45d2c8884bc6b4090afc6408198b
               expression: 'last(/OpenBSD by Zabbix agent/system.swap.size[,pfree])<50'
-              name: 'OpenBSD: Lack of free swap space on {HOST.NAME}'
+              name: 'Lack of free swap space on {HOST.NAME}'
               priority: WARNING
               description: 'It probably means that the systems requires more physical memory.'
               tags:
@@ -318,7 +318,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 61f33f0c3e35499b999626058048ec66
-          name: 'OpenBSD: Total swap space'
+          name: 'Total swap space'
           key: 'system.swap.size[,total]'
           delay: 1h
           history: 7d
@@ -328,7 +328,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: b19974c64b4141c2aca0e997b03c2f0a
-          name: 'OpenBSD: System information'
+          name: 'System information'
           key: system.uname
           delay: 1h
           history: 7d
@@ -346,13 +346,13 @@ zabbix_export:
           triggers:
             - uuid: 3d3bcd54f24448c1a11746a4e75ea736
               expression: 'last(/OpenBSD by Zabbix agent/system.uname,#1)<>last(/OpenBSD by Zabbix agent/system.uname,#2)'
-              name: 'OpenBSD: Host information was changed on {HOST.NAME}'
+              name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: d14bcdc15cc24f90baea06a13077a54f
-          name: 'OpenBSD: System uptime'
+          name: 'System uptime'
           key: system.uptime
           delay: 10m
           history: 7d
@@ -363,13 +363,13 @@ zabbix_export:
           triggers:
             - uuid: de874b9d875a4298ab39888c9e9cb747
               expression: 'change(/OpenBSD by Zabbix agent/system.uptime)<0'
-              name: 'OpenBSD: {HOST.NAME} has just been restarted'
+              name: '{HOST.NAME} has just been restarted'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 165a44bf3b9d49378e500acb90aa7957
-          name: 'OpenBSD: Number of logged in users'
+          name: 'Number of logged in users'
           key: system.users.num
           history: 7d
           description: 'The number of users who are currently logged in.'
@@ -379,7 +379,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: f11f6e3539a244409f1c72dbd6f16b76
-          name: 'OpenBSD: Checksum of /etc/passwd'
+          name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
           history: 7d
@@ -395,13 +395,13 @@ zabbix_export:
           triggers:
             - uuid: 9db4055df94d414d86938066ed05dbc5
               expression: 'last(/OpenBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/OpenBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
-              name: 'OpenBSD: /etc/passwd has been changed on {HOST.NAME}'
+              name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: security
         - uuid: b5de01cf628b48cb899a8ad2a02a3b62
-          name: 'OpenBSD: Get filesystems'
+          name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
           trends: '0'
@@ -411,7 +411,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5b6c92c92e434dff8ce19e28b3ba785e
-          name: 'OpenBSD: Available memory'
+          name: 'Available memory'
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
@@ -422,7 +422,7 @@ zabbix_export:
           triggers:
             - uuid: bdf3c729b8bc4a9481c9041e4c1ea624
               expression: 'last(/OpenBSD by Zabbix agent/vm.memory.size[available])<20M'
-              name: 'OpenBSD: Lack of available memory on server {HOST.NAME}'
+              name: 'Lack of available memory on server {HOST.NAME}'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -430,7 +430,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: b32320608732421fac18437006bc1874
-          name: 'OpenBSD: Total memory'
+          name: 'Total memory'
           key: 'vm.memory.size[total]'
           delay: 1h
           history: 7d
@@ -440,7 +440,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 7ab36f1fcf0244229effa26f16889a36
-          name: 'OpenBSD: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
@@ -453,8 +453,8 @@ zabbix_export:
           triggers:
             - uuid: d046f431e11d4bd7be42e66e14a21663
               expression: 'max(/OpenBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'OpenBSD: Zabbix agent is not available'
-              event_name: 'OpenBSD: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive checks only; the availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.'
               manual_close: 'YES'

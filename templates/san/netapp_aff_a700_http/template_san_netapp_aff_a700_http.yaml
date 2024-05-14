@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/SAN
       items:
         - uuid: 95d822159f2a4c4084ad36b18cd11a1d
-          name: 'NetApp AFF A700: Get chassis'
+          name: 'Get chassis'
           type: HTTP_AGENT
           key: netapp.chassis.get
           history: '0'
@@ -35,7 +35,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 49490a886b5f4e5c9e8cc121a6ffd713
-          name: 'NetApp AFF A700: Get cluster'
+          name: 'Get cluster'
           type: HTTP_AGENT
           key: netapp.cluster.get
           history: '0'
@@ -50,7 +50,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2c98b9d6353a4b1f9c0a794681788c22
-          name: 'NetApp AFF A700: Cluster location'
+          name: 'Cluster location'
           type: DEPENDENT
           key: netapp.cluster.location
           delay: '0'
@@ -71,7 +71,7 @@ zabbix_export:
             - tag: component
               value: cluster
         - uuid: a052583b18b44ed9b8df1c1eca375113
-          name: 'NetApp AFF A700: Cluster name'
+          name: 'Cluster name'
           type: DEPENDENT
           key: netapp.cluster.name
           delay: '0'
@@ -92,7 +92,7 @@ zabbix_export:
             - tag: component
               value: cluster
         - uuid: 63c3ea4634024fb88841cee7e64c964b
-          name: 'NetApp AFF A700: Cluster IOPS, other rate'
+          name: 'Cluster IOPS, other rate'
           type: DEPENDENT
           key: netapp.cluster.statistics.iops.other.rate
           delay: '0'
@@ -115,7 +115,7 @@ zabbix_export:
             - tag: component
               value: iops
         - uuid: 5f38f233c9c0446e8bb9e60229294cdf
-          name: 'NetApp AFF A700: Cluster IOPS, read rate'
+          name: 'Cluster IOPS, read rate'
           type: DEPENDENT
           key: netapp.cluster.statistics.iops.read.rate
           delay: '0'
@@ -138,7 +138,7 @@ zabbix_export:
             - tag: component
               value: iops
         - uuid: 8380db1dbf2a4c2e95eff184d3a61fde
-          name: 'NetApp AFF A700: Cluster IOPS, total rate'
+          name: 'Cluster IOPS, total rate'
           type: DEPENDENT
           key: netapp.cluster.statistics.iops.total.rate
           delay: '0'
@@ -161,7 +161,7 @@ zabbix_export:
             - tag: component
               value: iops
         - uuid: 65a4b938010045ef9735a7d9f6239ccd
-          name: 'NetApp AFF A700: Cluster IOPS, write rate'
+          name: 'Cluster IOPS, write rate'
           type: DEPENDENT
           key: netapp.cluster.statistics.iops.write.rate
           delay: '0'
@@ -184,7 +184,7 @@ zabbix_export:
             - tag: component
               value: iops
         - uuid: 77253d87ce8242afa45a3c79ab96a91e
-          name: 'NetApp AFF A700: Cluster IOPS raw, other'
+          name: 'Cluster IOPS raw, other'
           type: DEPENDENT
           key: netapp.cluster.statistics.iops_raw.other
           delay: '0'
@@ -203,7 +203,7 @@ zabbix_export:
             - tag: component
               value: iops
         - uuid: 14262390978b45729fa3ac593cf21a69
-          name: 'NetApp AFF A700: Cluster IOPS raw, read'
+          name: 'Cluster IOPS raw, read'
           type: DEPENDENT
           key: netapp.cluster.statistics.iops_raw.read
           delay: '0'
@@ -222,7 +222,7 @@ zabbix_export:
             - tag: component
               value: iops
         - uuid: 7a0407b68348478f9bc56bf0629f59d2
-          name: 'NetApp AFF A700: Cluster IOPS raw, total'
+          name: 'Cluster IOPS raw, total'
           type: DEPENDENT
           key: netapp.cluster.statistics.iops_raw.total
           delay: '0'
@@ -241,7 +241,7 @@ zabbix_export:
             - tag: component
               value: iops
         - uuid: 92640d6a2d044100a59c5d180d43fbce
-          name: 'NetApp AFF A700: Cluster IOPS raw, write'
+          name: 'Cluster IOPS raw, write'
           type: DEPENDENT
           key: netapp.cluster.statistics.iops_raw.write
           delay: '0'
@@ -260,7 +260,7 @@ zabbix_export:
             - tag: component
               value: iops
         - uuid: 4bd4fe94e9a54fa2b8ab9bdf0475edff
-          name: 'NetApp AFF A700: Cluster latency, other'
+          name: 'Cluster latency, other'
           type: CALCULATED
           key: netapp.cluster.statistics.latency.other
           history: 7d
@@ -277,7 +277,7 @@ zabbix_export:
             - tag: component
               value: latency
         - uuid: 4b89e603f9cf4b92a85293b1ad15c005
-          name: 'NetApp AFF A700: Cluster latency, read'
+          name: 'Cluster latency, read'
           type: CALCULATED
           key: netapp.cluster.statistics.latency.read
           history: 7d
@@ -294,7 +294,7 @@ zabbix_export:
             - tag: component
               value: latency
         - uuid: 2c953f67a7484e389d11ac5ef6b06c44
-          name: 'NetApp AFF A700: Cluster latency, total'
+          name: 'Cluster latency, total'
           type: CALCULATED
           key: netapp.cluster.statistics.latency.total
           history: 7d
@@ -311,7 +311,7 @@ zabbix_export:
             - tag: component
               value: latency
         - uuid: 543ba306d85e41c98d34dab39463dd87
-          name: 'NetApp AFF A700: Cluster latency, write'
+          name: 'Cluster latency, write'
           type: CALCULATED
           key: netapp.cluster.statistics.latency.write
           history: 7d
@@ -328,7 +328,7 @@ zabbix_export:
             - tag: component
               value: latency
         - uuid: acd5b961c4d843589514771fa9a0aaa3
-          name: 'NetApp AFF A700: Cluster latency raw, other'
+          name: 'Cluster latency raw, other'
           type: DEPENDENT
           key: netapp.cluster.statistics.latency_raw.other
           delay: '0'
@@ -347,7 +347,7 @@ zabbix_export:
             - tag: component
               value: latency
         - uuid: 3e81e918028d412eaa2cb27718ae3b98
-          name: 'NetApp AFF A700: Cluster latency raw, read'
+          name: 'Cluster latency raw, read'
           type: DEPENDENT
           key: netapp.cluster.statistics.latency_raw.read
           delay: '0'
@@ -366,7 +366,7 @@ zabbix_export:
             - tag: component
               value: latency
         - uuid: 78253f625b7e468898f6dd48c9707ad3
-          name: 'NetApp AFF A700: Cluster latency raw, total'
+          name: 'Cluster latency raw, total'
           type: DEPENDENT
           key: netapp.cluster.statistics.latency_raw.total
           delay: '0'
@@ -385,7 +385,7 @@ zabbix_export:
             - tag: component
               value: latency
         - uuid: fb73702348d3468cad5312af772eaeb9
-          name: 'NetApp AFF A700: Cluster latency raw, write'
+          name: 'Cluster latency raw, write'
           type: DEPENDENT
           key: netapp.cluster.statistics.latency_raw.write
           delay: '0'
@@ -404,7 +404,7 @@ zabbix_export:
             - tag: component
               value: latency
         - uuid: 61acb5f1435f4452a789c44bfd105da3
-          name: 'NetApp AFF A700: Cluster throughput, other rate'
+          name: 'Cluster throughput, other rate'
           type: DEPENDENT
           key: netapp.cluster.statistics.throughput.other.rate
           delay: '0'
@@ -427,7 +427,7 @@ zabbix_export:
             - tag: component
               value: throughput
         - uuid: a1fad2e35b8f4c1da450b953d3952263
-          name: 'NetApp AFF A700: Cluster throughput, read rate'
+          name: 'Cluster throughput, read rate'
           type: DEPENDENT
           key: netapp.cluster.statistics.throughput.read.rate
           delay: '0'
@@ -450,7 +450,7 @@ zabbix_export:
             - tag: component
               value: throughput
         - uuid: e894ad01c2d74edfb8f954198979070c
-          name: 'NetApp AFF A700: Cluster throughput, total rate'
+          name: 'Cluster throughput, total rate'
           type: DEPENDENT
           key: netapp.cluster.statistics.throughput.total.rate
           delay: '0'
@@ -473,7 +473,7 @@ zabbix_export:
             - tag: component
               value: throughput
         - uuid: c06c118d3fbe48b78db12e43232d6d97
-          name: 'NetApp AFF A700: Cluster throughput, write rate'
+          name: 'Cluster throughput, write rate'
           type: DEPENDENT
           key: netapp.cluster.statistics.throughput.write.rate
           delay: '0'
@@ -496,7 +496,7 @@ zabbix_export:
             - tag: component
               value: throughput
         - uuid: 5029bccf54f542b1a2dc760067ddabe3
-          name: 'NetApp AFF A700: Cluster status'
+          name: 'Cluster status'
           type: DEPENDENT
           key: netapp.cluster.status
           delay: '0'
@@ -519,7 +519,7 @@ zabbix_export:
           triggers:
             - uuid: c823a2eb325a4153871be705d7c24c72
               expression: '(last(/NetApp AFF A700 by HTTP/netapp.cluster.status)<>"ok")'
-              name: 'NetApp AFF A700: Cluster status is abnormal'
+              name: 'Cluster status is abnormal'
               priority: AVERAGE
               description: 'Any errors associated with the sample. For example, if the aggregation of data over multiple nodes fails then any of the partial errors might be returned, “ok” on success, or “error” on any internal uncategorized failure. Whenever a sample collection is missed but done at a later time, it is back filled to the previous 15 second timestamp and tagged with "backfilled_data". “Inconsistent_ delta_time” is encountered when the time between two collections is not the same for all nodes. Therefore, the aggregated value might be over or under inflated. “Negative_delta” is returned when an expected monotonically increasing value has decreased in value. “Inconsistent_old_data” is returned when one or more nodes do not have the latest data.'
               tags:
@@ -528,7 +528,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: cd56dc70e28f4a3382f2f1b08a4fa584
-          name: 'NetApp AFF A700: Cluster software version'
+          name: 'Cluster software version'
           type: DEPENDENT
           key: netapp.cluster.version
           delay: '0'
@@ -551,8 +551,8 @@ zabbix_export:
           triggers:
             - uuid: 4a2936f068ed486f8c8a2cf2cfa7440b
               expression: 'last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#1)<>last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#2) and length(last(/NetApp AFF A700 by HTTP/netapp.cluster.version))>0'
-              name: 'NetApp AFF A700: Version has changed'
-              event_name: 'NetApp AFF A700: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'The NetApp AFF A700 version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -560,7 +560,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: c9bf91e0f23c4961aed8ee5b32ff7767
-          name: 'NetApp AFF A700: Get disks'
+          name: 'Get disks'
           type: HTTP_AGENT
           key: netapp.disks.get
           history: '0'
@@ -575,7 +575,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 54163ca73a8c40188048ef5d89ec4927
-          name: 'NetApp AFF A700: Get FRUs'
+          name: 'Get FRUs'
           type: HTTP_AGENT
           key: netapp.frus.get
           history: '0'
@@ -604,7 +604,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c9b6ac2405af48c0899d1536662f752b
-          name: 'NetApp AFF A700: Get LUNs'
+          name: 'Get LUNs'
           type: HTTP_AGENT
           key: netapp.luns.get
           history: '0'
@@ -619,7 +619,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5c36efc545ba4dcbb0be84da5e8088cc
-          name: 'NetApp AFF A700: Get nodes'
+          name: 'Get nodes'
           type: HTTP_AGENT
           key: netapp.nodes.get
           history: '0'
@@ -634,7 +634,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c677a3caf7a04710bc67b165b4152808
-          name: 'NetApp AFF A700: Get ethernet ports'
+          name: 'Get ethernet ports'
           type: HTTP_AGENT
           key: netapp.ports.eth.get
           history: '0'
@@ -649,7 +649,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2a6abfe87cc548bb81fcb217cde4f805
-          name: 'NetApp AFF A700: Get FC ports'
+          name: 'Get FC ports'
           type: HTTP_AGENT
           key: netapp.ports.fc.get
           history: '0'
@@ -664,7 +664,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7a813b7cb05d497fbf77bf11b01757dd
-          name: 'NetApp AFF A700: Get SVMs'
+          name: 'Get SVMs'
           type: HTTP_AGENT
           key: netapp.svms.get
           history: '0'
@@ -679,7 +679,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: fa7fa8daaaa640d494af38614ba12c2e
-          name: 'NetApp AFF A700: Get volumes'
+          name: 'Get volumes'
           type: HTTP_AGENT
           key: netapp.volumes.get
           history: '0'

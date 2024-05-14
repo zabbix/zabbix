@@ -30,7 +30,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: efc5456a02d04ade93cd54b145ebc24d
-          name: 'SD-WAN: Authentication item errors'
+          name: 'Authentication item errors'
           type: DEPENDENT
           key: sd_wan.auth.errors
           delay: '0'
@@ -53,13 +53,13 @@ zabbix_export:
           triggers:
             - uuid: 9f98b660a10a4891910b0e3b42f90403
               expression: 'length(last(/Cisco SD-WAN by HTTP/sd_wan.auth.errors))>0'
-              name: 'SD-WAN: Authentication has failed'
+              name: 'Authentication has failed'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: availability
         - uuid: 5aa5a643a3cf42148454507da22aeb17
-          name: 'SD-WAN: Authentication'
+          name: Authentication
           type: SCRIPT
           key: sd_wan.authentication
           delay: '{$SDWAN.AUTH.FREQUENCY}'
@@ -174,7 +174,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: bbb2713e2e174c558315de8b2fd55f0f
-          name: 'SD-WAN: Get devices'
+          name: 'Get devices'
           type: DEPENDENT
           key: sd_wan.get.devices
           delay: '0'
@@ -292,7 +292,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 172dd697ad7b4b5d907b8d30faef7c52
-          name: 'SD-WAN: Get devices item errors'
+          name: 'Get devices item errors'
           type: DEPENDENT
           key: sd_wan.get.devices.errors
           delay: '0'
@@ -315,13 +315,13 @@ zabbix_export:
           triggers:
             - uuid: 9cfcfbb6b6264c19a831a71cc47483a9
               expression: 'length(last(/Cisco SD-WAN by HTTP/sd_wan.get.devices.errors))>0'
-              name: 'SD-WAN: There are errors in the ''Get devices'' metric'
+              name: 'There are errors in the ''Get devices'' metric'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: eb1ffb2430c8450981f86174ac71456e
-          name: 'SD-WAN: Invalid certificates'
+          name: 'Invalid certificates'
           type: DEPENDENT
           key: sd_wan.invalid_certificates
           delay: '0'
@@ -338,7 +338,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6ad73678b22346849ce5df9656e6edae
-          name: 'SD-WAN: Total devices'
+          name: 'Total devices'
           type: DEPENDENT
           key: sd_wan.total.devices
           delay: '0'
@@ -358,7 +358,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: aee4253ce4e143ddad3d7776ebe72055
-          name: 'SD-WAN: Number of vBond devices'
+          name: 'Number of vBond devices'
           type: DEPENDENT
           key: sd_wan.vbond.devices
           delay: '0'
@@ -378,7 +378,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8e0b166d7cac435bb74fba811c5881af
-          name: 'SD-WAN: Number of vEdge devices'
+          name: 'Number of vEdge devices'
           type: DEPENDENT
           key: sd_wan.vedge.devices
           delay: '0'
@@ -398,7 +398,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e419f8b060af44b0ad6f52d5613b0973
-          name: 'SD-WAN: Number of vManage devices'
+          name: 'Number of vManage devices'
           type: DEPENDENT
           key: sd_wan.vmanage.devices
           delay: '0'
@@ -418,7 +418,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 385cb04360ea4d34b2ae04c6879ec8fa
-          name: 'SD-WAN: Number of vSmart devices'
+          name: 'Number of vSmart devices'
           type: DEPENDENT
           key: sd_wan.vsmart.devices
           delay: '0'
@@ -646,7 +646,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: e72b66fe978e4495b07c95216ee2fb30
-          name: 'SD-WAN: Operating system architecture'
+          name: 'Operating system architecture'
           type: DEPENDENT
           key: sd_wan.device.arch
           delay: '0'
@@ -668,7 +668,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: a9565657b94b4bd5b4e82692ab3f0f9a
-          name: 'SD-WAN: Certificate validity'
+          name: 'Certificate validity'
           type: DEPENDENT
           key: sd_wan.device.certificate_validity
           delay: '0'
@@ -699,13 +699,13 @@ zabbix_export:
           triggers:
             - uuid: 8a35b69998bd4819b3f9677fd4367d59
               expression: 'last(/Cisco SD-WAN device by HTTP/sd_wan.device.certificate_validity)=1'
-              name: 'SD-WAN: Device certificate is invalid'
+              name: 'Device certificate is invalid'
               priority: WARNING
               tags:
                 - tag: scope
                   value: security
         - uuid: 8a30d4aef9c54c15a56a34ddc0f277d5
-          name: 'SD-WAN: Control connections'
+          name: 'Control connections'
           type: DEPENDENT
           key: sd_wan.device.control_conn
           delay: '0'
@@ -729,7 +729,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e8185c1ab7924a378dd4a0368b2bc96d
-          name: 'SD-WAN: Load average (1m avg)'
+          name: 'Load average (1m avg)'
           type: DEPENDENT
           key: 'sd_wan.device.cpu.load[avg1]'
           delay: '0'
@@ -747,7 +747,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 8e1b51fcdb9c49028adfe41d8e4cd07f
-          name: 'SD-WAN: Load average (5m avg)'
+          name: 'Load average (5m avg)'
           type: DEPENDENT
           key: 'sd_wan.device.cpu.load[avg5]'
           delay: '0'
@@ -765,7 +765,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e9b2cedafb0a4dde83c3f8e3ec658d9e
-          name: 'SD-WAN: Load average (15m avg)'
+          name: 'Load average (15m avg)'
           type: DEPENDENT
           key: 'sd_wan.device.cpu.load[avg15]'
           delay: '0'
@@ -783,7 +783,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 193a05a570744296b12927cdd7d5c80a
-          name: 'SD-WAN: Number of CPUs'
+          name: 'Number of CPUs'
           type: DEPENDENT
           key: sd_wan.device.cpu.num
           delay: '0'
@@ -800,7 +800,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: cbdaee2fc07f4fe9941bb9e1c1b25693
-          name: 'SD-WAN: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: sd_wan.device.cpu.util
           delay: '0'
@@ -821,13 +821,13 @@ zabbix_export:
           triggers:
             - uuid: 58cedf1e3f2e42a8a58d270ca0c385a8
               expression: 'min(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.util,5m)>{$SDWAN.CPU.UTIL.CRIT}'
-              name: 'SD-WAN: High CPU utilization'
-              event_name: 'SD-WAN: High CPU utilization (over {$SDWAN.CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$SDWAN.CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
               dependencies:
-                - name: 'SD-WAN: Load average is too high'
+                - name: 'Load average is too high'
                   expression: |
                     min(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg1],5m)/last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.num)>{$SDWAN.LA.PER.CPU.MAX.WARN}
                     and last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg5])>0
@@ -836,7 +836,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: d87ecb03ca2b48efb7a47ddde260b497
-          name: 'SD-WAN: CPU idle time'
+          name: 'CPU idle time'
           type: DEPENDENT
           key: 'sd_wan.device.cpu.util[idle]'
           delay: '0'
@@ -855,7 +855,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 3f82fb93e5d74aeaa656f23fd9647a27
-          name: 'SD-WAN: CPU system time'
+          name: 'CPU system time'
           type: DEPENDENT
           key: 'sd_wan.device.cpu.util[system]'
           delay: '0'
@@ -874,7 +874,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4f7d0c18da724f888b3f6e82f4becd7a
-          name: 'SD-WAN: CPU user time'
+          name: 'CPU user time'
           type: DEPENDENT
           key: 'sd_wan.device.cpu.util[user]'
           delay: '0'
@@ -893,7 +893,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ce17521dd90a442d86270a11e3931338
-          name: 'SD-WAN: System name'
+          name: 'System name'
           type: DEPENDENT
           key: sd_wan.device.hostname
           delay: '0'
@@ -917,8 +917,8 @@ zabbix_export:
           triggers:
             - uuid: 8658639567ed4eb5964b4543c5b3debe
               expression: 'last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname))>0'
-              name: 'SD-WAN: System name has changed'
-              event_name: 'SD-WAN: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -926,7 +926,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: dfdd804076df4050963a5270501dc759
-          name: 'SD-WAN: Available memory'
+          name: 'Available memory'
           type: DEPENDENT
           key: sd_wan.device.memory.avail
           delay: '0'
@@ -944,7 +944,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 0ad610d976644766b8997311c72c0d7c
-          name: 'SD-WAN: Memory (buffers)'
+          name: 'Memory (buffers)'
           type: DEPENDENT
           key: sd_wan.device.memory.buffers
           delay: '0'
@@ -962,7 +962,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: e344c9575c954e9584074e6cd161349b
-          name: 'SD-WAN: Memory (cached)'
+          name: 'Memory (cached)'
           type: DEPENDENT
           key: sd_wan.device.memory.cached
           delay: '0'
@@ -980,7 +980,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 90566bdf0458468e8607dd05a53efb4c
-          name: 'SD-WAN: Total memory'
+          name: 'Total memory'
           type: DEPENDENT
           key: sd_wan.device.memory.total
           delay: '0'
@@ -998,7 +998,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 80ae65af0a4c42ffb5a5b6b5179e85fc
-          name: 'SD-WAN: Used memory'
+          name: 'Used memory'
           type: DEPENDENT
           key: sd_wan.device.memory.used
           delay: '0'
@@ -1016,7 +1016,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 8b8551ab8a8c4586b2a1bc02bcc7ca60
-          name: 'SD-WAN: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: sd_wan.device.memory.util
           history: 7d
@@ -1031,13 +1031,13 @@ zabbix_export:
           triggers:
             - uuid: 0f30b8dc5ebc44ea98a860b159501f99
               expression: 'min(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.util,5m)>{$SDWAN.MEMORY.UTIL.MAX}'
-              name: 'SD-WAN: High memory utilization'
-              event_name: 'SD-WAN: High memory utilization (>{$SDWAN.MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$SDWAN.MEMORY.UTIL.MAX}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
-                - name: 'SD-WAN: Lack of available memory'
+                - name: 'Lack of available memory'
                   expression: 'max(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.avail,5m)<{$SDWAN.MEMORY.AVAILABLE.MIN} and last(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.total)>0'
               tags:
                 - tag: scope
@@ -1045,7 +1045,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 840c5d843f4f4def865a8043396a21f5
-          name: 'SD-WAN: Model name'
+          name: 'Model name'
           type: DEPENDENT
           key: sd_wan.device.model
           delay: '0'
@@ -1064,7 +1064,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 809418dac3be4dd7b8cf3024388b1a11
-          name: 'SD-WAN: Operating system'
+          name: 'Operating system'
           type: DEPENDENT
           key: sd_wan.device.os
           delay: '0'
@@ -1088,18 +1088,18 @@ zabbix_export:
           triggers:
             - uuid: b2c78cb56f7f40cfa8844f3f51293538
               expression: 'last(/Cisco SD-WAN device by HTTP/sd_wan.device.os,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.os,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.os))>0'
-              name: 'SD-WAN: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
               manual_close: 'YES'
               dependencies:
-                - name: 'SD-WAN: Device has been replaced'
+                - name: 'Device has been replaced'
                   expression: 'last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 5e9d4d61e72e4755a242f36bcf93b534
-          name: 'SD-WAN: Number of processes'
+          name: 'Number of processes'
           type: DEPENDENT
           key: sd_wan.device.proc.num
           delay: '0'
@@ -1116,7 +1116,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 60381f3d5e914ce4b281d65c212c44b6
-          name: 'SD-WAN: Device reachability'
+          name: 'Device reachability'
           type: DEPENDENT
           key: sd_wan.device.reachability
           delay: '0'
@@ -1147,7 +1147,7 @@ zabbix_export:
           triggers:
             - uuid: d35babbd678f44c3a570fc9a896c58dc
               expression: 'last(/Cisco SD-WAN device by HTTP/sd_wan.device.reachability)<>0'
-              name: 'SD-WAN: Device is not reachable'
+              name: 'Device is not reachable'
               opdata: 'Current status: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Device is not reachable to the vManager and/or the entire network.'
@@ -1155,7 +1155,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: f1cc4c623c754d17881f9217466ec21d
-          name: 'SD-WAN: Device role'
+          name: 'Device role'
           type: DEPENDENT
           key: sd_wan.device.role
           delay: '0'
@@ -1177,7 +1177,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d665ec254da44501bf7be0b78156b01f
-          name: 'SD-WAN: Serial Number'
+          name: 'Serial Number'
           type: DEPENDENT
           key: sd_wan.device.serialnumber
           delay: '0'
@@ -1198,8 +1198,8 @@ zabbix_export:
           triggers:
             - uuid: a6ad77fe04684d1fa90fac2164519b31
               expression: 'last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber))>0'
-              name: 'SD-WAN: Device has been replaced'
-              event_name: 'SD-WAN: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1207,7 +1207,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 19bc5d63eb424ecab4d8b1291191d0cd
-          name: 'SD-WAN: Device state'
+          name: 'Device state'
           type: DEPENDENT
           key: sd_wan.device.state
           delay: '0'
@@ -1235,7 +1235,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: bae48575c12941e38346df2ae00374ec
-          name: 'SD-WAN: Device state description'
+          name: 'Device state description'
           type: DEPENDENT
           key: sd_wan.device.state_descr
           delay: '0'
@@ -1256,7 +1256,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: c1ada0df07b94b1daf3881fac4c9a8d3
-          name: 'SD-WAN: System uptime'
+          name: 'System uptime'
           type: DEPENDENT
           key: sd_wan.device.uptime
           delay: '0'
@@ -1279,8 +1279,8 @@ zabbix_export:
           triggers:
             - uuid: 08ac00695a6c4e2a80dc9cb16d85de43
               expression: 'last(/Cisco SD-WAN device by HTTP/sd_wan.device.uptime)<10m'
-              name: 'SD-WAN: Device has been restarted'
-              event_name: 'SD-WAN: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Device has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'The host uptime is less than 10 minutes'
               manual_close: 'YES'
@@ -1288,7 +1288,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 818ad0a67ba749619e03a746e9489404
-          name: 'SD-WAN: Version'
+          name: Version
           type: DEPENDENT
           key: sd_wan.device.version
           delay: '0'
@@ -1310,7 +1310,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7a4cc11f131e4f7f9511ac19dbfb82f4
-          name: 'SD-WAN: Get device data'
+          name: 'Get device data'
           type: SCRIPT
           key: sd_wan.get.device
           history: '0'
@@ -1423,7 +1423,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: dfef0a5aa8054effaab44fb04df20778
-          name: 'SD-WAN: Device data item errors'
+          name: 'Device data item errors'
           type: DEPENDENT
           key: sd_wan.get.device.errors
           delay: '0'
@@ -1446,13 +1446,13 @@ zabbix_export:
           triggers:
             - uuid: 7e9b6cee9ddd47428d01d1a8cadb28fc
               expression: 'length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.device.errors))>0'
-              name: 'SD-WAN: There are errors in the ''Get device data'' metric'
+              name: 'There are errors in the ''Get device data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 694fb02640314fcab6cb2352fe4378ea
-          name: 'SD-WAN: Get interfaces data'
+          name: 'Get interfaces data'
           type: SCRIPT
           key: sd_wan.get.interfaces
           history: '0'
@@ -1574,7 +1574,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0a1427fdcaaf44a3a389a68c781497ef
-          name: 'SD-WAN: Device interfaces item errors'
+          name: 'Device interfaces item errors'
           type: DEPENDENT
           key: sd_wan.get.interfaces.errors
           delay: '0'
@@ -1597,13 +1597,13 @@ zabbix_export:
           triggers:
             - uuid: 03772a571b5c417297b11a612b48cb81
               expression: 'length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.interfaces.errors))>0'
-              name: 'SD-WAN: There are errors in the ''Get interfaces data'' metric'
+              name: 'There are errors in the ''Get interfaces data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: d9ae4a103ae74932a57ad495f2829b62
-          name: 'SD-WAN: Get routes data'
+          name: 'Get routes data'
           type: SCRIPT
           key: sd_wan.get.routes
           delay: '{$SDWAN.ROUTES.FREQUENCY}'
@@ -1777,7 +1777,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e0a8bb6a05364e9ea0467dced14ac4a6
-          name: 'SD-WAN: Device routes item errors'
+          name: 'Device routes item errors'
           type: DEPENDENT
           key: sd_wan.get.routes.errors
           delay: '0'
@@ -1800,7 +1800,7 @@ zabbix_export:
           triggers:
             - uuid: edb75d50551643c999da9e93efd0ff1b
               expression: 'length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.routes.errors))>0'
-              name: 'SD-WAN: There are errors in the ''Get routes data'' metric'
+              name: 'There are errors in the ''Get routes data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
@@ -3107,7 +3107,7 @@ zabbix_export:
   triggers:
     - uuid: fe3886ed10b94fd6b7cd99cba20809a4
       expression: 'last(/Cisco SD-WAN device by HTTP/sd_wan.device.state)<>0 and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.state_descr))>0'
-      name: 'SD-WAN: Device state is not green'
+      name: 'Device state is not green'
       opdata: 'Current state: {ITEM.LASTVALUE1}, Reason: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'The device current state is not green.'
@@ -3116,8 +3116,8 @@ zabbix_export:
           value: availability
     - uuid: 9e558d5397e34468bd845f3e3f0442ec
       expression: 'max(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.avail,5m)<{$SDWAN.MEMORY.AVAILABLE.MIN} and last(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.total)>0'
-      name: 'SD-WAN: Lack of available memory'
-      event_name: 'SD-WAN: Lack of available memory (<{$SDWAN.MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory'
+      event_name: 'Lack of available memory (<{$SDWAN.MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       tags:
@@ -3130,8 +3130,8 @@ zabbix_export:
         min(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg1],5m)/last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.num)>{$SDWAN.LA.PER.CPU.MAX.WARN}
         and last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg5])>0
         and last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg15])>0
-      name: 'SD-WAN: Load average is too high'
-      event_name: 'SD-WAN: Load average is too high (per CPU load over {$SDWAN.LA.PER.CPU.MAX.WARN} for 5m)'
+      name: 'Load average is too high'
+      event_name: 'Load average is too high (per CPU load over {$SDWAN.LA.PER.CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'The load average per CPU is too high. The system might be slow to respond.'

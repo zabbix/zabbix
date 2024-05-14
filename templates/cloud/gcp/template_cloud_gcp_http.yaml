@@ -196,7 +196,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3ac5c859692140c0b686e772efa05032
-          name: 'GCP Cloud SQL: Instances get'
+          name: 'Instances get'
           type: DEPENDENT
           key: gcp.cloudsql.instances.get
           delay: '0'
@@ -333,7 +333,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b926ba1901c5413396c1c071e6e76072
-          name: 'GCP Cloud SQL: Instances total'
+          name: 'Instances total'
           type: DEPENDENT
           key: gcp.cloudsql.instances.total
           delay: '0'
@@ -350,7 +350,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 58329c9a5b124b1990c94f15266e6edf
-          name: 'GCP Compute Engine: Container-Optimized instances count'
+          name: 'Container-Optimized instances count'
           type: DEPENDENT
           key: gcp.gce.instances.cos_count
           delay: '0'
@@ -368,7 +368,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 461e72fb7e104261831455ae3cc87358
-          name: 'GCP Compute Engine: Instances get'
+          name: 'Instances get'
           type: DEPENDENT
           key: gcp.gce.instances.get
           delay: '0'
@@ -494,7 +494,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 80687b35246b45ffa1be9d171f686e94
-          name: 'GCP Cloud SQL MSSQL: Instances count'
+          name: 'Instances count'
           type: DEPENDENT
           key: gcp.gce.instances.mssql_count
           delay: '0'
@@ -512,7 +512,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 8ec94dff7a3b47998242d97a18cf0821
-          name: 'GCP Cloud SQL MySQL: Instances count'
+          name: 'Instances count'
           type: DEPENDENT
           key: gcp.gce.instances.mysql_count
           delay: '0'
@@ -530,7 +530,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: de284dd30b2d4ecb9f7d0cf3ca80a094
-          name: 'GCP Cloud SQL PostgreSQL: Instances count'
+          name: 'Instances count'
           type: DEPENDENT
           key: gcp.gce.instances.pgsql_count
           delay: '0'
@@ -548,7 +548,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: a936207f9d914955b2e2140e953f22f2
-          name: 'GCP Compute Engine: Regular instances count'
+          name: 'Regular instances count'
           type: DEPENDENT
           key: gcp.gce.instances.regular_count
           delay: '0'
@@ -566,7 +566,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 46eaeccd1f43466caadd44440da88568
-          name: 'GCP Compute Engine: Instances total'
+          name: 'Instances total'
           type: DEPENDENT
           key: gcp.gce.instances.total
           delay: '0'
@@ -584,7 +584,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: c4f17331815345bcb0ac6ea98413b2b5
-          name: 'GCP Compute Engine: Project quotas get'
+          name: 'Project quotas get'
           type: DEPENDENT
           key: gcp.gce.quotas.get
           delay: '0'
@@ -1177,7 +1177,7 @@ zabbix_export:
           description: 'GCP Compute Engine: Quotas discovery.'
           item_prototypes:
             - uuid: 1e9a772b9a89497ba695079fc480bd0a
-              name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Limit'
+              name: 'Quota [{#GCE.QUOTA.NAME}]: Limit'
               type: DEPENDENT
               key: 'gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]'
               delay: '0'
@@ -1198,7 +1198,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: ac0d8842f0934dcead56d41f328c10d2
                   expression: 'change(/GCP by HTTP/gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]) <> 0'
-                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit has been changed'
+                  name: 'Quota [{#GCE.QUOTA.NAME}] limit has been changed'
                   opdata: 'Current limit: {ITEM.VALUE}'
                   priority: INFO
                   description: 'GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota has been changed.'
@@ -1207,7 +1207,7 @@ zabbix_export:
                     - tag: scope
                       value: capacity
             - uuid: 6bb3700f7c5c4c51b6a435f5c7d0e315
-              name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percentage used'
+              name: 'Quota [{#GCE.QUOTA.NAME}]: Percentage used'
               type: DEPENDENT
               key: 'gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]'
               delay: '0'
@@ -1233,20 +1233,20 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: ecce0204198d4edda88f84d4f25ba75c
                   expression: 'last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.WARN:"{#GCE.QUOTA.NAME}"}'
-                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is close to reaching the limit'
+                  name: 'Quota [{#GCE.QUOTA.NAME}] usage is close to reaching the limit'
                   opdata: 'Usage: {#GCE.QUOTA.USAGE} | Limit: {#GCE.QUOTA.LIMIT} | Percentage {ITEM.VALUE}%'
                   priority: WARNING
                   description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reaching the limit.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit'
+                    - name: 'Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit'
                       expression: 'last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}'
                   tags:
                     - tag: scope
                       value: capacity
                 - uuid: bc894d5e4f694e428fcb32babe87c204
                   expression: 'last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}'
-                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit'
+                  name: 'Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit'
                   opdata: 'Usage: {#GCE.QUOTA.USAGE} | Limit: {#GCE.QUOTA.LIMIT} | Percentage {ITEM.VALUE}%'
                   priority: AVERAGE
                   description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reaching the limit.'
@@ -1257,7 +1257,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: a439501636fd49f0aaf3902300d943b8
-              name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Raw data'
+              name: 'Quota [{#GCE.QUOTA.NAME}]: Raw data'
               type: DEPENDENT
               key: 'gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]'
               delay: '0'
@@ -1277,7 +1277,7 @@ zabbix_export:
                 - tag: quota
                   value: '{#GCE.QUOTA.NAME}'
             - uuid: 936c66cc59a240858f67922dcba2cbec
-              name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Usage'
+              name: 'Quota [{#GCE.QUOTA.NAME}]: Usage'
               type: DEPENDENT
               key: 'gcp.gce.quota.usage[{#GCE.QUOTA.NAME}]'
               delay: '0'
@@ -1642,7 +1642,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: a8d79cab89864c03a7614bd59f734942
-          name: 'GCP Cloud SQL MSSQL: Audits size'
+          name: 'Audits size'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.audits_size
           delay: '0'
@@ -1664,7 +1664,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 3026bc61670c496a942a94ab50b614df
-          name: 'GCP Cloud SQL MSSQL: Audits successfully uploaded'
+          name: 'Audits successfully uploaded'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.audits_upload_count
           delay: '0'
@@ -1685,7 +1685,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: d512c542f5514681acbb11431a0a6f5a
-          name: 'GCP Cloud SQL MSSQL: Connection resets'
+          name: 'Connection resets'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.connection_reset_count
           delay: '0'
@@ -1704,7 +1704,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 300a6cb53fb44176bdf99eba86a976bd
-          name: 'GCP Cloud SQL MSSQL: Login attempts'
+          name: 'Login attempts'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.login_attempt_count
           delay: '0'
@@ -1726,7 +1726,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 622c237ed12e44c7b2415676ec23bd2d
-          name: 'GCP Cloud SQL MSSQL: Logouts'
+          name: Logouts
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.logout_count
           delay: '0'
@@ -1745,7 +1745,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 6ba672cbf4c242eb8e6fb80eba4c90d8
-          name: 'GCP Cloud SQL MSSQL: Processes blocked'
+          name: 'Processes blocked'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.processes_blocked
           delay: '0'
@@ -1764,7 +1764,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 38de8ae591854d5fbc4ee4946a2e189a
-          name: 'GCP Cloud SQL MSSQL: Reserved CPU cores'
+          name: 'Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.cpu.reserved_cores
           delay: '0'
@@ -1782,7 +1782,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: cd1f9ab326ac4694b3aeea6cb4ec56ab
-          name: 'GCP Cloud SQL MSSQL: CPU usage time'
+          name: 'CPU usage time'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.cpu.usage_time
           delay: '0'
@@ -1801,7 +1801,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 42d51e38b96f472996eff1e0f9d7b931
-          name: 'GCP Cloud SQL MSSQL: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.cpu.utilization
           delay: '0'
@@ -1825,7 +1825,7 @@ zabbix_export:
           triggers:
             - uuid: b8280e45fea8470e9f36f7f08e4a77e1
               expression: 'min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.cpu.utilization,5m) >= {$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}'
-              name: 'GCP Cloud SQL MSSQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -1833,7 +1833,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: ecdd1774ef744bcb93e8e4094e29772f
-          name: 'GCP Cloud SQL MSSQL: Databases get'
+          name: 'Databases get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.db.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -1951,7 +1951,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9806c645a10a4e1d8fbb39eb1d3ac993
-          name: 'GCP Cloud SQL MSSQL: DB engine state'
+          name: 'DB engine state'
           type: HTTP_AGENT
           key: gcp.cloudsql.mssql.db.state
           history: 7d
@@ -1987,30 +1987,30 @@ zabbix_export:
               expression: |
                 last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0
                 
-              name: 'GCP Cloud SQL MSSQL: Database engine is down'
+              name: 'Database engine is down'
               priority: AVERAGE
               description: |
                 Database engine is down.
                 If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.
                 
               dependencies:
-                - name: 'GCP Cloud SQL MSSQL: Failed to get the instance state'
+                - name: 'Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in failed state'
+                - name: 'Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in maintenance'
+                - name: 'Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
+                - name: 'Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in unknown state'
+                - name: 'Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
-                - name: 'GCP Cloud SQL MSSQL: Instance is stopped by the owner'
+                - name: 'Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2'
               tags:
                 - tag: scope
                   value: availability
         - uuid: cd6cf3870a514ff59bd1f40987764642
-          name: 'GCP Cloud SQL MSSQL: Disk bytes used'
+          name: 'Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.bytes_used
           delay: '0'
@@ -2028,7 +2028,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 86bdbf20c9b4466c9ea00e26cb0f0652
-          name: 'GCP Cloud SQL MSSQL: Disk size'
+          name: 'Disk size'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.quota
           delay: '0'
@@ -2046,7 +2046,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 400a7318203f40928ebf0b023da65848
-          name: 'GCP Cloud SQL MSSQL: Disk read I/O'
+          name: 'Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.read_ops_count
           delay: '0'
@@ -2063,7 +2063,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 1d0c09441d9d4333b7be32c3d69bad47
-          name: 'GCP Cloud SQL MSSQL: Disk utilization'
+          name: 'Disk utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.utilization
           delay: '0'
@@ -2090,7 +2090,7 @@ zabbix_export:
           triggers:
             - uuid: 2cbc7e3008f24197963df4ea920ab5a8
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}'
-              name: 'GCP Cloud SQL MSSQL: Disk space is critically low'
+              name: 'Disk space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: 'Critical utilization of the disk space.'
@@ -2099,18 +2099,18 @@ zabbix_export:
                   value: capacity
             - uuid: 2569abbb94ca4df38cdd4f9d5a5df9fc
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}'
-              name: 'GCP Cloud SQL MSSQL: Disk space is low'
+              name: 'Disk space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: WARNING
               description: 'High utilization of the storage space.'
               dependencies:
-                - name: 'GCP Cloud SQL MSSQL: Disk space is critically low'
+                - name: 'Disk space is critically low'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 819078cd99af46368eb33d76dadf4861
-          name: 'GCP Cloud SQL MSSQL: Disk write I/O'
+          name: 'Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.write_ops_count
           delay: '0'
@@ -2127,7 +2127,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 556c96cf1bf342f99c69dc47813f221e
-          name: 'GCP Cloud SQL MSSQL: Instance state'
+          name: 'Instance state'
           type: HTTP_AGENT
           key: gcp.cloudsql.mssql.inst.state
           history: 7d
@@ -2172,7 +2172,7 @@ zabbix_export:
           triggers:
             - uuid: dff9067ad7de4ab1a4f83c9d482e6b71
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10'
-              name: 'GCP Cloud SQL MSSQL: Failed to get the instance state'
+              name: 'Failed to get the instance state'
               priority: AVERAGE
               description: |
                 Failed to get the instance state. 
@@ -2183,7 +2183,7 @@ zabbix_export:
                   value: availability
             - uuid: 3d7e054340e94b09b085e508b9b76841
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
-              name: 'GCP Cloud SQL MSSQL: Instance is in failed state'
+              name: 'Instance is in failed state'
               priority: AVERAGE
               description: |
                 The instance creation failed, or an operation left the instance in an own bad state.
@@ -2193,7 +2193,7 @@ zabbix_export:
                   value: availability
             - uuid: dd395fd3003f4fce847cd72309cdf7ec
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
-              name: 'GCP Cloud SQL MSSQL: Instance is in maintenance'
+              name: 'Instance is in maintenance'
               priority: INFO
               description: 'The instance is down for maintenance.'
               tags:
@@ -2201,7 +2201,7 @@ zabbix_export:
                   value: availability
             - uuid: 3c080bba511e44aab1139b66f00451ee
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
-              name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
+              name: 'Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in suspended state. 
@@ -2212,7 +2212,7 @@ zabbix_export:
                   value: availability
             - uuid: 378b4d62582d416db7cb7fd6ed099ac9
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
-              name: 'GCP Cloud SQL MSSQL: Instance is in unknown state'
+              name: 'Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -2222,7 +2222,7 @@ zabbix_export:
                   value: availability
             - uuid: 72ecba08f6424573a36b816da9695b89
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2'
-              name: 'GCP Cloud SQL MSSQL: Instance is stopped by the owner'
+              name: 'Instance is stopped by the owner'
               priority: INFO
               description: |
                 The instance has been stopped by the owner. 
@@ -2232,7 +2232,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: a29584de7ab142309f0bb6f57b52af85
-          name: 'GCP Cloud SQL MSSQL: Buffer cache hit ratio'
+          name: 'Buffer cache hit ratio'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio
           delay: '0'
@@ -2254,7 +2254,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: f8460bbac21c44a98a31a49daf7f692f
-          name: 'GCP Cloud SQL MSSQL: Checkpoint pages'
+          name: 'Checkpoint pages'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.checkpoint_page_count
           delay: '0'
@@ -2271,7 +2271,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: cc6a5230c7a2447e8038cdbe52105da4
-          name: 'GCP Cloud SQL MSSQL: Free list stalls'
+          name: 'Free list stalls'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.free_list_stall_count
           delay: '0'
@@ -2288,7 +2288,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d86e328fc5fa4c3d938a4959075299b5
-          name: 'GCP Cloud SQL MSSQL: Lazy writes'
+          name: 'Lazy writes'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.lazy_write_count
           delay: '0'
@@ -2310,7 +2310,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 2fa0744221884109951ce62d3bb9aaaf
-          name: 'GCP Cloud SQL MSSQL: Memory grants pending'
+          name: 'Memory grants pending'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.memory_grants_pending
           delay: '0'
@@ -2327,7 +2327,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 3dcad151d0c04f8eb0e8e81c00de23c8
-          name: 'GCP Cloud SQL MSSQL: Page life expectancy'
+          name: 'Page life expectancy'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.page_life_expectancy
           delay: '0'
@@ -2345,7 +2345,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 4d87a50d490348afbaf751857beb5b61
-          name: 'GCP Cloud SQL MSSQL: Read page operations'
+          name: 'Read page operations'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.page_ops.read
           delay: '0'
@@ -2365,7 +2365,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 41654bd730b744acbc0ea6de07c992f3
-          name: 'GCP Cloud SQL MSSQL: Write age operations'
+          name: 'Write age operations'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.page_ops.write
           delay: '0'
@@ -2385,7 +2385,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: db943300803847718c52d0d33988d81e
-          name: 'GCP Cloud SQL MSSQL: Memory size'
+          name: 'Memory size'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.quota
           delay: '0'
@@ -2403,7 +2403,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 21b075a5f95d4c93888b7a0766fdcea5
-          name: 'GCP Cloud SQL MSSQL: Memory used by DB engine'
+          name: 'Memory used by DB engine'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.total_usage
           delay: '0'
@@ -2424,7 +2424,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 05d1ff573371416dad9ee028247b1cf3
-          name: 'GCP Cloud SQL MSSQL: Memory usage'
+          name: 'Memory usage'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.usage
           delay: '0'
@@ -2445,7 +2445,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 4e11944fb7624ffdb02b5d1bb5bedf7a
-          name: 'GCP Cloud SQL MSSQL: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.utilization
           delay: '0'
@@ -2469,7 +2469,7 @@ zabbix_export:
           triggers:
             - uuid: c5003533f3524b8b868a0c2f86b1fa9b
               expression: 'min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.memory.utilization,5m) >= {$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}'
-              name: 'GCP Cloud SQL MSSQL: High memory utilization'
+              name: 'High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
               description: 'RAM utilization is too high. The system might be slow to respond.'
@@ -2477,7 +2477,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 6de08b07cecc47a88bde22de5d1b4e5a
-          name: 'GCP Cloud SQL MSSQL: Metrics get'
+          name: 'Metrics get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -2697,7 +2697,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 393b6117008d4925be9474afc9c7cdf9
-          name: 'GCP Cloud SQL MSSQL: Connections'
+          name: Connections
           type: DEPENDENT
           key: gcp.cloudsql.mssql.network.connections
           delay: '0'
@@ -2716,7 +2716,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 297744bfcdd84565b828e1c6912beb46
-          name: 'GCP Cloud SQL MSSQL: Network: Received bytes'
+          name: 'Network: Received bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.network.received_bytes_count
           delay: '0'
@@ -2736,7 +2736,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: b362d14169b34f00ab3fa94b89a1b362
-          name: 'GCP Cloud SQL MSSQL: Network: Sent bytes'
+          name: 'Network: Sent bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.network.sent_bytes_count
           delay: '0'
@@ -2756,7 +2756,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 7ee117702e1f40faadd901faa9d333ff
-          name: 'GCP Cloud SQL MSSQL: Resources get'
+          name: 'Resources get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.resources.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -2875,7 +2875,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3c14882329b94b8e88ca5d85e21bb7c8
-          name: 'GCP Cloud SQL MSSQL: Schedulers get'
+          name: 'Schedulers get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.schedulers.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -2990,7 +2990,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7d2c28a537e44ee284e4b5d186b935d6
-          name: 'GCP Cloud SQL MSSQL: Batch requests'
+          name: 'Batch requests'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.batch_request_count
           delay: '0'
@@ -3007,7 +3007,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 774cffa1a1f24d778f346bea24926690
-          name: 'GCP Cloud SQL MSSQL: Forwarded records'
+          name: 'Forwarded records'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.forwarded_record_count
           delay: '0'
@@ -3024,7 +3024,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: f80a924d20c4470496202d3e32261e7d
-          name: 'GCP Cloud SQL MSSQL: Full scans'
+          name: 'Full scans'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.full_scan_count
           delay: '0'
@@ -3044,7 +3044,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: cd6f91964b7041bb929c6f6f3430cc75
-          name: 'GCP Cloud SQL MSSQL: Page splits'
+          name: 'Page splits'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.page_split_count
           delay: '0'
@@ -3061,7 +3061,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 0b431016ca8245dea8e33c252a9a7c9b
-          name: 'GCP Cloud SQL MSSQL: Probe scans'
+          name: 'Probe scans'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.probe_scan_count
           delay: '0'
@@ -3078,7 +3078,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: bf4eb81de038452cb3af16b4efcdb4c5
-          name: 'GCP Cloud SQL MSSQL: SQL compilations'
+          name: 'SQL compilations'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.sql_compilation_count
           delay: '0'
@@ -3095,7 +3095,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 39c350f5d1f94726b03c435e9e5e3110
-          name: 'GCP Cloud SQL MSSQL: SQL recompilations'
+          name: 'SQL recompilations'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.sql_recompilation_count
           delay: '0'
@@ -3130,7 +3130,7 @@ zabbix_export:
           description: 'Databases discovery.'
           item_prototypes:
             - uuid: 8f6deafa9efd416797ea58d1fce41c29
-              name: 'GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Log bytes flushed'
+              name: 'Database [{#DB.NAME}]: Log bytes flushed'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.db.log_bytes_flushed_count[{#DB.NAME}]'
               delay: '0'
@@ -3150,7 +3150,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DB.NAME}'
             - uuid: b52f757bc2b341e891f60e15795088ca
-              name: 'GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Raw data'
+              name: 'Database [{#DB.NAME}]: Raw data'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.db.raw[{#DB.NAME}]'
               delay: '0'
@@ -3170,7 +3170,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DB.NAME}'
             - uuid: 9f8d37a25e1041c087bbea8d670cce46
-              name: 'GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Transactions started'
+              name: 'Database [{#DB.NAME}]: Transactions started'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.db.transaction_count[{#DB.NAME}]'
               delay: '0'
@@ -3215,7 +3215,7 @@ zabbix_export:
           description: 'Resources discovery.'
           item_prototypes:
             - uuid: 55bb12000dca46e096045da83a46edea
-              name: 'GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Deadlocks'
+              name: 'Resource [{#RESOURCE.NAME}]: Deadlocks'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.resource.deadlock_count[{#RESOURCE.NAME}]'
               delay: '0'
@@ -3234,7 +3234,7 @@ zabbix_export:
                 - tag: resource
                   value: '{#RESOURCE.NAME}'
             - uuid: 0117dba440f34461959490efaff059e2
-              name: 'GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Lock waits'
+              name: 'Resource [{#RESOURCE.NAME}]: Lock waits'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.resource.lock_wait_count[{#RESOURCE.NAME}]'
               delay: '0'
@@ -3253,7 +3253,7 @@ zabbix_export:
                 - tag: resource
                   value: '{#RESOURCE.NAME}'
             - uuid: 6e8b5646d70b470fa18960c7b43a9aff
-              name: 'GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Lock wait time'
+              name: 'Resource [{#RESOURCE.NAME}]: Lock wait time'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.resource.lock_wait_time[{#RESOURCE.NAME}]'
               delay: '0'
@@ -3273,7 +3273,7 @@ zabbix_export:
                 - tag: resource
                   value: '{#RESOURCE.NAME}'
             - uuid: 0cc16595d1e044db947084a44786aaaa
-              name: 'GCP Cloud SQL MSSQL: Resource [{#RESOURCE.NAME}]: Raw data'
+              name: 'Resource [{#RESOURCE.NAME}]: Raw data'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.resource.raw[{#RESOURCE.NAME}]'
               delay: '0'
@@ -3319,7 +3319,7 @@ zabbix_export:
           description: 'Schedulers discovery.'
           item_prototypes:
             - uuid: 67bde61c128e4dfe9e47d8a3a6e3ceec
-              name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers'
+              name: 'Scheduler [{#SCHEDULER.ID}]: Active workers'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.active_workers[{#SCHEDULER.ID}]'
               delay: '0'
@@ -3341,7 +3341,7 @@ zabbix_export:
                 - tag: scheduler
                   value: '{#SCHEDULER.ID}'
             - uuid: fc5113b2b5f64205ad9d100bd480adea
-              name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current tasks'
+              name: 'Scheduler [{#SCHEDULER.ID}]: Current tasks'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.current_tasks[{#SCHEDULER.ID}]'
               delay: '0'
@@ -3363,7 +3363,7 @@ zabbix_export:
                 - tag: scheduler
                   value: '{#SCHEDULER.ID}'
             - uuid: 6602f8d26a9a46fb8ed74a40d10f36e4
-              name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current workers'
+              name: 'Scheduler [{#SCHEDULER.ID}]: Current workers'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.current_workers[{#SCHEDULER.ID}]'
               delay: '0'
@@ -3385,7 +3385,7 @@ zabbix_export:
                 - tag: scheduler
                   value: '{#SCHEDULER.ID}'
             - uuid: 2022a85bb7c04e73a75136e55162084a
-              name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Pending I/O operations'
+              name: 'Scheduler [{#SCHEDULER.ID}]: Pending I/O operations'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.pending_disk_io[{#SCHEDULER.ID}]'
               delay: '0'
@@ -3410,7 +3410,7 @@ zabbix_export:
                 - tag: scheduler
                   value: '{#SCHEDULER.ID}'
             - uuid: c3e337845c344f4cb0d14a5e7d22cbb7
-              name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Raw data'
+              name: 'Scheduler [{#SCHEDULER.ID}]: Raw data'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]'
               delay: '0'
@@ -3430,7 +3430,7 @@ zabbix_export:
                 - tag: scheduler
                   value: '{#SCHEDULER.ID}'
             - uuid: a9852ac0cdcc423fad6b305eb57eedf1
-              name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Runnable tasks'
+              name: 'Scheduler [{#SCHEDULER.ID}]: Runnable tasks'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.runnable_tasks[{#SCHEDULER.ID}]'
               delay: '0'
@@ -3449,7 +3449,7 @@ zabbix_export:
                 - tag: scheduler
                   value: '{#SCHEDULER.ID}'
             - uuid: eaae59fb97124471b1c7c30c601dba1f
-              name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Work queue'
+              name: 'Scheduler [{#SCHEDULER.ID}]: Work queue'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.work_queue[{#SCHEDULER.ID}]'
               delay: '0'
@@ -3763,7 +3763,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: e66fe8bb6f924cb088ec57b215fe21d7
-          name: 'GCP Cloud SQL MSSQL: Bytes sent to replica'
+          name: 'Bytes sent to replica'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.bytes_sent_to_replica_count
           delay: '0'
@@ -3785,7 +3785,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 4100432768354e1ca7349a901bccbe85
-          name: 'GCP Cloud SQL MSSQL: Log apply pending queue'
+          name: 'Log apply pending queue'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.log_apply_pending_queue
           delay: '0'
@@ -3802,7 +3802,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: d060637548af434e926ed833083d9fa0
-          name: 'GCP Cloud SQL MSSQL: Log bytes received'
+          name: 'Log bytes received'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.log_bytes_received_count
           delay: '0'
@@ -3820,7 +3820,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: f0d4c711863f4ca9ad76b0099a66a86d
-          name: 'GCP Cloud SQL MSSQL: Replica metrics get'
+          name: 'Replica metrics get'
           type: SCRIPT
           key: gcp.cloudsql.mssql.repl.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -3942,7 +3942,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 4ec364fea7894df29813b65c2d170367
-          name: 'GCP Cloud SQL MSSQL: Recovery queue'
+          name: 'Recovery queue'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.recovery_queue
           delay: '0'
@@ -3963,7 +3963,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 37c145777926471482ecffd1b6cca792
-          name: 'GCP Cloud SQL MSSQL: Redone bytes'
+          name: 'Redone bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.redone_bytes_count
           delay: '0'
@@ -3981,7 +3981,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 23911902d27e4fa68435935aeeec28e1
-          name: 'GCP Cloud SQL MSSQL: Resent messages'
+          name: 'Resent messages'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.resent_message_count
           delay: '0'
@@ -4079,7 +4079,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 83e36c61e8ce4d06a395ea7b06c5877b
-          name: 'GCP Cloud SQL MySQL: Reserved CPU cores'
+          name: 'Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.cpu.reserved_cores
           delay: '0'
@@ -4097,7 +4097,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: a39ba253dbf24110af48fd49572976fd
-          name: 'GCP Cloud SQL MySQL: CPU usage time'
+          name: 'CPU usage time'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.cpu.usage_time
           delay: '0'
@@ -4116,7 +4116,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: df7469e3c76c4286846c27003c9785cc
-          name: 'GCP Cloud SQL MySQL: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.cpu.utilization
           delay: '0'
@@ -4140,7 +4140,7 @@ zabbix_export:
           triggers:
             - uuid: 5bf54c01665549c8a05f49db34c86191
               expression: 'min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.cpu.utilization,5m) >= {$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}'
-              name: 'GCP Cloud SQL MySQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -4148,7 +4148,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 948dac37023c4efcaf5f830ba5d4fafe
-          name: 'GCP Cloud SQL MySQL: DB engine state'
+          name: 'DB engine state'
           type: HTTP_AGENT
           key: gcp.cloudsql.mysql.db.state
           history: 7d
@@ -4184,30 +4184,30 @@ zabbix_export:
               expression: |
                 last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0
                 
-              name: 'GCP Cloud SQL MySQL: Database engine is down'
+              name: 'Database engine is down'
               priority: AVERAGE
               description: |
                 Database engine is down.
                 If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.
                 
               dependencies:
-                - name: 'GCP Cloud SQL MySQL: Failed to get the instance state'
+                - name: 'Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10'
-                - name: 'GCP Cloud SQL MySQL: Instance is in failed state'
+                - name: 'Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
-                - name: 'GCP Cloud SQL MySQL: Instance is in maintenance'
+                - name: 'Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
-                - name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
+                - name: 'Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
-                - name: 'GCP Cloud SQL MySQL: Instance is in unknown state'
+                - name: 'Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
-                - name: 'GCP Cloud SQL MySQL: Instance is stopped by the owner'
+                - name: 'Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 76c37760145d43f3927f1a9548dea8a5
-          name: 'GCP Cloud SQL MySQL: Disk bytes used'
+          name: 'Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.bytes_used
           delay: '0'
@@ -4225,7 +4225,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 464fecbbedd64e988739c93736d2b824
-          name: 'GCP Cloud SQL MySQL: Disk size'
+          name: 'Disk size'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.quota
           delay: '0'
@@ -4243,7 +4243,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d426d282d2ee43fe9c9b64dcb6d0c4c9
-          name: 'GCP Cloud SQL MySQL: Disk read I/O'
+          name: 'Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.read_ops_count
           delay: '0'
@@ -4260,7 +4260,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b2274d47be5041b493b00fd55172c0e9
-          name: 'GCP Cloud SQL MySQL: Disk utilization'
+          name: 'Disk utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.utilization
           delay: '0'
@@ -4287,7 +4287,7 @@ zabbix_export:
           triggers:
             - uuid: d5ade16fb0494ca6af61100a2e643702
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}'
-              name: 'GCP Cloud SQL MySQL: Disk space is critically low'
+              name: 'Disk space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: 'Critical utilization of the disk space.'
@@ -4296,18 +4296,18 @@ zabbix_export:
                   value: capacity
             - uuid: 3b5c84fee47f4376b19d0738b261c01b
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}'
-              name: 'GCP Cloud SQL MySQL: Disk space is low'
+              name: 'Disk space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: WARNING
               description: 'High utilization of the storage space.'
               dependencies:
-                - name: 'GCP Cloud SQL MySQL: Disk space is critically low'
+                - name: 'Disk space is critically low'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 7a44187c6a404defb0dc83fa22f89d96
-          name: 'GCP Cloud SQL MySQL: Disk write I/O'
+          name: 'Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.write_ops_count
           delay: '0'
@@ -4324,7 +4324,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 5e5b9cdfa7f2455b881cceface136e65
-          name: 'GCP Cloud SQL MySQL: InnoDB dirty pages'
+          name: 'InnoDB dirty pages'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_dirty
           delay: '0'
@@ -4343,7 +4343,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 75835c8326e6461d8f25fb7d55271f16
-          name: 'GCP Cloud SQL MySQL: InnoDB free pages'
+          name: 'InnoDB free pages'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_free
           delay: '0'
@@ -4362,7 +4362,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 080d5304c0e346808bd70b125a27be4b
-          name: 'GCP Cloud SQL MySQL: InnoDB total pages'
+          name: 'InnoDB total pages'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_total
           delay: '0'
@@ -4381,7 +4381,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 19e259f61fc24e29a189c35121878eb3
-          name: 'GCP Cloud SQL MySQL: InnoDB fsync calls'
+          name: 'InnoDB fsync calls'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_data_fsyncs
           delay: '0'
@@ -4400,7 +4400,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: c4a4ffa274974041bccbd25643ff9f70
-          name: 'GCP Cloud SQL MySQL: InnoDB log fsync calls'
+          name: 'InnoDB log fsync calls'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_os_log_fsyncs
           delay: '0'
@@ -4419,7 +4419,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 4a9154e235e84c0d9dbf0abf44479f49
-          name: 'GCP Cloud SQL MySQL: InnoDB pages read'
+          name: 'InnoDB pages read'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_pages_read
           delay: '0'
@@ -4438,7 +4438,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 584714b219034bbebbc24edad36704c9
-          name: 'GCP Cloud SQL MySQL: InnoDB pages written'
+          name: 'InnoDB pages written'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_pages_written
           delay: '0'
@@ -4457,7 +4457,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 71559008ad444772b0b1212f715980ed
-          name: 'GCP Cloud SQL MySQL: Instance state'
+          name: 'Instance state'
           type: HTTP_AGENT
           key: gcp.cloudsql.mysql.inst.state
           history: 7d
@@ -4502,7 +4502,7 @@ zabbix_export:
           triggers:
             - uuid: 3b3adc89e0bb45a79a824121f49d2d02
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10'
-              name: 'GCP Cloud SQL MySQL: Failed to get the instance state'
+              name: 'Failed to get the instance state'
               priority: AVERAGE
               description: |
                 Failed to get the instance state. 
@@ -4513,7 +4513,7 @@ zabbix_export:
                   value: availability
             - uuid: 65831fed3d19425c86933db4034ed565
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
-              name: 'GCP Cloud SQL MySQL: Instance is in failed state'
+              name: 'Instance is in failed state'
               priority: AVERAGE
               description: |
                 The instance creation failed, or an operation left the instance in an own bad state.
@@ -4523,7 +4523,7 @@ zabbix_export:
                   value: availability
             - uuid: fae15d1ab46c418ebfdfdd73fb698b51
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
-              name: 'GCP Cloud SQL MySQL: Instance is in maintenance'
+              name: 'Instance is in maintenance'
               priority: INFO
               description: 'The instance is down for maintenance.'
               tags:
@@ -4531,7 +4531,7 @@ zabbix_export:
                   value: availability
             - uuid: 347215d307c8465cad41198f12b5ff68
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
-              name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
+              name: 'Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in suspended state. 
@@ -4542,7 +4542,7 @@ zabbix_export:
                   value: availability
             - uuid: 1387f9a2ef194d5bb5d1e548fc4eb8d3
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
-              name: 'GCP Cloud SQL MySQL: Instance is in unknown state'
+              name: 'Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -4552,7 +4552,7 @@ zabbix_export:
                   value: availability
             - uuid: 9c66317433a24be985559fdb11907c70
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2'
-              name: 'GCP Cloud SQL MySQL: Instance is stopped by the owner'
+              name: 'Instance is stopped by the owner'
               priority: INFO
               description: |
                 The instance has been stopped by the owner. 
@@ -4562,7 +4562,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: cc09f5591b0242b3b99199b267a1c527
-          name: 'GCP Cloud SQL MySQL: Memory size'
+          name: 'Memory size'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.memory.quota
           delay: '0'
@@ -4580,7 +4580,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 13868b9408c9489296531bf1fd927084
-          name: 'GCP Cloud SQL MySQL: Memory used by DB engine'
+          name: 'Memory used by DB engine'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.memory.total_usage
           delay: '0'
@@ -4601,7 +4601,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 995d07fc814f4d12a9c9bdc6bb52481d
-          name: 'GCP Cloud SQL MySQL: Memory usage'
+          name: 'Memory usage'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.memory.usage
           delay: '0'
@@ -4622,7 +4622,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: efe4357a63ec43f799b2303a952c1378
-          name: 'GCP Cloud SQL MySQL: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.memory.utilization
           delay: '0'
@@ -4646,7 +4646,7 @@ zabbix_export:
           triggers:
             - uuid: 82e3af43d3104b4ba641e0be56d11662
               expression: 'min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.memory.utilization,5m) >= {$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}'
-              name: 'GCP Cloud SQL MySQL: High memory utilization'
+              name: 'High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
               description: 'RAM utilization is too high. The system might be slow to respond.'
@@ -4654,7 +4654,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 682484eaf1db4a239c69566a5cd492e2
-          name: 'GCP Cloud SQL MySQL: Metrics get'
+          name: 'Metrics get'
           type: SCRIPT
           key: gcp.cloudsql.mysql.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -4818,7 +4818,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9ddae405a9b343759d03b5b29c469d18
-          name: 'GCP Cloud SQL MySQL: Connections'
+          name: Connections
           type: DEPENDENT
           key: gcp.cloudsql.mysql.network.connections
           delay: '0'
@@ -4837,7 +4837,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: d970d8e209df4b2a810c2e59f39fa429
-          name: 'GCP Cloud SQL MySQL: Network: Received bytes'
+          name: 'Network: Received bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.network.received_bytes_count
           delay: '0'
@@ -4857,7 +4857,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 977e4e22ebfc4a19a228a8935d9a342c
-          name: 'GCP Cloud SQL MySQL: Network: Sent bytes'
+          name: 'Network: Sent bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.network.sent_bytes_count
           delay: '0'
@@ -4877,7 +4877,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 1d651976f70944acb31cd0430e70d422
-          name: 'GCP Cloud SQL MySQL: Open tables'
+          name: 'Open tables'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.open_tables
           delay: '0'
@@ -4894,7 +4894,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: 1606766c63bf4aa1ade24a34650eef05
-          name: 'GCP Cloud SQL MySQL: Open table definitions'
+          name: 'Open table definitions'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.open_table_definitions
           delay: '0'
@@ -4911,7 +4911,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: 3d3ec2e37bf94fb68c40967b56dfd95c
-          name: 'GCP Cloud SQL MySQL: Network: Bytes received by MySQL'
+          name: 'Network: Bytes received by MySQL'
           type: DEPENDENT
           key: gcp.cloudsql.mysql_received_bytes_count
           delay: '0'
@@ -4931,7 +4931,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: f926beb31be44dc0bfb30c571fac280a
-          name: 'GCP Cloud SQL MySQL: Network: Bytes sent by MySQL'
+          name: 'Network: Bytes sent by MySQL'
           type: DEPENDENT
           key: gcp.cloudsql.mysql_sent_bytes_count
           delay: '0'
@@ -4951,7 +4951,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: bbdeb595ab1b44d7a332fbf0c2637403
-          name: 'GCP Cloud SQL MySQL: Queries'
+          name: Queries
           type: DEPENDENT
           key: gcp.cloudsql.queries
           delay: '0'
@@ -4968,7 +4968,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 114fb26dcdc1441c84c150c7809b3400
-          name: 'GCP Cloud SQL MySQL: Questions'
+          name: Questions
           type: DEPENDENT
           key: gcp.cloudsql.questions
           delay: '0'
@@ -5220,7 +5220,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 17aa9eb4749e46be9b0b0f93ef011fca
-          name: 'GCP Cloud SQL MySQL: Last I/O thread error number'
+          name: 'Last I/O thread error number'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.last_io_errno
           delay: '0'
@@ -5237,7 +5237,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 52c11965a2fc4d37a97ebccc04ee7b80
-          name: 'GCP Cloud SQL MySQL: Last SQL thread error number'
+          name: 'Last SQL thread error number'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.last_sql_errno
           delay: '0'
@@ -5254,7 +5254,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 470200d2cca348bb8a670a2be3a270e3
-          name: 'GCP Cloud SQL MySQL: Replica metrics get'
+          name: 'Replica metrics get'
           type: SCRIPT
           key: gcp.cloudsql.mysql.repl.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -5393,7 +5393,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e84ac3a2537848b29024659ab5e3a0e9
-          name: 'GCP Cloud SQL MySQL: Network lag'
+          name: 'Network lag'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.network_lag
           delay: '0'
@@ -5411,7 +5411,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: b5f9960de9414975ac48357844a15860
-          name: 'GCP Cloud SQL MySQL: Replication lag'
+          name: 'Replication lag'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.replica_lag
           delay: '0'
@@ -5429,7 +5429,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 0c093a0416f24afb96fc28a7abb283d4
-          name: 'GCP Cloud SQL MySQL: Slave I/O thread running'
+          name: 'Slave I/O thread running'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.slave_io_running
           delay: '0'
@@ -5460,7 +5460,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 994d92340dd146a381f2e6bbebd1c3f2
-          name: 'GCP Cloud SQL MySQL: Slave SQL thread running'
+          name: 'Slave SQL thread running'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.slave_sql_running
           delay: '0'
@@ -5482,7 +5482,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 90a9154072164b5c89d715fa77e7e2b0
-          name: 'GCP Cloud SQL MySQL: Replication state'
+          name: 'Replication state'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.state
           delay: '0'
@@ -5674,7 +5674,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 396a555958514890af339f4504a96cc6
-          name: 'GCP Cloud SQL PostgreSQL: Reserved CPU cores'
+          name: 'Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.cpu.reserved_cores
           delay: '0'
@@ -5692,7 +5692,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: aa2e6d9118ed4b198ed9a28932ea8539
-          name: 'GCP Cloud SQL PostgreSQL: CPU usage time'
+          name: 'CPU usage time'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.cpu.usage_time
           delay: '0'
@@ -5711,7 +5711,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: cb7cd1b74e4944d88334f22d25b985fa
-          name: 'GCP Cloud SQL PostgreSQL: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.cpu.utilization
           delay: '0'
@@ -5735,7 +5735,7 @@ zabbix_export:
           triggers:
             - uuid: 3ca3942121bd41029645a19fd3947416
               expression: 'min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.cpu.utilization,5m) >= {$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}'
-              name: 'GCP Cloud SQL PostgreSQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -5743,7 +5743,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 27ad9640bf734dd49548c19241cc4838
-          name: 'GCP Cloud SQL PostgreSQL: DB engine state'
+          name: 'DB engine state'
           type: HTTP_AGENT
           key: gcp.cloudsql.pgsql.db.state
           history: 7d
@@ -5779,30 +5779,30 @@ zabbix_export:
               expression: |
                 last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0
                 
-              name: 'GCP Cloud SQL PostgreSQL: Database engine is down'
+              name: 'Database engine is down'
               priority: AVERAGE
               description: |
                 Database engine is down.
                 If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.
                 
               dependencies:
-                - name: 'GCP Cloud SQL PostgreSQL: Failed to get the instance state'
+                - name: 'Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in failed state'
+                - name: 'Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in maintenance'
+                - name: 'Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
+                - name: 'Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in unknown state'
+                - name: 'Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is stopped by the owner'
+                - name: 'Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 799cad827e8b44d98b8285b08153842d
-          name: 'GCP Cloud SQL PostgreSQL: Disk bytes used'
+          name: 'Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.bytes_used
           delay: '0'
@@ -5820,7 +5820,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 470510bf76fb47fbbddfc8c4a711a335
-          name: 'GCP Cloud SQL PostgreSQL: Disk size'
+          name: 'Disk size'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.quota
           delay: '0'
@@ -5838,7 +5838,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: f12ba5129c2d435389f4fb6964294381
-          name: 'GCP Cloud SQL PostgreSQL: Disk read I/O'
+          name: 'Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.read_ops_count
           delay: '0'
@@ -5855,7 +5855,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e2d6702514b941cb9586cb98786c6a01
-          name: 'GCP Cloud SQL PostgreSQL: Disk utilization'
+          name: 'Disk utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.utilization
           delay: '0'
@@ -5882,7 +5882,7 @@ zabbix_export:
           triggers:
             - uuid: c4fa1d580ffd4546b82605f94da5d2ba
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}'
-              name: 'GCP Cloud SQL PostgreSQL: Disk space is critically low'
+              name: 'Disk space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: 'Critical utilization of the disk space.'
@@ -5891,18 +5891,18 @@ zabbix_export:
                   value: capacity
             - uuid: 186a707ca3194c32a894ae809177a7e2
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}'
-              name: 'GCP Cloud SQL PostgreSQL: Disk space is low'
+              name: 'Disk space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: WARNING
               description: 'High utilization of the storage space.'
               dependencies:
-                - name: 'GCP Cloud SQL PostgreSQL: Disk space is critically low'
+                - name: 'Disk space is critically low'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 8d8d6c13cdb244cb80c03226b7c14a90
-          name: 'GCP Cloud SQL PostgreSQL: Disk write I/O'
+          name: 'Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.write_ops_count
           delay: '0'
@@ -5919,7 +5919,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 88fd41960538460ebfd2ed9194677cd1
-          name: 'GCP Cloud SQL PostgreSQL: Instance state'
+          name: 'Instance state'
           type: HTTP_AGENT
           key: gcp.cloudsql.pgsql.inst.state
           history: 7d
@@ -5964,7 +5964,7 @@ zabbix_export:
           triggers:
             - uuid: 596020e32d0c4193a6626c960b4b5be8
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10'
-              name: 'GCP Cloud SQL PostgreSQL: Failed to get the instance state'
+              name: 'Failed to get the instance state'
               priority: AVERAGE
               description: |
                 Failed to get the instance state. 
@@ -5975,7 +5975,7 @@ zabbix_export:
                   value: availability
             - uuid: 1a2efb6f755444c0bab85d2778018eb1
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in failed state'
+              name: 'Instance is in failed state'
               priority: AVERAGE
               description: |
                 The instance creation failed, or an operation left the instance in an own bad state.
@@ -5985,7 +5985,7 @@ zabbix_export:
                   value: availability
             - uuid: aad6fb2d86c84e33868aacbf160c3d65
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in maintenance'
+              name: 'Instance is in maintenance'
               priority: INFO
               description: 'The instance is down for maintenance.'
               tags:
@@ -5993,7 +5993,7 @@ zabbix_export:
                   value: availability
             - uuid: 959072ed00c4461196bef71618799b82
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
+              name: 'Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in suspended state. 
@@ -6004,7 +6004,7 @@ zabbix_export:
                   value: availability
             - uuid: 5f1084f744b444f3b803110baf703973
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in unknown state'
+              name: 'Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -6014,7 +6014,7 @@ zabbix_export:
                   value: availability
             - uuid: fb0df2eb001649febb6fc6513e056fcc
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is stopped by the owner'
+              name: 'Instance is stopped by the owner'
               priority: INFO
               description: |
                 The instance has been stopped by the owner. 
@@ -6024,7 +6024,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 014d96156a364f2c8eac6a47de3eddfe
-          name: 'GCP Cloud SQL PostgreSQL: Memory size'
+          name: 'Memory size'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.memory.quota
           delay: '0'
@@ -6042,7 +6042,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: e73876fa0728402db7688a41938f4a12
-          name: 'GCP Cloud SQL PostgreSQL: Memory used by DB engine'
+          name: 'Memory used by DB engine'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.memory.total_usage
           delay: '0'
@@ -6063,7 +6063,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 2a5daa0300564b97a5e744e576a217cb
-          name: 'GCP Cloud SQL PostgreSQL: Memory usage'
+          name: 'Memory usage'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.memory.usage
           delay: '0'
@@ -6084,7 +6084,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 4c524a81bf3b4a6bbc87d23b60c4f74c
-          name: 'GCP Cloud SQL PostgreSQL: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.memory.utilization
           delay: '0'
@@ -6108,7 +6108,7 @@ zabbix_export:
           triggers:
             - uuid: bbbdbd9c3c5b407491b359f98e4e3fa9
               expression: 'min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.memory.utilization,5m) >= {$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}'
-              name: 'GCP Cloud SQL PostgreSQL: High memory utilization'
+              name: 'High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
               description: 'RAM utilization is too high. The system might be slow to respond.'
@@ -6116,7 +6116,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9bf09a42ddd64f7eabf6bbc011eda689
-          name: 'GCP Cloud SQL PostgreSQL: Metrics get'
+          name: 'Metrics get'
           type: SCRIPT
           key: gcp.cloudsql.pgsql.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -6290,7 +6290,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f2d00c86eedd4a1e8efce7661c3da18d
-          name: 'GCP Cloud SQL PostgreSQL: Network: Received bytes'
+          name: 'Network: Received bytes'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.network.received_bytes_count
           delay: '0'
@@ -6310,7 +6310,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: dc67deac1a2f4cc993406028d6cc8c3b
-          name: 'GCP Cloud SQL PostgreSQL: Network: Sent bytes'
+          name: 'Network: Sent bytes'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.network.sent_bytes_count
           delay: '0'
@@ -6330,7 +6330,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 512c5d8156fb4d5299284f708e64dffc
-          name: 'GCP Cloud SQL PostgreSQL: Connections'
+          name: Connections
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.num_backends
           delay: '0'
@@ -6352,7 +6352,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 88603b1881114551ba23e8f12d5ab47f
-          name: 'GCP Cloud SQL PostgreSQL: Oldest prepared transaction age'
+          name: 'Oldest prepared transaction age'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.oldest_transaction.prepared
           delay: '0'
@@ -6373,7 +6373,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 50df8067afcb42a9ac44fe963ee635d2
-          name: 'GCP Cloud SQL PostgreSQL: Oldest replica transaction age'
+          name: 'Oldest replica transaction age'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.oldest_transaction.replica
           delay: '0'
@@ -6394,7 +6394,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: fee3d72f615c479389c5fdb46f32229f
-          name: 'GCP Cloud SQL PostgreSQL: Oldest replication slot transaction age'
+          name: 'Oldest replication slot transaction age'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.oldest_transaction.replication_slot
           delay: '0'
@@ -6415,7 +6415,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 6d51c4865cd04607986ef4e02bc43fb6
-          name: 'GCP Cloud SQL PostgreSQL: Oldest running transaction age'
+          name: 'Oldest running transaction age'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.oldest_transaction.running
           delay: '0'
@@ -6436,7 +6436,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 75bc8d76a59a465fb66a434e13de107d
-          name: 'GCP Cloud SQL PostgreSQL: Data written to temporary'
+          name: 'Data written to temporary'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.temp_bytes_written_count
           delay: '0'
@@ -6454,7 +6454,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: bd10ec6251c444a79878e82e3ebe9ac0
-          name: 'GCP Cloud SQL PostgreSQL: Temporary files used for writing data'
+          name: 'Temporary files used for writing data'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.temp_files_written_count
           delay: '0'
@@ -6471,7 +6471,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 2498b066f4964aa7be03f4cc43eab95e
-          name: 'GCP Cloud SQL PostgreSQL: Assigned transactions'
+          name: 'Assigned transactions'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.transaction_id_count_assigned
           delay: '0'
@@ -6488,7 +6488,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 23d1b88571d347db9672596ec13580cc
-          name: 'GCP Cloud SQL PostgreSQL: Frozen transactions'
+          name: 'Frozen transactions'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.transaction_id_count_frozen
           delay: '0'
@@ -6505,7 +6505,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 004042d342d0478ea8f826466353454d
-          name: 'GCP Cloud SQL PostgreSQL: Transaction ID utilization'
+          name: 'Transaction ID utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.transaction_id_utilization
           delay: '0'
@@ -6545,7 +6545,7 @@ zabbix_export:
           description: 'Databases discovery for the particular PostgreSQL instance.'
           item_prototypes:
             - uuid: 997bdb03ba0b437ca2705f28dcc651ed
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Buffer cache blocks read.'
+              name: 'Database [{#PGSQL.DB.NAME}]: Buffer cache blocks read.'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.blocks_read_count_buffer_cache[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6564,7 +6564,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: b35c4a888743448688a8c5233ed165e7
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Disk blocks read.'
+              name: 'Database [{#PGSQL.DB.NAME}]: Disk blocks read.'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.blocks_read_count_disk[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6583,7 +6583,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: 7a1df30ae0c443839fe625142aea61b2
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Metrics raw'
+              name: 'Database [{#PGSQL.DB.NAME}]: Metrics raw'
               type: SCRIPT
               key: 'gcp.cloudsql.pgsql.db.metrics.get[{#PGSQL.DB.NAME}]'
               delay: '{$GCP.TIME.WINDOW}'
@@ -6719,7 +6719,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: d5632c60593749209a6e681b396f4cc7
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Deadlocks count'
+              name: 'Database [{#PGSQL.DB.NAME}]: Deadlocks count'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.deadlock_count[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6738,7 +6738,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: 6d846507fbc24cbb9fb4ad59167552db
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Committed transactions'
+              name: 'Database [{#PGSQL.DB.NAME}]: Committed transactions'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.transaction_count_commit[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6757,7 +6757,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: 4751ef5e498e4ce184bd07aadc831d2b
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled-back transactions'
+              name: 'Database [{#PGSQL.DB.NAME}]: Rolled-back transactions'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.transaction_count_rollback[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6776,7 +6776,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: a7451a61e0b04be8b1f85b47c44107e2
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples fetched'
+              name: 'Database [{#PGSQL.DB.NAME}]: Tuples fetched'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_fetched_count[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6795,7 +6795,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: 7daca0b14f5843669bc5b0823cd4d44f
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Deleted rows processed'
+              name: 'Database [{#PGSQL.DB.NAME}]: Deleted rows processed'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_processed_count_delete[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6814,7 +6814,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: 48a7613fa611410b8353d03d87af0f8d
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Inserted rows processed.'
+              name: 'Database [{#PGSQL.DB.NAME}]: Inserted rows processed.'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_processed_count_insert[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6833,7 +6833,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: e159cc28aec6448b9162f780479f5aab
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Updated rows processed'
+              name: 'Database [{#PGSQL.DB.NAME}]: Updated rows processed'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_processed_count_update[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6852,7 +6852,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: ee6fad5b2fb44a14a29c7cd662b1f5d2
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples returned'
+              name: 'Database [{#PGSQL.DB.NAME}]: Tuples returned'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_returned_count[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6871,7 +6871,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: f7a58601a3384b8ba24c89b3693ddb88
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Dead tuples'
+              name: 'Database [{#PGSQL.DB.NAME}]: Dead tuples'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuple_size_dead[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -6890,7 +6890,7 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: 16e88225cd41406285b3237ee1e61bb4
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Live tuples'
+              name: 'Database [{#PGSQL.DB.NAME}]: Live tuples'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuple_size_live[{#PGSQL.DB.NAME}]'
               delay: '0'
@@ -7231,7 +7231,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: c67dd812c7784948bad5dfa0d9a6cc66
-          name: 'GCP Cloud SQL PostgreSQL: Flush location lag'
+          name: 'Flush location lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.flush_location
           delay: '0'
@@ -7249,7 +7249,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 2b8b51f0266049ffbfb7ece2f944fb68
-          name: 'GCP Cloud SQL PostgreSQL: Number of log archival failures'
+          name: 'Number of log archival failures'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.log_archive_failure_count
           delay: '0'
@@ -7266,7 +7266,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 4657c4bb904b437598b68410e47f7194
-          name: 'GCP Cloud SQL PostgreSQL: Number of log archival successes'
+          name: 'Number of log archival successes'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.log_archive_success_count
           delay: '0'
@@ -7283,7 +7283,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: cb9c5aff913e4deeb29dfa1a20b5ff04
-          name: 'GCP Cloud SQL PostgreSQL: Replica metrics get'
+          name: 'Replica metrics get'
           type: SCRIPT
           key: gcp.cloudsql.pgsql.repl.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -7420,7 +7420,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e43272210c45425d871d70a5bb91cdd1
-          name: 'GCP Cloud SQL PostgreSQL: Network lag'
+          name: 'Network lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.network_lag
           delay: '0'
@@ -7438,7 +7438,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 7d74736aa2804c899de35634bc072edf
-          name: 'GCP Cloud SQL PostgreSQL: Replay location lag'
+          name: 'Replay location lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.replay_location
           delay: '0'
@@ -7456,7 +7456,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 192e0bb3ac744f8eb38a760ee3f7c623
-          name: 'GCP Cloud SQL PostgreSQL: Replication lag'
+          name: 'Replication lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.replica_lag
           delay: '0'
@@ -7474,7 +7474,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 379c8bc0cfe847d1819ab96aceee5efe
-          name: 'GCP Cloud SQL PostgreSQL: Sent location lag'
+          name: 'Sent location lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.sent_location
           delay: '0'
@@ -7492,7 +7492,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: a7f785dbe4954d77a82e6384620b5d6e
-          name: 'GCP Cloud SQL PostgreSQL: Replication state'
+          name: 'Replication state'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.state
           delay: '0'
@@ -7527,7 +7527,7 @@ zabbix_export:
             - tag: component
               value: status
         - uuid: 10af15bc71ed446eb4e614c2cb6029d5
-          name: 'GCP Cloud SQL PostgreSQL: Write location lag'
+          name: 'Write location lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.write_location
           delay: '0'
@@ -7636,7 +7636,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 3de05ba490644a62ba4a700ffe439c98
-          name: 'GCP Compute Engine: Guest visible vCPUs'
+          name: 'Guest visible vCPUs'
           type: DEPENDENT
           key: gcp.gce.cpu.guest_visible_vcpus
           delay: '0'
@@ -7660,7 +7660,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2fa7a2aa15a242cc826248ebe96bb173
-          name: 'GCP Compute Engine: Reserved vCPUs'
+          name: 'Reserved vCPUs'
           type: DEPENDENT
           key: gcp.gce.cpu.reserved_cores
           delay: '0'
@@ -7678,7 +7678,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f6c9c633f514416189ba85d2015251ba
-          name: 'GCP Compute Engine: Scheduler wait time'
+          name: 'Scheduler wait time'
           type: DEPENDENT
           key: gcp.gce.cpu.scheduler_wait_time
           delay: '0'
@@ -7703,7 +7703,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: daf4d0d23ccf4633aad6405bd1f09dc3
-          name: 'GCP Compute Engine: CPU usage time'
+          name: 'CPU usage time'
           type: DEPENDENT
           key: gcp.gce.cpu.usage_time
           delay: '0'
@@ -7726,7 +7726,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 666cd3e9f21d4ede9d4bcc16bc95347c
-          name: 'GCP Compute Engine: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: gcp.gce.cpu.utilization
           delay: '0'
@@ -7753,8 +7753,8 @@ zabbix_export:
           triggers:
             - uuid: fb8e28649b4947e9a11d891e3126a3a1
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}'
-              name: 'GCP Compute Engine: High CPU utilization'
-              event_name: 'GCP Compute Engine: High CPU utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'The CPU utilization is too high. The system might be slow to respond.'
               manual_close: 'YES'
@@ -7762,7 +7762,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 4bdd3662247749a69bb59e6643ba7b9a
-          name: 'GCP Compute Engine: Disks get'
+          name: 'Disks get'
           type: SCRIPT
           key: gcp.gce.disks.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -7879,7 +7879,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e1cd503d86f7487db023e2fd3cea5385
-          name: 'GCP Compute Engine: Firewall: Dropped bytes'
+          name: 'Firewall: Dropped bytes'
           type: DEPENDENT
           key: gcp.gce.firewall.dropped_bytes_count
           delay: '0'
@@ -7899,7 +7899,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 25002706c5164c43a345a8ce594615c7
-          name: 'GCP Compute Engine: Firewall: Dropped packets'
+          name: 'Firewall: Dropped packets'
           type: DEPENDENT
           key: gcp.gce.firewall.dropped_packets_count
           delay: '0'
@@ -7918,7 +7918,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3f82955d43694b25b1e96c9b8f4f6ffb
-          name: 'GCP Compute Engine: Instance state'
+          name: 'Instance state'
           type: HTTP_AGENT
           key: gcp.gce.instance.state
           history: 7d
@@ -7962,7 +7962,7 @@ zabbix_export:
           triggers:
             - uuid: 96abd48a3e684e1b9b95fdd96d095188
               expression: 'last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 10'
-              name: 'GCP Compute Engine: Failed to get the instance state'
+              name: 'Failed to get the instance state'
               priority: AVERAGE
               description: |
                 Failed to get the instance state.
@@ -7974,7 +7974,7 @@ zabbix_export:
                   value: availability
             - uuid: 1223f00a5e4b4bc8aa9e8ec08253c4cc
               expression: 'last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 7'
-              name: 'GCP Compute Engine: Instance is in suspended state'
+              name: 'Instance is in suspended state'
               priority: INFO
               description: 'The VM is in a suspended state. You can resume the VM or delete it.'
               manual_close: 'YES'
@@ -7985,7 +7985,7 @@ zabbix_export:
                   value: notice
             - uuid: d2144e2277ec458c80d2b948364f1924
               expression: 'last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 4'
-              name: 'GCP Compute Engine: The instance is in repairing state'
+              name: 'The instance is in repairing state'
               priority: WARNING
               description: |
                 The VM is being repaired.
@@ -7998,7 +7998,7 @@ zabbix_export:
                   value: availability
             - uuid: 4a010c2b1e6f4ec88dbbe97255b9bac4
               expression: 'last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 5'
-              name: 'GCP Compute Engine: The instance is in terminated state'
+              name: 'The instance is in terminated state'
               priority: AVERAGE
               description: 'The VM is stopped. You stopped the VM, or the VM encountered a failure.'
               manual_close: 'YES'
@@ -8006,7 +8006,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: f075482578ec475385cdfc57346d1570
-          name: 'GCP Compute Engine: Instance uptime'
+          name: 'Instance uptime'
           type: DEPENDENT
           key: gcp.gce.instance.uptime
           delay: '0'
@@ -8025,7 +8025,7 @@ zabbix_export:
             - tag: component
               value: uptime
         - uuid: 744f3f821847473d9cef1236580bda38
-          name: 'GCP Compute Engine: Integrity: Early boot validation status'
+          name: 'Integrity: Early boot validation status'
           type: DEPENDENT
           key: gcp.gce.integrity.early_boot_validation_status
           delay: '0'
@@ -8057,7 +8057,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: aa334c3a0faf4f36bcbbf51d87ef9186
-          name: 'GCP Compute Engine: Integrity: Late boot validation status'
+          name: 'Integrity: Late boot validation status'
           type: DEPENDENT
           key: gcp.gce.integrity.late_boot_validation_status
           delay: '0'
@@ -8089,7 +8089,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 1b14fefa6b0f4abc98f6ddf3164074b3
-          name: 'GCP Compute Engine: Memory usage percentage'
+          name: 'Memory usage percentage'
           type: DEPENDENT
           key: gcp.gce.memory.ram_pused
           delay: '0'
@@ -8114,15 +8114,15 @@ zabbix_export:
           triggers:
             - uuid: fa918889bcb84d3886254f00f0df288c
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}'
-              name: 'GCP Compute Engine: High memory utilization'
-              event_name: 'GCP Compute Engine: High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 10d63d2c01dc481380bf386af7af7f97
-          name: 'GCP Compute Engine: Memory size'
+          name: 'Memory size'
           type: DEPENDENT
           key: gcp.gce.memory.ram_size
           delay: '0'
@@ -8144,7 +8144,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 20dc9e49a60d46b4b6d855eb74a60d5e
-          name: 'GCP Compute Engine: Memory used'
+          name: 'Memory used'
           type: DEPENDENT
           key: gcp.gce.memory.ram_used
           delay: '0'
@@ -8166,7 +8166,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: b043128882254e9492c7436521bf994a
-          name: 'GCP Compute Engine: VM swap in'
+          name: 'VM swap in'
           type: DEPENDENT
           key: gcp.gce.memory.swap_in_bytes_count
           delay: '0'
@@ -8188,7 +8188,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 7166423bbcf0456ab0fcc7c852d89125
-          name: 'GCP Compute Engine: VM swap out'
+          name: 'VM swap out'
           type: DEPENDENT
           key: gcp.gce.memory.swap_out_bytes_count
           delay: '0'
@@ -8210,7 +8210,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 723fbff060ab41a39322bc0d6d8b1f84
-          name: 'GCP Compute Engine: Metrics get'
+          name: 'Metrics get'
           type: SCRIPT
           key: gcp.gce.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -8444,7 +8444,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: faf1c3ccbcc24b9eb52be355f2f782e6
-          name: 'GCP Compute Engine: Network: Received bytes'
+          name: 'Network: Received bytes'
           type: DEPENDENT
           key: gcp.gce.network.lb.received_bytes_count.false
           delay: '0'
@@ -8464,7 +8464,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 91ef1b33d7ae479999302cdec227eb3e
-          name: 'GCP Compute Engine: Network: Received bytes: Load-balanced'
+          name: 'Network: Received bytes: Load-balanced'
           type: DEPENDENT
           key: gcp.gce.network.lb.received_bytes_count.true
           delay: '0'
@@ -8489,7 +8489,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 84dec0cb32ea434a9d6f29f402d337a0
-          name: 'GCP Compute Engine: Network: Received packets'
+          name: 'Network: Received packets'
           type: DEPENDENT
           key: gcp.gce.network.lb.received_packets_count.false
           delay: '0'
@@ -8508,7 +8508,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 148fe8aaa01e4863bbe2ca4c0226ce80
-          name: 'GCP Compute Engine: Network: Received packets: Load-balanced'
+          name: 'Network: Received packets: Load-balanced'
           type: DEPENDENT
           key: gcp.gce.network.lb.received_packets_count.true
           delay: '0'
@@ -8532,7 +8532,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: b8ea22b00a254ee5a2484fd833421b12
-          name: 'GCP Compute Engine: Network: Sent bytes'
+          name: 'Network: Sent bytes'
           type: DEPENDENT
           key: gcp.gce.network.lb.sent_bytes_count.false
           delay: '0'
@@ -8552,7 +8552,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 77bd252194764837bc71b031e4d7e2b8
-          name: 'GCP Compute Engine: Network: Sent bytes: Load-balanced'
+          name: 'Network: Sent bytes: Load-balanced'
           type: DEPENDENT
           key: gcp.gce.network.lb.sent_bytes_count.true
           delay: '0'
@@ -8577,7 +8577,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 44032903b7da4d72b2dff35e81e787d3
-          name: 'GCP Compute Engine: Network: Sent packets'
+          name: 'Network: Sent packets'
           type: DEPENDENT
           key: gcp.gce.network.lb.sent_packets_count.false
           delay: '0'
@@ -8596,7 +8596,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 2aef5ad0f3704550b4920ce36614b52d
-          name: 'GCP Compute Engine: Network: Sent packets: Load-balanced'
+          name: 'Network: Sent packets: Load-balanced'
           type: DEPENDENT
           key: gcp.gce.network.lb.sent_packets_count.true
           delay: '0'
@@ -8620,7 +8620,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 199fb1f4278848138ef8cfd8fc3e07ee
-          name: 'GCP Compute Engine: Network: Mirrored bytes'
+          name: 'Network: Mirrored bytes'
           type: DEPENDENT
           key: gcp.gce.network.mirrored_bytes_count
           delay: '0'
@@ -8640,7 +8640,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: f0add3d3853d4d8c9993b1603fd7b542
-          name: 'GCP Compute Engine: Network: Mirrored packets'
+          name: 'Network: Mirrored packets'
           type: DEPENDENT
           key: gcp.gce.network.mirrored_packets_count
           delay: '0'
@@ -8659,7 +8659,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 6ca64c0fa39e4587a2987cd607058b54
-          name: 'GCP Compute Engine: Network: Mirrored packets dropped: Invalid'
+          name: 'Network: Mirrored packets dropped: Invalid'
           type: DEPENDENT
           key: gcp.gce.network.mirr_dropped_packets.invalid
           delay: '0'
@@ -8681,7 +8681,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 3cf438aa0225428385d30c5be30ea3e6
-          name: 'GCP Compute Engine: Network: Mirrored packets dropped: Out of quota'
+          name: 'Network: Mirrored packets dropped: Out of quota'
           type: DEPENDENT
           key: gcp.gce.network.mirr_dropped_packets.out_of_quota
           delay: '0'
@@ -8703,7 +8703,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 5303badcf26641f1af85366fbaecdd77
-          name: 'GCP Compute Engine: Network: Mirrored packets dropped: Unknown'
+          name: 'Network: Mirrored packets dropped: Unknown'
           type: DEPENDENT
           key: gcp.gce.network.mirr_dropped_packets.unknown
           delay: '0'
@@ -8757,7 +8757,7 @@ zabbix_export:
           description: 'GCP Compute Engine: Physical disks discovery.'
           item_prototypes:
             - uuid: dda10a0535c04fdb92092efeff020b2c
-              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read bytes'
+              name: 'Disk [{#GCE.DISK.NAME}]: Read bytes'
               type: DEPENDENT
               key: 'gcp.gce.disk.read_bytes_count[{#GCE.DISK.NAME}]'
               delay: '0'
@@ -8781,7 +8781,7 @@ zabbix_export:
                 - tag: storage-type
                   value: '{#GCE.DISK.STOR_TYPE}'
             - uuid: e166d3dfeb404111bcd143415070a0af
-              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read operations'
+              name: 'Disk [{#GCE.DISK.NAME}]: Read operations'
               type: DEPENDENT
               key: 'gcp.gce.disk.read_ops_count[{#GCE.DISK.NAME}]'
               delay: '0'
@@ -8804,7 +8804,7 @@ zabbix_export:
                 - tag: storage-type
                   value: '{#GCE.DISK.STOR_TYPE}'
             - uuid: cf21b2bf6dc74ed28bc55a2c567b3dae
-              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Write bytes'
+              name: 'Disk [{#GCE.DISK.NAME}]: Write bytes'
               type: DEPENDENT
               key: 'gcp.gce.disk.write_bytes_count[{#GCE.DISK.NAME}]'
               delay: '0'
@@ -8828,7 +8828,7 @@ zabbix_export:
                 - tag: storage-type
                   value: '{#GCE.DISK.STOR_TYPE}'
             - uuid: 602255b7df004129b5a3e0e1d2fba920
-              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Write operations'
+              name: 'Disk [{#GCE.DISK.NAME}]: Write operations'
               type: DEPENDENT
               key: 'gcp.gce.disk.write_ops_count[{#GCE.DISK.NAME}]'
               delay: '0'
@@ -8851,7 +8851,7 @@ zabbix_export:
                 - tag: storage-type
                   value: '{#GCE.DISK.STOR_TYPE}'
             - uuid: 7fc27a6630664e2fbac8fe64ac40985a
-              name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Raw data'
+              name: 'Disk [{#GCE.DISK.NAME}]: Raw data'
               type: DEPENDENT
               key: 'gcp.gce.quota.single.raw[{#GCE.DISK.NAME}]'
               delay: '0'

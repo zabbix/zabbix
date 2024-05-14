@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 89d60f525bd04be28cc4267d0224cdb6
-          name: 'QTech QSW: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -40,14 +40,14 @@ zabbix_export:
           triggers:
             - uuid: fd05f449cbc64dcba10029c246594568
               expression: 'max(/QTech QSW by SNMP/icmpping,#3)=0'
-              name: 'QTech QSW: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 8f355d66881c47b5be8097dbd1f950d1
-          name: 'QTech QSW: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -61,11 +61,11 @@ zabbix_export:
           triggers:
             - uuid: 4b2e2d168a0b4da3b5999263f52f3c36
               expression: 'min(/QTech QSW by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/QTech QSW by SNMP/icmppingloss,5m)<100'
-              name: 'QTech QSW: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'QTech QSW: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/QTech QSW by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -73,7 +73,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 6138402da32a40259bb26f217be2df59
-          name: 'QTech QSW: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -87,14 +87,14 @@ zabbix_export:
           triggers:
             - uuid: 18f41db36192463eabaa3797034e578a
               expression: 'avg(/QTech QSW by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'QTech QSW: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'QTech QSW: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/QTech QSW by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/QTech QSW by SNMP/icmppingloss,5m)<100'
-                - name: 'QTech QSW: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/QTech QSW by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -102,7 +102,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: ddb9ac31893d4b1d882b0e500d2d6ad7
-          name: 'QTech QSW: Temperature'
+          name: Temperature
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.27514.100.1.11.9.0
           key: 'sensor.temp.value[switchTemperature.0]'
@@ -121,8 +121,8 @@ zabbix_export:
               expression: 'avg(/QTech QSW by SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/QTech QSW by SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT}-3'
-              name: 'QTech QSW: Temperature is above critical threshold'
-              event_name: 'QTech QSW: Temperature is above critical threshold: >{$TEMP_CRIT}'
+              name: 'Temperature is above critical threshold'
+              event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -135,13 +135,13 @@ zabbix_export:
               expression: 'avg(/QTech QSW by SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_WARN}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/QTech QSW by SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_WARN}-3'
-              name: 'QTech QSW: Temperature is above warning threshold'
-              event_name: 'QTech QSW: Temperature is above warning threshold: >{$TEMP_WARN}'
+              name: 'Temperature is above warning threshold'
+              event_name: 'Temperature is above warning threshold: >{$TEMP_WARN}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
               dependencies:
-                - name: 'QTech QSW: Temperature is above critical threshold'
+                - name: 'Temperature is above critical threshold'
                   expression: 'avg(/QTech QSW by SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT}'
                   recovery_expression: 'max(/QTech QSW by SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT}-3'
               tags:
@@ -153,8 +153,8 @@ zabbix_export:
               expression: 'avg(/QTech QSW by SNMP/sensor.temp.value[switchTemperature.0],5m)<{$TEMP_CRIT_LOW}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'min(/QTech QSW by SNMP/sensor.temp.value[switchTemperature.0],5m)>{$TEMP_CRIT_LOW}+3'
-              name: 'QTech QSW: Temperature is too low'
-              event_name: 'QTech QSW: Temperature is too low: <{$TEMP_CRIT_LOW}'
+              name: 'Temperature is too low'
+              event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               tags:
@@ -163,7 +163,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 568c2b550b944dd084ec4e4486e7ec72
-          name: 'QTech QSW: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -176,7 +176,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: b821576134ff4185a3e11b35763b7d1d
-          name: 'QTech QSW: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -196,7 +196,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: daab52a7d91b431b8ec579200e53a0c4
-          name: 'QTech QSW: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.27514.100.1.11.10.0
           key: 'system.cpu.util[switchCpuUsage.0]'
@@ -212,8 +212,8 @@ zabbix_export:
           triggers:
             - uuid: 57bf78318ded4574bde08adfafe94454
               expression: 'min(/QTech QSW by SNMP/system.cpu.util[switchCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'QTech QSW: High CPU utilization'
-              event_name: 'QTech QSW: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -221,7 +221,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 3701b10845d449a3b1a5d67a7d743ca4
-          name: 'QTech QSW: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -242,7 +242,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e7dda2d7f577404dbe8e5beba7609617
-          name: 'QTech QSW: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.9.1
           key: system.hw.firmware
@@ -261,7 +261,7 @@ zabbix_export:
           triggers:
             - uuid: e4682afd0cc547eea9605452b7df79f4
               expression: 'last(/QTech QSW by SNMP/system.hw.firmware,#1)<>last(/QTech QSW by SNMP/system.hw.firmware,#2) and length(last(/QTech QSW by SNMP/system.hw.firmware))>0'
-              name: 'QTech QSW: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -270,7 +270,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 5ff90f06a84a43ac937d3798b360bbd9
-          name: 'QTech QSW: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.1
           key: system.hw.model
@@ -288,7 +288,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 684868048c1645aea9d8ad94514bd4c6
-          name: 'QTech QSW: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
           key: system.hw.serialnumber
@@ -308,8 +308,8 @@ zabbix_export:
           triggers:
             - uuid: 83db3bd248994482a92ba86e5d3ae5ab
               expression: 'last(/QTech QSW by SNMP/system.hw.serialnumber,#1)<>last(/QTech QSW by SNMP/system.hw.serialnumber,#2) and length(last(/QTech QSW by SNMP/system.hw.serialnumber))>0'
-              name: 'QTech QSW: Device has been replaced'
-              event_name: 'QTech QSW: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -317,7 +317,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 94671639676f476f8b7c37a884d32ed0
-          name: 'QTech QSW: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -341,7 +341,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a842a44da43a4d2c906d0c642eb11411
-          name: 'QTech QSW: Hardware version(revision)'
+          name: 'Hardware version(revision)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.8.1
           key: system.hw.version
@@ -358,7 +358,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: de9a507ae83247398a4708fff2889862
-          name: 'QTech QSW: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -378,7 +378,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: aa2a90f772154d0e9354d496afae9939
-          name: 'QTech QSW: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -400,8 +400,8 @@ zabbix_export:
           triggers:
             - uuid: 27fa16e646224f88ad3b35ce7a71a18a
               expression: 'last(/QTech QSW by SNMP/system.name,#1)<>last(/QTech QSW by SNMP/system.name,#2) and length(last(/QTech QSW by SNMP/system.name))>0'
-              name: 'QTech QSW: System name has changed'
-              event_name: 'QTech QSW: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -411,7 +411,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 0123f7f4eab541a786130af4fbb2a534
-          name: 'QTech QSW: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -430,7 +430,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 237a5f0537a549b3a63ed7f81d0b6122
-          name: 'QTech QSW: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -449,7 +449,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ea6000232033495babf9157a67b89bcc
-          name: 'QTech QSW: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.27514.100.1.3.0
           key: 'system.sw.os[sysSoftwareVersion.0]'
@@ -469,18 +469,18 @@ zabbix_export:
           triggers:
             - uuid: 6431f9a46fcb4a42ab3e04c8289bd07d
               expression: 'last(/QTech QSW by SNMP/system.sw.os[sysSoftwareVersion.0],#1)<>last(/QTech QSW by SNMP/system.sw.os[sysSoftwareVersion.0],#2) and length(last(/QTech QSW by SNMP/system.sw.os[sysSoftwareVersion.0]))>0'
-              name: 'QTech QSW: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'QTech QSW: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/QTech QSW by SNMP/system.name,#1)<>last(/QTech QSW by SNMP/system.name,#2) and length(last(/QTech QSW by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 609971d1876444659f779ef28ed81ce7
-          name: 'QTech QSW: Total memory'
+          name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.27514.100.1.11.6.0
           key: 'vm.memory.total[switchMemorySize.0]'
@@ -493,7 +493,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 8821718704db4ab4a8af8fbeb61dde93
-          name: 'QTech QSW: Used memory'
+          name: 'Used memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.27514.100.1.11.7.0
           key: 'vm.memory.used[switchMemoryBusy.0]'
@@ -506,7 +506,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: f2271ace8bd040618f10ec651a634cbc
-          name: 'QTech QSW: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[vm.memory.util.0]'
           history: 7d
@@ -520,8 +520,8 @@ zabbix_export:
           triggers:
             - uuid: 082a768e190d4e8e97e0857cd3412ea1
               expression: 'min(/QTech QSW by SNMP/vm.memory.util[vm.memory.util.0],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'QTech QSW: High memory utilization'
-              event_name: 'QTech QSW: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -530,7 +530,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 3e44eea15b2a4b2c994fb3372c538466
-          name: 'QTech QSW: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -550,12 +550,12 @@ zabbix_export:
           triggers:
             - uuid: 7a7c0c7501ca484491394fe82c75b401
               expression: 'max(/QTech QSW by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'QTech QSW: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'QTech QSW: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/QTech QSW by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1866,13 +1866,13 @@ zabbix_export:
   triggers:
     - uuid: 44d6c66a6a1641f8816031c0d5bf4040
       expression: '(last(/QTech QSW by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/QTech QSW by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/QTech QSW by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/QTech QSW by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'QTech QSW: Host has been restarted'
-      event_name: 'QTech QSW: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'QTech QSW: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/QTech QSW by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

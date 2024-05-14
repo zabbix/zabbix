@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 86cc718ce21b4ff9b0a09479ae3fc130
-          name: 'Squid: Service ping'
+          name: 'Service ping'
           type: SIMPLE
           key: 'net.tcp.service[tcp,,{$SQUID.HTTP.PORT}]'
           history: 7d
@@ -38,14 +38,14 @@ zabbix_export:
           triggers:
             - uuid: 7e0f0a9e8a9d4f6193946e4f8cd4a2e3
               expression: 'last(/Squid by SNMP/net.tcp.service[tcp,,{$SQUID.HTTP.PORT}])=0'
-              name: 'Squid: Port {$SQUID.HTTP.PORT} is down'
+              name: 'Port {$SQUID.HTTP.PORT} is down'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 6d7f0f6b0f89462e96e86940b779eb69
-          name: 'Squid: CPU usage'
+          name: 'CPU usage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.5.0
           key: 'squid[cacheCpuUsage]'
@@ -57,7 +57,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 960b137ab773492ab3073e108575e4fc
-          name: 'Squid: File descriptor count - current used'
+          name: 'File descriptor count - current used'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.12.0
           key: 'squid[cacheCurrentFileDescrCnt]'
@@ -68,7 +68,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 37b45201f8444583b01e0df5af2bc14e
-          name: 'Squid: File descriptor count - current maximum'
+          name: 'File descriptor count - current maximum'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.13.0
           key: 'squid[cacheCurrentFileDescrMax]'
@@ -79,7 +79,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 910afdc20767408f90d1bc5b7a9fd6a4
-          name: 'Squid: Objects LRU expiration age'
+          name: 'Objects LRU expiration age'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.8.0
           key: 'squid[cacheCurrentLRUExpiration]'
@@ -95,7 +95,7 @@ zabbix_export:
             - tag: component
               value: objects
         - uuid: 26b8b1a25dc74099b61813905477b414
-          name: 'Squid: File descriptor count - current reserved'
+          name: 'File descriptor count - current reserved'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.11.0
           key: 'squid[cacheCurrentResFileDescrCnt]'
@@ -106,7 +106,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 35f3009401b6449d95988d9ee7a621a7
-          name: 'Squid: Cache swap current size'
+          name: 'Cache swap current size'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.14.0
           key: 'squid[cacheCurrentSwapSize]'
@@ -120,7 +120,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 0789a0fa3e3b42a08a5e5bf8d0307970
-          name: 'Squid: Objects unlinkd requests'
+          name: 'Objects unlinkd requests'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.9.0
           key: 'squid[cacheCurrentUnlinkRequests]'
@@ -131,7 +131,7 @@ zabbix_export:
             - tag: component
               value: objects
         - uuid: 6bc024be663b466ca677941130e11f50
-          name: 'Squid: File descriptor count - current available'
+          name: 'File descriptor count - current available'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.10.0
           key: 'squid[cacheCurrentUnusedFDescrCnt]'
@@ -144,14 +144,14 @@ zabbix_export:
           triggers:
             - uuid: 40c41c87e46443f886506da5e580657e
               expression: 'last(/Squid by SNMP/squid[cacheCurrentUnusedFDescrCnt])<{$SQUID.FILE.DESC.WARN.MIN}'
-              name: 'Squid: Squid is running out of file descriptors'
-              event_name: 'Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})'
+              name: 'Squid is running out of file descriptors'
+              event_name: 'Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 1aecf10756f949999c8f3fe5ce9c2a32
-          name: 'Squid: DNS server replies per second'
+          name: 'DNS server replies per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.3.2.0
           key: 'squid[cacheDnsReplies]'
@@ -168,7 +168,7 @@ zabbix_export:
             - tag: component
               value: replies
         - uuid: e5f647c77bdb498e9cc286795bc4077c
-          name: 'Squid: DNS server requests per second'
+          name: 'DNS server requests per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.3.1.0
           key: 'squid[cacheDnsRequests]'
@@ -185,7 +185,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 3f4366896dd84b8ab78d6e3dc8a6ab63
-          name: 'Squid: DNS service time per 5 minutes'
+          name: 'DNS service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.8.5
           key: 'squid[cacheDnsSvcTime.5]'
@@ -201,7 +201,7 @@ zabbix_export:
             - tag: component
               value: dns
         - uuid: 99448052f1a34e15a5c042124db7b651
-          name: 'Squid: DNS service time per hour'
+          name: 'DNS service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.8.60
           key: 'squid[cacheDnsSvcTime.60]'
@@ -217,7 +217,7 @@ zabbix_export:
             - tag: component
               value: dns
         - uuid: 0aea1fe702004d65919fc010c971c3b5
-          name: 'Squid: FQDN cache hits per second'
+          name: 'FQDN cache hits per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.2.3.0
           key: 'squid[cacheFqdnHits]'
@@ -234,7 +234,7 @@ zabbix_export:
             - tag: component
               value: hits
         - uuid: 2dea9b707b844d32b65a2d479ddb7d72
-          name: 'Squid: FQDN cache misses per second'
+          name: 'FQDN cache misses per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.2.6.0
           key: 'squid[cacheFqdnMisses]'
@@ -251,7 +251,7 @@ zabbix_export:
             - tag: component
               value: misses
         - uuid: 1dad3f381c174b869c73f55cd831b40a
-          name: 'Squid: FQDN cache requests per second'
+          name: 'FQDN cache requests per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.2.2.0
           key: 'squid[cacheFqdnRequests]'
@@ -268,7 +268,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 633a70cd41c44f2c895148a7ae394acd
-          name: 'Squid: HTTP all service time per 5 minutes'
+          name: 'HTTP all service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.2.5
           key: 'squid[cacheHttpAllSvcTime.5]'
@@ -284,7 +284,7 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: d3aa021743134d97af9dd8840b0ef692
-          name: 'Squid: HTTP all service time per hour'
+          name: 'HTTP all service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.2.60
           key: 'squid[cacheHttpAllSvcTime.60]'
@@ -300,7 +300,7 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: 7f5bd8f89ea0495ea87c294fb8c606dd
-          name: 'Squid: HTTP Errors sent per second'
+          name: 'HTTP Errors sent per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.3.0
           key: 'squid[cacheHttpErrors]'
@@ -317,7 +317,7 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: 0c4fd7c154a44442a3cec82ba4026b7d
-          name: 'Squid: HTTP hit service time per 5 minutes'
+          name: 'HTTP hit service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.5.5
           key: 'squid[cacheHttpHitSvcTime.5]'
@@ -335,7 +335,7 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: a642c99d6c3f4f5e8ec218459fd76f04
-          name: 'Squid: HTTP hit service time per hour'
+          name: 'HTTP hit service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.5.60
           key: 'squid[cacheHttpHitSvcTime.60]'
@@ -353,7 +353,7 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: adfe3e2fc775400991d2ea2f06218daf
-          name: 'Squid: HTTP Hits sent from cache per second'
+          name: 'HTTP Hits sent from cache per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.2.0
           key: 'squid[cacheHttpHits]'
@@ -370,7 +370,7 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: f2366a6008cb4dc7856904ea5c6631dd
-          name: 'Squid: HTTP traffic received per second'
+          name: 'HTTP traffic received per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.4.0
           key: 'squid[cacheHttpInKb]'
@@ -391,7 +391,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: f8fa271a272442369b6cbc4fb1a2decc
-          name: 'Squid: HTTP miss service time per 5 minutes'
+          name: 'HTTP miss service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.3.5
           key: 'squid[cacheHttpMissSvcTime.5]'
@@ -409,7 +409,7 @@ zabbix_export:
             - tag: component
               value: misses
         - uuid: 23e5a3bd6e9a4c50a7d54336a6afc1e1
-          name: 'Squid: HTTP miss service time per hour'
+          name: 'HTTP miss service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.3.60
           key: 'squid[cacheHttpMissSvcTime.60]'
@@ -427,7 +427,7 @@ zabbix_export:
             - tag: component
               value: misses
         - uuid: ff6b7946363d44bba5721c82c8f84df7
-          name: 'Squid: HTTP traffic sent per second'
+          name: 'HTTP traffic sent per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.5.0
           key: 'squid[cacheHttpOutKb]'
@@ -448,7 +448,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: bde307ead15d48859a97e35e52327d50
-          name: 'Squid: ICP traffic received per second'
+          name: 'ICP traffic received per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.9.0
           key: 'squid[cacheIcpKbRecv]'
@@ -469,7 +469,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 7234b612b50a45e0a1bb69654e2e784d
-          name: 'Squid: ICP traffic transmitted per second'
+          name: 'ICP traffic transmitted per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.8.0
           key: 'squid[cacheIcpKbSent]'
@@ -490,7 +490,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 9ee83c13fa6d41dfb8bfea91c02341b9
-          name: 'Squid: ICP messages received per second'
+          name: 'ICP messages received per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.7.0
           key: 'squid[cacheIcpPktsRecv]'
@@ -505,7 +505,7 @@ zabbix_export:
             - tag: component
               value: icp
         - uuid: dee7d8cf211b4ad0a645a8d6d4f24c31
-          name: 'Squid: ICP messages sent per second'
+          name: 'ICP messages sent per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.6.0
           key: 'squid[cacheIcpPktsSent]'
@@ -520,7 +520,7 @@ zabbix_export:
             - tag: component
               value: icp
         - uuid: cb9d0c300beb47568e99ff7966e1b10e
-          name: 'Squid: ICP query service time per 5 minutes'
+          name: 'ICP query service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.6.5
           key: 'squid[cacheIcpQuerySvcTime.5]'
@@ -538,7 +538,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 9130a0bc53144fe992b701aa9159ff70
-          name: 'Squid: ICP query service time per hour'
+          name: 'ICP query service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.6.60
           key: 'squid[cacheIcpQuerySvcTime.60]'
@@ -556,7 +556,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 35a7585432b3467585ff98b23e610d82
-          name: 'Squid: ICP reply service time per 5 minutes'
+          name: 'ICP reply service time per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.7.5
           key: 'squid[cacheIcpReplySvcTime.5]'
@@ -574,7 +574,7 @@ zabbix_export:
             - tag: component
               value: replies
         - uuid: 94eab55af41a465196588d08acbacb56
-          name: 'Squid: ICP reply service time per hour'
+          name: 'ICP reply service time per hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.7.60
           key: 'squid[cacheIcpReplySvcTime.60]'
@@ -592,7 +592,7 @@ zabbix_export:
             - tag: component
               value: replies
         - uuid: c5409583483e4024aabaab500bcb637a
-          name: 'Squid: IP cache hits per second'
+          name: 'IP cache hits per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.1.3.0
           key: 'squid[cacheIpHits]'
@@ -609,7 +609,7 @@ zabbix_export:
             - tag: component
               value: ip
         - uuid: 8e474d2fd410472bb03024d2a2361b5d
-          name: 'Squid: IP cache misses per second'
+          name: 'IP cache misses per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.1.6.0
           key: 'squid[cacheIpMisses]'
@@ -626,7 +626,7 @@ zabbix_export:
             - tag: component
               value: misses
         - uuid: dc837a887c3c463a9011d923dbbfbc0f
-          name: 'Squid: IP cache requests per second'
+          name: 'IP cache requests per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.4.1.2.0
           key: 'squid[cacheIpRequests]'
@@ -643,7 +643,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 70786920f94f41eeb0fc525c2e6431cf
-          name: 'Squid: Memory maximum resident size'
+          name: 'Memory maximum resident size'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.6.0
           key: 'squid[cacheMaxResSize]'
@@ -659,7 +659,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d84c3a3633784f77bf9375bf59da490b
-          name: 'Squid: Memory maximum cache size'
+          name: 'Memory maximum cache size'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.5.1.0
           key: 'squid[cacheMemMaxSize]'
@@ -675,7 +675,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: c14fe87f87ca48f39bbe765db60e0a41
-          name: 'Squid: Memory cache usage'
+          name: 'Memory cache usage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.3.0
           key: 'squid[cacheMemUsage]'
@@ -691,7 +691,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 387bbd61d3bd469baa6c560afe8a18ae
-          name: 'Squid: Objects count'
+          name: 'Objects count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.7.0
           key: 'squid[cacheNumObjCount]'
@@ -702,7 +702,7 @@ zabbix_export:
             - tag: component
               value: objects
         - uuid: 1e648a20db904e92ae4ec0c3f9037a99
-          name: 'Squid: HTTP requests received per second'
+          name: 'HTTP requests received per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.1.1.0
           key: 'squid[cacheProtoClientHttpRequests]'
@@ -719,7 +719,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 31f3e3bb57d645ff8df6b9b8d1b70a49
-          name: 'Squid: Byte hit ratio per 1 minute'
+          name: 'Byte hit ratio per 1 minute'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.10.1
           key: 'squid[cacheRequestByteRatio.1]'
@@ -730,7 +730,7 @@ zabbix_export:
             - tag: component
               value: hits
         - uuid: e19775b9c83648d58655a1130c5771e4
-          name: 'Squid: Byte hit ratio per 5 minutes'
+          name: 'Byte hit ratio per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.10.5
           key: 'squid[cacheRequestByteRatio.5]'
@@ -741,7 +741,7 @@ zabbix_export:
             - tag: component
               value: hits
         - uuid: ffb3fc17631f4cd6b55ed6eefd2e6cea
-          name: 'Squid: Byte hit ratio per 1 hour'
+          name: 'Byte hit ratio per 1 hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.10.60
           key: 'squid[cacheRequestByteRatio.60]'
@@ -752,7 +752,7 @@ zabbix_export:
             - tag: component
               value: hits
         - uuid: a4ba5af69dd64fd8acf707ee1eaaeb32
-          name: 'Squid: Request hit ratio per 1 minute'
+          name: 'Request hit ratio per 1 minute'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.9.1
           key: 'squid[cacheRequestHitRatio.1]'
@@ -765,7 +765,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: b5ae7935e9be40e18c3020820a7865c7
-          name: 'Squid: Request hit ratio per 5 minutes'
+          name: 'Request hit ratio per 5 minutes'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.9.5
           key: 'squid[cacheRequestHitRatio.5]'
@@ -778,7 +778,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: b09f7a1d9dc340b88106016586099dba
-          name: 'Squid: Request hit ratio per 1 hour'
+          name: 'Request hit ratio per 1 hour'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.2.2.1.9.60
           key: 'squid[cacheRequestHitRatio.60]'
@@ -791,7 +791,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 69e4fb088c6949ac94eabcb892df46ab
-          name: 'Squid: Cache swap high water mark'
+          name: 'Cache swap high water mark'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.5.3.0
           key: 'squid[cacheSwapHighWM]'
@@ -805,7 +805,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 221e583d7cf2455b9d848462de4b1e9a
-          name: 'Squid: Cache swap low water mark'
+          name: 'Cache swap low water mark'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.5.4.0
           key: 'squid[cacheSwapLowWM]'
@@ -819,7 +819,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 215aefddd30e41aea54e30678f290215
-          name: 'Squid: Cache swap directory size'
+          name: 'Cache swap directory size'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.5.2.0
           key: 'squid[cacheSwapMaxSize]'
@@ -837,7 +837,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 38ad99f9b30c4d729030ceab6575f4f5
-          name: 'Squid: Sys page faults per second'
+          name: 'Sys page faults per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.3.1.1.0
           key: 'squid[cacheSysPageFaults]'
@@ -852,7 +852,7 @@ zabbix_export:
             - tag: component
               value: faults
         - uuid: 67460731d9c94166870874239c9a60da
-          name: 'Squid: Uptime'
+          name: Uptime
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.1.3.0
           key: 'squid[cacheUptime]'
@@ -870,8 +870,8 @@ zabbix_export:
           triggers:
             - uuid: 89efc9400197427fa718395286dd3583
               expression: 'last(/Squid by SNMP/squid[cacheUptime])<10m'
-              name: 'Squid: Squid has been restarted'
-              event_name: 'Squid: Squid has been restarted (uptime < 10m)'
+              name: 'Squid has been restarted'
+              event_name: 'Squid has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -879,7 +879,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: d7c7f0faa1f64745be774e30e6f0b68f
-          name: 'Squid: Version'
+          name: Version
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3495.1.2.3.0
           key: 'squid[cacheVersionId]'
@@ -897,8 +897,8 @@ zabbix_export:
           triggers:
             - uuid: c5991152d2da4df7ae0d978233c5a859
               expression: 'last(/Squid by SNMP/squid[cacheVersionId],#1)<>last(/Squid by SNMP/squid[cacheVersionId],#2) and length(last(/Squid by SNMP/squid[cacheVersionId]))>0'
-              name: 'Squid: Squid version has been changed'
-              event_name: 'Squid: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Squid version has been changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Squid version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1048,16 +1048,16 @@ zabbix_export:
   triggers:
     - uuid: 89a1cfe0f02f4da880f197c2e5605db8
       expression: 'avg(/Squid by SNMP/squid[cacheSysPageFaults],5m)>avg(/Squid by SNMP/squid[cacheProtoClientHttpRequests],5m)/100*{$SQUID.PAGE.FAULT.WARN}'
-      name: 'Squid: High sys page faults rate'
-      event_name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
+      name: 'High sys page faults rate'
+      event_name: 'High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
       priority: WARNING
       tags:
         - tag: scope
           value: performance
     - uuid: 5676f1e02dc7413fb1a34543ccaf1384
       expression: 'last(/Squid by SNMP/squid[cacheCurrentSwapSize])>last(/Squid by SNMP/squid[cacheSwapHighWM])*last(/Squid by SNMP/squid[cacheSwapMaxSize])/100'
-      name: 'Squid: Swap usage is more than high watermark'
-      event_name: 'Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%)'
+      name: 'Swap usage is more than high watermark'
+      event_name: 'Swap usage is more than high watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: HIGH
       tags:
@@ -1067,8 +1067,8 @@ zabbix_export:
           value: performance
     - uuid: 2cf87472ebf74239bb782580448f696c
       expression: 'last(/Squid by SNMP/squid[cacheCurrentSwapSize])>last(/Squid by SNMP/squid[cacheSwapLowWM])*last(/Squid by SNMP/squid[cacheSwapMaxSize])/100'
-      name: 'Squid: Swap usage is more than low watermark'
-      event_name: 'Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%)'
+      name: 'Swap usage is more than low watermark'
+      event_name: 'Swap usage is more than low watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
       priority: WARNING
       tags:

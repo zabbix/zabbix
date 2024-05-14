@@ -32,7 +32,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 8520813edccc4fb9ba975c27914c5633
-          name: 'OCI Autonomous DB: Database availability'
+          name: 'Database availability'
           type: DEPENDENT
           key: oci.aut.db.availability
           delay: '0'
@@ -58,17 +58,17 @@ zabbix_export:
           triggers:
             - uuid: 21b1a5c7d7754eb6be30098b2df99a22
               expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.availability) = 0'
-              name: 'OCI Autonomous DB: Database is not available'
+              name: 'Database is not available'
               priority: HIGH
               description: 'Autonomous database is not available.'
               dependencies:
-                - name: 'OCI Autonomous DB: Database is not available or accessible'
+                - name: 'Database is not available or accessible'
                   expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 20'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 038c4b2c000747799b60cb074aebbce5
-          name: 'OCI Autonomous DB: DB block changes'
+          name: 'DB block changes'
           type: DEPENDENT
           key: oci.aut.db.block.changes
           delay: '0'
@@ -91,7 +91,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: a471a74943b24a4a81347404e37b7359
-          name: 'OCI Autonomous DB: Failed connections'
+          name: 'Failed connections'
           type: DEPENDENT
           key: oci.aut.db.conn.failed
           delay: '0'
@@ -112,7 +112,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: cc1244e911314e9aaa6a995636848809
-          name: 'OCI Autonomous DB: CPU time'
+          name: 'CPU time'
           type: DEPENDENT
           key: oci.aut.db.cpu.time
           delay: '0'
@@ -137,7 +137,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: da165d0adf324b9e98390d122925fd67
-          name: 'OCI Autonomous DB: CPU utilization, in %'
+          name: 'CPU utilization, in %'
           type: DEPENDENT
           key: oci.aut.db.cpu.util
           delay: '0'
@@ -165,21 +165,21 @@ zabbix_export:
           triggers:
             - uuid: 59fd2d0eff9f4f5493cd0de94ba57572
               expression: 'min(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.cpu.util,5m) >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}'
-              name: 'OCI Autonomous DB: Current CPU utilization is high'
-              event_name: 'OCI Autonomous DB: Current CPU utilization is high (util >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}%)'
+              name: 'Current CPU utilization is high'
+              event_name: 'Current CPU utilization is high (util >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}%)'
               opdata: 'Current: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Current CPU utilization has exceeded `{$OCI.AUTONOMOUS.DB.CPU.UTIL.WARN}`% of the max available value.'
               dependencies:
-                - name: 'OCI Autonomous DB: Current CPU utilization is too high'
+                - name: 'Current CPU utilization is too high'
                   expression: 'min(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.cpu.util,5m) >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}'
               tags:
                 - tag: scope
                   value: capacity
             - uuid: f8a53ef11d2140649bc701660183c33d
               expression: 'min(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.cpu.util,5m) >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}'
-              name: 'OCI Autonomous DB: Current CPU utilization is too high'
-              event_name: 'OCI Autonomous DB: Current CPU utilization is too high (util >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}%)'
+              name: 'Current CPU utilization is too high'
+              event_name: 'Current CPU utilization is too high (util >= {$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}%)'
               opdata: 'Current: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Current CPU utilization has exceeded `{$OCI.AUTONOMOUS.DB.CPU.UTIL.HIGH}`% of the max available value.'
@@ -187,7 +187,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 47708f3446644bbc9afd11bd0e98d1f5
-          name: 'OCI Autonomous DB: Execute count'
+          name: 'Execute count'
           type: DEPENDENT
           key: oci.aut.db.exec.count
           delay: '0'
@@ -208,7 +208,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 4a1af0cbea8645cc897d64e3c1ac802e
-          name: 'OCI Autonomous DB: Connection latency'
+          name: 'Connection latency'
           type: DEPENDENT
           key: oci.aut.db.latency.conn
           delay: '0'
@@ -234,7 +234,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: e233b1ab82384297b9ee88556969da31
-          name: 'OCI Autonomous DB: Query latency'
+          name: 'Query latency'
           type: DEPENDENT
           key: oci.aut.db.latency.query
           delay: '0'
@@ -260,7 +260,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: b39b36b4a72b4cbf80584614c3d996ed
-          name: 'OCI Autonomous DB: Session logical reads'
+          name: 'Session logical reads'
           type: DEPENDENT
           key: oci.aut.db.logical.reads.session
           delay: '0'
@@ -281,7 +281,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 27b77344e5fc473693e48eb676ceb746
-          name: 'OCI Autonomous DB: Current logons'
+          name: 'Current logons'
           type: DEPENDENT
           key: oci.aut.db.logons
           delay: '0'
@@ -302,7 +302,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: f4c0af10cea04decbb049c02f06795e4
-          name: 'OCI Autonomous DB: Failed logons'
+          name: 'Failed logons'
           type: DEPENDENT
           key: oci.aut.db.logons.failed
           delay: '0'
@@ -324,7 +324,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 6104537179324cb48d82e05d64f3a19f
-          name: 'OCI Autonomous DB: Get frequent metrics'
+          name: 'Get frequent metrics'
           type: SCRIPT
           key: oci.aut.db.metrics.frequent.get
           history: '0'
@@ -556,7 +556,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 87a25240776a4b8a9a17ac053b69fd99
-          name: 'OCI Autonomous DB: Get database stats'
+          name: 'Get database stats'
           type: SCRIPT
           key: oci.aut.db.metrics.stats
           delay: 5m
@@ -763,7 +763,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: cb2936c594e4450096559b3023f6aa4f
-          name: 'OCI Autonomous DB: Get storage stats'
+          name: 'Get storage stats'
           type: SCRIPT
           key: oci.aut.db.metrics.storage.stats
           delay: 60m
@@ -971,7 +971,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8ca09dafd8a744489ac122d995367a76
-          name: 'OCI Autonomous DB: Parse count (failures)'
+          name: 'Parse count (failures)'
           type: DEPENDENT
           key: oci.aut.db.parse.count.failed
           delay: '0'
@@ -992,7 +992,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 0f052e0dd75d4ae190c3b87581e29136
-          name: 'OCI Autonomous DB: Parse count (hard)'
+          name: 'Parse count (hard)'
           type: DEPENDENT
           key: oci.aut.db.parse.count.hard
           delay: '0'
@@ -1013,7 +1013,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: d5097f4c85ee40608ca8096f1d5f81c1
-          name: 'OCI Autonomous DB: Parse count (total)'
+          name: 'Parse count (total)'
           type: DEPENDENT
           key: oci.aut.db.parse.count.total
           delay: '0'
@@ -1034,7 +1034,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: db1b10f32442428b89a0437176b94906
-          name: 'OCI Autonomous DB: Physical read total bytes'
+          name: 'Physical read total bytes'
           type: DEPENDENT
           key: oci.aut.db.physical.read.bytes
           delay: '0'
@@ -1056,7 +1056,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: a0e9f2b67c364a8baecc611ff1637399
-          name: 'OCI Autonomous DB: Physical reads'
+          name: 'Physical reads'
           type: DEPENDENT
           key: oci.aut.db.physical.reads
           delay: '0'
@@ -1077,7 +1077,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 81f85ed2baa44bb3a0b05255cc866c3e
-          name: 'OCI Autonomous DB: Physical write total bytes'
+          name: 'Physical write total bytes'
           type: DEPENDENT
           key: oci.aut.db.physical.write.bytes
           delay: '0'
@@ -1099,7 +1099,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 2b9998f8dd7d493496146d10fff0a5ee
-          name: 'OCI Autonomous DB: Physical writes'
+          name: 'Physical writes'
           type: DEPENDENT
           key: oci.aut.db.physical.writes
           delay: '0'
@@ -1120,7 +1120,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 2acac07f1c30472a84b8864a6cfa7985
-          name: 'OCI Autonomous DB: Queued statements'
+          name: 'Queued statements'
           type: DEPENDENT
           key: oci.aut.db.queued.statements
           delay: '0'
@@ -1141,7 +1141,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 0f79764cca3f45688d79bb79c762ef99
-          name: 'OCI Autonomous DB: Redo generated'
+          name: 'Redo generated'
           type: DEPENDENT
           key: oci.aut.db.redo.gen
           delay: '0'
@@ -1162,7 +1162,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 11ca43167a374fe99eab91817957a3fb
-          name: 'OCI Autonomous DB: Sessions'
+          name: Sessions
           type: DEPENDENT
           key: oci.aut.db.sessions
           delay: '0'
@@ -1183,7 +1183,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: a71a6114736f4ce89425ed8de504140d
-          name: 'OCI Autonomous DB: Bytes received via SQL*Net from client'
+          name: 'Bytes received via SQL*Net from client'
           type: DEPENDENT
           key: oci.aut.db.sqlnet.bytes.recv.client
           delay: '0'
@@ -1205,7 +1205,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: a1555ae851e1432c94169e430a782c7d
-          name: 'OCI Autonomous DB: Bytes received via SQL*Net from DBLink'
+          name: 'Bytes received via SQL*Net from DBLink'
           type: DEPENDENT
           key: oci.aut.db.sqlnet.bytes.recv.dblink
           delay: '0'
@@ -1227,7 +1227,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 35cdcf2b736745708910f2389a64670d
-          name: 'OCI Autonomous DB: Bytes sent via SQL*Net to client'
+          name: 'Bytes sent via SQL*Net to client'
           type: DEPENDENT
           key: oci.aut.db.sqlnet.bytes.sent.client
           delay: '0'
@@ -1249,7 +1249,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 5cc3975e76a842b89a7c6d2ac5108b8c
-          name: 'OCI Autonomous DB: Bytes sent via SQL*Net to DBLink'
+          name: 'Bytes sent via SQL*Net to DBLink'
           type: DEPENDENT
           key: oci.aut.db.sqlnet.bytes.sent.dblink
           delay: '0'
@@ -1271,7 +1271,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 48d69be6970c41fcb110f18e18ff6387
-          name: 'OCI Autonomous DB: State'
+          name: State
           type: SCRIPT
           key: oci.aut.db.state
           history: 7d
@@ -1488,7 +1488,7 @@ zabbix_export:
           triggers:
             - uuid: bb790262359f4e35af895b1a69ad511c
               expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 12'
-              name: 'OCI Autonomous DB: Available, needs attention'
+              name: 'Available, needs attention'
               priority: WARNING
               description: 'Autonomous database is available, but needs attention.'
               tags:
@@ -1496,7 +1496,7 @@ zabbix_export:
                   value: availability
             - uuid: 18594a88549843c498d0e037f51afc59
               expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 20'
-              name: 'OCI Autonomous DB: Database is not available or accessible'
+              name: 'Database is not available or accessible'
               priority: HIGH
               description: 'Autonomous database is not available or accessible.'
               tags:
@@ -1504,7 +1504,7 @@ zabbix_export:
                   value: availability
             - uuid: 4ee1a96f29ef461c8830667e19637911
               expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 9'
-              name: 'OCI Autonomous DB: Restore has failed'
+              name: 'Restore has failed'
               priority: WARNING
               description: 'Autonomous database restore has failed.'
               tags:
@@ -1512,34 +1512,34 @@ zabbix_export:
                   value: notice
             - uuid: 783550ed705944259190fb10dae3f5a8
               expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state,#1)<>last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state,#2)'
-              name: 'OCI Autonomous DB: State has changed'
-              event_name: 'OCI Autonomous DB: State has changed (new state: {ITEM.VALUE})'
+              name: 'State has changed'
+              event_name: 'State has changed (new state: {ITEM.VALUE})'
               opdata: 'Current state: {ITEM.LASTVALUE}'
               priority: INFO
               description: 'Autonomous database state has changed.'
               manual_close: 'YES'
               dependencies:
-                - name: 'OCI Autonomous DB: Available, needs attention'
+                - name: 'Available, needs attention'
                   expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 12'
-                - name: 'OCI Autonomous DB: Database is not available or accessible'
+                - name: 'Database is not available or accessible'
                   expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 19 or last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 20'
-                - name: 'OCI Autonomous DB: Restore has failed'
+                - name: 'Restore has failed'
                   expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 9'
-                - name: 'OCI Autonomous DB: State unknown'
+                - name: 'State unknown'
                   expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 0'
               tags:
                 - tag: scope
                   value: notice
             - uuid: 2bc79a5a19a544d39c6de861b94564af
               expression: 'last(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.state) = 0'
-              name: 'OCI Autonomous DB: State unknown'
+              name: 'State unknown'
               priority: WARNING
               description: 'Autonomous database state is unknown.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 6111b1843fe94fefbf1ca1d530832d39
-          name: 'OCI Autonomous DB: Running statements'
+          name: 'Running statements'
           type: DEPENDENT
           key: oci.aut.db.statements.running
           delay: '0'
@@ -1561,7 +1561,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 7901279fcb2a4f6285874680ed5f55f5
-          name: 'OCI Autonomous DB: Storage space allocated'
+          name: 'Storage space allocated'
           type: DEPENDENT
           key: oci.aut.db.storage.space.alloc
           delay: '0'
@@ -1587,7 +1587,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 9dd27df012b24019ad2562822b471a25
-          name: 'OCI Autonomous DB: Maximum storage space'
+          name: 'Maximum storage space'
           type: DEPENDENT
           key: oci.aut.db.storage.space.max
           delay: '0'
@@ -1613,7 +1613,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e5378b6a3d33462eb4f3ed6228532d10
-          name: 'OCI Autonomous DB: Storage space used'
+          name: 'Storage space used'
           type: DEPENDENT
           key: oci.aut.db.storage.space.used
           delay: '0'
@@ -1639,7 +1639,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 5cad114ed74341199a4d3ef17c9acd8e
-          name: 'OCI Autonomous DB: Storage utilization, in %'
+          name: 'Storage utilization, in %'
           type: DEPENDENT
           key: oci.aut.db.storage.space.util
           delay: '0'
@@ -1664,21 +1664,21 @@ zabbix_export:
           triggers:
             - uuid: 37bb41d830424ba2871e768957225add
               expression: 'min(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.storage.space.util,5m) >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.WARN}'
-              name: 'OCI Autonomous DB: Current storage utilization is high'
-              event_name: 'OCI Autonomous DB: Current storage utilization is high (util >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.WARN}%)'
+              name: 'Current storage utilization is high'
+              event_name: 'Current storage utilization is high (util >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.WARN}%)'
               opdata: 'Current: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Current storage utilization has exceeded `{$OCI.AUTONOMOUS.DB.STORAGE.UTIL.WARN}`% of the max available value.'
               dependencies:
-                - name: 'OCI Autonomous DB: Current storage utilization is too high'
+                - name: 'Current storage utilization is too high'
                   expression: 'min(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.storage.space.util,5m) >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.HIGH}'
               tags:
                 - tag: scope
                   value: capacity
             - uuid: 8e16451106094713abaa624967026dc3
               expression: 'min(/Oracle Cloud Autonomous Database by HTTP/oci.aut.db.storage.space.util,5m) >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.HIGH}'
-              name: 'OCI Autonomous DB: Current storage utilization is too high'
-              event_name: 'OCI Autonomous DB: Current storage utilization is too high (util >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.HIGH}%)'
+              name: 'Current storage utilization is too high'
+              event_name: 'Current storage utilization is too high (util >= {$OCI.AUTONOMOUS.DB.STORAGE.UTIL.HIGH}%)'
               opdata: 'Current: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Current storage utilization has exceeded `{$OCI.AUTONOMOUS.DB.STORAGE.UTIL.HIGH}`% of the max available value.'
@@ -1686,7 +1686,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 3455978b6e2a4291984bf1e7c95551e1
-          name: 'OCI Autonomous DB: DB time'
+          name: 'DB time'
           type: DEPENDENT
           key: oci.aut.db.time
           delay: '0'
@@ -1712,7 +1712,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 35995e92de8e45b0a8493bc285ccd0c8
-          name: 'OCI Autonomous DB: Transaction count'
+          name: 'Transaction count'
           type: DEPENDENT
           key: oci.aut.db.transaction.count
           delay: '0'
@@ -1733,7 +1733,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 3e1cd8b4c829451499d605512e1a1bf0
-          name: 'OCI Autonomous DB: User calls'
+          name: 'User calls'
           type: DEPENDENT
           key: oci.aut.db.user.calls
           delay: '0'
@@ -1754,7 +1754,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 0cda6a956ca1476da28083cfc6de8bcc
-          name: 'OCI Autonomous DB: User commits'
+          name: 'User commits'
           type: DEPENDENT
           key: oci.aut.db.user.commits
           delay: '0'
@@ -1775,7 +1775,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 99292418f1764484b1cda27b70af84cc
-          name: 'OCI Autonomous DB: User rollbacks'
+          name: 'User rollbacks'
           type: DEPENDENT
           key: oci.aut.db.user.rollbacks
           delay: '0'
@@ -1796,7 +1796,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 8f627c48a0a94e41ad1b66d7a4817898
-          name: 'OCI Autonomous DB: Wait time'
+          name: 'Wait time'
           type: DEPENDENT
           key: oci.aut.db.wait.time
           delay: '0'
@@ -2394,7 +2394,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: CPU utilization'
                     - type: STRING
                       name: reference
-                      value: ABAAA
+                      value: AAAAA
                 - type: gauge
                   name: 'CPU time'
                   x: '36'
@@ -2475,7 +2475,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: CPU time'
                     - type: STRING
                       name: reference
-                      value: ABAAB
+                      value: AAAAB
             - name: Storage
               display_period: '30'
               widgets:
@@ -2557,7 +2557,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Storage utilization'
                     - type: STRING
                       name: reference
-                      value: ACAAA
+                      value: AAAAA
                 - type: item
                   name: 'Max storage space'
                   x: '18'
@@ -2614,7 +2614,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Storage stats'
                     - type: STRING
                       name: reference
-                      value: ACAAB
+                      value: AAAAB
                 - type: item
                   name: 'Allocated Storage Space'
                   x: '36'
@@ -2756,7 +2756,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Physical reads/writes'
                     - type: STRING
                       name: reference
-                      value: ADAAA
+                      value: AAAAA
                 - type: item
                   name: 'Physical writes'
                   x: '15'
@@ -2855,7 +2855,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Physical read/write total bytes'
                     - type: STRING
                       name: reference
-                      value: ADAAB
+                      value: AAAAB
                 - type: item
                   name: 'Physical write total bytes'
                   x: '42'
@@ -2954,7 +2954,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Session logical reads'
                     - type: STRING
                       name: reference
-                      value: ADAAC
+                      value: AAAAC
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -3057,7 +3057,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Session stats'
                     - type: STRING
                       name: reference
-                      value: AEAAA
+                      value: AAAAA
                 - type: item
                   name: Logons
                   x: '15'
@@ -3199,7 +3199,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Wait time'
                     - type: STRING
                       name: reference
-                      value: AEAAB
+                      value: AAAAB
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -3259,7 +3259,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: DB time'
                     - type: STRING
                       name: reference
-                      value: AEAAC
+                      value: AAAAC
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -3319,7 +3319,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Connection latency'
                     - type: STRING
                       name: reference
-                      value: AEAAD
+                      value: AAAAD
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -3380,7 +3380,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: User calls'
                     - type: STRING
                       name: reference
-                      value: AFAAA
+                      value: AAAAA
                 - type: item
                   name: 'User commits'
                   x: '18'
@@ -3437,7 +3437,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: User commits'
                     - type: STRING
                       name: reference
-                      value: AFAAB
+                      value: AAAAB
                 - type: item
                   name: 'User rollbacks'
                   x: '36'
@@ -3494,7 +3494,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: User rollbacks'
                     - type: STRING
                       name: reference
-                      value: AFAAC
+                      value: AAAAC
                 - type: item
                   name: 'Execute count'
                   x: '54'
@@ -3551,7 +3551,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Execute count'
                     - type: STRING
                       name: reference
-                      value: AFAAD
+                      value: AAAAD
             - name: Parses
               display_period: '30'
               widgets:
@@ -3609,7 +3609,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Parse count hard'
                     - type: STRING
                       name: reference
-                      value: AGAAA
+                      value: AAAAA
                 - type: item
                   name: 'Parse count (failures)'
                   x: '24'
@@ -3666,7 +3666,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Parse count failures'
                     - type: STRING
                       name: reference
-                      value: AGAAB
+                      value: AAAAB
                 - type: item
                   name: 'Parse count (total)'
                   x: '48'
@@ -3723,7 +3723,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Parse count total'
                     - type: STRING
                       name: reference
-                      value: AGAAC
+                      value: AAAAC
             - name: 'SQL*Net'
               display_period: '30'
               widgets:
@@ -3781,7 +3781,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: SQL*Net client bytes'
                     - type: STRING
                       name: reference
-                      value: AHAAA
+                      value: AAAAA
                 - type: item
                   name: 'Bytes sent to client'
                   x: '18'
@@ -3880,7 +3880,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: SQL*Net DBLink bytes'
                     - type: STRING
                       name: reference
-                      value: AHAAB
+                      value: AAAAB
                 - type: item
                   name: 'Bytes sent to DBLink'
                   x: '54'
@@ -3980,7 +3980,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Query latency'
                     - type: STRING
                       name: reference
-                      value: AIAAA
+                      value: AAAAA
                 - type: item
                   name: 'Running statements'
                   x: '21'
@@ -4037,7 +4037,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Statements'
                     - type: STRING
                       name: reference
-                      value: AIAAB
+                      value: AAAAB
                 - type: item
                   name: 'Queued statements'
                   x: '33'
@@ -4283,7 +4283,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: dc2887a2b954406db8588c0ead37411f
-          name: 'OCI Block Volume: Volume guaranteed IOPS'
+          name: 'Volume guaranteed IOPS'
           type: DEPENDENT
           key: oci.block.volume.iops
           delay: '0'
@@ -4306,7 +4306,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 5c1d0fd1686e4c74b33dbe12956d7b7c
-          name: 'OCI Block Volume: Get metrics'
+          name: 'Get metrics'
           type: SCRIPT
           key: oci.block.volume.metrics.get
           history: '0'
@@ -4517,7 +4517,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 680f9e8c96d34c099533adc99c33a48f
-          name: 'OCI Block Volume: Volume read throughput'
+          name: 'Volume read throughput'
           type: DEPENDENT
           key: oci.block.volume.read
           delay: '0'
@@ -4540,7 +4540,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6b8060ce122142968e73da9a3e0813a1
-          name: 'OCI Block Volume: Volume read operations'
+          name: 'Volume read operations'
           type: DEPENDENT
           key: oci.block.volume.read.ops
           delay: '0'
@@ -4563,7 +4563,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 4fdab3067ada41219c8208862e7c8b14
-          name: 'OCI Block Volume: State'
+          name: State
           type: SCRIPT
           key: oci.block.volume.state
           history: 7d
@@ -4765,25 +4765,25 @@ zabbix_export:
           triggers:
             - uuid: 4ea859d86e29455aa4bdd2f3667894f6
               expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) = 0'
-              name: 'OCI Block Volume: Block volume state unknown'
+              name: 'Block volume state unknown'
               priority: WARNING
               description: 'Block volume state is unknown.'
               dependencies:
-                - name: 'OCI Block Volume: Block volume terminated or faulty'
+                - name: 'Block volume terminated or faulty'
                   expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) >= 4'
               tags:
                 - tag: scope
                   value: availability
             - uuid: b8d9491d762f40c58fb1094fa0468d9e
               expression: 'min(/Oracle Cloud Block Volume by HTTP/oci.block.volume.state,5m) >= 4'
-              name: 'OCI Block Volume: Block volume terminated or faulty'
+              name: 'Block volume terminated or faulty'
               priority: HIGH
               description: 'Block volume state is "terminated"/"terminating" or "faulty".'
               tags:
                 - tag: scope
                   value: availability
         - uuid: cc9ef37437b04a40a4b48a9f21e36ff1
-          name: 'OCI Block Volume: Volume throttled operations'
+          name: 'Volume throttled operations'
           type: DEPENDENT
           key: oci.block.volume.throttled.ops
           delay: '0'
@@ -4804,7 +4804,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d1b199adc996404db814ba7568b054df
-          name: 'OCI Block Volume: Volume guaranteed throughput'
+          name: 'Volume guaranteed throughput'
           type: DEPENDENT
           key: oci.block.volume.throughput
           delay: '0'
@@ -4830,7 +4830,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 607f3c4a8197473bb1872e4ed45edd26
-          name: 'OCI Block Volume: Volume guaranteed VPUs/GB'
+          name: 'Volume guaranteed VPUs/GB'
           type: DEPENDENT
           key: oci.block.volume.vpu
           delay: '0'
@@ -4853,7 +4853,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 9ec2ce2d21154028a5623b5d0ac9c082
-          name: 'OCI Block Volume: Volume write throughput'
+          name: 'Volume write throughput'
           type: DEPENDENT
           key: oci.block.volume.write
           delay: '0'
@@ -4876,7 +4876,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e55fee2db439493992a80e39ca647e9a
-          name: 'OCI Block Volume: Volume write operations'
+          name: 'Volume write operations'
           type: DEPENDENT
           key: oci.block.volume.write.ops
           delay: '0'
@@ -5308,7 +5308,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: c629f4e4424b48288b7e7058eef2ca92
-          name: 'OCI Boot Volume: Volume guaranteed IOPS'
+          name: 'Volume guaranteed IOPS'
           type: DEPENDENT
           key: oci.boot.volume.iops
           delay: '0'
@@ -5331,7 +5331,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 388e89b8e68149438d714237e785ccde
-          name: 'OCI Boot Volume: Get metrics'
+          name: 'Get metrics'
           type: SCRIPT
           key: oci.boot.volume.metrics.get
           history: '0'
@@ -5542,7 +5542,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 01700702f306414892828674c0046e5c
-          name: 'OCI Boot Volume: Volume read throughput'
+          name: 'Volume read throughput'
           type: DEPENDENT
           key: oci.boot.volume.read
           delay: '0'
@@ -5565,7 +5565,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b004ee7931dd4eccbfc89d3a8c363209
-          name: 'OCI Boot Volume: Volume read operations'
+          name: 'Volume read operations'
           type: DEPENDENT
           key: oci.boot.volume.read.ops
           delay: '0'
@@ -5588,7 +5588,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3f0e4bed1fd14293b40b23595f01ebb1
-          name: 'OCI Boot Volume: State'
+          name: State
           type: SCRIPT
           key: oci.boot.volume.state
           history: 7d
@@ -5790,25 +5790,25 @@ zabbix_export:
           triggers:
             - uuid: b31f698c5b164afc85a14acc813f463d
               expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) = 0'
-              name: 'OCI Boot Volume: Boot volume state unknown'
+              name: 'Boot volume state unknown'
               priority: WARNING
               description: 'Boot volume state is unknown.'
               dependencies:
-                - name: 'OCI Boot Volume: Boot volume terminated or faulty'
+                - name: 'Boot volume terminated or faulty'
                   expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 4'
               tags:
                 - tag: scope
                   value: availability
             - uuid: 6525eef6dd6c4cb0a22a6442773c3cfa
               expression: 'min(/Oracle Cloud Boot Volume by HTTP/oci.boot.volume.state,5m) >= 4'
-              name: 'OCI Boot Volume: Boot volume terminated or faulty'
+              name: 'Boot volume terminated or faulty'
               priority: HIGH
               description: 'Boot volume state is "terminated"/"terminating" or "faulty".'
               tags:
                 - tag: scope
                   value: availability
         - uuid: cfdc208b621b46508f9addc7ddb0808c
-          name: 'OCI Boot Volume: Volume throttled operations'
+          name: 'Volume throttled operations'
           type: DEPENDENT
           key: oci.boot.volume.throttled.ops
           delay: '0'
@@ -5830,7 +5830,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 09bc5d7c95fe4b41bed9d786b78eba88
-          name: 'OCI Boot Volume: Volume guaranteed throughput'
+          name: 'Volume guaranteed throughput'
           type: DEPENDENT
           key: oci.boot.volume.throughput
           delay: '0'
@@ -5856,7 +5856,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: a3e5f888d2c84d7eb105f1061b9fadd1
-          name: 'OCI Boot Volume: Volume guaranteed VPUs/GB'
+          name: 'Volume guaranteed VPUs/GB'
           type: DEPENDENT
           key: oci.boot.volume.vpu
           delay: '0'
@@ -5879,7 +5879,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: a92206102a7a45d7b5c46096486465b6
-          name: 'OCI Boot Volume: Volume write throughput'
+          name: 'Volume write throughput'
           type: DEPENDENT
           key: oci.boot.volume.write
           delay: '0'
@@ -5902,7 +5902,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 724197c8dcfe4c3ea52bc25d99de727c
-          name: 'OCI Boot Volume: Volume write operations'
+          name: 'Volume write operations'
           type: DEPENDENT
           key: oci.boot.volume.write.ops
           delay: '0'
@@ -7732,7 +7732,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 657ad1d54de4454696573418f5f17f11
-          name: 'OCI Compute: Get instance availability'
+          name: 'Get instance availability'
           type: SCRIPT
           key: oci.compute.availability.get
           delay: 5m
@@ -7921,14 +7921,14 @@ zabbix_export:
           triggers:
             - uuid: dbaee26c1de544d08fa6dd76ddc4c06a
               expression: 'last(/Oracle Cloud Compute by HTTP/oci.compute.availability.get) = 1'
-              name: 'OCI Compute: Compute instance is not available'
+              name: 'Compute instance is not available'
               priority: HIGH
               description: 'Current instance availability.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 04a1f534ae844021be0935abf1214951
-          name: 'OCI Compute: CPU utilization, in %'
+          name: 'CPU utilization, in %'
           type: DEPENDENT
           key: oci.compute.cpu.util
           delay: '0'
@@ -7956,21 +7956,21 @@ zabbix_export:
           triggers:
             - uuid: 38987527713b404f842e26ad12ce3015
               expression: 'min(/Oracle Cloud Compute by HTTP/oci.compute.cpu.util,5m) >= {$OCI.COMPUTE.CPU.UTIL.WARN}'
-              name: 'OCI Compute: Current CPU utilization is high'
-              event_name: 'OCI Compute: Current CPU utilization is high (util >= {$OCI.COMPUTE.CPU.UTIL.WARN}%)'
+              name: 'Current CPU utilization is high'
+              event_name: 'Current CPU utilization is high (util >= {$OCI.COMPUTE.CPU.UTIL.WARN}%)'
               opdata: 'Current: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Current CPU utilization has exceeded `{$OCI.COMPUTE.CPU.UTIL.WARN}`% of the max available value.'
               dependencies:
-                - name: 'OCI Compute: Current CPU utilization is too high'
+                - name: 'Current CPU utilization is too high'
                   expression: 'min(/Oracle Cloud Compute by HTTP/oci.compute.cpu.util,5m) >= {$OCI.COMPUTE.CPU.UTIL.HIGH}'
               tags:
                 - tag: scope
                   value: capacity
             - uuid: 082ba105bf614996a68054ad8c7d7101
               expression: 'min(/Oracle Cloud Compute by HTTP/oci.compute.cpu.util,5m) >= {$OCI.COMPUTE.CPU.UTIL.HIGH}'
-              name: 'OCI Compute: Current CPU utilization is too high'
-              event_name: 'OCI Compute: Current CPU utilization is too high (util >= {$OCI.COMPUTE.CPU.UTIL.HIGH}%)'
+              name: 'Current CPU utilization is too high'
+              event_name: 'Current CPU utilization is too high (util >= {$OCI.COMPUTE.CPU.UTIL.HIGH}%)'
               opdata: 'Current: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Current CPU utilization has exceeded `{$OCI.COMPUTE.CPU.UTIL.HIGH}`% of the max available value.'
@@ -7978,7 +7978,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 670783a729a647db9349d78ac61f1d94
-          name: 'OCI Compute: Disk read I/O'
+          name: 'Disk read I/O'
           type: DEPENDENT
           key: oci.compute.disk.io.read
           delay: '0'
@@ -8004,7 +8004,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: cbd32ebd403c48b2b2f9815f13407afe
-          name: 'OCI Compute: Disk write I/O'
+          name: 'Disk write I/O'
           type: DEPENDENT
           key: oci.compute.disk.io.write
           delay: '0'
@@ -8030,7 +8030,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 15d234ef381747bfb76e7ccf9169046d
-          name: 'OCI Compute: Disk bytes read'
+          name: 'Disk bytes read'
           type: DEPENDENT
           key: oci.compute.disk.read
           delay: '0'
@@ -8056,7 +8056,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: c7e061599b474ac49082d28572ab74c6
-          name: 'OCI Compute: Disk bytes written'
+          name: 'Disk bytes written'
           type: DEPENDENT
           key: oci.compute.disk.written
           delay: '0'
@@ -8082,7 +8082,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 75308c4fb9bd4bad8fbb80aa9b62b099
-          name: 'OCI Compute: Load average'
+          name: 'Load average'
           type: DEPENDENT
           key: oci.compute.load.avg
           delay: '0'
@@ -8108,7 +8108,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 610796958f694aa99f3e9ea1082972bf
-          name: 'OCI Compute: Memory allocation stalls'
+          name: 'Memory allocation stalls'
           type: DEPENDENT
           key: oci.compute.mem.stalls
           delay: '0'
@@ -8131,7 +8131,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: ef284ac17689442e835b686126161bc5
-          name: 'OCI Compute: Memory utilization, in %'
+          name: 'Memory utilization, in %'
           type: DEPENDENT
           key: oci.compute.mem.util
           delay: '0'
@@ -8159,21 +8159,21 @@ zabbix_export:
           triggers:
             - uuid: 9baaacf70a4446a7ae816afdc4db0ae8
               expression: 'min(/Oracle Cloud Compute by HTTP/oci.compute.mem.util,5m) >= {$OCI.COMPUTE.MEM.UTIL.WARN}'
-              name: 'OCI Compute: Current memory utilization is high'
-              event_name: 'OCI Compute: Current memory utilization is high (util >= {$OCI.COMPUTE.MEM.UTIL.WARN}%)'
+              name: 'Current memory utilization is high'
+              event_name: 'Current memory utilization is high (util >= {$OCI.COMPUTE.MEM.UTIL.WARN}%)'
               opdata: 'Current: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Current memory utilization has exceeded `{$OCI.COMPUTE.MEM.UTIL.WARN}`% of the max available value.'
               dependencies:
-                - name: 'OCI Compute: Current memory utilization is too high'
+                - name: 'Current memory utilization is too high'
                   expression: 'min(/Oracle Cloud Compute by HTTP/oci.compute.mem.util,5m) >= {$OCI.COMPUTE.MEM.UTIL.HIGH}'
               tags:
                 - tag: scope
                   value: capacity
             - uuid: 3b894aa250f04ebdb63fb8a914fbd72a
               expression: 'min(/Oracle Cloud Compute by HTTP/oci.compute.mem.util,5m) >= {$OCI.COMPUTE.MEM.UTIL.HIGH}'
-              name: 'OCI Compute: Current memory utilization is too high'
-              event_name: 'OCI Compute: Current memory utilization is too high (util >= {$OCI.COMPUTE.MEM.UTIL.HIGH}%)'
+              name: 'Current memory utilization is too high'
+              event_name: 'Current memory utilization is too high (util >= {$OCI.COMPUTE.MEM.UTIL.HIGH}%)'
               opdata: 'Current: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Current memory utilization has exceeded `{$OCI.COMPUTE.MEM.UTIL.HIGH}`% of the max available value.'
@@ -8181,7 +8181,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 65ff665a67374bb082f260ca473dfb1b
-          name: 'OCI Compute: Get compute metrics'
+          name: 'Get compute metrics'
           type: SCRIPT
           key: oci.compute.metrics.get
           history: '0'
@@ -8394,7 +8394,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0c910a86a99b47f08dee930f07422f45
-          name: 'OCI Compute: Network bytes in'
+          name: 'Network bytes in'
           type: DEPENDENT
           key: oci.compute.network.in
           delay: '0'
@@ -8420,7 +8420,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: a7a027ae583740e19e5f6288b3f15d10
-          name: 'OCI Compute: Network bytes out'
+          name: 'Network bytes out'
           type: DEPENDENT
           key: oci.compute.network.out
           delay: '0'
@@ -8446,7 +8446,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3c4a11c3c8fe40fca36635e2a6882816
-          name: 'OCI Compute: State'
+          name: State
           type: SCRIPT
           key: oci.compute.state.get
           history: 7d
@@ -8651,8 +8651,8 @@ zabbix_export:
           triggers:
             - uuid: 2bce7c23998f4331a5eca3507fc671d9
               expression: 'last(/Oracle Cloud Compute by HTTP/oci.compute.state.get,#1)<>last(/Oracle Cloud Compute by HTTP/oci.compute.state.get,#2)'
-              name: 'OCI Compute: State has changed'
-              event_name: 'OCI Compute: State has changed (new state: {ITEM.VALUE})'
+              name: 'State has changed'
+              event_name: 'State has changed (new state: {ITEM.VALUE})'
               opdata: 'Current state: {ITEM.LASTVALUE}'
               priority: INFO
               description: 'Compute instance state has changed.'
@@ -8661,7 +8661,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: c0e74098afb14984af6355ac0711662e
-          name: 'OCI Compute: Get VNICs'
+          name: 'Get VNICs'
           type: SCRIPT
           key: oci.compute.vnic.get
           history: '0'
@@ -10283,7 +10283,7 @@ zabbix_export:
                         name: 'OCI Compute: Cpu utilization'
                     - type: STRING
                       name: reference
-                      value: ABAAA
+                      value: AAAAA
                 - type: gauge
                   name: Memory
                   x: '24'
@@ -10364,7 +10364,7 @@ zabbix_export:
                         name: 'OCI Compute: Memory utilization'
                     - type: STRING
                       name: reference
-                      value: ABAAB
+                      value: AAAAB
                 - type: graph
                   name: 'Memory allocation stalls'
                   x: '48'
@@ -10379,7 +10379,7 @@ zabbix_export:
                         name: 'OCI Compute: Memory allocation stalls'
                     - type: STRING
                       name: reference
-                      value: ABAAC
+                      value: AAAAC
             - name: 'Net In/Out'
               display_period: '30'
               widgets:
@@ -10437,7 +10437,7 @@ zabbix_export:
                         name: 'OCI Compute: Network bytes in'
                     - type: STRING
                       name: reference
-                      value: ACAAA
+                      value: AAAAA
                 - type: item
                   name: 'Net bytes out'
                   x: '36'
@@ -10494,7 +10494,7 @@ zabbix_export:
                         name: 'OCI Compute: Network bytes out'
                     - type: STRING
                       name: reference
-                      value: ACAAC
+                      value: AAAAC
             - name: Disk
               display_period: '30'
               widgets:
@@ -10552,7 +10552,7 @@ zabbix_export:
                         name: 'OCI Compute: Disk bytes read'
                     - type: STRING
                       name: reference
-                      value: ADAAA
+                      value: AAAAA
                 - type: item
                   name: 'Disk bytes written'
                   x: '18'
@@ -10609,7 +10609,7 @@ zabbix_export:
                         name: 'OCI Compute: Disk bytes written'
                     - type: STRING
                       name: reference
-                      value: ADAAB
+                      value: AAAAB
                 - type: item
                   name: 'Disk read i/o'
                   x: '36'
@@ -10666,7 +10666,7 @@ zabbix_export:
                         name: 'OCI Compute: Disk bytes read I/O'
                     - type: STRING
                       name: reference
-                      value: ADAAC
+                      value: AAAAC
                 - type: item
                   name: 'Disk write i/o'
                   x: '54'
@@ -10723,7 +10723,7 @@ zabbix_export:
                         name: 'OCI Compute: Disk bytes write I/O'
                     - type: STRING
                       name: reference
-                      value: ADAAD
+                      value: AAAAD
             - name: 'VNIC In/Out'
               display_period: '30'
               widgets:
@@ -10790,7 +10790,7 @@ zabbix_export:
                         name: 'OCI Compute: Network bytes in'
                     - type: STRING
                       name: reference
-                      value: AEAAA
+                      value: AAAAA
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -10811,7 +10811,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network bytes in'
                     - type: STRING
                       name: reference
-                      value: AEAAB
+                      value: AAAAB
                 - type: graphprototype
                   name: 'VNIC packets in'
                   x: '6'
@@ -10829,7 +10829,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network packets in'
                     - type: STRING
                       name: reference
-                      value: AEAAC
+                      value: AAAAC
                 - type: item
                   name: 'Total bytes out'
                   x: '36'
@@ -10894,7 +10894,7 @@ zabbix_export:
                         name: 'OCI Compute: Network bytes out'
                     - type: STRING
                       name: reference
-                      value: AEAAD
+                      value: AAAAD
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -10915,7 +10915,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network bytes out'
                     - type: STRING
                       name: reference
-                      value: AEAAE
+                      value: AAAAE
                 - type: graphprototype
                   name: 'VNIC packets out'
                   x: '42'
@@ -10933,7 +10933,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network packets out'
                     - type: STRING
                       name: reference
-                      value: AEAAF
+                      value: AAAAF
             - name: 'VNIC Detailed'
               display_period: '30'
               widgets:
@@ -10952,7 +10952,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network packets dropped by connection tracking table'
                     - type: STRING
                       name: reference
-                      value: AFAAA
+                      value: AAAAA
                 - type: graphprototype
                   name: 'Security list'
                   x: '24'
@@ -10969,7 +10969,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network packets dropped by security list'
                     - type: STRING
                       name: reference
-                      value: AFAAB
+                      value: AAAAB
                 - type: graphprototype
                   name: Smartnic
                   x: '48'
@@ -10986,7 +10986,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Smartnic buffer drops'
                     - type: STRING
                       name: reference
-                      value: AFAAC
+                      value: AAAAC
       valuemaps:
         - uuid: 9e238671edca4ed7b58eefacc861a77d
           name: 'Compute instance availability'
@@ -11060,7 +11060,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 7b2fdfb034ba4657a731ab11ffa175f6
-          name: 'OCI VCN: Get VCN state'
+          name: 'Get VCN state'
           type: SCRIPT
           key: oci.vcn.state.get
           delay: 5m
@@ -11266,7 +11266,7 @@ zabbix_export:
           triggers:
             - uuid: 8a5a94ea28db43df93e85d26703f9e7c
               expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 3 or min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 4'
-              name: 'OCI VCN: VCN state terminated'
+              name: 'VCN state terminated'
               priority: HIGH
               description: 'Virtual cloud network state is "terminated" or "terminating".'
               tags:
@@ -11274,14 +11274,14 @@ zabbix_export:
                   value: availability
             - uuid: 80c3f4d6696c40a78ddb2c00378eeae1
               expression: 'min(/Oracle Cloud Networking by HTTP/oci.vcn.state.get,5m) = 0'
-              name: 'OCI VCN: VCN state unknown'
+              name: 'VCN state unknown'
               priority: WARNING
               description: 'Virtual cloud network state is unknown.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 83236aeedf5e4ba39f0425c21f745690
-          name: 'OCI VCN: Get subnets'
+          name: 'Get subnets'
           type: SCRIPT
           key: oci.vcn.subnets.get
           delay: 5m
@@ -11621,7 +11621,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 8a216ff99ea84e169ba24305a5501b45
-          name: 'OCI Object Storage: Client-side error count'
+          name: 'Client-side error count'
           type: DEPENDENT
           key: oci.obj.storage.client.errors
           delay: '0'
@@ -11643,7 +11643,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3d41eed5ab23438d9f2a87c48bb3def4
-          name: 'OCI Object Storage: First byte latency time'
+          name: 'First byte latency time'
           type: DEPENDENT
           key: oci.obj.storage.latency.byte
           delay: '0'
@@ -11669,7 +11669,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: a47bb44ccb35489e965432c332bd8892
-          name: 'OCI Object Storage: Overall latency time'
+          name: 'Overall latency time'
           type: DEPENDENT
           key: oci.obj.storage.latency.overall
           delay: '0'
@@ -11695,7 +11695,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 5463c35f2c48408997532001025989fa
-          name: 'OCI Object Storage: Get frequent metrics'
+          name: 'Get frequent metrics'
           type: SCRIPT
           key: oci.obj.storage.metrics.frequent.get
           history: '0'
@@ -11905,7 +11905,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 4a12f1c73e8f40be9136a095ad147775
-          name: 'OCI Object Storage: Get hourly metrics'
+          name: 'Get hourly metrics'
           type: SCRIPT
           key: oci.obj.storage.metrics.hourly.get
           delay: 1h
@@ -12113,7 +12113,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5bb5ba3011e94e43bb1fdc79668c9537
-          name: 'OCI Object Storage: Get enabled object lifecycle management'
+          name: 'Get enabled object lifecycle management'
           type: SCRIPT
           key: oci.obj.storage.metrics.olm.get
           delay: 3h
@@ -12307,14 +12307,14 @@ zabbix_export:
           triggers:
             - uuid: 5d9652a8736247c2bcac15cf02012824
               expression: 'last(/Oracle Cloud Object Storage by HTTP/oci.obj.storage.metrics.olm.get,#1)<>last(/Oracle Cloud Object Storage by HTTP/oci.obj.storage.metrics.olm.get,#2) and length(last(/Oracle Cloud Object Storage by HTTP/oci.obj.storage.metrics.olm.get))>0'
-              name: 'OCI Object Storage: Object lifecycle management policy has changed'
+              name: 'Object lifecycle management policy has changed'
               priority: INFO
               description: 'The object lifecycle management policy configuration has changed.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 867aa1736d4c40a18a4f660023d117f4
-          name: 'OCI Object Storage: Number of objects'
+          name: 'Number of objects'
           type: DEPENDENT
           key: oci.obj.storage.objects
           delay: '0'
@@ -12336,7 +12336,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: a3d83de1735d4c409192d187d793f7b2
-          name: 'OCI Object Storage: All requests count'
+          name: 'All requests count'
           type: DEPENDENT
           key: oci.obj.storage.requests
           delay: '0'
@@ -12358,7 +12358,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 2baef7eb0b1348499eda8fb9fd11e0c8
-          name: 'OCI Object Storage: Post object request count'
+          name: 'Post object request count'
           type: DEPENDENT
           key: oci.obj.storage.requests.post
           delay: '0'
@@ -12380,7 +12380,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 1853b681b5e64a0f9c172e6166a430ae
-          name: 'OCI Object Storage: Put object request count'
+          name: 'Put object request count'
           type: DEPENDENT
           key: oci.obj.storage.requests.put
           delay: '0'
@@ -12402,7 +12402,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 61901f89399c413186c9df957760c2d5
-          name: 'OCI Object Storage: Bucket size'
+          name: 'Bucket size'
           type: DEPENDENT
           key: oci.obj.storage.size
           delay: '0'
@@ -12425,7 +12425,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: a4dc04db6b294aef865d137e5fdd0dc2
-          name: 'OCI Object Storage: Incomplete multipart upload size'
+          name: 'Incomplete multipart upload size'
           type: DEPENDENT
           key: oci.obj.storage.size.incomplete
           delay: '0'
@@ -12965,7 +12965,7 @@ zabbix_export:
                         name: 'OCI Object Storage: Overall latency'
                     - type: STRING
                       name: reference
-                      value: ABAAA
+                      value: AAAAA
                 - type: item
                   name: 'First byte latency time'
                   x: '36'
@@ -13022,7 +13022,7 @@ zabbix_export:
                         name: 'OCI Object Storage: First byte latency'
                     - type: STRING
                       name: reference
-                      value: ABAAB
+                      value: AAAAB
   graphs:
     - uuid: 97956d8f4b084cf38c8e46c842e806f5
       name: 'OCI Autonomous DB: Connection latency'

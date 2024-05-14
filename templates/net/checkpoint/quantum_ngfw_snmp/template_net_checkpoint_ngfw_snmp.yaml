@@ -25,7 +25,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 737cc32022044218bd0599bc9be1c6cf
-          name: 'Check Point: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -43,14 +43,14 @@ zabbix_export:
           triggers:
             - uuid: b1d8e86983234d998ed7819d176dc406
               expression: 'max(/Check Point Next Generation Firewall by SNMP/icmpping,#3)=0'
-              name: 'Check Point: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout. Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 584837895d324e5bbcbce686ec894fb4
-          name: 'Check Point: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -65,12 +65,12 @@ zabbix_export:
           triggers:
             - uuid: 7fc82682e0c345e8aefd0c9a261f6890
               expression: 'min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)<100'
-              name: 'Check Point: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'ICMP packet loss detected.'
               dependencies:
-                - name: 'Check Point: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Check Point Next Generation Firewall by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -78,7 +78,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 85013b32538f445d87955582857f2942
-          name: 'Check Point: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -93,14 +93,14 @@ zabbix_export:
           triggers:
             - uuid: 95c6128f0ab84518af233627fe6f3e2b
               expression: 'avg(/Check Point Next Generation Firewall by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Check Point: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Check Point: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)<100'
-                - name: 'Check Point: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Check Point Next Generation Firewall by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -108,7 +108,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: a81c01a9acfe49eabea71a3106bf43b8
-          name: 'Check Point: SNMP walk network interfaces'
+          name: 'SNMP walk network interfaces'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.31.1.1.1.6,1.3.6.1.2.1.31.1.1.1.10,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.31.1.1.1.15]'
           key: net.if.walk
@@ -120,7 +120,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d50cbc1930c24647b1f5a7921c9c3b06
-          name: 'Check Point: Remote Access users'
+          name: 'Remote Access users'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2620.500.9000.1.2]'
           key: remote.users.number
@@ -136,7 +136,7 @@ zabbix_export:
             - tag: component
               value: users
         - uuid: b943e400640e46498ba7ecf2ea3510dd
-          name: 'Check Point: SNMP walk fan sensors'
+          name: 'SNMP walk fan sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2620.1.6.7.8.2.1.2,1.3.6.1.4.1.2620.1.6.7.8.2.1.3,1.3.6.1.4.1.2620.1.6.7.8.2.1.4,1.3.6.1.4.1.2620.1.6.7.8.2.1.6]'
           key: sensor.fan.walk
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 76167bb41de149d6a4b4af4ba68e1460
-          name: 'Check Point: SNMP walk PSU sensors'
+          name: 'SNMP walk PSU sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2620.1.6.7.9.1.1.1,1.3.6.1.4.1.2620.1.6.7.9.1.1.2]'
           key: sensor.psu.walk
@@ -160,7 +160,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d5122dad11df4f6790d49d46614c3ea2
-          name: 'Check Point: SNMP walk temperature sensors'
+          name: 'SNMP walk temperature sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2620.1.6.7.8.1.1.2,1.3.6.1.4.1.2620.1.6.7.8.1.1.3]'
           key: sensor.temp.walk
@@ -172,7 +172,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 620126ff805d48aea5b7cac6d5ab4084
-          name: 'Check Point: SNMP walk voltage sensors'
+          name: 'SNMP walk voltage sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2620.1.6.7.8.3.1.2,1.3.6.1.4.1.2620.1.6.7.8.3.1.3]'
           key: sensor.volt.walk
@@ -184,7 +184,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e04735bdbc4f453692902c0bc6596f3b
-          name: 'Check Point: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -197,7 +197,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 847084d2b72a4c9688a4375a12fd7ea0
-          name: 'Check Point: SNMP walk svn features'
+          name: 'SNMP walk svn features'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2620.1.6.18.1.1.4,1.3.6.1.4.1.2620.1.6.18.1.1.5,1.3.6.1.4.1.2620.1.6.18.1.1.6,1.3.6.1.4.1.2620.1.6.18.1.1.8,1.3.6.1.4.1.2620.1.6.18.1.1.9,1.3.6.1.4.1.2620.1.6.18.1.1.10]'
           key: svn.feature.walk
@@ -209,7 +209,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 499ee4e8eb2f481295625592ee215610
-          name: 'Check Point: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: system.contact
@@ -229,7 +229,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 07162e1ca0c44dc5979b17c258b34052
-          name: 'Check Point: CPU idle time'
+          name: 'CPU idle time'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.3.0
           key: system.cpu.idle
@@ -243,7 +243,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 5acef2ff22464f2c816bf1ab5ed8c66f
-          name: 'Check Point: CPU interrupts per second'
+          name: 'CPU interrupts per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.6.0
           key: system.cpu.intr
@@ -256,7 +256,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4b659e86f18146ca877b595c3151368a
-          name: 'Check Point: Load average (1m avg)'
+          name: 'Load average (1m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-1"]'
           key: system.cpu.load.avg1
@@ -269,7 +269,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 534ad1fb2bec4db5aa25de1a42f28dc6
-          name: 'Check Point: Load average (5m avg)'
+          name: 'Load average (5m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-5"]'
           key: system.cpu.load.avg5
@@ -282,7 +282,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f23f2785833b4096ad65114c40fdaa9b
-          name: 'Check Point: Load average (15m avg)'
+          name: 'Load average (15m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-15"]'
           key: system.cpu.load.avg15
@@ -295,7 +295,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: b42cc71d0b5143108b2314ab1fb1ceff
-          name: 'Check Point: Number of CPUs'
+          name: 'Number of CPUs'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.7.0
           key: system.cpu.num
@@ -311,7 +311,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ada3e8eb30bc4c4f863fca6e46dc1cd5
-          name: 'Check Point: Context switches per second'
+          name: 'Context switches per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.11.60.0
           key: system.cpu.switches
@@ -328,7 +328,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: bf0a80a981d248bdb2e4567ee8c084b3
-          name: 'Check Point: CPU system time'
+          name: 'CPU system time'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.2.0
           key: system.cpu.system
@@ -342,7 +342,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 7a8a46d486404a5184a7fdba0832c50f
-          name: 'Check Point: CPU user time'
+          name: 'CPU user time'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.1.0
           key: system.cpu.user
@@ -356,7 +356,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: db554f92ee6a4ab297b75839c019a7fe
-          name: 'Check Point: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.4.0
           key: system.cpu.util
@@ -372,8 +372,8 @@ zabbix_export:
           triggers:
             - uuid: b9df7717d21145dc86954380422671a9
               expression: 'min(/Check Point Next Generation Firewall by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'Check Point: High CPU utilization'
-              event_name: 'Check Point: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -381,7 +381,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 3628aac1e934408489153062d078e2e7
-          name: 'Check Point: SNMP walk CPU'
+          name: 'SNMP walk CPU'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2620.1.6.7.5.1.1,1.3.6.1.4.1.2620.1.6.7.5.1.2,1.3.6.1.4.1.2620.1.6.7.5.1.3,1.3.6.1.4.1.2620.1.6.7.5.1.4,1.3.6.1.4.1.2620.1.6.7.5.1.5]'
           key: system.cpu.walk
@@ -393,7 +393,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: a7ad79b572ab4e678011aa8ee810cd75
-          name: 'Check Point: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.descr
@@ -412,7 +412,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8385b6ee11b340f888676d013531a4d5
-          name: 'Check Point: Appliance manufacturer'
+          name: 'Appliance manufacturer'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.16.9.0
           key: system.hw.manufacturer
@@ -432,7 +432,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b461939fa04348f19c4f03ce3fd211b8
-          name: 'Check Point: Appliance product name'
+          name: 'Appliance product name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.16.7.0
           key: system.hw.model
@@ -452,7 +452,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: adb0bce1162a4e8990f4d299d8554d29
-          name: 'Check Point: Appliance serial number'
+          name: 'Appliance serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.16.3.0
           key: system.hw.serialnumber
@@ -476,8 +476,8 @@ zabbix_export:
               expression: |
                 last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#2) and
                 length(last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber))>0
-              name: 'Check Point: Device has been replaced'
-              event_name: 'Check Point: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'The device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -485,7 +485,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: df1681db47dc40b987f7be51e640974e
-          name: 'Check Point: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: system.location
@@ -505,7 +505,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a18c50a7b53e49c09de5fa39d9a70a14
-          name: 'Check Point: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -527,8 +527,8 @@ zabbix_export:
           triggers:
             - uuid: d6891f768d354bd09adf47ea313a4ec8
               expression: 'last(/Check Point Next Generation Firewall by SNMP/system.name,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.name,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.name))>0'
-              name: 'Check Point: System name has changed'
-              event_name: 'Check Point: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -538,7 +538,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: bd2f23c23fff46b5b43e8283f1683927
-          name: 'Check Point: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: system.objectid
@@ -557,7 +557,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b05995de7faf4d408b467c1024f2a438
-          name: 'Check Point: System uptime'
+          name: 'System uptime'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: system.uptime
@@ -576,8 +576,8 @@ zabbix_export:
           triggers:
             - uuid: 9c5b6ef7d033486189e045ad62d13991
               expression: 'last(/Check Point Next Generation Firewall by SNMP/system.uptime)<10m'
-              name: 'Check Point: Device has been restarted'
-              event_name: 'Check Point: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Device has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -585,7 +585,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: d66ff3625ea74b5493a37d7b5e231c66
-          name: 'Check Point: SNMP walk disks'
+          name: 'SNMP walk disks'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2620.1.6.7.6.1.2,1.3.6.1.4.1.2620.1.6.7.6.1.3,1.3.6.1.4.1.2620.1.6.7.6.1.4,1.3.6.1.4.1.2620.1.6.7.6.1.5,1.3.6.1.4.1.2620.1.6.7.6.1.6,1.3.6.1.4.1.2620.1.6.7.6.1.7]'
           key: vfs.fs.walk
@@ -597,7 +597,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9c5fbaca93854ad3941cb95e159b0ee1
-          name: 'Check Point: Active memory'
+          name: 'Active memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.4.4.0
           key: vm.memory.active
@@ -610,7 +610,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 0a55ee1b84cb490494e27a4543db7691
-          name: 'Check Point: Free memory'
+          name: 'Free memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.4.5.0
           key: vm.memory.free
@@ -623,7 +623,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 517445d996d148bcb34d7898dca55df6
-          name: 'Check Point: Total memory'
+          name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.6.7.4.3.0
           key: vm.memory.total
@@ -636,7 +636,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 8846be280ae14ee8a1af1be65bef1996
-          name: 'Check Point: Used memory'
+          name: 'Used memory'
           type: CALCULATED
           key: vm.memory.used
           history: 7d
@@ -647,7 +647,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 6bb39f4c24f14cc6a90db2ce1492dbea
-          name: 'Check Point: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: vm.memory.util
           history: 7d
@@ -661,8 +661,8 @@ zabbix_export:
           triggers:
             - uuid: e641a3b2e5ce41dabffed001b26c6075
               expression: 'min(/Check Point Next Generation Firewall by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Check Point: High memory utilization'
-              event_name: 'Check Point: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -671,7 +671,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 0eac75ac03af43d596b84cee15a8ddb4
-          name: 'Check Point: Decrypted packets per second'
+          name: 'Decrypted packets per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.2.5.4.6.0
           key: vpn.packets.decrypted
@@ -687,7 +687,7 @@ zabbix_export:
             - tag: component
               value: vpn
         - uuid: 5d2b872c90774b868d5ce086fabe5cb2
-          name: 'Check Point: Encrypted packets per second'
+          name: 'Encrypted packets per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.2.5.4.5.0
           key: vpn.packets.encrypted
@@ -703,7 +703,7 @@ zabbix_export:
             - tag: component
               value: vpn
         - uuid: eb15e618aff347b3ba986a2c02deb6bd
-          name: 'Check Point: SNMP walk VPN tunnels'
+          name: 'SNMP walk VPN tunnels'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2620.500.9002.1.1,1.3.6.1.4.1.2620.500.9002.1.2,1.3.6.1.4.1.2620.500.9002.1.3,1.3.6.1.4.1.2620.500.9002.1.4,1.3.6.1.4.1.2620.500.9002.1.6,1.3.6.1.4.1.2620.500.9002.1.7,1.3.6.1.4.1.2620.500.9002.1.8,1.3.6.1.4.1.2620.500.9002.1.9,1.3.6.1.4.1.2620.500.9002.1.10,1.3.6.1.4.1.2620.500.9002.1.11]'
           key: vpn.tunnel.walk
@@ -715,7 +715,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 843f5f01701e4d79b3e899134f87632d
-          name: 'Check Point: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -736,12 +736,12 @@ zabbix_export:
           triggers:
             - uuid: 5d450a6a6d1f483da57164e6a32d1828
               expression: 'max(/Check Point Next Generation Firewall by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Check Point: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Check Point: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Check Point Next Generation Firewall by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -2895,9 +2895,6 @@ zabbix_export:
                     - type: INTEGER
                       name: acknowledgement_status
                       value: '1'
-                    - type: STRING
-                      name: reference
-                      value: BAAAA
                     - type: INTEGER
                       name: show
                       value: '3'
@@ -4187,8 +4184,8 @@ zabbix_export:
         min(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg1,5m)/last(/Check Point Next Generation Firewall by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg5)>0
         and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg15)>0
-      name: 'Check Point: Load average is too high'
-      event_name: 'Check Point: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      name: 'Load average is too high'
+      event_name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'The load average per CPU is too high. The system may be slow to respond.'

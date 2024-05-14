@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: deea3cfb1f7442edbc4e715ca73395e8
-          name: 'Mikrotik: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -40,14 +40,14 @@ zabbix_export:
           triggers:
             - uuid: 247cdbc159624b33a4b415d3e048c087
               expression: 'max(/MikroTik RB260GSP by SNMP/icmpping,#3)=0'
-              name: 'Mikrotik: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 468b063753fd4bca861646312909abf7
-          name: 'Mikrotik: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -61,11 +61,11 @@ zabbix_export:
           triggers:
             - uuid: 4d4cde77c8324a88ac0798e2f096be69
               expression: 'min(/MikroTik RB260GSP by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik RB260GSP by SNMP/icmppingloss,5m)<100'
-              name: 'Mikrotik: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Mikrotik: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/MikroTik RB260GSP by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -73,7 +73,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: fe030b0a6cb447a1b1c2fe5f96b2bffa
-          name: 'Mikrotik: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -87,14 +87,14 @@ zabbix_export:
           triggers:
             - uuid: 0f9f0ffd9322422babb52a5a5058d97e
               expression: 'avg(/MikroTik RB260GSP by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Mikrotik: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Mikrotik: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/MikroTik RB260GSP by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik RB260GSP by SNMP/icmppingloss,5m)<100'
-                - name: 'Mikrotik: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/MikroTik RB260GSP by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -114,7 +114,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 44d98891c0a04a8680fe30331f0e44ac
-          name: 'Mikrotik: SNMP walk wireless interfaces'
+          name: 'SNMP walk wireless interfaces'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.14.1.1.2,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.2.2.1.7,1.3.6.1.4.1.14988.1.1.16.1.1.2,1.3.6.1.4.1.14988.1.1.16.1.1.4,1.3.6.1.4.1.14988.1.1.16.1.1.3,1.3.6.1.4.1.14988.1.1.16.1.1.7,1.3.6.1.4.1.14988.1.1.1.3.1.4,1.3.6.1.4.1.14988.1.1.1.3.1.8,1.3.6.1.4.1.14988.1.1.1.3.1.9,1.3.6.1.4.1.14988.1.1.1.3.1.6,1.3.6.1.4.1.14988.1.1.1.3.1.11,1.3.6.1.4.1.14988.1.1.1.7.1.5,1.3.6.1.4.1.14988.1.1.1.7.1.4,1.3.6.1.4.1.14988.1.1.1.7.1.2,1.3.6.1.4.1.14988.1.1.1.7.1.3]'
           key: net.if.wireless.walk
@@ -125,7 +125,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f851b846d4f547d8be926dcbbbbb4338
-          name: 'Mikrotik: SNMP walk CPU temperature sensors'
+          name: 'SNMP walk CPU temperature sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.3.11]'
           key: sensor.cpu.temp.walk
@@ -139,7 +139,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3039020f9ffb48b192fe52524bc9484e
-          name: 'Mikrotik: SNMP walk temperature sensors'
+          name: 'SNMP walk temperature sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.3.10]'
           key: sensor.temp.walk
@@ -153,7 +153,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: cc100edb014b4ff8b119ffe683403396
-          name: 'Mikrotik: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -166,7 +166,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e8656127772b4835b2b102d972b29de8
-          name: 'Mikrotik: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -186,7 +186,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ed241d40ab044cb3ade0c7b4b504cade
-          name: 'Mikrotik: SNMP walk system CPUs'
+          name: 'SNMP walk system CPUs'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.25.3.3.1.1,1.3.6.1.2.1.25.3.3.1.2]'
           key: system.cpu.walk
@@ -200,7 +200,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e35b5c62cfa241fdad672ee8b7303044
-          name: 'Mikrotik: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -221,7 +221,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: df5bf48843cd4981bf719769b3194a3d
-          name: 'Mikrotik: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.7.4.0
           key: system.hw.firmware
@@ -242,7 +242,7 @@ zabbix_export:
           triggers:
             - uuid: 1f05ddb5fc1c4d18a5d9f5755b22a080
               expression: 'last(/MikroTik RB260GSP by SNMP/system.hw.firmware,#1)<>last(/MikroTik RB260GSP by SNMP/system.hw.firmware,#2) and length(last(/MikroTik RB260GSP by SNMP/system.hw.firmware))>0'
-              name: 'Mikrotik: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -251,7 +251,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 50100a89b236431d9ba7e4f2352fa2b9
-          name: 'Mikrotik: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.hw.model
@@ -268,7 +268,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 65a753ce87934f75aa719e3e59f76dbd
-          name: 'Mikrotik: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.7.3.0
           key: system.hw.serialnumber
@@ -290,8 +290,8 @@ zabbix_export:
           triggers:
             - uuid: 9bc744f5b70748e68b13933b618f9550
               expression: 'last(/MikroTik RB260GSP by SNMP/system.hw.serialnumber,#1)<>last(/MikroTik RB260GSP by SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik RB260GSP by SNMP/system.hw.serialnumber))>0'
-              name: 'Mikrotik: Device has been replaced'
-              event_name: 'Mikrotik: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -299,7 +299,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 4cb64b20e3c84697b744db08b605c5b0
-          name: 'Mikrotik: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -323,7 +323,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d5c52de296b04ceab2cfd1a87ccffc6b
-          name: 'Mikrotik: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -343,7 +343,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d3e819d5e0dc403fb4b9dafd1ddc59d5
-          name: 'Mikrotik: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -365,8 +365,8 @@ zabbix_export:
           triggers:
             - uuid: a5fed81db3c7447c8c62b02974765f57
               expression: 'last(/MikroTik RB260GSP by SNMP/system.name,#1)<>last(/MikroTik RB260GSP by SNMP/system.name,#2) and length(last(/MikroTik RB260GSP by SNMP/system.name))>0'
-              name: 'Mikrotik: System name has changed'
-              event_name: 'Mikrotik: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -376,7 +376,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: f0b0b111aac440189f71bb1b2830ded3
-          name: 'Mikrotik: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -395,7 +395,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 530490cf5862413b8e7896aa8c0cb627
-          name: 'Mikrotik: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -414,7 +414,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b5a74fe98a7948a9b189953b457b2975
-          name: 'Mikrotik: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.4.4.0
           key: 'system.sw.os[mtxrLicVersion.0]'
@@ -436,18 +436,18 @@ zabbix_export:
           triggers:
             - uuid: 72cedbd4d23948c3941d5b2011f5cdab
               expression: 'last(/MikroTik RB260GSP by SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik RB260GSP by SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik RB260GSP by SNMP/system.sw.os[mtxrLicVersion.0]))>0'
-              name: 'Mikrotik: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Mikrotik: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/MikroTik RB260GSP by SNMP/system.name,#1)<>last(/MikroTik RB260GSP by SNMP/system.name,#2) and length(last(/MikroTik RB260GSP by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: ad95f1d123f54de3a2b06dfa32e25eed
-          name: 'Mikrotik: SNMP walk mounted filesystems'
+          name: 'SNMP walk mounted filesystems'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.25.2.3.1.3,1.3.6.1.2.1.25.2.3.1.4,1.3.6.1.2.1.25.2.3.1.2,1.3.6.1.2.1.25.2.3.1.6,1.3.6.1.2.1.25.2.3.1.5]'
           key: vfs.fs.walk
@@ -461,7 +461,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 806938d083e848b4b84b2c222c4f4d2e
-          name: 'Mikrotik: Total memory'
+          name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.2.3.1.5.65536
           key: 'vm.memory.total[hrStorageSize.Memory]'
@@ -486,7 +486,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 0d4cc61a9f8c44f385606bc8394eaeb4
-          name: 'Mikrotik: Used memory'
+          name: 'Used memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.2.3.1.6.65536
           key: 'vm.memory.used[hrStorageUsed.Memory]'
@@ -503,7 +503,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 836ba120a51d4c659c034e3a94003c0f
-          name: 'Mikrotik: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[memoryUsedPercentage.Memory]'
           history: 7d
@@ -517,8 +517,8 @@ zabbix_export:
           triggers:
             - uuid: 971f8265db9348ce942f4e0adb49bd1a
               expression: 'min(/MikroTik RB260GSP by SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Mikrotik: High memory utilization'
-              event_name: 'Mikrotik: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -527,7 +527,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9a70b1387ea14502aadcf05f636e7a5c
-          name: 'Mikrotik: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -547,12 +547,12 @@ zabbix_export:
           triggers:
             - uuid: a82f1cafcb424685bb2f562c1c6dce11
               expression: 'max(/MikroTik RB260GSP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Mikrotik: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Mikrotik: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/MikroTik RB260GSP by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -2710,13 +2710,13 @@ zabbix_export:
   triggers:
     - uuid: a3c432e1d04448d3940f69f8d9633c8f
       expression: '(last(/MikroTik RB260GSP by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik RB260GSP by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik RB260GSP by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik RB260GSP by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Mikrotik: Host has been restarted'
-      event_name: 'Mikrotik: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Mikrotik: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/MikroTik RB260GSP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

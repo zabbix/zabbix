@@ -25,7 +25,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: a3d05c4b2b2e40ba8cd29255012f5582
-          name: 'Netgear Fastpath: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -39,14 +39,14 @@ zabbix_export:
           triggers:
             - uuid: 424d07aafe9f4e8c8f647db6a43363d0
               expression: 'max(/Netgear Fastpath by SNMP/icmpping,#3)=0'
-              name: 'Netgear Fastpath: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 4c2b7fe079ba45f6b150d9aeda4b8ab1
-          name: 'Netgear Fastpath: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -60,11 +60,11 @@ zabbix_export:
           triggers:
             - uuid: 9d2efd0614ba4e16b3479ed515d3a9a2
               expression: 'min(/Netgear Fastpath by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Netgear Fastpath by SNMP/icmppingloss,5m)<100'
-              name: 'Netgear Fastpath: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Netgear Fastpath: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Netgear Fastpath by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -72,7 +72,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: f6d11b8498e04df9bcf392aee2aacde3
-          name: 'Netgear Fastpath: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -86,14 +86,14 @@ zabbix_export:
           triggers:
             - uuid: 99888c77fc084d43b742a1f156d87832
               expression: 'avg(/Netgear Fastpath by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Netgear Fastpath: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Netgear Fastpath: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Netgear Fastpath by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Netgear Fastpath by SNMP/icmppingloss,5m)<100'
-                - name: 'Netgear Fastpath: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Netgear Fastpath by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -101,7 +101,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 6f2e3553d7874f81b184b1b25a3d9ac6
-          name: 'Netgear Fastpath: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -114,7 +114,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 44a19d5435e8476dafa2e52b481b9c75
-          name: 'Netgear Fastpath: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -134,7 +134,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e8ffc912f0ee47cca513861fcecfddb0
-          name: 'Netgear Fastpath: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.4.9.0
           key: 'system.cpu.util[agentSwitchCpuProcessTotalUtilization.0]'
@@ -155,8 +155,8 @@ zabbix_export:
           triggers:
             - uuid: 1e47f984c5514205aad2be5db1157fd2
               expression: 'min(/Netgear Fastpath by SNMP/system.cpu.util[agentSwitchCpuProcessTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'Netgear Fastpath: High CPU utilization'
-              event_name: 'Netgear Fastpath: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -164,7 +164,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 59c81fd37e334a0ba60b1256d3730624
-          name: 'Netgear Fastpath: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -185,7 +185,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2470e113b1174c70a1265bf4c4252b5f
-          name: 'Netgear Fastpath: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.3.0
           key: system.hw.model
@@ -203,7 +203,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 697f863cf86544d4a366e8827976ed50
-          name: 'Netgear Fastpath: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.4.0
           key: system.hw.serialnumber
@@ -225,8 +225,8 @@ zabbix_export:
           triggers:
             - uuid: eba057a7ef5743ecb2c037476c97fc38
               expression: 'last(/Netgear Fastpath by SNMP/system.hw.serialnumber,#1)<>last(/Netgear Fastpath by SNMP/system.hw.serialnumber,#2) and length(last(/Netgear Fastpath by SNMP/system.hw.serialnumber))>0'
-              name: 'Netgear Fastpath: Device has been replaced'
-              event_name: 'Netgear Fastpath: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -234,7 +234,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: d0e66c64c0b2449a9c5ffbbdaf176963
-          name: 'Netgear Fastpath: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -258,7 +258,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: eeeceba5d9dd43de856ada8b5460f3d5
-          name: 'Netgear Fastpath: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -278,7 +278,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 53b0dbb74854494eb834804a1f0afbe7
-          name: 'Netgear Fastpath: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -300,8 +300,8 @@ zabbix_export:
           triggers:
             - uuid: 61e82ab169374a51a1ebd876cc7813a8
               expression: 'last(/Netgear Fastpath by SNMP/system.name,#1)<>last(/Netgear Fastpath by SNMP/system.name,#2) and length(last(/Netgear Fastpath by SNMP/system.name))>0'
-              name: 'Netgear Fastpath: System name has changed'
-              event_name: 'Netgear Fastpath: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -311,7 +311,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 6538a853fd47460585dbc2b4853ea65b
-          name: 'Netgear Fastpath: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -330,7 +330,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8d5bfc785de5459c967659306d66b7e5
-          name: 'Netgear Fastpath: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -349,7 +349,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5bd8c956163d4201a7e896abde28044b
-          name: 'Netgear Fastpath: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.1.10.0
           key: 'system.sw.os[agentInventoryOperatingSystem.0]'
@@ -371,18 +371,18 @@ zabbix_export:
           triggers:
             - uuid: bf0a6ff122a14f4c9baa640d27c8f982
               expression: 'last(/Netgear Fastpath by SNMP/system.sw.os[agentInventoryOperatingSystem.0],#1)<>last(/Netgear Fastpath by SNMP/system.sw.os[agentInventoryOperatingSystem.0],#2) and length(last(/Netgear Fastpath by SNMP/system.sw.os[agentInventoryOperatingSystem.0]))>0'
-              name: 'Netgear Fastpath: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Netgear Fastpath: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Netgear Fastpath by SNMP/system.name,#1)<>last(/Netgear Fastpath by SNMP/system.name,#2) and length(last(/Netgear Fastpath by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: f94ffd4d6eb84ae88cdf5033df65f249
-          name: 'Netgear Fastpath: Available memory'
+          name: 'Available memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.5.1.0
           key: 'vm.memory.available[agentSwitchCpuProcessMemFree.0]'
@@ -395,7 +395,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 98037eeab349478c8c393b163ec5193e
-          name: 'Netgear Fastpath: Total memory'
+          name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.4526.10.1.1.5.2.0
           key: 'vm.memory.total[agentSwitchCpuProcessMemAvailable.0]'
@@ -408,7 +408,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 86ef153d78b5466cac76a32f81d8b958
-          name: 'Netgear Fastpath: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[memoryUsedPercentage.0]'
           history: 7d
@@ -422,8 +422,8 @@ zabbix_export:
           triggers:
             - uuid: 21c1a017dcc14148a9020207a6fd7488
               expression: 'min(/Netgear Fastpath by SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Netgear Fastpath: High memory utilization'
-              event_name: 'Netgear Fastpath: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -432,7 +432,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 755ae00add264d2ba735b45f7dc5ca23
-          name: 'Netgear Fastpath: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -452,12 +452,12 @@ zabbix_export:
           triggers:
             - uuid: cc91cb171901433bbb35752127e54ad0
               expression: 'max(/Netgear Fastpath by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Netgear Fastpath: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Netgear Fastpath: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Netgear Fastpath by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1818,13 +1818,13 @@ zabbix_export:
   triggers:
     - uuid: d68e4595fd4c4e5a9307b268cfe06b3e
       expression: '(last(/Netgear Fastpath by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Netgear Fastpath by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Netgear Fastpath by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Netgear Fastpath by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Netgear Fastpath: Host has been restarted'
-      event_name: 'Netgear Fastpath: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Netgear Fastpath: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Netgear Fastpath by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

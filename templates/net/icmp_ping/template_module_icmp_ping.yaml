@@ -18,7 +18,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: db5a94f6cea14deba957202b2f014469
-          name: 'ICMP: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -32,14 +32,14 @@ zabbix_export:
           triggers:
             - uuid: b030876299434f3ba43e11c584104a81
               expression: 'max(/ICMP Ping/icmpping,#3)=0'
-              name: 'ICMP: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 04b21adaf422473a88df2c52786474ed
-          name: 'ICMP: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -53,11 +53,11 @@ zabbix_export:
           triggers:
             - uuid: 42c4b0310aaf4b9c8cb502542b7dea90
               expression: 'min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100'
-              name: 'ICMP: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'ICMP: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/ICMP Ping/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -65,7 +65,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: a79e33e5fd264725b934f603fa071555
-          name: 'ICMP: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -79,14 +79,14 @@ zabbix_export:
           triggers:
             - uuid: 32b4d8f3eba34bd380803410111d4b7f
               expression: 'avg(/ICMP Ping/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'ICMP: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'ICMP: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100'
-                - name: 'ICMP: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/ICMP Ping/icmpping,#3)=0'
               tags:
                 - tag: scope

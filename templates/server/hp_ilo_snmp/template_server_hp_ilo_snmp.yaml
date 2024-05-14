@@ -24,7 +24,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 5abff4175d1640b9b633c4d9184bd243
-          name: 'HP iLO: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -38,14 +38,14 @@ zabbix_export:
           triggers:
             - uuid: 755a4c5e809d418cbb1162102b0d1c26
               expression: 'max(/HP iLO by SNMP/icmpping,#3)=0'
-              name: 'HP iLO: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 1db2fcdd357e4d15a989c0511bbed8bd
-          name: 'HP iLO: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -59,11 +59,11 @@ zabbix_export:
           triggers:
             - uuid: 0492380bc6374f24b92b4661b27d8f2c
               expression: 'min(/HP iLO by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP iLO by SNMP/icmppingloss,5m)<100'
-              name: 'HP iLO: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'HP iLO: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP iLO by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -71,7 +71,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 8be612f43d1d40ce9efd3c36d18e6a20
-          name: 'HP iLO: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -85,14 +85,14 @@ zabbix_export:
           triggers:
             - uuid: a869db9f341c479c80dca50bac0ff309
               expression: 'avg(/HP iLO by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'HP iLO: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'HP iLO: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/HP iLO by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP iLO by SNMP/icmppingloss,5m)<100'
-                - name: 'HP iLO: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP iLO by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -100,7 +100,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 399110973c134983bd5020b9e5b509f4
-          name: 'HP iLO: System temperature status'
+          name: 'System temperature status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
           key: 'sensor.temp.status[cpqHeThermalCondition.0]'
@@ -124,7 +124,7 @@ zabbix_export:
             - tag: component
               value: temperature
         - uuid: 0107bcd0d6b840c4a64061ee83e69f11
-          name: 'HP iLO: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -137,7 +137,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 2203e586148a418f9e2f06b38c340b53
-          name: 'HP iLO: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -157,7 +157,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 03ff0b6d9c7a483eaae565d90473d291
-          name: 'HP iLO: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -178,7 +178,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2708e6cb2ba240a791685ebdcab3407f
-          name: 'HP iLO: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
           key: system.hw.model
@@ -197,7 +197,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 96e27ad668944845a7f598f35b577d18
-          name: 'HP iLO: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
           key: system.hw.serialnumber
@@ -218,8 +218,8 @@ zabbix_export:
           triggers:
             - uuid: 7e8d377e1b49469a8b19b94e6dad97ce
               expression: 'last(/HP iLO by SNMP/system.hw.serialnumber,#1)<>last(/HP iLO by SNMP/system.hw.serialnumber,#2) and length(last(/HP iLO by SNMP/system.hw.serialnumber))>0'
-              name: 'HP iLO: Device has been replaced'
-              event_name: 'HP iLO: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -227,7 +227,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 02e21fa19e814d529ae24f89e3bbf947
-          name: 'HP iLO: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -251,7 +251,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 84ed489ba1be43738be79f8a71b60381
-          name: 'HP iLO: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -271,7 +271,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 88baf9f1da184fc78a49b064f0b4de85
-          name: 'HP iLO: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -293,8 +293,8 @@ zabbix_export:
           triggers:
             - uuid: df3c9e64b0f844ddac8f40f6df956595
               expression: 'last(/HP iLO by SNMP/system.name,#1)<>last(/HP iLO by SNMP/system.name,#2) and length(last(/HP iLO by SNMP/system.name))>0'
-              name: 'HP iLO: System name has changed'
-              event_name: 'HP iLO: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -304,7 +304,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 05166eb015534cae9798f9266d3d0a6b
-          name: 'HP iLO: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -323,7 +323,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d02b8e2d5c7a4afabc2fbadc8674288c
-          name: 'HP iLO: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -342,7 +342,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5f30715570c449ecb4e07858256a3e05
-          name: 'HP iLO: Overall system health status'
+          name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
           key: 'system.status[cpqHeMibCondition.0]'
@@ -363,7 +363,7 @@ zabbix_export:
           triggers:
             - uuid: 6d0d0554e1c945dc90701aebd531f9cb
               expression: 'count(/HP iLO by SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
-              name: 'HP iLO: System status is in critical state'
+              name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
@@ -374,12 +374,12 @@ zabbix_export:
                   value: performance
             - uuid: 273c27c7929649f1a45ddc92c09ab982
               expression: 'count(/HP iLO by SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
-              name: 'HP iLO: System status is in warning state'
+              name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings'
               dependencies:
-                - name: 'HP iLO: System status is in critical state'
+                - name: 'System status is in critical state'
                   expression: 'count(/HP iLO by SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               tags:
                 - tag: scope
@@ -387,7 +387,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: e5ebd75f34f24502b3cdc2a707fb24c5
-          name: 'HP iLO: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -407,12 +407,12 @@ zabbix_export:
           triggers:
             - uuid: 8870beab300f41ea8d54619fd2bf0371
               expression: 'max(/HP iLO by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'HP iLO: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'HP iLO: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP iLO by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -2222,13 +2222,13 @@ zabbix_export:
   triggers:
     - uuid: 261749b9936c4a26b48d660f01435fb7
       expression: '(last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP iLO by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'HP iLO: Host has been restarted'
-      event_name: 'HP iLO: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'HP iLO: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/HP iLO by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

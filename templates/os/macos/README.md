@@ -47,41 +47,41 @@ Install Zabbix agent on macOS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|macOS: Maximum number of opened files|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxfiles|
-|macOS: Maximum number of processes|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxproc|
-|macOS: Incoming network traffic on en0||Zabbix agent|net.if.in[en0]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|macOS: Outgoing network traffic on en0||Zabbix agent|net.if.out[en0]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|macOS: Host boot time||Zabbix agent|system.boottime|
-|macOS: Processor load (1 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg1]|
-|macOS: Processor load (5 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg5]|
-|macOS: Processor load (15 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg15]|
-|macOS: Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|macOS: Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
-|macOS: System information|<p>Information as normally returned by `uname -a`.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|macOS: System uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Zabbix agent|system.uptime|
-|macOS: Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
-|macOS: Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|macOS: Available memory|<p>Defined as free + cached + buffers.</p>|Zabbix agent|vm.memory.size[available]|
-|macOS: Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent|vm.memory.size[total]|
-|macOS: Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|macOS: Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|macOS: Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent|agent.ping|
-|macOS: Zabbix agent availability|<p>Used for monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
-|macOS: Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
+|Maximum number of opened files|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxfiles|
+|Maximum number of processes|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxproc|
+|Incoming network traffic on en0||Zabbix agent|net.if.in[en0]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Outgoing network traffic on en0||Zabbix agent|net.if.out[en0]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Host boot time||Zabbix agent|system.boottime|
+|Processor load (1 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg1]|
+|Processor load (5 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg5]|
+|Processor load (15 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg15]|
+|Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
+|System information|<p>Information as normally returned by `uname -a`.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|System uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Zabbix agent|system.uptime|
+|Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
+|Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Available memory|<p>Defined as free + cached + buffers.</p>|Zabbix agent|vm.memory.size[available]|
+|Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent|vm.memory.size[total]|
+|Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent|agent.ping|
+|Zabbix agent availability|<p>Used for monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
+|Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|macOS: Configured max number of opened files is too low||`last(/macOS by Zabbix agent/kernel.maxfiles)<1024`|Info||
-|macOS: Configured max number of processes is too low||`last(/macOS by Zabbix agent/kernel.maxproc)<256`|Info||
-|macOS: Processor load is too high||`avg(/macOS by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5`|Warning||
-|macOS: Hostname was changed||`last(/macOS by Zabbix agent/system.hostname,#1)<>last(/macOS by Zabbix agent/system.hostname,#2)`|Info||
-|macOS: Host information was changed||`last(/macOS by Zabbix agent/system.uname,#1)<>last(/macOS by Zabbix agent/system.uname,#2)`|Info||
-|macOS: Server has just been restarted||`change(/macOS by Zabbix agent/system.uptime)<0`|Info||
-|macOS: /etc/passwd has been changed||`last(/macOS by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
-|macOS: Lack of available memory on server||`last(/macOS by Zabbix agent/vm.memory.size[available])<20M`|Average||
-|macOS: Zabbix agent is not available|<p>For passive checks only; the availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.</p>|`max(/macOS by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
+|Configured max number of opened files is too low||`last(/macOS by Zabbix agent/kernel.maxfiles)<1024`|Info||
+|Configured max number of processes is too low||`last(/macOS by Zabbix agent/kernel.maxproc)<256`|Info||
+|Processor load is too high||`avg(/macOS by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5`|Warning||
+|Hostname was changed||`last(/macOS by Zabbix agent/system.hostname,#1)<>last(/macOS by Zabbix agent/system.hostname,#2)`|Info||
+|Host information was changed||`last(/macOS by Zabbix agent/system.uname,#1)<>last(/macOS by Zabbix agent/system.uname,#2)`|Info||
+|Server has just been restarted||`change(/macOS by Zabbix agent/system.uptime)<0`|Info||
+|/etc/passwd has been changed||`last(/macOS by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
+|Lack of available memory on server||`last(/macOS by Zabbix agent/vm.memory.size[available])<20M`|Average||
+|Zabbix agent is not available|<p>For passive checks only; the availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.</p>|`max(/macOS by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
 
 ### LLD rule Mounted filesystem discovery
 
