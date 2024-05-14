@@ -4192,21 +4192,22 @@ static int	DBpatch_6050301(void)
 
 	zbx_db_insert_autoincrement(&db_insert_int, "widget_fieldid");
 	ret = zbx_db_insert_execute(&db_insert_int);
-	zbx_db_insert_clean(&db_insert_int);
 
 	if (SUCCEED == ret)
 	{
 		zbx_db_insert_autoincrement(&db_insert_str, "widget_fieldid");
 		ret = zbx_db_insert_execute(&db_insert_str);
-		zbx_db_insert_clean(&db_insert_str);
 	}
 
 	if (SUCCEED == ret)
 	{
 		zbx_db_insert_autoincrement(&db_insert_itemid, "widget_fieldid");
 		ret = zbx_db_insert_execute(&db_insert_itemid);
-		zbx_db_insert_clean(&db_insert_itemid);
 	}
+
+	zbx_db_insert_clean(&db_insert_int);
+	zbx_db_insert_clean(&db_insert_str);
+	zbx_db_insert_clean(&db_insert_itemid);
 
 	return ret;
 }
