@@ -2250,7 +2250,7 @@ static int	am_check_dbstatus()
 	res = DBselect_once("select null");
 #endif
 
-	if (res == (DB_RESULT)ZBX_DB_DOWN)
+	if ((DB_RESULT)ZBX_DB_DOWN == res || NULL == res)
 	{
 		DBclose();
 		ret = DBconnect(ZBX_DB_CONNECT_ONCE);
