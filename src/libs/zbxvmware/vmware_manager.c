@@ -21,6 +21,7 @@
 #include "vmware_internal.h"
 
 #include "vmware_perfcntr.h"
+#include "vmware_event.h"
 
 #include "zbxalgo.h"
 #include "zbxnix.h"

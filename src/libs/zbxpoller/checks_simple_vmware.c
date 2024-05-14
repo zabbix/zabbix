@@ -1174,6 +1174,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	unsigned char		skip_old, severity = 0;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
+	time_t			lastaccess;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1219,7 +1220,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	if (NULL == service->eventlog_job_ref)
 		zbx_vmware_eventlog_job_create(service);
 
-	time_t	lastaccess = time(NULL);
+	lastaccess = time(NULL);
 
 	if (0 != service->eventlog.lastaccess)
 	{
