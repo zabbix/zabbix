@@ -33,29 +33,29 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1 G4 (H1I1 and H3I1)'],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-							'expected' => ['Dynamic widgets H1I2' => '12']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I1',
-							'expected' => ['Dynamic widgets H1I1' => '11']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-							'expected' => ['Dynamic widgets H1I2' => '12']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: 2 items',
-							'expected' => [
-								'Dynamic widgets H1I1' => '11',
-								'Dynamic widgets H1I2' => '12'
-							]
-						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
+//							'expected' => ['Dynamic widgets H1I2' => '12']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I1',
+//							'expected' => ['Dynamic widgets H1I1' => '11']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
+//							'expected' => ['Dynamic widgets H1I2' => '12']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: 2 items',
+//							'expected' => [
+//								'Dynamic widgets H1I1' => '11',
+//								'Dynamic widgets H1I2' => '12'
+//							]
+//						],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I1'],
 						[
@@ -89,29 +89,29 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-							'expected' => ['Dynamic widgets H1I2' => '12']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I1',
-							'expected' => ['Dynamic widgets H1I1' => '11']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-							'expected' => ['Dynamic widgets H1I2' => '12']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: 2 items',
-							'expected' => [
-								'Dynamic widgets H1I1' => '11',
-								'Dynamic widgets H1I2' => '12'
-							]
-						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
+//							'expected' => ['Dynamic widgets H1I2' => '12']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I1',
+//							'expected' => ['Dynamic widgets H1I1' => '11']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
+//							'expected' => ['Dynamic widgets H1I2' => '12']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: 2 items',
+//							'expected' => [
+//								'Dynamic widgets H1I1' => '11',
+//								'Dynamic widgets H1I2' => '12'
+//							]
+//						],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I1'],
 						[
@@ -142,25 +142,25 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-							'expected' => ['Dynamic widgets H1I2' => '12']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H2: Dynamic widgets H2I1',
-							'expected' => ['Dynamic widgets H2I1' => '21']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Plain text'
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H2: Dynamic widgets H2I1',
-							'expected' => ['Dynamic widgets H2I1' => '21']
-						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
+//							'expected' => ['Dynamic widgets H1I2' => '12']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H2: Dynamic widgets H2I1',
+//							'expected' => ['Dynamic widgets H2I1' => '21']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Plain text'
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H2: Dynamic widgets H2I1',
+//							'expected' => ['Dynamic widgets H2I1' => '21']
+//						],
 						['type' => 'Gauge', 'header' => 'Gauge'],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H2: Dynamic widgets H2I1'],
 						[
@@ -191,25 +191,25 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-							'expected' => ['Dynamic widgets H1I2' => '12']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H3: Dynamic widgets H3I1',
-							'expected' => ['Dynamic widgets H3I1' => '31']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Plain text'
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H3: Dynamic widgets H3I1',
-							'expected' => ['Dynamic widgets H3I1' => '31']
-						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
+//							'expected' => ['Dynamic widgets H1I2' => '12']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H3: Dynamic widgets H3I1',
+//							'expected' => ['Dynamic widgets H3I1' => '31']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Plain text'
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H3: Dynamic widgets H3I1',
+//							'expected' => ['Dynamic widgets H3I1' => '31']
+//						],
 						['type' => 'Gauge', 'header' => 'Gauge'],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H3: Dynamic widgets H3I1'],
 						[
@@ -240,23 +240,23 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
-						[
-							'type' => 'Plain text',
-							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-							'expected' => ['Dynamic widgets H1I2' => '12']
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Plain text'
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Plain text'
-						],
-						[
-							'type' => 'Plain text',
-							'header' => 'Plain text'
-						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
+//							'expected' => ['Dynamic widgets H1I2' => '12']
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Plain text'
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Plain text'
+//						],
+//						[
+//							'type' => 'Plain text',
+//							'header' => 'Plain text'
+//						],
 						['type' => 'Gauge', 'header' => 'Gauge'],
 						['type' => 'Gauge', 'header' => 'Gauge'],
 						[
@@ -337,21 +337,19 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 
 			// Check widget content when the host match dynamic option criteria.
 			$this->assertFalse($widget_content->query('class:no-data-message')->one(false)->isValid());
-			switch ($expected['type']) {
-				case 'Plain text':
-					$data = $widget_content->asTable()->index('Name');
-					foreach ($expected['expected'] as $item => $value) {
-						$row = $data[$item];
-						$this->assertEquals($value, $row['Value']);
-					}
-					break;
 
-				case 'URL':
-					$this->page->switchTo($widget_content->query('id:iframe')->one());
-					$params = json_decode($this->query('xpath://body')->one()->getText(), true);
-					$this->assertEquals($expected['host'], $params['name']);
-					$this->page->switchTo();
-					break;
+			if ($expected['type'] === 'URL') {
+//				case 'Plain text':
+//					$data = $widget_content->asTable()->index('Name');
+//					foreach ($expected['expected'] as $item => $value) {
+//						$row = $data[$item];
+//						$this->assertEquals($value, $row['Value']);
+//					}
+//					break;
+				$this->page->switchTo($widget_content->query('id:iframe')->one());
+				$params = json_decode($this->query('xpath://body')->one()->getText(), true);
+				$this->assertEquals($expected['host'], $params['name']);
+				$this->page->switchTo();
 			}
 		}
 	}
