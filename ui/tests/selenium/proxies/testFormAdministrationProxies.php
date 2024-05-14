@@ -77,7 +77,8 @@ class testFormAdministrationProxies extends CWebTest {
 				'timeout_http_agent' => '300s',
 				'timeout_ssh_agent' => '300s',
 				'timeout_telnet_agent' => '300s',
-				'timeout_script' => '300s'
+				'timeout_script' => '300s',
+				'timeout_browser' => '300s'
 			],
 			[
 				'name' => self::CHANGE_PASSIVE_PROXY,
@@ -98,7 +99,8 @@ class testFormAdministrationProxies extends CWebTest {
 				'timeout_http_agent' => '300s',
 				'timeout_ssh_agent' => '300s',
 				'timeout_telnet_agent' => '300s',
-				'timeout_script' => '300s'
+				'timeout_script' => '300s',
+				'timeout_browser' => '300s'
 			]
 		]);
 	}
@@ -534,7 +536,7 @@ class testFormAdministrationProxies extends CWebTest {
 
 				// Available timeouts list.
 				$timeouts = ['Zabbix agent', 'Simple check', 'SNMP agent', 'External check', 'Database monitor',
-						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script'
+						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script', 'Browser'
 				];
 
 				// Every timeout has mandatory status.
@@ -545,8 +547,9 @@ class testFormAdministrationProxies extends CWebTest {
 					$form->fill(['Timeouts for item types' => $timeout]);
 
 					foreach ($timeouts as $timeout) {
+						$default = ($timeout === 'Browser') ? '1m' : '3s';
 						$field = $form->getField($timeout);
-						$this->assertEquals('3s', $field->getValue());
+						$this->assertEquals($default, $field->getValue());
 						$this->assertEquals(255, $field->getAttribute('maxlength'));
 						$this->assertEquals($enabled, $field->isClickable());
 					}
@@ -556,7 +559,7 @@ class testFormAdministrationProxies extends CWebTest {
 				$this->assertEquals(['Proxy', 'Encryption', 'Timeouts'], $form->getTabs());
 				$form->checkValue(['Proxy mode' => 'Active']);
 			}
-			else{
+			else {
 				$form->getField('Proxy mode')->asSegmentedRadio()->select('Passive');
 
 				// Check that 'Proxy address' is disappeared.
@@ -873,7 +876,7 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'All timeouts fields empty',
+						'Proxy name' => 'All timeout fields empty',
 						'Proxy mode' => 'Active'
 					],
 					'timeout_fields' => [
@@ -885,7 +888,8 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '',
 						'SSH agent' => '',
 						'TELNET agent' => '',
-						'Script' => ''
+						'Script' => '',
+						'Browser' => ''
 					],
 					'error' => [
 						'Incorrect value for field "timeout_zabbix_agent": cannot be empty.',
@@ -896,7 +900,8 @@ class testFormAdministrationProxies extends CWebTest {
 						'Incorrect value for field "timeout_http_agent": cannot be empty.',
 						'Incorrect value for field "timeout_ssh_agent": cannot be empty.',
 						'Incorrect value for field "timeout_telnet_agent": cannot be empty.',
-						'Incorrect value for field "timeout_script": cannot be empty.'
+						'Incorrect value for field "timeout_script": cannot be empty.',
+						'Incorrect value for field "timeout_browser": cannot be empty.'
 					]
 				]
 			],
@@ -1444,6 +1449,66 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'Browser timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Browser' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_browser": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Browser timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Browser' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_browser": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Browser timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Browser' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_browser": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Browser timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Browser' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_browser": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'Timeouts field - global macros',
 						'Proxy mode' => 'Active'
 					],
@@ -1519,7 +1584,7 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				[
 					'proxy_fields' => [
-						'Proxy name' => 'All timeouts fields - 300',
+						'Proxy name' => 'All timeout fields - 300',
 						'Proxy mode' => 'Active'
 					],
 					'timeout_fields' => [
@@ -1531,14 +1596,15 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '300',
 						'SSH agent' => '300',
 						'TELNET agent' => '300',
-						'Script' => '300'
+						'Script' => '300',
+						'Browser' => '300'
 					]
 				]
 			],
 			[
 				[
 					'proxy_fields' => [
-						'Proxy name' => 'All timeouts fields - macros',
+						'Proxy name' => 'All timeout fields - macros',
 						'Proxy mode' => 'Active'
 					],
 					'timeout_fields' => [
@@ -1550,7 +1616,8 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '{$MACROS}',
 						'SSH agent' => '{$MACROS}',
 						'TELNET agent' => '{$MACROS}',
-						'Script' => '{$MACROS}'
+						'Script' => '{$MACROS}',
+						'Browser' => '{$MACROS}'
 					]
 				]
 			],
