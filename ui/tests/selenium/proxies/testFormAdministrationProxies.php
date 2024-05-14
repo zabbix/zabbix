@@ -547,7 +547,7 @@ class testFormAdministrationProxies extends CWebTest {
 					$form->fill(['Timeouts for item types' => $timeout]);
 
 					foreach ($timeouts as $timeout) {
-						$default = ($timeout === 'Browser') ? '1m' : '3s';
+						$default = ($timeout === 'Browser') ? '60s' : '3s';
 						$field = $form->getField($timeout);
 						$this->assertEquals($default, $field->getValue());
 						$this->assertEquals(255, $field->getAttribute('maxlength'));
