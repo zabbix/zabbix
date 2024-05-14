@@ -33,6 +33,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1 G4 (H1I1 and H3I1)'],
+						// TODO: will be fixed in terms of DEV-3728.
 //						[
 //							'type' => 'Plain text',
 //							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
@@ -89,6 +90,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
+						// TODO: will be fixed in terms of DEV-3728.
 //						[
 //							'type' => 'Plain text',
 //							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
@@ -142,6 +144,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
+						// TODO: will be fixed in terms of DEV-3728.
 //						[
 //							'type' => 'Plain text',
 //							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
@@ -191,6 +194,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
+						// TODO: will be fixed in terms of DEV-3728.
 //						[
 //							'type' => 'Plain text',
 //							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
@@ -240,6 +244,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
+						// TODO: will be fixed in terms of DEV-3728.
 //						[
 //							'type' => 'Plain text',
 //							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
@@ -339,6 +344,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			$this->assertFalse($widget_content->query('class:no-data-message')->one(false)->isValid());
 
 			if ($expected['type'] === 'URL') {
+				// TODO: will be fixed in terms of DEV-3728.
 //				case 'Plain text':
 //					$data = $widget_content->asTable()->index('Name');
 //					foreach ($expected['expected'] as $item => $value) {
