@@ -542,7 +542,7 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		if (FAIL == zbx_is_uint64(statm_rss_str, &rss))
 			goto out;
 		rss *= psize;
-
+#ifdef LINUX_VERSION_CODE
 		if ((KERNEL_VERSION(2, 6, 1) >= LINUX_VERSION_CODE) &&
 			(KERNEL_VERSION(2, 6, 9) <= LINUX_VERSION_CODE))
 		{
@@ -552,6 +552,7 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 		}
 		else
 		{
+#endif
 			tmp_str++;
 			if (NULL == (statm_rss_str = strchr(tmp_str, ' ')))
 				goto out;
@@ -561,7 +562,9 @@ static void	get_pid_mem_stats(const char *pid, zbx_uint64_t *bytes)
 			shared *= psize;
 			shared_huge = 0;
 			private = rss - shared;
+#ifdef LINUX_VERSION_CODE
 		}
+#endif
 		private <<= 10;
 		shared <<= 10;
 	}
