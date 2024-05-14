@@ -1019,7 +1019,7 @@ static void	zbx_snmp_close_session(zbx_snmp_sess_t	session)
 
 static char	*zbx_sprint_asn_octet_str_dyn(const struct variable_list *var)
 {
-	if (var->type != ASN_OCTET_STR)
+	if (var->type != ASN_OCTET_STR || NULL != memchr(var->val.string, '\0', var->val_len))
 		return NULL;
 
 	char	*strval_dyn = (char *)zbx_malloc(NULL, var->val_len + 1);
