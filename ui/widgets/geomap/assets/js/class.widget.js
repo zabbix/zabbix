@@ -557,15 +557,19 @@ class CWidgetGeoMap extends CWidget {
 		const dom = document.createElement('template');
 		dom.innerHTML = html;
 
-		dom.content.querySelector('tbody').addEventListener('click', (e) => {
-			if (e.target.tagName === 'A') {
+		dom.content.querySelector('tbody').addEventListener('click', e => {
+			if (e.target.closest('a') !== null) {
 				return;
 			}
 
 			const row = e.target.closest('tr');
 
-			if (row.dataset.hostid !== undefined) {
-				this.#selectHost(row.dataset.hostid);
+			if (row !== null) {
+				const hostid = row.dataset.hostid;
+
+				if (hostid !== undefined) {
+					this.#selectHost(hostid);
+				}
 			}
 		});
 
