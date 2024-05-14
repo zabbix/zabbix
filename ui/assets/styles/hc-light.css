@@ -4204,7 +4204,11 @@ div.dashboard-widget-geomap {
   div.dashboard-widget-geomap .leaflet-container {
     height: 100%;
     z-index: 1; }
-  div.dashboard-widget-geomap .geomap-hosts-table [data-hostid] {
+
+.geomap-hintbox {
+  overflow: auto;
+  white-space: normal; }
+  .geomap-hintbox tr[data-hostid] {
     cursor: pointer; }
 
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
