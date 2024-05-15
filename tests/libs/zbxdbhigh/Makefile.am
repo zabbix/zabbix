@@ -1,6 +1,6 @@
 if SERVER
 noinst_PROGRAMS = \
-	DBselect_uint64 \
+	zbx_db_select_uint64 \
 	DBadd_condition_alloc \
 	zbx_merge_tags \
 	zbx_del_tags \
@@ -132,18 +132,18 @@ DBHIGH_LIBS = \
 
 if SERVER
 
-DBselect_uint64_SOURCES = \
-	DBselect_uint64.c \
+zbx_db_select_uint64_SOURCES = \
+	zbx_db_select_uint64.c \
 	$(COMMON_SRC)
 
-DBselect_uint64_LDADD = $(DBHIGH_LIBS)
+zbx_db_select_uint64_LDADD = $(DBHIGH_LIBS)
 
 
-DBselect_uint64_LDADD += @SERVER_LIBS@
+zbx_db_select_uint64_LDADD += @SERVER_LIBS@
 
-DBselect_uint64_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_db_select_uint64_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
-DBselect_uint64_CFLAGS = $(COMMON_FLAGS)
+zbx_db_select_uint64_CFLAGS = $(COMMON_FLAGS)
 
 
 DBadd_condition_alloc_SOURCES = \
