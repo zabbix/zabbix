@@ -35,7 +35,34 @@ files:
     Swap:                  0 kB
     SwapPss:               0 kB
     Locked:                0 kB
+---
+test case: "valid smaps_rollup large"
+out:
+  expected: '9984000512'
 
+files:
+  /proc/1/smaps_rollup: |
+    Rss:               9776000 kB
+    Pss:               9750000 kB
+    Pss_Dirty:         80064 kB
+    Pss_Anon:          80064 kB
+    Pss_File:          17436 kB
+    Pss_Shmem:             0 kB
+    Shared_Clean:        516 kB
+    Shared_Dirty:          0 kB
+    Private_Clean:     17180 kB
+    Private_Dirty:     80064 kB
+    Referenced:        97760 kB
+    Anonymous:         80064 kB
+    LazyFree:              0 kB
+    AnonHugePages:         0 kB
+    ShmemPmdMapped:        0 kB
+    FilePmdMapped:         0 kB
+    Shared_Hugetlb:        0 kB
+    Private_Hugetlb:       0 kB
+    Swap:                  0 kB
+    SwapPss:               0 kB
+    Locked:                0 kB
 ---
 test case: "valid smaps"
 out:
