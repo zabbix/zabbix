@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-30 07:12+0000\n"
+"PO-Revision-Date: 2024-05-13 07:36+0000\n"
 "Last-Translator: Jacques Centue <jeanchristophemartin373@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -91,7 +91,7 @@ msgstr "%1$d sur %1$d+ hôtes sont affichés"
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "%1$d sur %1$d+ éléments sont affichés"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1474,6 +1474,14 @@ msgstr "Toutes les modifications apportées au formulaire actuel seront perdues.
 msgid "Any character string included"
 msgstr "Toute chaîne de caractères inclue"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "Erreur d'application."
@@ -2069,6 +2077,11 @@ msgstr "Amener vers l'avant"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "Amener à l'avant"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2891,7 +2904,7 @@ msgstr[1] "Impossible de supprimer les groupes d'utilisateurs"
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
-msgstr ""
+msgstr "Impossible de supprimer le groupe d'utilisateurs « %1$s », car il est utilisé par l'utilisateur provisionné « %2$s »."
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -5661,7 +5674,7 @@ msgstr "Journalier"
 
 #: include/locales.inc.php:40
 msgid "Danish (da_DK)"
-msgstr ""
+msgstr "Danois (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -7159,6 +7172,10 @@ msgstr "Afficher les déclencheurs OK pendant"
 msgid "Display graph"
 msgstr "Afficher le graphique"
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Afficher min/moy/max"
@@ -8483,7 +8500,7 @@ msgstr "Filtre supprimé"
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Filter is not set"
-msgstr ""
+msgstr "Le filtre n'est pas défini"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -9254,6 +9271,10 @@ msgstr "Clair à contraste élevé"
 msgid "Highlight whole row"
 msgstr "Mettre en surbrillance la ligne entière"
 
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
 #: app/partials/configuration.filter.items.php:158
@@ -9637,7 +9658,7 @@ msgstr "Réseaux de l'hôte"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
-msgstr ""
+msgstr "Modèles d'hôte"
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
@@ -9721,11 +9742,11 @@ msgstr "Masque de sous-réseau de l'hôte"
 
 #: widgets/itemnavigator/Widget.php:43
 msgid "Host tag"
-msgstr ""
+msgstr "Tag d'hôte"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
 msgid "Host tag value"
-msgstr ""
+msgstr "Valeur du tag de l'hôte"
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11799,13 +11820,17 @@ msgid_plural "Items enabled"
 msgstr[0] "Élément activé"
 msgstr[1] "Éléments activés"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "Élément dans l'état \"non supporté\""
 
 #: widgets/itemnavigator/includes/WidgetForm.php:107
 msgid "Item limit"
-msgstr ""
+msgstr "Limite d'éléments"
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11818,7 +11843,7 @@ msgstr "Nom de l'élément"
 
 #: widgets/itemnavigator/Widget.php:29
 msgid "Item navigator"
-msgstr ""
+msgstr "Navigateur d'éléments"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -11834,7 +11859,7 @@ msgstr "Modèle d'éléments"
 #: widgets/piechart/views/widget.edit.js.php:208
 #: widgets/svggraph/views/widget.edit.js.php:279
 msgid "Item patterns"
-msgstr ""
+msgstr "Modèle d'élément"
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11881,11 +11906,11 @@ msgstr "Prototypes d'éléments"
 
 #: widgets/itemnavigator/Widget.php:44
 msgid "Item tag"
-msgstr ""
+msgstr "Tag d'élément"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
 msgid "Item tag value"
-msgstr ""
+msgstr "Valeur du tag de l'élément"
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12310,6 +12335,10 @@ msgstr "Graphique dernière semaine"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "Dernières données"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -13257,7 +13286,7 @@ msgstr "Types de média désactivés par l'administration."
 
 #: app/views/popup.media.php:78
 msgid "Media types disabled in Alerts."
-msgstr ""
+msgstr "Types de médias désactivés dans les alertes."
 
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
@@ -14140,9 +14169,18 @@ msgstr "Nouveau prototype de déclencheur"
 msgid "New triggers"
 msgstr "Nouveaux déclencheurs"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "Nouvelle correspondance de groupe d'utilisateurs"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -14225,7 +14263,7 @@ msgstr "Sans collecte de données"
 #: app/views/search.php:394 include/classes/html/CTableInfo.php:72
 #: widgets/hostnavigator/Widget.php:40
 msgid "No data found"
-msgstr ""
+msgstr "Aucune donnée disponible"
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -16057,6 +16095,14 @@ msgstr "Veuillez vérifier et afficher votre code de vérification dans votre ap
 msgid "Please select two elements"
 msgstr "Veuillez sélectionner deux éléments"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr "Veuillez mettre à jour la configuration"
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16880,6 +16926,10 @@ msgstr "Attribut de référence"
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr "Le widget référencé est devenu indisponible. Veuillez mettre à jour la configuration."
 
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr "Le widget référencé n'est pas disponible"
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Rafraîchir"
@@ -16953,6 +17003,10 @@ msgstr "Expressions régulières"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "Rapports associés"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18717,6 +18771,10 @@ msgstr "Afficher la fonction d'agrégation"
 msgid "Show arc"
 msgstr "Afficher l'arc"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18787,6 +18845,10 @@ msgstr "Afficher sélections"
 msgid "Show sidebar"
 msgstr "Afficher la barre latérale"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18818,11 +18880,19 @@ msgstr "Afficher les erreurs techniques"
 msgid "Show text as HTML"
 msgstr "Afficher le texte en HTML"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "Afficher la chronologie"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18862,7 +18932,7 @@ msgstr "Affiché comme nom de compte pour tous les utilisateurs de l'authentific
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the label to all MFA users in authenticator apps."
-msgstr ""
+msgstr "Affiché comme étiquette pour tous les utilisateurs MFA dans les applications d’authentification."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -18922,6 +18992,14 @@ msgstr "Déclencheurs simples"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "Seul"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19029,6 +19107,10 @@ msgstr "Application logicielle E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "Information sur l'architecture logicielle. Retourne une chaîne de caractères"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20240,6 +20322,10 @@ msgstr "Ce paramètre doit être activé, car les tables d'historique contiennen
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "Ce paramètre doit être activé, car les tableaux de tendance contiennent des blocs compressés."
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -21221,6 +21307,10 @@ msgstr "Non acquittés uniquement"
 msgid "Unavailable"
 msgstr "Indisponible"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr "Widget indisponible"
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "Débloquer"
@@ -21521,6 +21611,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Fonctionne"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21704,10 +21799,14 @@ msgstr "Utiliser si sévérité"
 msgid "Use iframe sandboxing"
 msgstr "Utiliser l'attribut sandbox des iframe"
 
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Use the filter to display results"
-msgstr ""
+msgstr "Utilisez le filtre pour afficher les résultats"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -21941,7 +22040,7 @@ msgstr "Macros utilisateur"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "User media"
-msgstr ""
+msgstr "Média utilisateur"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22709,7 +22808,7 @@ msgstr "Échec de la connexion au coffre."
 #: include/classes/setup/CSetupWizard.php:843
 #: include/classes/setup/CSetupWizard.php:863
 msgid "Vault prefix"
-msgstr ""
+msgstr "Préfixe du coffre"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -23714,7 +23813,7 @@ msgstr "un tableau ou un objet est attendu"
 
 #: include/classes/api/services/CUser.php:990
 msgid "an email address is expected"
-msgstr ""
+msgstr "une adresse email est attendue"
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -24120,7 +24219,7 @@ msgstr "impossible de mettre à jour le paramètre en lecture seule \"%1$s\" de 
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr ""
+msgstr "impossible de mettre à jour le paramètre en lecture seule \"%1$s\" de l'utilisateur provisionné"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -24494,7 +24593,7 @@ msgstr "modèle d'hôte"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "host patterns"
-msgstr ""
+msgstr "modèles d'hôte"
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
@@ -24741,7 +24840,7 @@ msgstr "modèle d'élément"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
 msgid "item patterns"
-msgstr ""
+msgstr "modèles d'éléments"
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -25263,7 +25362,7 @@ msgstr "motif"
 #: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
-msgstr ""
+msgstr "modèles"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
@@ -25327,6 +25426,11 @@ msgstr "référence à un élément de l'arbre inexistant"
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "l'objet référencé n'existe pas"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr "le widget référencé n'est pas disponible"
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

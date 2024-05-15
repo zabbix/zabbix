@@ -1475,6 +1475,14 @@ msgstr ""
 msgid "Any character string included"
 msgstr "Beliebige Zeichenfolge enthalten"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 # Achtung: Hier ist NICHT die Zabbix "item application" gemeint.
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -2073,6 +2081,11 @@ msgstr "Ebene nach vorn"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "In den Vordergrund"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -7184,6 +7197,10 @@ msgstr "OK-Auslöser zeigen"
 msgid "Display graph"
 msgstr "Diagramm anzeigen"
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr ""
@@ -9285,6 +9302,10 @@ msgstr "Konotrastreich hell"
 #: app/partials/monitoring.problem.filter.php:312
 msgid "Highlight whole row"
 msgstr "Ganze Zeile auswählen"
+
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -11836,6 +11857,10 @@ msgid_plural "Items enabled"
 msgstr[0] "Datenpunkt aktiviert"
 msgstr[1] "Datenpunkte aktiviert"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "Datenpunkt im Zustand \"nicht unterstützt\""
@@ -12350,6 +12375,10 @@ msgstr "Diagramm der letzten Woche"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "Aktuelle Daten"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -14182,8 +14211,17 @@ msgstr ""
 msgid "New triggers"
 msgstr "Neue Auslöser"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
+msgstr ""
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
 msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
@@ -16105,6 +16143,14 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "Bitte zwei Elemente auswählen"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16929,6 +16975,10 @@ msgstr ""
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr ""
 
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Aktualisieren"
@@ -17002,6 +17052,10 @@ msgstr "Reguläre Ausdrücke"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "Verwandte Berichte"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18769,6 +18823,10 @@ msgstr ""
 msgid "Show arc"
 msgstr ""
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18840,6 +18898,10 @@ msgstr "Anzeigen"
 msgid "Show sidebar"
 msgstr "Seitenbereich zeigen"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18871,11 +18933,19 @@ msgstr "Zeige technische Fehler"
 msgid "Show text as HTML"
 msgstr "Zeige Text als HTML"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "Zeige Zeitachse"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18975,6 +19045,14 @@ msgstr "Einfache Auslöser"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "Einfach"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19083,6 +19161,10 @@ msgstr "Programm E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "Informationen zur Software-Architektur. Rückgabe String"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20301,6 +20383,10 @@ msgstr ""
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr ""
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -21285,6 +21371,10 @@ msgstr "Nur Unbestätigte"
 msgid "Unavailable"
 msgstr "Nicht verfügbar"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "Freigeben"
@@ -21585,6 +21675,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Erreichbar"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21767,6 +21862,10 @@ msgstr "Bei Schweregrad"
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
 msgstr "Verwende iFrame Sandboxing"
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
@@ -25391,6 +25490,11 @@ msgstr "Verweis auf ein nicht vorhandenes Baumelement"
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "referenziertes Objekt existiert nicht"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

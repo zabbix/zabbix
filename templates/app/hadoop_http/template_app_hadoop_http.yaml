@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: d2d19ac9d1eb434c98a55cbf76c27850
-          name: 'Hadoop: Get DataNodes states'
+          name: 'Get DataNodes states'
           type: HTTP_AGENT
           key: hadoop.datanodes.get
           history: '0'
@@ -141,7 +141,7 @@ zabbix_export:
             - tag: component
               value: namenode
         - uuid: 687406d06ce94a8291b2e72bb2f8bec4
-          name: 'Hadoop: Get NameNode stats'
+          name: 'Get NameNode stats'
           type: HTTP_AGENT
           key: hadoop.namenode.get
           history: '0'
@@ -444,7 +444,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 6d7546c5d15d4e478b2e87e35d5306b0
-          name: 'Hadoop: Get NodeManagers states'
+          name: 'Get NodeManagers states'
           type: HTTP_AGENT
           key: hadoop.nodemanagers.get
           history: '0'
@@ -459,7 +459,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e693cff98ec74cc198ec6b5e973f116c
-          name: 'Hadoop: Get ResourceManager stats'
+          name: 'Get ResourceManager stats'
           type: HTTP_AGENT
           key: hadoop.resourcemanager.get
           history: '0'
@@ -1408,7 +1408,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'NameNode status'
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1423,7 +1423,7 @@ zabbix_export:
                       value: '2'
                 - type: graph
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -1439,7 +1439,7 @@ zabbix_export:
                       value: '1'
                 - type: graph
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1452,8 +1452,8 @@ zabbix_export:
                       value: AAAAC
                 - type: item
                   name: 'NameNode uptime'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1465,8 +1465,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'NameNode response time'
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1481,8 +1481,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'ResourceManager status'
-                  x: '12'
-                  width: '4'
+                  x: '36'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1496,9 +1496,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -1513,9 +1513,9 @@ zabbix_export:
                       name: source_type
                       value: '1'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1528,8 +1528,8 @@ zabbix_export:
                       value: AAAAD
                 - type: item
                   name: 'ResourceManager uptime'
-                  x: '16'
-                  width: '4'
+                  x: '48'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1541,8 +1541,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'ResourceManager response time'
-                  x: '20'
-                  width: '4'
+                  x: '60'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0

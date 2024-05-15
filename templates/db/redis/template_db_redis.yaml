@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: bc4989f098954259924cbee6717519a7
-          name: 'Redis: Blocked clients'
+          name: 'Blocked clients'
           type: DEPENDENT
           key: redis.clients.blocked
           delay: '0'
@@ -36,7 +36,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 6140e8ff18fe41c6b65165b0f5346c7b
-          name: 'Redis: Connected clients'
+          name: 'Connected clients'
           type: DEPENDENT
           key: redis.clients.connected
           delay: '0'
@@ -52,7 +52,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: daff9d68e5c6439082842959224ff709
-          name: 'Redis: Get Clients info'
+          name: 'Get Clients info'
           type: DEPENDENT
           key: redis.clients.info_raw
           delay: '0'
@@ -70,7 +70,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3f5d6532f403436c823e1461e49e54c2
-          name: 'Redis: Max input buffer'
+          name: 'Max input buffer'
           type: DEPENDENT
           key: redis.clients.max_input_buffer
           delay: '0'
@@ -88,7 +88,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 44788aa774e64fe685fe6496a9bea97d
-          name: 'Redis: Max output buffer'
+          name: 'Max output buffer'
           type: DEPENDENT
           key: redis.clients.max_output_buffer
           delay: '0'
@@ -106,7 +106,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 74f9fe26bdaf4a7bb86214bd7d500363
-          name: 'Redis: Cluster enabled'
+          name: 'Cluster enabled'
           type: DEPENDENT
           key: redis.cluster.enabled
           delay: '0'
@@ -124,7 +124,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 066486e3be25406185e624611eeb167a
-          name: 'Redis: Max clients'
+          name: 'Max clients'
           type: DEPENDENT
           key: redis.config.maxclients
           delay: '0'
@@ -145,7 +145,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: bf68f3ecc3544ef0af00889139caf313
-          name: 'Redis: Get config'
+          name: 'Get config'
           key: 'redis.config["{$REDIS.CONN.URI}"]'
           history: 1h
           trends: '0'
@@ -160,8 +160,8 @@ zabbix_export:
           triggers:
             - uuid: 819b379b51c34616820f86d21c703b27
               expression: 'last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#1)<>last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#2) and length(last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"]))>0'
-              name: 'Redis: Configuration has changed'
-              event_name: 'Redis: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Configuration has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Redis configuration has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -169,7 +169,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 3aa0abb0b391474a9bd40d0b3e1cd4da
-          name: 'Redis: Get CPU info'
+          name: 'Get CPU info'
           type: DEPENDENT
           key: redis.cpu.info_raw
           delay: '0'
@@ -187,7 +187,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 99d427f1f76a468c9878225abb8cebbd
-          name: 'Redis: CPU sys'
+          name: 'CPU sys'
           type: DEPENDENT
           key: redis.cpu.sys
           delay: '0'
@@ -205,7 +205,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 1bfce9a62c924510a9cac3b04320d838
-          name: 'Redis: CPU sys children'
+          name: 'CPU sys children'
           type: DEPENDENT
           key: redis.cpu.sys_children
           delay: '0'
@@ -223,7 +223,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 83e7c9f5b8a24c949d72125671d6d39a
-          name: 'Redis: CPU user'
+          name: 'CPU user'
           type: DEPENDENT
           key: redis.cpu.user
           delay: '0'
@@ -241,7 +241,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 8bc18ca0c79d4a81811b600cf3fe8ddd
-          name: 'Redis: CPU user children'
+          name: 'CPU user children'
           type: DEPENDENT
           key: redis.cpu.user_children
           delay: '0'
@@ -259,7 +259,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 720f146ffe7e481482e11db4b99634c8
-          name: 'Redis: Get info'
+          name: 'Get info'
           key: 'redis.info["{$REDIS.CONN.URI}"]'
           history: 1h
           trends: '0'
@@ -270,19 +270,19 @@ zabbix_export:
           triggers:
             - uuid: 0a5176877ba24df8b5d38c8cc544f0a8
               expression: 'nodata(/Redis by Zabbix agent 2/redis.info["{$REDIS.CONN.URI}"],30m)=1'
-              name: 'Redis: Failed to fetch info data'
-              event_name: 'Redis: Failed to fetch info data (or no data for 30m)'
+              name: 'Failed to fetch info data'
+              event_name: 'Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Redis: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/Redis by Zabbix agent 2/redis.ping["{$REDIS.CONN.URI}"])=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 52a4cad66c3c47ffab8762050f48e4af
-          name: 'Redis: Get Keyspace info'
+          name: 'Get Keyspace info'
           type: DEPENDENT
           key: redis.keyspace.info_raw
           delay: '0'
@@ -300,7 +300,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5fe2afa1c8ff434a876822ea0b290659
-          name: 'Redis: Memory fragmentation ratio'
+          name: 'Memory fragmentation ratio'
           type: DEPENDENT
           key: redis.memory.fragmentation_ratio
           delay: '0'
@@ -326,8 +326,8 @@ zabbix_export:
           triggers:
             - uuid: 629531ff1ebc4bdbb1f277848c436230
               expression: 'min(/Redis by Zabbix agent 2/redis.memory.fragmentation_ratio,15m)>{$REDIS.MEM.FRAG_RATIO.MAX.WARN}'
-              name: 'Redis: Memory fragmentation ratio is too high'
-              event_name: 'Redis: Memory fragmentation ratio is too high (over {$REDIS.MEM.FRAG_RATIO.MAX.WARN} in 15m)'
+              name: 'Memory fragmentation ratio is too high'
+              event_name: 'Memory fragmentation ratio is too high (over {$REDIS.MEM.FRAG_RATIO.MAX.WARN} in 15m)'
               priority: WARNING
               description: |
                 This ratio is an indication of memory mapping efficiency:
@@ -341,7 +341,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: b4f76d36ac5b45f7b58b6f9b0d2a669d
-          name: 'Redis: Get Memory info'
+          name: 'Get Memory info'
           type: DEPENDENT
           key: redis.memory.info_raw
           delay: '0'
@@ -359,7 +359,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5fef1d341a974cc5aa164e550aff1537
-          name: 'Redis: Memory used'
+          name: 'Memory used'
           type: DEPENDENT
           key: redis.memory.used_memory
           delay: '0'
@@ -376,7 +376,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: de026d98fd9146b78f9a0be2c0b9de10
-          name: 'Redis: Memory used Lua'
+          name: 'Memory used Lua'
           type: DEPENDENT
           key: redis.memory.used_memory_lua
           delay: '0'
@@ -393,7 +393,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d3f05ab1c0404f01875afb964d9820e2
-          name: 'Redis: Memory used peak'
+          name: 'Memory used peak'
           type: DEPENDENT
           key: redis.memory.used_memory_peak
           delay: '0'
@@ -410,7 +410,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: ef06ae3dd4784702ad0d281da94c294d
-          name: 'Redis: Memory used RSS'
+          name: 'Memory used RSS'
           type: DEPENDENT
           key: redis.memory.used_memory_rss
           delay: '0'
@@ -427,7 +427,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 86501872c68c4e9fa4b55aaacebb3c3c
-          name: 'Redis: AOF current rewrite time sec'
+          name: 'AOF current rewrite time sec'
           type: DEPENDENT
           key: redis.persistence.aof_current_rewrite_time_sec
           delay: '0'
@@ -447,7 +447,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: d298e1ce9aa1481391a48754e2a648b0
-          name: 'Redis: AOF enabled'
+          name: 'AOF enabled'
           type: DEPENDENT
           key: redis.persistence.aof_enabled
           delay: '0'
@@ -465,7 +465,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: e2e62cc728c04169afeb051000042e28
-          name: 'Redis: AOF last bgrewrite status'
+          name: 'AOF last bgrewrite status'
           type: DEPENDENT
           key: redis.persistence.aof_last_bgrewrite_status
           delay: '0'
@@ -486,7 +486,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: 5a14501541c44699b81e3a89cc93d628
-          name: 'Redis: AOF last rewrite time sec'
+          name: 'AOF last rewrite time sec'
           type: DEPENDENT
           key: redis.persistence.aof_last_rewrite_time_sec
           delay: '0'
@@ -506,7 +506,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: 2cfd96e347d341219238bdaf65f1846d
-          name: 'Redis: AOF last write status'
+          name: 'AOF last write status'
           type: DEPENDENT
           key: redis.persistence.aof_last_write_status
           delay: '0'
@@ -529,14 +529,14 @@ zabbix_export:
           triggers:
             - uuid: 324e0e8fac514ba99d67aea7eb0ddf7c
               expression: 'last(/Redis by Zabbix agent 2/redis.persistence.aof_last_write_status)=0'
-              name: 'Redis: Last AOF write operation failed'
+              name: 'Last AOF write operation failed'
               priority: WARNING
               description: 'Detailed information about persistence: https://redis.io/topics/persistence'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 3f4866909425447a828600e9b44ace5b
-          name: 'Redis: AOF rewrite in progress'
+          name: 'AOF rewrite in progress'
           type: DEPENDENT
           key: redis.persistence.aof_rewrite_in_progress
           delay: '0'
@@ -552,7 +552,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: 83d243cc46304694954e08c0b03a3527
-          name: 'Redis: AOF rewrite scheduled'
+          name: 'AOF rewrite scheduled'
           type: DEPENDENT
           key: redis.persistence.aof_rewrite_scheduled
           delay: '0'
@@ -568,7 +568,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: ce5f961bbf7247e2b210aa026694b256
-          name: 'Redis: Get Persistence info'
+          name: 'Get Persistence info'
           type: DEPENDENT
           key: redis.persistence.info_raw
           delay: '0'
@@ -586,7 +586,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 90df2d442dc049d690044b92e0888c31
-          name: 'Redis: Dump loading'
+          name: 'Dump loading'
           type: DEPENDENT
           key: redis.persistence.loading
           delay: '0'
@@ -604,7 +604,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: 5b1ecad187764429a22cbeb69afa3a28
-          name: 'Redis: RDB bgsave in progress'
+          name: 'RDB bgsave in progress'
           type: DEPENDENT
           key: redis.persistence.rdb_bgsave_in_progress
           delay: '0'
@@ -620,7 +620,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: ea673953a3014dc091ec62a20ee53945
-          name: 'Redis: RDB changes since last save'
+          name: 'RDB changes since last save'
           type: DEPENDENT
           key: redis.persistence.rdb_changes_since_last_save
           delay: '0'
@@ -636,7 +636,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: d8c4d8fceeb5482a951999eedd350f73
-          name: 'Redis: RDB current bgsave time sec'
+          name: 'RDB current bgsave time sec'
           type: DEPENDENT
           key: redis.persistence.rdb_current_bgsave_time_sec
           delay: '0'
@@ -656,7 +656,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: e25772b422314949a564f219d6f725bc
-          name: 'Redis: RDB last bgsave status'
+          name: 'RDB last bgsave status'
           type: DEPENDENT
           key: redis.persistence.rdb_last_bgsave_status
           delay: '0'
@@ -679,14 +679,14 @@ zabbix_export:
           triggers:
             - uuid: 44e427ae3ce7419dbac3059be11e31ef
               expression: 'last(/Redis by Zabbix agent 2/redis.persistence.rdb_last_bgsave_status)=0'
-              name: 'Redis: Last RDB save operation failed'
+              name: 'Last RDB save operation failed'
               priority: WARNING
               description: 'Detailed information about persistence: https://redis.io/topics/persistence'
               tags:
                 - tag: scope
                   value: notice
         - uuid: f506941104e34db08c0d8f5a6d9d9710
-          name: 'Redis: RDB last bgsave time sec'
+          name: 'RDB last bgsave time sec'
           type: DEPENDENT
           key: redis.persistence.rdb_last_bgsave_time_sec
           delay: '0'
@@ -706,7 +706,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: 04e1c21ca49246d7aba062cd001a8c00
-          name: 'Redis: RDB last save time'
+          name: 'RDB last save time'
           type: DEPENDENT
           key: redis.persistence.rdb_last_save_time
           delay: '0'
@@ -722,7 +722,7 @@ zabbix_export:
             - tag: component
               value: persistence
         - uuid: 5949fadcbe2b405baff0668e81627278
-          name: 'Redis: Ping'
+          name: Ping
           key: 'redis.ping["{$REDIS.CONN.URI}"]'
           history: 7d
           valuemap:
@@ -739,14 +739,14 @@ zabbix_export:
           triggers:
             - uuid: 62353f9ed6204b70ba270827c3922244
               expression: 'last(/Redis by Zabbix agent 2/redis.ping["{$REDIS.CONN.URI}"])=0'
-              name: 'Redis: Service is down'
+              name: 'Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 6680a01fb98c4504bed6458ba6cde146
-          name: 'Redis: Connected slaves'
+          name: 'Connected slaves'
           type: DEPENDENT
           key: redis.replication.connected_slaves
           delay: '0'
@@ -765,7 +765,7 @@ zabbix_export:
             - uuid: 6d213088211a4bb38ff97b59113dccd9
               expression: 'last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#1)<>last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#2)'
               recovery_mode: NONE
-              name: 'Redis: Number of slaves has changed'
+              name: 'Number of slaves has changed'
               priority: INFO
               description: 'Redis number of slaves has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -773,7 +773,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 57d121578bc848d787419221ac8dcabe
-          name: 'Redis: Get Replication info'
+          name: 'Get Replication info'
           type: DEPENDENT
           key: redis.replication.info_raw
           delay: '0'
@@ -791,7 +791,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 37fa1595299c4a3ea091039f4db47cf3
-          name: 'Redis: Master replication offset'
+          name: 'Master replication offset'
           type: DEPENDENT
           key: redis.replication.master_repl_offset
           delay: '0'
@@ -810,7 +810,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: cf067374339e44e5a4ba2cd70d4fec3a
-          name: 'Redis: Replication backlog active'
+          name: 'Replication backlog active'
           type: DEPENDENT
           key: redis.replication.repl_backlog_active
           delay: '0'
@@ -828,7 +828,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: b4ea8df4d73144f99ffd4f5f6e6359ef
-          name: 'Redis: Replication backlog first byte offset'
+          name: 'Replication backlog first byte offset'
           type: DEPENDENT
           key: redis.replication.repl_backlog_first_byte_offset
           delay: '0'
@@ -845,7 +845,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 081cd9df926d48cea7e5c68f7761ddb1
-          name: 'Redis: Replication backlog history length'
+          name: 'Replication backlog history length'
           type: DEPENDENT
           key: redis.replication.repl_backlog_histlen
           delay: '0'
@@ -861,7 +861,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: a437a46aafe3413884975fc480091bb5
-          name: 'Redis: Replication backlog size'
+          name: 'Replication backlog size'
           type: DEPENDENT
           key: redis.replication.repl_backlog_size
           delay: '0'
@@ -878,7 +878,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: d8371457697744159aabc3bdece4af2e
-          name: 'Redis: Replication role'
+          name: 'Replication role'
           type: DEPENDENT
           key: redis.replication.role
           delay: '0'
@@ -902,8 +902,8 @@ zabbix_export:
             - uuid: d24f7aabefb345e791b3bb276f30ac8c
               expression: 'last(/Redis by Zabbix agent 2/redis.replication.role,#1)<>last(/Redis by Zabbix agent 2/redis.replication.role,#2) and length(last(/Redis by Zabbix agent 2/redis.replication.role))>0'
               recovery_mode: NONE
-              name: 'Redis: Replication role has changed'
-              event_name: 'Redis: Replication role has changed (new role: {ITEM.VALUE})'
+              name: 'Replication role has changed'
+              event_name: 'Replication role has changed (new role: {ITEM.VALUE})'
               priority: WARNING
               description: 'Redis replication role has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -911,7 +911,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 6ac72e70dc98478aa5c7730f59440c19
-          name: 'Redis: Get Server info'
+          name: 'Get Server info'
           type: DEPENDENT
           key: redis.server.info_raw
           delay: '0'
@@ -929,7 +929,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8a08d4f30b78448986b9fd94cafd398c
-          name: 'Redis: Process id'
+          name: 'Process id'
           type: DEPENDENT
           key: redis.server.process_id
           delay: '0'
@@ -948,7 +948,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: b2deab550d984b3e93741c53019e7f89
-          name: 'Redis: Redis mode'
+          name: 'Redis mode'
           type: DEPENDENT
           key: redis.server.redis_mode
           delay: '0'
@@ -969,7 +969,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9699d6a6563b498ea73f88a4c1dd9cf1
-          name: 'Redis: Redis version'
+          name: 'Redis version'
           type: DEPENDENT
           key: redis.server.redis_version
           delay: '0'
@@ -992,8 +992,8 @@ zabbix_export:
           triggers:
             - uuid: 6e307546b26344deb83f2295c90e9a33
               expression: 'last(/Redis by Zabbix agent 2/redis.server.redis_version,#1)<>last(/Redis by Zabbix agent 2/redis.server.redis_version,#2) and length(last(/Redis by Zabbix agent 2/redis.server.redis_version))>0'
-              name: 'Redis: Version has changed'
-              event_name: 'Redis: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'The Redis version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1001,7 +1001,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 8c28e54f9e5d40d6b69c1f5b39b85054
-          name: 'Redis: TCP port'
+          name: 'TCP port'
           type: DEPENDENT
           key: redis.server.tcp_port
           delay: '0'
@@ -1020,7 +1020,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: af225edd976146f2920bc05afb703f14
-          name: 'Redis: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: redis.server.uptime
           delay: '0'
@@ -1039,8 +1039,8 @@ zabbix_export:
           triggers:
             - uuid: 4961e91eed2a4e83899d135315748b0e
               expression: 'last(/Redis by Zabbix agent 2/redis.server.uptime)<10m'
-              name: 'Redis: Host has been restarted'
-              event_name: 'Redis: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1048,7 +1048,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 51a65fa1d27e4fcd915c5019687e7bc9
-          name: 'Redis: Slowlog entries per second'
+          name: 'Slowlog entries per second'
           key: 'redis.slowlog.count["{$REDIS.CONN.URI}"]'
           history: 7d
           preprocessing:
@@ -1061,14 +1061,14 @@ zabbix_export:
           triggers:
             - uuid: 37fb0255e49c42c8913e56fe4aaa1d14
               expression: 'min(/Redis by Zabbix agent 2/redis.slowlog.count["{$REDIS.CONN.URI}"],5m)>{$REDIS.SLOWLOG.COUNT.MAX.WARN}'
-              name: 'Redis: Too many entries in the slowlog'
-              event_name: 'Redis: Too many entries in the slowlog (over {$REDIS.SLOWLOG.COUNT.MAX.WARN} per second in 5m)'
+              name: 'Too many entries in the slowlog'
+              event_name: 'Too many entries in the slowlog (over {$REDIS.SLOWLOG.COUNT.MAX.WARN} per second in 5m)'
               priority: INFO
               tags:
                 - tag: scope
                   value: performance
         - uuid: eca69284ac8e4ae3a7e965b6549e9343
-          name: 'Redis: Evicted keys'
+          name: 'Evicted keys'
           type: DEPENDENT
           key: redis.stats.evicted_keys
           delay: '0'
@@ -1084,7 +1084,7 @@ zabbix_export:
             - tag: component
               value: keys
         - uuid: 0a77355cfba348bb8884d2405892ed5d
-          name: 'Redis: Expired keys'
+          name: 'Expired keys'
           type: DEPENDENT
           key: redis.stats.expired_keys
           delay: '0'
@@ -1100,7 +1100,7 @@ zabbix_export:
             - tag: component
               value: keys
         - uuid: edcd97d79c2a4213b2bbefa36f37881d
-          name: 'Redis: Get Stats info'
+          name: 'Get Stats info'
           type: DEPENDENT
           key: redis.stats.info_raw
           delay: '0'
@@ -1118,7 +1118,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5841b6f2a76b432080029367e7008cd1
-          name: 'Redis: Instantaneous input bytes per second'
+          name: 'Instantaneous input bytes per second'
           type: DEPENDENT
           key: redis.stats.instantaneous_input.rate
           delay: '0'
@@ -1139,7 +1139,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3552b285d7ca41f796c1838e268a92c1
-          name: 'Redis: Instantaneous operations per sec'
+          name: 'Instantaneous operations per sec'
           type: DEPENDENT
           key: redis.stats.instantaneous_ops.rate
           delay: '0'
@@ -1155,7 +1155,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 86c05ed58e8448e9b7307a3c82e182af
-          name: 'Redis: Instantaneous output bytes per second'
+          name: 'Instantaneous output bytes per second'
           type: DEPENDENT
           key: redis.stats.instantaneous_output.rate
           delay: '0'
@@ -1176,7 +1176,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 66d30a422e704174ae7700e1dd006aa1
-          name: 'Redis: Keyspace hits'
+          name: 'Keyspace hits'
           type: DEPENDENT
           key: redis.stats.keyspace_hits
           delay: '0'
@@ -1192,7 +1192,7 @@ zabbix_export:
             - tag: component
               value: keys
         - uuid: e24da63a83dc4223bed35cf80fc22300
-          name: 'Redis: Keyspace misses'
+          name: 'Keyspace misses'
           type: DEPENDENT
           key: redis.stats.keyspace_misses
           delay: '0'
@@ -1208,7 +1208,7 @@ zabbix_export:
             - tag: component
               value: keys
         - uuid: 1f11810f06d44e498a895c516f902f95
-          name: 'Redis: Latest fork usec'
+          name: 'Latest fork usec'
           type: DEPENDENT
           key: redis.stats.latest_fork_usec
           delay: '0'
@@ -1228,7 +1228,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 2662dfd3524749998306f1d7afe33019
-          name: 'Redis: Migrate cached sockets'
+          name: 'Migrate cached sockets'
           type: DEPENDENT
           key: redis.stats.migrate_cached_sockets
           delay: '0'
@@ -1244,7 +1244,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 186e6bda0a0e463bb8218a58f227ff2b
-          name: 'Redis: Pubsub channels'
+          name: 'Pubsub channels'
           type: DEPENDENT
           key: redis.stats.pubsub_channels
           delay: '0'
@@ -1260,7 +1260,7 @@ zabbix_export:
             - tag: component
               value: subscribes
         - uuid: 1e0711a2b40e4fea88c0c57a1f6d2b30
-          name: 'Redis: Pubsub patterns'
+          name: 'Pubsub patterns'
           type: DEPENDENT
           key: redis.stats.pubsub_patterns
           delay: '0'
@@ -1276,7 +1276,7 @@ zabbix_export:
             - tag: component
               value: subscribes
         - uuid: 65135267c836435d872325a7129e5857
-          name: 'Redis: Rejected connections'
+          name: 'Rejected connections'
           type: DEPENDENT
           key: redis.stats.rejected_connections
           delay: '0'
@@ -1294,7 +1294,7 @@ zabbix_export:
           triggers:
             - uuid: 5bf0680529ce496b8fe419e2732c69d1
               expression: 'last(/Redis by Zabbix agent 2/redis.stats.rejected_connections)>0'
-              name: 'Redis: Connections are rejected'
+              name: 'Connections are rejected'
               priority: HIGH
               description: |
                 The number of connections has reached the value of "maxclients".
@@ -1304,7 +1304,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 37135fd8b7e94c41bc21e802f21baeb4
-          name: 'Redis: Sync full'
+          name: 'Sync full'
           type: DEPENDENT
           key: redis.stats.sync_full
           delay: '0'
@@ -1320,7 +1320,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: cb5b6380b164419280fdcd98077c5d8f
-          name: 'Redis: Sync partial err'
+          name: 'Sync partial err'
           type: DEPENDENT
           key: redis.stats.sync_partial_err
           delay: '0'
@@ -1336,7 +1336,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 231560fd350e4b5096b242dddecd7c8b
-          name: 'Redis: Sync partial ok'
+          name: 'Sync partial ok'
           type: DEPENDENT
           key: redis.stats.sync_partial_ok
           delay: '0'
@@ -1352,7 +1352,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 278ff045f367443380fcd594dba77d53
-          name: 'Redis: Total commands processed'
+          name: 'Total commands processed'
           type: DEPENDENT
           key: redis.stats.total_commands_processed
           delay: '0'
@@ -1368,7 +1368,7 @@ zabbix_export:
             - tag: component
               value: commands
         - uuid: c9afbbbec8a44926887389a590f1df91
-          name: 'Redis: Total connections received'
+          name: 'Total connections received'
           type: DEPENDENT
           key: redis.stats.total_connections_received
           delay: '0'
@@ -1384,7 +1384,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 838cb6cbfd8a42e1b9cfa4a60670324a
-          name: 'Redis: Total net input bytes'
+          name: 'Total net input bytes'
           type: DEPENDENT
           key: redis.stats.total_net_input_bytes
           delay: '0'
@@ -1401,7 +1401,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 762f6b06eb094de896d265fcf3f9a603
-          name: 'Redis: Total net output bytes'
+          name: 'Total net output bytes'
           type: DEPENDENT
           key: redis.stats.total_net_output_bytes
           delay: '0'
@@ -1425,7 +1425,7 @@ zabbix_export:
           description: 'Collect metrics by Zabbix agent if it exists'
           item_prototypes:
             - uuid: 376a8861723c45c3bde08573c7ab2ed9
-              name: 'Redis: CPU utilization'
+              name: 'CPU utilization'
               key: 'proc.cpu.util["{$REDIS.PROCESS_NAME}{#SINGLETON}"]'
               history: 7d
               value_type: FLOAT
@@ -1435,7 +1435,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: 9d68e00f913a4faea5a334d361f324b0
-              name: 'Redis: Memory usage (rss)'
+              name: 'Memory usage (rss)'
               key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,rss]'
               history: 7d
               units: B
@@ -1444,7 +1444,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 325cabaa95994a58bf30992586ba7544
-              name: 'Redis: Memory usage (vsize)'
+              name: 'Memory usage (vsize)'
               key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,vsize]'
               history: 7d
               units: B
@@ -1453,7 +1453,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: d9ccc25e5d1b4f05b22354a7672b518c
-              name: 'Redis: Number of running processes'
+              name: 'Number of running processes'
               key: 'proc.num["{$REDIS.PROCESS_NAME}{#SINGLETON}"]'
               history: 7d
               tags:
@@ -1462,7 +1462,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 590bd23c52b74dd7951dcf74903ac2ed
                   expression: 'last(/Redis by Zabbix agent 2/proc.num["{$REDIS.PROCESS_NAME}{#SINGLETON}"])=0'
-                  name: 'Redis: Process is not running'
+                  name: 'Process is not running'
                   priority: HIGH
                   tags:
                     - tag: scope
@@ -1611,7 +1611,7 @@ zabbix_export:
           description: 'Additional metrics for versions 4+'
           item_prototypes:
             - uuid: b7e8d996335f41158b3c6a8961319db0
-              name: 'Redis: Active defrag running{#SINGLETON}'
+              name: 'Active defrag running{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.active_defrag_running[{#SINGLETON}]'
               delay: '0'
@@ -1627,7 +1627,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 2065e38cd7e5417abfd0b80116b0d77b
-              name: 'Redis: Lazyfree pending objects{#SINGLETON}'
+              name: 'Lazyfree pending objects{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.lazyfree_pending_objects[{#SINGLETON}]'
               delay: '0'
@@ -1643,7 +1643,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 2c5c700b53374dac86d805384b6bc9b0
-              name: 'Redis: Max memory{#SINGLETON}'
+              name: 'Max memory{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.maxmemory[{#SINGLETON}]'
               delay: '0'
@@ -1660,7 +1660,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 0f094be6d0fa4afda3aa7916fac4d3a3
-              name: 'Redis: Max memory policy{#SINGLETON}'
+              name: 'Max memory policy{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.maxmemory_policy[{#SINGLETON}]'
               delay: '0'
@@ -1681,7 +1681,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: bf804c6ee44640168e15ca62803b7f10
-              name: 'Redis: Total system memory{#SINGLETON}'
+              name: 'Total system memory{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.total_system_memory[{#SINGLETON}]'
               delay: '0'
@@ -1698,7 +1698,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 1c0e0355d5cd429f9a914fb67f29e366
-              name: 'Redis: Memory used dataset{#SINGLETON}'
+              name: 'Memory used dataset{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.used_memory_dataset[{#SINGLETON}]'
               delay: '0'
@@ -1715,7 +1715,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 4e5937420b3843568d9f36b40c0a3c28
-              name: 'Redis: Memory used dataset %{#SINGLETON}'
+              name: 'Memory used dataset %{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.used_memory_dataset_perc[{#SINGLETON}]'
               delay: '0'
@@ -1737,7 +1737,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: e085382c18f3473f9d2271024cd61e93
-              name: 'Redis: Memory used overhead{#SINGLETON}'
+              name: 'Memory used overhead{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.used_memory_overhead[{#SINGLETON}]'
               delay: '0'
@@ -1754,7 +1754,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 5da63141e8b145a38954736806602b4a
-              name: 'Redis: Memory used peak %{#SINGLETON}'
+              name: 'Memory used peak %{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.used_memory_peak_perc[{#SINGLETON}]'
               delay: '0'
@@ -1776,7 +1776,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: dabd2918056b4b999f4b30bd8e64e8a1
-              name: 'Redis: Memory used startup{#SINGLETON}'
+              name: 'Memory used startup{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.used_memory_startup[{#SINGLETON}]'
               delay: '0'
@@ -1793,7 +1793,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 9da41967290742cb8daa2f69ac1d6966
-              name: 'Redis: AOF last CoW size{#SINGLETON}'
+              name: 'AOF last CoW size{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_last_cow_size[{#SINGLETON}]'
               delay: '0'
@@ -1810,7 +1810,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: 768839c72e3f4be89e30dd0d140c9d03
-              name: 'Redis: RDB last CoW size{#SINGLETON}'
+              name: 'RDB last CoW size{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.rdb_last_cow_size[{#SINGLETON}]'
               delay: '0'
@@ -1827,7 +1827,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: bead155d26054d0487622f29b86dcd2b
-              name: 'Redis: Replication second offset{#SINGLETON}'
+              name: 'Replication second offset{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.second_repl_offset[{#SINGLETON}]'
               delay: '0'
@@ -1847,7 +1847,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: 14d062351a114e8eafa2b2b889317903
-              name: 'Redis: Executable path{#SINGLETON}'
+              name: 'Executable path{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.server.executable[{#SINGLETON}]'
               delay: '0'
@@ -1868,7 +1868,7 @@ zabbix_export:
                 - tag: component
                   value: system
             - uuid: 5458542148954618a6d22df1effffe57
-              name: 'Redis: Active defrag hits{#SINGLETON}'
+              name: 'Active defrag hits{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.stats.active_defrag_hits[{#SINGLETON}]'
               delay: '0'
@@ -1884,7 +1884,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: f8b424743dd24691be2bd07d5538b16a
-              name: 'Redis: Active defrag key hits{#SINGLETON}'
+              name: 'Active defrag key hits{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.stats.active_defrag_key_hits[{#SINGLETON}]'
               delay: '0'
@@ -1900,7 +1900,7 @@ zabbix_export:
                 - tag: component
                   value: keys
             - uuid: 8aba0ad8d7314b6b8cf1e80cb0afb618
-              name: 'Redis: Active defrag key misses{#SINGLETON}'
+              name: 'Active defrag key misses{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.stats.active_defrag_key_misses[{#SINGLETON}]'
               delay: '0'
@@ -1916,7 +1916,7 @@ zabbix_export:
                 - tag: component
                   value: keys
             - uuid: 3c20cca8b4a84c619d90d64a34386dfa
-              name: 'Redis: Active defrag misses{#SINGLETON}'
+              name: 'Active defrag misses{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.stats.active_defrag_misses[{#SINGLETON}]'
               delay: '0'
@@ -1932,7 +1932,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: a34f4e33a0cb4381b5c3b7a507e90bee
-              name: 'Redis: Expired stale %{#SINGLETON}'
+              name: 'Expired stale %{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.stats.expired_stale_perc[{#SINGLETON}]'
               delay: '0'
@@ -1948,7 +1948,7 @@ zabbix_export:
                 - tag: component
                   value: keys
             - uuid: 81667ae170b04ac0980e122566c5ed8e
-              name: 'Redis: Expired time cap reached count{#SINGLETON}'
+              name: 'Expired time cap reached count{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.stats.expired_time_cap_reached_count[{#SINGLETON}]'
               delay: '0'
@@ -1963,7 +1963,7 @@ zabbix_export:
                 - tag: component
                   value: cycles
             - uuid: 93bf8753d6b242f1b8d2288fb926e01b
-              name: 'Redis: Slave expires tracked keys{#SINGLETON}'
+              name: 'Slave expires tracked keys{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.stats.slave_expires_tracked_keys[{#SINGLETON}]'
               delay: '0'
@@ -1981,8 +1981,8 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 0c3560588d2d421c843c006ef5fa4645
               expression: 'last(/Redis by Zabbix agent 2/redis.memory.used_memory)/min(/Redis by Zabbix agent 2/redis.memory.maxmemory[{#SINGLETON}],5m)*100>{$REDIS.MEM.PUSED.MAX.WARN}'
-              name: 'Redis: Memory usage is too high'
-              event_name: 'Redis: Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)'
+              name: 'Memory usage is too high'
+              event_name: 'Memory usage is too high (over {$REDIS.MEM.PUSED.MAX.WARN}% in 5m)'
               priority: WARNING
               tags:
                 - tag: scope
@@ -2006,7 +2006,7 @@ zabbix_export:
           description: 'Additional metrics for versions 5+'
           item_prototypes:
             - uuid: adc25c08108e4fcaa3b41d2897d0a0c6
-              name: 'Redis: Allocator active{#SINGLETON}'
+              name: 'Allocator active{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.allocator_active[{#SINGLETON}]'
               delay: '0'
@@ -2021,7 +2021,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 81ef89fc751746ac8254a55a2b2e4ea7
-              name: 'Redis: Allocator allocated{#SINGLETON}'
+              name: 'Allocator allocated{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.allocator_allocated[{#SINGLETON}]'
               delay: '0'
@@ -2036,7 +2036,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 23e034630d7246f7ba993d5c6db2d6bb
-              name: 'Redis: Allocator fragmentation bytes{#SINGLETON}'
+              name: 'Allocator fragmentation bytes{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.allocator_frag_bytes[{#SINGLETON}]'
               delay: '0'
@@ -2052,7 +2052,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 690a13b13d134f648b4b8381f6a185f0
-              name: 'Redis: Allocator fragmentation ratio{#SINGLETON}'
+              name: 'Allocator fragmentation ratio{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.allocator_frag_ratio[{#SINGLETON}]'
               delay: '0'
@@ -2068,7 +2068,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 0abd6a9adb034536b3a389e0af2af732
-              name: 'Redis: Allocator resident{#SINGLETON}'
+              name: 'Allocator resident{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.allocator_resident[{#SINGLETON}]'
               delay: '0'
@@ -2083,7 +2083,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: b5ecad496c554ccaad495d2f112b5e2f
-              name: 'Redis: Allocator RSS bytes{#SINGLETON}'
+              name: 'Allocator RSS bytes{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.allocator_rss_bytes[{#SINGLETON}]'
               delay: '0'
@@ -2099,7 +2099,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 643fe70e1a7f488196b053722a2df9c2
-              name: 'Redis: Allocator RSS ratio{#SINGLETON}'
+              name: 'Allocator RSS ratio{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.allocator_rss_ratio[{#SINGLETON}]'
               delay: '0'
@@ -2115,7 +2115,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 40a639acab5a415a8fb48b7520b7d198
-              name: 'Redis: Memory fragmentation bytes{#SINGLETON}'
+              name: 'Memory fragmentation bytes{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.fragmentation_bytes[{#SINGLETON}]'
               delay: '0'
@@ -2131,7 +2131,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 70c53f60d020440c8f7cba83b32f58c9
-              name: 'Redis: Memory AOF buffer{#SINGLETON}'
+              name: 'Memory AOF buffer{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.mem_aof_buffer[{#SINGLETON}]'
               delay: '0'
@@ -2149,7 +2149,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: d64718269f20470e9661ff7c479dc300
-              name: 'Redis: Memory clients normal{#SINGLETON}'
+              name: 'Memory clients normal{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.mem_clients_normal[{#SINGLETON}]'
               delay: '0'
@@ -2164,7 +2164,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: e685ab11ab534f8abd1a7e2ee35839e8
-              name: 'Redis: Memory clients slaves{#SINGLETON}'
+              name: 'Memory clients slaves{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.mem_clients_slaves[{#SINGLETON}]'
               delay: '0'
@@ -2179,7 +2179,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: f6c9bfda015d47d0b34f466e95356a5d
-              name: 'Redis: Memory not counted for evict{#SINGLETON}'
+              name: 'Memory not counted for evict{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.not_counted_for_evict[{#SINGLETON}]'
               delay: '0'
@@ -2194,7 +2194,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: eaac8b142fc540ad9c7563e145819643
-              name: 'Redis: Memory number of cached scripts{#SINGLETON}'
+              name: 'Memory number of cached scripts{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.number_of_cached_scripts[{#SINGLETON}]'
               delay: '0'
@@ -2209,7 +2209,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: a221fd161be641c1a8091d0bfd1d2157
-              name: 'Redis: Memory replication backlog{#SINGLETON}'
+              name: 'Memory replication backlog{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.replication_backlog[{#SINGLETON}]'
               delay: '0'
@@ -2226,7 +2226,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: e699ad3b29ca486f91688684ffde6b73
-              name: 'Redis: Memory RSS overhead bytes{#SINGLETON}'
+              name: 'Memory RSS overhead bytes{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.rss_overhead_bytes[{#SINGLETON}]'
               delay: '0'
@@ -2243,7 +2243,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: d4d51ae4ce214699ba760fcb62289a51
-              name: 'Redis: Memory RSS overhead ratio{#SINGLETON}'
+              name: 'Memory RSS overhead ratio{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.rss_overhead_ratio[{#SINGLETON}]'
               delay: '0'
@@ -2259,7 +2259,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: e3733b2993cb4199bfac8b0711d4bb72
-              name: 'Redis: Memory used scripts{#SINGLETON}'
+              name: 'Memory used scripts{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.used_memory_scripts[{#SINGLETON}]'
               delay: '0'
@@ -2290,7 +2290,7 @@ zabbix_export:
           description: 'If AOF is activated, additional metrics will be added'
           item_prototypes:
             - uuid: e68a7b6931324bd79268a5151717505e
-              name: 'Redis: AOF base size{#SINGLETON}'
+              name: 'AOF base size{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_base_size[{#SINGLETON}]'
               delay: '0'
@@ -2307,7 +2307,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: 875ace20e5c94044ae63f36d98ac6256
-              name: 'Redis: AOF buffer length{#SINGLETON}'
+              name: 'AOF buffer length{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_buffer_length[{#SINGLETON}]'
               delay: '0'
@@ -2324,7 +2324,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: 679bd919383a4106916a84fae5be47bb
-              name: 'Redis: AOF current size{#SINGLETON}'
+              name: 'AOF current size{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_current_size[{#SINGLETON}]'
               delay: '0'
@@ -2341,7 +2341,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: ff9955c770aa4e0883cc72bf1d762be7
-              name: 'Redis: AOF delayed fsync{#SINGLETON}'
+              name: 'AOF delayed fsync{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_delayed_fsync[{#SINGLETON}]'
               delay: '0'
@@ -2357,7 +2357,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: 0606ef5762b04d91abba95269eb77ae2
-              name: 'Redis: AOF pending background I/O fsync{#SINGLETON}'
+              name: 'AOF pending background I/O fsync{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_pending_bio_fsync[{#SINGLETON}]'
               delay: '0'
@@ -2373,7 +2373,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: 194061b8ad6c484ca8c732d69eeb0f1e
-              name: 'Redis: AOF pending rewrite{#SINGLETON}'
+              name: 'AOF pending rewrite{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_pending_rewrite[{#SINGLETON}]'
               delay: '0'
@@ -2391,7 +2391,7 @@ zabbix_export:
                 - tag: component
                   value: persistence
             - uuid: 1a39f5854ae948759deadac0ae57e9f7
-              name: 'Redis: AOF rewrite buffer length{#SINGLETON}'
+              name: 'AOF rewrite buffer length{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_rewrite_buffer_length[{#SINGLETON}]'
               delay: '0'
@@ -2481,7 +2481,7 @@ zabbix_export:
           description: 'If the instance is a replica, additional metrics are provided'
           item_prototypes:
             - uuid: 92e4b2133a6a4ec28e739bbef94ab992
-              name: 'Redis: Master host{#SINGLETON}'
+              name: 'Master host{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.master_host[{#SINGLETON}]'
               delay: '0'
@@ -2502,7 +2502,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: 0acbeb8633da41be9bfb56627a946fd9
-              name: 'Redis: Master last I/O seconds ago{#SINGLETON}'
+              name: 'Master last I/O seconds ago{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.master_last_io_seconds_ago[{#SINGLETON}]'
               delay: '0'
@@ -2522,14 +2522,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 292f477d970d4a138d2d1b2c45d965dd
                   expression: 'min(/Redis by Zabbix agent 2/redis.replication.master_last_io_seconds_ago[{#SINGLETON}],5m)>{$REDIS.REPL.LAG.MAX.WARN}'
-                  name: 'Redis: Replication lag with master is too high'
-                  event_name: 'Redis: Replication lag with master is too high (over {$REDIS.REPL.LAG.MAX.WARN} in 5m)'
+                  name: 'Replication lag with master is too high'
+                  event_name: 'Replication lag with master is too high (over {$REDIS.REPL.LAG.MAX.WARN} in 5m)'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 8024463a9f644e6e91def5a0e88abd4b
-              name: 'Redis: Master link status{#SINGLETON}'
+              name: 'Master link status{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.master_link_status[{#SINGLETON}]'
               delay: '0'
@@ -2550,7 +2550,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: da63a0b31bed47edaba3f802738fa4fd
-              name: 'Redis: Master port{#SINGLETON}'
+              name: 'Master port{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.master_port[{#SINGLETON}]'
               delay: '0'
@@ -2569,7 +2569,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: 6835a260e66741159ee10046265a1ea4
-              name: 'Redis: Master sync in progress{#SINGLETON}'
+              name: 'Master sync in progress{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.master_sync_in_progress[{#SINGLETON}]'
               delay: '0'
@@ -2585,7 +2585,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: 3f92dfa07237495ca7696bb4b078eb93
-              name: 'Redis: Slave priority{#SINGLETON}'
+              name: 'Slave priority{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.slave_priority[{#SINGLETON}]'
               delay: '0'
@@ -2601,7 +2601,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: f38492a49f214ec8b71fdc51d243281e
-              name: 'Redis: Slave priority{#SINGLETON}'
+              name: 'Slave priority{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.slave_read_only[{#SINGLETON}]'
               delay: '0'
@@ -2620,7 +2620,7 @@ zabbix_export:
                 - tag: component
                   value: replication
             - uuid: 7eb23d1d96ea489c9e0b39b7839147bd
-              name: 'Redis: Slave replication offset{#SINGLETON}'
+              name: 'Slave replication offset{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.slave_repl_offset[{#SINGLETON}]'
               delay: '0'
@@ -2696,7 +2696,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2709,7 +2709,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2722,7 +2722,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2735,7 +2735,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2748,7 +2748,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graphprototype
                   'y': '20'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2763,8 +2763,8 @@ zabbix_export:
                       name: reference
                       value: AAAAI
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2776,9 +2776,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2790,9 +2790,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2804,9 +2804,9 @@ zabbix_export:
                       name: reference
                       value: AAAAF
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2822,7 +2822,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2835,7 +2835,7 @@ zabbix_export:
                       value: AAAAJ
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2847,8 +2847,8 @@ zabbix_export:
                       name: reference
                       value: AAAAL
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2860,9 +2860,9 @@ zabbix_export:
                       name: reference
                       value: AAAAK
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2908,8 +2908,8 @@ zabbix_export:
   triggers:
     - uuid: 65e4652dbebe47c4b46e47bb8a17aac6
       expression: 'min(/Redis by Zabbix agent 2/redis.clients.connected,5m)/last(/Redis by Zabbix agent 2/redis.config.maxclients)*100>{$REDIS.CLIENTS.PRC.MAX.WARN}'
-      name: 'Redis: Total number of connected clients is too high'
-      event_name: 'Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m)'
+      name: 'Total number of connected clients is too high'
+      event_name: 'Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m)'
       priority: WARNING
       description: |
         When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -61,9 +56,20 @@ class CWidgetItemNavigator extends CWidget {
 	}
 
 	setContents(response) {
-		if (this.#item_navigator === null) {
-			this.#item_navigator = new CItemNavigator(response.config);
+		if (response.items.length === 0) {
+			this.clearContents();
+			this.setCoverMessage({
+				message: t('No data found'),
+				icon: ZBX_ICON_SEARCH_LARGE
+			});
 
+			return;
+		}
+
+		if (this.#item_navigator === null) {
+			this.clearContents();
+
+			this.#item_navigator = new CItemNavigator(response.config);
 			this._body.appendChild(this.#item_navigator.getContainer());
 
 			this.#registerListeners();
@@ -80,7 +86,10 @@ class CWidgetItemNavigator extends CWidget {
 	#registerListeners() {
 		this.#listeners = {
 			itemSelect: e => {
-				this.broadcast({_itemid: e.detail._itemid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_ITEM_ID]: [e.detail.itemid],
+					[CWidgetsData.DATA_TYPE_ITEM_IDS]: [e.detail.itemid]
+				});
 			},
 
 			groupToggle: e => {
@@ -115,11 +124,7 @@ class CWidgetItemNavigator extends CWidget {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				is_open: is_open,
-				group_identifier: group_identifier,
-				widgetid: widgetid
-			})
+			body: JSON.stringify({is_open, group_identifier, widgetid})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -147,5 +152,12 @@ class CWidgetItemNavigator extends CWidget {
 
 	hasPadding() {
 		return false;
+	}
+
+	onClearContents() {
+		if (this.#item_navigator !== null) {
+			this.#item_navigator.destroy();
+			this.#item_navigator = null;
+		}
 	}
 }

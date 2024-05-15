@@ -53,7 +53,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 668f0a143b164fd5b62b1311ac798ca3
-          name: 'MSSQL: Get Access Methods counters'
+          name: 'Get Access Methods counters'
           type: DEPENDENT
           key: mssql.access_methods.raw
           delay: '0'
@@ -72,7 +72,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e48534a4fd3042ee9c2f0155230298a2
-          name: 'MSSQL: Auto-param attempts per second'
+          name: 'Auto-param attempts per second'
           type: DEPENDENT
           key: mssql.autoparam_attempts_sec.rate
           delay: '0'
@@ -92,7 +92,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 71ade3c11bcd4f4691c5fa1c3fa6ded1
-          name: 'MSSQL: Get availability groups'
+          name: 'Get availability groups'
           key: 'mssql.availability.group.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -102,7 +102,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8c5e2250dcc4405d95cc33167be33bb2
-          name: 'MSSQL: Average latch wait time'
+          name: 'Average latch wait time'
           type: CALCULATED
           key: mssql.average_latch_wait_time
           delay: 0;m0-59s3
@@ -118,7 +118,7 @@ zabbix_export:
             - tag: component
               value: wait-time
         - uuid: 394d622b256945289ed9ca88999e024d
-          name: 'MSSQL: Average latch wait time base'
+          name: 'Average latch wait time base'
           type: DEPENDENT
           key: mssql.average_latch_wait_time_base
           delay: '0'
@@ -134,7 +134,7 @@ zabbix_export:
             - tag: component
               value: wait-time
         - uuid: fe80511b840544da86ef3dd1b34bfce2
-          name: 'MSSQL: Average latch wait time raw'
+          name: 'Average latch wait time raw'
           type: DEPENDENT
           key: mssql.average_latch_wait_time_raw
           delay: '0'
@@ -151,7 +151,7 @@ zabbix_export:
             - tag: component
               value: wait-time
         - uuid: 3ba031d33d9147f786ee6fb6fddafaed
-          name: 'MSSQL: Total average wait time'
+          name: 'Total average wait time'
           type: CALCULATED
           key: mssql.average_wait_time
           delay: 0;m0-59s3
@@ -169,15 +169,15 @@ zabbix_export:
           triggers:
             - uuid: 7d284dc23d4649c79bf67e13f1edc83b
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.average_wait_time,5m)>{$MSSQL.AVERAGE_WAIT_TIME.MAX}'
-              name: 'MSSQL: Total average wait time for locks is high'
-              event_name: 'MSSQL: Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)'
+              name: 'Total average wait time for locks is high'
+              event_name: 'Total average wait time for locks is high (over {$MSSQL.AVERAGE_WAIT_TIME.MAX}ms for 5m)'
               priority: WARNING
               description: 'An average wait time longer than 500 ms may indicate excessive blocking. This value should generally correlate to "Lock Waits/sec" and move up or down with it accordingly.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: fc14601c16314459bc8277ebd244997d
-          name: 'MSSQL: Total average wait time base'
+          name: 'Total average wait time base'
           type: DEPENDENT
           key: mssql.average_wait_time_base
           delay: '0'
@@ -193,7 +193,7 @@ zabbix_export:
             - tag: component
               value: wait-time
         - uuid: 5fa855e501dc42e68d8a06e435c08024
-          name: 'MSSQL: Total average wait time raw'
+          name: 'Total average wait time raw'
           type: DEPENDENT
           key: mssql.average_wait_time_raw
           delay: '0'
@@ -210,7 +210,7 @@ zabbix_export:
             - tag: component
               value: wait-time
         - uuid: b6c19fe6e67f4686a23455211fb2c076
-          name: 'MSSQL: Batch requests per second'
+          name: 'Batch requests per second'
           type: DEPENDENT
           key: mssql.batch_requests_sec.rate
           delay: '0'
@@ -231,7 +231,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: e2581ae0fd6d4cc18728b7301cb22730
-          name: 'MSSQL: Buffer cache hit ratio'
+          name: 'Buffer cache hit ratio'
           type: DEPENDENT
           key: mssql.buffer_cache_hit_ratio
           delay: '0'
@@ -251,8 +251,8 @@ zabbix_export:
           triggers:
             - uuid: 9ee2397e2560447eb01d4d50cde5fa9d
               expression: 'max(/MSSQL by Zabbix agent 2/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
-              name: 'MSSQL: Percentage of the buffer cache efficiency is low'
-              event_name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
+              name: 'Percentage of the buffer cache efficiency is low'
+              event_name: 'Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
               description: 'Too low buffer cache hit ratio.'
               tags:
@@ -260,18 +260,18 @@ zabbix_export:
                   value: performance
             - uuid: c22ac1cbc5224eb98fde9f87c52a3724
               expression: 'max(/MSSQL by Zabbix agent 2/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}'
-              name: 'MSSQL: Percentage of the buffer cache efficiency is low'
-              event_name: 'MSSQL: Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m)'
+              name: 'Percentage of the buffer cache efficiency is low'
+              event_name: 'Percentage of the buffer cache efficiency is low (below {$MSSQL.BUFFER_CACHE_RATIO.MIN.WARN}% for 5m)'
               priority: WARNING
               description: 'Low buffer cache hit ratio.'
               dependencies:
-                - name: 'MSSQL: Percentage of the buffer cache efficiency is low'
+                - name: 'Percentage of the buffer cache efficiency is low'
                   expression: 'max(/MSSQL by Zabbix agent 2/mssql.buffer_cache_hit_ratio,5m)<{$MSSQL.BUFFER_CACHE_RATIO.MIN.CRIT}'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 2e0810566767476db6cd0ca4eccb9e99
-          name: 'MSSQL: Get Buffer Manager counters'
+          name: 'Get Buffer Manager counters'
           type: DEPENDENT
           key: mssql.buffer_manager.raw
           delay: '0'
@@ -290,7 +290,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: ca959c973e8a4a549c0c33c85dce3598
-          name: 'MSSQL: Cache hit ratio'
+          name: 'Cache hit ratio'
           type: DEPENDENT
           key: mssql.cache_hit_ratio
           delay: '0'
@@ -308,7 +308,7 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: 9925ceb7e021480598aab2bfba74370d
-          name: 'MSSQL: Get Cache counters'
+          name: 'Get Cache counters'
           type: DEPENDENT
           key: mssql.cache_info.raw
           delay: '0'
@@ -327,7 +327,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 913fa728180d4a73a093a2ee05454081
-          name: 'MSSQL: Cache objects in use'
+          name: 'Cache objects in use'
           type: DEPENDENT
           key: mssql.cache_objects_in_use
           delay: '0'
@@ -343,7 +343,7 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: 4dbb2d972bcc42f19aaa537a0d0431e9
-          name: 'MSSQL: Cache object counts'
+          name: 'Cache object counts'
           type: DEPENDENT
           key: mssql.cache_object_counts
           delay: '0'
@@ -359,7 +359,7 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: 952940ebb15942b3ac7d4b96c816a7c3
-          name: 'MSSQL: Cache pages'
+          name: 'Cache pages'
           type: DEPENDENT
           key: mssql.cache_pages
           delay: '0'
@@ -377,7 +377,7 @@ zabbix_export:
             - tag: component
               value: page
         - uuid: 14bba7081bd84521994b2a28d1af422d
-          name: 'MSSQL: Checkpoint pages per second'
+          name: 'Checkpoint pages per second'
           type: DEPENDENT
           key: mssql.checkpoint_pages_sec.rate
           delay: '0'
@@ -399,7 +399,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: f74a2bc9da424fc0ad288ddce6a4f6fa
-          name: 'MSSQL: Database pages'
+          name: 'Database pages'
           type: DEPENDENT
           key: mssql.database_pages
           delay: '0'
@@ -415,7 +415,7 @@ zabbix_export:
             - tag: component
               value: page
         - uuid: d124c9d4a3724e32a37895ad1cbc036b
-          name: 'MSSQL: Total data file size'
+          name: 'Total data file size'
           type: DEPENDENT
           key: mssql.data_files_size
           delay: '0'
@@ -438,7 +438,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 6c942840048b463e9439f327adceb767
-          name: 'MSSQL: Get database'
+          name: 'Get database'
           key: 'mssql.db.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           delay: 1h
           history: '0'
@@ -449,7 +449,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7ee97938f31d4983b3c216684089c23f
-          name: 'MSSQL: Get DB counters'
+          name: 'Get DB counters'
           type: DEPENDENT
           key: mssql.db_info.raw
           delay: '0'
@@ -468,7 +468,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b82b979548824464a204d49a9c760c99
-          name: 'MSSQL: Total errors per second'
+          name: 'Total errors per second'
           type: DEPENDENT
           key: mssql.errors_sec.rate
           delay: '0'
@@ -490,7 +490,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 152cf9cbf35f475bb242ddcb58e23c35
-          name: 'MSSQL: Failed auto-params per second'
+          name: 'Failed auto-params per second'
           type: DEPENDENT
           key: mssql.failed_autoparams_sec.rate
           delay: '0'
@@ -510,7 +510,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: e7c66d2857034bfcbef7af94673ea66f
-          name: 'MSSQL: Forwarded records per second'
+          name: 'Forwarded records per second'
           type: DEPENDENT
           key: mssql.forwarded_records_sec.rate
           delay: '0'
@@ -530,7 +530,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 7d688d051647440595e42bd798ce78dc
-          name: 'MSSQL: Free list stalls per second'
+          name: 'Free list stalls per second'
           type: DEPENDENT
           key: mssql.free_list_stalls_sec.rate
           delay: '0'
@@ -553,15 +553,15 @@ zabbix_export:
           triggers:
             - uuid: 5cf3182a47694569b9d75822404b77f7
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.free_list_stalls_sec.rate,5m)>{$MSSQL.FREE_LIST_STALLS.MAX}'
-              name: 'MSSQL: Number of rps waiting for a free page is high'
-              event_name: 'MSSQL: Number of rps waiting for a free page is high (over {$MSSQL.FREE_LIST_STALLS.MAX} for 5m)'
+              name: 'Number of rps waiting for a free page is high'
+              event_name: 'Number of rps waiting for a free page is high (over {$MSSQL.FREE_LIST_STALLS.MAX} for 5m)'
               priority: WARNING
               description: 'Some requests have to wait for a free page.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 5e8ccbe07c254c2086a58aafe1aa2fdf
-          name: 'MSSQL: Full scans per second'
+          name: 'Full scans per second'
           type: DEPENDENT
           key: mssql.full_scans_sec.rate
           delay: '0'
@@ -581,7 +581,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 055399281d2b4e7a90ae1fb4b181a0b2
-          name: 'MSSQL: Get General Statistics counters'
+          name: 'Get General Statistics counters'
           type: DEPENDENT
           key: mssql.general_statistics.raw
           delay: '0'
@@ -600,7 +600,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5aa885322d4d4f2d9b55d8f2d65f55b0
-          name: 'MSSQL: Granted Workspace Memory'
+          name: 'Granted Workspace Memory'
           type: DEPENDENT
           key: mssql.granted_workspace_memory
           delay: '0'
@@ -620,7 +620,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 65a2e35bc66e45a08690faf08733c5fb
-          name: 'MSSQL: Index searches per second'
+          name: 'Index searches per second'
           type: DEPENDENT
           key: mssql.index_searches_sec.rate
           delay: '0'
@@ -640,7 +640,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 5439b52bd72e4204876d0c3716eb0a23
-          name: 'MSSQL: Errors per second (Info errors)'
+          name: 'Errors per second (Info errors)'
           type: DEPENDENT
           key: mssql.info_errors_sec.rate
           delay: '0'
@@ -662,7 +662,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: e36f8695b4f74178a19bb88afad586b8
-          name: 'MSSQL: Get job status'
+          name: 'Get job status'
           key: 'mssql.job.status.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           delay: 10m
           history: '0'
@@ -673,7 +673,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c43a0e1c2adf45cf8809e9a361ec190e
-          name: 'MSSQL: Errors per second (Kill connection errors)'
+          name: 'Errors per second (Kill connection errors)'
           type: DEPENDENT
           key: mssql.kill_connection_errors_sec.rate
           delay: '0'
@@ -695,7 +695,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: a394835aeddd46a18327f25747e3564d
-          name: 'MSSQL: Get last backup'
+          name: 'Get last backup'
           key: 'mssql.last.backup.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           delay: 10m
           history: '0'
@@ -706,7 +706,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2bd7c7ec217b4f62b7d94a42e9324f51
-          name: 'MSSQL: Get Latches counters'
+          name: 'Get Latches counters'
           type: DEPENDENT
           key: mssql.latches_info.raw
           delay: '0'
@@ -725,7 +725,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2daa0932d2a9491f9b262c06def40ccc
-          name: 'MSSQL: Latch waits per second'
+          name: 'Latch waits per second'
           type: DEPENDENT
           key: mssql.latch_waits_sec.rate
           delay: '0'
@@ -748,7 +748,7 @@ zabbix_export:
             - tag: component
               value: wait-time
         - uuid: d5710a51fb474d14b7d7716781b76c58
-          name: 'MSSQL: Lazy writes per second'
+          name: 'Lazy writes per second'
           type: DEPENDENT
           key: mssql.lazy_writes_sec.rate
           delay: '0'
@@ -770,15 +770,15 @@ zabbix_export:
           triggers:
             - uuid: 96698537fee846199197a25beecaafca
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.lazy_writes_sec.rate,5m)>{$MSSQL.LAZY_WRITES.MAX}'
-              name: 'MSSQL: Number of buffers written per second by the lazy writer is high'
-              event_name: 'MSSQL: Number of buffers written per second by the lazy writer is high (over {$MSSQL.LAZY_WRITES.MAX} for 5m)'
+              name: 'Number of buffers written per second by the lazy writer is high'
+              event_name: 'Number of buffers written per second by the lazy writer is high (over {$MSSQL.LAZY_WRITES.MAX} for 5m)'
               priority: WARNING
               description: 'The number of buffers written per second by the buffer manager''s lazy writer exceeds the threshold.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: f049c16678ad4daa83e55ab6c3a99fbc
-          name: 'MSSQL: Get local DB'
+          name: 'Get local DB'
           key: 'mssql.local.db.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -788,7 +788,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 46040926001f46c685c160820194a969
-          name: 'MSSQL: Get Locks counters'
+          name: 'Get Locks counters'
           type: DEPENDENT
           key: mssql.locks_info.raw
           delay: '0'
@@ -807,7 +807,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d8adec0bd76a4e1881b8b7e0ba44c7a1
-          name: 'MSSQL: Total lock requests per second'
+          name: 'Total lock requests per second'
           type: DEPENDENT
           key: mssql.lock_requests_sec.rate
           delay: '0'
@@ -832,15 +832,15 @@ zabbix_export:
           triggers:
             - uuid: 19137e1b06fe4f1eaf5e76c5ae47d29d
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.lock_requests_sec.rate,5m)>{$MSSQL.LOCK_REQUESTS.MAX}'
-              name: 'MSSQL: Total number of locks per second is high'
-              event_name: 'MSSQL: Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)'
+              name: 'Total number of locks per second is high'
+              event_name: 'Total number of locks per second is high (over {$MSSQL.LOCK_REQUESTS.MAX} for 5m)'
               priority: WARNING
               description: 'Number of new locks and lock conversions per second requested from the lock manager is high.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 3077e748f89844e0b666a82c26051399
-          name: 'MSSQL: Total lock requests per second that timed out'
+          name: 'Total lock requests per second that timed out'
           type: DEPENDENT
           key: mssql.lock_timeouts_sec.rate
           delay: '0'
@@ -865,15 +865,15 @@ zabbix_export:
           triggers:
             - uuid: a7313fad35804feeaddf544acb2a0d26
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.lock_timeouts_sec.rate,5m)>{$MSSQL.LOCK_TIMEOUTS.MAX}'
-              name: 'MSSQL: Total lock requests per second that timed out is high'
-              event_name: 'MSSQL: Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)'
+              name: 'Total lock requests per second that timed out is high'
+              event_name: 'Total lock requests per second that timed out is high (over {$MSSQL.LOCK_TIMEOUTS.MAX} for 5m)'
               priority: WARNING
               description: 'The total number of timed out lock requests per second, including requests for NOWAIT locks, is high.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: bcb606f27714414a92347a45e6bc8d31
-          name: 'MSSQL: Total lock requests per second that required waiting'
+          name: 'Total lock requests per second that required waiting'
           type: DEPENDENT
           key: mssql.lock_waits_sec.rate
           delay: '0'
@@ -898,14 +898,14 @@ zabbix_export:
           triggers:
             - uuid: c4fb968a66784746a11feee64a8f98e8
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.lock_waits_sec.rate,5m)>0'
-              name: 'MSSQL: Some blocking is occurring for 5m'
+              name: 'Some blocking is occurring for 5m'
               priority: AVERAGE
               description: 'Values greater than zero indicate at least some blocking is occurring, while a value of zero can quickly eliminate blocking as a potential root-cause problem.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 706b5931a7d24e2190d071c1088ba469
-          name: 'MSSQL: Lock wait time'
+          name: 'Lock wait time'
           type: DEPENDENT
           key: mssql.lock_wait_time
           delay: '0'
@@ -926,7 +926,7 @@ zabbix_export:
             - tag: component
               value: lock
         - uuid: 343c44bfdd154e99879fbecb4e703dab
-          name: 'MSSQL: Logins per second'
+          name: 'Logins per second'
           type: DEPENDENT
           key: mssql.logins_sec.rate
           delay: '0'
@@ -946,7 +946,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: da069a96cc3c410db1c053d3de2a6508
-          name: 'MSSQL: Logouts per second'
+          name: 'Logouts per second'
           type: DEPENDENT
           key: mssql.logouts_sec.rate
           delay: '0'
@@ -966,7 +966,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: e00f3549800a477ba77a8635a27d849b
-          name: 'MSSQL: Total log file size'
+          name: 'Total log file size'
           type: DEPENDENT
           key: mssql.log_files_size
           delay: '0'
@@ -989,7 +989,7 @@ zabbix_export:
             - tag: component
               value: log
         - uuid: fb2125c36295434a8821462b5c86fbee
-          name: 'MSSQL: Total log file used size'
+          name: 'Total log file used size'
           type: DEPENDENT
           key: mssql.log_files_used_size
           delay: '0'
@@ -1009,7 +1009,7 @@ zabbix_export:
             - tag: component
               value: log
         - uuid: 462eecc28a3f44ef831fc76d3a0a278b
-          name: 'MSSQL: Maximum workspace memory'
+          name: 'Maximum workspace memory'
           type: DEPENDENT
           key: mssql.maximum_workspace_memory
           delay: '0'
@@ -1029,7 +1029,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 08919bb644c746c7a51fcc43d3581309
-          name: 'MSSQL: Memory grants outstanding'
+          name: 'Memory grants outstanding'
           type: DEPENDENT
           key: mssql.memory_grants_outstanding
           delay: '0'
@@ -1045,7 +1045,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: f790245e08654eddb5cceff6405e68e2
-          name: 'MSSQL: Memory grants pending'
+          name: 'Memory grants pending'
           type: DEPENDENT
           key: mssql.memory_grants_pending
           delay: '0'
@@ -1061,7 +1061,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 4114e184cecd4040a26d9156ac11b6d2
-          name: 'MSSQL: Get Memory counters'
+          name: 'Get Memory counters'
           type: DEPENDENT
           key: mssql.mem_manager.raw
           delay: '0'
@@ -1080,7 +1080,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: fb51801472fc4ca7beed49c2586ba1cb
-          name: 'MSSQL: Get DB mirroring'
+          name: 'Get DB mirroring'
           key: 'mssql.mirroring.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -1090,7 +1090,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8730198507594f4aa38d45bf00e65a38
-          name: 'MSSQL: Get non-local DB'
+          name: 'Get non-local DB'
           key: 'mssql.nonlocal.db.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -1100,7 +1100,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0e8935dc71584982b20ff2dbe42b31a4
-          name: 'MSSQL: Total lock requests per second that have deadlocks'
+          name: 'Total lock requests per second that have deadlocks'
           type: DEPENDENT
           key: mssql.number_deadlocks_sec.rate
           delay: '0'
@@ -1125,15 +1125,15 @@ zabbix_export:
           triggers:
             - uuid: f0b039f08b694db1bbafe6b3d8d4e9ab
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.number_deadlocks_sec.rate,5m)>{$MSSQL.DEADLOCKS.MAX}'
-              name: 'MSSQL: Number of deadlocks is high'
-              event_name: 'MSSQL: Number of deadlocks is high (over {$MSSQL.DEADLOCKS.MAX} for 5m)'
+              name: 'Number of deadlocks is high'
+              event_name: 'Number of deadlocks is high (over {$MSSQL.DEADLOCKS.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many deadlocks are occurring currently.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 6e8968403b9e4abfbc5ec0a4c990636c
-          name: 'MSSQL: Errors per second (DB offline errors)'
+          name: 'Errors per second (DB offline errors)'
           type: DEPENDENT
           key: mssql.offline_errors_sec.rate
           delay: '0'
@@ -1155,7 +1155,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 0b53d7e1a0174db2b6ebc1c47ac92d9e
-          name: 'MSSQL: Page life expectancy'
+          name: 'Page life expectancy'
           type: DEPENDENT
           key: mssql.page_life_expectancy
           delay: '0'
@@ -1175,15 +1175,15 @@ zabbix_export:
           triggers:
             - uuid: e47d0eeac246490cbeedb8ba1cf77e94
               expression: 'max(/MSSQL by Zabbix agent 2/mssql.page_life_expectancy,15m)<{$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}'
-              name: 'MSSQL: Page life expectancy is low'
-              event_name: 'MSSQL: Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)'
+              name: 'Page life expectancy is low'
+              event_name: 'Page life expectancy is low (less {$MSSQL.PAGE_LIFE_EXPECTANCY.MIN}min for 15m)'
               priority: HIGH
               description: 'The page stays in the buffer pool without references for less time than the threshold value.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 97fb6c5dd7de48879f378ac464c37f48
-          name: 'MSSQL: Page lookups per second'
+          name: 'Page lookups per second'
           type: DEPENDENT
           key: mssql.page_lookups_sec.rate
           delay: '0'
@@ -1204,7 +1204,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 936ded2166da48a8acc3c94262b0bbac
-          name: 'MSSQL: Page reads per second'
+          name: 'Page reads per second'
           type: DEPENDENT
           key: mssql.page_reads_sec.rate
           delay: '0'
@@ -1228,15 +1228,15 @@ zabbix_export:
           triggers:
             - uuid: 5050b7c4e5a4445d9c4aae031b01115b
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.page_reads_sec.rate,5m)>{$MSSQL.PAGE_READS.MAX}'
-              name: 'MSSQL: Number of physical database page reads per second is high'
-              event_name: 'MSSQL: Number of physical database page reads per second is high (over {$MSSQL.PAGE_READS.MAX} for 5m)'
+              name: 'Number of physical database page reads per second is high'
+              event_name: 'Number of physical database page reads per second is high (over {$MSSQL.PAGE_READS.MAX} for 5m)'
               priority: WARNING
               description: 'The physical database page reads are issued too frequently.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 7e39012b0bc640689d3b295fc8f2abc6
-          name: 'MSSQL: Page splits per second'
+          name: 'Page splits per second'
           type: DEPENDENT
           key: mssql.page_splits_sec.rate
           delay: '0'
@@ -1258,7 +1258,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 2be68cb7cfe441339af164b3b4ce9c90
-          name: 'MSSQL: Page writes per second'
+          name: 'Page writes per second'
           type: DEPENDENT
           key: mssql.page_writes_sec.rate
           delay: '0'
@@ -1282,15 +1282,15 @@ zabbix_export:
           triggers:
             - uuid: 48e32bec13d34ad88db7c9cc98d86a3b
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.page_writes_sec.rate,5m)>{$MSSQL.PAGE_WRITES.MAX}'
-              name: 'MSSQL: Number of physical database page writes per second is high'
-              event_name: 'MSSQL: Number of physical database page writes per second is high (over {$MSSQL.PAGE_WRITES.MAX} for 5m)'
+              name: 'Number of physical database page writes per second is high'
+              event_name: 'Number of physical database page writes per second is high (over {$MSSQL.PAGE_WRITES.MAX} for 5m)'
               priority: WARNING
               description: 'The physical database page writes are issued too frequently.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 2064cd9f8e7646fa8fb329ca287fedd2
-          name: 'MSSQL: Percent of ad hoc queries running'
+          name: 'Percent of ad hoc queries running'
           type: CALCULATED
           key: mssql.percent_of_adhoc_queries
           delay: 0;m0-59s3
@@ -1307,15 +1307,15 @@ zabbix_export:
           triggers:
             - uuid: cf0649863fe5421aa1dc279d1ca7e360
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.percent_of_adhoc_queries,15m) > {$MSSQL.PERCENT_COMPILATIONS.MAX}'
-              name: 'MSSQL: Percent of ad hoc queries running is high'
-              event_name: 'MSSQL: Percent of ad hoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
+              name: 'Percent of ad hoc queries running is high'
+              event_name: 'Percent of ad hoc queries running is over {$MSSQL.PERCENT_COMPILATIONS.MAX}% for 15m'
               priority: WARNING
               description: 'The lower this value is, the better. High values often indicate excessive ad hoc querying and should be as low as possible. If excessive ad hoc querying is happening, try rewriting the queries as procedures or invoke the queries using `sp_executeSQL`. When rewriting isn''t possible, consider using a plan guide or setting the database to parameterization forced mode.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 98b0754f231c4160bcd2daafeef64fe0
-          name: 'MSSQL: Percent of Recompiled Transact-SQL Objects'
+          name: 'Percent of Recompiled Transact-SQL Objects'
           type: CALCULATED
           key: mssql.percent_recompilations_to_compilations
           delay: 0;m0-59s3
@@ -1332,15 +1332,15 @@ zabbix_export:
           triggers:
             - uuid: 1218fe12f4d542d99d997ede6cc30813
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.percent_recompilations_to_compilations,15m) > {$MSSQL.PERCENT_RECOMPILATIONS.MAX}'
-              name: 'MSSQL: Percent of times statement recompiles is high'
-              event_name: 'MSSQL: Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
+              name: 'Percent of times statement recompiles is high'
+              event_name: 'Percent of times statement recompiles is over {$MSSQL.PERCENT_RECOMPILATIONS.MAX}% for 15m'
               priority: WARNING
               description: 'This number should be at or near zero, since recompiles can cause deadlocks and exclusive compile locks. This counter''s value should follow in proportion to "Batch Requests/sec" and "SQL Compilations/sec".'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 2128f1e7d0fa46e2bdb8b06f5c07c436
-          name: 'MSSQL: Get performance counters'
+          name: 'Get performance counters'
           key: 'mssql.perfcounter.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           delay: 0;m0-59
           history: '0'
@@ -1351,7 +1351,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9b769f48534c4e6cb9bb2cd4079bd808
-          name: 'MSSQL: Number of blocked processes'
+          name: 'Number of blocked processes'
           type: DEPENDENT
           key: mssql.processes_blocked
           delay: '0'
@@ -1370,7 +1370,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 432178b4071e46758c421f6d9b75f4cd
-          name: 'MSSQL: Get quorum'
+          name: 'Get quorum'
           key: 'mssql.quorum.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -1380,7 +1380,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7343a6e34956475db3e79f7cfa905baa
-          name: 'MSSQL: Get quorum member'
+          name: 'Get quorum member'
           key: 'mssql.quorum.member.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -1390,7 +1390,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 18b09445472c46be81281c0cb55297ea
-          name: 'MSSQL: Read-ahead pages per second'
+          name: 'Read-ahead pages per second'
           type: DEPENDENT
           key: mssql.readahead_pages_sec.rate
           delay: '0'
@@ -1412,7 +1412,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 77deceae02df4e2280f42ae7b7b16f76
-          name: 'MSSQL: Get replica'
+          name: 'Get replica'
           key: 'mssql.replica.get["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -1422,7 +1422,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7c5778b466fe488a9c7571a0b0b35597
-          name: 'MSSQL: Safe auto-params per second'
+          name: 'Safe auto-params per second'
           type: DEPENDENT
           key: mssql.safe_autoparams_sec.rate
           delay: '0'
@@ -1442,7 +1442,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 5dda9c1a17fa43ada4a6857e62148f1a
-          name: 'MSSQL: Full scans to Index searches ratio'
+          name: 'Full scans to Index searches ratio'
           type: CALCULATED
           key: mssql.scan_to_search
           delay: 0;m0-59s3
@@ -1456,14 +1456,14 @@ zabbix_export:
           triggers:
             - uuid: 378cdaf994ea4167b7727996357d7564
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.scan_to_search,15m) > 0.001'
-              name: 'MSSQL: Number of index and table scans exceeds index searches in the last 15m'
+              name: 'Number of index and table scans exceeds index searches in the last 15m'
               priority: WARNING
               description: 'Index searches are preferable to index and table scans. For OLTP applications, optimize for more index searches and less scans (preferably, 1 full scan for every 1000 index searches). Index and table scans are expensive I/O operations.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: f02b411d44784721a4fb4e032f094867
-          name: 'MSSQL: SQL compilations per second'
+          name: 'SQL compilations per second'
           type: DEPENDENT
           key: mssql.sql_compilations_sec.rate
           delay: '0'
@@ -1483,7 +1483,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 60c2c827c40a4d09b0b41cd7004cb0b0
-          name: 'MSSQL: Get SQL Errors counters'
+          name: 'Get SQL Errors counters'
           type: DEPENDENT
           key: mssql.sql_errors.raw
           delay: '0'
@@ -1502,7 +1502,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 515fe1b64f82415fbdfd118358bdcc2d
-          name: 'MSSQL: SQL re-compilations per second'
+          name: 'SQL re-compilations per second'
           type: DEPENDENT
           key: mssql.sql_recompilations_sec.rate
           delay: '0'
@@ -1522,7 +1522,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 8c18cf97c2dc4e94a9b889c72d76cdde
-          name: 'MSSQL: Get SQL Statistics counters'
+          name: 'Get SQL Statistics counters'
           type: DEPENDENT
           key: mssql.sql_statistics.raw
           delay: '0'
@@ -1541,7 +1541,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 78b85902a71b47b1845bb55a797e8800
-          name: 'MSSQL: Table lock escalations per second'
+          name: 'Table lock escalations per second'
           type: DEPENDENT
           key: mssql.table_lock_escalations.rate
           delay: '0'
@@ -1563,7 +1563,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 29b91e97aa5f4efcafa38d59568c16ec
-          name: 'MSSQL: Target pages'
+          name: 'Target pages'
           type: DEPENDENT
           key: mssql.target_pages
           delay: '0'
@@ -1582,7 +1582,7 @@ zabbix_export:
             - tag: component
               value: page
         - uuid: 06de7547c13c4e25af22c14fc7af84bd
-          name: 'MSSQL: Target server memory'
+          name: 'Target server memory'
           type: DEPENDENT
           key: mssql.target_server_memory
           delay: '0'
@@ -1602,7 +1602,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 304dd414b91c450db0594bd7135e340b
-          name: 'MSSQL: Total latch wait time'
+          name: 'Total latch wait time'
           type: DEPENDENT
           key: mssql.total_latch_wait_time
           delay: '0'
@@ -1623,7 +1623,7 @@ zabbix_export:
             - tag: component
               value: wait-time
         - uuid: a1dd82b237304bf39d9e34d6ff7d76a2
-          name: 'MSSQL: Total server memory'
+          name: 'Total server memory'
           type: DEPENDENT
           key: mssql.total_server_memory
           delay: '0'
@@ -1643,7 +1643,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: f7c8f1bbf68c4f43b0e263d45022346e
-          name: 'MSSQL: Total transactions number'
+          name: 'Total transactions number'
           type: DEPENDENT
           key: mssql.transactions
           delay: '0'
@@ -1659,7 +1659,7 @@ zabbix_export:
             - tag: component
               value: transaction
         - uuid: c23c93f8492946ba9932bf8c8a7a306e
-          name: 'MSSQL: Total transactions per second'
+          name: 'Total transactions per second'
           type: DEPENDENT
           key: mssql.transactions_sec.rate
           delay: '0'
@@ -1681,7 +1681,7 @@ zabbix_export:
             - tag: component
               value: transaction
         - uuid: b2805c08cc28424ca8fca0ab51ace519
-          name: 'MSSQL: Unsafe auto-params per second'
+          name: 'Unsafe auto-params per second'
           type: DEPENDENT
           key: mssql.unsafe_autoparams_sec.rate
           delay: '0'
@@ -1701,7 +1701,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: f4b8d9b10b4c40f6a38c03729025f618
-          name: 'MSSQL: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: mssql.uptime
           delay: '0'
@@ -1721,20 +1721,20 @@ zabbix_export:
           triggers:
             - uuid: b64d08b9212645cd8bab9e35a8e29942
               expression: 'nodata(/MSSQL by Zabbix agent 2/mssql.uptime,30m)=1'
-              name: 'MSSQL: Failed to fetch info data'
-              event_name: 'MSSQL: Failed to fetch info data (or no data for 30m)'
+              name: 'Failed to fetch info data'
+              event_name: 'Failed to fetch info data (or no data for 30m)'
               priority: INFO
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
-                - name: 'MSSQL: Service is unavailable'
+                - name: 'Service is unavailable'
                   expression: 'last(/MSSQL by Zabbix agent 2/net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}])=0'
               tags:
                 - tag: scope
                   value: availability
             - uuid: 4ab35137c34845c495bc3837ac1f6f9f
               expression: 'last(/MSSQL by Zabbix agent 2/mssql.uptime)<10m'
-              name: 'MSSQL: Service has been restarted'
-              event_name: 'MSSQL: Service has been restarted (uptime < 10m)'
+              name: 'Service has been restarted'
+              event_name: 'Service has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1742,7 +1742,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 821f3a9f694349c2afb983d4c26ff090
-          name: 'MSSQL: Number of users connected'
+          name: 'Number of users connected'
           type: DEPENDENT
           key: mssql.user_connections
           delay: '0'
@@ -1758,7 +1758,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 27e1d9f9005f475784f930c8cbaefa91
-          name: 'MSSQL: Errors per second (User errors)'
+          name: 'Errors per second (User errors)'
           type: DEPENDENT
           key: mssql.user_errors_sec.rate
           delay: '0'
@@ -1780,7 +1780,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 624ea81f4a7c43659f291a2fc7913778
-          name: 'MSSQL: Version'
+          name: Version
           key: 'mssql.version["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]'
           history: 7d
           trends: '0'
@@ -1796,8 +1796,8 @@ zabbix_export:
           triggers:
             - uuid: 12643eb3af884023ab61802559cde946
               expression: 'last(/MSSQL by Zabbix agent 2/mssql.version["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"],#1)<>last(/MSSQL by Zabbix agent 2/mssql.version["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"],#2) and length(last(/MSSQL by Zabbix agent 2/mssql.version["{$MSSQL.URI}","{$MSSQL.USER}","{$MSSQL.PASSWORD}"]))>0'
-              name: 'MSSQL: Version has changed'
-              event_name: 'MSSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               description: 'MSSQL version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1805,7 +1805,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 081cc2db8e9b481f8ca39e5f02f8f48d
-          name: 'MSSQL: Work files created per second'
+          name: 'Work files created per second'
           type: DEPENDENT
           key: mssql.workfiles_created_sec.rate
           delay: '0'
@@ -1827,15 +1827,15 @@ zabbix_export:
           triggers:
             - uuid: 6d25ee02edc14d7497b339627cc0c680
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.workfiles_created_sec.rate,5m)>{$MSSQL.WORK_FILES.MAX}'
-              name: 'MSSQL: Number of work files created per second is high'
-              event_name: 'MSSQL: Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
+              name: 'Number of work files created per second is high'
+              event_name: 'Number of work files created per second is high (over {$MSSQL.WORK_FILES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work files created per second to store temporary results for hash joins and hash aggregates.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: a2127497537a46b6be10fac14be04259
-          name: 'MSSQL: Work tables created per second'
+          name: 'Work tables created per second'
           type: DEPENDENT
           key: mssql.worktables_created_sec.rate
           delay: '0'
@@ -1857,15 +1857,15 @@ zabbix_export:
           triggers:
             - uuid: 4cd0c8e7089144aeaeb10c4866e89b06
               expression: 'min(/MSSQL by Zabbix agent 2/mssql.worktables_created_sec.rate,5m)>{$MSSQL.WORK_TABLES.MAX}'
-              name: 'MSSQL: Number of work tables created per second is high'
-              event_name: 'MSSQL: Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
+              name: 'Number of work tables created per second is high'
+              event_name: 'Number of work tables created per second is high (over {$MSSQL.WORK_TABLES.MAX} for 5m)'
               priority: AVERAGE
               description: 'Too many work tables created per second to store temporary results for query spool, LOB variables, XML variables, and cursors.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: dbcf930a346c40db9d8fafa89eafe79a
-          name: 'MSSQL: Worktables from cache ratio'
+          name: 'Worktables from cache ratio'
           type: DEPENDENT
           key: mssql.worktables_from_cache_ratio
           delay: '0'
@@ -1885,15 +1885,15 @@ zabbix_export:
           triggers:
             - uuid: cb3dd51615d447379a3abda929faf881
               expression: 'max(/MSSQL by Zabbix agent 2/mssql.worktables_from_cache_ratio,5m)<{$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}'
-              name: 'MSSQL: Percentage of work tables available from the work table cache is low'
-              event_name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
+              name: 'Percentage of work tables available from the work table cache is low'
+              event_name: 'Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
               description: 'A value less than 90% may indicate insufficient memory, since execution plans are being dropped, or, on 32-bit systems, may indicate the need for an upgrade to a 64-bit system.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 7fc4f1f9c3df45269972e617ce81f4b2
-          name: 'MSSQL: Service''s TCP port state'
+          name: 'Service''s TCP port state'
           type: SIMPLE
           key: 'net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}]'
           delay: 30s
@@ -1911,7 +1911,7 @@ zabbix_export:
           triggers:
             - uuid: 2ea9eaf463144defbd85340a824f7986
               expression: 'last(/MSSQL by Zabbix agent 2/net.tcp.service[tcp,{$MSSQL.HOST},{$MSSQL.PORT}])=0'
-              name: 'MSSQL: Service is unavailable'
+              name: 'Service is unavailable'
               priority: DISASTER
               description: 'The TCP port of the MSSQL Server service is currently unavailable.'
               tags:
@@ -4082,7 +4082,7 @@ zabbix_export:
             - name: Main
               widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4095,7 +4095,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4108,7 +4108,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4121,7 +4121,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4134,7 +4134,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graph
                   'y': '20'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4147,7 +4147,7 @@ zabbix_export:
                       value: AAAAI
                 - type: graph
                   'y': '25'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4160,7 +4160,7 @@ zabbix_export:
                       value: AAAAK
                 - type: graph
                   'y': '30'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4173,7 +4173,7 @@ zabbix_export:
                       value: AAAAM
                 - type: graph
                   'y': '35'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4186,7 +4186,7 @@ zabbix_export:
                       value: AAAAO
                 - type: graph
                   'y': '40'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4198,8 +4198,8 @@ zabbix_export:
                       name: reference
                       value: AAAAQ
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4211,9 +4211,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4225,9 +4225,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4239,9 +4239,9 @@ zabbix_export:
                       name: reference
                       value: AAAAF
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4253,9 +4253,9 @@ zabbix_export:
                       name: reference
                       value: AAAAH
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '20'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4267,9 +4267,9 @@ zabbix_export:
                       name: reference
                       value: AAAAJ
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '25'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4281,9 +4281,9 @@ zabbix_export:
                       name: reference
                       value: AAAAL
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '30'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4295,9 +4295,9 @@ zabbix_export:
                       name: reference
                       value: AAAAN
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '35'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -4311,7 +4311,7 @@ zabbix_export:
             - name: Databases
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER
@@ -4329,8 +4329,8 @@ zabbix_export:
                       name: rows
                       value: '3'
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER
@@ -4562,7 +4562,7 @@ zabbix_export:
   triggers:
     - uuid: 366fa3cfcba94e038ad77c2f5a2649a2
       expression: 'last(/MSSQL by Zabbix agent 2/mssql.forwarded_records_sec.rate) * 100 > 10 * last(/MSSQL by Zabbix agent 2/mssql.batch_requests_sec.rate)'
-      name: 'MSSQL: Too frequently using pointers'
+      name: 'Too frequently using pointers'
       priority: WARNING
       description: 'Rows with VARCHAR columns can experience expansion when VARCHAR values are updated with a longer string. In the case where the row cannot fit in the existing page, the row migrates, and access to the row will traverse a pointer. This only happens on heaps (tables without clustered indexes). In cases where clustered indexes cannot be used, drop non-clustered indexes, build a clustered index to reorg pages and rows, drop the clustered index, then recreate non-clustered indexes.'
       tags:
@@ -4570,7 +4570,7 @@ zabbix_export:
           value: performance
     - uuid: 274773f4bb9d4af798e8922b5054226b
       expression: 'last(/MSSQL by Zabbix agent 2/mssql.readahead_pages_sec.rate) > {$MSSQL.PERCENT_READAHEAD.MAX} / 100 * last(/MSSQL by Zabbix agent 2/mssql.page_reads_sec.rate)'
-      name: 'MSSQL: Too many physical reads occurring'
+      name: 'Too many physical reads occurring'
       priority: WARNING
       description: 'If this value makes up even a sizeable minority of the total "Page Reads/sec" (say, greater than 20% of the total page reads), you may have too many physical reads occurring.'
       tags:

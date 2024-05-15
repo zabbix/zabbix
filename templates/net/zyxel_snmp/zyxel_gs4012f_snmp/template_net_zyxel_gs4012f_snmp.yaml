@@ -32,7 +32,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 2839fec9602a4162bb0acfb1be89fd57
-          name: 'ZYXEL GS-4012F: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -48,7 +48,7 @@ zabbix_export:
           triggers:
             - uuid: 07b74d3face24c838c7efe8dfb87564e
               expression: 'max(/ZYXEL GS-4012F by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'ZYXEL GS-4012F: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -56,7 +56,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 831444715edf4a12baf6a5727ba9276c
-          name: 'ZYXEL GS-4012F: Contact'
+          name: Contact
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.4012f.contact
@@ -78,7 +78,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: e2a6ce044f6d40bebb50927cc70bd593
-          name: 'ZYXEL GS-4012F: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.20.12.7.0
           key: zyxel.4012f.cpuusage
@@ -95,8 +95,8 @@ zabbix_export:
           triggers:
             - uuid: 2052d9e6becd48e5a3aed8037eaf9e87
               expression: 'min(/ZYXEL GS-4012F by SNMP/zyxel.4012f.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL GS-4012F: High CPU utilization'
-              event_name: 'ZYXEL GS-4012F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -104,7 +104,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: adb85140eb8c4b6489078dc79bd61a87
-          name: 'ZYXEL GS-4012F: ZyNOS F/W Version'
+          name: 'ZyNOS F/W Version'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.20.1]'
           key: zyxel.4012f.fwversion
@@ -136,7 +136,7 @@ zabbix_export:
           triggers:
             - uuid: ecde6db248674039a30874f29e704e65
               expression: 'last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.fwversion,#1)<>last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.fwversion,#2) and length(last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.fwversion))>0'
-              name: 'ZYXEL GS-4012F: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -145,7 +145,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 1f979fc1f31c4766949cfc343d3c231a
-          name: 'ZYXEL GS-4012F: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.25.1.1.0
           key: zyxel.4012f.hw.uptime
@@ -172,7 +172,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f55214647bab4544adb7d9a63e8be69d
-          name: 'ZYXEL GS-4012F: Location'
+          name: Location
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.4012f.location
@@ -193,7 +193,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 770d70d2ebcb4978b6c6fae0692ab77f
-          name: 'ZYXEL GS-4012F: MAC address'
+          name: 'MAC address'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.4012f.mac
@@ -217,7 +217,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 25c5e9b3d34f4bb8805e2a6c43934f51
-          name: 'ZYXEL GS-4012F: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.4012f.model
@@ -244,14 +244,14 @@ zabbix_export:
           triggers:
             - uuid: 1ba1faabe15c4d46adaa4dc74c5dc05c
               expression: 'last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.model)<>"GS-4012F"'
-              name: 'ZYXEL GS-4012F: Template does not match hardware'
+              name: 'Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel GS-4012F, but connected to {ITEM.VALUE}'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 38fb81dca1db49bc83343ba197bfe980
-          name: 'ZYXEL GS-4012F: Host name'
+          name: 'Host name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.4012f.name
@@ -273,7 +273,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 1c14e77679fe4ee6b167036d8888867e
-          name: 'ZYXEL GS-4012F: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
           key: zyxel.4012f.net.uptime
@@ -294,7 +294,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 0080e896f1384245887a191d87496fa9
-          name: 'ZYXEL GS-4012F: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.20.1.10.0
           key: zyxel.4012f.serialnumber
@@ -316,8 +316,8 @@ zabbix_export:
           triggers:
             - uuid: ae941404115d4b10809bce603528ceaa
               expression: 'last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.serialnumber,#1)<>last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.serialnumber,#2) and length(last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.serialnumber))>0'
-              name: 'ZYXEL GS-4012F: Device has been replaced'
-              event_name: 'ZYXEL GS-4012F: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -334,7 +334,7 @@ zabbix_export:
           description: 'An entry in fanRpmTable.'
           item_prototypes:
             - uuid: 0f7fb278c896436c96fb1b5006ee4e06
-              name: 'ZYXEL GS-4012F: Fan #{#SNMPINDEX}'
+              name: 'Fan #{#SNMPINDEX}'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.9.1.1.2.{#SNMPINDEX}'
               key: 'zyxel.4012f.fan[{#SNMPINDEX}]'
@@ -355,7 +355,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: c91993daf9e44102a04b1ff2b72bf773
                   expression: 'last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
-                  name: 'ZYXEL GS-4012F: FAN{#SNMPINDEX} is in critical state'
+                  name: 'FAN{#SNMPINDEX} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
@@ -395,7 +395,7 @@ zabbix_export:
                 formulaid: D
           item_prototypes:
             - uuid: 2b87dc4104704d3891ac061aaa81c629
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Administrative status'
+              name: 'Port {#SNMPINDEX}: Administrative status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.adminstatus[{#SNMPINDEX}]'
@@ -419,7 +419,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 32abe2903d1c4652a74a44c5154f1451
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Interface name'
+              name: 'Port {#SNMPINDEX}: Interface name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.descr[{#SNMPINDEX}]'
@@ -441,7 +441,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 42040f2ca85e4f80bdc4bdc9d0ef5966
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link speed'
+              name: 'Port {#SNMPINDEX}: Link speed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.highspeed[{#SNMPINDEX}]'
@@ -465,7 +465,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: a71a364726524a6e9d00eb4098fa5faa
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming broadcast packages'
+              name: 'Port {#SNMPINDEX}: Incoming broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.in.broadcastpkts[{#SNMPINDEX}]'
@@ -488,7 +488,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 8dda9a8e70bc44c5acca08284eb94bac
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming multicast packages'
+              name: 'Port {#SNMPINDEX}: Incoming multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.in.multicastpkts[{#SNMPINDEX}]'
@@ -512,7 +512,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 7240d04927a742dd93844c1fcc68dba0
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming traffic'
+              name: 'Port {#SNMPINDEX}: Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.in.traffic[{#SNMPINDEX}]'
@@ -537,7 +537,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 4b7a80cf38d44dd9b270dcbc5c44ecfc
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming unicast packages'
+              name: 'Port {#SNMPINDEX}: Incoming unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.in.ucastpkts[{#SNMPINDEX}]'
@@ -560,7 +560,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 8c0eca407f47404a86d26c5fb1885f87
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Incoming utilization'
+              name: 'Port {#SNMPINDEX}: Incoming utilization'
               type: CALCULATED
               key: 'zyxel.4012f.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
@@ -585,7 +585,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: a63165d407e740c38cab55aefeccbca8
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link type'
+              name: 'Port {#SNMPINDEX}: Link type'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.23.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.link_type[{#SNMPINDEX}]'
@@ -607,7 +607,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 5c439eae60184abd8ec9b209cda19f8b
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Interface description'
+              name: 'Port {#SNMPINDEX}: Interface description'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.23.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.name[{#SNMPINDEX}]'
@@ -629,7 +629,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 033b0e5b141b437c805b845f2e3f54a0
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Operational status'
+              name: 'Port {#SNMPINDEX}: Operational status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.operstatus[{#SNMPINDEX}]'
@@ -657,7 +657,7 @@ zabbix_export:
                   expression: 'last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.net.if.operstatus[{#SNMPINDEX}])<>2'
-                  name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Link down'
+                  name: 'Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -672,7 +672,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 0f3decaec17a4812aac826056cce9e8a
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing broadcast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.out.broadcastpkts[{#SNMPINDEX}]'
@@ -696,7 +696,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 5ac33c29b537409cb6347548290e5ecc
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing multicast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.out.multicastpkts[{#SNMPINDEX}]'
@@ -721,7 +721,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 69ab1d86cd0347b49e2500a1d8e7e6a8
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing traffic'
+              name: 'Port {#SNMPINDEX}: Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.out.traffic[{#SNMPINDEX}]'
@@ -747,7 +747,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 870c54f85d57473c8b48ed896d5e2b2b
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing unicast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.out.ucastpkts[{#SNMPINDEX}]'
@@ -771,7 +771,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 98fffdb492a149b7b684e3867b113d37
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Outgoing utilization'
+              name: 'Port {#SNMPINDEX}: Outgoing utilization'
               type: CALCULATED
               key: 'zyxel.4012f.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
@@ -796,7 +796,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 64037c50f0344d02ae06690e91c7ead8
-              name: 'ZYXEL GS-4012F: Port {#SNMPINDEX}: Speed Duplex'
+              name: 'Port {#SNMPINDEX}: Speed Duplex'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.23.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.4012f.net.if.speed_duplex[{#SNMPINDEX}]'
@@ -901,7 +901,7 @@ zabbix_export:
             Index of temperature unit. 1:MAC, 2:CPU, 3:PHY
           item_prototypes:
             - uuid: ee82e6f1916a4ce7b5cd77f0249cc2af
-              name: 'ZYXEL GS-4012F: Temperature "{#ZYXEL.TEMP.ID}"'
+              name: 'Temperature "{#ZYXEL.TEMP.ID}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.9.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.4012f.temp[{#SNMPINDEX}]'
@@ -922,7 +922,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 719aad00708e4fd3b99997834c5d68b2
                   expression: 'last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
-                  name: 'ZYXEL GS-4012F: Temperature {#ZYXEL.TEMP.ID} is in critical state'
+                  name: 'Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
@@ -958,7 +958,7 @@ zabbix_export:
           description: 'An entry in voltageTable.'
           item_prototypes:
             - uuid: b5cb92c8d63a41158e7072b8ebf33ca1
-              name: 'ZYXEL GS-4012F: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              name: 'Nominal "{#ZYXEL.VOLT.NOMINAL}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.20.9.3.1.2.{#SNMPINDEX}'
               key: 'zyxel.4012f.volt[{#SNMPINDEX}]'
@@ -983,7 +983,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7d28666404bd4cedb687214846f89d4a
                   expression: 'last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
-                  name: 'ZYXEL GS-4012F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
+                  name: 'Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
@@ -1050,7 +1050,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1130,8 +1130,8 @@ zabbix_export:
   triggers:
     - uuid: 93c70a5dd2504d0d9b13a17af942d45e
       expression: '(last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.hw.uptime)>0 and last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.hw.uptime)<10m) or (last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.hw.uptime)=0 and last(/ZYXEL GS-4012F by SNMP/zyxel.4012f.net.uptime)<10m)'
-      name: 'ZYXEL GS-4012F: Host has been restarted'
-      event_name: 'ZYXEL GS-4012F: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

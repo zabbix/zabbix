@@ -23,7 +23,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 87e91f23320043549457a5b2ab8ddf74
-          name: 'Kubernetes Scheduler: REST Client requests: 2xx, rate'
+          name: 'REST Client requests: 2xx, rate'
           type: DEPENDENT
           key: kubernetes.scheduler.client_http_requests_200.rate
           delay: '0'
@@ -48,7 +48,7 @@ zabbix_export:
             - tag: http-code
               value: 2xx
         - uuid: b790f8c9a6b44f54837a6b3cb1dcec41
-          name: 'Kubernetes Scheduler: REST Client requests: 3xx, rate'
+          name: 'REST Client requests: 3xx, rate'
           type: DEPENDENT
           key: kubernetes.scheduler.client_http_requests_300.rate
           delay: '0'
@@ -73,7 +73,7 @@ zabbix_export:
             - tag: http-code
               value: 3xx
         - uuid: 84e09cb3134b492b983649bc29da11ee
-          name: 'Kubernetes Scheduler: REST Client requests: 4xx, rate'
+          name: 'REST Client requests: 4xx, rate'
           type: DEPENDENT
           key: kubernetes.scheduler.client_http_requests_400.rate
           delay: '0'
@@ -98,7 +98,7 @@ zabbix_export:
             - tag: http-code
               value: 4xx
         - uuid: d94fce6ae59b4735b93e1ccfb9084dc2
-          name: 'Kubernetes Scheduler: REST Client requests: 5xx, rate'
+          name: 'REST Client requests: 5xx, rate'
           type: DEPENDENT
           key: kubernetes.scheduler.client_http_requests_500.rate
           delay: '0'
@@ -125,15 +125,15 @@ zabbix_export:
           triggers:
             - uuid: ea92474a61214053b2cd20775817010e
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.client_http_requests_500.rate,5m)>{$KUBE.SCHEDULER.HTTP.CLIENT.ERROR}'
-              name: 'Kubernetes Scheduler: Too many REST Client errors'
-              event_name: 'Kubernetes Scheduler: Too many REST Client errors (over {$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} for 5m)'
+              name: 'Too many REST Client errors'
+              event_name: 'Too many REST Client errors (over {$KUBE.SCHEDULER.HTTP.CLIENT.ERROR} for 5m)'
               priority: WARNING
               description: '"Kubernetes Scheduler REST Client requests is experiencing high error rate (with 5xx HTTP code).'
               tags:
                 - tag: scope
                   value: availability
         - uuid: b1d79dbb773d47668476a12ca8ee3d08
-          name: 'Kubernetes Scheduler: CPU'
+          name: CPU
           type: DEPENDENT
           key: kubernetes.scheduler.cpu.util
           delay: '0'
@@ -159,7 +159,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2534eacdaf9b44d68388b366da40af59
-          name: 'Kubernetes Scheduler: Get Scheduler metrics'
+          name: 'Get Scheduler metrics'
           type: HTTP_AGENT
           key: kubernetes.scheduler.get_metrics
           history: '0'
@@ -179,7 +179,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: a21ec7ee8a76449f99199777d35cdd03
-          name: 'Kubernetes Scheduler: Goroutines'
+          name: Goroutines
           type: DEPENDENT
           key: kubernetes.scheduler.go_goroutines
           delay: '0'
@@ -199,7 +199,7 @@ zabbix_export:
             - tag: component
               value: goroutines
         - uuid: d7493f23748f440b8cae127e6ff70bb7
-          name: 'Kubernetes Scheduler: Go threads'
+          name: 'Go threads'
           type: DEPENDENT
           key: kubernetes.scheduler.go_threads
           delay: '0'
@@ -219,7 +219,7 @@ zabbix_export:
             - tag: component
               value: go-threads
         - uuid: 11471cff0d664bdb906cf54821af9710
-          name: 'Kubernetes Scheduler: Fds max'
+          name: 'Fds max'
           type: DEPENDENT
           key: kubernetes.scheduler.max_fds
           delay: '0'
@@ -239,7 +239,7 @@ zabbix_export:
             - tag: component
               value: fds
         - uuid: 2aa6fb05cb3e4f33a05ebf331be1ed54
-          name: 'Kubernetes Scheduler: Fds open'
+          name: 'Fds open'
           type: DEPENDENT
           key: kubernetes.scheduler.open_fds
           delay: '0'
@@ -259,7 +259,7 @@ zabbix_export:
             - tag: component
               value: fds
         - uuid: f8272f957dc447f19876395994050edd
-          name: 'Kubernetes Scheduler: Resident memory, bytes'
+          name: 'Resident memory, bytes'
           type: DEPENDENT
           key: kubernetes.scheduler.process_resident_memory_bytes
           delay: '0'
@@ -280,7 +280,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 0319ccb3efb94aeba6181c1f34cc999a
-          name: 'Kubernetes Scheduler: Virtual memory, bytes'
+          name: 'Virtual memory, bytes'
           type: DEPENDENT
           key: kubernetes.scheduler.process_virtual_memory_bytes
           delay: '0'
@@ -301,7 +301,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: f198d7705dd34d52b57a31aa8b5a423a
-          name: 'Kubernetes Scheduler: Schedule attempts: error'
+          name: 'Schedule attempts: error'
           type: DEPENDENT
           key: kubernetes.scheduler.scheduler_schedule_attempts.error.rate
           delay: '0'
@@ -326,15 +326,15 @@ zabbix_export:
           triggers:
             - uuid: 9116327bc14f4f189ca867b43187f6bd
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.error.rate,5m)>{$KUBE.SCHEDULER.ERROR}'
-              name: 'Kubernetes Scheduler: Too many schedule attempts with errors'
-              event_name: 'Kubernetes Scheduler: Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m)'
+              name: 'Too many schedule attempts with errors'
+              event_name: 'Too many schedule attempts with errors (over {$KUBE.SCHEDULER.ERROR} for 5m)'
               priority: WARNING
               description: 'Number of attempts to schedule pods with ''error'' result is too high. ''error'' means an internal scheduler problem.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: d5c901849f134b40b077c50e02415fff
-          name: 'Kubernetes Scheduler: Schedule attempts: scheduled'
+          name: 'Schedule attempts: scheduled'
           type: DEPENDENT
           key: kubernetes.scheduler.scheduler_schedule_attempts.scheduled.rate
           delay: '0'
@@ -357,7 +357,7 @@ zabbix_export:
             - tag: component
               value: scheduler
         - uuid: 5736a89200684c709c22f9fb3711bb83
-          name: 'Kubernetes Scheduler: Schedule attempts: unschedulable'
+          name: 'Schedule attempts: unschedulable'
           type: DEPENDENT
           key: kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate
           delay: '0'
@@ -382,8 +382,8 @@ zabbix_export:
           triggers:
             - uuid: 16efba4ba322416fa2b8986273b83904
               expression: 'min(/Kubernetes Scheduler by HTTP/kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate,5m)>{$KUBE.SCHEDULER.UNSCHEDULABLE}'
-              name: 'Kubernetes Scheduler: Too many unschedulable pods'
-              event_name: 'Kubernetes Scheduler: Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m)'
+              name: 'Too many unschedulable pods'
+              event_name: 'Too many unschedulable pods (over {$KUBE.SCHEDULER.UNSCHEDULABLE} for 5m)'
               priority: WARNING
               description: 'Number of attempts to schedule pods with ''unschedulable'' result is too high. ''unschedulable'' means a pod could not be scheduled.'
               tags:
@@ -398,7 +398,7 @@ zabbix_export:
           description: 'Discovery raw data and percentile items of e2e scheduling latency.'
           item_prototypes:
             - uuid: eaeb8c321626466bbf7c08008a82b9c8
-              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling seconds bucket, {#LE}'
+              name: '["{#RESULT}"]: e2e scheduling seconds bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.scheduler.e2e_scheduling_bucket[{#LE},"{#RESULT}"]'
               delay: '0'
@@ -422,7 +422,7 @@ zabbix_export:
                 - tag: result
                   value: '{#RESULT}'
             - uuid: b8fd5b4454484f4298e2c2b1e5c832c5
-              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p50'
+              name: '["{#RESULT}"]: e2e scheduling, p50'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p50["{#RESULT}"]'
               history: 7d
@@ -437,7 +437,7 @@ zabbix_export:
                 - tag: result
                   value: '{#RESULT}'
             - uuid: 01edd56cd1c94d4b80589d91349e4be5
-              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p90'
+              name: '["{#RESULT}"]: e2e scheduling, p90'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p90["{#RESULT}"]'
               history: 7d
@@ -452,7 +452,7 @@ zabbix_export:
                 - tag: result
                   value: '{#RESULT}'
             - uuid: 706fc27da4d34a4e9189c566c7aa96ff
-              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p95'
+              name: '["{#RESULT}"]: e2e scheduling, p95'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]'
               history: 7d
@@ -467,7 +467,7 @@ zabbix_export:
                 - tag: result
                   value: '{#RESULT}'
             - uuid: 829627aeab764590b3a17e6b10c56709
-              name: 'Kubernetes Scheduler: ["{#RESULT}"]: e2e scheduling, p99'
+              name: '["{#RESULT}"]: e2e scheduling, p99'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p99["{#RESULT}"]'
               history: 7d
@@ -576,7 +576,7 @@ zabbix_export:
           description: 'Discovery raw data of binding latency.'
           item_prototypes:
             - uuid: 17a3d7122cd844ea905059020532907b
-              name: 'Kubernetes Scheduler: Binding duration bucket, {#LE}'
+              name: 'Binding duration bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.scheduler.binding_duration[{#LE}]'
               delay: '0'
@@ -598,7 +598,7 @@ zabbix_export:
                 - tag: component
                   value: binding
             - uuid: 5f40c030c1964ff7ab7786cee97bee81
-              name: 'Kubernetes Scheduler: Binding duration, p50'
+              name: 'Binding duration, p50'
               type: CALCULATED
               key: 'kubernetes.scheduler.binding_duration_p50[{#SINGLETON}]'
               history: 7d
@@ -611,7 +611,7 @@ zabbix_export:
                 - tag: component
                   value: binding
             - uuid: 19ba0e215a9f4e13b3079fcdaf124cc5
-              name: 'Kubernetes Scheduler: Binding duration, p90'
+              name: 'Binding duration, p90'
               type: CALCULATED
               key: 'kubernetes.scheduler.binding_duration_p90[{#SINGLETON}]'
               history: 7d
@@ -624,7 +624,7 @@ zabbix_export:
                 - tag: component
                   value: binding
             - uuid: b24d657a1568437fac77535a80d63bc3
-              name: 'Kubernetes Scheduler: Binding duration, p95'
+              name: 'Binding duration, p95'
               type: CALCULATED
               key: 'kubernetes.scheduler.binding_duration_p95[{#SINGLETON}]'
               history: 7d
@@ -637,7 +637,7 @@ zabbix_export:
                 - tag: component
                   value: binding
             - uuid: 258d5d4b6534488a92ba29185e3ca56f
-              name: 'Kubernetes Scheduler: Binding duration, p99'
+              name: 'Binding duration, p99'
               type: CALCULATED
               key: 'kubernetes.scheduler.binding_duration_p99[{#SINGLETON}]'
               history: 7d
@@ -736,7 +736,7 @@ zabbix_export:
           description: 'Discovery raw data of scheduling algorithm latency.'
           item_prototypes:
             - uuid: c794f7fbd7494bb69d9c51140c443236
-              name: 'Kubernetes Scheduler: Scheduling algorithm duration bucket, {#LE}'
+              name: 'Scheduling algorithm duration bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.scheduler.scheduling_algorithm_duration[{#LE}]'
               delay: '0'
@@ -758,7 +758,7 @@ zabbix_export:
                 - tag: component
                   value: scheduling-algorithm
             - uuid: 3df35ee6e86a424f89f51bb74cb40b9d
-              name: 'Kubernetes Scheduler: Scheduling algorithm duration, p50'
+              name: 'Scheduling algorithm duration, p50'
               type: CALCULATED
               key: 'kubernetes.scheduler.scheduling_algorithm_duration_p50[{#SINGLETON}]'
               history: 7d
@@ -771,7 +771,7 @@ zabbix_export:
                 - tag: component
                   value: scheduling-algorithm
             - uuid: 2368f2c98f3641bdbd030d94ca53a4dd
-              name: 'Kubernetes Scheduler: Scheduling algorithm duration, p90'
+              name: 'Scheduling algorithm duration, p90'
               type: CALCULATED
               key: 'kubernetes.scheduler.scheduling_algorithm_duration_p90[{#SINGLETON}]'
               history: 7d
@@ -784,7 +784,7 @@ zabbix_export:
                 - tag: component
                   value: scheduling-algorithm
             - uuid: 6ca6a2480c4343a8b9a4e6598ec86501
-              name: 'Kubernetes Scheduler: Scheduling algorithm duration, p95'
+              name: 'Scheduling algorithm duration, p95'
               type: CALCULATED
               key: 'kubernetes.scheduler.scheduling_algorithm_duration_p95[{#SINGLETON}]'
               history: 7d
@@ -797,7 +797,7 @@ zabbix_export:
                 - tag: component
                   value: scheduling-algorithm
             - uuid: 955f0989372c4f9d82ad364b09f5efea
-              name: 'Kubernetes Scheduler: Scheduling algorithm duration, p99'
+              name: 'Scheduling algorithm duration, p99'
               type: CALCULATED
               key: 'kubernetes.scheduler.scheduling_algorithm_duration_p99[{#SINGLETON}]'
               history: 7d
@@ -917,7 +917,7 @@ zabbix_export:
             - name: General
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -930,7 +930,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -943,7 +943,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -957,7 +957,7 @@ zabbix_export:
             - name: Latencies
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -973,7 +973,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -989,7 +989,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-27 10:03+0000\n"
+"PO-Revision-Date: 2024-05-11 05:33+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -90,7 +90,7 @@ msgstr "Es veuen els equips %1$d de %1$d+"
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "Es veuen els elements %1$d de %1$d+"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1473,6 +1473,14 @@ msgstr "Es perdran els canvis fets al formulari actual."
 msgid "Any character string included"
 msgstr "Qualsevol cadena de caràcters inclosa"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "Error a l'aplicació."
@@ -2068,6 +2076,11 @@ msgstr "Dur endavant"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "Dur al davant"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2890,7 +2903,7 @@ msgstr[1] "No es poden pas esborrar els grups d'usuaris"
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
-msgstr ""
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra l'usuari subministrat \"%2$s\"."
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -5660,7 +5673,7 @@ msgstr "Diàriament"
 
 #: include/locales.inc.php:40
 msgid "Danish (da_DK)"
-msgstr ""
+msgstr "Danès (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -7158,6 +7171,10 @@ msgstr "Mostra els triggers en bon estat per"
 msgid "Display graph"
 msgstr "Mostra el gràfic"
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Mostra min/mitjana/max"
@@ -8482,7 +8499,7 @@ msgstr "S'ha esborrat el filtre"
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Filter is not set"
-msgstr ""
+msgstr "El filtre no és pas configurat"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -9253,6 +9270,10 @@ msgstr "Llum d'alt contrast"
 msgid "Highlight whole row"
 msgstr "Ressalteu la filera sencera"
 
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
 #: app/partials/configuration.filter.items.php:158
@@ -9636,7 +9657,7 @@ msgstr "Xarxes d'equips"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
-msgstr ""
+msgstr "Patró d'equips"
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
@@ -9720,11 +9741,11 @@ msgstr "Màscara de subxarxa de l'equip"
 
 #: widgets/itemnavigator/Widget.php:43
 msgid "Host tag"
-msgstr ""
+msgstr "Etiqueta d'equip"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
 msgid "Host tag value"
-msgstr ""
+msgstr "Valor de l'etiqueta d'equip"
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11798,13 +11819,17 @@ msgid_plural "Items enabled"
 msgstr[0] "Element activat"
 msgstr[1] "Elements activats"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "Element amb estat \"no compatible\""
 
 #: widgets/itemnavigator/includes/WidgetForm.php:107
 msgid "Item limit"
-msgstr ""
+msgstr "Límit d'elements"
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11817,7 +11842,7 @@ msgstr "Nom de l'element"
 
 #: widgets/itemnavigator/Widget.php:29
 msgid "Item navigator"
-msgstr ""
+msgstr "Navegador d'elements"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -11833,7 +11858,7 @@ msgstr "Patró d'element"
 #: widgets/piechart/views/widget.edit.js.php:208
 #: widgets/svggraph/views/widget.edit.js.php:279
 msgid "Item patterns"
-msgstr ""
+msgstr "Patrons d'element"
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11880,11 +11905,11 @@ msgstr "Prototips d'elements"
 
 #: widgets/itemnavigator/Widget.php:44
 msgid "Item tag"
-msgstr ""
+msgstr "Etiqueta d'elements"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
 msgid "Item tag value"
-msgstr ""
+msgstr "Valor de l'etiqueta d'element"
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12309,6 +12334,10 @@ msgstr "Gràfic de la setmana passada"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "Darreres dades"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -13256,7 +13285,7 @@ msgstr "Tipus de suport desactivats per l'Administrador."
 
 #: app/views/popup.media.php:78
 msgid "Media types disabled in Alerts."
-msgstr ""
+msgstr "Tipus de suports desactivats a les alertes."
 
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
@@ -14139,9 +14168,18 @@ msgstr "Nou prototip de trigger"
 msgid "New triggers"
 msgstr "Nous triggers"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "Nou mapatge de grups d'usuaris"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -14224,7 +14262,7 @@ msgstr "Sense recollida d'informació"
 #: app/views/search.php:394 include/classes/html/CTableInfo.php:72
 #: widgets/hostnavigator/Widget.php:40
 msgid "No data found"
-msgstr ""
+msgstr "No s'ha trobat pas informació"
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -16056,6 +16094,14 @@ msgstr "Si us plau, escaneja i obtingues el teu codi de verificació a la teva a
 msgid "Please select two elements"
 msgstr "Trieu dos elements"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr "Si us plau, actualitzeu la configuració"
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16879,6 +16925,10 @@ msgstr "Atribut de referència"
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr "El giny referit no és pas disponible. Actualitzeu la configuració."
 
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr "El giny referenciat no és pas disponible"
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Recarregar"
@@ -16952,6 +17002,10 @@ msgstr "Expressions regulars"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "Informes relacionats"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18716,6 +18770,10 @@ msgstr "Veure la funció d'agregació"
 msgid "Show arc"
 msgstr "Mostra l'arc"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18786,6 +18844,10 @@ msgstr "Mostra els triats"
 msgid "Show sidebar"
 msgstr "Mostra la barra lateral"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18817,11 +18879,19 @@ msgstr "Mostra les errades tècnics"
 msgid "Show text as HTML"
 msgstr "Mostra el text com a HTML"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "Mostra la línia de temps"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18861,7 +18931,7 @@ msgstr "Es mostra com el nom del compte a tots els usuaris d'MFA a les aplicacio
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the label to all MFA users in authenticator apps."
-msgstr ""
+msgstr "Es mostra com a etiqueta tots els usuaris d'MFA a les aplicacions d'autenticació."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -18921,6 +18991,14 @@ msgstr "Triggers simples"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "Únic"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19028,6 +19106,10 @@ msgstr "Aplicació de programari E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "Informació sobre l'arquitectura del programari. Retorna una cadena"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20239,6 +20321,10 @@ msgstr "Aquesta configuració hauria d'ésser activa, doncs les taules d'histori
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "Aquesta configuració hauria d'ésser actives, doncs les taules de tendències contenen fragments comprimits."
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -21220,6 +21306,10 @@ msgstr "Només els no reconeguts"
 msgid "Unavailable"
 msgstr "No disponible"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr "Giny no disponible"
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "Desbloqueja"
@@ -21520,6 +21610,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Amunt"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21703,10 +21798,14 @@ msgstr "Emprar si és greu"
 msgid "Use iframe sandboxing"
 msgstr "Emprar el sandboxing iframe"
 
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Use the filter to display results"
-msgstr ""
+msgstr "Emprar el filtre per veure els resultats"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -21940,7 +22039,7 @@ msgstr "Macros d'usuari"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "User media"
-msgstr ""
+msgstr "Suport d'usuari"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22708,7 +22807,7 @@ msgstr "La connexió al cofre ha fallat."
 #: include/classes/setup/CSetupWizard.php:843
 #: include/classes/setup/CSetupWizard.php:863
 msgid "Vault prefix"
-msgstr ""
+msgstr "Prefix del vault"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -23713,7 +23812,7 @@ msgstr "s'espera una matriu o objecte"
 
 #: include/classes/api/services/CUser.php:990
 msgid "an email address is expected"
-msgstr ""
+msgstr "s'espera una adreça de correu-e"
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -24119,7 +24218,7 @@ msgstr "no es pot pas actualitzar el paràmetre de només lectura \"%1$s\" de l'
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr ""
+msgstr "no es pot pas actualitzar el paràmetre de només lectura \"%1$s\" de l'usuari subministrat"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -24493,7 +24592,7 @@ msgstr "patró d'equips"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "host patterns"
-msgstr ""
+msgstr "patrons d'equips"
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
@@ -24740,7 +24839,7 @@ msgstr "patró d'element"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
 msgid "item patterns"
-msgstr ""
+msgstr "patrons d'elements"
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -25262,7 +25361,7 @@ msgstr "patró"
 #: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
-msgstr ""
+msgstr "patrons"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
@@ -25326,6 +25425,11 @@ msgstr "referència a un element d'arbre inexistent"
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "l'objecte referenciat no existeix pas"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr "el giny referenciat no és pas disponible"
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

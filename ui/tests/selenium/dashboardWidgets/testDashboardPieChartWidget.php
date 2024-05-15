@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -94,25 +89,25 @@ class testDashboardPieChartWidget extends testWidgets {
 							'type' => 'piechart',
 							'x' => 0,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						],
 						[
 							'name' => 'Pie chart for delete',
 							'type' => 'piechart',
-							'x' => 6,
+							'x' => 18,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						],
 						[
 							'name' => 'Pie chart for cancel',
 							'type' => 'piechart',
-							'x' => 12,
+							'x' => 36,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						]
@@ -804,7 +799,7 @@ class testDashboardPieChartWidget extends testWidgets {
 						[
 							'name' => 'Edit widget',
 							'type' => 'piechart',
-							'width' => 12,
+							'width' => 36,
 							'height' => 8,
 							'fields' => [
 								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
@@ -1052,7 +1047,7 @@ class testDashboardPieChartWidget extends testWidgets {
 							'name' => $data['widget_name'],
 							'view_mode' => CTestArrayHelper::get($data, 'view_mode', 0),
 							'type' => 'piechart',
-							'width' => 8,
+							'width' => 24,
 							'height' => 6,
 							'fields' => $data['widget_fields']
 						]
@@ -1313,7 +1308,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		// For each hintbox - open, assert text, close.
 		foreach ($hints as $field => $text) {
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->query('xpath:./button')->one()->click();
 		}

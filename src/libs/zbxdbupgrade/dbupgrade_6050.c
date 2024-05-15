@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbupgrade.h"
@@ -1557,7 +1552,7 @@ static char	*create_widget_reference(const zbx_vector_str_t *references)
 #undef FIRST_LETTER
 #undef REFERENCE_LEN
 
-static int	DBpatch_6050134(void)
+static int	add_widget_references(const char *widget_type_list)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1583,7 +1578,7 @@ static int	DBpatch_6050134(void)
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
 			NULL);
 
-	result = zbx_db_select("select widgetid from widget where type in ('graph','svggraph','graphprototype')");
+	result = zbx_db_select("select widgetid from widget where type in (%s)", widget_type_list);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1605,6 +1600,11 @@ static int	DBpatch_6050134(void)
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
+}
+
+static int	DBpatch_6050134(void)
+{
+	return add_widget_references("'graph','svggraph','graphprototype'");
 }
 
 static int	DBpatch_6050135(void)
@@ -3860,7 +3860,7 @@ static int	DBpatch_6050285(void)
 
 static int	DBpatch_6050286(void)
 {
-	const zbx_db_field_t	field = {"timeout_browser", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"timeout_browser", "60s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -4024,6 +4024,271 @@ static int	DBpatch_6050296(void)
 	const zbx_db_field_t	field = {"message_format", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("media_type", "content_type", &field);
+}
+
+static int	DBpatch_6050297(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update widget set x=x*3,width=width*3"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050298(void)
+{
+	return add_widget_references("'geomap','map','plaintext','problemhosts','problems','problemsbysv','tophosts'"
+			",'web'");
+}
+
+static int	DBpatch_6050299(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select(
+			"select wf.widget_fieldid"
+			" from widget w,widget_field wf"
+			" where w.widgetid=wf.widgetid"
+				" and w.type='plaintext'"
+				" and wf.name='style'");
+
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update widget_field set name='layout' where widget_fieldid=%s", row[0]))
+			ret = FAIL;
+	}
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+#define ZBX_WIDGET_FIELD_TYPE_INT32		(0)
+#define ZBX_WIDGET_FIELD_TYPE_STR		(1)
+#define ZBX_WIDGET_FIELD_TYPE_ITEM		(4)
+
+static int	DBpatch_6050300(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_int", NULL);
+
+	result = zbx_db_select("select widgetid from widget where type='plaintext'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, ZBX_WIDGET_FIELD_TYPE_INT32,
+				"show_timestamp", 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050301(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert_int, db_insert_str, db_insert_itemid;
+	zbx_uint64_t	last_widgetid = 0;
+	int		index, ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert_int, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_int", NULL);
+	zbx_db_insert_prepare(&db_insert_str, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_str", NULL);
+	zbx_db_insert_prepare(&db_insert_itemid, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_itemid", NULL);
+
+	result = zbx_db_select(
+			"select w.widgetid,i.value_type,i.itemid,irn.name_resolved,wfs.value_int"
+			" from widget w"
+				" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+				" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is null"
+				" join widget_field wf on w.widgetid=wf.widgetid and wf.name like 'itemids%%'"
+				" join items i on wf.value_itemid=i.itemid"
+				" join item_rtname irn on wf.value_itemid=irn.itemid"
+				" left join widget_field wfs on w.widgetid=wfs.widgetid and wfs.name='show_as_html'"
+			" where w.type='plaintext'"
+			" union all"
+			" select w.widgetid,i.value_type,i.itemid,i.name,wfs.value_int"
+			" from widget w"
+				" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+				" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is not null"
+				" join widget_field wf on w.widgetid=wf.widgetid and wf.name like 'itemids%%'"
+				" join items i on wf.value_itemid=i.itemid"
+				" left join widget_field wfs on w.widgetid=wfs.widgetid and wfs.name='show_as_html'"
+			" where w.type='plaintext'"
+			" order by widgetid");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid, itemid;
+		int		value_type, show_as_html;
+		const char	*item_name;
+		char		buf[64];
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		value_type = atoi(row[1]);
+		ZBX_STR2UINT64(itemid, row[2]);
+		item_name = row[3];
+		show_as_html = atoi(ZBX_NULL2EMPTY_STR(row[4]));
+
+		if (widgetid != last_widgetid)
+			index = 0;
+		else
+			index++;
+
+		zbx_snprintf(buf, sizeof(buf), "columns.%d.name", index);
+		zbx_db_insert_add_values(&db_insert_str, __UINT64_C(0), widgetid, ZBX_WIDGET_FIELD_TYPE_STR, buf,
+				item_name);
+
+		zbx_snprintf(buf, sizeof(buf), "columns.%d.itemid", index);
+		zbx_db_insert_add_values(&db_insert_itemid, __UINT64_C(0), widgetid, ZBX_WIDGET_FIELD_TYPE_ITEM, buf,
+				itemid);
+
+		/* 1 - ITEM_VALUE_TYPE_STR, 2 - ITEM_VALUE_TYPE_LOG, 4 - ITEM_VALUE_TYPE_TEXT */
+		if (1 == value_type || 2 == value_type || 4 == value_type)
+		{
+			zbx_snprintf(buf, sizeof(buf), "columns.%d.monospace_font", index);
+			zbx_db_insert_add_values(&db_insert_int, __UINT64_C(0), widgetid, ZBX_WIDGET_FIELD_TYPE_INT32,
+					buf, 1);
+
+			if (1 == show_as_html)
+			{
+				zbx_snprintf(buf, sizeof(buf), "columns.%d.display", index);
+				zbx_db_insert_add_values(&db_insert_int, __UINT64_C(0), widgetid,
+						ZBX_WIDGET_FIELD_TYPE_INT32, buf, 4);
+			}
+		}
+
+		last_widgetid = widgetid;
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert_int, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert_int);
+
+	if (SUCCEED == ret)
+	{
+		zbx_db_insert_autoincrement(&db_insert_str, "widget_fieldid");
+		ret = zbx_db_insert_execute(&db_insert_str);
+	}
+
+	if (SUCCEED == ret)
+	{
+		zbx_db_insert_autoincrement(&db_insert_itemid, "widget_fieldid");
+		ret = zbx_db_insert_execute(&db_insert_itemid);
+	}
+
+	zbx_db_insert_clean(&db_insert_int);
+	zbx_db_insert_clean(&db_insert_str);
+	zbx_db_insert_clean(&db_insert_itemid);
+
+	return ret;
+}
+
+#undef ZBX_WIDGET_FIELD_TYPE_ITEM
+#undef ZBX_WIDGET_FIELD_TYPE_STR
+#undef ZBX_WIDGET_FIELD_TYPE_INT32
+
+static int	DBpatch_6050302(void)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_vector_uint64_t	ids;
+	int			ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_uint64_create(&ids);
+
+	result = zbx_db_select(
+			"select wf.widget_fieldid"
+			" from widget w,widget_field wf"
+			" where w.widgetid=wf.widgetid"
+				" and w.type='plaintext'"
+				" and (wf.name='show_as_html' or wf.name like 'itemids%%')");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widget_fieldid;
+
+		ZBX_STR2UINT64(widget_fieldid, row[0]);
+
+		zbx_vector_uint64_append(&ids, widget_fieldid);
+	}
+	zbx_db_free_result(result);
+
+	if (0 != ids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from widget_field where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "widget_fieldid", ids.values, ids.values_num);
+
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			ret = FAIL;
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	return ret;
+}
+
+static int	DBpatch_6050303(void)
+{
+	const char	*sql =
+			"update module"
+			" set id='itemhistory',relative_path='widgets/itemhistory'"
+			" where id='plaintext'";
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050304(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update widget set type='itemhistory' where type='plaintext'"))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 #endif
@@ -4327,5 +4592,13 @@ DBPATCH_ADD(6050293, 0, 1)
 DBPATCH_ADD(6050294, 0, 1)
 DBPATCH_ADD(6050295, 0, 1)
 DBPATCH_ADD(6050296, 0, 1)
+DBPATCH_ADD(6050297, 0, 1)
+DBPATCH_ADD(6050298, 0, 1)
+DBPATCH_ADD(6050299, 0, 1)
+DBPATCH_ADD(6050300, 0, 1)
+DBPATCH_ADD(6050301, 0, 1)
+DBPATCH_ADD(6050302, 0, 1)
+DBPATCH_ADD(6050303, 0, 1)
+DBPATCH_ADD(6050304, 0, 1)
 
 DBPATCH_END()

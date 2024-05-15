@@ -172,23 +172,6 @@
 		}
 	}
 
-	.nothing-to-show {
-		td {
-			height: auto;
-			color: $font-alt-color;
-			text-align: center;
-
-			&:hover {
-				background-color: $ui-bg-color;
-			}
-		}
-
-		.no-data-found {
-			margin-top: 100px;
-			margin-bottom: 100px;
-		}
-	}
-
 	.latest-values,
 	.opdata {
 		max-width: 300px;
@@ -225,6 +208,29 @@
 
 			&.nowrap {
 				text-overflow: clip;
+			}
+		}
+	}
+
+	&.no-data {
+		tbody {
+			tr {
+				td {
+					height: auto;
+					color: $font-alt-color;
+					text-align: center;
+
+					&:hover {
+						background-color: $ui-bg-color;
+					}
+				}
+
+				.no-data-message {
+					&[class^="zi-"], &[class*=" zi-"] {
+						margin-top: 100px;
+						margin-bottom: 100px;
+					}
+				}
 			}
 		}
 	}

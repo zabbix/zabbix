@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -104,46 +99,32 @@ class CItemNavigator {
 			this.#reset();
 		}
 
-		if (items.length > 0) {
-			this.#hosts = hosts;
+		this.#hosts = hosts;
 
-			this.#prepareNodesStructure(items);
-			this.#prepareNodesProperties(this.#nodes);
+		this.#prepareNodesStructure(items);
+		this.#prepareNodesProperties(this.#nodes);
 
-			this.#navigation_tree = new CNavigationTree(this.#nodes, {
-				selected_id: this.#selected_item_id,
-				show_problems: this.#config.show_problems,
-				severities: this.#config.severities
-			});
+		this.#navigation_tree = new CNavigationTree(this.#nodes, {
+			selected_id: this.#selected_item_id,
+			show_problems: this.#config.show_problems,
+			severities: this.#config.severities
+		});
 
-			this.#container.classList.remove(ZBX_STYLE_NO_DATA);
-			this.#container.appendChild(this.#navigation_tree.getContainer());
+		this.#container.classList.remove(ZBX_STYLE_NO_DATA);
+		this.#container.appendChild(this.#navigation_tree.getContainer());
 
-			if (is_limit_exceeded) {
-				this.#createLimit(items.length);
-			}
-
-			this.#activateListeners();
-
-			const first_selected_item = this.#container.querySelector(
-				`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_item_id}"]`
-			);
-
-			if (this.#selected_item_id !== '' && first_selected_item === null) {
-				this.#selected_item_id = '';
-
-				this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
-					detail: {
-						_itemid: null
-					}
-				}));
-			}
+		if (is_limit_exceeded) {
+			this.#createLimit(items.length);
 		}
-		else {
-			this.#container.classList.add(ZBX_STYLE_NO_DATA);
-			this.#container.appendChild(
-				this.#setNoDataMessage(t('No data found'), null, ZBX_ICON_SEARCH_LARGE)
-			);
+
+		this.#activateListeners();
+
+		const first_selected_item = this.#container.querySelector(
+			`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_item_id}"]`
+		);
+
+		if (this.#selected_item_id !== '' && first_selected_item === null) {
+			this.#selected_item_id = '';
 		}
 	}
 
@@ -424,15 +405,13 @@ class CItemNavigator {
 	#registerListeners() {
 		this.#listeners = {
 			itemSelect: e => {
-				if (e.detail.id !== this.#selected_item_id) {
-					this.#selected_item_id = e.detail.id;
+				this.#selected_item_id = e.detail.id;
 
-					this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
-						detail: {
-							_itemid: e.detail.id
-						}
-					}));
-				}
+				this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
+					detail: {
+						itemid: e.detail.id
+					}
+				}));
 			},
 
 			groupToggle: e => {
@@ -492,30 +471,5 @@ class CItemNavigator {
 		this.#container.innerHTML = '';
 		this.#navigation_tree = null;
 		this.#nodes = [];
-	}
-
-	#setNoDataMessage(message, description = null, icon = null) {
-		const container = document.createElement('div');
-
-		const message_container = document.createElement('div');
-		message_container.classList.add(ZBX_STYLE_NO_DATA_MESSAGE);
-		message_container.innerText = message;
-
-		if (icon !== null) {
-			container.classList.add(ZBX_STYLE_NO_DATA_FOUND);
-			message_container.classList.add(icon);
-		}
-
-		container.appendChild(message_container);
-
-		if (description !== null) {
-			const description_container = document.createElement('div');
-			description_container.classList.add(ZBX_STYLE_NO_DATA_DESCRIPTION);
-			description_container.innerText = description;
-
-			container.appendChild(description_container);
-		}
-
-		return container;
 	}
 }

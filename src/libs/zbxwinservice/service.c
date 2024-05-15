@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxwinservice.h"
@@ -212,8 +207,8 @@ static void	svc_get_fullpath(const char *path, wchar_t *fullpath, size_t max_ful
 	zbx_free(wpath);
 }
 
-static void	svc_get_command_line(const char *path, int multiple_agents, wchar_t *cmdLine, size_t max_cmdLine,
-		const char *config_file)
+static void	svc_get_command_line(const char *path, unsigned int multiple_agents, wchar_t *cmdLine,
+		size_t max_cmdLine, const char *config_file)
 {
 	wchar_t	path1[MAX_PATH], path2[MAX_PATH];
 
@@ -266,24 +261,90 @@ static int	svc_install_event_source(const char *path)
 	return SUCCEED;
 }
 
-int	ZabbixCreateService(const char *path, int multiple_agents, const char *config_file)
+static DWORD	svc_start_type_get(unsigned int flags) {
+	if (0 == (flags & ZBX_TASK_FLAG_SERVICE_ENABLED))
+		return SERVICE_DISABLED;
+
+	if (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART))
+		return SERVICE_AUTO_START;
+	else
+		return SERVICE_DEMAND_START;
+}
+
+static int	svc_delayed_autostart_config(SC_HANDLE service, unsigned int flags)
+{
+	const OSVERSIONINFOEX		*vi;
+	SERVICE_DELAYED_AUTO_START_INFO	scdasi;
+
+	scdasi.fDelayedAutostart = (0 != (flags & ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED) ? TRUE : FALSE);
+
+	/* SERVICE_CONFIG_DELAYED_AUTO_START_INFO is supported on Windows Server 2008/Vista and onwards */
+	if (NULL == (vi = zbx_win_getversion()))
+	{
+		if (TRUE == scdasi.fDelayedAutostart)
+		{
+			zbx_error("cannot retrieve system version to check if delayed auto-start can be configured");
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	if (6 > vi->dwMajorVersion)
+	{
+		if (TRUE == scdasi.fDelayedAutostart)
+		{
+			zbx_error("delayed auto-start can be configured on Windows Server 2008/Vista and onwards");
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	if (0 == ChangeServiceConfig2(service, SERVICE_CONFIG_DELAYED_AUTO_START_INFO, &scdasi))
+	{
+		zbx_error("failed to configure service delayed auto-start %s: %s",
+				(TRUE == scdasi.fDelayedAutostart ? "TRUE" : "FALSE"),
+				zbx_strerror_from_system(GetLastError()));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: creates and installs Zabbix agent Windows service                 *
+ *                                                                            *
+ * Parameters: path        - [IN] path to Zabbix agent 2 binary file          *
+ *             config_file - [IN] path to Zabbix agent 2 config file          *
+ *             flags       - [IN] flags defined by command line options       *
+ *                                                                            *
+ * Return value: SUCCEED - installed and mandatory configuration set          *
+ *               FAIL    - failed to install or configure service             *
+ *                                                                            *
+ ******************************************************************************/
+int	ZabbixCreateService(const char *path, const char *config_file, unsigned int flags)
 {
 	SC_HANDLE		mgr, service;
 	SERVICE_DESCRIPTION	sd;
 	wchar_t			cmdLine[MAX_PATH];
 	wchar_t			*wservice_name;
-	DWORD			code;
-	int			ret = FAIL;
+	DWORD			code, dwStartType;
+	int			ret = SUCCEED;
 
 	if (FAIL == svc_OpenSCManager(&mgr))
-		return ret;
+		return FAIL;
 
-	svc_get_command_line(path, multiple_agents, cmdLine, MAX_PATH, config_file);
+	svc_get_command_line(path, flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS, cmdLine, MAX_PATH, config_file);
 
 	wservice_name = zbx_utf8_to_unicode(get_zbx_service_name_cb());
 
+	dwStartType = svc_start_type_get(flags);
+
+
 	if (NULL == (service = CreateService(mgr, wservice_name, wservice_name, GENERIC_READ, SERVICE_WIN32_OWN_PROCESS,
-			SERVICE_AUTO_START, SERVICE_ERROR_NORMAL, cmdLine, NULL, NULL, NULL, NULL, NULL)))
+			dwStartType, SERVICE_ERROR_NORMAL, cmdLine, NULL, NULL, NULL, NULL, NULL)))
 	{
 		if (ERROR_SERVICE_EXISTS == (code = GetLastError()))
 			zbx_error("ERROR: service [%s] already exists", get_zbx_service_name_cb());
@@ -292,12 +353,13 @@ int	ZabbixCreateService(const char *path, int multiple_agents, const char *confi
 			zbx_error("ERROR: cannot create service [%s]: %s", get_zbx_service_name_cb(),
 					zbx_strerror_from_system(code));
 		}
+
+		ret = FAIL;
 	}
 	else
 	{
 		zbx_error("service [%s] installed successfully", get_zbx_service_name_cb());
 		CloseServiceHandle(service);
-		ret = SUCCEED;
 
 		/* update the service description */
 		if (SUCCEED == svc_OpenService(mgr, &service, SERVICE_CHANGE_CONFIG))
@@ -308,6 +370,10 @@ int	ZabbixCreateService(const char *path, int multiple_agents, const char *confi
 				zbx_error("service description update failed: %s",
 						zbx_strerror_from_system(GetLastError()));
 			}
+
+			if (SERVICE_AUTO_START == dwStartType)
+				ret = svc_delayed_autostart_config(service, flags);
+
 			CloseServiceHandle(service);
 		}
 	}
@@ -437,6 +503,57 @@ int	ZabbixStopService(void)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: changes service startup type for installed service                *
+ *                                                                            *
+ * Parameters: flags - [IN] flags specifying service startup type to set      *
+ *                                                                            *
+ * Return value: SUCCEED - successfully set                                   *
+ *               FAIL    - failed to set                                      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_service_startup_type_change(unsigned int flags)
+{
+	int		ret = SUCCEED;
+	DWORD		dwStartType;
+	SC_HANDLE	mgr, service;
+
+	if (FAIL == svc_OpenSCManager(&mgr))
+		return FAIL;
+
+	if (SUCCEED != svc_OpenService(mgr, &service, SERVICE_CHANGE_CONFIG))
+	{
+		zbx_error("failed to set service startup type, failed to open service: %s",
+				zbx_strerror_from_system(GetLastError()));
+		ret = FAIL;
+		goto close_mgr;
+	}
+
+	dwStartType = svc_start_type_get(flags);
+
+	if (0 == ChangeServiceConfig(service, SERVICE_NO_CHANGE, dwStartType, SERVICE_NO_CHANGE, NULL, NULL,
+			NULL, NULL, NULL, NULL, NULL))
+	{
+		zbx_error("failed to set service startup type: %s",
+				zbx_strerror_from_system(GetLastError()));
+		ret = FAIL;
+		goto close_service;
+	}
+
+	if (SERVICE_AUTO_START == dwStartType)
+		ret = svc_delayed_autostart_config(service, flags);
+close_service:
+	CloseServiceHandle(service);
+close_mgr:
+	CloseServiceHandle(mgr);
+
+	if (SUCCEED == ret)
+		zbx_error("service startup-type configured successfully");
+
+	return ret;
+}
+
 void	zbx_set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg)
 {
 	zbx_on_exit_cb = zbx_on_exit_cb_arg;
@@ -456,4 +573,39 @@ void	zbx_service_init(zbx_get_config_str_f get_zbx_service_name_f, zbx_get_confi
 {
 	get_zbx_service_name_cb = get_zbx_service_name_f;
 	get_zbx_event_source_cb = get_zbx_event_source_f;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sets service startup type flags from command line option argument *
+ *                                                                            *
+ * Parameters: optarg - [IN]                                                  *
+ *             flags  - [OUT]                                                 *
+ *                                                                            *
+ * Return value: SUCCEED - successfully set                                   *
+ *               FAIL    - unknown argument                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_service_startup_flags_set(const char *optarg, unsigned int *flags) {
+	*flags &= ~(ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART |
+			ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED);
+
+	if (0 == strcmp(optarg, ZBX_SERVICE_STARTUP_AUTOMATIC))
+		*flags |= ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART;
+	else if (0 == strcmp(optarg, ZBX_SERVICE_STARTUP_DELAYED))
+	{
+		*flags |= ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART |
+			ZBX_TASK_FLAG_SERVICE_AUTOSTART_DELAYED;
+	}
+	else if (0 == strcmp(optarg, ZBX_SERVICE_STARTUP_MANUAL))
+		*flags |= ZBX_TASK_FLAG_SERVICE_ENABLED;
+	else if (0 != strcmp(optarg, ZBX_SERVICE_STARTUP_DISABLED))
+	{
+		zbx_error("unknown startup-type option argument, allowed values: %s, %s, %s, %s",
+				ZBX_SERVICE_STARTUP_AUTOMATIC, ZBX_SERVICE_STARTUP_DELAYED, ZBX_SERVICE_STARTUP_MANUAL,
+				ZBX_SERVICE_STARTUP_DISABLED);
+		return FAIL;
+	}
+
+	return SUCCEED;
 }

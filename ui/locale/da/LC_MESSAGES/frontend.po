@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-02 12:36+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2024-05-04 09:46+0000\n"
+"Last-Translator: Ryan Skov <rsk@capmon.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -84,12 +84,12 @@ msgstr "%1$d matcher for %2$s fundet"
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "%1$d af %1$d+ værter vises"
 
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "%1$d af %1$d+ datapunkter vises"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1101,7 +1101,7 @@ msgstr "Addresse"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Adresse for aktive agenter"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1133,7 +1133,7 @@ msgstr "Advancerede valgmuligheder"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Efter"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1472,6 +1472,14 @@ msgstr "Eventuelle ændringer i den nuværende formular vil gå tabt."
 msgid "Any character string included"
 msgstr "Enhver tegnstreng inkluderet"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "Applikationsfejl"
@@ -1568,7 +1576,7 @@ msgstr "Aktiv-tag"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Tildelt proxy"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -2068,6 +2076,11 @@ msgstr "Bring frem"
 msgid "Bring to front"
 msgstr "Bring forrest"
 
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
+
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
 msgstr "Bulgarisk (bg_BG)"
@@ -2317,7 +2330,7 @@ msgstr "Kan ikke tilføje proxy"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "Kan ikke tilføje proxygruppe"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2706,7 +2719,7 @@ msgstr "Kan ikke slette værts-grupper"
 msgid "Cannot delete host prototype"
 msgid_plural "Cannot delete host prototypes"
 msgstr[0] "Kan ikke slette værtsprototype"
-msgstr[1] ""
+msgstr[1] "Kan ikke slette værtsprototyper"
 
 #: host_prototypes.php:139
 msgid "Cannot delete host prototypes"
@@ -2782,12 +2795,12 @@ msgstr[1] "Kan ikke slette proxier"
 #: app/controllers/CControllerProxyGroupDelete.php:78
 msgid "Cannot delete proxy group"
 msgid_plural "Cannot delete proxy groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette proxy-gruppe"
+msgstr[1] "Kan ikke slette proxy-grupper"
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
 msgid "Cannot delete proxy groups"
-msgstr ""
+msgstr "Kan ikke slette proxygrupper"
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -2974,7 +2987,7 @@ msgstr[1] "Kan ikke deaktivere medietyper"
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
 msgstr[0] "Modulet kan ikke deaktiveres"
-msgstr[1] ""
+msgstr[1] "Modulerne kan ikke deaktiveres"
 
 #: app/controllers/CControllerScheduledReportDisable.php:78
 msgid "Cannot disable scheduled report"
@@ -3064,7 +3077,7 @@ msgstr[1] "Kan ikke aktivere medie typer"
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
 msgstr[0] "Kan ikke aktivere modulet"
-msgstr[1] ""
+msgstr[1] "Kan ikke aktivere modulerne"
 
 #: app/controllers/CControllerScheduledReportEnable.php:78
 msgid "Cannot enable scheduled report"
@@ -4068,7 +4081,7 @@ msgstr "Kan ikke opdatere proxy for den opdagede vært \"%1$s\"."
 #: app/controllers/CControllerProxyGroupUpdate.php:43
 #: app/controllers/CControllerProxyGroupUpdate.php:82
 msgid "Cannot update proxy group"
-msgstr ""
+msgstr "Kan ikke opdatere proxy gruppen"
 
 #: include/classes/api/services/CRole.php:768
 #, c-format
@@ -4810,7 +4823,7 @@ msgstr "Konfiguration af proxier"
 
 #: app/controllers/CControllerProxyGroupList.php:131
 msgid "Configuration of proxy groups"
-msgstr ""
+msgstr "Konfiguration af proxy grupper"
 
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
@@ -5422,7 +5435,7 @@ msgstr "Opret proxy"
 
 #: app/views/administration.proxygroup.list.php:168
 msgid "Create proxy group"
-msgstr ""
+msgstr "Opret proxy gruppe"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
@@ -5674,7 +5687,7 @@ msgstr "Daglige"
 
 #: include/locales.inc.php:40
 msgid "Danish (da_DK)"
-msgstr ""
+msgstr "Dansk (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -7171,6 +7184,10 @@ msgstr "Vis OK udløsere for"
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "Vis graf"
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9266,6 +9283,10 @@ msgstr "Lys med høj kontrast"
 #: app/partials/monitoring.problem.filter.php:312
 msgid "Highlight whole row"
 msgstr "Fremhæv hele rækken"
+
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -11812,6 +11833,10 @@ msgid_plural "Items enabled"
 msgstr[0] "Datapunkt deaktiveret"
 msgstr[1] "Datapunkter aktiveret"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "Datapunkt i tilstanden \"ikke understøttet\""
@@ -12323,6 +12348,10 @@ msgstr "Sidste uges graf"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "Seneste data"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -14153,9 +14182,18 @@ msgstr "Ny udløser prototype"
 msgid "New triggers"
 msgstr "Ny udløser"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "Ny brugergruppekortlægning"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -16070,6 +16108,14 @@ msgstr "Scan og få vist din bekræftelseskode i din autentificeringsapp."
 msgid "Please select two elements"
 msgstr "Vælg venligst to elementer"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16893,6 +16939,10 @@ msgstr "Referenceattribut"
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr ""
 
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "Opdater"
@@ -16966,6 +17016,10 @@ msgstr "Regulære udtryk"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "Relaterede rapporter"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18730,6 +18784,10 @@ msgstr "Vis aggregeringsfunktion"
 msgid "Show arc"
 msgstr "Vis bue"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18800,6 +18858,10 @@ msgstr "Vis valgte"
 msgid "Show sidebar"
 msgstr "Vis sidebjælke"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18831,11 +18893,19 @@ msgstr "Vis tekniske fejl"
 msgid "Show text as HTML"
 msgstr "Vis tekst som HTML"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "Vis tidslinje"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18935,6 +19005,14 @@ msgstr "Simple udløsere"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "Enkelt"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19042,6 +19120,10 @@ msgstr "Softwareapplikation E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "Software arkitektur information. Returnerer streng"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20253,6 +20335,10 @@ msgstr "Denne indstilling bør være aktiveret, fordi historietabeller indeholde
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "Denne indstilling bør være aktiveret, fordi trendtabeller indeholder komprimerede bidder."
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -21234,6 +21320,10 @@ msgstr ""
 msgid "Unavailable"
 msgstr ""
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr ""
@@ -21534,6 +21624,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr ""
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21715,6 +21810,10 @@ msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
 msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:36
@@ -25336,6 +25435,11 @@ msgstr ""
 #: include/classes/api/services/CUserDirectory.php:877
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
+msgstr ""
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
 msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:104

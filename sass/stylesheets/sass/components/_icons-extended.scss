@@ -158,6 +158,10 @@
 	}
 }
 
+.zi-link-external-small {
+	@extend %icon-small;
+}
+
 .zi-plus-small {
 	@extend .zi-plus;
 	@extend %icon-small;
@@ -200,6 +204,18 @@
 .zi-users-filled-small {
 	@extend .zi-users-filled;
 	@extend %icon-medium;
+}
+
+.zi-widget-awaiting-data-large {
+	@extend %icon-large;
+}
+
+.zi-widget-empty-references-large {
+	@extend %icon-large;
+
+	&::before {
+		color: $negative-color;
+	}
 }
 
 .zi-wrench-alt-small {

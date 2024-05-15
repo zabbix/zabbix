@@ -31,7 +31,7 @@ zabbix_export:
         - name: Templates/SAN
       items:
         - uuid: d5b8a74991d34652973a78d58203d5fd
-          name: 'HPE Primera: Disks total'
+          name: 'Disks total'
           type: DEPENDENT
           key: hpe.primera.disks.total
           delay: '0'
@@ -52,7 +52,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 89aa29280dc349a2acaae520849857e0
-          name: 'HPE Primera: Get CPGs data'
+          name: 'Get CPGs data'
           type: DEPENDENT
           key: hpe.primera.get.cpgs
           delay: '0'
@@ -71,7 +71,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 530e20083da8423e9d30c8342f1b7da3
-          name: 'HPE Primera: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: hpe.primera.get.data
           history: '0'
@@ -244,7 +244,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3940a3313b354d64924fc93be9b9db04
-          name: 'HPE Primera: Get disks data'
+          name: 'Get disks data'
           type: DEPENDENT
           key: hpe.primera.get.disks
           delay: '0'
@@ -263,7 +263,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 484a6b9568234bbca9b4bcae2833bbf1
-          name: 'HPE Primera: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: hpe.primera.get.errors
           delay: '0'
@@ -286,18 +286,18 @@ zabbix_export:
           triggers:
             - uuid: 570d440e7ec9445585003208eca06e63
               expression: 'length(last(/HPE Primera by HTTP/hpe.primera.get.errors))>0'
-              name: 'HPE Primera: There are errors in requests to WSAPI'
+              name: 'There are errors in requests to WSAPI'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in requests to WSAPI.'
               dependencies:
-                - name: 'HPE Primera: Service is unavailable'
+                - name: 'Service is unavailable'
                   expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: c027fd5d976d42bd90126edb46ddfe88
-          name: 'HPE Primera: Get hosts data'
+          name: 'Get hosts data'
           type: DEPENDENT
           key: hpe.primera.get.hosts
           delay: '0'
@@ -316,7 +316,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1569a51d018345b390d3e2b3c368ba85
-          name: 'HPE Primera: Get ports data'
+          name: 'Get ports data'
           type: DEPENDENT
           key: hpe.primera.get.ports
           delay: '0'
@@ -335,7 +335,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 6baed792c06444f598aec830f90f2f4c
-          name: 'HPE Primera: Get system data'
+          name: 'Get system data'
           type: DEPENDENT
           key: hpe.primera.get.system
           delay: '0'
@@ -354,7 +354,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9d5697db544f4f3993e6df499ad51b49
-          name: 'HPE Primera: Get tasks data'
+          name: 'Get tasks data'
           type: DEPENDENT
           key: hpe.primera.get.tasks
           delay: '0'
@@ -373,7 +373,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7faad091257b44f1a7ecf2c9156c83ca
-          name: 'HPE Primera: Get volumes data'
+          name: 'Get volumes data'
           type: DEPENDENT
           key: hpe.primera.get.volumes
           delay: '0'
@@ -392,7 +392,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: efc450d0682c4c5d93df41d05c10eceb
-          name: 'HPE Primera: Capacity allocated'
+          name: 'Capacity allocated'
           type: DEPENDENT
           key: hpe.primera.system.capacity.allocated
           delay: '0'
@@ -417,7 +417,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e3842eec2e45443681670d3c1d194900
-          name: 'HPE Primera: Capacity failed'
+          name: 'Capacity failed'
           type: DEPENDENT
           key: hpe.primera.system.capacity.failed
           delay: '0'
@@ -442,7 +442,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d23e888299d344238468481689f55e2d
-          name: 'HPE Primera: Capacity free'
+          name: 'Capacity free'
           type: DEPENDENT
           key: hpe.primera.system.capacity.free
           delay: '0'
@@ -467,7 +467,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 1e6fc0d68d18474e84b4fe2e4d3374d1
-          name: 'HPE Primera: Capacity total'
+          name: 'Capacity total'
           type: DEPENDENT
           key: hpe.primera.system.capacity.total
           delay: '0'
@@ -492,7 +492,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 65bcf3fb456a45358795d2f9d8249e16
-          name: 'HPE Primera: Chunklet size'
+          name: 'Chunklet size'
           type: DEPENDENT
           key: hpe.primera.system.chunklet.size
           delay: '0'
@@ -517,7 +517,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: dd6fd61256cc4eeeb94f50d0c86fc51f
-          name: 'HPE Primera: System contact'
+          name: 'System contact'
           type: DEPENDENT
           key: hpe.primera.system.contact
           delay: '0'
@@ -540,7 +540,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: dd61f3a680284893801c96bdbd445645
-          name: 'HPE Primera: System location'
+          name: 'System location'
           type: DEPENDENT
           key: hpe.primera.system.location
           delay: '0'
@@ -563,7 +563,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5f28ec66be1f43208139476af3653997
-          name: 'HPE Primera: Model'
+          name: Model
           type: DEPENDENT
           key: hpe.primera.system.model
           delay: '0'
@@ -585,7 +585,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 45281453bf204365a8a8ac2ba7255e54
-          name: 'HPE Primera: System name'
+          name: 'System name'
           type: DEPENDENT
           key: hpe.primera.system.name
           delay: '0'
@@ -607,7 +607,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: acf6d37022884dc99a3b55c95f6b19c8
-          name: 'HPE Primera: Nodes online'
+          name: 'Nodes online'
           type: DEPENDENT
           key: hpe.primera.system.nodes.online
           delay: '0'
@@ -626,7 +626,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 65b22e04d7334aaf970a8961a46c22c9
-          name: 'HPE Primera: Nodes total'
+          name: 'Nodes total'
           type: DEPENDENT
           key: hpe.primera.system.nodes.total
           delay: '0'
@@ -645,7 +645,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d194672ea7f64dd58296d7fb2537f35b
-          name: 'HPE Primera: Serial number'
+          name: 'Serial number'
           type: DEPENDENT
           key: hpe.primera.system.serial_number
           delay: '0'
@@ -667,7 +667,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e0f0ff7657784c8eab1a71a68ceefc19
-          name: 'HPE Primera: Software version number'
+          name: 'Software version number'
           type: DEPENDENT
           key: hpe.primera.system.sw_version
           delay: '0'
@@ -688,7 +688,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a0b4fdee38a64c5f82fd051ea74a7b2d
-          name: 'HPE Primera: Service ping'
+          name: 'Service ping'
           type: SIMPLE
           key: 'net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"]'
           history: 7d
@@ -707,7 +707,7 @@ zabbix_export:
           triggers:
             - uuid: 8e7aa46322c643878e509461dbb9169d
               expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
-              name: 'HPE Primera: Service is unavailable'
+              name: 'Service is unavailable'
               priority: HIGH
               manual_close: 'YES'
               tags:
@@ -3703,7 +3703,7 @@ zabbix_export:
             - name: 'System capacity'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -3717,7 +3717,7 @@ zabbix_export:
             - name: 'CPG (common provisioning groups)'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3733,7 +3733,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3749,7 +3749,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3765,7 +3765,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3781,7 +3781,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3797,7 +3797,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   'y': '25'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3814,7 +3814,7 @@ zabbix_export:
             - name: Volumes
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3830,7 +3830,7 @@ zabbix_export:
                       value: AAAAH
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3846,7 +3846,7 @@ zabbix_export:
                       value: AAAAI
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3862,7 +3862,7 @@ zabbix_export:
                       value: AAAAJ
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3878,7 +3878,7 @@ zabbix_export:
                       value: AAAAK
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

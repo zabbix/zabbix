@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-01 02:23+0000\n"
+"PO-Revision-Date: 2024-05-11 15:23+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -90,7 +90,7 @@ msgstr "%1$d+件中%1$d件のホストが表示されています"
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "%1$d+件中%1$d件のアイテムが表示されています"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1451,6 +1451,14 @@ msgstr "現在のフォームで行われた変更はすべて失われます。
 msgid "Any character string included"
 msgstr "いずれかの文字列が含まれる"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "アプリケーションエラー。"
@@ -1935,7 +1943,7 @@ msgstr "バイナリ"
 #: app/controllers/CControllerPopupTriggerExpr.php:1455
 #, c-format
 msgid "Binary item \"%1$s\" cannot be used in trigger"
-msgstr ""
+msgstr "バイナリアイテム\"%1$s\"はトリガーでは使用できません"
 
 #: app/views/popup.ldap.edit.php:85
 msgid "Bind DN"
@@ -2044,6 +2052,11 @@ msgstr "前面へ"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "最前面へ"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2270,16 +2283,16 @@ msgstr[0] "モジュールを追加できません: %1$s。"
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "グラフ\"%1$s\"にグラフの合計値を複数は設定できません。"
+msgstr "グラフ\"%1$s\"にグラフの合計値は1つしか設定できません。"
 
 #: include/classes/api/services/CGraphPrototype.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "グラフのプロトタイプ\"%1$s\"にグラフの合計値を複数は設定できません。"
+msgstr "グラフのプロトタイプ\"%1$s\"にグラフの合計値は1つしか設定できません。"
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "\"合計\"タイプのアイテムはグラフに1つしか追加できません。"
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
@@ -2427,27 +2440,27 @@ msgstr[0] "グラフをコピーできません"
 #: include/classes/helpers/CGraphHelper.php:74
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
-msgstr ""
+msgstr "複数のホストからのアイテムがあるため、グラフ\"%1$s\"をコピーできません。"
 
 #: include/classes/helpers/CGraphGeneralHelper.php:91
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"を持つアイテムがホスト\"%3$s\"に存在しないため、グラフ\"%1$s\"をコピーできません。"
 
 #: include/classes/helpers/CGraphGeneralHelper.php:92
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"を持つアイテムがテンプレート\"%3$s\"に存在しないため、グラフ\"%1$s\"をコピーできません。"
 
 #: include/classes/helpers/CGraphGeneralHelper.php:96
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"を持つアイテムがホスト\"%3$s\"に存在しないため、グラフプロトタイプ\"%1$s\"をコピーできません。"
 
 #: include/classes/helpers/CGraphGeneralHelper.php:97
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "キー\"%2$s\"を持つアイテムがテンプレート\"%3$s\"に存在しないため、グラフプロトタイプ\"%1$s\"をコピーできません。"
 
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
@@ -2472,12 +2485,12 @@ msgstr[0] "トリガーをコピーできません"
 #: include/classes/helpers/CTriggerGeneralHelper.php:196
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
-msgstr ""
+msgstr "トリガー\"%1$s\"は、依存するトリガー\"%2$s\"なしではホスト\"%3$s\"にコピーできません。"
 
 #: include/classes/helpers/CTriggerGeneralHelper.php:197
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
-msgstr ""
+msgstr "トリガー\"%1$s\"は、依存するトリガー\"%2$s\"なしではテンプレート\"%3$s\"にコピーできません。"
 
 #: include/classes/helpers/CTriggerHelper.php:76
 #, c-format
@@ -2487,7 +2500,7 @@ msgstr "条件式内に複数のホストがあるため、トリガー\"%1$s\"�
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr ""
+msgstr "式に複数のテンプレートが含まれているため、トリガー\"%1$s\"をコピーできません。"
 
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
@@ -2830,7 +2843,7 @@ msgstr[0] "ユーザーグループを削除できません"
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
-msgstr ""
+msgstr "ユーザー グループ\"%1$s\"はプロビジョニングされたユーザー\"%2$s\"によって使用されているため、削除できません。"
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -2917,7 +2930,7 @@ msgstr "アイテムのキューを表示できません。"
 
 #: chart7.php:93
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr "グラフの合計値は2つ以上表示できません。"
+msgstr "グラフの合計値は1つしか表示できません。"
 
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
@@ -3010,12 +3023,12 @@ msgstr "マクロを展開できません。"
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているSLA\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:241
 #, c-format
 msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているアクション\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
@@ -3125,7 +3138,7 @@ msgstr "ダッシュボード\"%2$s\"内で使用されているアイテム\"%1
 #: include/classes/import/importers/CTemplateDashboardImporter.php:193
 #, c-format
 msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているマップ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
@@ -3135,12 +3148,12 @@ msgstr "マップ\"%2$s\"で使用されているマップ\"%1$s\"が見つか�
 #: include/classes/import/importers/CTemplateDashboardImporter.php:253
 #, c-format
 msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているメディアタイプ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:205
 #, c-format
 msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているサービス\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CConfigurationImport.php:1458
 #, c-format
@@ -3161,7 +3174,7 @@ msgstr "マップ\"%2$s\"で使用されているトリガー\"%1$s\"が見つ�
 #: include/classes/import/importers/CTemplateDashboardImporter.php:229
 #, c-format
 msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "ダッシュボード\"%2$s\"内で使用されているユーザー\"%1$s\"が見つかりません。"
 
 #: include/classes/api/services/CUser.php:1543
 msgid "Cannot find user directory for LDAP."
@@ -3221,7 +3234,7 @@ msgstr "タイプが\"%4$s\"のホストインターフェースが必要なた�
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "同じキーのLLDルールをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
@@ -3241,7 +3254,7 @@ msgstr "同じキーの検出されたアイテムがすでにあるので、テ
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "同じキーのLLDルールをテンプレート\"%4$s\"からすでに継承しているので、テンプレート\"%2$s\"のキー\"%1$s\"のLLDルールをテンプレート\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
@@ -3256,27 +3269,27 @@ msgstr "同じアイテムキーのアイテムがすでにあるので、テン
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "同じキーを持つアイテム プロトタイプが既にLLD ルール\"%5$s\"に属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLD ルール\"%3$s\"を持つアイテムプロトタイプをホスト\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemPrototype.php:1221
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "同じキーを持つアイテムプロトタイプが既にLLD ルール\"%5$s\"に属しているため、テンプレート\"%2$s\"のキー\"%1$s\"とLLDルール\"%3$s\"を持つアイテムプロトタイプをテンプレート\"%4$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "同じキーの検出されたアイテムがすでにあるので、テンプレート\"%2$s\"のキー\"%1$s\"を持つアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:1234
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "タイプが\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "同じキーを持つLLDルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムプロトタイプをホスト \"%3$s\" に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
@@ -4359,7 +4372,7 @@ msgstr "クリックして表示または変更"
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
-msgstr ""
+msgstr "クライアントID"
 
 #: app/views/mfa.edit.php:120
 msgid "Client secret"
@@ -7046,6 +7059,10 @@ msgstr "正常イベントの表示期間"
 msgid "Display graph"
 msgstr "グラフ表示"
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr ""
@@ -9134,6 +9151,10 @@ msgstr "High-contrast light"
 msgid "Highlight whole row"
 msgstr "行を強調表示"
 
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
 #: app/partials/configuration.filter.items.php:158
@@ -9306,7 +9327,7 @@ msgstr "ホスト稼働状況"
 
 #: include/classes/api/services/CHostInterface.php:1022
 msgid "Host cannot have more than one default interface of the same type."
-msgstr "ホストに同じタイプのデフォルトインターフェースは2つ以上設定できません。"
+msgstr "ホストに同じタイプのデフォルトインターフェースは1つしか設定できません。"
 
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
@@ -11665,6 +11686,10 @@ msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "アイテムを有効にしました"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "アイテムが\"取得不可\"の状態"
@@ -12167,6 +12192,10 @@ msgstr "最新1週間のグラフ"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "最新データ"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -13986,9 +14015,18 @@ msgstr ""
 msgid "New triggers"
 msgstr "新規トリガー"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "新しいユーザーグループのマッピングの作成"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -15902,6 +15940,14 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "2つの要素を選択してください"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16723,6 +16769,10 @@ msgstr "リファレンスの属性"
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr ""
 
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "リフレッシュ"
@@ -16795,6 +16845,10 @@ msgstr "正規表現"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "関連するレポート"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18551,6 +18605,10 @@ msgstr ""
 msgid "Show arc"
 msgstr "円弧を表示"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18621,6 +18679,10 @@ msgstr "選択を表示"
 msgid "Show sidebar"
 msgstr "サイドバーを表示"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18652,11 +18714,19 @@ msgstr "技術的エラーを表示"
 msgid "Show text as HTML"
 msgstr "HTMLとしてテキストを表示"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "タイムラインを表示"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18756,6 +18826,14 @@ msgstr "シンプルトリガー"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "単一"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -18863,6 +18941,10 @@ msgstr "ソフトウェアアプリケーションE"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "ソフトウェアのアーキテクチャ情報。文字列値を返す。"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20069,6 +20151,10 @@ msgstr "ヒストリテーブルには圧縮されたチャンクが含まれて
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "トレンド テーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -21043,6 +21129,10 @@ msgstr "未確認のみ"
 msgid "Unavailable"
 msgstr "利用不可"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "ブロックを解除"
@@ -21342,6 +21432,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Up"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21524,6 +21619,10 @@ msgstr "指定した深刻度のときに使用"
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
 msgstr "iframeサンドボックスを使用する"
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
@@ -23744,7 +23843,7 @@ msgstr "高精細タイルを読み込むためにURLに\"@2x\"を追加でき�
 
 #: include/classes/api/services/CItemGeneral.php:2624
 msgid "cannot be a value map ID from another host or template"
-msgstr ""
+msgstr "別のホストまたはテンプレートの値マップIDは使用できません"
 
 #: include/classes/api/services/CItemGeneral.php:2179
 msgid "cannot be an item ID from another host or template"
@@ -24528,7 +24627,7 @@ msgstr "{}で括られていないか不正な値です"
 
 #: app/views/item.list.php:175
 msgid "item"
-msgstr ""
+msgstr "アイテム"
 
 #: app/controllers/CControllerItemMassCheckNow.php:139
 #: app/controllers/CControllerItemMassCheckNow.php:191
@@ -25141,6 +25240,11 @@ msgstr "存在しないツリー要素への参照です"
 msgid "referred object does not exist"
 msgstr "参照したオブジェクトが存在しません"
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
+
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82
 #: app/controllers/CControllerQueueOverviewProxy.php:73
@@ -25346,7 +25450,7 @@ msgstr "タグ"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
 msgid "tag cannot be empty"
-msgstr ""
+msgstr "タグに空白は指定できません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
@@ -25832,7 +25936,7 @@ msgstr "新しいイベントタグの値"
 
 #: include/classes/api/services/CScript.php:527
 msgid "values must be unique"
-msgstr ""
+msgstr "値は一意である必要があります"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"
