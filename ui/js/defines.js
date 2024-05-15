@@ -12,6 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+const ZBX_STYLE_DISPLAY_NONE = 'display-none';
+
 const ZBX_STYLE_NO_DATA = 'no-data';
 
 const ZBX_COLOR_SCHEME_DARK = 'dark';

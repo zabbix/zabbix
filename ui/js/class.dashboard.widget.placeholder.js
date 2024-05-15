@@ -17,7 +17,6 @@ const ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-widget-placeholder';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-widget-placeholder-box';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL = 'dashboard-widget-placeholder-label';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-widget-placeholder-resizing';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN = 'hidden';
 
 const WIDGET_PLACEHOLDER_STATE_ADD_NEW = 0;
 const WIDGET_PLACEHOLDER_STATE_RESIZING = 1;
@@ -76,7 +75,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	setState(state) {
-		this._target.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
+		this._target.classList.add(ZBX_STYLE_DISPLAY_NONE);
 
 		this._target.classList.remove('disabled');
 		this._placeholder_box.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
@@ -120,11 +119,16 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	resize() {
-		if (!this._target.classList.contains(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN)) {
-			this._placeholder_box_label_wrap.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
+		if (!this._target.classList.contains(ZBX_STYLE_DISPLAY_NONE)) {
+			this._placeholder_box_label.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			this._placeholder_box_label_wrap.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+
+			if (this._placeholder_box_label.scrollWidth > this._placeholder_box_label.clientWidth) {
+				this._placeholder_box_label.classList.add(ZBX_STYLE_DISPLAY_NONE);
+			}
 
 			if (this._placeholder_box_label.scrollHeight > this._placeholder_box_label.clientHeight) {
-				this._placeholder_box_label_wrap.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
+				this._placeholder_box_label_wrap.classList.add(ZBX_STYLE_DISPLAY_NONE);
 			}
 		}
 
@@ -142,7 +146,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this._target.style.top = `${y * this._cell_height}px`;
 		this._target.style.width = `${width * this._cell_width}%`;
 		this._target.style.height = `${height * this._cell_height}px`;
-		this._target.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
+		this._target.classList.remove(ZBX_STYLE_DISPLAY_NONE);
 
 		this.resize();
 
@@ -160,7 +164,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 		this._target.style.top = null;
 		this._target.style.width = null;
 		this._target.style.height = null;
-		this._target.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
+		this._target.classList.remove(ZBX_STYLE_DISPLAY_NONE);
 
 		this.resize();
 
@@ -173,7 +177,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	hide() {
-		this._target.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN);
+		this._target.classList.add(ZBX_STYLE_DISPLAY_NONE);
 
 		return this;
 	}
