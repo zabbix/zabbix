@@ -39,14 +39,14 @@ class CWidgetFieldReference extends CWidgetField {
 		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
-	/**
-	 * @param string $value  Reference value. Only numeric characters allowed.
-	 */
-	public function setValue($value): self {
-		if ($value === '' || ctype_alnum((string) $value)) {
-			$this->value = $value;
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($strict && $errors) {
+			$this->setValue('');
+			$errors = [];
 		}
 
-		return $this;
+		return $errors;
 	}
 }
