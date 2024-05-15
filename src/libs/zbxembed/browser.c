@@ -656,12 +656,12 @@ static duk_ret_t	es_browser_add_cookie(duk_context *ctx)
 	char		*error = NULL,  *cookie_json = NULL;
 	int		err_index = -1;
 
+	wd = es_webdriver(ctx);
+
 	duk_get_global_string(ctx, "JSON");
 	duk_push_string(ctx, "stringify");
 	duk_dup(ctx, 0);
 	duk_pcall_prop(ctx, -3, 1);
-
-	wd = es_webdriver(ctx);
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, -1), &cookie_json))
 	{
