@@ -150,6 +150,8 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	DBclose();
 	zbx_unblock_signals(&orig_mask);
 
+	zbx_ipc_service_close(&service);
+
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

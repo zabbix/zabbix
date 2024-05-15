@@ -3572,6 +3572,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 	DBclose();
 
+	zbx_ipc_service_close(&service);
+
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

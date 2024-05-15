@@ -1027,6 +1027,8 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		}
 	}
 
+	zbx_ipc_service_close(&ipmi_manager.ipc);
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
