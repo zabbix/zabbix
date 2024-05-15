@@ -220,6 +220,9 @@ static int	*threads_flags;
 
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
+
+static sigset_t	orig_mask;
+
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_pid_file, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, problems_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, history_export, NULL)
@@ -1671,6 +1674,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{
 		exit_args->listen_sock = listen_sock;
+		zbx_block_signals(&orig_mask);
 
 		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
@@ -1685,6 +1689,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			zbx_free(error);
 			return FAIL;
 		}
+		zbx_unblock_signals(&orig_mask);
 	}
 
 	for (zbx_threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
@@ -2117,6 +2122,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
+	zbx_block_signals(&orig_mask);
+
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
 		zbx_error("cannot initialize IPC services: %s", error);
@@ -2253,6 +2260,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_unblock_signals(&orig_mask);
 
 	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_config_dbhigh->config_dbuser,
 			&zbx_config_dbhigh->config_dbpassword, zbx_config_source_ip, config_ssl_ca_location,

@@ -188,6 +188,7 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping_location, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
+static sigset_t	orig_mask;
 
 int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
@@ -1533,6 +1534,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				config_hostname, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
+	zbx_block_signals(&orig_mask);
+
 	if (FAIL == zbx_ipc_service_init_env(config_socket_path, &error))
 	{
 		zbx_error("cannot initialize IPC services: %s", error);
@@ -1642,6 +1645,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	exit_args.rtc = &rtc;
 	zbx_set_on_exit_args(&exit_args);
 
+	zbx_unblock_signals(&orig_mask);
+
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_proxy_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
@@ -1737,6 +1742,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		exit_args.listen_sock = &listen_sock;
 
+		zbx_block_signals(&orig_mask);
+
 		if (FAIL == zbx_tcp_listen(&listen_sock, config_listen_ip, (unsigned short)config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
@@ -1750,6 +1757,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_free(error);
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_unblock_signals(&orig_mask);
 	}
 
 	/* not running zbx_tls_init_parent() since proxy is only run on Unix*/
