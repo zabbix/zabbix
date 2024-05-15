@@ -476,7 +476,7 @@ class testFormUserPermissions extends CWebTest {
 	public function testFormUserPermissions_Module() {
 		$widget_modules = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs', 'Favorite maps',
 			'Gauge', 'Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability',
-			'Host navigator', 'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Plain text',
+			'Host navigator', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart',
 			'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information', 'Top hosts',
 			'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 		];

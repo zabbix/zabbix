@@ -166,7 +166,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.0.itemid',
-										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory'.
+										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Available memory'.
 									]
 								]
 							]
@@ -348,7 +348,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory in %',
+								'values' =>  'Available memory in %',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -367,7 +367,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory in %',
+								'values' =>  'Available memory in %',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -386,7 +386,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory in %',
+								'values' =>  'Available memory in %',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -405,7 +405,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory in %',
+								'values' =>  'Available memory in %',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -439,14 +439,14 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory in %',
+								'values' =>  'Available memory in %',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						],
 						[
 							'Name' => 'Column2',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -465,7 +465,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory in %',
+								'values' =>  'Available memory in %',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						],
@@ -490,14 +490,14 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory in %',
+								'values' =>  'Available memory in %',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						],
 						[
 							'Name' => 'Column2',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -515,7 +515,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory in %',
+								'values' =>  'Available memory in %',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						],
@@ -561,7 +561,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -581,7 +581,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -599,7 +599,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -617,7 +617,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -636,7 +636,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -655,7 +655,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -673,7 +673,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -691,7 +691,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -710,7 +710,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -729,7 +729,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -772,7 +772,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						[
 							'Name' => 'Column1',
 							'Item' => [
-								'values' => 'Linux: Available memory',
+								'values' =>  'Available memory',
 								'context' => ['values' => 'ЗАББИКС Сервер']
 							]
 						]
@@ -1057,7 +1057,8 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Host name' => 'Zabbix Item history'
+							'Name' => 'Host name',
+							'Value' => 'Zabbix Item history'
 						]
 					],
 					'item_data' => [
@@ -1071,15 +1072,18 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					'initial_data' => [
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
-							'Host name' => 'Zabbix Item history'
+							'Name' => 'Host name',
+							'Value'=> 'Zabbix Item history'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 minute')),
-							'Host name' => 'Zabbix Item history2'
+							'Name' => 'Host name',
+							'Value' => 'Zabbix Item history2'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 minutes')),
-							'Host name' => 'Zabbix plain ⓣⓔⓧⓣ'
+							'Name' => 'Host name',
+							'Value' => 'Zabbix plain ⓣⓔⓧⓣ'
 						]
 					],
 					'item_data' => [
@@ -1095,23 +1099,28 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					'initial_data' => [
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
-							'Available memory' => '9.37 GB' // value rounding is expected.
+							'Name' => 'Available memory',
+							'Value' => '9.37 GB' // value rounding is expected.
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-30 seconds')),
-							'Available memory in %' => '82.0618 %' // value rounding is expected.
+							'Name' => 'Available memory in %',
+							'Value'=> '82.0618 %' // value rounding is expected.
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 minute')),
-							'Available memory in %' => '72.0618 %' // value rounding is expected.
+							'Name' => 'Available memory in %',
+							'Value' => '72.0618 %' // value rounding is expected.
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 hour')),
-							'Available memory' => '8.44 GB' // value rounding is expected.
+							'Name' => 'Available memory',
+							'Value' => '8.44 GB' // value rounding is expected.
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
-							'Available memory' => '7.51 GB' // value rounding is expected.
+							'Name' => 'Available memory',
+							'Value'=> '7.51 GB' // value rounding is expected.
 						]
 					],
 					'item_data' => [
@@ -1132,7 +1141,8 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
-							'Available memory' => '9.37 GB' // value rounding is expected.
+							'Name' => 'Available memory',
+							'Value'=> '9.37 GB' // value rounding is expected.
 						]
 						// TODO: ZBXNEXT-8316 Sub-issue (11).
 //						[
@@ -1143,7 +1153,8 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
-							'Available memory' => '9.37 GB' // value rounding is expected.
+							'Name' => 'Available memory',
+							'Value' => '9.37 GB' // value rounding is expected.
 						]
 					],
 					'item_data' => [
@@ -1240,17 +1251,17 @@ class testDashboardItemHistoryWidget extends CWebTest {
 //					'result' => [
 //						[
 //							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Name' => 'Linux: Host name of Zabbix agent running',
+//							'Name' =>  'Host name of Zabbix agent running',
 //							'Value' => 'Zabbix Item history'
 //						],
 //						[
 //							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
-//							'Name' => 'Linux: Host name of Zabbix agent running',
+//							'Name' =>  'Host name of Zabbix agent running',
 //							'Value' => STRING_255
 //						],
 //						[
 //							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-//							'Name' => 'Linux: Available memory in %',
+//							'Name' =>  'Available memory in %',
 //							'Value' => '82.0618 %' // value rounding is expected.
 //						]
 //					],
