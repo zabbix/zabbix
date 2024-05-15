@@ -1903,6 +1903,19 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
 	zbx_free(counter);
 }
 
+static void	vmware_check_url_suffix_sdk(const char *url, char **error)
+{
+#define VMWARE_URL_SUFFIX_SDK	"/sdk"
+	size_t	len = strlen(url);
+
+	if (ZBX_CONST_STRLEN(VMWARE_URL_SUFFIX_SDK) > len ||
+			0 != strcmp(url + (len - ZBX_CONST_STRLEN(VMWARE_URL_SUFFIX_SDK)), VMWARE_URL_SUFFIX_SDK))
+	{
+		*error = zbx_strdup(*error, "Invalid URL: missing '" VMWARE_URL_SUFFIX_SDK "'");
+	}
+#undef VMWARE_URL_SUFFIX_SDK
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: authenticates vmware service                                      *
@@ -1993,7 +2006,10 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 				username_esc, password_esc);
 
 		if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, &doc, NULL, error) && NULL == doc)
+		{
+			vmware_check_url_suffix_sdk(service->url, error);
 			goto out;
+		}
 
 		if (NULL == *error)
 		{
@@ -2023,7 +2039,10 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			username_esc, password_esc);
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, NULL, NULL, error))
+	{
+		vmware_check_url_suffix_sdk(service->url, error);
 		goto out;
+	}
 
 	ret = SUCCEED;
 out:
