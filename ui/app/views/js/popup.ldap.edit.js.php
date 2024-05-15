@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -291,11 +286,10 @@ window.ldap_edit_popup = new class {
 		else {
 			row_index = row.dataset.row_index;
 
-			popup_params = {
-				name: row.querySelector('[name="provision_media[' + row_index + '][name]"]').value,
-				attribute: row.querySelector('[name="provision_media[' + row_index + '][attribute]"]').value,
-				mediatypeid: row.querySelector('[name="provision_media[' + row_index + '][mediatypeid]"]').value
-			};
+			popup_params = Object.fromEntries(
+				[...row.querySelectorAll(`[name^="provision_media[${row_index}]"]`)].map(
+					i => [i.name.match(/\[([^\]]+)\]$/)[1], i.value]
+			));
 		}
 
 		const overlay = PopUp('popup.mediatypemapping.edit', popup_params,
@@ -388,10 +382,14 @@ window.ldap_edit_popup = new class {
 			<tr data-row_index="#{row_index}">
 				<td>
 					<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
+					<input type="hidden" name="provision_media[#{row_index}][userdirectory_mediaid]" value="#{userdirectory_mediaid}">
 					<input type="hidden" name="provision_media[#{row_index}][name]" value="#{name}">
 					<input type="hidden" name="provision_media[#{row_index}][mediatype_name]" value="#{mediatype_name}">
 					<input type="hidden" name="provision_media[#{row_index}][mediatypeid]" value="#{mediatypeid}">
 					<input type="hidden" name="provision_media[#{row_index}][attribute]" value="#{attribute}">
+					<input type="hidden" name="provision_media[#{row_index}][period]" value="#{period}">
+					<input type="hidden" name="provision_media[#{row_index}][severity]" value="#{severity}">
+					<input type="hidden" name="provision_media[#{row_index}][active]" value="#{active}">
 				</td>
 				<td class="wordbreak">#{mediatype_name}</td>
 				<td class="wordbreak">#{attribute}</td>
@@ -402,6 +400,10 @@ window.ldap_edit_popup = new class {
 
 		const template = document.createElement('template');
 		template.innerHTML = template_ldap_media_mapping_row.evaluate(provision_media).trim();
+
+		if (provision_media.userdirectory_mediaid === undefined) {
+			template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"]').remove();
+		}
 
 		return template.content.firstChild;
 	}

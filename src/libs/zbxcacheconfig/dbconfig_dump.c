@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
@@ -89,6 +84,7 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  ssh:%s", config->config->item_timeouts.ssh);
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:%s", config->config->item_timeouts.telnet);
 	zabbix_log(LOG_LEVEL_TRACE, "  script:%s", config->config->item_timeouts.script);
+	zabbix_log(LOG_LEVEL_TRACE, "  browser:%s", config->config->item_timeouts.browser);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
@@ -509,9 +505,24 @@ static void	DCdump_scriptitem(const ZBX_DC_SCRIPTITEM *scriptitem)
 
 	for (i = 0; i < scriptitem->params.values_num; i++)
 	{
-		zbx_dc_scriptitem_param_t	*params = (zbx_dc_scriptitem_param_t *)scriptitem->params.values[i];
+		zbx_dc_item_param_t	*params = (zbx_dc_item_param_t *)scriptitem->params.values[i];
 
-		zabbix_log(LOG_LEVEL_TRACE, "      item_script_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
+		zabbix_log(LOG_LEVEL_TRACE, "      item_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
+				params->item_script_paramid, params->name, params->value);
+	}
+}
+
+static void	DCdump_browseritem(const ZBX_DC_BROWSERITEM *browseritem)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "  browseritem:[script:'%s']", browseritem->script);
+
+	for (i = 0; i < browseritem->params.values_num; i++)
+	{
+		zbx_dc_item_param_t	*params = (zbx_dc_item_param_t *)browseritem->params.values[i];
+
+		zabbix_log(LOG_LEVEL_TRACE, "      item_paramid:" ZBX_FS_UI64 " name: '%s' value:'%s'",
 				params->item_script_paramid, params->name, params->value);
 	}
 }
@@ -691,6 +702,9 @@ static void	DCdump_items(void)
 				break;
 			case ITEM_TYPE_SCRIPT:
 				DCdump_scriptitem(item->itemtype.scriptitem);
+				break;
+			case ITEM_TYPE_BROWSER:
+				DCdump_browseritem(item->itemtype.browseritem);
 				break;
 		}
 

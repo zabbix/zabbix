@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 #include "zbxdbhigh.h"
 
@@ -59,7 +54,7 @@ void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx
 	zbx_serialize_prepare_value(data_len, mt->maxsessions);
 	zbx_serialize_prepare_value(data_len, mt->maxattempts);
 	zbx_serialize_prepare_str_len(data_len, mt->attempt_interval, attempt_interval_len);
-	zbx_serialize_prepare_value(data_len, mt->content_type);
+	zbx_serialize_prepare_value(data_len, mt->message_format);
 	zbx_serialize_prepare_str_len(data_len, mt->script, script_len);
 	zbx_serialize_prepare_str_len(data_len, mt->timeout, timeout_len);
 
@@ -87,7 +82,7 @@ void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx
 	ptr += zbx_serialize_value(ptr, mt->maxsessions);
 	ptr += zbx_serialize_value(ptr, mt->maxattempts);
 	ptr += zbx_serialize_str(ptr, mt->attempt_interval, attempt_interval_len);
-	ptr += zbx_serialize_value(ptr, mt->content_type);
+	ptr += zbx_serialize_value(ptr, mt->message_format);
 	ptr += zbx_serialize_str(ptr, mt->script, script_len);
 	(void)zbx_serialize_str(ptr, mt->timeout, timeout_len);
 
@@ -117,7 +112,7 @@ zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, zbx_db_mediaty
 	data += zbx_deserialize_value(data, &mt->maxsessions);
 	data += zbx_deserialize_value(data, &mt->maxattempts);
 	data += zbx_deserialize_str(data, &mt->attempt_interval, len);
-	data += zbx_deserialize_value(data, &mt->content_type);
+	data += zbx_deserialize_value(data, &mt->message_format);
 	data += zbx_deserialize_str(data, &mt->script, len);
 	data += zbx_deserialize_str(data, &mt->timeout, len);
 

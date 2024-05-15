@@ -116,7 +116,7 @@ zabbix_export:
             - tag: component
               value: archive
         - uuid: e9f4284fd3a1459e9c519dbdd8ee3425
-          name: 'PostgreSQL: Get archive'
+          name: 'Get archive'
           key: 'pgsql.archive["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -126,7 +126,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d9169b4b31554063b9d01d0d27b4beee
-          name: 'PostgreSQL: Count of autovacuum workers'
+          name: 'Count of autovacuum workers'
           key: 'pgsql.autovacuum.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           value_type: FLOAT
@@ -343,7 +343,7 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 6020e17c25104cbfba182e9cddfe6336
-          name: 'PostgreSQL: Get bgwriter'
+          name: 'Get bgwriter'
           key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -355,7 +355,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b98d2328694f44598f2177b3f93d4b90
-          name: 'PostgreSQL: Cache hit ratio, %'
+          name: 'Cache hit ratio, %'
           type: CALCULATED
           key: pgsql.cache.hit
           history: 7d
@@ -516,8 +516,8 @@ zabbix_export:
           triggers:
             - uuid: 1d0903401af64d93ac16761808d672ca
               expression: 'min(/PostgreSQL by Zabbix agent 2/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
-              name: 'PostgreSQL: Total number of connections is too high'
-              event_name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
+              name: 'Total number of connections is too high'
+              event_name: 'Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
               description: 'Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).'
               tags:
@@ -542,7 +542,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: e926ecd967f342bf90e9923825147d64
-          name: 'PostgreSQL: Get connections sum'
+          name: 'Get connections sum'
           key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -554,7 +554,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1cab825fac8a49ba96dfbf7a696be729
-          name: 'PostgreSQL: Custom queries'
+          name: 'Custom queries'
           key: 'pgsql.custom.query["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""]'
           history: 1h
           trends: '0'
@@ -924,7 +924,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: ddddde3084d54f55838b970f44290523
-          name: 'PostgreSQL: Get dbstat sum'
+          name: 'Get dbstat sum'
           key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -936,7 +936,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3be06ec14cba44d0892f3271a599c473
-          name: 'PostgreSQL: Get dbstat'
+          name: 'Get dbstat'
           key: 'pgsql.dbstat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -948,7 +948,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7112eeb300c14d959c79715462bf9563
-          name: 'PostgreSQL: Get locks'
+          name: 'Get locks'
           key: 'pgsql.locks["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -960,7 +960,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0377fe6f2f8d4539b649c636ab012415
-          name: 'PostgreSQL: Age of oldest xid'
+          name: 'Age of oldest xid'
           key: 'pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           value_type: FLOAT
@@ -971,13 +971,13 @@ zabbix_export:
           triggers:
             - uuid: 2a5c11571d9d46f093ed9081f9d51504
               expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000'
-              name: 'PostgreSQL: Oldest xid is too big'
+              name: 'Oldest xid is too big'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: availability
         - uuid: 56323e572fa443228987c62039153825
-          name: 'PostgreSQL: Ping'
+          name: Ping
           key: 'pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           description: 'Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.'
@@ -995,14 +995,14 @@ zabbix_export:
           triggers:
             - uuid: 48a24a78519d47349200f0b41ceec56a
               expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"])=0'
-              name: 'PostgreSQL: Service is down'
+              name: 'Service is down'
               priority: HIGH
               description: 'Last test of a connection was unsuccessful.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 01123126fcd54adc84c3bbfa227d9c0c
-          name: 'PostgreSQL: Get queries'
+          name: 'Get queries'
           key: 'pgsql.queries["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
           history: '0'
           trends: '0'
@@ -1012,7 +1012,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: a171db459d6144e4ad294579fb8dc56d
-          name: 'PostgreSQL: Replication: Standby count'
+          name: 'Replication: Standby count'
           key: 'pgsql.replication.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           description: 'Number of standby servers.'
@@ -1020,7 +1020,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: da9ce769f9444a3f9600ce64c4ab2857
-          name: 'PostgreSQL: Replication: Lag in bytes'
+          name: 'Replication: Lag in bytes'
           key: 'pgsql.replication.lag.b["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           units: B
@@ -1029,7 +1029,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 5a9eb8ee4a484911903688e620eb618b
-          name: 'PostgreSQL: Replication: Lag in seconds'
+          name: 'Replication: Lag in seconds'
           key: 'pgsql.replication.lag.sec["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           units: s
@@ -1038,7 +1038,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 4120befb754d47e9a931f868c28badb9
-          name: 'PostgreSQL: Get replication'
+          name: 'Get replication'
           key: 'pgsql.replication.process["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -1048,7 +1048,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 4085b836bf614f3d910818074c386845
-          name: 'PostgreSQL: Replication: Recovery role'
+          name: 'Replication: Recovery role'
           key: 'pgsql.replication.recovery_role["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           description: 'Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.'
@@ -1058,7 +1058,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 3c83904cbad74ff7a0d10136a233e6c6
-          name: 'PostgreSQL: Replication: Status'
+          name: 'Replication: Status'
           key: 'pgsql.replication.status["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           description: 'Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.'
@@ -1068,7 +1068,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: efa946a67e5844ecb905c68a2a6b85bb
-          name: 'PostgreSQL: Uptime'
+          name: Uptime
           key: 'pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: 7d
           value_type: FLOAT
@@ -1080,15 +1080,15 @@ zabbix_export:
           triggers:
             - uuid: 5fbabc5f60b74a369a13a260d25cce3c
               expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) < 10m'
-              name: 'PostgreSQL: Service has been restarted'
-              event_name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
+              name: 'Service has been restarted'
+              event_name: 'Service has been restarted (uptime < 10m)'
               priority: AVERAGE
               description: 'PostgreSQL uptime is less than 10 minutes.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 523528aad175455fbd1daba161365651
-          name: 'PostgreSQL: Version'
+          name: Version
           key: 'pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           delay: 15m
           history: 7d
@@ -1105,8 +1105,8 @@ zabbix_export:
           triggers:
             - uuid: 6b3ac2a19e114e1390e6e0793728f576
               expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#1)<>last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#2) and length(last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]))>0'
-              name: 'PostgreSQL: Version has changed'
-              event_name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               tags:
                 - tag: scope
@@ -1148,7 +1148,7 @@ zabbix_export:
             - tag: component
               value: wal
         - uuid: c3d96741af454f6b9a3a49b6117c31be
-          name: 'PostgreSQL: Get WAL'
+          name: 'Get WAL'
           key: 'pgsql.wal.stat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
           delay: 5m
           history: '0'
@@ -2392,7 +2392,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2408,7 +2408,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2424,7 +2424,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2439,8 +2439,8 @@ zabbix_export:
                       name: reference
                       value: AAAAE
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2455,9 +2455,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2472,9 +2472,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

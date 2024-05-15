@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_CACHECONFIG_H
@@ -30,6 +25,7 @@
 #include "zbxtagfilter.h"
 #include "zbxautoreg.h"
 #include "zbxpgservice.h"
+#include "zbxalgo.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -43,7 +39,8 @@
 #define	ZBX_POLLER_TYPE_AGENT		8
 #define	ZBX_POLLER_TYPE_SNMP		9
 #define ZBX_POLLER_TYPE_INTERNAL	10
-#define	ZBX_POLLER_TYPE_COUNT		11	/* number of poller types */
+#define ZBX_POLLER_TYPE_BROWSER		11
+#define	ZBX_POLLER_TYPE_COUNT		12	/* number of poller types */
 
 typedef enum
 {
@@ -1378,6 +1375,7 @@ typedef struct
 	const char	*ssh;
 	const char	*telnet;
 	const char	*script;
+	const char	*browser;
 }
 zbx_config_item_type_timeouts_t;
 
@@ -1395,6 +1393,7 @@ typedef struct
 	char	ssh[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	telnet[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	script[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	browser[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 }
 zbx_dc_item_type_timeouts_t;
 

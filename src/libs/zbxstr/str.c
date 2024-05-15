@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxstr.h"
@@ -45,7 +40,7 @@ char	*zbx_string_replace(const char *str, const char *sub_str1, const char *sub_
 	diff = (long)strlen(sub_str2) - len;
 
 	/* allocate new memory */
-	new_str = (char *)zbx_malloc(new_str, (size_t)(strlen(str) + count*diff + 1)*sizeof(char));
+	new_str = (char *)zbx_malloc(new_str, (strlen(str) + (size_t)(count * diff) + 1) * sizeof(char));
 
 	for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
 	{
@@ -1446,6 +1441,7 @@ size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen)
 }
 
 #define ZBX_UTF8_REPLACE_CHAR	'?'
+#define ZBX_CTRL_REPLACE_CHAR	'.'
 
 /******************************************************************************
  *                                                                            *
@@ -1545,16 +1541,24 @@ int	zbx_is_utf8(const char *text)
  * Purpose: replaces invalid UTF-8 sequences of bytes with '?' character      *
  *                                                                            *
  * Parameters: text - [IN/OUT] pointer to first char                          *
+ *             replace_nonprintable - [IN] 0 - leave control characters       *
+ *                                         1 - replace control characters     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_replace_invalid_utf8(char *text)
+static void	zbx_replace_invalid_utf8_impl(char *text, int replace_nonprintable)
 {
 	char	*out = text;
 
 	while ('\0' != *text)
 	{
 		if (0 == (*text & 0x80))			/* single ASCII character */
-			*out++ = *text++;
+		{
+			if (0 == replace_nonprintable || 0 == iscntrl((int)*text))
+				*out++ = *text;
+			else
+				*out++ = ZBX_CTRL_REPLACE_CHAR;
+			text++;
+		}
 		else if (0x80 == (*text & 0xc0) ||		/* unexpected continuation byte */
 				0xfe == (*text & 0xfe))		/* invalid UTF-8 bytes '\xfe' & '\xff' */
 		{
@@ -1592,7 +1596,7 @@ void	zbx_replace_invalid_utf8(char *text)
 				*out++ = *text++;
 			}
 
-			mb_len = out - (char *)utf8;
+			mb_len = (size_t)(out - (char *)utf8);
 
 			if (SUCCEED == ret)
 			{
@@ -1633,6 +1637,9 @@ void	zbx_replace_invalid_utf8(char *text)
 				 */
 				if (utf32 > 0x10ffff || 0xd800 == (utf32 & 0xf800))
 					ret = FAIL;
+				else if (0 != replace_nonprintable && 0x80 <= utf32 && 0x9f >= utf32)
+					ret = FAIL;
+
 			}
 
 			if (SUCCEED != ret)
@@ -1647,6 +1654,32 @@ void	zbx_replace_invalid_utf8(char *text)
 }
 
 #undef ZBX_UTF8_REPLACE_CHAR
+#undef ZBX_CTRL_REPLACE_CHAR
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replaces invalid UTF-8 sequences of bytes with '?' character      *
+ *                                                                            *
+ * Parameters: text - [IN/OUT] pointer to first char                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_replace_invalid_utf8(char *text)
+{
+	zbx_replace_invalid_utf8_impl(text, 0);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replaces invalid UTF-8 sequences of bytes with '?' character and  *
+ *          non-printable control characters with '.'                         *
+ *                                                                            *
+ * Parameters: text - [IN/OUT] pointer to first char                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_replace_invalid_utf8_and_nonprintable(char *text)
+{
+	zbx_replace_invalid_utf8_impl(text, 1);
+}
 
 void	zbx_dos2unix(char *str)
 {
@@ -1696,7 +1729,7 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 		}
 
 		to = *data + offset;
-		memmove(to + sz_from, to + sz_to, *data_len - (to - *data) - sz_from);
+		memmove(to + sz_from, to + sz_to, *data_len - (size_t)(to - *data) - sz_from);
 	}
 
 	memcpy(*data + offset, from, sz_from);
@@ -1975,7 +2008,7 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 						*ptr++ = '"';
 						break;
 					case '\0':
-						THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
+						THIS_SHOULD_NEVER_HAPPEN;
 						*ptr = '\0';
 						return str;
 				}
@@ -2154,7 +2187,7 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 	{
 		if (0 == *alloc_len)
 		{
-			THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE;
+			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
 

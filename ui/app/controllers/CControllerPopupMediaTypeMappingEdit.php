@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,9 +24,13 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'add_media_type_mapping' =>		'in 1',
+			'userdirectory_mediaid' =>		'id',
 			'name' =>						'string',
+			'mediatypeid' =>				'db media_type.mediatypeid',
 			'attribute' =>					'string',
-			'mediatypeid' =>				'db media_type.mediatypeid'
+			'period' =>						'time_periods',
+			'severity' =>					'int32|ge 0|le '.(pow(2, TRIGGER_SEVERITY_COUNT) - 1),
+			'active' =>						'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -64,14 +63,32 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 	 */
 	protected function doAction(): void {
 		$data = [
-			'add_media_type_mapping' => $this->getInput('add_media_type_mapping', 0),
-			'name' => $this->getInput('name', ''),
-			'attribute' => $this->getInput('attribute', ''),
-			'mediatypeid' => $this->getInput('mediatypeid', 0),
+			'add_media_type_mapping' => 0,
+			'name' => '',
+			'attribute' => '',
+			'mediatypeid' => 0,
+			'period' => ZBX_DEFAULT_INTERVAL,
+			'severity' => $this->hasInput('add_media_type_mapping')
+				? DB::getDefault('userdirectory_media', 'severity') : 0,
+			'active' => MEDIA_STATUS_ACTIVE
+		];
+		$this->getInputs($data, array_keys($data));
+		$data += [
+			'severities' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
+
+		if ($this->hasInput('userdirectory_mediaid')) {
+			$data['userdirectory_mediaid'] = $this->getInput('userdirectory_mediaid');
+		}
+
+		foreach (CSeverityHelper::getSeverities() as $severity) {
+			if (pow(2, $severity['value']) & $data['severity']) {
+				$data['severities'][] = $severity['value'];
+			}
+		}
 
 		$data['db_mediatypes'] = API::MediaType()->get(['output' => ['name', 'mediatypeid']]);
 		CArrayHelper::sort($data['db_mediatypes'], ['name']);

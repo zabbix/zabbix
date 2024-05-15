@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: d1a5f3c79a604bae98c314d2aed64ff4
-          name: 'Meraki: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: meraki.get.data
           delay: 1h
@@ -134,7 +134,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 6fdd764d820341e7bd2a24f42802c58a
-          name: 'Meraki: Data item errors'
+          name: 'Data item errors'
           type: DEPENDENT
           key: meraki.get.data.errors
           delay: '0'
@@ -157,7 +157,7 @@ zabbix_export:
           triggers:
             - uuid: 2bf9355f548e4e9b9b8581fb43f175fe
               expression: 'length(last(/Cisco Meraki dashboard by HTTP/meraki.get.data.errors))>0'
-              name: 'Meraki: There are errors in ''Get data'' metric'
+              name: 'There are errors in ''Get data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
@@ -327,7 +327,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 0c97a8fcad764133b4e7c35d0134665c
-          name: 'Meraki: Get status'
+          name: 'Get status'
           type: HTTP_AGENT
           key: meraki.device.get.status
           delay: '{$MERAKI.GET.STATUS.INTERVAL}'
@@ -351,7 +351,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2280b9212c474d99835ec1334ff780eb
-          name: 'Meraki: public IP'
+          name: 'public IP'
           type: DEPENDENT
           key: meraki.device.public.ip
           delay: '0'
@@ -372,7 +372,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 324b748bfe2e4383927176046e246acb
-          name: 'Meraki: status'
+          name: status
           type: DEPENDENT
           key: meraki.device.status
           delay: '0'
@@ -408,13 +408,13 @@ zabbix_export:
           triggers:
             - uuid: 00583ac9e9824f7db22a1685421f0be9
               expression: 'last(/Cisco Meraki device by HTTP/meraki.device.status)<>1'
-              name: 'Meraki: Status is not online'
+              name: 'Status is not online'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: e4963b68cdde453f91767ff9e3a31d16
-          name: 'Meraki: Get device data'
+          name: 'Get device data'
           type: SCRIPT
           key: meraki.get.device
           delay: '{$MERAKI.UPLINK.LL.TIMESPAN}'
@@ -531,7 +531,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b673516073354c9aaaf60cf3ce2e2fa6
-          name: 'Meraki: Device data item errors'
+          name: 'Device data item errors'
           type: DEPENDENT
           key: meraki.get.device.errors
           delay: '0'
@@ -554,7 +554,7 @@ zabbix_export:
           triggers:
             - uuid: c8f8af6c92f14dc0bcdf426b124c7344
               expression: 'length(last(/Cisco Meraki device by HTTP/meraki.get.device.errors))>0'
-              name: 'Meraki: There are errors in ''Get device data'' metric'
+              name: 'There are errors in ''Get device data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
@@ -745,7 +745,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: Loss
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -761,8 +761,8 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   name: Latency
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -800,7 +800,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 495f3a6047644dadadbbc676ba6900f9
-          name: 'Meraki: Account lockout attempts'
+          name: 'Account lockout attempts'
           type: DEPENDENT
           key: meraki.account.lockout.attempts
           delay: '0'
@@ -816,7 +816,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 25f8f61ddf964f39b39cc38b23b017b9
-          name: 'Meraki: Get list of adaptive policy aggregate statistics'
+          name: 'Get list of adaptive policy aggregate statistics'
           type: HTTP_AGENT
           key: meraki.get.adaptive.policy
           delay: 20m
@@ -836,7 +836,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 75c09cebedc7436cb4304acc3652955c
-          name: 'Meraki: Get admin''s account'
+          name: 'Get admin''s account'
           type: HTTP_AGENT
           key: meraki.get.admins
           delay: 12h
@@ -856,7 +856,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f2a65bce3adf4511a3f37ed4caa66b3d
-          name: 'Meraki: Get list of configuration changes'
+          name: 'Get list of configuration changes'
           type: HTTP_AGENT
           key: meraki.get.configuration.changes
           delay: '{$MERAKI.CONFIG.CHANGE.TIMESPAN}'
@@ -882,13 +882,13 @@ zabbix_export:
           triggers:
             - uuid: 2fc56ad4baef4796a3ad7d097cad918f
               expression: 'length(last(/Cisco Meraki organization by HTTP/meraki.get.configuration.changes))>3'
-              name: 'Meraki: Configuration has been changed'
+              name: 'Configuration has been changed'
               priority: WARNING
               tags:
                 - tag: scope
                   value: security
         - uuid: 3306da0ec0d749829db2f5f42e4e7876
-          name: 'Meraki: Get licenses overview'
+          name: 'Get licenses overview'
           type: HTTP_AGENT
           key: meraki.get.licenses
           delay: 12h
@@ -908,7 +908,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8ea56a7338f040fcbb9016da892dec90
-          name: 'Meraki: Get list licenses'
+          name: 'Get list licenses'
           type: SCRIPT
           key: meraki.get.list.licenses
           delay: 12h
@@ -1034,7 +1034,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: ac5da80c1e9b46a2ac31809e16fe1bfc
-          name: 'Meraki: Get login security'
+          name: 'Get login security'
           type: HTTP_AGENT
           key: meraki.get.login.security
           delay: 12h
@@ -1054,7 +1054,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: efe8853443d44eed8daeecee5ab9e481
-          name: 'Meraki: Get list of the networks'
+          name: 'Get list of the networks'
           type: SCRIPT
           key: meraki.get.networks
           delay: 3m
@@ -1176,7 +1176,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b2bb422b7d794a03a93c8d46209cd3fb
-          name: 'Meraki: Networks item errors'
+          name: 'Networks item errors'
           type: DEPENDENT
           key: meraki.get.networks.errors
           delay: '0'
@@ -1199,13 +1199,13 @@ zabbix_export:
           triggers:
             - uuid: c149d21e19f3453b8e569c549ed2c78a
               expression: 'length(last(/Cisco Meraki organization by HTTP/meraki.get.networks.errors))>0'
-              name: 'Meraki: There are errors in ''Get networks'' metric'
+              name: 'There are errors in ''Get networks'' metric'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: b33608b4c24d4c7bbf1f76f639890715
-          name: 'Meraki: Get SAML SSO'
+          name: 'Get SAML SSO'
           type: HTTP_AGENT
           key: meraki.get.saml
           delay: 12h
@@ -1232,7 +1232,7 @@ zabbix_export:
             - tag: component
               value: saml
         - uuid: 055cc5b5b49b4f398e06832091f66544
-          name: 'Meraki: Get SAML roles'
+          name: 'Get SAML roles'
           type: HTTP_AGENT
           key: meraki.get.saml.roles
           delay: 12h
@@ -1252,7 +1252,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: bb653e6dba3f489494a7143b74fe8f4f
-          name: 'Meraki: Get list of the VPN stats'
+          name: 'Get list of the VPN stats'
           type: SCRIPT
           key: meraki.get.vpn.stats
           delay: '{$MERAKI.VPN.STATS.TIMESPAN}'
@@ -1398,7 +1398,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: a5106f644c4e46fc963cc953dafaeb4e
-          name: 'Meraki: VPN item errors'
+          name: 'VPN item errors'
           type: DEPENDENT
           key: meraki.get.vpn.stats.errors
           delay: '0'
@@ -1421,13 +1421,13 @@ zabbix_export:
           triggers:
             - uuid: f65ff582e1a84f5a9e9d6a9c0501b013
               expression: 'length(last(/Cisco Meraki organization by HTTP/meraki.get.vpn.stats.errors))>0'
-              name: 'Meraki: There are errors in ''Get VPNs'' metric'
+              name: 'There are errors in ''Get VPNs'' metric'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 3e79a9319f0146c5b5aefeba13ec722c
-          name: 'Meraki: Idle timeout minutes'
+          name: 'Idle timeout minutes'
           type: DEPENDENT
           key: meraki.idle.timeout.minutes
           delay: '0'
@@ -1443,7 +1443,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: bd6eca7b707a4bee8e2302765afa6074
-          name: 'Meraki: License expire'
+          name: 'License expire'
           type: DEPENDENT
           key: meraki.license.expire
           delay: '0'
@@ -1484,13 +1484,13 @@ zabbix_export:
           triggers:
             - uuid: 8694c7fc18904004978a3ce46f06a67e
               expression: 'last(/Cisco Meraki organization by HTTP/meraki.license.expire)<{$MERAKI.LICENSE.EXPIRE} and last(/Cisco Meraki organization by HTTP/meraki.license.expire)>=0'
-              name: 'Meraki: License expires in less than {$MERAKI.LICENSE.EXPIRE} seconds'
+              name: 'License expires in less than {$MERAKI.LICENSE.EXPIRE} seconds'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 2b8e2c4093074dbaa88db3df57eb2cd1
-          name: 'Meraki: License status'
+          name: 'License status'
           type: DEPENDENT
           key: meraki.license.status
           delay: '0'
@@ -1521,13 +1521,13 @@ zabbix_export:
           triggers:
             - uuid: d4f71dd53bf8495789b53e063db3555b
               expression: 'last(/Cisco Meraki organization by HTTP/meraki.license.status)<>1'
-              name: 'Meraki: License status is not OK'
+              name: 'License status is not OK'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: c313fa31777a42d29d874f46f00ac82f
-          name: 'Meraki: Enforce account lockout'
+          name: 'Enforce account lockout'
           type: DEPENDENT
           key: meraki.login.enforce.account.lockout
           delay: '0'
@@ -1548,7 +1548,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: d71eb53c76e84ce1ad65959e381c358f
-          name: 'Meraki: Enforce different passwords'
+          name: 'Enforce different passwords'
           type: DEPENDENT
           key: meraki.login.enforce.different.passwords
           delay: '0'
@@ -1569,7 +1569,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: bd9423ea744f4855926e0edf677ef2a6
-          name: 'Meraki: Enforce idle timeout'
+          name: 'Enforce idle timeout'
           type: DEPENDENT
           key: meraki.login.enforce.idle.timeout
           delay: '0'
@@ -1590,7 +1590,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: f7b88a64223c4b2992f15d0b6807f55f
-          name: 'Meraki: Enforce login IP ranges'
+          name: 'Enforce login IP ranges'
           type: DEPENDENT
           key: meraki.login.enforce.login.ip.ranges
           delay: '0'
@@ -1611,7 +1611,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 09dc6f6619ea4a1dba1b17d9803bbe7a
-          name: 'Meraki: Enforce password expiration'
+          name: 'Enforce password expiration'
           type: DEPENDENT
           key: meraki.login.enforce.password.expiration
           delay: '0'
@@ -1632,7 +1632,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: cae90669ec7b4b2d9743b2f60fe6f99e
-          name: 'Meraki: Enforce 2FA'
+          name: 'Enforce 2FA'
           type: DEPENDENT
           key: meraki.login.enforce.two.factor.auth
           delay: '0'
@@ -1653,7 +1653,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 903cca42650f489f80ae5ace3adecb69
-          name: 'Meraki: Number of different passwords'
+          name: 'Number of different passwords'
           type: DEPENDENT
           key: meraki.login.num.different.passwords
           delay: '0'
@@ -1669,7 +1669,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 8e882c747c7047f99127346adc7e0a5a
-          name: 'Meraki: Password expiration days'
+          name: 'Password expiration days'
           type: DEPENDENT
           key: meraki.login.password.expiration.days
           delay: '0'
@@ -1685,7 +1685,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: e18f69d27fcb4b949d5744aebef97ffb
-          name: 'Meraki: Policies'
+          name: Policies
           type: DEPENDENT
           key: meraki.policies
           delay: '0'
@@ -1701,7 +1701,7 @@ zabbix_export:
             - tag: component
               value: policy
         - uuid: 8a8369134eff4153aba32d9c435786f3
-          name: 'Meraki: Allow policies'
+          name: 'Allow policies'
           type: DEPENDENT
           key: meraki.policies.allow
           delay: '0'
@@ -1717,7 +1717,7 @@ zabbix_export:
             - tag: component
               value: policy
         - uuid: f85b33412a2a41b39c33d64f3c641232
-          name: 'Meraki: Custom ACLs'
+          name: 'Custom ACLs'
           type: DEPENDENT
           key: meraki.policies.custom.acls
           delay: '0'
@@ -1733,7 +1733,7 @@ zabbix_export:
             - tag: component
               value: policy
         - uuid: 8b9e13124628460584668dbe5cd1b92b
-          name: 'Meraki: Deny policies'
+          name: 'Deny policies'
           type: DEPENDENT
           key: meraki.policies.deny
           delay: '0'
@@ -1749,7 +1749,7 @@ zabbix_export:
             - tag: component
               value: policy
         - uuid: a4918ea4d6954b5f829e5533117c109a
-          name: 'Meraki: Groups'
+          name: Groups
           type: DEPENDENT
           key: meraki.policies.groups
           delay: '0'
@@ -3037,7 +3037,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: latency
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3054,7 +3054,7 @@ zabbix_export:
                 - type: graphprototype
                   name: loss
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3070,8 +3070,8 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   name: loss
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -3089,7 +3089,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: latency
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -1,54 +1,39 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 class CTableInfo extends CTable {
 
-	protected $message = null;
+	protected $no_data_message = null;
+	protected $no_data_description = null;
+	protected $no_data_icon = null;
+
 	protected $page_navigation;
 
 	public function __construct() {
 		parent::__construct();
 
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
+
+		$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE);
 	}
 
-	public function setNoDataMessage($message, $description = null, $icon = null) {
-		if ($description === null && $icon === null) {
-			$container = (new CDiv($message))->addClass(ZBX_STYLE_NO_DATA_MESSAGE);
-		}
-		else {
-			$container = new CDiv([
-				(new CDiv($message))
-					->addClass(ZBX_STYLE_NO_DATA_MESSAGE)
-					->addClass($icon),
-				$description !== null ? (new CDiv($description))->addClass(ZBX_STYLE_NO_DATA_DESCRIPTION) : null
-			]);
-
-			if ($icon !== null) {
-				$this->addClass(ZBX_STYLE_NO_DATA);
-				$container->addClass(ZBX_STYLE_NO_DATA_FOUND);
-			}
-		}
-
-		$this->message = new CCol($container);
+	public function setNoDataMessage($message, $description = null, $icon = null): self {
+		$this->no_data_message = $message;
+		$this->no_data_description = $description;
+		$this->no_data_icon = $icon;
 
 		return $this;
 	}
@@ -68,8 +53,12 @@ class CTableInfo extends CTable {
 			$this->setId($tableid);
 		}
 
-		if ($this->rownum == 0 && $this->message === null) {
-			$this->setNoDataMessage(_('No data found'), null, ZBX_ICON_SEARCH_LARGE);
+		if ($this->rownum == 0) {
+			$this->addClass(ZBX_STYLE_NO_DATA);
+
+			if ($this->no_data_icon === null) {
+				$this->addClass(ZBX_STYLE_NO_DATA_WITHOUT_ICON);
+			}
 		}
 
 		return parent::toString($destroy);
@@ -79,7 +68,19 @@ class CTableInfo extends CTable {
 		$ret = '';
 
 		if ($this->rownum == 0) {
-			$ret .= $this->prepareRow($this->message, ZBX_STYLE_NOTHING_TO_SHOW)->toString();
+			$container = (new CDiv($this->no_data_message))->addClass(ZBX_STYLE_NO_DATA_MESSAGE);
+
+			if ($this->no_data_icon !== null) {
+				$container->addClass($this->no_data_icon);
+			}
+
+			if ($this->no_data_description !== null) {
+				$container->addItem(
+					(new CDiv($this->no_data_description))->addClass(ZBX_STYLE_NO_DATA_DESCRIPTION)
+				);
+			}
+
+			$ret .= $this->prepareRow(new CCol($container))->toString();
 		}
 
 		$ret .= parent::endToString();

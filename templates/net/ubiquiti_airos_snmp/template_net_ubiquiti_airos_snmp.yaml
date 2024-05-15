@@ -43,7 +43,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 473f39f191164f578539e842f18bfe65
-          name: 'Ubiquiti AirOS: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -57,14 +57,14 @@ zabbix_export:
           triggers:
             - uuid: 2a6711992f354095b056b628be78022c
               expression: 'max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0'
-              name: 'Ubiquiti AirOS: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 11297d0102734139aa4fa81eefad9839
-          name: 'Ubiquiti AirOS: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -78,11 +78,11 @@ zabbix_export:
           triggers:
             - uuid: 8e66ba0787b54af2897dd348e5453f10
               expression: 'min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)<100'
-              name: 'Ubiquiti AirOS: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Ubiquiti AirOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -90,7 +90,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: d8416e68bab94a568b8fbc67927ae739
-          name: 'Ubiquiti AirOS: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -104,13 +104,14 @@ zabbix_export:
           triggers:
             - uuid: 4ae253aa403a42ad8cd4721e2ffdfbca
               expression: 'avg(/Ubiquiti AirOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Ubiquiti AirOS: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Ubiquiti AirOS: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)<100'
-                - name: 'Ubiquiti AirOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -118,7 +119,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 11edabc72e4a4d69a0dc9c36458fbfbc
-          name: 'Ubiquiti AirOS: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -131,7 +132,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 362b533375e544d9804eba534e5f4935
-          name: 'Ubiquiti AirOS: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -151,7 +152,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 1aaf7d729983431cb28351e7ba0c8235
-          name: 'Ubiquiti AirOS: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2
           key: 'system.cpu.util[loadValue.2]'
@@ -167,8 +168,8 @@ zabbix_export:
           triggers:
             - uuid: 0a779320c2ba4494b8c55aef969e7c9d
               expression: 'min(/Ubiquiti AirOS by SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}'
-              name: 'Ubiquiti AirOS: High CPU utilization'
-              event_name: 'Ubiquiti AirOS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -176,7 +177,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: a05d416bcdde44929f091c4cde2e6537
-          name: 'Ubiquiti AirOS: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -197,7 +198,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9e8ab4b180f24b64bcddfc1606d616d0
-          name: 'Ubiquiti AirOS: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.2.840.10036.3.1.2.1.4.5
           key: system.hw.firmware
@@ -218,7 +219,7 @@ zabbix_export:
           triggers:
             - uuid: ab4a91cf3c2a4305a59727558c00a1f8
               expression: 'last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#2) and length(last(/Ubiquiti AirOS by SNMP/system.hw.firmware))>0'
-              name: 'Ubiquiti AirOS: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -227,7 +228,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: e770de183b1e4ffc9348750520719b41
-          name: 'Ubiquiti AirOS: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.2.840.10036.3.1.2.1.3.5
           key: system.hw.model
@@ -247,7 +248,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 0d47c914219e4da0a7d67631d8171244
-          name: 'Ubiquiti AirOS: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -271,7 +272,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: eabbdf5343fb42bfa3e5f13bc51ad66d
-          name: 'Ubiquiti AirOS: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -281,7 +282,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -291,7 +292,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5994fe565b1d437f8e9f1d0d8ec83104
-          name: 'Ubiquiti AirOS: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -313,8 +314,8 @@ zabbix_export:
           triggers:
             - uuid: 15523bce03a24cd6a4818ab655d1d2ad
               expression: 'last(/Ubiquiti AirOS by SNMP/system.name,#1)<>last(/Ubiquiti AirOS by SNMP/system.name,#2) and length(last(/Ubiquiti AirOS by SNMP/system.name))>0'
-              name: 'Ubiquiti AirOS: System name has changed'
-              event_name: 'Ubiquiti AirOS: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -324,7 +325,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: de270e3ac6874ca59a236a040d82c099
-          name: 'Ubiquiti AirOS: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -334,7 +335,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -343,7 +344,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2fbfe02459724f089b5bcd31ff6245d9
-          name: 'Ubiquiti AirOS: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -362,7 +363,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6393f8a84fd4417abdccd8bd867aac7e
-          name: 'Ubiquiti AirOS: Memory (buffers)'
+          name: 'Memory (buffers)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.1.3.0
           key: 'vm.memory.buffers[memBuffer.0]'
@@ -379,7 +380,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 224c8d32f0d649b3b94b77e960934f15
-          name: 'Ubiquiti AirOS: Memory (cached)'
+          name: 'Memory (cached)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.1.4.0
           key: 'vm.memory.cached[memCache.0]'
@@ -396,7 +397,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 401b95eff89743cba6942606ac051b01
-          name: 'Ubiquiti AirOS: Free memory'
+          name: 'Free memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.1.2.0
           key: 'vm.memory.free[memFree.0]'
@@ -411,7 +412,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: eefa6d2e8560407f82bbb8783bb399ad
-          name: 'Ubiquiti AirOS: Total memory'
+          name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10002.1.1.1.1.1.0
           key: 'vm.memory.total[memTotal.0]'
@@ -428,7 +429,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 29df9ffb192d4434a88ac6a413b9569d
-          name: 'Ubiquiti AirOS: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[memoryUsedPercentage]'
           history: 7d
@@ -442,8 +443,8 @@ zabbix_export:
           triggers:
             - uuid: 30c0c80ae6df45bb96c434016e394bba
               expression: 'min(/Ubiquiti AirOS by SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Ubiquiti AirOS: High memory utilization'
-              event_name: 'Ubiquiti AirOS: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -452,13 +453,13 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 0aad82f9addd45efa20253da000ec699
-          name: 'Ubiquiti AirOS: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -472,12 +473,12 @@ zabbix_export:
           triggers:
             - uuid: 7735f20ab7fd40b8b34cead6cb306b30
               expression: 'max(/Ubiquiti AirOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Ubiquiti AirOS: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Ubiquiti AirOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -731,8 +732,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -889,8 +890,10 @@ zabbix_export:
           value: '90'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
         - macro: '{$IF.UTIL.MAX}'
@@ -924,6 +927,7 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
       dashboards:
         - uuid: 9f32e8b35c17466dbf695110eb21c03d
           name: 'Ubiquiti AirOS: General'
@@ -932,7 +936,7 @@ zabbix_export:
               widgets:
                 - type: graph
                   name: 'Memory utilization'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -945,8 +949,8 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'CPU utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1567,13 +1571,13 @@ zabbix_export:
   triggers:
     - uuid: 2d9ed5a3b714461bbcdc4c530f955e5b
       expression: '(last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ubiquiti AirOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Ubiquiti AirOS: Host has been restarted'
-      event_name: 'Ubiquiti AirOS: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Ubiquiti AirOS: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Ubiquiti AirOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope
