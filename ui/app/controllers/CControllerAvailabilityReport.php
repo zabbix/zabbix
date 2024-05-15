@@ -266,7 +266,10 @@ class CControllerAvailabilityReport extends CController {
 					'with_triggers' => true,
 					'preservekeys' => true
 				]);
-				$prepared_data = CArrayHelper::renameObjectsKeys($hosts, ['hostid' => 'id']);
+
+				if ($hosts) {
+					$prepared_data = CArrayHelper::renameObjectsKeys($hosts, ['hostid' => 'id']);
+				}
 
 				break;
 			case 'host_groups':
@@ -276,7 +279,10 @@ class CControllerAvailabilityReport extends CController {
 					'with_monitored_hosts' => true,
 					'preservekeys' => true
 				]);
-				$prepared_data = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+
+				if ($host_groups) {
+					$prepared_data = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+				}
 
 				break;
 			case 'templates':
@@ -286,7 +292,10 @@ class CControllerAvailabilityReport extends CController {
 					'with_triggers' => true,
 					'preservekeys' => true
 				]);
-				$prepared_data = CArrayHelper::renameObjectsKeys($templates, ['templateid' => 'id']);
+
+				if ($templates) {
+					$prepared_data = CArrayHelper::renameObjectsKeys($templates, ['templateid' => 'id']);
+				}
 
 				break;
 			case 'template_groups':
@@ -298,7 +307,10 @@ class CControllerAvailabilityReport extends CController {
 					'preservekeys' => true
 				]);
 
-				$prepared_data = CArrayHelper::renameObjectsKeys($template_groups, ['groupid' => 'id']);
+				if ($template_groups) {
+					$prepared_data = CArrayHelper::renameObjectsKeys($template_groups, ['groupid' => 'id']);
+				}
+
 				break;
 
 			case 'triggers':
@@ -306,6 +318,7 @@ class CControllerAvailabilityReport extends CController {
 					'output' => ['triggerid', 'description'],
 					'triggerids' => $ids,
 					'templated' => true,
+					'selectHosts' => ['name'],
 					'filter' => [
 						'status' => TRIGGER_STATUS_ENABLED,
 						'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
@@ -313,8 +326,15 @@ class CControllerAvailabilityReport extends CController {
 					'preservekeys' => true
 				]);
 
-				$prepared_data = CArrayHelper::renameObjectsKeys($triggers,
-					['triggerid' => 'id', 'description' => 'name']);
+				if ($triggers) {
+					foreach ($triggers as $id => $trigger) {
+						$prepared_data[$id] = [
+							'id' => $id,
+							'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']
+						];
+					}
+				}
+
 				break;
 		}
 

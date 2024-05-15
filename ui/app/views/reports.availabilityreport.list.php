@@ -118,6 +118,7 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 					(new CMultiSelect([
 						'name' => 'filter_triggers[]',
 						'object_name' => 'triggers',
+						'multiple' => false,
 						'data' => $data['filter']['triggers'],
 						'popup' => [
 							'filter_preselect' => [
