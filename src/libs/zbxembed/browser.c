@@ -42,6 +42,7 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 	duk_push_this(ctx);
 	duk_get_prop_string(ctx, -1, "\xff""\xff""d");
 	wd = (zbx_webdriver_t *)duk_to_pointer(ctx, -1);
+	duk_pop_2(ctx);
 
 	return wd;
 }
