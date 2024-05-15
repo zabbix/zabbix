@@ -61,8 +61,8 @@ class CControllerAvailabilityReportTrigger extends CController {
 
 	protected function doAction(): void {
 		$trigger = API::Trigger()->get([
-			'triggerids' => $this->getInput('triggerid'),
 			'output' => API_OUTPUT_EXTEND,
+			'triggerids' => $this->getInput('triggerid'),
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'expandDescription' => true
 		]);

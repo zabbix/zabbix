@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerAvailabilityReport extends CController {
+class CControllerAvailabilityReportList extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -54,45 +54,45 @@ class CControllerAvailabilityReport extends CController {
 		}
 
 		if ($this->hasInput('filter_host_groups')) {
-			$hostgroup = API::HostGroup()->get([
+			$host_groups = API::HostGroup()->get([
 				'countOutput' => true,
 				'groupids' => $this->getInput('filter_host_groups')
 			]);
 
-			if (!$hostgroup) {
+			if (!$host_groups) {
 				return false;
 			}
 		}
 
 		if ($this->hasInput('filter_template_groups')) {
-			$templategroup = API::TemplateGroup()->get([
+			$template_groups = API::TemplateGroup()->get([
 				'countOutput' => true,
 				'groupids' => $this->getInput('filter_template_groups')
 			]);
 
-			if (!$templategroup) {
+			if (!$template_groups) {
 				return false;
 			}
 		}
 
 		if ($this->hasInput('filter_templates')) {
-			$template = API::Template()->get([
+			$templates = API::Template()->get([
 				'countOutput' => true,
 				'templateids' => $this->getInput('filter_templates')
 			]);
 
-			if (!$template) {
+			if (!$templates) {
 				return false;
 			}
 		}
 
 		if ($this->hasInput('filter_triggers')) {
-			$trigger = API::Trigger()->get([
+			$triggers = API::Trigger()->get([
 				'countOutput' => true,
 				'triggerids' => $this->getInput('filter_triggers')
 			]);
 
-			if (!$trigger) {
+			if (!$triggers) {
 				return false;
 			}
 		}
@@ -107,28 +107,10 @@ class CControllerAvailabilityReport extends CController {
 		$prefix = 'web.availabilityreport.filter.'.$report_mode;
 
 		if ($this->hasInput('filter_set')) {
-			if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-				CProfile::updateArray($prefix.'.template_groups', $this->getInput('filter_template_groups', []), PROFILE_TYPE_ID);
-				CProfile::updateArray($prefix.'.templates', $this->getInput('filter_templates', []), PROFILE_TYPE_ID);
-				CProfile::updateArray($prefix.'.triggers', $this->getInput('filter_triggers', []), PROFILE_TYPE_ID);
-				CProfile::updateArray($prefix.'.host_groups', $this->getInput('filter_host_groups', []), PROFILE_TYPE_ID);
-			}
-			else {
-				CProfile::updateArray($prefix.'.host_groups', $this->getInput('filter_groups', []), PROFILE_TYPE_ID);
-				CProfile::updateArray($prefix.'.hosts', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
-			}
+			$this->updateProfiles($report_mode);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-				CProfile::delete($prefix.'.template_groups');
-				CProfile::delete($prefix.'.templates');
-				CProfile::delete($prefix.'.triggers');
-				CProfile::delete($prefix.'.host_groups');
-			}
-			else {
-				CProfile::deleteIdx($prefix.'.host_groups');
-				CProfile::deleteIdx($prefix.'.hosts');
-			}
+			$this->deleteProfiles($report_mode);
 		}
 
 		$timeselector_options = [
@@ -242,6 +224,38 @@ class CControllerAvailabilityReport extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Availability report'));
 		$this->setResponse($response);
+	}
+
+	private function updateProfiles($report_mode): void {
+		$prefix = 'web.availabilityreport.filter.'.$report_mode;
+
+		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+			CProfile::updateArray($prefix.'.template_groups',
+				$this->getInput('filter_template_groups', []), PROFILE_TYPE_ID
+			);
+			CProfile::updateArray($prefix.'.templates', $this->getInput('filter_templates', []), PROFILE_TYPE_ID);
+			CProfile::updateArray($prefix.'.triggers', $this->getInput('filter_triggers', []), PROFILE_TYPE_ID);
+			CProfile::updateArray($prefix.'.host_groups', $this->getInput('filter_host_groups', []), PROFILE_TYPE_ID);
+		}
+		else {
+			CProfile::updateArray($prefix.'.host_groups', $this->getInput('filter_host_groups', []), PROFILE_TYPE_ID);
+			CProfile::updateArray($prefix.'.hosts', $this->getInput('filter_hosts', []), PROFILE_TYPE_ID);
+		}
+	}
+
+	private function deleteProfiles($report_mode): void {
+		$prefix = 'web.availabilityreport.filter.'.$report_mode;
+
+		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
+			CProfile::delete($prefix.'.template_groups');
+			CProfile::delete($prefix.'.templates');
+			CProfile::delete($prefix.'.triggers');
+			CProfile::delete($prefix.'.host_groups');
+		}
+		else {
+			CProfile::deleteIdx($prefix.'.host_groups');
+			CProfile::deleteIdx($prefix.'.hosts');
+		}
 	}
 
 	/**
