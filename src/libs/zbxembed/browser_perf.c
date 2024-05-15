@@ -170,7 +170,7 @@ static zbx_wd_attr_t	*wd_perf_entry_get_attribute(zbx_wd_perf_entry_t *entry, co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: attribute hasshet support functions                               *
+ * Purpose: attribute hashset support functions                               *
  *                                                                            *
  ******************************************************************************/
 static zbx_hash_t	wd_attr_hash(const void *d)
@@ -322,7 +322,7 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_create_from_json(const struct zbx_json
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free peformance entry                                             *
+ * Purpose: free performance entry                                            *
  *                                                                            *
  ******************************************************************************/
 static void	wd_perf_entry_free(zbx_wd_perf_entry_t *entry)
@@ -339,7 +339,7 @@ static void	wd_perf_entry_free(zbx_wd_perf_entry_t *entry)
  * Purpose: merge attribute src into dst                                      *
  *                                                                            *
  * Comments: numeric values are added                                         *
- *           string/error values are concatenaded with newline separator      *
+ *           string/error values are concatenated with newline separator      *
  *           vectors are appended                                             *
  *                                                                            *
  ******************************************************************************/
@@ -658,7 +658,7 @@ static void	wd_perf_dump(zbx_wd_perf_t *perf)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collect performance entires from json data                        *
+ * Purpose: collect performance entries from json data                        *
  *                                                                            *
  ******************************************************************************/
 void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp)

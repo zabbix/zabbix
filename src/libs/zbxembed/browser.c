@@ -912,7 +912,6 @@ out:
 	return 0;
 }
 
-
 static const duk_function_list_entry	browser_methods[] = {
 	{"navigate", es_browser_navigate, 1},
 	{"getUrl", es_browser_get_url, 0},

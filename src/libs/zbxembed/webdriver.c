@@ -156,7 +156,7 @@ void	webdriver_discard_error(zbx_webdriver_t *wd)
  *                                                                            *
  * Parameters: wd   - [IN] webdriver object                                   *
  *             jp   - [IN] webdriver response                                 *
- *             into - [OUT] error message                                     *
+ *             info - [OUT] error message                                     *
  *                                                                            *
  * Return value: SUCCEED - error was found                                    *
  *               FAIL    - otherwise                                          *
@@ -198,8 +198,8 @@ static int	webdriver_get_error(zbx_webdriver_t *wd, const struct zbx_json_parse 
  *                                                                            *
  * Purpose: performs webdriver query                                          *
  *                                                                            *
- * Parameters: wd   - [IN] webdriver object                                   *
- *             method   - [IN] HTTP method                                    *
+ * Parameters: wd      - [IN] webdriver object                                *
+ *             method  - [IN] HTTP method                                     *
  *             command - [IN] webdriver command (optional, can be NULL)       *
  *             data    - [IN] data to post (optional, can be NULL)            *
  *             jp      - [OUT] returned value (optional, can be NULL)         *
@@ -307,7 +307,7 @@ static void	webdriver_close_session(zbx_webdriver_t *wd)
  * Purpose: create webdriver object                                           *
  *                                                                            *
  * Parameters: browser  - [IN] browser type                                   *
- *             endpoint - [IN] webdriver url                                  *
+ *             endpoint - [IN] webdriver URL                                  *
  *             sourceip - [IN] source ip (optional, can be NULL)              *
  *             error    - [OUT] error message                                 *
  *                                                                            *
@@ -433,11 +433,11 @@ zbx_webdriver_t	*webdriver_addref(zbx_webdriver_t *wd)
  *                                                                            *
  * Purpose: open webdriver session                                            *
  *                                                                            *
- * Parameters: wd    - [IN] webdriver object                                  *
+ * Parameters: wd           - [IN] webdriver object                           *
  *             capabilities - [IN] browser capabilities (JSON formatted)      *
- *             error - [OUT] error message                                    *
+ *             error        - [OUT] error message                             *
  *                                                                            *
- * Return value: SUCEED - session was opened successfully                     *
+ * Return value: SUCCEED - session was opened successfully                    *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -485,7 +485,7 @@ out:
  *             url   - [IN] target url                                        *
  *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -512,7 +512,7 @@ int	webdriver_url(zbx_webdriver_t *wd, const char *url, char **error)
  *             url   - [OUT] current url                                      *
  *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -544,7 +544,7 @@ int	webdriver_get_url(zbx_webdriver_t *wd, char **url, char **error)
  *             element  - [OUT] element id                                    *
  *             error    - [OUT] error message                                 *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -603,7 +603,7 @@ out:
  *             elements - [OUT] vector of element identifiers                 *
  *             error    - [OUT] error message                                 *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -671,10 +671,10 @@ out:
  *                                                                            *
  * Parameters: wd       - [IN] webdriver object                               *
  *             element  - [IN] target element identifier                      *
- *             keys     - [IN] keys sto send                                  *
+ *             keys     - [IN] keys to send                                   *
  *             error    - [OUT] error message                                 *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -705,7 +705,7 @@ int	webdriver_send_keys_to_element(zbx_webdriver_t *wd, const char *element, con
  *             element  - [IN] target element identifier                      *
  *             error    - [OUT] error message                                 *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -736,7 +736,7 @@ int	webdriver_click_element(zbx_webdriver_t *wd, const char *element, char **err
  *             element  - [IN] target element identifier                      *
  *             error    - [OUT] error message                                 *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -771,7 +771,7 @@ int	webdriver_clear_element(zbx_webdriver_t *wd, const char *element, char **err
  *             value    - [OUT] attribute/property/text value                 *
  *             error    - [OUT] error message                                 *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -811,17 +811,17 @@ out:
  * Parameters: wd                - [IN] webdriver object                      *
  *             script_timeout    - [IN] script timeout (ms) or -1             *
  *             page_load_timeout - [IN] page load timeout (ms) or -1          *
- *             implicit_timeot   - [IN] implicit timeout (ms) or -1           *
+ *             implicit_timeout   - [IN] implicit timeout (ms) or -1          *
  *             error             - [OUT] error message                        *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  * Comments: When timeout parameter is set to -1 the timeout value is not     *
  *           changed.                                                         *
  *                                                                            *
  ******************************************************************************/
-int	webdriver_set_timeouts(zbx_webdriver_t *wd, int script_timeout, int page_load_timeout, int implicit_timeot,
+int	webdriver_set_timeouts(zbx_webdriver_t *wd, int script_timeout, int page_load_timeout, int implicit_timeout,
 		char **error)
 {
 	struct zbx_json	json;
@@ -835,8 +835,8 @@ int	webdriver_set_timeouts(zbx_webdriver_t *wd, int script_timeout, int page_loa
 	if (-1 != page_load_timeout)
 		zbx_json_addint64(&json, "pageLoad", page_load_timeout);
 
-	if (-1 != implicit_timeot)
-		zbx_json_addint64(&json, "implicit", implicit_timeot);
+	if (-1 != implicit_timeout)
+		zbx_json_addint64(&json, "implicit", implicit_timeout);
 
 	ret = webdriver_session_query(wd, "POST", "timeouts", json.buffer, NULL, error);
 
@@ -853,7 +853,7 @@ int	webdriver_set_timeouts(zbx_webdriver_t *wd, int script_timeout, int page_loa
  *             cookies - [OUT] array of cookie objects in JSON format         *
  *             error   - [OUT] error message                                  *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -881,7 +881,7 @@ int	webdriver_get_cookies(zbx_webdriver_t *wd, char **cookies, char **error)
  *             cookie - [IN] cookie object in JSON format                     *
  *             error  - [OUT] error message                                   *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -908,7 +908,7 @@ int	webdriver_add_cookie(zbx_webdriver_t *wd, const char *cookie, char **error)
  *             screenshot - [OUT] base64 encoded captured screenshot          *
  *             error      - [OUT] error message                               *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -939,7 +939,7 @@ int	webdriver_get_screenshot(zbx_webdriver_t *wd, char **screenshot, char **erro
  *             height - [IN] screen height                                    *
  *             error  - [OUT] error message                                   *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -997,9 +997,10 @@ out:
  *                                                                            *
  * Purpose: get performance entries from performance object                   *
  *                                                                            *
- * Parameters: wd      - [IN] webdriver object                                *
- *             jp      - [OUT] performance entries                            *
- *             error   - [OUT] error message                                  *
+ * Parameters: wd       - [IN] webdriver object                               *
+ *             bookmark - [OUT] performance entry bookmark                    *
+ *                              (optional, can be null)                       *
+ *             error    - [OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED - query was performed successfully                   *
  *               FAIL    - otherwise                                          *
@@ -1025,17 +1026,16 @@ out:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get page source                                                   *
  *                                                                            *
- * Parameters: wd      - [IN] webdriver object                                *
- *             sopurce - [OUT] page source                                    *
- *             error   - [OUT] error message                                  *
+ * Parameters: wd     - [IN] webdriver object                                 *
+ *             source - [OUT] page source                                     *
+ *             error  - [OUT] error message                                   *
  *                                                                            *
- * Return value: SUCCEED - operation was performed successfully                *
- *               FAIL   - otherwise                                           *
+ * Return value: SUCCEED - operation was performed successfully               *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	webdriver_get_page_source(zbx_webdriver_t *wd, char **source, char **error)
@@ -1099,7 +1099,7 @@ void	webdriver_set_error(zbx_webdriver_t *wd, char *message)
  *             text  - [OUT] alert text or null if there are no alerts        *
  *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCEED - operation was performed successfully                *
+ * Return value: SUCCEED - operation was performed successfully               *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/

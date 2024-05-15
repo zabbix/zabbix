@@ -13,7 +13,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 #include "browser_element.h"
 #include "browser_error.h"
 #include "duktape.h"
@@ -80,16 +79,8 @@ static duk_ret_t	wd_element_dtor(duk_context *ctx)
 static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const char *elementid)
 {
 	zbx_wd_element_t	*el;
-	zbx_es_env_t		*env;
 
 	zabbix_log(LOG_LEVEL_TRACE, "Element::Element()");
-
-	if (NULL == (env = zbx_es_get_env(ctx)))
-	{
-		(void)browser_push_error(ctx, wd, "cannot access internal environment");
-
-		return duk_throw(ctx);
-	}
 
 	el = (zbx_wd_element_t *)zbx_malloc(NULL, sizeof(zbx_wd_element_t));
 	el->wd = webdriver_addref(wd);
