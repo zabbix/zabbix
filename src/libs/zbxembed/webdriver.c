@@ -249,6 +249,8 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_TRACE, "webdriver %s url:%s data:%s", method, url, ZBX_NULL2EMPTY_STR(data));
+
 	if (0 == strcmp(method, "POST"))
 	{
 		if (SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(data), error))
@@ -260,7 +262,11 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 			goto out;
 	}
 
-	wd->data_offset = 0;
+	if (0 != wd->data_alloc)
+	{
+		wd->data_offset = 0;
+		*wd->data = '\0';
+	}
 
 	if (CURLE_OK != (err = curl_easy_perform(wd->handle)))
 	{
@@ -268,6 +274,8 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 				method, ZBX_NULL2EMPTY_STR(command), curl_easy_strerror(err));
 		goto out;
 	}
+
+	zabbix_log(LOG_LEVEL_TRACE, "webdriver response: %s", wd->data);
 
 	if (NULL == jp)
 		jp = &jp_value;
