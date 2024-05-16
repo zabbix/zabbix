@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$html_page = (new CHtmlPage())
+(new CHtmlPage())
 	->setTitle(_('Availability report graph'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AVAILABILITYREPORT))
 	->setNavigation((new CList())->addItem(new CBreadcrumbs([

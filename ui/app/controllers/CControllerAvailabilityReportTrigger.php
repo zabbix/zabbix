@@ -33,30 +33,14 @@ class CControllerAvailabilityReportTrigger extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot display availability report.'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
-			);
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)) {
-			return false;
-		}
-
-		$trigger = API::Trigger()->get([
-			'countOutput' => true,
-			'triggerids' => $this->getInput('triggerid')
-		]);
-
-		return (bool) $trigger;
+		return $this->checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT);
 	}
 
 	protected function doAction(): void {
