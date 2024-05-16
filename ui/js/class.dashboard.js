@@ -2154,7 +2154,7 @@ class CDashboard {
 					for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
 						const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
 
-						if (circular_references.has(reference)) {
+						if (reference !== '' && circular_references.has(reference)) {
 							circular_references_next.add(fields.reference);
 
 							referable_widgets.delete(widget);
