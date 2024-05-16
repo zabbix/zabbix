@@ -70,7 +70,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 			}
 
 			if (!preg_match('/^\d+\.\d+$/', $version['version'])) {
-				error('Invalid version.');
+				error(sprintf('Invalid parameter "%1$s": %2$s.', $path.'/version', 'invalid version'));
 
 				return false;
 			}
@@ -90,13 +90,15 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 
 			if (!is_numeric($version['latest_release']['created'])
 					|| bccomp($version['latest_release']['created'], ZBX_MAX_DATE) > 0) {
-				error('Invalid timestamp.');
+				error(sprintf('Invalid parameter "%1$s": %2$s.', $path.'/latest_release/created', 'invalid timestamp'));
 
 				return false;
 			}
 
 			if (!preg_match('/^\d+\.\d+\.\d+(?:(alpha|beta|rc)\d+)?$/', $version['latest_release']['release'])) {
-				error('Invalid release version.');
+				error(sprintf('Invalid parameter "%1$s": %2$s.', $path.'/latest_release/release',
+					'invalid release version'
+				));
 
 				return false;
 			}
