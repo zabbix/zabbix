@@ -1439,8 +1439,6 @@ static void	zbx_check_db(void)
 			goto out;
 	}
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	if (SUCCEED == zbx_db_field_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
@@ -1473,8 +1471,6 @@ static void	zbx_check_db(void)
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
-
-	zbx_db_close();
 out:
 	if (SUCCEED != ret)
 	{
@@ -1508,12 +1504,8 @@ static void	zbx_db_save_server_status(void)
 
 	zbx_json_close(&json);
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	if (ZBX_DB_OK > zbx_db_execute("update config set server_status='%s'", json.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to save server status to database");
-
-	zbx_db_close();
 
 	zbx_json_free(&json);
 }
@@ -2269,6 +2261,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
@@ -2304,6 +2297,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
+	zbx_db_close();
 
 	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))
 	{

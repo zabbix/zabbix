@@ -307,8 +307,6 @@ static void	pb_init_state(zbx_pb_t *pb)
 		return;
 	}
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	history_ret = pb_check_unsent_rows("proxy_history", "history_lastid", &lastid, &maxid);
 	pb->history_lastid_db = maxid;
 	pb->history_lastid_sent = lastid;
@@ -316,16 +314,12 @@ static void	pb_init_state(zbx_pb_t *pb)
 	discovery_ret = pb_check_unsent_rows("proxy_dhistory", "dhistory_lastid", &lastid, &maxid);
 	autoreg_ret = pb_check_unsent_rows("proxy_autoreg_host", "autoreg_host_lastid", &lastid, &maxid);
 
-	zbx_db_close();
-
 	if (ZBX_PB_MODE_DISK == pb->mode)
 		pb_set_state(pb, PB_DATABASE, "proxy buffer initialized in disk mode");
 	else if (SUCCEED == history_ret || SUCCEED == discovery_ret || SUCCEED == autoreg_ret)
 		pb_set_state(pb, PB_DATABASE, "unsent database records found");
 	else
 		pb_set_state(pb, PB_MEMORY, "no unsent database records found");
-
-	zbx_db_close();
 }
 
 zbx_pb_t	*get_pb_data(void)
