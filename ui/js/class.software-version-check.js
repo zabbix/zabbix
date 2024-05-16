@@ -22,7 +22,11 @@ class CSoftwareVersionCheck {
 	#data = {};
 
 	constructor() {
-		this.#getSavedData();
+		this.#startUpdating(ZBX_SOFTWARE_VERSION_CHECK_DELAY);
+	}
+
+	#startUpdating(delay) {
+		setTimeout(() => this.#getSavedData(), delay * 1000);
 	}
 
 	#getSavedData() {
@@ -42,7 +46,7 @@ class CSoftwareVersionCheck {
 				}
 
 				if ('delay' in response) {
-					setTimeout(() => this.#getSavedData(), response.delay * 1000);
+					this.#startUpdating(response.delay);
 				}
 				else {
 					this.#data.versions = [];
@@ -96,7 +100,7 @@ class CSoftwareVersionCheck {
 					throw {error: response.error};
 				}
 
-				setTimeout(() => this.#getSavedData(), response.delay * 1000);
+				this.#startUpdating(response.delay);
 			})
 			.catch(exception => {
 				console.log('Could not update data', exception);
