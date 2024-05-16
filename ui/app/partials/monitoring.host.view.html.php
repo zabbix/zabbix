@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -27,22 +22,22 @@
 $form = (new CForm())
 	->setName('host_view');
 
-$table = (new CTableInfo());
-
 $view_url = $data['view_curl']->getUrl();
 
-$table->setHeader([
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
-	(new CColHeader(_('Interface'))),
-	(new CColHeader(_('Availability'))),
-	(new CColHeader(_('Tags'))),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url),
-	(new CColHeader(_('Latest data'))),
-	(new CColHeader(_('Problems'))),
-	(new CColHeader(_('Graphs'))),
-	(new CColHeader(_('Dashboards'))),
-	(new CColHeader(_('Web')))
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+		(new CColHeader(_('Interface'))),
+		(new CColHeader(_('Availability'))),
+		(new CColHeader(_('Tags'))),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url),
+		(new CColHeader(_('Latest data'))),
+		(new CColHeader(_('Problems'))),
+		(new CColHeader(_('Graphs'))),
+		(new CColHeader(_('Dashboards'))),
+		(new CColHeader(_('Web')))
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
@@ -164,6 +159,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 	]);
 }
 
-$form->addItem([$table,	$data['paging']]);
+$form->addItem($table);
 
 echo $form;

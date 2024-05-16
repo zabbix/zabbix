@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_DBCONFIG_H
@@ -224,6 +219,13 @@ typedef struct
 }
 ZBX_DC_SCRIPTITEM;
 
+typedef struct
+{
+	const char		*script;
+	zbx_vector_ptr_t	params;
+}
+ZBX_DC_BROWSERITEM;
+
 typedef union
 {
 	ZBX_DC_TRAPITEM		*trapitem;
@@ -238,6 +240,7 @@ typedef union
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
+	ZBX_DC_BROWSERITEM	*browseritem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -763,6 +766,10 @@ typedef struct
 }
 zbx_dc_corr_condition_t;
 
+ZBX_PTR_VECTOR_DECL(dc_corr_condition_ptr, zbx_dc_corr_condition_t *)
+
+int     zbx_dc_corr_condition_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
 	zbx_uint64_t	corr_operationid;
@@ -771,15 +778,19 @@ typedef struct
 }
 zbx_dc_corr_operation_t;
 
+ZBX_PTR_VECTOR_DECL(dc_corr_operation_ptr, zbx_dc_corr_operation_t *)
+
+int     zbx_dc_corr_operation_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
-	zbx_uint64_t		correlationid;
-	const char		*name;
-	const char		*formula;
-	unsigned char		evaltype;
+	zbx_uint64_t				correlationid;
+	const char				*name;
+	const char				*formula;
+	unsigned char				evaltype;
 
-	zbx_vector_ptr_t	conditions;
-	zbx_vector_ptr_t	operations;
+	zbx_vector_dc_corr_condition_ptr_t	conditions;
+	zbx_vector_dc_corr_operation_ptr_t	operations;
 }
 zbx_dc_correlation_t;
 
@@ -816,7 +827,7 @@ typedef struct
 	const char	*name;
 	const char	*value;
 }
-zbx_dc_scriptitem_param_t;
+zbx_dc_item_param_t;
 
 typedef struct
 {
@@ -1013,7 +1024,7 @@ typedef struct
 	zbx_hashset_t		gmacro_kv;
 	zbx_hashset_t		hmacro_kv;
 	zbx_hashset_t		preprocops;
-	zbx_hashset_t		itemscript_params;
+	zbx_hashset_t		items_params;
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;

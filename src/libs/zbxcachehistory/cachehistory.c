@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcachehistory.h"
@@ -70,8 +65,8 @@ static zbx_history_sync_f	sync_history_cb = NULL;
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
-/* the maximum number of characters for history cache values */
-#define ZBX_HISTORY_VALUE_LEN	(1024 * 64)
+/* the maximum number of characters for history cache values (except binary) */
+#define ZBX_HISTORY_VALUE_LEN		(1024 * 64)
 
 typedef struct
 {
@@ -1036,7 +1031,7 @@ typedef struct
 	zbx_uint64_t		itemid;
 	char			*name;
 	zbx_history_sync_item_t	*item;
-	zbx_vector_tags_t	item_tags;
+	zbx_vector_tags_ptr_t	item_tags;
 }
 zbx_item_info_t;
 
@@ -1110,7 +1105,7 @@ static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vect
 		{
 			if (NULL != item_info)
 			{
-				zbx_vector_tags_sort(&item_info->item_tags, zbx_compare_tags);
+				zbx_vector_tags_ptr_sort(&item_info->item_tags, zbx_compare_tags);
 			}
 			if (NULL == (item_info = (zbx_item_info_t *)zbx_hashset_search(items_info, &itemid)))
 			{
@@ -1122,12 +1117,12 @@ static void	db_get_item_tags_by_itemid(zbx_hashset_t *items_info, const zbx_vect
 		item_tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(*item_tag));
 		item_tag->tag = zbx_strdup(NULL, row[1]);
 		item_tag->value = zbx_strdup(NULL, row[2]);
-		zbx_vector_tags_append(&item_info->item_tags, item_tag);
+		zbx_vector_tags_ptr_append(&item_info->item_tags, item_tag);
 	}
 
 	if (NULL != item_info)
 	{
-		zbx_vector_tags_sort(&item_info->item_tags, zbx_compare_tags);
+		zbx_vector_tags_ptr_sort(&item_info->item_tags, zbx_compare_tags);
 	}
 
 	zbx_db_free_result(result);
@@ -1156,8 +1151,8 @@ static void	db_get_items_info_by_itemid(zbx_hashset_t *items_info, const zbx_vec
  ******************************************************************************/
 static void	zbx_item_info_clean(zbx_item_info_t *item_info)
 {
-	zbx_vector_tags_clear_ext(&item_info->item_tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&item_info->item_tags);
+	zbx_vector_tags_ptr_clear_ext(&item_info->item_tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&item_info->item_tags);
 	zbx_free(item_info->name);
 }
 
@@ -1486,7 +1481,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 		item_info.itemid = item->itemid;
 		item_info.name = NULL;
 		item_info.item = item;
-		zbx_vector_tags_create(&item_info.item_tags);
+		zbx_vector_tags_ptr_create(&item_info.item_tags);
 		zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 	}
 
@@ -1514,7 +1509,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 			item_info.itemid = item->itemid;
 			item_info.name = NULL;
 			item_info.item = item;
-			zbx_vector_tags_create(&item_info.item_tags);
+			zbx_vector_tags_ptr_create(&item_info.item_tags);
 			zbx_hashset_insert(&items_info, &item_info, sizeof(item_info));
 		}
 	}
@@ -1654,14 +1649,14 @@ static void	DCsync_trends(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_ptr_t *inventory_values)
+static void	DCadd_update_inventory_sql(size_t *sql_offset, const zbx_vector_inventory_value_ptr_t *inventory_values)
 {
 	char	*value_esc;
 	int	i;
 
 	for (i = 0; i < inventory_values->values_num; i++)
 	{
-		const zbx_inventory_value_t	*inventory_value = (zbx_inventory_value_t *)inventory_values->values[i];
+		const zbx_inventory_value_t	*inventory_value = inventory_values->values[i];
 
 		value_esc = zbx_db_dyn_escape_field("host_inventory", inventory_value->field_name,
 				inventory_value->value);
@@ -1740,7 +1735,8 @@ void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num)
  *             inventory_values - inventory values                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff, const zbx_vector_ptr_t *inventory_values)
+void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
+		const zbx_vector_inventory_value_ptr_t *inventory_values)
 {
 	size_t	sql_offset = 0;
 	int	i;
@@ -2029,7 +2025,10 @@ static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_u
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, ZBX_HISTORY_VALUE_LEN) + 1;
+		size_t	maxlen = (ITEM_VALUE_TYPE_BIN == item_value_type ? ZBX_HISTORY_BIN_VALUE_LEN :
+				ZBX_HISTORY_VALUE_LEN);
+
+		item_value->value.value_str.len = (size_t)zbx_db_strlen_n(value_orig, maxlen) + 1;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
 
 		item_value->value.value_str.pvalue = string_values_offset;
@@ -2922,7 +2921,7 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
  *           zbx_hc_push_items() function after they have been processed.         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items)
+void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items)
 {
 	zbx_binary_heap_elem_t	*elem;
 	zbx_hc_item_t		*item;
@@ -2930,8 +2929,8 @@ void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items)
 	while (ZBX_HC_SYNC_MAX > history_items->values_num && FAIL == zbx_binary_heap_empty(&cache->history_queue))
 	{
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
-		item = (zbx_hc_item_t *)elem->data;
-		zbx_vector_ptr_append(history_items, item);
+		item = elem->data;
+		zbx_vector_hc_item_ptr_append(history_items, item);
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
 	}
@@ -2945,7 +2944,7 @@ void	zbx_hc_pop_items(zbx_vector_ptr_t *history_items)
  *             history_items - [IN] the history items                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history_items)
+void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t *history_items)
 {
 	int		i, history_num = 0;
 	zbx_hc_item_t	*item;
@@ -2954,7 +2953,7 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history
 	/* change item's history data until it is pushed back to history queue */
 	for (i = 0; i < history_items->values_num; i++)
 	{
-		item = (zbx_hc_item_t *)history_items->values[i];
+		item = history_items->values[i];
 
 		if (ZBX_HC_ITEM_STATUS_BUSY == item->status)
 			continue;
@@ -2975,7 +2974,7 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_ptr_t *history
  *           removed from history index.                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_push_items(zbx_vector_ptr_t *history_items)
+void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 {
 	int		i;
 	zbx_hc_item_t	*item;
@@ -2983,7 +2982,7 @@ void	zbx_hc_push_items(zbx_vector_ptr_t *history_items)
 
 	for (i = 0; i < history_items->values_num; i++)
 	{
-		item = (zbx_hc_item_t *)history_items->values[i];
+		item = history_items->values[i];
 
 		switch (item->status)
 		{

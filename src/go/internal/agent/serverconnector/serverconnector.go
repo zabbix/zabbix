@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package serverconnector
@@ -32,15 +27,15 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxcomms"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
+	"golang.zabbix.com/sdk/log"
 )
 
 const defaultAgentPort = 10050
@@ -66,6 +61,7 @@ type activeChecksRequest struct {
 	Request        string `json:"request"`
 	Host           string `json:"host"`
 	Version        string `json:"version"`
+	Variant        int    `json:"variant"`
 	Session        string `json:"session"`
 	ConfigRevision uint64 `json:"config_revision"`
 	HostMetadata   string `json:"host_metadata,omitempty"`
@@ -94,6 +90,8 @@ type heartbeatMessage struct {
 	Request            string `json:"request"`
 	Host               string `json:"host"`
 	HeartbeatFrequency int    `json:"heartbeat_freq"`
+	Version            string `json:"version"`
+	Variant            int    `json:"variant"`
 }
 
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
@@ -154,7 +152,8 @@ func (c *Connector) refreshActiveChecks() {
 	a := activeChecksRequest{
 		Request:        "active checks",
 		Host:           c.hostname,
-		Version:        version.Short(),
+		Version:        version.Long(),
+		Variant:        agent.Variant,
 		Session:        c.session,
 		ConfigRevision: c.configRevision,
 	}
@@ -352,6 +351,8 @@ func (c *Connector) sendHeartbeatMsg() {
 		Request:            "active check heartbeat",
 		HeartbeatFrequency: c.options.HeartbeatFrequency,
 		Host:               c.hostname,
+		Version:            version.Long(),
+		Variant:            agent.Variant,
 	}
 
 	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.address)

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package zbxlib
@@ -46,11 +41,12 @@ static void	free_global_regexp(zbx_vector_expression_t *regexps)
 
 */
 import "C"
+
 import (
 	"errors"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 func NewGlobalRegexp() (grxp unsafe.Pointer) {
@@ -68,7 +64,7 @@ func AddGlobalRegexp(grxp unsafe.Pointer, name, body string, expr_type int, deli
 	cbody := C.CString(body)
 	log.Tracef("Calling C function \"zbx_add_regexp_ex()\"")
 	C.zbx_add_regexp_ex(C.zbx_vector_expression_lp_t(grxp), cname, cbody, C.int(expr_type), C.char(delim),
-			C.int(mode))
+		C.int(mode))
 	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(cname))
 	log.Tracef("Calling C function \"free()\"")
@@ -100,7 +96,7 @@ func MatchGlobalRegexp(
 
 	log.Tracef("Calling C function \"zbx_regexp_sub_ex()\"")
 	ret := C.zbx_regexp_sub_ex(C.zbx_vector_expression_lp_t(grxp), cvalue, cpattern, C.int(mode), ctemplate,
-			&coutput)
+		&coutput)
 	switch ret {
 	case C.ZBX_REGEXP_MATCH:
 		match = true

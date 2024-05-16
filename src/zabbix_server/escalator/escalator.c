@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "escalator.h"
@@ -100,7 +95,7 @@ typedef struct
 	zbx_vector_uint64_t	serviceids;
 
 	/* the service.read.tag.* and service.write.tag.* rules */
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 }
 zbx_service_role_t;
 
@@ -321,7 +316,7 @@ static int	check_parent_service_intersection(zbx_vector_uint64_t *parent_ids, zb
 	return PERM_DENY;
 }
 
-static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_vector_tags_t *tags)
+static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_vector_tags_ptr_t *tags)
 {
 	zbx_db_result_t	result;
 	char		*sql = NULL;
@@ -372,7 +367,8 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 	return perm;
 }
 
-static int	check_service_tags_rule_match(const zbx_vector_tags_t *service_tags, const zbx_vector_tags_t *role_tags)
+static int	check_service_tags_rule_match(const zbx_vector_tags_ptr_t *service_tags,
+		const zbx_vector_tags_ptr_t *role_tags)
 {
 	for (int i = 0; i < role_tags->values_num; i++)
 	{
@@ -437,7 +433,7 @@ static void	zbx_db_cache_service_role(zbx_service_role_t *role)
 				tag = (zbx_tag_t*)zbx_malloc(NULL, sizeof(zbx_tag_t));
 				tag->tag = zbx_strdup(NULL, value_str);
 				tag->value = NULL;
-				zbx_vector_tags_append(&role->tags, tag);
+				zbx_vector_tags_ptr_append(&role->tags, tag);
 			}
 			else if (0 == strcmp("read.tag.value", name) || 0 == strcmp("write.tag.value", name))
 			{
@@ -514,7 +510,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	if (NULL == (role = zbx_hashset_search(roles, &role_local)))
 	{
 		zbx_vector_uint64_create(&role_local.serviceids);
-		zbx_vector_tags_create(&role_local.tags);
+		zbx_vector_tags_ptr_create(&role_local.tags);
 		zbx_db_cache_service_role(&role_local);
 		role = zbx_hashset_insert(roles, &role_local, sizeof(role_local));
 	}
@@ -2899,7 +2895,7 @@ static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, z
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
 
-			zbx_vector_tags_append(&last_service->service_tags, tag);
+			zbx_vector_tags_ptr_append(&last_service->service_tags, tag);
 			continue;
 		}
 
@@ -2909,7 +2905,7 @@ static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, z
 		service->description = zbx_strdup(NULL, row[2]);
 		zbx_vector_uint64_create(&service->eventids);
 		zbx_vector_db_event_create(&service->events);
-		zbx_vector_tags_create(&service->service_tags);
+		zbx_vector_tags_ptr_create(&service->service_tags);
 
 		if (FAIL == zbx_db_is_null(row[3]))
 		{
@@ -2918,7 +2914,7 @@ static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, z
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
 
-			zbx_vector_tags_append(&service->service_tags, tag);
+			zbx_vector_tags_ptr_append(&service->service_tags, tag);
 		}
 
 		zbx_vector_db_service_append(services, service);
@@ -3032,15 +3028,15 @@ static void	service_clean(zbx_db_service *service)
 	zbx_free(service->description);
 	zbx_vector_db_event_destroy(&service->events);
 	zbx_vector_uint64_destroy(&service->eventids);
-	zbx_vector_tags_clear_ext(&service->service_tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&service->service_tags);
+	zbx_vector_tags_ptr_clear_ext(&service->service_tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&service->service_tags);
 	zbx_free(service);
 }
 
 static void	service_role_clean(zbx_service_role_t *role)
 {
-	zbx_vector_tags_clear_ext(&role->tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&role->tags);
+	zbx_vector_tags_ptr_clear_ext(&role->tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&role->tags);
 	zbx_vector_uint64_destroy(&role->serviceids);
 }
 

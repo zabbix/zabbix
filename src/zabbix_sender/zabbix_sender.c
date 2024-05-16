@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "send_buffer.h"
@@ -30,9 +25,12 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxfile.h"
+#include "zbxbincommon.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
 #endif
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
@@ -927,7 +925,7 @@ static void	parse_commandline(int argc, char **argv)
 					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_print_version(title_message);
@@ -1052,7 +1050,7 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #endif
 			default:
-				zbx_print_usage(usage_message, zbx_progname);
+				zbx_print_usage(zbx_progname, usage_message);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -1290,7 +1288,7 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		printf("Try '%s --help' for more information.\n", zbx_progname);
 		exit(EXIT_FAILURE);
 	}
@@ -1344,7 +1342,7 @@ static void	parse_commandline(int argc, char **argv)
 					)
 	{
 		zbx_error("too few or mutually exclusive options used");
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1435,7 +1433,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif

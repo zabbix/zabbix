@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
@@ -1557,7 +1552,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 		// Check that nothing is returned in the widget if such outcome is expected.
 		if (CTestArrayHelper::get($data, 'check.empty', false)) {
-			$this->assertTrue($widget->query('class:nothing-to-show')->one()->isTextPresent('No data found.'));
+			$this->assertTrue($widget->query('class:no-data-message')->one()->isTextPresent('No data found'));
 
 			return;
 		}
@@ -1671,7 +1666,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		else {
 			$widget->query('xpath:.//div[@class="average-bg"]//a[@data-hintbox-static="1"]')->one()->click();
 		}
-		$popup = $this->query('xpath://div[@class="overlay-dialogue"]//table')->asTable()->one();
+		$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]//table')->asTable()->one();
 		$this->assertEquals($rows_count, $popup->getRows()->count());
 
 		$row = $popup->findRow('Problem', $expected_popup['fields']['Problem'])->asTableRow();

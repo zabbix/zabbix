@@ -46,7 +46,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|HPE MSA: Get data|<p>The JSON with result of API requests.</p>|Script|hpe.msa.get.data|
+|Get data|<p>The JSON with result of API requests.</p>|Script|hpe.msa.get.data|
 |Get system|<p>The system data.</p>|Dependent item|hpe.msa.get.system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system[0]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get FRU|<p>FRU data.</p>|Dependent item|hpe.msa.get.fru<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['frus']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get fans|<p>Fans data.</p>|Dependent item|hpe.msa.get.fans<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['fans']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -69,7 +69,7 @@ This template has been tested on:
 |System name|<p>The name of the storage system.</p>|Dependent item|hpe.msa.system.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['system-name']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Vendor name|<p>The vendor name.</p>|Dependent item|hpe.msa.system.vendor_name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['vendor-name']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |System health|<p>System health status.</p>|Dependent item|hpe.msa.system.health<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric']`</p><p>⛔️Custom on fail: Set value to: `4`</p></li></ul>|
-|HPE MSA: Service ping|<p>Check if HTTP/HTTPS service accepts TCP connections.</p>|Simple check|net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service ping|<p>Check if HTTP/HTTPS service accepts TCP connections.</p>|Simple check|net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 

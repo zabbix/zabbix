@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "listener.h"
@@ -49,7 +44,8 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 	char			**value;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION_SHORT, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(&j, ZBX_PROTO_TAG_VARIANT, ZBX_PROGRAM_VARIANT_AGENT);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_REQUEST, tmp, sizeof(tmp), NULL))
 	{

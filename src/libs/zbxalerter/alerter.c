@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxalerter.h"
@@ -164,13 +159,13 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password,
 			*inreplyto, *expression, *recovery_expression, *error = NULL;
 	unsigned short	smtp_port;
-	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
+	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format;
 	int		object, source, ret;
 
 	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &source, &object, &objectid,
 			&sendto, &subject, &message, &smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security,
 			&smtp_verify_peer, &smtp_verify_host, &smtp_authentication, &username, &password,
-			&content_type, &expression, &recovery_expression);
+			&message_format, &expression, &recovery_expression);
 
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
 
@@ -202,7 +197,7 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
-			content_type, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
+			message_format, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
 
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 

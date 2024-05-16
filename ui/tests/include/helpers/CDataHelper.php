@@ -1,22 +1,17 @@
 <?php
 
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once 'vendor/autoload.php';
@@ -424,11 +419,26 @@ class CDataHelper extends CAPIHelper {
 	/**
 	 * Remove item data from history and trends tables.
 	 *
-	 * @param string $itemid		item id
+	 * @param string|array $itemids		item id(s)
 	 */
-	public static function removeItemData($itemid) {
-		DBexecute('DELETE FROM history'.self::getItemDataTableSuffix($itemid).' WHERE itemid='.zbx_dbstr($itemid));
-		DBexecute('DELETE FROM trends WHERE itemid='.zbx_dbstr($itemid));
+	public static function removeItemData($itemids) {
+		$groups = [];
+
+		if (!is_array($itemids)) {
+			$itemids = [$itemids];
+		}
+
+		foreach ($itemids as $itemid) {
+			$groups[self::getItemDataTableSuffix($itemid)][] = zbx_dbstr($itemid);
+		}
+
+		foreach (array_keys($groups) as $suffix) {
+			DBexecute('DELETE FROM history'.$suffix.' WHERE itemid IN ('.implode(',', $groups[$suffix]).')');
+
+			if ($suffix === '_uint' || $suffix === '') {
+				DBexecute('DELETE FROM trends'.$suffix.' WHERE itemid IN ('.implode(',', $groups[$suffix]).')');
+			}
+		}
 	}
 
 	/**

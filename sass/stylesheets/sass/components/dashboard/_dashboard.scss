@@ -409,6 +409,39 @@
 				bottom: -8px;
 			}
 		}
+
+		&.no-data {
+			&:not(.no-data-without-icon) {
+				height: 100%;
+
+				thead {
+					th, td {
+						height: 1%;
+					}
+				}
+
+				tbody {
+					tr {
+						td {
+							vertical-align: middle;
+						}
+
+						&:last-child {
+							td {
+								border-bottom: 0;
+							}
+						}
+
+						.no-data-message {
+							&[class^="zi-"], &[class*=" zi-"] {
+								margin-top: 0;
+								margin-bottom: 0;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	&.no-padding {

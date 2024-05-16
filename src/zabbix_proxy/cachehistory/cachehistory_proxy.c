@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "cachehistory_proxy.h"
@@ -367,13 +362,13 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 
 	int				history_num, txn_rc = ZBX_DB_OK;
 	time_t				sync_start;
-	zbx_vector_ptr_t		history_items;
+	zbx_vector_hc_item_ptr_t	history_items;
 	zbx_vector_item_diff_ptr_t	item_diff;
 	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
 
 	ZBX_UNUSED(config_history_storage_pipelines);
-	zbx_vector_ptr_create(&history_items);
-	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
+	zbx_vector_hc_item_ptr_create(&history_items);
+	zbx_vector_hc_item_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 	zbx_vector_item_diff_ptr_create(&item_diff);
 
 	sync_start = time(NULL);
@@ -433,7 +428,7 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 			zbx_dbcache_unlock();
 		}
 
-		zbx_vector_ptr_clear(&history_items);
+		zbx_vector_hc_item_ptr_clear(&history_items);
 		zbx_vector_item_diff_ptr_clear_ext(&item_diff, zbx_item_diff_free);
 
 		/* Exit from sync loop if we have spent too much time here */
@@ -443,5 +438,5 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
 
 	zbx_vector_item_diff_ptr_destroy(&item_diff);
-	zbx_vector_ptr_destroy(&history_items);
+	zbx_vector_hc_item_ptr_destroy(&history_items);
 }

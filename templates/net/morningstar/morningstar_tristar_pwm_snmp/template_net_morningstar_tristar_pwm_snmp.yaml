@@ -1091,7 +1091,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: GRAPH

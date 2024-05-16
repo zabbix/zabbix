@@ -35,7 +35,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: e9f5ba061b7e41e7bac26aeec105f4da
-          name: 'TP-LINK: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -49,14 +49,14 @@ zabbix_export:
           triggers:
             - uuid: 5b86c558f99d4ff5a8abca830df6e86e
               expression: 'max(/TP-LINK by SNMP/icmpping,#3)=0'
-              name: 'TP-LINK: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 71567de591174a64aafd48aebae0b4f4
-          name: 'TP-LINK: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -70,11 +70,11 @@ zabbix_export:
           triggers:
             - uuid: 421d12d2c2a0405ba31c869c4d481b70
               expression: 'min(/TP-LINK by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TP-LINK by SNMP/icmppingloss,5m)<100'
-              name: 'TP-LINK: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'TP-LINK: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/TP-LINK by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -82,7 +82,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: dde3ad74c18847f4a91bee29b20a6364
-          name: 'TP-LINK: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -96,13 +96,14 @@ zabbix_export:
           triggers:
             - uuid: 4d1df00b9476483fa77e6064708abf58
               expression: 'avg(/TP-LINK by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'TP-LINK: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'TP-LINK: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/TP-LINK by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TP-LINK by SNMP/icmppingloss,5m)<100'
-                - name: 'TP-LINK: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/TP-LINK by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -122,7 +123,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 707bcd801726449d9a7d3de0fa650c0a
-          name: 'TP-LINK: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -135,7 +136,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 2b293fd8a3e346f9be437ae539dca3c3
-          name: 'TP-LINK: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -155,7 +156,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ae66a99ae15d4fe98e513745978c2ce4
-          name: 'TP-LINK: SNMP walk system CPUs'
+          name: 'SNMP walk system CPUs'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11863.6.4.1.1.1.1.1,1.3.6.1.4.1.11863.6.4.1.1.1.1.3]'
           key: system.cpu.walk
@@ -167,7 +168,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 4727c07daa0c413aa4bbc293198f9cde
-          name: 'TP-LINK: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -188,7 +189,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 1d20905fda0442b8b7b0eefcf473afd9
-          name: 'TP-LINK: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11863.6.1.1.6.0
           key: system.hw.firmware
@@ -209,7 +210,7 @@ zabbix_export:
           triggers:
             - uuid: ee797ebfc568468d8a3e9a8b388afb6d
               expression: 'last(/TP-LINK by SNMP/system.hw.firmware,#1)<>last(/TP-LINK by SNMP/system.hw.firmware,#2) and length(last(/TP-LINK by SNMP/system.hw.firmware))>0'
-              name: 'TP-LINK: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -218,7 +219,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: a571370a974c43deb9b5bb531d4dc4ce
-          name: 'TP-LINK: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11863.6.1.1.5.0
           key: system.hw.model
@@ -238,7 +239,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d2cc080e7e7f49a19bb27737c749ba36
-          name: 'TP-LINK: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11863.6.1.1.8.0
           key: system.hw.serialnumber
@@ -260,8 +261,8 @@ zabbix_export:
           triggers:
             - uuid: 57a906ac8f994ebaa2543a5eb4949db7
               expression: 'last(/TP-LINK by SNMP/system.hw.serialnumber,#1)<>last(/TP-LINK by SNMP/system.hw.serialnumber,#2) and length(last(/TP-LINK by SNMP/system.hw.serialnumber))>0'
-              name: 'TP-LINK: Device has been replaced'
-              event_name: 'TP-LINK: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -269,7 +270,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 964e73aa4e534b50bd1d93e137ca41f1
-          name: 'TP-LINK: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -293,7 +294,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 20690cbfeb924ec79f67200da3e0577c
-          name: 'TP-LINK: Hardware version(revision)'
+          name: 'Hardware version(revision)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11863.6.1.1.5.0
           key: system.hw.version
@@ -312,7 +313,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3cfe39b7d7f9401190de46aa86a04686
-          name: 'TP-LINK: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -322,7 +323,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -332,7 +333,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 72bc86c14222404cad76bc04836d11eb
-          name: 'TP-LINK: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -354,8 +355,8 @@ zabbix_export:
           triggers:
             - uuid: 367bce2d38fe4ecbbe23c34bc7ec6226
               expression: 'last(/TP-LINK by SNMP/system.name,#1)<>last(/TP-LINK by SNMP/system.name,#2) and length(last(/TP-LINK by SNMP/system.name))>0'
-              name: 'TP-LINK: System name has changed'
-              event_name: 'TP-LINK: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -365,7 +366,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: cb63d68e6d0143049534225d1d69da12
-          name: 'TP-LINK: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -375,7 +376,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -384,7 +385,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 78034b7a1d964b199f6a12c43821c27e
-          name: 'TP-LINK: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -403,7 +404,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 4ac2fe58877e4a8ab1dedb38fe41ef3e
-          name: 'TP-LINK: SNMP walk memory'
+          name: 'SNMP walk memory'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.11863.6.4.1.2.1.1.1,1.3.6.1.4.1.11863.6.4.1.2.1.1.2]'
           key: vm.memory.walk
@@ -415,13 +416,13 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b6cd5b22d8014aa18fdb7735d77cc84c
-          name: 'TP-LINK: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -435,12 +436,12 @@ zabbix_export:
           triggers:
             - uuid: 7b533ce3df8c4405a04f90dd1e850a32
               expression: 'max(/TP-LINK by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'TP-LINK: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'TP-LINK: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/TP-LINK by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -878,8 +879,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1063,10 +1064,13 @@ zabbix_export:
           value: '90'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '95'
         - macro: '{$IFCONTROL}'
@@ -1098,13 +1102,14 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
       dashboards:
         - uuid: badebb168da14b07856c04774bf07102
           name: 'Network interfaces'
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1728,13 +1733,13 @@ zabbix_export:
   triggers:
     - uuid: 63b45803131d4391abfa313a222339e5
       expression: '(last(/TP-LINK by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/TP-LINK by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/TP-LINK by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/TP-LINK by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'TP-LINK: Host has been restarted'
-      event_name: 'TP-LINK: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'TP-LINK: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/TP-LINK by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

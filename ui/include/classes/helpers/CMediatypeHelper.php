@@ -1,21 +1,16 @@
 <?php
 /*
- ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -60,7 +55,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_GMAIL => [
 				'name' => 'Gmail',
@@ -71,7 +66,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_GMAIL_RELAY => [
 				'name' => 'Gmail relay',
@@ -82,7 +77,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_OFFICE365 => [
 				'name' => 'Office365',
@@ -93,7 +88,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_OFFICE365_RELAY => [
 				'name' => 'Office365 relay',
@@ -104,7 +99,7 @@ class CMediatypeHelper {
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'content_type' => SMTP_MESSAGE_FORMAT_HTML
+				'message_format' => ZBX_MEDIA_MESSAGE_FORMAT_HTML
 			]
 		];
 
@@ -398,7 +393,7 @@ class CMediatypeHelper {
 			];
 		}
 
-		if ($media_type == MEDIA_TYPE_EMAIL && $message_format == SMTP_MESSAGE_FORMAT_HTML) {
+		if ($media_type == MEDIA_TYPE_EMAIL && $message_format == ZBX_MEDIA_MESSAGE_FORMAT_HTML) {
 			return [
 				'subject' => $message_templates[$message_type]['template']['subject'],
 				'message' => $message_templates[$message_type]['template']['html']

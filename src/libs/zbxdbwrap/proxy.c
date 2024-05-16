@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbwrap.h"
@@ -423,12 +418,12 @@ int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const 
 int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts)
 {
 	int				i, ret = FAIL;
-	zbx_vector_ptr_t		interfaces;
+	zbx_vector_availability_ptr_t	interfaces;
 	zbx_interface_availability_t	*ia;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&interfaces);
+	zbx_vector_availability_ptr_create(&interfaces);
 
 	if (SUCCEED != zbx_dc_get_interfaces_availability(&interfaces, ts))
 		goto out;
@@ -437,7 +432,7 @@ int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts)
 
 	for (i = 0; i < interfaces.values_num; i++)
 	{
-		ia = (zbx_interface_availability_t *)interfaces.values[i];
+		ia = interfaces.values[i];
 
 		zbx_json_addobject(json, NULL);
 		zbx_json_adduint64(json, ZBX_PROTO_TAG_INTERFACE_ID, ia->interfaceid);
@@ -452,8 +447,8 @@ int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts)
 
 	ret = SUCCEED;
 out:
-	zbx_vector_ptr_clear_ext(&interfaces, (zbx_mem_free_func_t)zbx_interface_availability_free);
-	zbx_vector_ptr_destroy(&interfaces);
+	zbx_vector_availability_ptr_clear_ext(&interfaces, zbx_interface_availability_free);
+	zbx_vector_availability_ptr_destroy(&interfaces);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
