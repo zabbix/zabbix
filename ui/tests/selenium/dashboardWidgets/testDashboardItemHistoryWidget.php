@@ -54,7 +54,8 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' ON w.widgetid=wf.widgetid'.
+			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
 
 	public static function prepareData() {
@@ -161,12 +162,17 @@ class testDashboardItemHistoryWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.name',
-										'value' => 'Column_1'
+										'value' => 'Update column 1'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.0.itemid',
 										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Available memory'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EDCBA'
 									]
 								]
 							]
