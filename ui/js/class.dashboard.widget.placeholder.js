@@ -13,21 +13,21 @@
 **/
 
 
-const ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-widget-placeholder';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-widget-placeholder-box';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL = 'dashboard-widget-placeholder-label';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-widget-placeholder-resizing';
-
-const WIDGET_PLACEHOLDER_STATE_ADD_NEW = 0;
-const WIDGET_PLACEHOLDER_STATE_RESIZING = 1;
-const WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
-
-const WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET = 'widget-placeholder-add-new-widget';
-
 /**
  * New widget placeholder class.
  */
 class CDashboardWidgetPlaceholder {
+
+	static ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-widget-placeholder';
+	static ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-widget-placeholder-box';
+	static ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL = 'dashboard-widget-placeholder-label';
+	static ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-widget-placeholder-resizing';
+
+	static WIDGET_PLACEHOLDER_STATE_ADD_NEW = 0;
+	static WIDGET_PLACEHOLDER_STATE_RESIZING = 1;
+	static WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
+
+	static WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET = 'widget-placeholder-add-new-widget';
 
 	/**
 	 * @type {HTMLDivElement}
@@ -75,13 +75,13 @@ class CDashboardWidgetPlaceholder {
 		this.#cell_width = cell_width;
 		this.#cell_height = cell_height;
 
-		this.#target.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER);
+		this.#target.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER);
 
 		this.#placeholder_box = document.createElement('div');
-		this.#placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_BOX);
+		this.#placeholder_box.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_BOX);
 
 		this.#placeholder_box_label = document.createElement('div');
-		this.#placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
+		this.#placeholder_box_label.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
 
 		this.#placeholder_box_label_wrap = document.createElement('div');
 
@@ -89,7 +89,7 @@ class CDashboardWidgetPlaceholder {
 		this.#placeholder_box.appendChild(this.#placeholder_box_label);
 		this.#target.appendChild(this.#placeholder_box);
 
-		this.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW);
+		this.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_ADD_NEW);
 	}
 
 	/**
@@ -112,13 +112,13 @@ class CDashboardWidgetPlaceholder {
 		this.#target.classList.add(ZBX_STYLE_DISPLAY_NONE);
 
 		this.#target.classList.remove('disabled');
-		this.#placeholder_box.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
+		this.#placeholder_box.classList.remove(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
 		this.#placeholder_box_label_wrap.textContent = '';
 
 		this.#target.removeEventListener('click', this.#listeners.onAddNewClick);
 
 		switch (state) {
-			case WIDGET_PLACEHOLDER_STATE_ADD_NEW:
+			case CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_ADD_NEW:
 				const link = document.createElement('a');
 
 				link.textContent = t('Add a new widget');
@@ -130,13 +130,13 @@ class CDashboardWidgetPlaceholder {
 
 				break;
 
-			case WIDGET_PLACEHOLDER_STATE_RESIZING:
-				this.#placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
+			case CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_RESIZING:
+				this.#placeholder_box.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
 				this.#placeholder_box_label_wrap.textContent = t('Release to create a widget.');
 
 				break;
 
-			case WIDGET_PLACEHOLDER_STATE_POSITIONING:
+			case CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_POSITIONING:
 				this.#placeholder_box_label_wrap.textContent = t('Click and drag to desired size.');
 
 				break;
@@ -218,7 +218,7 @@ class CDashboardWidgetPlaceholder {
 		onAddNewClick: (e) => {
 			e.stopImmediatePropagation();
 
-			this.fire(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET);
+			this.fire(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET);
 		}
 	};
 
