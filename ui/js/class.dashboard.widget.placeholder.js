@@ -27,33 +27,67 @@ const WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET = 'widget-placeholder-add-new-widg
 /**
  * New widget placeholder class.
  */
-class CDashboardWidgetPlaceholder extends CBaseComponent {
+class CDashboardWidgetPlaceholder {
+
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	#target;
+
+	/**
+	 * Dashboard grid cell width in percents.
+	 *
+	 * @type {number}
+	 */
+	#cell_width;
+
+	/**
+	 * Dashboard grid cell height in pixels.
+	 *
+	 * @type {number}
+	 */
+	#cell_height;
+
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	#placeholder_box;
+
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	#placeholder_box_label
+
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	#placeholder_box_label_wrap
 
 	/**
 	 * Create new widget placeholder instance.
 	 *
-	 * @param {int} cell_width   Dashboard grid cell width in percents.
-	 * @param {int} cell_height  Dashboard grid cell height in pixels.
+	 * @param {number} cell_width   Dashboard grid cell width in percents.
+	 * @param {number} cell_height  Dashboard grid cell height in pixels.
 	 */
 	constructor(cell_width, cell_height) {
-		super(document.createElement('div'));
+		this.#target = document.createElement('div');
 
-		this._cell_width = cell_width;
-		this._cell_height = cell_height;
+		this.#cell_width = cell_width;
+		this.#cell_height = cell_height;
 
-		this._target.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER);
+		this.#target.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER);
 
-		this._placeholder_box = document.createElement('div');
-		this._placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_BOX);
+		this.#placeholder_box = document.createElement('div');
+		this.#placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_BOX);
 
-		this._placeholder_box_label = document.createElement('div');
-		this._placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
+		this.#placeholder_box_label = document.createElement('div');
+		this.#placeholder_box_label.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
 
-		this._placeholder_box_label_wrap = document.createElement('div');
+		this.#placeholder_box_label_wrap = document.createElement('div');
 
-		this._placeholder_box_label.appendChild(this._placeholder_box_label_wrap);
-		this._placeholder_box.appendChild(this._placeholder_box_label);
-		this._target.appendChild(this._placeholder_box);
+		this.#placeholder_box_label.appendChild(this.#placeholder_box_label_wrap);
+		this.#placeholder_box.appendChild(this.#placeholder_box_label);
+		this.#target.appendChild(this.#placeholder_box);
 
 		this.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW);
 	}
@@ -64,7 +98,7 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {HTMLElement}
 	 */
 	getNode() {
-		return this._target;
+		return this.#target;
 	}
 
 	/**
@@ -75,11 +109,13 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	setState(state) {
-		this._target.classList.add(ZBX_STYLE_DISPLAY_NONE);
+		this.#target.classList.add(ZBX_STYLE_DISPLAY_NONE);
 
-		this._target.classList.remove('disabled');
-		this._placeholder_box.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
-		this._placeholder_box_label_wrap.textContent = '';
+		this.#target.classList.remove('disabled');
+		this.#placeholder_box.classList.remove(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
+		this.#placeholder_box_label_wrap.textContent = '';
+
+		this.#target.removeEventListener('click', this.#listeners.onAddNewClick);
 
 		switch (state) {
 			case WIDGET_PLACEHOLDER_STATE_ADD_NEW:
@@ -88,24 +124,20 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 				link.textContent = t('Add a new widget');
 				link.href = 'javascript:void(0)';
 
-				this._target.addEventListener('click', (e) => {
-					e.stopImmediatePropagation();
+				this.#placeholder_box_label_wrap.appendChild(link);
 
-					this.fire(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET);
-				});
-
-				this._placeholder_box_label_wrap.appendChild(link);
+				this.#target.addEventListener('click', this.#listeners.onAddNewClick);
 
 				break;
 
 			case WIDGET_PLACEHOLDER_STATE_RESIZING:
-				this._placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
-				this._placeholder_box_label_wrap.textContent = t('Release to create a widget.');
+				this.#placeholder_box.classList.add(ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
+				this.#placeholder_box_label_wrap.textContent = t('Release to create a widget.');
 
 				break;
 
 			case WIDGET_PLACEHOLDER_STATE_POSITIONING:
-				this._placeholder_box_label_wrap.textContent = t('Click and drag to desired size.');
+				this.#placeholder_box_label_wrap.textContent = t('Click and drag to desired size.');
 
 				break;
 		}
@@ -119,16 +151,16 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	resize() {
-		if (!this._target.classList.contains(ZBX_STYLE_DISPLAY_NONE)) {
-			this._placeholder_box_label.classList.remove(ZBX_STYLE_DISPLAY_NONE);
-			this._placeholder_box_label_wrap.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+		if (!this.#target.classList.contains(ZBX_STYLE_DISPLAY_NONE)) {
+			this.#placeholder_box_label.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+			this.#placeholder_box_label_wrap.classList.remove(ZBX_STYLE_DISPLAY_NONE);
 
-			if (this._placeholder_box_label.scrollWidth > this._placeholder_box_label.clientWidth) {
-				this._placeholder_box_label.classList.add(ZBX_STYLE_DISPLAY_NONE);
+			if (this.#placeholder_box_label.scrollWidth > this.#placeholder_box_label.clientWidth) {
+				this.#placeholder_box_label.classList.add(ZBX_STYLE_DISPLAY_NONE);
 			}
 
-			if (this._placeholder_box_label.scrollHeight > this._placeholder_box_label.clientHeight) {
-				this._placeholder_box_label_wrap.classList.add(ZBX_STYLE_DISPLAY_NONE);
+			if (this.#placeholder_box_label.scrollHeight > this.#placeholder_box_label.clientHeight) {
+				this.#placeholder_box_label_wrap.classList.add(ZBX_STYLE_DISPLAY_NONE);
 			}
 		}
 
@@ -141,12 +173,12 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	showAtPosition({x, y, width, height}) {
-		this._target.style.position = 'absolute';
-		this._target.style.left = `${x * this._cell_width}%`;
-		this._target.style.top = `${y * this._cell_height}px`;
-		this._target.style.width = `${width * this._cell_width}%`;
-		this._target.style.height = `${height * this._cell_height}px`;
-		this._target.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+		this.#target.style.position = 'absolute';
+		this.#target.style.left = `${x * this.#cell_width}%`;
+		this.#target.style.top = `${y * this.#cell_height}px`;
+		this.#target.style.width = `${width * this.#cell_width}%`;
+		this.#target.style.height = `${height * this.#cell_height}px`;
+		this.#target.classList.remove(ZBX_STYLE_DISPLAY_NONE);
 
 		this.resize();
 
@@ -159,12 +191,12 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	showAtDefaultPosition() {
-		this._target.style.position = null;
-		this._target.style.left = null;
-		this._target.style.top = null;
-		this._target.style.width = null;
-		this._target.style.height = null;
-		this._target.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+		this.#target.style.position = null;
+		this.#target.style.left = null;
+		this.#target.style.top = null;
+		this.#target.style.width = null;
+		this.#target.style.height = null;
+		this.#target.classList.remove(ZBX_STYLE_DISPLAY_NONE);
 
 		this.resize();
 
@@ -177,8 +209,59 @@ class CDashboardWidgetPlaceholder extends CBaseComponent {
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
 	hide() {
-		this._target.classList.add(ZBX_STYLE_DISPLAY_NONE);
+		this.#target.classList.add(ZBX_STYLE_DISPLAY_NONE);
 
 		return this;
+	}
+
+	#listeners = {
+		onAddNewClick: (e) => {
+			e.stopImmediatePropagation();
+
+			this.fire(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET);
+		}
+	};
+
+	/**
+	 * Attach event listener to widget placeholder events.
+	 *
+	 * @param {string}        type
+	 * @param {function}      listener
+	 * @param {Object|false}  options
+	 *
+	 * @returns {CDashboardWidgetPlaceholder}
+	 */
+	on(type, listener, options = false) {
+		this.#target.addEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Detach event listener from widget placeholder events.
+	 *
+	 * @param {string}        type
+	 * @param {function}      listener
+	 * @param {Object|false}  options
+	 *
+	 * @returns {CDashboardWidgetPlaceholder}
+	 */
+	off(type, listener, options = false) {
+		this.#target.removeEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Dispatch widget placeholder event.
+	 *
+	 * @param {string}  type
+	 * @param {Object}  detail
+	 * @param {Object}  options
+	 *
+	 * @returns {boolean}
+	 */
+	fire(type, detail = {}, options = {}) {
+		return this.#target.dispatchEvent(new CustomEvent(type, {...options, detail: {target: this, ...detail}}));
 	}
 }
