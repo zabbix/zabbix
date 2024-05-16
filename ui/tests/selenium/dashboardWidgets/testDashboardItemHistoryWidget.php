@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * @backup dashboard
+ * backup dashboard
  *
  * @onBefore prepareData
  */
@@ -1150,7 +1150,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 							'Name' => 'Available memory',
 							'Value'=> '9.37 GB' // value rounding is expected.
 						]
-						// TODO: ZBXNEXT-8316 Sub-issue (11).
+						// TODO: ZBX-24488 Sub-issue (6).
 //						[
 //							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
 //							'Available memory' => '8.44 GB' // value rounding is expected.
@@ -1187,7 +1187,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 //							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
 //							'Host name' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
 //						],
-//                          TODO: ZBXNEXT-8316 Sub-issue (11).
+//                          TODO: ZBX-24488 Sub-issue (6).
 ////						[
 ////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
 ////							'Host name' => STRING_255
@@ -1209,7 +1209,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 //							'Name' => 'Host name',
 //							'Value' => 'TEST'
 //						],
-//                          TODO: ZBXNEXT-8316 Sub-issue (11).
+//                          TODO: ZBX-24488 Sub-issue (6).
 ////						[
 ////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
 ////							'Name' => 'Host name',
@@ -1283,7 +1283,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 	}
 
 	/**
-	 * @backup !history, !history_uint, !history_str
+	 * backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
 	 */
