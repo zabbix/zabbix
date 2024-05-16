@@ -580,8 +580,7 @@ int	webdriver_find_element(zbx_webdriver_t *wd, const char *strategy, const char
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot find element with strategy:'%s' and selector:'%s': %s",
 				strategy, selector, *error);
 
-		webdriver_free_error(wd->error);
-		wd->error = NULL;
+		webdriver_discard_error(wd);
 		zbx_free(*error);
 		*element = NULL;
 	}
@@ -629,15 +628,11 @@ int	webdriver_find_elements(zbx_webdriver_t *wd, const char *strategy, const cha
 
 	if (SUCCEED != webdriver_session_query(wd, "POST", "elements", json.buffer, &jp, error))
 	{
-		/* throw exception in the case of connection errors */
-		if (0 == wd->data_offset)
-			goto out;
-
 		/* otherwise log the error and return NULL element */
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot find element with strategy:'%s' and selector:'%s': %s",
 				strategy, selector, *error);
 
-		zbx_free(*error);
+		goto out;
 	}
 	else
 	{
@@ -1092,10 +1087,7 @@ int	webdriver_has_error(zbx_webdriver_t *wd)
  ******************************************************************************/
 void	webdriver_set_error(zbx_webdriver_t *wd, char *message)
 {
-	if (NULL != wd->error)
-		webdriver_free_error(wd->error);
-
-	zbx_free(wd->last_error_message);
+	webdriver_discard_error(wd);
 	wd->last_error_message = message;
 }
 
@@ -1126,8 +1118,7 @@ int	webdriver_get_alert(zbx_webdriver_t *wd, char **text, char **error)
 		/* otherwise log the error and return NULL alert */
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot get alert text: %s", error);
 
-		webdriver_free_error(wd->error);
-		wd->error = NULL;
+		webdriver_discard_error(wd);
 		zbx_free(*error);
 		*text = NULL;
 	}
