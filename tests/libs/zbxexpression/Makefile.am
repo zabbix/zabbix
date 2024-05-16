@@ -1,14 +1,14 @@
 if SERVER
 SERVER_tests = \
-	evaluate \
-	evaluate_unknown \
+	zbx_evaluate \
+	zbx_evaluate_unknown \
 	evaluate_function \
-	evaluate_stl \
-	evaluate_percentage_deviations_in_remainder \
-	substitute_lld_macros \
-	macro_fmttime \
-	macro_functions \
-	valuemaps
+	zbx_STL \
+	zbx_get_percentage_of_deviations_in_stl_remainder \
+	zbx_substitute_lld_macros \
+	zbx_calculate_macro_function \
+	zbx_substitute_simple_macros \
+	evaluate_value_by_map
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -122,78 +122,78 @@ endif
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
-evaluate_SOURCES = \
-	evaluate.c \
+zbx_evaluate_SOURCES = \
+	zbx_evaluate.c \
 	$(COMMON_SRC_FILES)
 
-evaluate_LDADD = \
+zbx_evaluate_LDADD = \
 	$(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-evaluate_LDADD += @SERVER_LIBS@
+zbx_evaluate_LDADD += @SERVER_LIBS@
 
-evaluate_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_evaluate_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-evaluate_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
+zbx_evaluate_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
 
-evaluate_unknown_SOURCES = \
-	evaluate_unknown.c \
+zbx_evaluate_unknown_SOURCES = \
+	zbx_evaluate_unknown.c \
 	$(COMMON_SRC_FILES)
 
-evaluate_unknown_LDADD = \
+zbx_evaluate_unknown_LDADD = \
 	$(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-evaluate_unknown_LDADD += @SERVER_LIBS@
+zbx_evaluate_unknown_LDADD += @SERVER_LIBS@
 
-evaluate_unknown_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_evaluate_unknown_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-evaluate_unknown_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
+zbx_evaluate_unknown_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
 
-substitute_lld_macros_SOURCES = \
-	substitute_lld_macros.c
+zbx_substitute_lld_macros_SOURCES = \
+	zbx_substitute_lld_macros.c
 
-substitute_lld_macros_LDADD = \
+zbx_substitute_lld_macros_LDADD = \
 	$(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-substitute_lld_macros_LDADD += @SERVER_LIBS@
+zbx_substitute_lld_macros_LDADD += @SERVER_LIBS@
 
-substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
+zbx_substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
 
-macro_fmttime_SOURCES = \
-	macro_fmttime.c \
+zbx_calculate_macro_function_SOURCES = \
+	zbx_calculate_macro_function.c \
 	$(COMMON_SRC_FILES)
 
-macro_fmttime_LDADD = \
+zbx_calculate_macro_function_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-macro_fmttime_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+zbx_calculate_macro_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-macro_fmttime_LDADD += @SERVER_LIBS@
+zbx_calculate_macro_function_LDADD += @SERVER_LIBS@
 
-macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_calculate_macro_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-macro_fmttime_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+zbx_calculate_macro_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxexpression
 
-macro_functions_SOURCES = \
-	macro_functions.c \
+zbx_substitute_simple_macros_SOURCES = \
+	zbx_substitute_simple_macros.c \
 	$(COMMON_SRC_FILES)
 
-macro_functions_LDADD = \
+zbx_substitute_simple_macros_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-macro_functions_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+zbx_substitute_simple_macros_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-macro_functions_LDADD += @SERVER_LIBS@
+zbx_substitute_simple_macros_LDADD += @SERVER_LIBS@
 
-macro_functions_LDFLAGS = @SERVER_LDFLAGS@ \
+zbx_substitute_simple_macros_LDFLAGS = @SERVER_LDFLAGS@ \
 			-Wl,--wrap=expr_db_get_trigger_value \
 			-Wl,--wrap=zbx_dc_open_user_macros \
 			-Wl,--wrap=zbx_dc_close_user_macros \
@@ -201,7 +201,7 @@ macro_functions_LDFLAGS = @SERVER_LDFLAGS@ \
 			-Wl,--wrap=zbx_dc_get_user_macro \
 			$(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-macro_functions_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+zbx_substitute_simple_macros_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
@@ -220,42 +220,42 @@ evaluate_function_LDADD += @SERVER_LIBS@
 
 evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-evaluate_stl_SOURCES = \
-	evaluate_stl.c \
+zbx_STL_SOURCES = \
+	zbx_STL.c \
 	$(COMMON_SRC_FILES)
 
-evaluate_stl_LDADD = \
+zbx_STL_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-evaluate_stl_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+zbx_STL_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-evaluate_stl_LDADD += @SERVER_LIBS@
+zbx_STL_LDADD += @SERVER_LIBS@
 
-evaluate_stl_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_STL_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-evaluate_percentage_deviations_in_remainder_SOURCES = \
-	evaluate_percentage_deviations_in_remainder.c \
+zbx_get_percentage_of_deviations_in_stl_remainder_SOURCES = \
+	zbx_get_percentage_of_deviations_in_stl_remainder.c \
 	$(COMMON_SRC_FILES)
 
-evaluate_percentage_deviations_in_remainder_LDADD = \
+zbx_get_percentage_of_deviations_in_stl_remainder_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-evaluate_percentage_deviations_in_remainder_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+zbx_get_percentage_of_deviations_in_stl_remainder_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-evaluate_percentage_deviations_in_remainder_LDADD += @SERVER_LIBS@
+zbx_get_percentage_of_deviations_in_stl_remainder_LDADD += @SERVER_LIBS@
 
-evaluate_percentage_deviations_in_remainder_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS)  \
+zbx_get_percentage_of_deviations_in_stl_remainder_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS)\
 	$(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-valuemaps_SOURCES = \
-	valuemaps.c \
+evaluate_value_by_map_SOURCES = \
+	evaluate_value_by_map.c \
 	$(COMMON_SRC_FILES)
 
-valuemaps_LDADD = $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+evaluate_value_by_map_LDADD = $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-valuemaps_LDADD += @SERVER_LIBS@
+evaluate_value_by_map_LDADD += @SERVER_LIBS@
 
-valuemaps_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+evaluate_value_by_map_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_mutex_create \
@@ -283,21 +283,21 @@ evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory
 
-evaluate_stl_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+zbx_STL_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory
 
-evaluate_percentage_deviations_in_remainder_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+zbx_get_percentage_of_deviations_in_stl_remainder_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory
 
-valuemaps_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+evaluate_value_by_map_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
