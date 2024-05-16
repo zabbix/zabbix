@@ -2056,7 +2056,8 @@ static int	DBpatch_6050165(void)
 					/* zbx_function_param_quote() should always succeed with esc_bs set to 1 */
 					zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON);
 
-					if (0 != strncmp(param, ptr + param_pos, strlen(param))) {
+					if (0 != strncmp(param, ptr + param_pos, strlen(param)))
+					{
 						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr, param_pos);
 						zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 						func_params_changed = changed = 1;
@@ -2075,7 +2076,8 @@ static int	DBpatch_6050165(void)
 		if (0 == buf_offset)
 			continue;
 
-		if (0 != func_params_changed) {
+		if (0 != func_params_changed)
+		{
 			tmp = zbx_db_dyn_escape_string(buf);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
@@ -3629,11 +3631,15 @@ static int	DBpatch_6050255(void)
 
 static int	DBpatch_6050256(void)
 {
+	zbx_uint64_t	moduleid;
+
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	moduleid = zbx_db_get_maxid("module");
+
 	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
-			" (" ZBX_FS_UI64 ",'hostnavigator','widgets/hostnavigator',%d,'[]')", zbx_db_get_maxid("module"), 1))
+			" (" ZBX_FS_UI64 ",'hostnavigator','widgets/hostnavigator',%d,'[]')", moduleid, 1))
 	{
 		return FAIL;
 	}
