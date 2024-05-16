@@ -912,6 +912,63 @@ out:
 	return 0;
 }
 
+#ifdef BROWSER_EXECUTE_SCRIPT
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute custom script                                             *
+ *                                                                            *
+ * Stack 0 - script                                                           *
+ *                                                                            *
+ * Return value: script result                                                *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_browser_execute_script(duk_context *ctx)
+{
+	zbx_webdriver_t		*wd;
+	char			*script = NULL, error = NULL;
+	int			err_index = -1;
+	struct zbx_json_parse	jp;
+
+	wd = es_webdriver(ctx);
+
+	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &script))
+	{
+		(void)browser_push_error(ctx, wd, "cannot convert script parameter to utf8");
+
+		return duk_throw(ctx);
+	}
+
+	if (SUCCEED != webdriver_execute_script(wd, script, &jp, &error))
+	{
+		err_index = browser_push_error(ctx, wd, "cannot execute script: %s", error);
+		zbx_free(error);
+	}
+	else
+	{
+		char	*result = NULL;
+		size_t	result_alloc = 0;
+
+		if (NULL == zbx_json_decodevalue_dyn(jp.start, &result, &result_alloc, NULL))
+		{
+			result = (char *)zbx_malloc(NULL, jp.end - jp.start + 2);
+			memcpy(result, jp.start, jp.end - jp.start + 1);
+			result[jp.end - jp.start + 1] = '\0';
+		}
+
+		duk_push_string(ctx, result);
+		zbx_free(result);
+	}
+
+	zbx_free(script);
+
+	if (-1 != err_index)
+		return duk_throw(ctx);
+
+	return 1;
+}
+
+#endif
+
 static const duk_function_list_entry	browser_methods[] = {
 	{"navigate", es_browser_navigate, 1},
 	{"getUrl", es_browser_get_url, 0},
@@ -931,6 +988,9 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"collectPerfEntries", es_browser_collect_perf_entries, 1},
 	{"getPageSource", es_browser_get_page_source, 0},
 	{"getAlert", es_browser_get_alert, 0},
+#ifdef BROWSER_EXECUTE_SCRIPT
+	{"executeScript", es_browser_execute_script, 1},
+#endif
 	{0}
 };
 

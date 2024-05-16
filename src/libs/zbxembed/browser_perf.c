@@ -53,6 +53,40 @@ ZBX_PTR_VECTOR_IMPL(wd_perf_entry_ptr, zbx_wd_perf_entry_t *)
 ZBX_VECTOR_IMPL(wd_perf_details, zbx_wd_perf_details_t)
 ZBX_VECTOR_IMPL(wd_perf_bookmark, zbx_wd_perf_bookmark_t)
 
+static int	wd_perf_attr_compare(const void *d1, const void *d2)
+{
+	const char *n1 = *(const char * const *)d1;
+	const char *n2 = *(const char * const *)d2;
+
+	return strcmp(n1, n2);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the attribute contains time based metric                 *
+ *                                                                            *
+ * Return value: SUCCEED - attribute contains time based metric               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	wd_perf_is_time_based_attribute(const char *name)
+{
+	/* attributes MUST be sorted as they are used in binary search */
+	static const char	*attributes[] = {"x1activation_start", "connect_end", "connect_start",
+					"critical_ch_restart", "domain_lookup_end", "domain_lookup_start",
+					"dom_complete", "dom_content_loaded_event_end",
+					"dom_content_loaded_event_start", "dom_interactive", "duration", "fetch_start",
+					"first_interim_response_start", "load_event_end", "load_event_start",
+					"redirect_end", "redirect_start", "request_start", "response_end",
+					"response_start", "secure_connection_start", "start_time", "unload_event_end",
+					"unload_event_start", "worker_start"};
+
+	if (NULL == bsearch(&name, attributes, ARRSIZE(attributes), sizeof(attributes[0]), wd_perf_attr_compare))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: extract attribute from json key,value pair                        *
@@ -89,6 +123,11 @@ static int	wd_perf_init_attribute_from_json(zbx_wd_attr_t *attr, const char *nam
 			case ZBX_JSON_TYPE_INT:
 			case ZBX_JSON_TYPE_NUMBER:
 				(void)zbx_is_double(value, &value_dbl);
+
+				/* convert time based attribute values to seconds */
+				if (SUCCEED == wd_perf_is_time_based_attribute(name))
+					value_dbl /= 1000;
+
 				zbx_variant_set_dbl(&attr->value, value_dbl);
 				zbx_free(value);
 				break;

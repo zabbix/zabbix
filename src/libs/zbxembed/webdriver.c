@@ -980,7 +980,7 @@ int	webdriver_set_screen_size(zbx_webdriver_t *wd, int width, int height, char *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, struct zbx_json_parse *jp,
+int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, struct zbx_json_parse *jp,
 		char **error)
 {
 	struct zbx_json	json;
