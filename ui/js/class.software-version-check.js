@@ -45,6 +45,7 @@ class CSoftwareVersionCheck {
 					setTimeout(() => this.#getSavedData(), response.delay * 1000);
 				}
 				else {
+					this.#data.versions = [];
 					this.#data.major_version = response.major_version;
 					this.#data.check_hash = response.check_hash;
 					this.#data._csrf_token = response._csrf_token;
@@ -81,15 +82,13 @@ class CSoftwareVersionCheck {
 
 		curl.setArgument('action', 'softwareversioncheck.update');
 
-		const data = {
-			versions: this.#data.versions || [],
-			_csrf_token: this.#data._csrf_token
-		};
-
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify({
+				versions: this.#data.versions,
+				_csrf_token: this.#data._csrf_token
+			})
 		})
 			.then(response => response.json())
 			.then(response => {
