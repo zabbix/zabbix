@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * backup dashboard
+ * @backup dashboard
  *
  * @onBefore prepareData
  */
@@ -1283,7 +1283,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 	}
 
 	/**
-	 * backup !history, !history_uint, !history_str
+	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
 	 */
