@@ -5,7 +5,7 @@ use warnings;
 
 my ($db, $table, $tsdb_compression) = @ARGV;
 
-my @dbs = ('mysql', 'oracle', 'postgresql', 'timescaledb');
+my @dbs = ('mysql', 'postgresql', 'timescaledb');
 my @tables = ('history', 'history_uint', 'history_str', 'history_log', 'history_text');
 my @tables_tsdb = ('history', 'history_uint', 'history_str', 'history_log', 'history_text', 'trends');
 
@@ -47,47 +47,6 @@ HEREDOC
 	`clock` integer DEFAULT '0' NOT NULL,
 	`value` text NOT NULL,
 	`ns` integer DEFAULT '0' NOT NULL,
-HEREDOC
-);
-
-my %oracle = (
-	'alter_table' => 'RENAME %TBL TO %TBL_old;',
-	'create_table_begin' => 'CREATE TABLE %TBL (',
-	'create_table_end' => ');',
-	'pk_constraint' => "\t" . 'CONSTRAINT PK_%UTBL PRIMARY KEY (itemid,clock,ns)',
-	'history' => <<'HEREDOC'
-	itemid                   number(20)                                NOT NULL,
-	clock                    number(10)      DEFAULT '0'               NOT NULL,
-	value                    BINARY_DOUBLE   DEFAULT '0.0000'          NOT NULL,
-	ns                       number(10)      DEFAULT '0'               NOT NULL,
-HEREDOC
-	, 'history_uint' => <<'HEREDOC'
-	itemid                   number(20)                                NOT NULL,
-	clock                    number(10)      DEFAULT '0'               NOT NULL,
-	value                    number(20)      DEFAULT '0'               NOT NULL,
-	ns                       number(10)      DEFAULT '0'               NOT NULL,
-HEREDOC
-	, 'history_str' => <<'HEREDOC'
-	itemid                   number(20)                                NOT NULL,
-	clock                    number(10)      DEFAULT '0'               NOT NULL,
-	value                    nvarchar2(255)  DEFAULT ''                ,
-	ns                       number(10)      DEFAULT '0'               NOT NULL,
-HEREDOC
-	, 'history_log' => <<'HEREDOC'
-	itemid                   number(20)                                NOT NULL,
-	clock                    number(10)      DEFAULT '0'               NOT NULL,
-	timestamp                number(10)      DEFAULT '0'               NOT NULL,
-	source                   nvarchar2(64)   DEFAULT ''                ,
-	severity                 number(10)      DEFAULT '0'               NOT NULL,
-	value                    nclob           DEFAULT ''                ,
-	logeventid               number(10)      DEFAULT '0'               NOT NULL,
-	ns                       number(10)      DEFAULT '0'               NOT NULL,
-HEREDOC
-	, 'history_text' => <<'HEREDOC'
-	itemid                   number(20)                                NOT NULL,
-	clock                    number(10)      DEFAULT '0'               NOT NULL,
-	value                    nclob           DEFAULT ''                ,
-	ns                       number(10)      DEFAULT '0'               NOT NULL,
 HEREDOC
 );
 
@@ -279,13 +238,6 @@ else
 		foreach my $tbl (@tables)
 		{
 			output_table(\%mysql, $tbl, 0);
-		}
-	}
-	elsif ($db eq 'oracle')
-	{
-		foreach my $tbl (@tables)
-		{
-			output_table(\%oracle, $tbl, 1);
 		}
 	}
 	elsif ($db eq 'postgresql')
