@@ -106,31 +106,6 @@ zbx_err_codes_t	zbx_db_last_errcode(void);
 int	zbx_tsdb_get_version(void);
 #endif
 
-#ifdef HAVE_ORACLE
-
-/* context for dynamic parameter binding */
-typedef struct
-{
-	/* the parameter position, starting with 0 */
-	int			position;
-	/* the parameter type (ZBX_TYPE_* ) */
-	unsigned char		type;
-	/* the maximum parameter size */
-	size_t			size_max;
-	/* the data to bind - array of rows, each row being an array of columns */
-	zbx_db_value_t		**rows;
-	/* custom data, depending on column type */
-	void			*data;
-}
-zbx_db_bind_context_t;
-
-int		zbx_db_statement_prepare_basic(const char *sql);
-int		zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsigned char type,
-				zbx_db_value_t **rows, int rows_num);
-void		zbx_db_clean_bind_context(zbx_db_bind_context_t *context);
-int		zbx_db_statement_execute(int iters);
-#endif
-
 #if defined (HAVE_MYSQL)
 void	zbx_mysql_escape_bin(const char *src, char *dst, size_t size);
 #elif defined(HAVE_POSTGRESQL)
@@ -163,9 +138,6 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
 #elif defined(HAVE_MYSQL)
 #	define ZBX_DB_STRLIST_DELIM		','
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8"
@@ -243,9 +215,6 @@ struct zbx_db_version_info_t
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
-#ifdef HAVE_ORACLE
-	struct zbx_json		tables_json;
-#endif
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
@@ -266,9 +235,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_TIMESTAMP()	"cast(extract(epoch from now()) as int)"
 #	define ZBX_DB_CHAR_LENGTH(str)	"char_length(" #str ")"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_DB_TIMESTAMP()	"(cast(sys_extract_utc(systimestamp) as date) - date'1970-01-01') * 86400"
-#	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
 #else
 #	define ZBX_DB_TIMESTAMP()	"cast(strftime('%s', 'now') as integer)"
 #	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"

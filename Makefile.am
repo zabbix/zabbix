@@ -67,12 +67,6 @@ dbschema_mysql:
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
-dbschema_oracle:
-	cd database/oracle && \
-	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
-
 dbschema_postgresql:
 	cd database/postgresql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
@@ -93,7 +87,7 @@ dbschema_c:
 	cd src/libs/zbxdbschema && \
 	$(MAKE) $(AM_MAKEFLAGS) dbschema.c
 
-dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_timescaledb dbschema_sqlite3 dbschema_c
+dbschema: dbschema_mysql dbschema_postgresql dbschema_timescaledb dbschema_sqlite3 dbschema_c
 endif
 
 gettext:

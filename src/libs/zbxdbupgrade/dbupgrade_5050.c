@@ -435,12 +435,7 @@ static int	DBpatch_5050050(void)
 #define DBPATCH_SYSMAPS_LABEL_LEN		255
 #define DBPATCH_SYSMAPS_ELEMENTS_LABEL_LEN	2048
 #define DBPATCH_SYSMAPS_LINKS_LABEL_LEN		2048
-
-#if defined(HAVE_ORACLE)
-#	define DBPATCH_SHORTTEXT_LEN		2048
-#else
-#	define DBPATCH_SHORTTEXT_LEN		65535
-#endif
+#define DBPATCH_SHORTTEXT_LEN			65535
 
 static int	dbpatch_update_simple_macro(const char *table, const char *field, const char *id, size_t field_len,
 		const char *descr)

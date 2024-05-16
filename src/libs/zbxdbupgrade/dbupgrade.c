@@ -52,14 +52,6 @@
 #	define ZBX_TYPE_BLOB_STR		"longblob"
 #	define ZBX_TYPE_SERIAL_STR		"bigint unsigned"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	"auto_increment"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_TYPE_ID_STR			"number(20)"
-#	define ZBX_TYPE_FLOAT_STR		"binary_double"
-#	define ZBX_TYPE_UINT_STR		"number(20)"
-#	define ZBX_TYPE_LONGTEXT_STR		"nclob"
-#	define ZBX_TYPE_BLOB_STR		"blob"
-#	define ZBX_TYPE_SERIAL_STR		"number(20)"
-#	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_TYPE_ID_STR			"bigint"
 #	define ZBX_TYPE_FLOAT_STR		"double precision"
@@ -70,17 +62,10 @@
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #endif
 
-#if defined(HAVE_ORACLE)
-#	define ZBX_TYPE_INT_STR		"number(10)"
-#	define ZBX_TYPE_CHAR_STR	"nvarchar2"
-#	define ZBX_TYPE_SHORTTEXT_STR	"nvarchar2(2048)"
-#	define ZBX_TYPE_TEXT_STR	"nclob"
-#else
-#	define ZBX_TYPE_INT_STR		"integer"
-#	define ZBX_TYPE_CHAR_STR	"varchar"
-#	define ZBX_TYPE_SHORTTEXT_STR	"text"
-#	define ZBX_TYPE_TEXT_STR	"text"
-#endif
+#define ZBX_TYPE_INT_STR	"integer"
+#define ZBX_TYPE_CHAR_STR	"varchar"
+#define ZBX_TYPE_SHORTTEXT_STR	"text"
+#define ZBX_TYPE_TEXT_STR	"text"
 
 #define ZBX_FIRST_DB_VERSION		2010000
 
@@ -151,52 +136,6 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 	}
 }
 
-#ifdef HAVE_ORACLE
-typedef enum
-{
-	ZBX_ORACLE_COLUMN_TYPE_NUMERIC,
-	ZBX_ORACLE_COLUMN_TYPE_CHARACTER,
-	ZBX_ORACLE_COLUMN_TYPE_DOUBLE,
-	ZBX_ORACLE_COLUMN_TYPE_UNKNOWN
-}
-zbx_oracle_column_type_t;
-
-/******************************************************************************
- *                                                                            *
- * Purpose: determine whether column type is character or numeric             *
- *                                                                            *
- * Parameters: field_type - [IN] column type in Zabbix definitions            *
- *                                                                            *
- * Return value: column type (character/raw, numeric) in Oracle definitions   *
- *                                                                            *
- * Comments: The size of a character or raw column or the precision of a      *
- *           numeric column can be changed, whether or not all the rows       *
- *           contain nulls. Otherwise in order to change the datatype of a    *
- *           column all rows of the column must contain nulls.                *
- *                                                                            *
- ******************************************************************************/
-static zbx_oracle_column_type_t	zbx_oracle_column_type(unsigned char field_type)
-{
-	switch (field_type)
-	{
-		case ZBX_TYPE_ID:
-		case ZBX_TYPE_INT:
-		case ZBX_TYPE_UINT:
-			return ZBX_ORACLE_COLUMN_TYPE_NUMERIC;
-		case ZBX_TYPE_CHAR:
-		case ZBX_TYPE_LONGTEXT:
-		case ZBX_TYPE_SHORTTEXT:
-		case ZBX_TYPE_TEXT:
-			return ZBX_ORACLE_COLUMN_TYPE_CHARACTER;
-		case ZBX_TYPE_FLOAT:
-			return ZBX_ORACLE_COLUMN_TYPE_DOUBLE;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return ZBX_ORACLE_COLUMN_TYPE_UNKNOWN;
-	}
-}
-#endif
-
 static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const zbx_db_field_t *field)
 {
@@ -227,22 +166,7 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 
 	if (0 != (field->flags & ZBX_NOTNULL))
 	{
-#if defined(HAVE_ORACLE)
-		switch (field->type)
-		{
-			case ZBX_TYPE_INT:
-			case ZBX_TYPE_FLOAT:
-			case ZBX_TYPE_BLOB:
-			case ZBX_TYPE_UINT:
-			case ZBX_TYPE_ID:
-				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " not null");
-				break;
-			default:	/* ZBX_TYPE_CHAR, ZBX_TYPE_TEXT, ZBX_TYPE_SHORTTEXT or ZBX_TYPE_LONGTEXT */
-				/* nothing to do */;
-		}
-#else
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " not null");
-#endif
 	}
 
 	DBfield_type_suffix_string(sql, sql_alloc, sql_offset, field);
@@ -285,8 +209,6 @@ static void	DBset_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
-#elif defined(HAVE_ORACLE)
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default '%s'", field->name, field->default_value);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set default '%s'", field->name, field->default_value);
 #endif
@@ -299,8 +221,6 @@ static void	DBdrop_default_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
-#elif defined(HAVE_ORACLE)
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s default null", field->name);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s drop default", field->name);
 #endif
@@ -334,8 +254,6 @@ static void	DBdrop_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offse
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
-#elif defined(HAVE_ORACLE)
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s null", field->name);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s drop not null", field->name);
 #endif
@@ -348,8 +266,6 @@ static void	DBset_not_null_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 
 #if defined(HAVE_MYSQL)
 	DBfield_definition_string(sql, sql_alloc, sql_offset, field);
-#elif defined(HAVE_ORACLE)
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s not null", field->name);
 #else
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s set not null", field->name);
 #endif
@@ -410,7 +326,7 @@ static void	DBrename_index_sql(char **sql, size_t *sql_alloc, size_t *sql_offset
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 	DBdrop_index_sql(sql, sql_alloc, sql_offset, table_name, old_name);
 	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
-#elif defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL)
+#elif defined(HAVE_POSTGRESQL)
 	ZBX_UNUSED(table_name);
 	ZBX_UNUSED(fields);
 	ZBX_UNUSED(unique);
@@ -516,92 +432,6 @@ int	DBrename_field(const char *table_name, const char *field_name, const zbx_db_
 	return ret;
 }
 
-#ifdef HAVE_ORACLE
-static int	DBmodify_field_type_with_copy(const char *table_name, const zbx_db_field_t *field)
-{
-#define ZBX_OLD_FIELD	"zbx_old_tmp"
-
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
-	int	ret = FAIL;
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "alter table %s rename column %s to " ZBX_OLD_FIELD,
-			table_name, field->name);
-
-	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-		goto out;
-
-	if (ZBX_DB_OK > DBadd_field(table_name, field))
-		goto out;
-
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set %s=" ZBX_OLD_FIELD, table_name,
-			field->name);
-
-	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-		goto out;
-
-	ret = DBdrop_field(table_name, ZBX_OLD_FIELD);
-out:
-	zbx_free(sql);
-
-	return ret;
-
-#undef ZBX_OLD_FIELD
-}
-
-#define ZBX_FS_DB_SEQUENCE	"%s_seq"
-#define ZBX_FS_DB_TRIGGER	"%s_tr"
-
-int	DBcreate_serial_sequence(const char *table_name)
-{
-	if (ZBX_DB_OK > zbx_db_execute("create sequence " ZBX_FS_DB_SEQUENCE " start with 1 increment by 1 nomaxvalue",
-			table_name))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-static int	DBdrop_serial_sequence(const char *table_name)
-{
-	if (ZBX_DB_OK > zbx_db_execute("drop sequence " ZBX_FS_DB_SEQUENCE, table_name))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
-{
-	if (ZBX_DB_OK > zbx_db_execute("create trigger " ZBX_FS_DB_TRIGGER " before insert on %s for each row\n"
-					"begin\n"
-						"select " ZBX_FS_DB_SEQUENCE ".nextval into :new.%s from dual;\n"
-					"end;",
-				table_name, table_name, table_name, field_name))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-static int	DBdrop_serial_trigger(const char *table_name)
-{
-	if (ZBX_DB_OK > zbx_db_execute("drop trigger " ZBX_FS_DB_TRIGGER, table_name))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-
-#endif
-
-
 #if defined(HAVE_POSTGRESQL)
 int	DBcheck_field_type(const char *table_name, const zbx_db_field_t *field)
 {
@@ -636,23 +466,7 @@ int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, con
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
 
-#ifndef HAVE_ORACLE
 	ZBX_UNUSED(old_field);
-#else
-	/* Oracle cannot change column type in a general case if column contents are not null. Conversions like   */
-	/* number -> nvarchar2 or nvarchar2 -> nclob need special processing. New column is created with desired  */
-	/* datatype and data from old column is copied there. Then old column is dropped. This method does not    */
-	/* preserve column order.                                                                                 */
-	/* NOTE: Existing column indexes and constraints are not respected by the current implementation!         */
-
-	if (NULL != old_field && (zbx_oracle_column_type(old_field->type) != zbx_oracle_column_type(field->type) ||
-			ZBX_ORACLE_COLUMN_TYPE_DOUBLE == zbx_oracle_column_type(field->type) ||
-			((ZBX_TYPE_TEXT == field->type || ZBX_TYPE_LONGTEXT == field->type) &&
-				(ZBX_TYPE_SHORTTEXT == old_field->type || ZBX_TYPE_CHAR == old_field->type))))
-	{
-		return DBmodify_field_type_with_copy(table_name, field);
-	}
-#endif
 	DBmodify_field_type_sql(&sql, &sql_alloc, &sql_offset, table_name, field);
 
 	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
@@ -1311,16 +1125,7 @@ int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_
 		return FAIL;
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_insert after insert on %s\n"
-				"for each row\n"
-				"begin\n"
-					"insert into changelog (object,objectid,operation,clock)\n"
-						"values (%d,:new.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
-						"-date'1970-01-01')*86400);\n"
-				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT);
-#elif HAVE_MYSQL
+#if HAVE_MYSQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"create trigger %s_insert after insert on %s\n"
 				"for each row\n"
@@ -1363,16 +1168,7 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 		return FAIL;
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_update after update on %s\n"
-				"for each row\n"
-				"begin\n"
-					"insert into changelog (object,objectid,operation,clock)\n"
-						"values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
-						"-date'1970-01-01')*86400);\n"
-				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE);
-#elif HAVE_MYSQL
+#if HAVE_MYSQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"create trigger %s_update after update on %s\n"
 				"for each row\n"
@@ -1415,16 +1211,7 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 		return FAIL;
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_delete before delete on %s\n"
-				"for each row\n"
-				"begin\n"
-					"insert into changelog (object,objectid,operation,clock)\n"
-						"values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
-						"-date'1970-01-01')*86400);\n"
-				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE);
-#elif HAVE_MYSQL
+#if HAVE_MYSQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"create trigger %s_delete before delete on %s\n"
 				"for each row\n"
@@ -1462,18 +1249,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-#ifdef HAVE_ORACLE
-	ZBX_UNUSED(idname);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_%s_insert\n"
-			"before insert on %s for each row\n"
-			"begin\n"
-				":new.%s:=%s(:new.%s);\n"
-			"end;",
-			table_name, indexed_column_name, table_name, indexed_column_name, function,
-			original_column_name);
-#elif HAVE_MYSQL
+#if HAVE_MYSQL
 	ZBX_UNUSED(idname);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1514,21 +1290,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = FAIL;
-#ifdef HAVE_ORACLE
-	ZBX_UNUSED(idname);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_%s_update\n"
-			"before update on %s for each row\n"
-			"begin\n"
-				"if :new.%s<>:old.%s\n"
-				"then\n"
-					":new.%s:=%s(:new.%s);\n"
-				"end if;\n"
-			"end;",
-			table_name, indexed_column_name, table_name, original_column_name,
-			original_column_name, indexed_column_name, function, original_column_name);
-#elif HAVE_MYSQL
+#if HAVE_MYSQL
 	ZBX_UNUSED(idname);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

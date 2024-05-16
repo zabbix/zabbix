@@ -918,15 +918,7 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 	}
 	else
 	{
-#if defined(HAVE_ORACLE)
-		return zbx_db_execute(
-				"delete from %s"
-				" where %s"
-					" and rownum<=%d",
-				tablename,
-				filter,
-				limit);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 		return zbx_db_execute(
 				"delete from %s"
 				" where %s limit %d",

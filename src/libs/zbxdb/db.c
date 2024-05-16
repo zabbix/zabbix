@@ -22,10 +22,6 @@
 #	include "mysql.h"
 #	include "errmsg.h"
 #	include "mysqld_error.h"
-#elif defined(HAVE_ORACLE)
-#	include "zbxcrypto.h"
-#	include "zbxdbschema.h"
-#	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
 #	include <libpq-fe.h>
 #elif defined(HAVE_SQLITE3)
@@ -39,12 +35,6 @@ struct zbx_db_result
 {
 #if defined(HAVE_MYSQL)
 	MYSQL_RES	*result;
-#elif defined(HAVE_ORACLE)
-	OCIStmt		*stmthp;	/* the statement handle for select operations */
-	int		ncolumn;
-	zbx_db_row_t	values;
-	ub4		*values_alloc;
-	OCILobLocator	**clobs;
 #elif defined(HAVE_POSTGRESQL)
 	PGresult	*pg_result;
 	int		row_num;
@@ -76,28 +66,6 @@ static int			mysql_err_cnt = 0;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
 static int			txn_begin = 0;	/* transaction begin statement is executed */
-#elif defined(HAVE_ORACLE)
-#include "zbxalgo.h"
-
-typedef struct
-{
-	OCIEnv			*envhp;
-	OCIError		*errhp;
-	OCISvcCtx		*svchp;
-	OCIServer		*srvhp;
-	OCIStmt			*stmthp;	/* the statement handle for execute operations */
-	zbx_vector_ptr_t	db_results;
-}
-zbx_oracle_db_handle_t;
-
-static zbx_uint32_t		ZBX_ORACLE_SVERSION = ZBX_DBVERSION_UNDEFINED;
-
-static zbx_oracle_db_handle_t	oracle;
-
-static ub4	OCI_DBserver_status(void);
-
-#define ORA_ERR_UNIQ_CONSTRAINT	-1
-
 #elif defined(HAVE_POSTGRESQL)
 #define ZBX_PG_READ_ONLY	"25006"
 #define ZBX_PG_UNIQUE_VIOLATION	"23505"
@@ -111,11 +79,6 @@ static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
 static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
-#endif
-
-#if defined(HAVE_ORACLE)
-static void	OCI_DBclean_result_handle(zbx_db_result_t result);
-static void	OCI_DBclean_result(zbx_db_result_t result);
 #endif
 
 static zbx_err_codes_t last_db_errcode;
@@ -197,87 +160,6 @@ zbx_err_codes_t	zbx_db_last_errcode(void)
 	return last_db_errcode;
 }
 
-#if defined(HAVE_ORACLE)
-static const char	*zbx_oci_error(sword status, sb4 *err)
-{
-	static char	errbuf[512];
-	sb4		errcode, *perrcode;
-
-	perrcode = (NULL == err ? &errcode : err);
-
-	errbuf[0] = '\0';
-	*perrcode = 0;
-
-	switch (status)
-	{
-		case OCI_SUCCESS_WITH_INFO:
-			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, perrcode,
-					(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
-			break;
-		case OCI_NEED_DATA:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NEED_DATA");
-			break;
-		case OCI_NO_DATA:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NODATA");
-			break;
-		case OCI_ERROR:
-			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, perrcode,
-					(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
-			break;
-		case OCI_INVALID_HANDLE:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_INVALID_HANDLE");
-			break;
-		case OCI_STILL_EXECUTING:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_STILL_EXECUTING");
-			break;
-		case OCI_CONTINUE:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_CONTINUE");
-			break;
-	}
-
-	zbx_rtrim(errbuf, ZBX_WHITESPACE);
-
-	return errbuf;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: handles Oracle prepare/bind/execute/select operation error        *
- *                                                                            *
- * Parameters: zerrcode   - [IN] the Zabbix errorcode for the failed database *
- *                               operation                                    *
- *             oci_error  - [IN] the return code from failed Oracle operation *
- *             sql        - [IN] the failed sql statement (can be NULL)       *
- *                                                                            *
- * Return value: ZBX_DB_DOWN - database connection is down                    *
- *               ZBX_DB_FAIL - otherwise                                      *
- *                                                                            *
- * Comments: This function logs the error description and checks the          *
- *           database connection status.                                      *
- *                                                                            *
- ******************************************************************************/
-static int	OCI_handle_sql_error(int zerrcode, sword oci_error, const char *sql)
-{
-	sb4	errcode;
-	int	ret = ZBX_DB_DOWN;
-
-	zbx_db_errlog(zerrcode, oci_error, zbx_oci_error(oci_error, &errcode), sql);
-
-	/* after ORA-02396 (and consequent ORA-01012) errors the OCI_SERVER_NORMAL server status is still returned */
-	switch (errcode)
-	{
-		case 1012:	/* ORA-01012: not logged on */
-		case 2396:	/* ORA-02396: exceeded maximum idle time */
-			goto out;
-	}
-
-	if (OCI_SERVER_NORMAL == OCI_DBserver_status())
-		ret = ZBX_DB_FAIL;
-out:
-	return ret;
-}
-
-#endif	/* HAVE_ORACLE */
 
 #ifdef HAVE_POSTGRESQL
 static void	zbx_postgresql_error(char **error, const PGresult *pg_result)
@@ -417,10 +299,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
 	int		err_no = 0;
-#elif defined(HAVE_ORACLE)
-	char		*connect = NULL;
-	sword		err = OCI_SUCCESS;
-	static ub2	csid = 0;
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_MAX_PARAMS	9
 
@@ -618,109 +496,6 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 		ret = ZBX_DB_DOWN;
 
 	mysql_err_cnt = ZBX_DB_OK == ret ? 0 : mysql_err_cnt + 1;
-#elif defined(HAVE_ORACLE)
-	memset(&oracle, 0, sizeof(oracle));
-
-	zbx_vector_ptr_create(&oracle.db_results);
-
-	/* connection string format: [//]host[:port][/service name] */
-
-	if ('\0' != *cfg->config_dbhost)
-	{
-		/* Easy Connect method */
-		connect = zbx_strdcatf(connect, "//%s", cfg->config_dbhost);
-		if (0 != cfg->config_dbport)
-			connect = zbx_strdcatf(connect, ":%d", cfg->config_dbport);
-		if ('\0' != *cfg->config_dbname)
-			connect = zbx_strdcatf(connect, "/%s", cfg->config_dbname);
-	}
-	else
-	{
-		/* Net Service Name method */
-		connect = zbx_strdup(connect, cfg->config_dbname);
-	}
-
-	while (ZBX_DB_OK == ret)
-	{
-		/* initialize environment */
-		if (OCI_SUCCESS == (err = OCIEnvNlsCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT, (dvoid *)0,
-				(dvoid * (*)(dvoid *,size_t))0, (dvoid * (*)(dvoid *, dvoid *, size_t))0,
-				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0, csid, csid)))
-		{
-			if (0 != csid)
-				break;	/* environment with UTF8 character set successfully created */
-
-			/* try to find out the id of UTF8 character set */
-			if (0 == (csid = OCINlsCharSetNameToId(oracle.envhp, (const oratext *)"UTF8")))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Cannot find out the ID of \"UTF8\" character set."
-						" Relying on current \"NLS_LANG\" settings.");
-				break;	/* use default environment with character set derived from NLS_LANG */
-			}
-
-			/* get rid of this environment to create a better one on the next iteration */
-			OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
-			oracle.envhp = NULL;
-		}
-		else
-		{
-			zbx_db_errlog(ERR_Z3001, err, zbx_oci_error(err, NULL), connect);
-			ret = ZBX_DB_FAIL;
-		}
-	}
-
-	if (ZBX_DB_OK == ret)
-	{
-		/* allocate an error handle */
-		(void)OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&oracle.errhp, OCI_HTYPE_ERROR,
-				(size_t)0, (dvoid **)0);
-
-		/* get the session */
-		err = OCILogon2(oracle.envhp, oracle.errhp, &oracle.svchp,
-				(text *)cfg->config_dbuser, (ub4)(NULL != cfg->config_dbuser ?
-				strlen(cfg->config_dbuser) : 0), (text *)cfg->config_dbpassword,
-				(ub4)(NULL != cfg->config_dbpassword ?
-				strlen(cfg->config_dbpassword) : 0), (text *)connect, (ub4)strlen(connect),
-				OCI_DEFAULT);
-
-		switch (err)
-		{
-			case OCI_SUCCESS_WITH_INFO:
-				zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_oci_error(err, NULL));
-				/* break; is not missing here */
-				ZBX_FALLTHROUGH;
-			case OCI_SUCCESS:
-				err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp,
-						(ub4 *)0, OCI_ATTR_SERVER, oracle.errhp);
-		}
-
-		if (OCI_SUCCESS != err)
-		{
-			zbx_db_errlog(ERR_Z3001, err, zbx_oci_error(err, NULL), connect);
-			ret = ZBX_DB_DOWN;
-		}
-	}
-
-	if (ZBX_DB_OK == ret)
-	{
-		/* initialize statement handle */
-		err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&oracle.stmthp, OCI_HTYPE_STMT,
-				(size_t)0, (dvoid **)0);
-
-		if (OCI_SUCCESS != err)
-		{
-			zbx_db_errlog(ERR_Z3001, err, zbx_oci_error(err, NULL), connect);
-			ret = ZBX_DB_DOWN;
-		}
-	}
-
-	if (ZBX_DB_OK == ret)
-	{
-		if (0 < (ret = zbx_db_execute_basic("alter session set nls_numeric_characters='. '")))
-			ret = ZBX_DB_OK;
-	}
-
-	zbx_free(connect);
 #elif defined(HAVE_POSTGRESQL)
 	if (NULL != cfg->config_db_tls_connect)
 	{
@@ -951,53 +726,6 @@ void	zbx_db_close_basic(void)
 		mysql_close(conn);
 		conn = NULL;
 	}
-#elif defined(HAVE_ORACLE)
-	if (0 != oracle.db_results.values_num)
-	{
-		int	i;
-
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process queries: database is closed");
-
-		for (i = 0; i < oracle.db_results.values_num; i++)
-		{
-			/* deallocate all handles before environment is deallocated */
-			OCI_DBclean_result_handle(oracle.db_results.values[i]);
-		}
-	}
-
-	/* deallocate statement handle */
-	if (NULL != oracle.stmthp)
-	{
-		OCIHandleFree((dvoid *)oracle.stmthp, OCI_HTYPE_STMT);
-		oracle.stmthp = NULL;
-	}
-
-	if (NULL != oracle.svchp)
-	{
-		OCILogoff(oracle.svchp, oracle.errhp);
-		oracle.svchp = NULL;
-	}
-
-	if (NULL != oracle.errhp)
-	{
-		OCIHandleFree(oracle.errhp, OCI_HTYPE_ERROR);
-		oracle.errhp = NULL;
-	}
-
-	if (NULL != oracle.srvhp)
-	{
-		OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
-		oracle.srvhp = NULL;
-	}
-
-	if (NULL != oracle.envhp)
-	{
-		/* delete the environment handle, which deallocates all other handles associated with it */
-		OCIHandleFree((dvoid *)oracle.envhp, OCI_HTYPE_ENV);
-		oracle.envhp = NULL;
-	}
-
-	zbx_vector_ptr_destroy(&oracle.db_results);
 #elif defined(HAVE_POSTGRESQL)
 	if (NULL != conn)
 	{
@@ -1059,9 +787,6 @@ int	zbx_db_begin_basic(void)
 int	zbx_db_commit_basic(void)
 {
 	int	rc = ZBX_DB_OK;
-#ifdef HAVE_ORACLE
-	sword	err;
-#endif
 
 	if (0 == txn_level)
 	{
@@ -1073,10 +798,7 @@ int	zbx_db_commit_basic(void)
 	if (ZBX_DB_OK != txn_error)
 		return ZBX_DB_FAIL; /* commit called on failed transaction */
 
-#if defined(HAVE_ORACLE)
-	if (OCI_SUCCESS != (err = OCITransCommit(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
-		rc = OCI_handle_sql_error(ERR_Z3005, err, "commit failed");
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	rc = zbx_db_execute_basic("commit;");
 #endif
 
@@ -1105,9 +827,6 @@ int	zbx_db_commit_basic(void)
 int	zbx_db_rollback_basic(void)
 {
 	int	rc = ZBX_DB_OK, last_txn_error;
-#ifdef HAVE_ORACLE
-	sword	err;
-#endif
 
 	if (0 == txn_level)
 	{
@@ -1123,9 +842,6 @@ int	zbx_db_rollback_basic(void)
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 	rc = zbx_db_execute_basic("rollback;");
-#elif defined(HAVE_ORACLE)
-	if (OCI_SUCCESS != (err = OCITransRollback(oracle.svchp, oracle.errhp, OCI_DEFAULT)))
-		rc = OCI_handle_sql_error(ERR_Z3005, err, "rollback failed");
 #elif defined(HAVE_SQLITE3)
 	rc = zbx_db_execute_basic("rollback;");
 	zbx_mutex_unlock(sqlite_access);
@@ -1157,287 +873,6 @@ int	zbx_db_txn_end_error(void)
 {
 	return txn_end_error;
 }
-
-#ifdef HAVE_ORACLE
-static sword	zbx_oracle_statement_prepare(const char *sql)
-{
-	return OCIStmtPrepare(oracle.stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql), (ub4)OCI_NTV_SYNTAX,
-			(ub4)OCI_DEFAULT);
-}
-
-static sword	zbx_oracle_statement_execute(ub4 iters, ub4 *nrows)
-{
-	sword	err;
-
-	if (OCI_SUCCESS == (err = OCIStmtExecute(oracle.svchp, oracle.stmthp, oracle.errhp, iters, (ub4)0,
-			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
-			0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT)))
-	{
-		err = OCIAttrGet((void *)oracle.stmthp, OCI_HTYPE_STMT, nrows, (ub4 *)0, OCI_ATTR_ROW_COUNT,
-				oracle.errhp);
-	}
-
-	return err;
-}
-#endif
-
-#ifdef HAVE_ORACLE
-int	zbx_db_statement_prepare_basic(const char *sql)
-{
-	sword	err;
-	int	ret = ZBX_DB_OK;
-
-	if (0 == txn_level)
-		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
-
-	if (ZBX_DB_OK != txn_error)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
-		return ZBX_DB_FAIL;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
-
-	if (OCI_SUCCESS != (err = zbx_oracle_statement_prepare(sql)))
-		ret = OCI_handle_sql_error(ERR_Z3005, err, sql);
-
-	if (ZBX_DB_FAIL == ret && 0 < txn_level)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
-		txn_error = ZBX_DB_FAIL;
-	}
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: callback function used by dynamic parameter binding               *
- *                                                                            *
- ******************************************************************************/
-static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, dvoid **bufpp, ub4 *alenp, ub1 *piecep,
-		dvoid **indpp)
-{
-	zbx_db_bind_context_t	*context = (zbx_db_bind_context_t *)ctxp;
-
-	ZBX_UNUSED(bindp);
-	ZBX_UNUSED(index);
-
-	switch (context->type)
-	{
-		case ZBX_TYPE_ID: /* handle 0 -> NULL conversion */
-			if (0 == context->rows[iter][context->position].ui64)
-			{
-				*bufpp = NULL;
-				*alenp = 0;
-				break;
-			}
-			ZBX_FALLTHROUGH;
-		case ZBX_TYPE_UINT:
-			*bufpp = &((OCINumber *)context->data)[iter];
-			*alenp = sizeof(OCINumber);
-			break;
-		case ZBX_TYPE_INT:
-			*bufpp = &context->rows[iter][context->position].i32;
-			*alenp = sizeof(int);
-			break;
-		case ZBX_TYPE_FLOAT:
-			*bufpp = &context->rows[iter][context->position].dbl;
-			*alenp = sizeof(double);
-			break;
-		case ZBX_TYPE_CHAR:
-		case ZBX_TYPE_TEXT:
-		case ZBX_TYPE_SHORTTEXT:
-		case ZBX_TYPE_LONGTEXT:
-		case ZBX_TYPE_CUID:
-		case ZBX_TYPE_BLOB:
-			*bufpp = context->rows[iter][context->position].str;
-			*alenp = ((size_t *)context->data)[iter];
-			break;
-		default:
-			return FAIL;
-	}
-
-	*indpp = NULL;
-	*piecep = OCI_ONE_PIECE;
-
-	return OCI_CONTINUE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: performs dynamic parameter binding, converting value if necessary *
- *                                                                            *
- * Parameters: context  - [OUT] the bind context                              *
- *             position - [IN] the parameter position                         *
- *             type     - [IN] the parameter type (ZBX_TYPE_* )               *
- *             rows     - [IN] the data to bind - array of rows,              *
- *                             each row being an array of columns             *
- *             rows_num - [IN] the number of rows in the data                 *
- *                                                                            *
- ******************************************************************************/
-int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsigned char type,
-		zbx_db_value_t **rows, int rows_num)
-{
-	int		i, ret = ZBX_DB_OK;
-	size_t		*sizes;
-	sword		err;
-	OCINumber	*values;
-	ub2		data_type;
-	OCIBind		*bindhp = NULL;
-
-	context->position = position;
-	context->rows = rows;
-	context->data = NULL;
-	context->type = type;
-
-	switch (type)
-	{
-		case ZBX_TYPE_ID:
-		case ZBX_TYPE_UINT:
-			values = (OCINumber *)zbx_malloc(NULL, sizeof(OCINumber) * rows_num);
-
-			for (i = 0; i < rows_num; i++)
-			{
-				err = OCINumberFromInt(oracle.errhp, &rows[i][position].ui64, sizeof(zbx_uint64_t),
-						OCI_NUMBER_UNSIGNED, &values[i]);
-
-				if (OCI_SUCCESS != err)
-				{
-					ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
-					goto out;
-				}
-			}
-
-			context->data = (OCINumber *)values;
-			context->size_max = sizeof(OCINumber);
-			data_type = SQLT_VNU;
-			break;
-		case ZBX_TYPE_INT:
-			context->size_max = sizeof(int);
-			data_type = SQLT_INT;
-			break;
-		case ZBX_TYPE_FLOAT:
-			context->size_max = sizeof(double);
-			data_type = SQLT_BDOUBLE;
-			break;
-		case ZBX_TYPE_CHAR:
-		case ZBX_TYPE_TEXT:
-		case ZBX_TYPE_SHORTTEXT:
-		case ZBX_TYPE_LONGTEXT:
-		case ZBX_TYPE_CUID:
-			sizes = (size_t *)zbx_malloc(NULL, sizeof(size_t) * rows_num);
-			context->size_max = 0;
-
-			for (i = 0; i < rows_num; i++)
-			{
-				sizes[i] = strlen(rows[i][position].str);
-
-				if (sizes[i] > context->size_max)
-					context->size_max = sizes[i];
-			}
-
-			context->data = sizes;
-			data_type = SQLT_LNG;
-			break;
-		case ZBX_TYPE_BLOB:
-			sizes = (size_t *)zbx_malloc(NULL, sizeof(size_t) * rows_num);
-			context->size_max = 0;
-
-			for (i = 0; i < rows_num; i++)
-			{
-				size_t	dst_len;
-				size_t	src_len = strlen(rows[i][position].str) * 3 / 4 + 1;
-				char	*dst = (char*)zbx_malloc(NULL, src_len);
-
-				zbx_base64_decode(rows[i][position].str, (char *)dst, src_len, &dst_len);
-				sizes[i] = dst_len;
-				zbx_free(rows[i][position].str);
-				rows[i][position].str = dst;
-
-				if (sizes[i] > context->size_max)
-					context->size_max = sizes[i];
-			}
-
-			context->data = sizes;
-			data_type = SQLT_BIN;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
-	}
-
-	err = OCIBindByPos(oracle.stmthp, &bindhp, oracle.errhp, context->position + 1, NULL, context->size_max,
-			data_type, NULL, NULL, NULL, 0, NULL, (ub4)OCI_DATA_AT_EXEC);
-
-	if (OCI_SUCCESS != err)
-	{
-		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
-
-		if (ZBX_DB_FAIL == ret && 0 < txn_level)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
-			txn_error = ZBX_DB_FAIL;
-		}
-
-		goto out;
-	}
-
-	err = OCIBindDynamic(bindhp, oracle.errhp, (dvoid *)context, db_bind_dynamic_cb, NULL, NULL);
-
-	if (OCI_SUCCESS != err)
-	{
-		ret = OCI_handle_sql_error(ERR_Z3007, err, NULL);
-
-		if (ZBX_DB_FAIL == ret && 0 < txn_level)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
-			txn_error = ZBX_DB_FAIL;
-		}
-
-		goto out;
-	}
-out:
-	if (ret != ZBX_DB_OK)
-		zbx_db_clean_bind_context(context);
-
-	return ret;
-}
-
-void	zbx_db_clean_bind_context(zbx_db_bind_context_t *context)
-{
-	zbx_free(context->data);
-}
-
-int	zbx_db_statement_execute(int iters)
-{
-	sword	err;
-	ub4	nrows;
-	int	ret;
-
-	if (ZBX_DB_OK != txn_error)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] within failed transaction", txn_level);
-		ret = ZBX_DB_FAIL;
-		goto out;
-	}
-
-	if (OCI_SUCCESS != (err = zbx_oracle_statement_execute(iters, &nrows)))
-		ret = OCI_handle_sql_error((ORA_ERR_UNIQ_CONSTRAINT == err ? ERR_Z3008 : ERR_Z3007), err, NULL);
-	else
-		ret = (int)nrows;
-
-	if (ZBX_DB_FAIL == ret && 0 < txn_level)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "query failed, setting transaction as failed");
-		txn_error = ZBX_DB_FAIL;
-	}
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "%s():%d", __func__, ret);
-
-	return ret;
-}
-#endif
 
 #if defined(HAVE_MYSQL)
 void	zbx_mysql_escape_bin(const char *src, char *dst, size_t size)
@@ -1477,10 +912,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	char		*sql = NULL, *sql_printable = NULL;
 	int		ret = ZBX_DB_OK;
 	double		sec = 0;
-#if defined(HAVE_MYSQL)
-#elif defined(HAVE_ORACLE)
-	sword		err = OCI_SUCCESS;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	PGresult	*result;
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
@@ -1559,18 +991,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 			while (0 == status);
 		}
 	}
-#elif defined(HAVE_ORACLE)
-	if (OCI_SUCCESS == (err = zbx_oracle_statement_prepare(sql)))
-	{
-		ub4	nrows = 0;
-
-		if (OCI_SUCCESS == (err = zbx_oracle_statement_execute(1, &nrows)))
-			ret = (int)nrows;
-	}
-
-	if (OCI_SUCCESS != err)
-		ret = OCI_handle_sql_error((err == ORA_ERR_UNIQ_CONSTRAINT ? ERR_Z3008 : ERR_Z3005), err, sql);
-
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
 
@@ -1673,12 +1093,7 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 	char		*sql = NULL;
 	zbx_db_result_t	result = NULL;
 	double		sec = 0;
-#if defined(HAVE_ORACLE)
-	sword		err = OCI_SUCCESS;
-	ub4		prefetch_rows = 200, counter;
-
-	ZBX_UNUSED(counter);
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	char		*error = NULL;
 #elif defined(HAVE_SQLITE3)
 	int		ret = FAIL;
@@ -1723,164 +1138,6 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 			zbx_db_free_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (zbx_db_result_t)ZBX_DB_DOWN : NULL);
 		}
-	}
-#elif defined(HAVE_ORACLE)
-	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
-	memset(result, 0, sizeof(struct zbx_db_result));
-	zbx_vector_ptr_append(&oracle.db_results, result);
-
-	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
-
-	/* Prefetching when working with Oracle is needed because otherwise it fetches only 1 row at a time when doing */
-	/* selects (default behavior). There are 2 ways to do prefetching: memory based and rows based. Based on the   */
-	/* study optimal (speed-wise) memory based prefetch is 2 MB. But in case of many subsequent selects CPU usage  */
-	/* jumps up to 100 %. Using rows prefetch with up to 200 rows does not affect CPU usage, it is the same as     */
-	/* without prefetching at all. See ZBX-5920, ZBX-6493 for details.                                             */
-	/*                                                                                                             */
-	/* Tested on Oracle 11gR2.                                                                                     */
-	/*                                                                                                             */
-	/* Oracle info: docs.oracle.com/cd/B28359_01/appdev.111/b28395/oci04sql.htm                                    */
-
-	if (OCI_SUCCESS == err)
-	{
-		err = OCIAttrSet(result->stmthp, OCI_HTYPE_STMT, &prefetch_rows, sizeof(prefetch_rows),
-				OCI_ATTR_PREFETCH_ROWS, oracle.errhp);
-	}
-
-	if (OCI_SUCCESS == err)
-	{
-		err = OCIStmtPrepare(result->stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql),
-				(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
-	}
-
-	if (OCI_SUCCESS == err)
-	{
-		err = OCIStmtExecute(oracle.svchp, result->stmthp, oracle.errhp, (ub4)0, (ub4)0,
-				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL,
-				0 == txn_level ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT);
-	}
-
-	if (OCI_SUCCESS == err)
-	{
-		/* get the number of columns in the query */
-		err = OCIAttrGet((void *)result->stmthp, OCI_HTYPE_STMT, (void *)&result->ncolumn,
-				  (ub4 *)0, OCI_ATTR_PARAM_COUNT, oracle.errhp);
-	}
-
-	if (OCI_SUCCESS != err)
-		goto error;
-
-	assert(0 < result->ncolumn);
-
-	result->values = zbx_malloc(NULL, result->ncolumn * sizeof(char *));
-	result->clobs = zbx_malloc(NULL, result->ncolumn * sizeof(OCILobLocator *));
-	result->values_alloc = zbx_malloc(NULL, result->ncolumn * sizeof(ub4));
-	memset(result->values, 0, result->ncolumn * sizeof(char *));
-	memset(result->clobs, 0, result->ncolumn * sizeof(OCILobLocator *));
-	memset(result->values_alloc, 0, result->ncolumn * sizeof(ub4));
-
-	for (counter = 1; OCI_SUCCESS == err && counter <= (ub4)result->ncolumn; counter++)
-	{
-		OCIParam	*parmdp = NULL;
-		OCIDefine	*defnp = NULL;
-		ub4		char_semantics;
-		ub2		col_width = 0, data_type = 0;
-
-		/* request a parameter descriptor in the select-list */
-		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp, (void **)&parmdp, (ub4)counter);
-
-		if (OCI_SUCCESS == err)
-		{
-			/* retrieve the data type for the column */
-			err = OCIAttrGet((void *)parmdp, OCI_DTYPE_PARAM, (dvoid *)&data_type, (ub4 *)NULL,
-					(ub4)OCI_ATTR_DATA_TYPE, (OCIError *)oracle.errhp);
-		}
-
-		if (SQLT_CLOB == data_type)
-		{
-			if (OCI_SUCCESS == err)
-			{
-				/* allocate the lob locator variable */
-				err = OCIDescriptorAlloc((dvoid *)oracle.envhp, (dvoid **)&result->clobs[counter - 1],
-						OCI_DTYPE_LOB, (size_t)0, (dvoid **)0);
-			}
-
-			if (OCI_SUCCESS == err)
-			{
-				/* associate clob var with its define handle */
-				err = OCIDefineByPos((void *)result->stmthp, &defnp, (OCIError *)oracle.errhp,
-						(ub4)counter, (dvoid *)&result->clobs[counter - 1], (sb4)-1,
-						data_type, (dvoid *)0, (ub2 *)0, (ub2 *)0, (ub4)OCI_DEFAULT);
-			}
-		}
-		else
-		{
-			if (SQLT_IBDOUBLE != data_type && SQLT_BDOUBLE != data_type)
-			{
-				if (OCI_SUCCESS == err)
-				{
-					/* retrieve the length semantics for the column */
-					char_semantics = 0;
-					err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics,
-							(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
-				}
-
-				if (OCI_SUCCESS == err)
-				{
-					if (0 != char_semantics)
-					{
-						/* retrieve the column width in characters */
-						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
-								(ub4 *)NULL, (ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
-
-						/* adjust for UTF-8 */
-						col_width *= 4;
-					}
-					else
-					{
-#define ZBX_MIN_OCI_NUMBER_WIDTH	22
-						/* retrieve the column width in bytes */
-						err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,
-								(ub4 *)NULL, (ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
-
-						if (ZBX_MIN_OCI_NUMBER_WIDTH > col_width && SQLT_NUM == data_type)
-						{
-							col_width = ZBX_MIN_OCI_NUMBER_WIDTH;
-						}
-#undef ZBX_MIN_OCI_NUMBER_WIDTH
-					}
-				}
-				col_width++;	/* add 1 byte for terminating '\0' */
-			}
-			else
-				col_width = ZBX_MAX_DOUBLE_LEN + 1;
-
-			result->values_alloc[counter - 1] = col_width;
-			result->values[counter - 1] = zbx_malloc(NULL, col_width);
-			*result->values[counter - 1] = '\0';
-
-			if (OCI_SUCCESS == err)
-			{
-				/* represent any data as characters */
-				err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
-						(dvoid *)result->values[counter - 1], col_width, SQLT_STR,
-						(dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
-			}
-		}
-
-		/* free cell descriptor */
-		OCIDescriptorFree(parmdp, OCI_DTYPE_PARAM);
-		parmdp = NULL;
-	}
-error:
-	if (OCI_SUCCESS != err)
-	{
-		int	server_status;
-
-		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
-		zbx_db_free_result(result);
-
-		result = (ZBX_DB_DOWN == server_status ? (zbx_db_result_t)(intptr_t)server_status : NULL);
 	}
 #elif defined(HAVE_POSTGRESQL)
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
@@ -1969,23 +1226,10 @@ clean:
  */
 zbx_db_result_t	zbx_db_select_n_basic(const char *query, int n)
 {
-#if defined(HAVE_ORACLE)
-	return zbx_db_select_basic("select * from (%s) where rownum<=%d", query, n);
-#elif defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	return zbx_db_select_basic("%s limit %d", query, n);
 #endif
 }
-
-#if defined(HAVE_ORACLE)
-static void	db_set_fetch_error(int dberr)
-{
-	if (0 < txn_level)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "fetch failed, setting transaction as failed");
-		txn_error = dberr;
-	}
-}
-#endif
 
 int	zbx_db_get_row_num(zbx_db_result_t result)
 {
@@ -2001,12 +1245,6 @@ int	zbx_db_get_row_num(zbx_db_result_t result)
 
 zbx_db_row_t	zbx_db_fetch_basic(zbx_db_result_t result)
 {
-#if defined(HAVE_ORACLE)
-	int		i;
-	sword		rc;
-	static char	errbuf[512];
-	sb4		errcode;
-#endif
 
 	if (NULL == result)
 		return NULL;
@@ -2016,99 +1254,6 @@ zbx_db_row_t	zbx_db_fetch_basic(zbx_db_result_t result)
 		return NULL;
 
 	return (zbx_db_row_t)mysql_fetch_row(result->result);
-#elif defined(HAVE_ORACLE)
-	if (NULL == result->stmthp)
-		return NULL;
-
-	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
-		return NULL;
-
-	if (OCI_SUCCESS != rc)
-	{
-		ub4	rows_fetched;
-		ub4	sizep = sizeof(ub4);
-
-		if (OCI_SUCCESS != (rc = OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL,
-				&errcode, (text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR)))
-		{
-			zbx_db_errlog(ERR_Z3006, rc, zbx_oci_error(rc, NULL), NULL);
-			db_set_fetch_error(ZBX_DB_FAIL);
-			return NULL;
-		}
-
-		switch (errcode)
-		{
-			case 1012:	/* ORA-01012: not logged on */
-			case 2396:	/* ORA-02396: exceeded maximum idle time */
-			case 3113:	/* ORA-03113: end-of-file on communication channel */
-			case 3114:	/* ORA-03114: not connected to ORACLE */
-				zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
-				db_set_fetch_error(ZBX_DB_DOWN);
-				return NULL;
-			default:
-				rc = OCIAttrGet((void *)result->stmthp, (ub4)OCI_HTYPE_STMT, (void *)&rows_fetched,
-						(ub4 *)&sizep, (ub4)OCI_ATTR_ROWS_FETCHED, (OCIError *)oracle.errhp);
-
-				if (OCI_SUCCESS != rc || 1 != rows_fetched)
-				{
-					zbx_db_errlog(ERR_Z3006, errcode, errbuf, NULL);
-					db_set_fetch_error(ZBX_DB_FAIL);
-					return NULL;
-				}
-		}
-	}
-
-	for (i = 0; i < result->ncolumn; i++)
-	{
-		ub4	alloc, amount;
-		ub1	csfrm;
-		sword	rc2;
-
-		if (NULL == result->clobs[i])
-			continue;
-
-		if (OCI_SUCCESS != (rc2 = OCILobGetLength(oracle.svchp, oracle.errhp, result->clobs[i], &amount)))
-		{
-			/* If the LOB is NULL, the length is undefined. */
-			/* In this case the function returns OCI_INVALID_HANDLE. */
-			if (OCI_INVALID_HANDLE != rc2)
-			{
-				zbx_db_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
-				db_set_fetch_error(ZBX_DB_FAIL);
-				return NULL;
-			}
-			else
-				amount = 0;
-		}
-		else if (OCI_SUCCESS != (rc2 = OCILobCharSetForm(oracle.envhp, oracle.errhp, result->clobs[i], &csfrm)))
-		{
-			zbx_db_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
-			db_set_fetch_error(ZBX_DB_FAIL);
-			return NULL;
-		}
-
-		if (result->values_alloc[i] < (alloc = amount * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1))
-		{
-			result->values_alloc[i] = alloc;
-			result->values[i] = zbx_realloc(result->values[i], result->values_alloc[i]);
-		}
-
-		if (OCI_SUCCESS == rc2)
-		{
-			if (OCI_SUCCESS != (rc2 = OCILobRead(oracle.svchp, oracle.errhp, result->clobs[i], &amount,
-					(ub4)1, (dvoid *)result->values[i], (ub4)(result->values_alloc[i] - 1),
-					(dvoid *)NULL, (OCICallbackLobRead)NULL, (ub2)0, csfrm)))
-			{
-				zbx_db_errlog(ERR_Z3006, rc2, zbx_oci_error(rc2, NULL), NULL);
-				db_set_fetch_error(ZBX_DB_FAIL);
-				return NULL;
-			}
-		}
-
-		result->values[i][amount] = '\0';
-	}
-
-	return result->values;
 #elif defined(HAVE_POSTGRESQL)
 	/* EOF */
 	if (result->cursor == result->row_num)
@@ -2155,57 +1300,9 @@ int	zbx_db_is_null_basic(const char *field)
 {
 	if (NULL == field)
 		return SUCCEED;
-#ifdef HAVE_ORACLE
-	if ('\0' == *field)
-		return SUCCEED;
-#endif
+
 	return FAIL;
 }
-
-#ifdef HAVE_ORACLE
-static void	OCI_DBclean_result_handle(zbx_db_result_t result)
-{
-	if (NULL != result->values)
-	{
-		int	i;
-
-		for (i = 0; i < result->ncolumn; i++)
-		{
-			/* deallocate the lob locator variable */
-			if (NULL != result->clobs[i])
-			{
-				OCIDescriptorFree((dvoid *)result->clobs[i], OCI_DTYPE_LOB);
-				result->clobs[i] = NULL;
-			}
-		}
-	}
-
-	if (result->stmthp)
-	{
-		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
-		result->stmthp = NULL;
-	}
-}
-static void	OCI_DBclean_result(zbx_db_result_t result)
-{
-	if (NULL == result)
-		return;
-
-	OCI_DBclean_result_handle(result);
-
-	if (NULL != result->values)
-	{
-		int	i;
-
-		for (i = 0; i < result->ncolumn; i++)
-			zbx_free(result->values[i]);
-
-		zbx_free(result->values);
-		zbx_free(result->clobs);
-		zbx_free(result->values_alloc);
-	}
-}
-#endif
 
 void	zbx_db_free_result(zbx_db_result_t result)
 {
@@ -2214,24 +1311,6 @@ void	zbx_db_free_result(zbx_db_result_t result)
 		return;
 
 	mysql_free_result(result->result);
-	zbx_free(result);
-#elif defined(HAVE_ORACLE)
-	int i;
-
-	if (NULL == result)
-		return;
-
-	OCI_DBclean_result(result);
-
-	for (i = 0; i < oracle.db_results.values_num; i++)
-	{
-		if (oracle.db_results.values[i] == result)
-		{
-			zbx_vector_ptr_remove_noorder(&oracle.db_results, i);
-			break;
-		}
-	}
-
 	zbx_free(result);
 #elif defined(HAVE_POSTGRESQL)
 	if (NULL == result)
@@ -2258,23 +1337,6 @@ void	zbx_db_free_result(zbx_db_result_t result)
 	zbx_free(result);
 #endif	/* HAVE_SQLITE3 */
 }
-
-#ifdef HAVE_ORACLE
-/* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
-static ub4	OCI_DBserver_status(void)
-{
-	sword	err;
-	ub4	server_status = OCI_SERVER_NOT_CONNECTED;
-
-	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
-			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
-
-	if (OCI_SUCCESS != err)
-		zabbix_log(LOG_LEVEL_WARNING, "cannot determine Oracle server status, assuming not connected");
-
-	return server_status;
-}
-#endif	/* HAVE_ORACLE */
 
 static int	zbx_db_is_escape_sequence(char c)
 {
@@ -2590,15 +1652,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	}
 
 	zbx_json_addint64(json, "flag", info->flag);
-#ifdef HAVE_ORACLE
-	if (0 != info->tables_json.buffer_offset)
-	{
-		zbx_json_addobject(json, "schema_diff");
-		if (0 != strcmp(info->tables_json.buffer, "{}"))
-			zbx_json_addraw(json, "tables", info->tables_json.buffer);
-		zbx_json_close(json);
-	}
-#endif
 	zbx_json_close(json);
 
 	if (NULL != info->extension)
@@ -2669,8 +1722,6 @@ static zbx_uint32_t	zbx_dbms_version_get(void)
 	return ZBX_MYSQL_SVERSION;
 #elif defined(HAVE_POSTGRESQL)
 	return ZBX_PG_SVERSION;
-#elif defined(HAVE_ORACLE)
-	return ZBX_ORACLE_SVERSION;
 #else
 	return ZBX_DBVERSION_UNDEFINED;
 #endif
@@ -2792,94 +1843,6 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_STR;
 	version_info->friendly_max_version = ZBX_POSTGRESQL_MAX_VERSION_STR;
 	version_info->friendly_min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR;
-
-	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
-			version_info->min_version, version_info->max_version, version_info->min_supported_version);
-
-#elif defined(HAVE_ORACLE)
-#	ifdef HAVE_OCI_SERVER_RELEASE2
-	char	*version_str = "Version ";
-	ub4	oci_ver = 0;
-#	endif
-	char	*start, *release_str = "Release ";
-	char	version_friendly[MAX_STRING_LEN / 8];
-	int	major_release_version, release_update_version, release_update_version_revision,
-			increment_version, reserved_for_future_use, overall_status = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-#	ifdef HAVE_OCI_SERVER_RELEASE2
-	if (OCI_SUCCESS != OCIServerRelease2(oracle.svchp, oracle.errhp, (OraText *) version_friendly,
-			(ub4)sizeof(version_friendly), OCI_HTYPE_SVCCTX, &oci_ver, OCI_DEFAULT))
-#	else
-	if (OCI_SUCCESS != OCIServerVersion(oracle.svchp, oracle.errhp, (OraText *) version_friendly,
-			(ub4)sizeof(version_friendly), OCI_HTYPE_SVCCTX))
-#	endif
-	{
-		overall_status = FAIL;
-		goto out;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "OracleDB version retrieved unparsed: %s", version_friendly);
-
-	if (
-#	ifdef HAVE_OCI_SERVER_RELEASE2
-			NULL != (start = strstr(version_friendly, version_str)) ||
-#	endif
-			NULL != (start = strstr(version_friendly, release_str)))
-	{
-		size_t	next_start_index;
-
-		next_start_index = start - version_friendly + strlen(release_str); /* same length for version_str */
-
-		if (5 != sscanf(version_friendly + next_start_index, "%d.%d.%d.%d.%d", &major_release_version,
-				&release_update_version, &release_update_version_revision, &increment_version,
-				&reserved_for_future_use) || major_release_version >= 100 ||
-				major_release_version <= 0 || release_update_version >= 100 ||
-				release_update_version < 0 || release_update_version_revision >= 100 ||
-				release_update_version_revision < 0 || increment_version >= 100 ||
-				increment_version < 0)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unexpected Oracle DB version format: %s", version_friendly);
-			overall_status = FAIL;
-		}
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot find Release keyword in Oracle DB version.");
-		overall_status = FAIL;
-	}
-out:
-	if (FAIL == overall_status)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Failed to detect OracleDB version");
-		ZBX_ORACLE_SVERSION = ZBX_DBVERSION_UNDEFINED;
-	}
-	else
-	{
-		ZBX_ORACLE_SVERSION = major_release_version * 100000000 + release_update_version * 1000000 +
-				release_update_version_revision * 10000 + increment_version * 100 +
-				reserved_for_future_use;
-#	ifndef HAVE_OCI_SERVER_RELEASE2
-		if (18 <= major_release_version)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to determine the accurate Oracle DB version "
-					"(possibly there is a DB driver - DB version mismatch, "
-					"only the major Oracle DB version can be established): %s", version_friendly);
-		}
-#	endif
-	}
-
-	version_info->database = "Oracle";
-
-	version_info->current_version = ZBX_ORACLE_SVERSION;
-	version_info->min_version = ZBX_ORACLE_MIN_VERSION;
-	version_info->max_version = ZBX_ORACLE_MAX_VERSION;
-	version_info->min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION;
-
-	version_info->friendly_current_version = zbx_strdup(NULL, version_friendly);
-	version_info->friendly_min_version = ZBX_ORACLE_MIN_VERSION_STR;
-	version_info->friendly_max_version = ZBX_ORACLE_MAX_VERSION_STR;
-	version_info->friendly_min_supported_version = ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR;
 
 	version_info->flag = zbx_db_version_check(version_info->database, version_info->current_version,
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);

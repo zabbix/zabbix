@@ -1751,42 +1751,22 @@ static int	DBpatch_2010195(void)
 
 static int	DBpatch_2010196(void)
 {
-#ifdef HAVE_ORACLE
-	const zbx_db_field_t	field = {"message_tmp", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("alerts", &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_2010197(void)
 {
-#ifdef HAVE_ORACLE
-	return ZBX_DB_OK > zbx_db_execute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_2010198(void)
 {
-#ifdef HAVE_ORACLE
-	return DBdrop_field("alerts", "message");
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_2010199(void)
 {
-#ifdef HAVE_ORACLE
-	const zbx_db_field_t	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
-
-	return DBrename_field("alerts", "message_tmp", &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 #endif

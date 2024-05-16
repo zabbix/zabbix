@@ -1169,13 +1169,8 @@ static int	DBpatch_2030095(void)
 
 			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, *p);
 		}
-#if defined(HAVE_ORACLE)
-		if (0 == params_offset || (2048 < params_offset && 2048 /* ZBX_ITEM_PARAM_LEN */ <
-				zbx_strlen_utf8(params)))
-#else
 		if (0 == params_offset ||
 				(65535 < params_offset && 65535 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
-#endif
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\": resulting"
 					" expression is %s", row[1], 0 == params_offset ? "empty" : "too long");

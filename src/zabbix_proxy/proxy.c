@@ -1432,13 +1432,6 @@ static void	proxy_db_init(void)
 		exit(EXIT_FAILURE);
 #endif
 	}
-
-#ifdef HAVE_ORACLE
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-	zbx_db_table_prepare("items", NULL);
-	zbx_db_table_prepare("item_preproc", NULL);
-	zbx_db_close();
-#endif
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1611,11 +1604,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
-
-#ifdef HAVE_ORACLE
-	zabbix_log(LOG_LEVEL_INFORMATION, "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in "
-			"future versions");
-#endif
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())

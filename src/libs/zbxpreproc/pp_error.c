@@ -83,13 +83,8 @@ static void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, i
 	switch (field_type)
 	{
 		case ZBX_TYPE_CHAR:
-#if defined(HAVE_ORACLE)
-			field->chars_num = field_len;
-			field->bytes_num = 4000;
-#else
 			field->chars_num = field_len;
 			field->bytes_num = -1;
-#endif
 			return;
 	}
 

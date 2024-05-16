@@ -1006,20 +1006,12 @@ static int	DBpatch_6010045(void)
 
 static int	DBpatch_6010046(void)
 {
-#ifdef HAVE_ORACLE
-	return DBcreate_serial_sequence("changelog");
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_6010047(void)
 {
-#ifdef HAVE_ORACLE
-	return DBcreate_serial_trigger("changelog", "changelogid");
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_6010048(void)

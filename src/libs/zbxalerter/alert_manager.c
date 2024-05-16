@@ -1038,8 +1038,6 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 
 #if defined(HAVE_MYSQL)
 #	define ZBX_DATABASE_TYPE "MySQL"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_DATABASE_TYPE "Oracle"
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_DATABASE_TYPE "PostgreSQL"
 #else

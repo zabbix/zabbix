@@ -356,11 +356,7 @@ static void	dbsync_prune_changelog(void)
 
 	last_prune_time = now;
 
-#ifndef HAVE_ORACLE
 	result = zbx_db_select("select %s", ZBX_DB_TIMESTAMP());
-#else
-	result = zbx_db_select("select %s from dual", ZBX_DB_TIMESTAMP());
-#endif
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{

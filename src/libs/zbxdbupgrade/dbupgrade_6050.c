@@ -97,10 +97,7 @@ static int	DBpatch_6050008(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-#if defined(HAVE_ORACLE)
-	if (SUCCEED == zbx_db_check_oracle_colum_type("history", "value", ZBX_TYPE_FLOAT))
-		return SUCCEED;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	if (SUCCEED == DBcheck_field_type("history", &field))
 		return SUCCEED;
 #endif
@@ -120,10 +117,7 @@ static int	DBpatch_6050009(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-#if defined(HAVE_ORACLE)
-	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_min", ZBX_TYPE_FLOAT))
-		return SUCCEED;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
 #endif
@@ -138,10 +132,7 @@ static int	DBpatch_6050010(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-#if defined(HAVE_ORACLE)
-	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_avg", ZBX_TYPE_FLOAT))
-		return SUCCEED;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
 #endif
@@ -160,13 +151,10 @@ static int	DBpatch_6050011(void)
 	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 	int			ret;
 
-#if defined(HAVE_ORACLE)
-	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_max", ZBX_TYPE_FLOAT))
-		return SUCCEED;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
+#endif
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;

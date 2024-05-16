@@ -7831,15 +7831,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	zbx_dbsync_init_changelog(&proxy_sync, changelog_sync_mode);
 
-
-#ifdef HAVE_ORACLE
-	/* With Oracle fetch statements can fail before all data has been fetched. */
-	/* In such cache next sync will need to do full scan rather than just      */
-	/* applying changelog diff. To detect this problem configuration is synced */
-	/* in transaction and error is checked at the end.                         */
-	zbx_db_begin();
-#endif
-
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_config(&config_sync))
 		goto out;
@@ -8630,12 +8621,6 @@ out:
 
 	FINISH_SYNC;
 
-#ifdef HAVE_ORACLE
-	if (ZBX_DB_OK == dberr)
-		dberr = zbx_db_commit();
-	else
-		zbx_db_rollback();
-#endif
 	switch (dberr)
 	{
 		case ZBX_DB_OK:
