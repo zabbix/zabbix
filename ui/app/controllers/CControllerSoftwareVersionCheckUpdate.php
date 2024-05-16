@@ -115,7 +115,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 		$lastcheck = time();
 		$versions = $this->getInput('versions');
 
-		if ($versions) {
+		if ($versions && in_array(ZABBIX_EXPORT_VERSION, array_column($versions, 'version'))) {
 			$delay = self::NEXTCHECK_DELAY;
 			$lastcheck_success = $lastcheck;
 			$nextcheck = $lastcheck + $delay;
