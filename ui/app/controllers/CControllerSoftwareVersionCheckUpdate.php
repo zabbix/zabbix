@@ -46,7 +46,15 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 	}
 
 	private function validateVersions(): bool {
-		foreach ($this->getInput('versions') as $version) {
+		foreach (array_values($this->getInput('versions')) as $i => $version) {
+			$path = '/versions/'.($i + 1);
+
+			if (!is_array($version)) {
+				error(_s('Invalid parameter "%1$s": %2$s.', $path, 'an array is expected'));
+
+				return false;
+			}
+
 			$validator = new CNewValidator($version, [
 				'version' =>				'required|not_empty|string',
 				'end_of_full_support' =>	'required|bool',
