@@ -18,7 +18,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 # zbxeval depends on zbxalgo, zbxexpr, zbxjson, zbxnum, zbxregexp, zbxserialize, zbxstr, zbxtime,
-#                    zbxvariant and zbxcommon
+#                    zbxvariant, zbxxml and zbxcommon
 # 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
 # 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 
@@ -73,6 +73,14 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
+XML_LIBS = \
+        $(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(VARIANT_LIBS) \
+        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+        $(JSON_LIBS) \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
 MOCK_DATA_DEPS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
@@ -94,11 +102,12 @@ MOCK_TEST_DEPS = \
 
 EVAL_LIBS = \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(EXPR_LIBS) \
 	$(JSON_LIBS) \
-	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(VARIANT_LIBS) \
+	$(XML_LIBS) \
+	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \

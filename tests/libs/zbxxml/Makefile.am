@@ -88,7 +88,7 @@ JSON_LIBS = \
 XML_LIBS = \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(VARIANT_LIBS) \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(JSON_LIBS) \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
