@@ -1803,7 +1803,8 @@ class CDashboardPage {
 
 			widgetRequireDataSource: e => {
 				for (const widget of this._widgets.keys()) {
-					if (widget.getFields().reference === e.detail.reference) {
+					if (widget.getFields().reference === e.detail.reference
+							&& widget.getBroadcastTypes().includes(e.detail.type)) {
 						return;
 					}
 				}
