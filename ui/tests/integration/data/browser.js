@@ -127,7 +127,7 @@ try
 	if (el === null)
 	{
 		throw Error("cannot find login button");
- 	}
+	}
 
 	Zabbix.log(5, "getText " + el.getText())
 
