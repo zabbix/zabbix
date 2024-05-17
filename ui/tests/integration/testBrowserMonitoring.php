@@ -84,25 +84,24 @@ class testBrowserMonitoring extends CIntegrationTest {
 	 * @configurationDataProvider configurationProvider
 	 * @required-components server
 	 */
-	public function testBrowserMonitoring_tc1() {
+	public function testBrowserMonitoring_executeBrowserJs() {
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'output' => 'extend',
 			'itemids' => [self::$itemid]
-		], 60, 2);
+		], 30, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('value', $response['result'][0]);
 
-		$value = $response['result'][0]['value'];
-		$j = json_decode($value);
+		$result = json_decode($response['result'][0]['value'], true);
 
-		$this->assertArrayHasKey('performance_data', $j);
-		$this->assertArrayHasKey('details', $j['performance_data']);
-		$this->assertArrayHasKey('summary', $j['performance_data']);
-		$this->assertArrayHasKey('navigation', $j['performance_data']['summary']);
-		$this->assertArrayHasKey('resource', $j['performance_data']['summary']);
-		$this->assertArrayHasKey('marks', $j['performance_data']);
-		$this->assertArrayNotHasKey('error', $j['performance_data']);
+		$this->assertArrayHasKey('performance_data', $result);
+		$this->assertArrayHasKey('details', $result['performance_data']);
+		$this->assertArrayHasKey('summary', $result['performance_data']);
+		$this->assertArrayHasKey('navigation', $result['performance_data']['summary']);
+		$this->assertArrayHasKey('resource', $result['performance_data']['summary']);
+		$this->assertArrayHasKey('marks', $result['performance_data']);
+		$this->assertArrayNotHasKey('error', $result['performance_data']);
 
 		return true;
 	}
