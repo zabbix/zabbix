@@ -3,9 +3,6 @@
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-	<!-- oracle oci library has functions declarations without arguments: f() instead of f(void), so it triggers -Wstrict-prototypes warning -->
-	<property name="COMP_FLAGS_ORACLE" value="-g -std=gnu99 -pedantic -Wall -Wextra -Wunused -Wshadow -Wpointer-arith -Wno-null-pointer-subtraction -Wno-overlength-strings -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wunreachable-code -Wformat-extra-args -Wmissing-field-initializers -Wincompatible-pointer-types -Wnull-dereference -Wold-style-definition -Wmissing-declarations -Wunused-parameter -Winit-self -Wnested-externs -Wjump-misses-init -Wdangling-else -Wformat-signedness -Wfloat-conversion -Wredundant-decls"/>
-	<property name="COMP_FLAGS" value="-Wstrict-prototypes ${COMP_FLAGS_ORACLE}"/>
 	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl"/>
 
 	<!-- Initialize database related options based on the database type -->
@@ -13,10 +10,6 @@
 		<case value="POSTGRESQL">
 			<property name="with.db" value="--with-postgresql"/>
 			<property name="with.postgresql" value="true"/>
-		</case>
-		<case value="ORACLE">
-			<property name="with.db" value="--with-oracle"/>
-			<property name="with.oracle" value="true"/>
 		</case>
 		<default>
 			<property name="with.db" value="--with-mysql"/>
@@ -120,7 +113,7 @@
 			<property name="common.cflags" value="-O2 -g"/>
 			<switch value="@{cc}">
 				<case value="gcc">
-					<property name="cc.cflags" value="${COMP_FLAGS_ORACLE}"/>
+					<property name="cc.cflags" value=""/>
 				</case>
 				<case value="clang">
 					<property name="cc.cflags" value=""/>
@@ -176,15 +169,8 @@
 		</sequential>
 	</target>
 
-	<target name="make-db-oracle" unless="${with.oracle}">
-		<!-- Build Zabbix with oracle database -->
-		<sequential>
-			<make args="${ZBX_BASE_FLAGS} --with-oracle --with-openipmi --with-openssl --with-oracle-include=/usr/include/oracle/19.8/client64 --with-oracle-lib=/usr/lib/oracle/19.8/client64/lib"/>
-		</sequential>
-	</target>
-
 	<!-- Build Zabbix with all supported databases  -->
-	<target name="make-db" depends="make-db-mysql,make-db-postgresql,make-db-oracle"/>
+	<target name="make-db" depends="make-db-mysql,make-db-postgresql"/>
 
 	<target name="clean-tests">
 		<exec executable="make" failonerror="on">
@@ -246,34 +232,6 @@
 		<for list="${conf.list}" param="name" delimiter=",">
 			<sequential>
 				<make-tests conf="${cmocka-@{name}}" conf-name="@{name}"/>
-				<antcall target="clean-tests"/>
-			</sequential>
-		</for>
-	</target>
-
-	<target name="init-cmocka-ora-test-conf-options">
-		<property name="ORA_INCLUDE" value="/usr/include/oracle/12.1/client64"/>
-		<property name="ORA_LIB" value="/usr/lib/oracle/12.1/client64/lib"/>
-
-		<!-- Zabbix various configuration parameters for cmocka Oracle tests -->
-		<!-- Configuration option name must consist of prefix 'cmocka-ora-', configuration order number
-			and configuration title: cmocka-<number>-<title> -->
-		<property name="cmocka-ora-1-default" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-openipmi --with-openssl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
-		<property name="cmocka-ora-2-server-only" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-server --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
-		<property name="cmocka-ora-3-proxy-only" value="-q CFLAGS='${COMP_FLAGS_ORACLE}' --enable-proxy --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
-		<property name="cmocka-ora-4-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS_ORACLE} -Wenum-conversion -O2 -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q ${ZBX_BASE_FLAGS}  --enable-ipv6 --with-openipmi --with-openssl --with-iconv --with-libpcre --with-oracle --with-oracle-include=${ORA_INCLUDE} --with-oracle-lib=${ORA_LIB}"/>
-	</target>
-
-	<target name="cmocka-ora-tests" depends="init-cmocka-ora-test-conf-options">
-		<!-- Build Zabbix with cmocka Oracle tests -->
-		<delete dir="tests_results"/>
-		<mkdir dir="tests_results"/>
-		<exec executable="./bootstrap.sh" failonerror="on"/>
-		<propertyselector property="conf.list" delimiter="," match="cmocka-ora-(.*)" select="\1"/>
-		<sortlist property="conf.list" delimiter="," value="${conf.list}" override="true"/>
-		<for list="${conf.list}" param="name" delimiter=",">
-			<sequential>
-				<make-tests conf="${cmocka-ora-@{name}}" conf-name="@{name}"/>
 				<antcall target="clean-tests"/>
 			</sequential>
 		</for>
