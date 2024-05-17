@@ -2351,8 +2351,8 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'widget_type' => 'Plain text',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/plain_text'
+					'widget_type' => 'Item history',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_history'
 				]
 			],
 			// #222 Start creating Problem hosts widget.
