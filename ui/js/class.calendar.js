@@ -1,4 +1,3 @@
-// JavaScript Document
 /*
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
@@ -11,8 +10,7 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-**
-*/
+**/
 
 
 var CLNDR = null,
