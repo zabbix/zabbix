@@ -56,7 +56,7 @@ void	test_process_fping_statistics_line(void)
 
 	fping_resp.linebuf = strdup(zbx_mock_get_parameter_string("in.linebuf"));
 
-	fping_args.hosts = (ZBX_FPING_HOST *)calloc(hosts_count, sizeof(ZBX_FPING_HOST));
+	fping_args.hosts = (zbx_fping_host_t *)calloc(hosts_count, sizeof(zbx_fping_host_t));
 	fping_args.hosts_count = (int)hosts_count;
 	fping_args.requests_count = (int)zbx_mock_get_parameter_uint64("in.requests_count");
 	fping_args.allow_redirect = (unsigned char)zbx_mock_get_parameter_uint64("in.allow_redirect");
@@ -95,7 +95,7 @@ void test_process_response_to_individual_fping_request(void)
 
 	fping_resp.linebuf = strdup(zbx_mock_get_parameter_string("in.linebuf"));
 
-	fping_args.hosts = (ZBX_FPING_HOST *)calloc(hosts_count, sizeof(ZBX_FPING_HOST));
+	fping_args.hosts = (zbx_fping_host_t *)calloc(hosts_count, sizeof(zbx_fping_host_t));
 	fping_args.hosts_count = (int)hosts_count;
 	fping_args.requests_count = (int)zbx_mock_get_parameter_uint64("in.requests_count");
 	fping_args.allow_redirect = (unsigned char)zbx_mock_get_parameter_uint64("in.allow_redirect");

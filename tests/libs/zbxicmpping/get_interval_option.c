@@ -90,10 +90,10 @@ void	zbx_mock_test_entry(void **state)
 {
 	const int	hosts_cnt = 1;
 
-	int		value, ret;
-	ZBX_FPING_HOST	hosts[hosts_cnt];
-	char 		error[ZBX_ITEM_ERROR_LEN_MAX];
-	char		status[1];
+	int			value, ret;
+	zbx_fping_host_t	hosts[hosts_cnt];
+	char 			error[ZBX_ITEM_ERROR_LEN_MAX];
+	char			status[1];
 
 	ZBX_UNUSED(state);
 
