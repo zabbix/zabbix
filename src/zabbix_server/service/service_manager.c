@@ -1393,7 +1393,6 @@ static int	its_write_status_and_alarms(const zbx_vector_status_update_ptr_t *ala
 	}
 
 	/* write service status changes into database */
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != updates.values_num)
 	{
@@ -2334,7 +2333,6 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager,
 	/* update problems, escalations and link problems with recovery events */
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_insert_prepare(&db_insert_recovery, "event_recovery", "eventid", "r_eventid", (char *)NULL);
 
@@ -3088,7 +3086,6 @@ static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *eve
 		size_t	sql_offset = 0;
 
 		zbx_db_begin();
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (int i = 0; i < event_severities->values_num; i++)
 		{

@@ -147,7 +147,6 @@ static void	lld_process_task(const zbx_ipc_message_t *message)
 		diff.itemid = itemid;
 		zbx_vector_item_diff_ptr_append(&diffs, &diff);
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
 		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 

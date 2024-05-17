@@ -122,8 +122,6 @@ int	db_rename_macro(zbx_db_result_t result, const char *table, const char *pkey,
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		old_offset = sql_offset;

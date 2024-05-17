@@ -1149,8 +1149,6 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	zbx_graph_copy_t	*found;
 
 	zbx_hashset_iter_reset(host_graphs_main_data, &iter1);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	zbx_db_begin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
 	while (SUCCEED == res && NULL != (found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
 	{

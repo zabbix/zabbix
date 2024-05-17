@@ -453,7 +453,6 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	if (0 != update_num)
 	{
 		sql_offset = 0;
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != insert_num)
@@ -1002,7 +1001,6 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(zbx_host_triggers_main_data, &iter1);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (found = (zbx_target_host_trigger_entry_t *)zbx_hashset_iter_next(&iter1)))
 	{
@@ -1293,9 +1291,6 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	zbx_trigger_functions_entry_t	*found, temp_t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_db_begin_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
-			&sql_update_triggers_expr_offset);
 
 	zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "priority", "status", "comments",
 			"url", "url_name", "type", "value", "state", "templateid", "flags", "recovery_mode",

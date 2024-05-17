@@ -1511,7 +1511,6 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 
 		*sql_offset = 0;
 
-		zbx_db_begin_multiple_update(sql, sql_alloc, sql_offset);
 	}
 
 	return ret;
@@ -1921,8 +1920,6 @@ int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx
 	int	ret = SUCCEED;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	ret = zbx_db_prepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
 
@@ -2522,7 +2519,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	}
 #endif
 	zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ") values ");
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < self->rows.values_num; i++)
 	{

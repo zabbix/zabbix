@@ -3323,8 +3323,6 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 
 		zbx_vector_uint64_pair_sort(&rec_escalations, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		for (int j = 0; j < rec_escalations.values_num; j++)
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

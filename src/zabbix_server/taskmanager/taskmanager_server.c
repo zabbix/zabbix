@@ -733,7 +733,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		zbx_dc_reschedule_items(&itemids, time(NULL), proxyids);
 
 		sql_offset = 0;
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (int i = 0; i < tasks.values_num; i++)
 		{

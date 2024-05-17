@@ -59,8 +59,6 @@ static int	DBpatch_6010002(void)
 		" from triggers"
 		" where " ZBX_DB_CHAR_LENGTH(description) ">%d", 255);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		row[1][zbx_strlen_utf8_nchars(row[1], 255)] = '\0';
@@ -112,8 +110,6 @@ static int	DBpatch_6010005(void)
 		"select ht.hosttemplateid"
 		" from hosts_templates ht, hosts h"
 		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -349,8 +345,6 @@ static int	DBpatch_6010024(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select hi.itemid,hi.type,ht.name"
 			" from httptestitem hi,httptest ht"
@@ -415,8 +409,6 @@ static int	DBpatch_6010025(void)
 
 	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select hi.itemid,hi.type,hs.name,ht.name"
@@ -643,7 +635,6 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", (char *)NULL);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{

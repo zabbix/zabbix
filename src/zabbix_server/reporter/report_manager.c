@@ -446,7 +446,6 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 	zbx_vector_uint64_uniq(&manager->flush_queue, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_db_begin();
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (int i = 0; i < manager->flush_queue.values_num; i++)
 	{

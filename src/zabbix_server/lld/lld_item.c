@@ -3574,8 +3574,6 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 		sql_offset = 0;
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		for (int i = 0; i < items->values_num; i++)
 		{
 			item = items->values[i];
@@ -3681,11 +3679,6 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_
 		}
 
 		*host_locked = 1;
-	}
-
-	if (0 != update_preproc_num)
-	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != new_preproc_num)
@@ -3901,11 +3894,6 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_pt
 		*host_locked = 1;
 	}
 
-	if (0 != update_param_num)
-	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	}
-
 	if (0 != new_param_num)
 	{
 		new_paramid = zbx_db_get_maxid_num("item_parameter", new_param_num);
@@ -4082,11 +4070,6 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 		}
 
 		*host_locked = 1;
-	}
-
-	if (0 != update_tag_num)
-	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != new_tag_num)

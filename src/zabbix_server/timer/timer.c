@@ -89,8 +89,6 @@ static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_p
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (int i = 0; i < updates->values_num; i++)
 	{
 		char					delim = ' ';
@@ -451,7 +449,6 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
 				"suppress_until", (char *)NULL);
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (int i = 0; i < event_queries.values_num; i++)
 		{

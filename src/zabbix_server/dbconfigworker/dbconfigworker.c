@@ -53,7 +53,6 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 	um_handle = zbx_dc_open_user_macros();
 
 	zbx_db_begin();
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (zbx_uint64_t *batch = hostids->values; batch < hostids->values + hostids->values_num;
 			batch += ZBX_DBCONFIG_BATCH_SIZE)

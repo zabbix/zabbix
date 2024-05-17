@@ -1031,7 +1031,6 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 	if (0 != upd_items)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1142,8 +1141,6 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			}
 		}
 	}
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* update lld rule conditions for existing items */
 	for (i = 0; i < rules->values_num; i++)
@@ -1567,9 +1564,6 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items, int audit
 		}
 	}
 
-	if (0 != update_preproc_num)
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != new_preproc_num)
 	{
 		new_preprocid = zbx_db_get_maxid_num("item_preproc", new_preproc_num);
@@ -1751,9 +1745,6 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items, int audit_con
 		}
 	}
 
-	if (0 != update_tag_num)
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != new_tag_num)
 	{
 		new_tagid = zbx_db_get_maxid_num("item_tag", new_tag_num);
@@ -1906,9 +1897,6 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items, int 
 			update_param_num++;
 		}
 	}
-
-	if (0 != update_param_num)
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_param_num)
 	{
@@ -2075,9 +2063,6 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items, int aud
 		delete_lld_macro_num = deleteids.values_num;
 		sql_offset = 0;
 	}
-
-	if (0 != update_lld_macro_num)
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_lld_macro_num)
 	{

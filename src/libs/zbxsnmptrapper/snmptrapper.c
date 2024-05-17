@@ -314,7 +314,6 @@ static void	db_update_snmp_id(const char *date, const char *trap)
 	zbx_db_begin();
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update globalvars set value=%d where name='snmp_timestamp';\n", (int)timestamp);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,

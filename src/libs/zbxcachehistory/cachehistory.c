@@ -591,7 +591,6 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 	result = zbx_db_select("%s order by itemid,clock", sql);
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1754,8 +1753,6 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 
 	if (i != item_diff->values_num || 0 != inventory_values->values_num)
 	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		if (i != item_diff->values_num)
 		{
 			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,

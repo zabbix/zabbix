@@ -1155,8 +1155,6 @@ static int	DBpatch_3050118(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select e.eventid,t.priority"
 			" from events e"
@@ -1196,8 +1194,6 @@ static int	DBpatch_3050119(void)
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select p.eventid,t.priority"
@@ -1243,8 +1239,6 @@ static int	DBpatch_3050120(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 	zbx_hashset_create(&eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select acknowledgeid,eventid,action from acknowledges order by clock");
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1320,8 +1314,6 @@ static int	DBpatch_3050122(void)
 	int		ret = FAIL;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select functionid,parameter from functions where name='logsource'");
 

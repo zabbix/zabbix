@@ -799,8 +799,6 @@ static int	DBpatch_5030046(void)
 	zbx_db_insert_execute(&db_insert_valuemap_mapping);
 	zbx_db_insert_clean(&db_insert_valuemap_mapping);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
 	{
 		zbx_host_t	*host;
@@ -4092,8 +4090,6 @@ static int	DBpatch_5030130(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select profileid,value_str from profiles"
 			" where idx='web.monitoring.problem.properties'");
 
@@ -4840,7 +4836,6 @@ static int	DBpatch_5030165(void)
 
 	zbx_db_insert_prepare(&db_insert_functions, "functions", "functionid", "itemid", "triggerid", "name",
 			"parameter", (char *)NULL);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select triggerid,recovery_mode,expression,recovery_expression from triggers"
 			" order by triggerid");
@@ -5049,8 +5044,6 @@ static int	DBpatch_5030167(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select triggerid,event_name from triggers order by triggerid");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -5241,8 +5234,6 @@ static int	DBpatch_5030168(void)
 	size_t			sql_alloc = 0, sql_offset = 0;
 
 	zbx_vector_ptr_create(&functions);
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select i.itemid,i.params"
 			" from items i,hosts h"
@@ -5462,8 +5453,6 @@ static int	DBpatch_5030169(void)
 	char		*sql = NULL, *params = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0, params_alloc = 0, params_offset;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* ITEM_TYPE_AGGREGATE = 8 */
 	result = zbx_db_select("select itemid,key_ from items where type=8");
 
@@ -5661,8 +5650,6 @@ static int	DBpatch_5030181(void)
 
 		ZBX_DBROW2UINT64(valuemapid, row[0]);
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		in_result = zbx_db_select("select valuemap_mappingid"
 				" from valuemap_mapping"
 				" where valuemapid=" ZBX_FS_UI64
@@ -5818,8 +5805,6 @@ static int	DBpatch_5030190(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select h.hostid,h.host"
 			" from hosts h"
@@ -5861,8 +5846,6 @@ static int	DBpatch_5030191(void)
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select i.itemid,i.key_,h.host"
@@ -5984,8 +5967,6 @@ static int	DBpatch_5030192(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
 			" from triggers t"
@@ -6047,7 +6028,6 @@ static int	DBpatch_5030193(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = zbx_db_select(
 			"select distinct g.graphid,g.name"
 			" from graphs g"
@@ -6116,8 +6096,6 @@ static int	DBpatch_5030194(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select d.dashboardid,d.name,h.host"
 			" from dashboard d"
@@ -6162,8 +6140,6 @@ static int	DBpatch_5030195(void)
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select ht.httptestid,ht.name,h.host"
@@ -6210,8 +6186,6 @@ static int	DBpatch_5030196(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select v.valuemapid,v.name,h.host"
 			" from valuemap v"
@@ -6257,8 +6231,6 @@ static int	DBpatch_5030197(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select groupid,name from hstgrp");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -6293,8 +6265,6 @@ static int	DBpatch_5030198(void)
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select i.itemid,i.key_,h.host,i2.key_"
@@ -6342,8 +6312,6 @@ static int	DBpatch_5030199(void)
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
@@ -6427,7 +6395,6 @@ static int	DBpatch_5030200(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	result = zbx_db_select(
 			"select distinct g.graphid,g.name,h.host,i2.key_"
 			" from graphs g"
@@ -6477,8 +6444,6 @@ static int	DBpatch_5030201(void)
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select h.hostid,h.host,h2.host,i.key_"

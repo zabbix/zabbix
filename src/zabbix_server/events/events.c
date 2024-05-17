@@ -575,8 +575,6 @@ static void	save_event_recovery(void)
 	if (0 == event_recovery.num_data)
 		return;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", "correlationid", "c_eventid",
 			"userid", (char *)NULL);
 

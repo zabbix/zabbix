@@ -483,8 +483,6 @@ static int	DBpatch_6030062(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select moduleid,relative_path from module");
 
 	while (NULL != (row = zbx_db_fetch(result)))

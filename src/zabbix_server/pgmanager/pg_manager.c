@@ -452,8 +452,6 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 
 			zbx_db_begin();
 
-			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 			pgm_db_flush_group_updates(&sql, &sql_alloc, &sql_offset, &group_updates);
 			pgm_db_flush_proxy_updates(&sql, &sql_alloc, &sql_offset, &proxy_updates);
 			pgm_db_flush_host_proxy_updates(&sql, &sql_alloc, &sql_offset, &hosts_mod);

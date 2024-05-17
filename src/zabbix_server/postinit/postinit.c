@@ -365,7 +365,6 @@ static int	update_event_names(void)
 	memset(&trigger, 0, sizeof(zbx_db_trigger));
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select triggerid,description,expression,priority,comments,url,url_name,"

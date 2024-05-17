@@ -325,8 +325,6 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 		zbx_db_free_result(result);
 	}
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* update object table */
 
 	if (0 != dis_ids.values_num)

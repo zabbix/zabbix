@@ -609,8 +609,6 @@ static int	DBpatch_3010024(void)
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		if (0 != actionids_disable.values_num)
 		{
 			/* status: 1 - ZBX_ACTION_STATUS_DISABLED */
@@ -1029,8 +1027,6 @@ static int	DBpatch_3010026(void)
 	zbx_vector_uint64_create(&conditionids);
 	zbx_vector_uint64_create(&actionids);
 	zbx_vector_str_create(&filter);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select actionid,eventsource,evaltype,formula,name from actions");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1585,8 +1581,6 @@ static int	DBpatch_3010079(void)
 	int			ret = FAIL;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select p.eventid,e.clock,e.ns"
 			" from problem p,events e"

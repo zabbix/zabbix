@@ -1447,8 +1447,6 @@ static int	DBpatch_6050133(void)
 		goto out;
 	}
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select widget_fieldid,name from widget_field where name like '%%.%%.%%'");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1789,8 +1787,6 @@ static int	DBpatch_6050149(void)
 	zbx_eval_init(&ctx);
 	zbx_vector_uint32_create(&del_idx);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* ITEM_TYPE_CALCULATED = 15 */
 	result = zbx_db_select("select itemid,params from items where type=15 and params like '%%%s%%'", LAST_FOREACH);
 
@@ -2006,8 +2002,6 @@ static int	DBpatch_6050165(void)
 	char		*sql = NULL, *buf = NULL, *like_condition;
 	size_t		sql_alloc = 0, sql_offset = 0, buf_alloc;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* functions table contains history functions used in trigger expressions */
 	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
 	if (NULL == (result = zbx_db_select("select functionid,parameter,triggerid"
@@ -2164,8 +2158,6 @@ int			ret = SUCCEED;
 	char			*sql = NULL, *error = NULL, *like_condition;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
 
 	if (NULL == (result = zbx_db_select("select itemid,params from items "
@@ -2282,8 +2274,6 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 	zbx_db_row_t		row;
 	char			*sql = NULL, *like_condition;
 	size_t			sql_alloc = 0, sql_offset = 0;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
 
@@ -2602,8 +2592,6 @@ static int	DBpatch_6050176_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	i, ret = SUCCEED;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < time_from->values_num; i++)
 	{

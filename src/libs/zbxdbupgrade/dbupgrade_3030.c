@@ -375,7 +375,6 @@ static int	DBpatch_3030030(void)
 		}
 
 		sql_offset = 0;
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1070,8 +1069,6 @@ static int	DBpatch_table_convert(const char *table, const char *recid, const DBp
 
 	sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table);
@@ -1255,8 +1252,6 @@ static int	DBpatch_3030093(void)
 
 	result = zbx_db_select("select itemid,delay,delay_flex from items");
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		delay = atoi(row[1]);
@@ -1376,8 +1371,6 @@ static int	DBpatch_3030102(void)
 	int		value, ret = FAIL;
 
 	result = zbx_db_select("select itemid,lifetime from items");
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1717,8 +1710,6 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 	int		ret = FAIL;
 
 	result = zbx_db_select("select %s,%s from %s%s", recid, field, table, condition);
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{

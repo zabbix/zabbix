@@ -937,8 +937,6 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 
 	zbx_db_free_result(result);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != actionids.values_num)
 	{
 		zbx_vector_uint64_sort(&actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1039,8 +1037,6 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_vector_uint64_create(&selementids);
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
 	if (0 != selementids.values_num)
 	{
@@ -1189,8 +1185,6 @@ void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids, int audit_context_mode)
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&profileids);
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "graphid", &profile_idx, 1, graphids);
@@ -1444,8 +1438,6 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	DBadd_to_housekeeper(itemids, "lldruleid", event_tables, ARRSIZE(event_tables));
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "itemid", &profile_idx, 1, itemids);
 	if (0 != profileids.values_num)
@@ -1548,8 +1540,6 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 	zbx_db_select_uint64(sql, &httpstepids);
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest_field where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
@@ -1689,8 +1679,6 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 	/* delete host prototypes */
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
@@ -3543,7 +3531,6 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != upd_tags.values_num)
 	{
 		sql1 = (char *)zbx_malloc(sql1, sql1_alloc);
-		zbx_db_begin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
 	if (0 != new_hosts_templates)
@@ -3553,7 +3540,6 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != del_interfaceids->values_num || 0 != del_inventory_modes_hostids.values_num)
 	{
 		sql2 = (char *)zbx_malloc(sql2, sql2_alloc);
-		zbx_db_begin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 	}
 
 	if (0 != del_hosttemplateids->values_num)
@@ -5026,8 +5012,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				(char *)NULL);
 	}
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (i = 0; i < httptests->values_num; i++)
 	{
 		httptest = (httptest_t *)httptests->values[i];
@@ -5882,7 +5866,6 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	}
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete host from maps */
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST, hostids);
@@ -6553,7 +6536,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 	if (0 == hgsets.values_num)
 	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		goto skip_permissions;
 	}
 
@@ -6751,7 +6733,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	/* update hosts to use new hgsets */
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hgsets.values_num; i ++)
 	{
@@ -6777,7 +6758,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	/* delete hgsets */
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,

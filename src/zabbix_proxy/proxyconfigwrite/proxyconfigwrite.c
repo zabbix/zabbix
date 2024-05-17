@@ -855,8 +855,6 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (i = 0; i < td->updates.values_num; i++)
 	{
 		char		delim = ' ';

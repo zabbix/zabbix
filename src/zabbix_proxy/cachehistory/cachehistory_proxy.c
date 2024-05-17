@@ -44,7 +44,6 @@ static void	DBmass_proxy_update_items(zbx_vector_item_diff_ptr_t *item_diff)
 
 	zbx_vector_item_diff_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
 	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
