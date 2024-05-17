@@ -6047,7 +6047,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     transform: rotate(45deg); }
 
 .overlay-dialogue {
-  display: table;
   position: absolute;
   z-index: 1000;
   padding: 17px 10px 10px;
