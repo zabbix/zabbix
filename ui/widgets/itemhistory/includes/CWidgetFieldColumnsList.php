@@ -79,7 +79,15 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	}
 
 	public function setValue($value): self {
-		$this->value = (array) $value;
+		$columns = (array) $value;
+
+		$columns = $columns
+			? array_filter($columns, static function ($column) {
+				return array_key_exists('itemid', $column) && $column['itemid'] !== '';
+			})
+			: [];
+
+		$this->value = $columns;
 
 		return $this;
 	}
