@@ -2394,7 +2394,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: CPU utilization'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: ABAAA
                 - type: gauge
                   name: 'CPU time'
                   x: '36'
@@ -2475,7 +2475,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: CPU time'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: ABAAB
             - name: Storage
               display_period: '30'
               widgets:
@@ -2557,7 +2557,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Storage utilization'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: ACAAA
                 - type: item
                   name: 'Max storage space'
                   x: '18'
@@ -2614,7 +2614,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Storage stats'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: ACAAB
                 - type: item
                   name: 'Allocated Storage Space'
                   x: '36'
@@ -2756,7 +2756,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Physical reads/writes'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: ADAAA
                 - type: item
                   name: 'Physical writes'
                   x: '15'
@@ -2855,7 +2855,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Physical read/write total bytes'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: ADAAB
                 - type: item
                   name: 'Physical write total bytes'
                   x: '42'
@@ -2954,7 +2954,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Session logical reads'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: ADAAC
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -3057,7 +3057,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Session stats'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AEAAA
                 - type: item
                   name: Logons
                   x: '15'
@@ -3199,7 +3199,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Wait time'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: AEAAB
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -3259,7 +3259,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: DB time'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: AEAAC
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -3319,7 +3319,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Connection latency'
                     - type: STRING
                       name: reference
-                      value: AAAAD
+                      value: AEAAD
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -3380,7 +3380,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: User calls'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AFAAA
                 - type: item
                   name: 'User commits'
                   x: '18'
@@ -3437,7 +3437,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: User commits'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: AFAAB
                 - type: item
                   name: 'User rollbacks'
                   x: '36'
@@ -3494,7 +3494,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: User rollbacks'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: AFAAC
                 - type: item
                   name: 'Execute count'
                   x: '54'
@@ -3551,7 +3551,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Execute count'
                     - type: STRING
                       name: reference
-                      value: AAAAD
+                      value: AFAAD
             - name: Parses
               display_period: '30'
               widgets:
@@ -3609,7 +3609,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Parse count hard'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AGAAA
                 - type: item
                   name: 'Parse count (failures)'
                   x: '24'
@@ -3666,7 +3666,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Parse count failures'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: AGAAB
                 - type: item
                   name: 'Parse count (total)'
                   x: '48'
@@ -3723,7 +3723,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Parse count total'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: AGAAC
             - name: 'SQL*Net'
               display_period: '30'
               widgets:
@@ -3781,7 +3781,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: SQL*Net client bytes'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AHAAA
                 - type: item
                   name: 'Bytes sent to client'
                   x: '18'
@@ -3880,7 +3880,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: SQL*Net DBLink bytes'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: AHAAB
                 - type: item
                   name: 'Bytes sent to DBLink'
                   x: '54'
@@ -3980,7 +3980,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Query latency'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AIAAA
                 - type: item
                   name: 'Running statements'
                   x: '21'
@@ -4037,7 +4037,7 @@ zabbix_export:
                         name: 'OCI Autonomous DB: Statements'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: AIAAB
                 - type: item
                   name: 'Queued statements'
                   x: '33'
@@ -10283,7 +10283,7 @@ zabbix_export:
                         name: 'OCI Compute: Cpu utilization'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: ABAAA
                 - type: gauge
                   name: Memory
                   x: '24'
@@ -10364,7 +10364,7 @@ zabbix_export:
                         name: 'OCI Compute: Memory utilization'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: ABAAB
                 - type: graph
                   name: 'Memory allocation stalls'
                   x: '48'
@@ -10379,7 +10379,7 @@ zabbix_export:
                         name: 'OCI Compute: Memory allocation stalls'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: ABAAC
             - name: 'Net In/Out'
               display_period: '30'
               widgets:
@@ -10437,7 +10437,7 @@ zabbix_export:
                         name: 'OCI Compute: Network bytes in'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: ACAAA
                 - type: item
                   name: 'Net bytes out'
                   x: '36'
@@ -10494,7 +10494,7 @@ zabbix_export:
                         name: 'OCI Compute: Network bytes out'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: ACAAC
             - name: Disk
               display_period: '30'
               widgets:
@@ -10552,7 +10552,7 @@ zabbix_export:
                         name: 'OCI Compute: Disk bytes read'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: ADAAA
                 - type: item
                   name: 'Disk bytes written'
                   x: '18'
@@ -10609,7 +10609,7 @@ zabbix_export:
                         name: 'OCI Compute: Disk bytes written'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: ADAAB
                 - type: item
                   name: 'Disk read i/o'
                   x: '36'
@@ -10666,7 +10666,7 @@ zabbix_export:
                         name: 'OCI Compute: Disk bytes read I/O'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: ADAAC
                 - type: item
                   name: 'Disk write i/o'
                   x: '54'
@@ -10723,7 +10723,7 @@ zabbix_export:
                         name: 'OCI Compute: Disk bytes write I/O'
                     - type: STRING
                       name: reference
-                      value: AAAAD
+                      value: ADAAD
             - name: 'VNIC In/Out'
               display_period: '30'
               widgets:
@@ -10790,7 +10790,7 @@ zabbix_export:
                         name: 'OCI Compute: Network bytes in'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AEAAA
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -10811,7 +10811,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network bytes in'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: AEAAB
                 - type: graphprototype
                   name: 'VNIC packets in'
                   x: '6'
@@ -10829,7 +10829,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network packets in'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: AEAAC
                 - type: item
                   name: 'Total bytes out'
                   x: '36'
@@ -10894,7 +10894,7 @@ zabbix_export:
                         name: 'OCI Compute: Network bytes out'
                     - type: STRING
                       name: reference
-                      value: AAAAD
+                      value: AEAAD
                     - type: INTEGER
                       name: show_legend
                       value: '0'
@@ -10915,7 +10915,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network bytes out'
                     - type: STRING
                       name: reference
-                      value: AAAAE
+                      value: AEAAE
                 - type: graphprototype
                   name: 'VNIC packets out'
                   x: '42'
@@ -10933,7 +10933,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network packets out'
                     - type: STRING
                       name: reference
-                      value: AAAAF
+                      value: AEAAF
             - name: 'VNIC Detailed'
               display_period: '30'
               widgets:
@@ -10952,7 +10952,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network packets dropped by connection tracking table'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: AFAAA
                 - type: graphprototype
                   name: 'Security list'
                   x: '24'
@@ -10969,7 +10969,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Network packets dropped by security list'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: AFAAB
                 - type: graphprototype
                   name: Smartnic
                   x: '48'
@@ -10986,7 +10986,7 @@ zabbix_export:
                         name: 'VNIC [{#NAME}]: Smartnic buffer drops'
                     - type: STRING
                       name: reference
-                      value: AAAAC
+                      value: AFAAC
       valuemaps:
         - uuid: 9e238671edca4ed7b58eefacc861a77d
           name: 'Compute instance availability'
@@ -12965,7 +12965,7 @@ zabbix_export:
                         name: 'OCI Object Storage: Overall latency'
                     - type: STRING
                       name: reference
-                      value: AAAAA
+                      value: ABAAA
                 - type: item
                   name: 'First byte latency time'
                   x: '36'
@@ -13022,7 +13022,7 @@ zabbix_export:
                         name: 'OCI Object Storage: First byte latency'
                     - type: STRING
                       name: reference
-                      value: AAAAB
+                      value: ABAAB
   graphs:
     - uuid: 97956d8f4b084cf38c8e46c842e806f5
       name: 'OCI Autonomous DB: Connection latency'
