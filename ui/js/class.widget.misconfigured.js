@@ -58,7 +58,7 @@ class CWidgetMisconfigured extends CWidget {
 	}
 
 	_startUpdating({delay_sec = 0} = {}) {
-		this.fire(CWidgetBase.EVENT_READY);
+		requestAnimationFrame(() => this.fire(CWidgetBase.EVENT_READY));
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
