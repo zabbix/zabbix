@@ -115,7 +115,7 @@ class CDashboardWidgetPlaceholder {
 		this.#placeholder_box.classList.remove(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
 		this.#placeholder_box_label_wrap.textContent = '';
 
-		this.#target.removeEventListener('click', this.#listeners.onAddNewClick);
+		this.off('click', this.#listeners.onAddNewClick);
 
 		switch (state) {
 			case CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_ADD_NEW:
@@ -126,7 +126,7 @@ class CDashboardWidgetPlaceholder {
 
 				this.#placeholder_box_label_wrap.appendChild(link);
 
-				this.#target.addEventListener('click', this.#listeners.onAddNewClick);
+				this.on('click', this.#listeners.onAddNewClick);
 
 				break;
 
