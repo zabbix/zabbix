@@ -9,6 +9,8 @@ Zabbix.log(5, JSON.stringify(optsFirefox))
 Zabbix.log(5, JSON.stringify(optsSafari))
 Zabbix.log(5, JSON.stringify(optsEdge))
 
+//opts.capabilities.alwaysMatch['goog:chromeOptions'].args = [] // comment out
+
 var browser = new Browser(opts)
 
 try
@@ -127,7 +129,7 @@ try
 	if (el === null)
 	{
 		throw Error("cannot find login button");
-	}
+ 	}
 
 	Zabbix.log(5, "getText " + el.getText())
 
@@ -176,8 +178,8 @@ try
 
 	el = browser.findElements("link text", "Web");
 	Zabbix.log(5, "Web length: " + el.length)
-
-	el = browser.findElement("link text", "Alerts");
+	
+	el = browser.findElement("link text", "Alerts"); 
 	Zabbix.sleep(500); // animation
 	if (el === null)
 	{
@@ -222,7 +224,7 @@ try
 	{
 		throw Error("couldn't enable Media types");
 	}
-
+	
 	cookies = browser.getCookies()
 
 	for (i = 0; i < cookies.length; i++)
@@ -231,6 +233,8 @@ try
 		if ("zbx_session" === cookies[i].name)
 			break;
 	}
+
+	browser.collectPerfEntries();
 
 	// start second browser, reuse zbx_session cookie and sign out
 	var browser2 = new Browser(opts)
@@ -258,9 +262,23 @@ try
 		}
 
 		Zabbix.log(5, "screenshot: " + browser2.getScreenshot());
-
+	
 		el = browser2.findElement("link text", "Sign out");
+		browser2.collectPerfEntries();
+		result = browser2.getResult();
 
+		summary = result.performance_data.summary;
+
+		if (summary.resource.response_time > result.duration ||
+			summary.resource.tcp_handshake_time > result.duration ||
+			summary.resource.service_worker_processing_time > result.duration ||
+			summary.resource.tls_negotiation_time > result.duration ||
+			summary.resource.resource_fetch_time > result.duration ||
+			summary.resource.request_time > result.duration)
+		{
+			Zabbix.log(5, "Duration of test: " +result.duration+" is less than response time: " + JSON.stringify(summary.resource));
+		}
+		
 	}
 	catch (error)
 	{
@@ -292,7 +310,7 @@ catch (err)
 	{
 		browser.setError(err.message);
 	}
-
+	
 	result = browser.getResult();
 	result["screenshot"] = browser.getScreenshot();
 	return JSON.stringify(result);
