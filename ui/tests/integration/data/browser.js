@@ -9,7 +9,8 @@ Zabbix.log(5, JSON.stringify(optsFirefox))
 Zabbix.log(5, JSON.stringify(optsSafari))
 Zabbix.log(5, JSON.stringify(optsEdge))
 
-//opts.capabilities.alwaysMatch['goog:chromeOptions'].args = [] // comment out
+// uncomment for foreground
+// opts.capabilities.alwaysMatch['goog:chromeOptions'].args = []
 
 var browser = new Browser(opts)
 
@@ -129,7 +130,7 @@ try
 	if (el === null)
 	{
 		throw Error("cannot find login button");
- 	}
+	}
 
 	Zabbix.log(5, "getText " + el.getText())
 
@@ -178,8 +179,8 @@ try
 
 	el = browser.findElements("link text", "Web");
 	Zabbix.log(5, "Web length: " + el.length)
-	
-	el = browser.findElement("link text", "Alerts"); 
+
+	el = browser.findElement("link text", "Alerts");
 	Zabbix.sleep(500); // animation
 	if (el === null)
 	{
@@ -224,7 +225,7 @@ try
 	{
 		throw Error("couldn't enable Media types");
 	}
-	
+
 	cookies = browser.getCookies()
 
 	for (i = 0; i < cookies.length; i++)
@@ -262,7 +263,7 @@ try
 		}
 
 		Zabbix.log(5, "screenshot: " + browser2.getScreenshot());
-	
+
 		el = browser2.findElement("link text", "Sign out");
 		browser2.collectPerfEntries();
 		result = browser2.getResult();
@@ -278,7 +279,6 @@ try
 		{
 			Zabbix.log(5, "Duration of test: " +result.duration+" is less than response time: " + JSON.stringify(summary.resource));
 		}
-		
 	}
 	catch (error)
 	{
@@ -310,7 +310,7 @@ catch (err)
 	{
 		browser.setError(err.message);
 	}
-	
+
 	result = browser.getResult();
 	result["screenshot"] = browser.getScreenshot();
 	return JSON.stringify(result);
