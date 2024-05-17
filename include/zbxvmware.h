@@ -571,6 +571,7 @@ ZBX_PTR_VECTOR_DECL(vmware_service_ptr, zbx_vmware_service_t *)
 struct zbx_vmware_job
 {
 	time_t				nextcheck;
+	time_t				ttl;
 #define ZBX_VMWARE_UPDATE_CONF		1
 #define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
 #define ZBX_VMWARE_UPDATE_REST_TAGS	3

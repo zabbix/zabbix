@@ -2982,6 +2982,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 
 	job = vmware_shmem_vmware_job_malloc();
 	job->nextcheck = 0;
+	job->ttl = 0;
 	job->type = job_type;
 	job->service = service;
 	service->jobs_num++;

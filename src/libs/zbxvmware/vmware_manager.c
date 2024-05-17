@@ -68,11 +68,11 @@ static const char	*vmware_job_type_string(zbx_vmware_job_t *job)
  * Return value: job for object or NULL                                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now, int eventlog_ttl)
+static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now)
 {
-#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 	zbx_binary_heap_elem_t	*elem;
 	zbx_vmware_job_t	*job = NULL;
+	time_t			lastaccess;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queue:%d", __func__, vmw->jobs_queue.elems_num);
 
@@ -92,10 +92,10 @@ static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now, int 
 
 	zbx_binary_heap_remove_min(&vmw->jobs_queue);
 	job->nextcheck = 0;
+	lastaccess = (ZBX_VMWARE_UPDATE_EVENTLOG == job->type) ? job->service->eventlog.lastaccess :
+			job->service->lastaccess;
 
-	if ((0 != job->service->lastaccess && time_now - job->service->lastaccess > ZBX_VMWARE_SERVICE_TTL) ||
-			(0 != job->service->eventlog.lastaccess && time_now - job->service->eventlog.lastaccess >
-			eventlog_ttl))
+	if (0 != lastaccess && 0 != job->ttl && time_now - lastaccess > job->ttl)
 	{
 		job->expired = SUCCEED;
 	}
@@ -105,7 +105,6 @@ unlock:
 			NULL == job ? "none" : vmware_job_type_string(job));
 
 	return job;
-#undef ZBX_VMWARE_SERVICE_TTL
 }
 
 /******************************************************************************
@@ -169,6 +168,7 @@ out:
 static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t time_now,
 		int cache_update_period, int perf_update_period)
 {
+#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 	zbx_binary_heap_elem_t	elem_new = {0, job};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queue:%d type:%s", __func__, vmw->jobs_queue.elems_num,
@@ -179,15 +179,27 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 	switch (job->type)
 	{
 		case ZBX_VMWARE_UPDATE_CONF:
+			if (0 == job->ttl)
+				job->ttl = ZBX_VMWARE_SERVICE_TTL;
+
 			job->nextcheck = time_now + cache_update_period;
 			break;
 		case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
+			if (0 == job->ttl)
+				job->ttl = ZBX_VMWARE_SERVICE_TTL;
+
 			job->nextcheck = time_now + perf_update_period;
 			break;
 		case ZBX_VMWARE_UPDATE_REST_TAGS:
+			if (0 == job->ttl)
+				job->ttl = ZBX_VMWARE_SERVICE_TTL;
+
 			job->nextcheck = time_now + cache_update_period;
 			break;
 		case ZBX_VMWARE_UPDATE_EVENTLOG:
+			if (0 == job->ttl)
+				job->ttl = cache_update_period * 2;
+
 			job->nextcheck = time_now + (0 == job->service->eventlog.interval ? perf_update_period :
 					job->service->eventlog.interval);
 			break;
@@ -198,6 +210,7 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s nextcheck:%s", __func__, vmware_job_type_string(job),
 			zbx_time2str(job->nextcheck, NULL));
+#undef ZBX_VMWARE_SERVICE_TTL
 }
 
 #endif
@@ -210,7 +223,7 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int				services_updated = 0, services_removed = 0, service_eventlog_ttl,
+	int				services_updated = 0, services_removed = 0,
 					server_num = ((zbx_thread_args_t *)args)->info.server_num,
 					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	double				time_stat, time_idle = 0;
@@ -227,8 +240,6 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 #define JOB_TIMEOUT	1
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
-
-	service_eventlog_ttl = vmware_args_in->config_vmware_frequency * 2;
 
 	time_stat = zbx_time();
 
@@ -252,7 +263,7 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 			services_removed = 0;
 		}
 
-		while (NULL != (job = vmware_job_get(zbx_vmware_get_vmware(), (int)time_now, service_eventlog_ttl)))
+		while (NULL != (job = vmware_job_get(zbx_vmware_get_vmware(), (time_t)time_now)))
 		{
 			if (SUCCEED == job->expired)
 			{
