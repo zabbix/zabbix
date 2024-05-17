@@ -2818,7 +2818,6 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups,
 
 	if (0 != groups_update_num || 0 != gd_update_num)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_execute("%s", sql);
 	}
 
@@ -4363,10 +4362,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 	if (NULL != sql1)
 	{
-		zbx_db_end_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-
-		/* in ORACLE always present begin..end; */
-		if (16 < sql1_offset)
+		if (0 != sql1_offset)
 			zbx_db_execute("%s", sql1);
 
 		zbx_free(sql1);
@@ -4457,7 +4453,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
-		zbx_db_end_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 		zbx_db_execute("%s", sql2);
 		zbx_free(sql2);
 	}
@@ -4782,10 +4777,8 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		zbx_db_execute("%s", sql);
 	}
 
@@ -4941,10 +4934,8 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, const zb
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		zbx_db_execute("%s", sql);
 	}
 

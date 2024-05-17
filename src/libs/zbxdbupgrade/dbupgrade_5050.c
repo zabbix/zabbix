@@ -503,9 +503,7 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
@@ -1202,9 +1200,7 @@ static int	DBpatch_5050114(void)
 
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
@@ -1777,9 +1773,7 @@ static int	DBpatch_5050132(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);

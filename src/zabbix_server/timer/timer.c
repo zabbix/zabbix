@@ -140,9 +140,7 @@ static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_p
 			log_host_maintenance_update(diff);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
+	if (0 != sql_offset)
 		zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
@@ -557,9 +555,7 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 
 		zbx_vector_uint64_destroy(&eventids);
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
+		if (0 != sql_offset)
 		{
 			if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 				goto cleanup;

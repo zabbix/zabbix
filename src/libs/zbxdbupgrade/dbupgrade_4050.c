@@ -141,9 +141,7 @@ static int	DBpatch_4050014(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -1072,9 +1070,7 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 	if (SUCCEED == ret)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
 

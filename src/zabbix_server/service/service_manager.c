@@ -1422,9 +1422,7 @@ static int	its_write_status_and_alarms(const zbx_vector_status_update_ptr_t *ala
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
+	if (0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto out;
@@ -2357,9 +2355,7 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager,
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 		zbx_db_execute("%s", sql);
 
 	zbx_db_insert_execute(&db_insert_recovery);
@@ -3097,9 +3093,7 @@ static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *eve
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
+		if (0 != sql_offset)
 			zbx_db_execute("%s", sql);
 	}
 	while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));

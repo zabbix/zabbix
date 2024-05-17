@@ -1343,9 +1343,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 		}
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == res && 16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == res && 0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs updates");
 		res = FAIL;
@@ -1355,9 +1353,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 	if (SUCCEED == res)
 	{
-		zbx_db_end_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
-
-		if (16 < sql_offset2 && (ZBX_DB_OK > zbx_db_execute("%s", sql2)))
+		if (0 != sql_offset2 && (ZBX_DB_OK > zbx_db_execute("%s", sql2)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
 			res = FAIL;

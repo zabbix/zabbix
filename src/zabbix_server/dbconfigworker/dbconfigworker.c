@@ -109,9 +109,7 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 		zbx_db_free_result(result);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+	if (0 != sql_offset)
 		zbx_db_execute("%s", sql);
 
 	zbx_free(sql_select);

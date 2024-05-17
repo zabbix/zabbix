@@ -2719,9 +2719,7 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		if (0 != sql_offset)
 			zbx_db_execute("%s", sql);
 
 		zbx_db_commit();

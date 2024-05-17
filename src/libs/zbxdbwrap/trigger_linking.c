@@ -542,9 +542,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	if (0 != update_num)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		if (0 != sql_offset)
 			zbx_db_execute("%s", sql);
 	}
 
@@ -1178,9 +1176,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data, 
 		}
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
+	if (0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			res = FAIL;
@@ -1447,10 +1443,7 @@ func_out:
 		res = zbx_db_insert_execute(&db_insert_funcs);
 	zbx_db_insert_clean(&db_insert_funcs);
 
-	zbx_db_end_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
-			&sql_update_triggers_expr_offset);
-
-	if (SUCCEED == res && 16 < sql_update_triggers_expr_offset)	/* In ORACLE always present begin..end; */
+	if (SUCCEED == res && 0 != sql_update_triggers_expr_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql_update_triggers_expr))
 			res = FAIL;

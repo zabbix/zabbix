@@ -635,8 +635,6 @@ static int	DBpatch_3010024(void)
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 
@@ -1064,9 +1062,7 @@ static int	DBpatch_3010026(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto out;
@@ -1597,9 +1593,7 @@ static int	DBpatch_3010079(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
+	if (0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto out;

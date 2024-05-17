@@ -411,9 +411,7 @@ static int	update_event_names(void)
 
 	zbx_dc_close_user_macros(um_handle);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset) /* in ORACLE always present begin..end; */
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;

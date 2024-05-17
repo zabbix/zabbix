@@ -3599,8 +3599,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-		if (sql_offset > 16)
+		if (0 != sql_offset)
 			zbx_db_execute("%s", sql);
 	}
 out:
@@ -3791,9 +3790,7 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_
 
 	if (0 != update_preproc_num)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		if (0 != sql_offset)
 			zbx_db_execute("%s", sql);
 	}
 
@@ -3969,9 +3966,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_pt
 
 	if (0 != update_param_num)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		if (0 != sql_offset)
 			zbx_db_execute("%s", sql);
 	}
 
@@ -4146,9 +4141,7 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 
 	if (0 != update_tag_num)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		if (0 != sql_offset)
 			zbx_db_execute("%s", sql);
 	}
 

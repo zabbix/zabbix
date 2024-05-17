@@ -496,9 +496,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 		report->flags = 0;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 		zbx_db_execute("%s", sql);
 
 	zbx_db_commit();

@@ -959,10 +959,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	/* in ORACLE always present begin..end; */
-	if (16 < sql_offset)
+	if (0 != sql_offset)
 		zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
@@ -1067,8 +1064,6 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values,
 			triggerids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -1200,8 +1195,6 @@ void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids, int audit_context_mode)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from graphs where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids->values, graphids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -1475,8 +1468,6 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	zbx_db_execute("%s", sql);
 	zbx_vector_uint64_destroy(&profileids);
 
@@ -1564,8 +1555,6 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid",
 			httpstepids.values, httpstepids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -1689,8 +1678,6 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -4003,10 +3990,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	if (SUCCEED == res && (NULL != sql1 || new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes ||
 			0 != upd_hostmacros || 0 != upd_inventory_modes))
 	{
-		zbx_db_end_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-
-		/* in ORACLE always present begin..end; */
-		if (16 < sql1_offset)
+		if (0 != sql1_offset)
 			zbx_db_execute("%s", sql1);
 	}
 
@@ -4014,10 +3998,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != del_hostmacroids->values_num || 0 != del_tagids.values_num ||
 			0 != del_interfaceids->values_num || 0 != del_inventory_modes_hostids.values_num))
 	{
-		zbx_db_end_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-
-		/* in ORACLE always present begin..end; */
-		if (16 < sql2_offset)
+		if (0 != sql2_offset)
 			zbx_db_execute("%s", sql2);
 	}
 
@@ -5310,9 +5291,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		zbx_db_insert_clean(&db_insert_httag);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
+	if (0 != sql_offset)
 		zbx_db_execute("%s", sql);
 
 	zbx_free(sql);
@@ -5906,8 +5885,6 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 				hgsetids_del.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -6749,9 +6726,8 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		ret = zbx_db_prepare_multiple_query(update, "hostid", &hgset->hostids, &sql, &sql_alloc, &sql_offset);
 	}
 
-	if (SUCCEED == ret && sql_offset > 16)	/* in ORACLE always present begin..end; */
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_execute("%s", sql);
 	}
 
@@ -6779,8 +6755,6 @@ skip_permissions:
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hstgrp where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 

@@ -393,9 +393,7 @@ static int	DBpatch_3030030(void)
 			upd_num++;
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
+		if (0 != sql_offset)
 		{
 			if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 				ret = FAIL;
@@ -1087,9 +1085,7 @@ static int	DBpatch_table_convert(const char *table, const char *recid, const DBp
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto out;
@@ -1285,9 +1281,7 @@ static int	DBpatch_3030093(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto out;
@@ -1391,9 +1385,7 @@ static int	DBpatch_3030102(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto out;
@@ -1723,9 +1715,7 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			goto out;

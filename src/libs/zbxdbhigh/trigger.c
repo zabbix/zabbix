@@ -76,9 +76,7 @@ void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_di
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 		zbx_db_execute("%s", sql);
 
 	zbx_free(sql);

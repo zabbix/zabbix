@@ -129,7 +129,6 @@
 
 typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num);
 
-#define	zbx_db_end_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 #ifdef HAVE_MYSQL
 #	define	ZBX_SQL_STRCMP			"%s binary '%s'"
 #else

@@ -42,8 +42,6 @@
 #	define ZBX_DB_SET_TYPE		""
 #endif
 
-/* NOTE: Do not forget to sync changes in ZBX_TYPE_*_STR defines for Oracle with zbx_oracle_column_type()! */
-
 #if defined(HAVE_MYSQL)
 #	define ZBX_TYPE_ID_STR			"bigint unsigned"
 #	define ZBX_TYPE_FLOAT_STR		"double precision"
@@ -489,17 +487,6 @@ int	DBdrop_field_autoincrement(const char *table_name, const zbx_db_field_t *fie
 		return FAIL;
 
 	if (ZBX_DB_OK > zbx_db_execute("drop sequence if exists %s_%s_seq", table_name, field->name))
-		return FAIL;
-
-	return SUCCEED;
-
-#else /* ORACLE */
-	ZBX_UNUSED(field);
-
-	if (SUCCEED != DBdrop_serial_sequence(table_name))
-		return FAIL;
-
-	if (SUCCEED != DBdrop_serial_trigger(table_name))
 		return FAIL;
 
 	return SUCCEED;

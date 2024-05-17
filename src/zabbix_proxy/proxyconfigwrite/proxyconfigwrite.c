@@ -916,9 +916,7 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
 		goto out;
 
 	ret = SUCCEED;

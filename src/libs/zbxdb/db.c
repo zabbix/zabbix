@@ -1498,7 +1498,7 @@ static int	zbx_db_get_escape_like_pattern_len(const char *src)
  *           using '!' as escape character. Our queries then become:          *
  *                                                                            *
  *           ... LIKE 'a!_b!%c\\d\'e!!f' ESCAPE '!' (MySQL, PostgreSQL)       *
- *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (Oracle, SQLite3)          *
+ *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (SQLite3)                  *
  *                                                                            *
  *           Using backslash as escape character in LIKE would be too much    *
  *           trouble, because escaping backslashes would have to be escaped   *
@@ -1506,7 +1506,7 @@ static int	zbx_db_get_escape_like_pattern_len(const char *src)
  *                                                                            *
  *           ... LIKE 'a\\_b\\%c\\\\d\'e!f' ESCAPE '\\' or                    *
  *           ... LIKE 'a\\_b\\%c\\\\d\\\'e!f' ESCAPE '\\' (MySQL, PostgreSQL) *
- *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (Oracle, SQLite3)          *
+ *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (SQLite3)                  *
  *                                                                            *
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
@@ -1578,7 +1578,7 @@ int	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
 /*********************************************************************************
  *                                                                               *
  * Purpose: determine if a vendor database(MySQL, MariaDB, PostgreSQL,           *
- *          Oracle, ElasticDB) version satisfies Zabbix requirements             *
+ *          ElasticDB) version satisfies Zabbix requirements                     *
  *                                                                               *
  * Parameters: database                - [IN] database name                      *
  *             current_version         - [IN] detected numeric version           *
@@ -1702,17 +1702,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
  *                                                                            *
  * Example: if the original DB version was 1.2.34 then 10234 gets returned    *
  *                                                                            *
- * Purpose: For OracleDB:                                                     *
- *          returns DBMS version as integer: MRruRRivUU                       *
- *          MR = major release version part                                   *
- *          ru = release update version part                                  *
- *          RR = release update version revision part                         *
- *          iv = increment version part                                       *
- *          UU = unused, reserved for future use                              *
- *                                                                            *
- * Example: if the OracleDB version was 18.1.0.0.7 then 1801000007 gets       *
- *          returned                                                          *
- *                                                                            *
  * Return value: DBMS version or DBVERSION_UNDEFINED if unknown               *
  *                                                                            *
  ******************************************************************************/
@@ -1738,21 +1727,6 @@ static zbx_uint32_t	zbx_dbms_version_get(void)
  *          numeric version is available from the API, but also the additional processing is required          *
  *          to determine if it is a MySQL or MariaDB and save this result as well                              *
  *                                                                                                             *
- *          For Oracle:                                                                                        *
- *          numeric version needs to be manually parsed from the string result                                 *
- *          Oracle DB format is like 18.1.2.3.0 where                                                          *
- *            18 - major release version                                                                       *
- *            1 - release update version                                                                       *
- *            2 - release update version revision                                                              *
- *            3 - increment version                                                                            *
- *            0 - unused, reserved for future use                                                              *
- *                                                                                                             *
- *          Oracle Examples:                                                                                   *
- *          For "Oracle Database 18c Express Edition Release 1.0.0.0.0 - Production"    => 100000000           *
- *          For "Oracle Database 18c Express Edition Release 18.2.0.0.7 - Production"   => 1802000007          *
- *          For "Oracle Database 18c Express Edition Release 0.0.34.123.7 - Production" => DBVERSION_UNDEFINED *
- *          For "Oracle Database 18c Express Edition Release 1.0.3.x.7 - Production"    => DBVERISON_UNDEFINED *
- *          For "<anything else>"                                                       => DBVERSION_UNDEFINED *
  *                                                                                                             *
  **************************************************************************************************************/
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)

@@ -1491,9 +1491,7 @@ static int	DBpatch_6050133(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 		zbx_db_execute("%s", sql);
 
 	ret = SUCCEED;
@@ -1854,9 +1852,7 @@ static int	DBpatch_6050149(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
@@ -2069,9 +2065,7 @@ static int	DBpatch_6050165(void)
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
@@ -2190,9 +2184,7 @@ int			ret = SUCCEED;
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
@@ -2347,9 +2339,8 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
@@ -2621,10 +2612,8 @@ static int	DBpatch_6050176_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	if (0 != sql_offset)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}

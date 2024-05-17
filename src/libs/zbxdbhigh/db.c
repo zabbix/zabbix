@@ -34,8 +34,6 @@
 #error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
 #endif
 
-#define	ZBX_SQL_EXEC_FROM	0
-
 #ifdef HAVE_MULTIROW_INSERT
 #	define ZBX_ROW_DL	","
 #else
@@ -1503,10 +1501,7 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 #else
 		ZBX_UNUSED(sql_alloc);
 #endif
-		zbx_db_end_multiple_update(sql, sql_alloc, sql_offset);
-		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
-		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
-		if (ZBX_DB_OK > zbx_db_execute("%s", *sql + ZBX_SQL_EXEC_FROM))
+		if (ZBX_DB_OK > zbx_db_execute("%s", *sql))
 			ret = FAIL;
 
 		*sql_offset = 0;
@@ -1923,10 +1918,8 @@ int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx
 
 	ret = zbx_db_prepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
 
-	if (SUCCEED == ret && sql_offset > 16)	/* in ORACLE always present begin..end; */
+	if (SUCCEED == ret && 0 != sql_offset)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
@@ -2599,7 +2592,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			goto out;
 	}
 
-	if (16 < sql_offset)
+	if (0 != sql_offset)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		if (',' == sql[sql_offset - 1])
@@ -2608,7 +2601,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 #endif
-		zbx_db_end_multiple_update(sql, sql_alloc, sql_offset);
 
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
