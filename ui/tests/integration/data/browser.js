@@ -13,7 +13,7 @@ var browser = new Browser(opts)
 
 try
 {
-	browser.setScreenSize(1920, 1080);
+	browser.setScreenSize(800, 600);
 	browser.navigate(parameters.url);
 
 	Zabbix.log(5, "getUrl: '"+ browser.getUrl()+"'")
@@ -89,7 +89,7 @@ try
 	el = browser.findElement("xpath", "//input[@id='name']");
 	el.sendKeys("A");
 	el.sendKeys("d");
-
+	Zabbix.sleep(3000);
 	try
 	{
 		Zabbix.log(5, "foo:" + el.getAttribute("foo"));
@@ -134,6 +134,8 @@ try
 	el.click();
 
 	el = browser.findElement("link text", "Data collection"); // animation
+	Zabbix.sleep(500); // animation
+
 	if (el === null)
 	{
 		throw Error("cannot find Data collection");
@@ -176,6 +178,7 @@ try
 	Zabbix.log(5, "Web length: " + el.length)
 
 	el = browser.findElement("link text", "Alerts");
+	Zabbix.sleep(500); // animation
 	if (el === null)
 	{
 		throw Error("cannot find Alerts");
@@ -188,8 +191,8 @@ try
 		throw Error("cannot find //li[@id='alerts' and contains(@class,'is-expanded')]");
 	}
 
-	el = browser.findElement("link text", "Media types"); // animation
-
+	el = browser.findElement("link text", "Media types");
+	Zabbix.sleep(500); // animation
 	if (el === null)
 	{
 		throw Error("cannot find Media types");
@@ -289,10 +292,11 @@ catch (err)
 	{
 		browser.setError(err.message);
 	}
+
 	result = browser.getResult();
+	result["screenshot"] = browser.getScreenshot();
+	return JSON.stringify(result);
 
 }
-finally
-{
-	return JSON.stringify(browser.getResult());
-}
+
+return JSON.stringify(browser.getResult());
