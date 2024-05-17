@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 5f90d6150d544b13b659a4023ced96fc
-          name: 'HPE ProLiant DL360: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'hp.server.contact[sysContact]'
@@ -46,7 +46,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2594044e5b6046c3944cc54744f7f133
-          name: 'HPE ProLiant DL360: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'hp.server.descr[sysDescr]'
@@ -67,7 +67,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2a807f6dd73e41418df98e294470ed67
-          name: 'HPE ProLiant DL360: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
           key: 'hp.server.hw.model[cpqSiProductName]'
@@ -86,7 +86,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 0aab370a165b42208ddc7e0ae693dabf
-          name: 'HPE ProLiant DL360: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
           key: 'hp.server.hw.serialnumber[cpqSiSysSerialNum]'
@@ -107,8 +107,8 @@ zabbix_export:
           triggers:
             - uuid: 1316d7def24a4a80adfdf4bc8ac5a12c
               expression: 'last(/HPE ProLiant DL360 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant DL360 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant DL360 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
-              name: 'HPE ProLiant DL360: Device has been replaced'
-              event_name: 'HPE ProLiant DL360: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -116,7 +116,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 8026a919077f4373adf774a18beb95eb
-          name: 'HPE ProLiant DL360: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'hp.server.hw.uptime[hrSystemUptime]'
@@ -139,7 +139,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 71486d7865174980a004d566e0a9e885
-          name: 'HPE ProLiant DL360: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'hp.server.location[sysLocation]'
@@ -159,7 +159,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2b0f62e1317c4900a7daee824cb360a3
-          name: 'HPE ProLiant DL360: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'hp.server.name[sysName]'
@@ -181,8 +181,8 @@ zabbix_export:
           triggers:
             - uuid: 6431a1a0b8494b50bcbd18e283e7158e
               expression: 'last(/HPE ProLiant DL360 by SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant DL360 by SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant DL360 by SNMP/hp.server.name[sysName]))>0'
-              name: 'HPE ProLiant DL360: System name has changed'
-              event_name: 'HPE ProLiant DL360: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -190,7 +190,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 361fa26e08284bbd822e17efde9a7856
-          name: 'HPE ProLiant DL360: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'hp.server.net.uptime[sysUpTime]'
@@ -208,7 +208,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b554640957a04d1fa2fc4bf91a0b81a2
-          name: 'HPE ProLiant DL360: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'hp.server.objectid[sysObjectID]'
@@ -227,7 +227,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2c9f9d96d50442bd99d6c46db6970d3d
-          name: 'HPE ProLiant DL360: System temperature status'
+          name: 'System temperature status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
           key: 'hp.server.sensor.temp.status[cpqHeThermalCondition]'
@@ -251,7 +251,7 @@ zabbix_export:
             - tag: component
               value: temperature
         - uuid: f61796d773b94de6b5177102cfb72005
-          name: 'HPE ProLiant DL360: Overall system health status'
+          name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
           key: 'hp.server.status[cpqHeMibCondition]'
@@ -274,7 +274,7 @@ zabbix_export:
           triggers:
             - uuid: 6cc840d5bccc4f1abfd7df6a161154ad
               expression: 'last(/HPE ProLiant DL360 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
-              name: 'HPE ProLiant DL360: System status is in critical state'
+              name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors.'
@@ -283,18 +283,18 @@ zabbix_export:
                   value: available
             - uuid: eab6760dda124629a9edcb2218ad3ad3
               expression: 'last(/HPE ProLiant DL360 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}'
-              name: 'HPE ProLiant DL360: System status is in warning state'
+              name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings.'
               dependencies:
-                - name: 'HPE ProLiant DL360: System status is in critical state'
+                - name: 'System status is in critical state'
                   expression: 'last(/HPE ProLiant DL360 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
               tags:
                 - tag: scope
                   value: available
         - uuid: 730b5262f94c4643bbcc4feb59b614da
-          name: 'HPE ProLiant DL360: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -307,7 +307,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: cb8fe041c0344b8f807a61a0d53344de
-          name: 'HPE ProLiant DL360: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -325,7 +325,7 @@ zabbix_export:
           triggers:
             - uuid: 0b91663d4b684e46aaccdf480d1622f0
               expression: 'max(/HPE ProLiant DL360 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'HPE ProLiant DL360: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -2240,8 +2240,8 @@ zabbix_export:
   triggers:
     - uuid: 383e0e2d556d4354ae50f68c94333ded
       expression: '(last(/HPE ProLiant DL360 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant DL360 by SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant DL360 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant DL360 by SNMP/hp.server.net.uptime[sysUpTime])<10m)'
-      name: 'HPE ProLiant DL360: Host has been restarted'
-      event_name: 'HPE ProLiant DL360: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

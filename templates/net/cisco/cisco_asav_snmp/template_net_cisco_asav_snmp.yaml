@@ -29,7 +29,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 9371a5b8ca3445eaa6516044e60a2ec6
-          name: 'Cisco ASAv: Contact'
+          name: Contact
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: cisco.asav.contact
@@ -51,7 +51,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2d4a058787a141629a33ab98194055f2
-          name: 'Cisco ASAv: Location'
+          name: Location
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: cisco.asav.location
@@ -72,7 +72,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c2e63e282bcd4fd09a80f1be95c089d4
-          name: 'Cisco ASAv: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: cisco.asav.model
@@ -97,7 +97,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d20d56dccd494060a4bc130f2951a610
-          name: 'Cisco ASAv: Host name'
+          name: 'Host name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: cisco.asav.name
@@ -119,7 +119,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 526b1a118bab4c948af0935197a659f6
-          name: 'Cisco ASAv: Uptime'
+          name: Uptime
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
           key: cisco.asav.uptime
@@ -142,8 +142,8 @@ zabbix_export:
           triggers:
             - uuid: 7fcf46583d2b42f4be6758e85784f28f
               expression: 'last(/Cisco ASAv by SNMP/cisco.asav.uptime)<10m'
-              name: 'Cisco ASAv: Host has been restarted'
-              event_name: 'Cisco ASAv: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -151,7 +151,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 33e87e5fe2774f1fabb93553e782aaa0
-          name: 'Cisco ASAv: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -169,7 +169,7 @@ zabbix_export:
           triggers:
             - uuid: 9ee945a0b0b942d7a7e3fcf218f0e82f
               expression: 'max(/Cisco ASAv by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Cisco ASAv: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -186,7 +186,7 @@ zabbix_export:
           description: 'Discovery of cpmCPUTotalTable, a table of CPU monitoring entries.'
           item_prototypes:
             - uuid: b2a6af9454a34ed3b8fa2e84ae801b69
-              name: 'Cisco ASAv: CPU [{#SNMPINDEX}] Utilization'
+              name: 'CPU [{#SNMPINDEX}] Utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}'
               key: 'cisco.asav.cpu.util[{#SNMPINDEX}]'
@@ -204,8 +204,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 2e90218795b94ee8b3c01dd79d2dd8b3
                   expression: 'min(/Cisco ASAv by SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: 'Cisco ASAv: High CPU utilization'
-                  event_name: 'Cisco ASAv: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: 'High CPU utilization'
+                  event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -229,7 +229,7 @@ zabbix_export:
           description: 'Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.'
           item_prototypes:
             - uuid: 983f90966701470fb713fdfae62f1146
-              name: 'Cisco ASAv: {#SNMPVALUE} Free memory'
+              name: '{#SNMPVALUE} Free memory'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}'
               key: 'cisco.asav.memory.free[{#SNMPINDEX}]'
@@ -243,7 +243,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: a34b4279d8ac40ec8f2d6577ebaa4280
-              name: 'Cisco ASAv: {#SNMPVALUE} Used memory'
+              name: '{#SNMPVALUE} Used memory'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}'
               key: 'cisco.asav.memory.used[{#SNMPINDEX}]'
@@ -257,7 +257,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: d67342c8a8124b1b89ef5ec36684b2a7
-              name: 'Cisco ASAv: {#SNMPVALUE} Memory utilization'
+              name: '{#SNMPVALUE} Memory utilization'
               type: CALCULATED
               key: 'cisco.asav.memory.util[{#SNMPINDEX}]'
               history: 7d
@@ -271,8 +271,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 688975747f664a15a3bca9dd3e1e0b01
                   expression: 'min(/Cisco ASAv by SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: 'Cisco ASAv: High memory utilization'
-                  event_name: 'Cisco ASAv: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'High memory utilization'
+                  event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -321,7 +321,7 @@ zabbix_export:
           description: 'Network interfaces discovery'
           item_prototypes:
             - uuid: c4be70b6d6934281ba1c78ef056c7d79
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Administrative status'
+              name: '{#CISCO.IF.NAME} Administrative status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.adminstatus[{#SNMPINDEX}]'
@@ -345,7 +345,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 17f768ffe6604c678e15bb2538cb8cc5
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Interface description'
+              name: '{#CISCO.IF.NAME} Interface description'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.18.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.descr[{#SNMPINDEX}]'
@@ -367,7 +367,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 01c5f157fc6140149dec01f512babadd
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Link speed'
+              name: '{#CISCO.IF.NAME} Link speed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.highspeed[{#SNMPINDEX}]'
@@ -391,7 +391,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 263e253c378f4928ad5c5f6fd0ce1cbe
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Incoming broadcast packets'
+              name: '{#CISCO.IF.NAME} Incoming broadcast packets'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.in.broadcastpkts[{#SNMPINDEX}]'
@@ -414,7 +414,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 9479f382e7e943e0aa560396d3a4db40
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Incoming multicast packets'
+              name: '{#CISCO.IF.NAME} Incoming multicast packets'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.in.multicastpkts[{#SNMPINDEX}]'
@@ -438,7 +438,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 443ce01bb9b04e69a936ec8fb9636720
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Incoming traffic'
+              name: '{#CISCO.IF.NAME} Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.in.traffic[{#SNMPINDEX}]'
@@ -463,7 +463,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 900bf66a4a7f411f9d9ce231daa8d8a8
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Incoming unicast packets'
+              name: '{#CISCO.IF.NAME} Incoming unicast packets'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.in.ucastpkts[{#SNMPINDEX}]'
@@ -486,7 +486,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: d7564be184564d06abb1f7a718bdf134
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Incoming utilization'
+              name: '{#CISCO.IF.NAME} Incoming utilization'
               type: CALCULATED
               key: 'cisco.asav.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
@@ -511,7 +511,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: ceb3a35e289043668d0087255de5c79b
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Interface name'
+              name: '{#CISCO.IF.NAME} Interface name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.1.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.name[{#SNMPINDEX}]'
@@ -533,7 +533,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 8d51a019f3634b079c2115ccb063840c
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Operational status'
+              name: '{#CISCO.IF.NAME} Operational status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.operstatus[{#SNMPINDEX}]'
@@ -561,7 +561,7 @@ zabbix_export:
                   expression: 'last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])<>2'
-                  name: 'Cisco ASAv: {#CISCO.IF.NAME} Link down'
+                  name: '{#CISCO.IF.NAME} Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -575,7 +575,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 8a97ed7804f042c7b6767f72bcf9a504
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Outgoing broadcast packets'
+              name: '{#CISCO.IF.NAME} Outgoing broadcast packets'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.out.broadcastpkts[{#SNMPINDEX}]'
@@ -599,7 +599,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: c0918a1acaa049e786a356c25c7dd654
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Outgoing multicast packets'
+              name: '{#CISCO.IF.NAME} Outgoing multicast packets'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.out.multicastpkts[{#SNMPINDEX}]'
@@ -624,7 +624,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 8e9c4d99c0d649e79e2f7f64d91789bf
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Outgoing traffic'
+              name: '{#CISCO.IF.NAME} Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.out.traffic[{#SNMPINDEX}]'
@@ -650,7 +650,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 1439162918d842ab92f4fca35c32279f
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Outgoing unicast packets'
+              name: '{#CISCO.IF.NAME} Outgoing unicast packets'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.out.ucastpkts[{#SNMPINDEX}]'
@@ -674,7 +674,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#CISCO.IF.NAME}'
             - uuid: 559d5ddae7744b19b32993174ef06918
-              name: 'Cisco ASAv: {#CISCO.IF.NAME} Outgoing utilization'
+              name: '{#CISCO.IF.NAME} Outgoing utilization'
               type: CALCULATED
               key: 'cisco.asav.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
@@ -780,7 +780,7 @@ zabbix_export:
           description: 'Information about a particular physical entity.'
           item_prototypes:
             - uuid: 3ac03ebbab6e4868887715f74443011c
-              name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Physical class'
+              name: '{#CISCO.ASAV.PHYS.NAME} Physical class'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.5.{#SNMPINDEX}'
               key: 'cisco.asav.phys.class[{#SNMPINDEX}]'
@@ -810,7 +810,7 @@ zabbix_export:
                 - tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             - uuid: a63fe0420f2e446ca10094fbf04ee4a8
-              name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Physical description'
+              name: '{#CISCO.ASAV.PHYS.NAME} Physical description'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}'
               key: 'cisco.asav.phys.description[{#SNMPINDEX}]'
@@ -835,7 +835,7 @@ zabbix_export:
                 - tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             - uuid: 862f2607838647b3b173d113e531c931
-              name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Hardware revision'
+              name: '{#CISCO.ASAV.PHYS.NAME} Hardware revision'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}'
               key: 'cisco.asav.phys.hw[{#SNMPINDEX}]'
@@ -867,7 +867,7 @@ zabbix_export:
                 - tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             - uuid: d64c4765f78847cc8071913c5454f433
-              name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Manufacturer name'
+              name: '{#CISCO.ASAV.PHYS.NAME} Manufacturer name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.12.{#SNMPINDEX}'
               key: 'cisco.asav.phys.mfgname[{#SNMPINDEX}]'
@@ -898,7 +898,7 @@ zabbix_export:
                 - tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             - uuid: 73739a08da634cd09b857a7512166d7b
-              name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Model name'
+              name: '{#CISCO.ASAV.PHYS.NAME} Model name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.13.{#SNMPINDEX}'
               key: 'cisco.asav.phys.model[{#SNMPINDEX}]'
@@ -925,7 +925,7 @@ zabbix_export:
                 - tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             - uuid: 21da0a63b5344b099ab21932a4a65dc6
-              name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Physical name'
+              name: '{#CISCO.ASAV.PHYS.NAME} Physical name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.7.{#SNMPINDEX}'
               key: 'cisco.asav.phys.name[{#SNMPINDEX}]'
@@ -959,7 +959,7 @@ zabbix_export:
                 - tag: physical
                   value: '{#CISCO.ASAV.PHYS.NAME}'
             - uuid: 9962cc7467c14221bee66a2f17aba12b
-              name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Serial number'
+              name: '{#CISCO.ASAV.PHYS.NAME} Serial number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
               key: 'cisco.asav.phys.sn[{#SNMPINDEX}]'
@@ -990,8 +990,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: c9f9bff9e9cd4519807c5be583670d02
                   expression: 'last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0'
-                  name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced'
-                  event_name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced (new serial number received)'
+                  name: '{#CISCO.ASAV.PHYS.NAME} has been replaced'
+                  event_name: '{#CISCO.ASAV.PHYS.NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#CISCO.ASAV.PHYS.NAME} serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -999,7 +999,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 698a7613f08048b48d7aad4ad5285562
-              name: 'Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} Software revision'
+              name: '{#CISCO.ASAV.PHYS.NAME} Software revision'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.10.{#SNMPINDEX}'
               key: 'cisco.asav.phys.sw[{#SNMPINDEX}]'
@@ -1036,7 +1036,7 @@ zabbix_export:
           description: 'Remote access session discovery'
           item_prototypes:
             - uuid: ff7de8cbf36643e3888451757b802873
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] ISP address'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] ISP address'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.10.{#SNMPINDEX}'
               key: 'cisco.asav.session.addr.isp[{#SNMPINDEX}]'
@@ -1058,7 +1058,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: 3071310f4f0e4c14bcf47d07a05568cc
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Local address'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Local address'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.8.{#SNMPINDEX}'
               key: 'cisco.asav.session.addr.local[{#SNMPINDEX}]'
@@ -1079,7 +1079,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: 47c84fde7b47415d96d461c28da50526
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Algorithm validate packets'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Algorithm validate packets'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.14.{#SNMPINDEX}'
               key: 'cisco.asav.session.authen.algorithm[{#SNMPINDEX}]'
@@ -1102,7 +1102,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: 901b8473e8054e929a55dd3e5d507d5d
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Authenticate method'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Authenticate method'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.4.{#SNMPINDEX}'
               key: 'cisco.asav.session.authen.method[{#SNMPINDEX}]'
@@ -1125,7 +1125,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: 452348005b1c4b7db194afcf3c95473d
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Authorize method'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Authorize method'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.5.{#SNMPINDEX}'
               key: 'cisco.asav.session.author.method[{#SNMPINDEX}]'
@@ -1148,7 +1148,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: c25050519610453baf3e69042fe77cf0
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Session duration'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Session duration'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.6.{#SNMPINDEX}'
               key: 'cisco.asav.session.duration[{#SNMPINDEX}]'
@@ -1169,7 +1169,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: 63ea7737e7534608b60744ec3b82ffae
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Encryption algorithm'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Encryption algorithm'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.13.{#SNMPINDEX}'
               key: 'cisco.asav.session.encryption[{#SNMPINDEX}]'
@@ -1192,7 +1192,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: c7a05da2f7d84743851e7d628d1e9838
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Incoming traffic'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.35.{#SNMPINDEX}'
               key: 'cisco.asav.session.in.traffic[{#SNMPINDEX}]'
@@ -1219,7 +1219,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: c71e07de9083472a982a827061496d5a
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Outgoing traffic'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.36.{#SNMPINDEX}'
               key: 'cisco.asav.session.out.traffic[{#SNMPINDEX}]'
@@ -1246,7 +1246,7 @@ zabbix_export:
                 - tag: session-user
                   value: '{#CISCO.CRAS.USER}'
             - uuid: de873aa34ad64f3d91e11d6999950692
-              name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Session protocol'
+              name: '{#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Session protocol'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.9.9.392.1.3.21.1.11.{#SNMPINDEX}'
               key: 'cisco.asav.session.protocol[{#SNMPINDEX}]'
@@ -1329,7 +1329,7 @@ zabbix_export:
             - name: Network
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1345,7 +1345,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -1361,7 +1361,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1378,7 +1378,7 @@ zabbix_export:
             - name: Resources
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1394,7 +1394,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1411,7 +1411,7 @@ zabbix_export:
             - name: 'Sessions traffic'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -70,75 +70,75 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FortiGate: Firmware version|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Firmware version of the device.</p>|SNMP agent|system.hw.firmware<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: Hardware model name|<p>MIB: ENTITY-MIB</p><p>Model of the device.</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: Hardware serial number|<p>MIB: ENTITY-MIB</p><p>Serial number of the device.</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: System contact details|<p>MIB: SNMPv2-MIB</p><p>Name and contact information of the contact person for the node. If not provided, the value is a zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|FortiGate: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should include the full name and version identification of the system's hardware type, software operating system, and networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|FortiGate: System location|<p>MIB: SNMPv2-MIB</p><p>Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|FortiGate: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for the node (the node's fully-qualified domain name). If not provided, the value is a zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|FortiGate: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the entity as part of the vendor's SMI enterprises subtree with the prefix 1.3.6.1.4.1 (e.g., a vendor with the identifier 1.3.6.1.4.1.4242 might assign a system object with the OID 1.3.6.1.4.1.4242.1.1).</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|FortiGate: System uptime|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Time since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.uptime[fgSysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
-|FortiGate: Number of CPUs|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of processors.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: CPU utilization|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>CPU utilization in %.</p>|SNMP agent|system.cpu.util[fgSysCpuUsage.0]|
-|FortiGate: ICMP ping|<p>Host accessibility by ICMP.</p><p>0 - ICMP ping failed.</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
-|FortiGate: ICMP loss|<p>Percentage of lost packets.</p>|Simple check|icmppingloss|
-|FortiGate: ICMP response time|<p>ICMP ping response time (in seconds).</p>|Simple check|icmppingsec|
-|FortiGate: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
-|FortiGate: SNMP walk network interfaces|<p>Used for discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.walk|
-|FortiGate: SNMP walk CPU|<p>Used for discovering CPU from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|system.cpu.walk|
-|FortiGate: SNMP walk VPN tunnels|<p>Used for discovering VPN tunnels from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|vpn.tunnel.walk|
-|FortiGate: SNMP walk HA members|<p>Used for discovering HA members from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|ha.members.walk|
-|FortiGate: SNMP walk SD-WAN health-checks|<p>Used for discovering SD-WAN health-checks from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|sdwan_health.walk|
-|FortiGate: SNMP walk wireless AP|<p>Used for discovering wireless access points from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|wireless.ap.walk|
-|FortiGate: SNMP walk hardware sensors|<p>Used for discovering hardware sensors from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|hw.sensor.walk|
-|FortiGate: SNMP walk virtual domain|<p>Used for discovering virtual domains from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|vdom.walk|
-|FortiGate: Total memory|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Total memory allocated for the tasks.</p>|SNMP agent|vm.memory.total[fgSysMemCapacity.0]|
-|FortiGate: Used memory|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Current memory utilization (percentage).</p>|SNMP agent|vm.memory.used[fgSysMemUsage.0]|
-|FortiGate: Available memory|<p>Total memory available for utilization.</p>|Calculated|vm.memory.available[fgSysMemFree.0]|
-|FortiGate: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util[memoryUsedPercentage.0]|
-|FortiGate: IPv4 Active sessions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of active sessions on the device.</p>|SNMP agent|net.ipv4.sessions[fgSysSesCount.0]|
-|FortiGate: SNMP traps (fallback)|<p>Used for collecting all SNMP traps unmatched by other `snmptrap` items.</p>|SNMP trap|snmptrap.fallback|
-|FortiGate: Total disk space|<p>Total hard disk capacity.</p>|SNMP agent|vfs.fs.total[fgSysDiskCapacity.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: Used disk space|<p>Current hard disk usage.</p>|SNMP agent|vfs.fs.used[fgSysDiskUsage.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|FortiGate: Free disk space|<p>Free hard disk capacity.</p>|Calculated|vfs.fs.free|
-|FortiGate: Free disk percentage|<p>Free disk space, expressed in %.</p>|Calculated|vfs.fs.pfree|
-|FortiGate: Active IPsec VPN tunnels|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of IPsec VPN tunnels with at least one SA.</p>|SNMP agent|vpn.tunnel.active[fgVpnTunnelUpCount.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|FortiGate: Active SSL VPN users|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Current number of users logged in through SSL-VPN tunnels in the virtual domain.</p>|SNMP agent|vpn.users.count[fgVpnSslStatsLoginUsers.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|FortiGate: SSL VPN state|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Used to determine whether SSL-VPN is enabled on this virtual domain.</p>|SNMP agent|vpn.ssl.state[fgVpnSslState.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|FortiGate: Blocked intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of intrusions blocked per second.</p>|SNMP agent|ips.blocked[fgIpsIntrusionsBlocked.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: Total detected intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Total number of intrusions detected per second.</p>|SNMP agent|ips.detected.total[fgIpsIntrusionsDetected.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: Detected critical intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of critical severity intrusions detected per second.</p>|SNMP agent|ips.detected.crit[fgIpsCritSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: Detected high intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of high severity intrusions detected per second.</p>|SNMP agent|ips.detected.high[fgIpsHighSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: Detected medium intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of medium severity intrusions detected per second.</p>|SNMP agent|ips.detected.med[fgIpsMedSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: Detected low intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of low severity intrusions detected per second.</p>|SNMP agent|ips.detected.low[fgIpsLowSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: Detected info intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of info severity intrusions detected per second.</p>|SNMP agent|ips.detected.info[fgIpsInfoSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: Detected anomaly based intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of intrusions detected as anomalies per second.</p>|SNMP agent|ips.detected.anomaly[fgIpsAnomalyDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: Detected signature based intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of intrusions detected by signature per second.</p>|SNMP agent|ips.detected.sign[fgIpsSignatureDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|FortiGate: IPS database version|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>IPS signature database version installed on the device.</p>|SNMP agent|ips.database.version[fgSysVersionIps.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|FortiGate: HA mode|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>High-availability mode (Standalone, A-A or A-P).</p>|SNMP agent|ha.mode[fgHaSystemMode.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: HA cluster group ID|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>HA cluster group ID device is configured for.</p>|SNMP agent|ha.cluster.group_id[fgHaGroupId.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: HA cluster group name|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>HA cluster group name.</p>|SNMP agent|ha.cluster.group_name[fgHaGroupName.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: HA cluster priority|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>HA clustering priority of the device (default = 128).</p>|SNMP agent|ha.cluster.priority[fgHaPriority.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: HA cluster primary override|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Status of the primary override flag.</p>|SNMP agent|ha.cluster.override[fgHaOverride.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: HA config sync|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Configuration of an automatic configuration synchronization (enabled or disabled).</p>|SNMP agent|ha.auto.sync[fgHaAutoSync.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FortiGate: HA load-balancing schedule|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Load-balancing schedule of cluster (in A-A mode).</p>|SNMP agent|ha.schedule[fgHaSchedule.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Firmware version|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Firmware version of the device.</p>|SNMP agent|system.hw.firmware<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Hardware model name|<p>MIB: ENTITY-MIB</p><p>Model of the device.</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Hardware serial number|<p>MIB: ENTITY-MIB</p><p>Serial number of the device.</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|System contact details|<p>MIB: SNMPv2-MIB</p><p>Name and contact information of the contact person for the node. If not provided, the value is a zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should include the full name and version identification of the system's hardware type, software operating system, and networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System location|<p>MIB: SNMPv2-MIB</p><p>Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for the node (the node's fully-qualified domain name). If not provided, the value is a zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the entity as part of the vendor's SMI enterprises subtree with the prefix 1.3.6.1.4.1 (e.g., a vendor with the identifier 1.3.6.1.4.1.4242 might assign a system object with the OID 1.3.6.1.4.1.4242.1.1).</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System uptime|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Time since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.uptime[fgSysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Number of CPUs|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of processors.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|CPU utilization|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>CPU utilization in %.</p>|SNMP agent|system.cpu.util[fgSysCpuUsage.0]|
+|ICMP ping|<p>Host accessibility by ICMP.</p><p>0 - ICMP ping failed.</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
+|ICMP loss|<p>Percentage of lost packets.</p>|Simple check|icmppingloss|
+|ICMP response time|<p>ICMP ping response time (in seconds).</p>|Simple check|icmppingsec|
+|SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
+|SNMP walk network interfaces|<p>Used for discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.walk|
+|SNMP walk CPU|<p>Used for discovering CPU from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|system.cpu.walk|
+|SNMP walk VPN tunnels|<p>Used for discovering VPN tunnels from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|vpn.tunnel.walk|
+|SNMP walk HA members|<p>Used for discovering HA members from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|ha.members.walk|
+|SNMP walk SD-WAN health-checks|<p>Used for discovering SD-WAN health-checks from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|sdwan_health.walk|
+|SNMP walk wireless AP|<p>Used for discovering wireless access points from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|wireless.ap.walk|
+|SNMP walk hardware sensors|<p>Used for discovering hardware sensors from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|hw.sensor.walk|
+|SNMP walk virtual domain|<p>Used for discovering virtual domains from FORTINET-FORTIGATE-MIB.</p>|SNMP agent|vdom.walk|
+|Total memory|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Total physical memory (RAM) installed.</p>|SNMP agent|vm.memory.total[fgSysMemCapacity.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000`</p></li></ul>|
+|Memory utilization|<p>Current memory utilization (percentage).</p>|SNMP agent|vm.memory.util[memoryUsedPercentage.0]|
+|Used memory|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Physical memory (RAM) used calculated based on memory utilization percentage.</p>|Calculated|vm.memory.used[fgSysMemUsage.0]|
+|Available memory|<p>Total memory available for utilization.</p>|Calculated|vm.memory.available[fgSysMemFree.0]|
+|IPv4 Active sessions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of active sessions on the device.</p>|SNMP agent|net.ipv4.sessions[fgSysSesCount.0]|
+|SNMP traps (fallback)|<p>Used for collecting all SNMP traps unmatched by other `snmptrap` items.</p>|SNMP trap|snmptrap.fallback|
+|Total disk space|<p>Total hard disk capacity.</p>|SNMP agent|vfs.fs.total[fgSysDiskCapacity.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Used disk space|<p>Current hard disk usage.</p>|SNMP agent|vfs.fs.used[fgSysDiskUsage.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Free disk space|<p>Free hard disk capacity.</p>|Calculated|vfs.fs.free|
+|Free disk percentage|<p>Free disk space, expressed in %.</p>|Calculated|vfs.fs.pfree|
+|Active IPsec VPN tunnels|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of IPsec VPN tunnels with at least one SA.</p>|SNMP agent|vpn.tunnel.active[fgVpnTunnelUpCount.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Active SSL VPN users|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Current number of users logged in through SSL-VPN tunnels in the virtual domain.</p>|SNMP agent|vpn.users.count[fgVpnSslStatsLoginUsers.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SSL VPN state|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Used to determine whether SSL-VPN is enabled on this virtual domain.</p>|SNMP agent|vpn.ssl.state[fgVpnSslState.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Blocked intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of intrusions blocked per second.</p>|SNMP agent|ips.blocked[fgIpsIntrusionsBlocked.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Total detected intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Total number of intrusions detected per second.</p>|SNMP agent|ips.detected.total[fgIpsIntrusionsDetected.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Detected critical intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of critical severity intrusions detected per second.</p>|SNMP agent|ips.detected.crit[fgIpsCritSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Detected high intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of high severity intrusions detected per second.</p>|SNMP agent|ips.detected.high[fgIpsHighSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Detected medium intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of medium severity intrusions detected per second.</p>|SNMP agent|ips.detected.med[fgIpsMedSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Detected low intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of low severity intrusions detected per second.</p>|SNMP agent|ips.detected.low[fgIpsLowSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Detected info intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of info severity intrusions detected per second.</p>|SNMP agent|ips.detected.info[fgIpsInfoSevDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Detected anomaly based intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of intrusions detected as anomalies per second.</p>|SNMP agent|ips.detected.anomaly[fgIpsAnomalyDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Detected signature based intrusions|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Number of intrusions detected by signature per second.</p>|SNMP agent|ips.detected.sign[fgIpsSignatureDetections.0]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|IPS database version|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>IPS signature database version installed on the device.</p>|SNMP agent|ips.database.version[fgSysVersionIps.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|HA mode|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>High-availability mode (Standalone, A-A or A-P).</p>|SNMP agent|ha.mode[fgHaSystemMode.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|HA cluster group ID|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>HA cluster group ID device is configured for.</p>|SNMP agent|ha.cluster.group_id[fgHaGroupId.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|HA cluster group name|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>HA cluster group name.</p>|SNMP agent|ha.cluster.group_name[fgHaGroupName.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|HA cluster priority|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>HA clustering priority of the device (default = 128).</p>|SNMP agent|ha.cluster.priority[fgHaPriority.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|HA cluster primary override|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Status of the primary override flag.</p>|SNMP agent|ha.cluster.override[fgHaOverride.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|HA config sync|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Configuration of an automatic configuration synchronization (enabled or disabled).</p>|SNMP agent|ha.auto.sync[fgHaAutoSync.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|HA load-balancing schedule|<p>MIB: FORTINET-FORTIGATE-MIB</p><p>Load-balancing schedule of cluster (in A-A mode).</p>|SNMP agent|ha.schedule[fgHaSchedule.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|FortiGate: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/FortiGate by SNMP/system.hw.serialnumber,#1)<>last(/FortiGate by SNMP/system.hw.serialnumber,#2) and length(last(/FortiGate by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|FortiGate: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/FortiGate by SNMP/system.name,#1)<>last(/FortiGate by SNMP/system.name,#2) and length(last(/FortiGate by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|FortiGate: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/FortiGate by SNMP/system.uptime[fgSysUpTime.0])<10m`|Info|**Manual close**: Yes|
-|FortiGate: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/FortiGate by SNMP/system.cpu.util[fgSysCpuUsage.0],5m)>{$CPU.UTIL.CRIT}`|Warning||
-|FortiGate: Unavailable by ICMP ping|<p>Last three attempts returned timeout. Please check device connectivity.</p>|`max(/FortiGate by SNMP/icmpping,#3)=0`|High||
-|FortiGate: High ICMP ping loss|<p>ICMP ping loss detected.</p>|`min(/FortiGate by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/FortiGate by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>FortiGate: Unavailable by ICMP ping</li></ul>|
-|FortiGate: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/FortiGate by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>FortiGate: Unavailable by ICMP ping</li><li>FortiGate: High ICMP ping loss</li></ul>|
-|FortiGate: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/FortiGate by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>FortiGate: Unavailable by ICMP ping</li></ul>|
-|FortiGate: High memory utilization|<p>The system is running out of free memory.</p>|`min(/FortiGate by SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}`|Average||
-|FortiGate: Free disk space is too low|<p>Available disk space is too low.</p>|`last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.CRIT}`|High||
-|FortiGate: Free disk space is low|<p>Available disk space is not enough.</p>|`last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.WARN}`|Warning|**Depends on**:<br><ul><li>FortiGate: Free disk space is too low</li></ul>|
+|Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/FortiGate by SNMP/system.hw.serialnumber,#1)<>last(/FortiGate by SNMP/system.hw.serialnumber,#2) and length(last(/FortiGate by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/FortiGate by SNMP/system.name,#1)<>last(/FortiGate by SNMP/system.name,#2) and length(last(/FortiGate by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/FortiGate by SNMP/system.uptime[fgSysUpTime.0])<10m`|Info|**Manual close**: Yes|
+|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/FortiGate by SNMP/system.cpu.util[fgSysCpuUsage.0],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Unavailable by ICMP ping|<p>Last three attempts returned timeout. Please check device connectivity.</p>|`max(/FortiGate by SNMP/icmpping,#3)=0`|High||
+|High ICMP ping loss|<p>ICMP ping loss detected.</p>|`min(/FortiGate by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/FortiGate by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
+|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/FortiGate by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li><li>High ICMP ping loss</li></ul>|
+|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/FortiGate by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
+|High memory utilization|<p>The system is running out of free memory.</p>|`min(/FortiGate by SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Free disk space is too low|<p>Available disk space is too low.</p>|`last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.CRIT}`|High||
+|Free disk space is low|<p>Available disk space is not enough.</p>|`last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.WARN}`|Warning|**Depends on**:<br><ul><li>Free disk space is too low</li></ul>|
 
 ### LLD rule CPU discovery
 

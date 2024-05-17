@@ -32,7 +32,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: a1b612cd8e274a27a834dbdb69fe7d08
-          name: 'Veeam Manager: Failed Job Runs'
+          name: 'Failed Job Runs'
           type: DEPENDENT
           key: veeam.manager.failed.jobs
           delay: '0'
@@ -54,15 +54,15 @@ zabbix_export:
           triggers:
             - uuid: 4885d43f36b541219be87b5e5ea19088
               expression: 'last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.failed.jobs)>{$VEEAM.MANAGER.JOB.MAX.FAIL}'
-              name: 'Veeam Manager: Failed job runs is too high'
-              event_name: 'Veeam Manager: Failed job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.FAIL})'
+              name: 'Failed job runs is too high'
+              event_name: 'Failed job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.FAIL})'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: availability
         - uuid: e698c05dae9f4d2f8323ce718e9ed83b
-          name: 'Veeam Manager: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: veeam.manager.get.errors
           delay: '0'
@@ -86,7 +86,7 @@ zabbix_export:
           triggers:
             - uuid: 83316e2168414042aeb9d98857534baa
               expression: 'length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0'
-              name: 'Veeam Manager: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -94,7 +94,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 525a61ff4fb747efab6ac58d1ac8b7c4
-          name: 'Veeam Manager: Get metrics'
+          name: 'Get metrics'
           type: SCRIPT
           key: veeam.manager.get.metrics
           delay: 5m
@@ -185,7 +185,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: a0a1e67c99c64bd1a801c87eeda3977b
-          name: 'Veeam Manager: Running Jobs'
+          name: 'Running Jobs'
           type: DEPENDENT
           key: veeam.manager.running.jobs
           delay: '0'
@@ -205,7 +205,7 @@ zabbix_export:
             - tag: component
               value: reports
         - uuid: d7510e46c6094e09979ea7dad2828cef
-          name: 'Veeam Manager: Scheduled Backup Jobs'
+          name: 'Scheduled Backup Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.backup.jobs
           delay: '0'
@@ -225,7 +225,7 @@ zabbix_export:
             - tag: component
               value: reports
         - uuid: de9f62198b5b42cdb25460315f4af949
-          name: 'Veeam Manager: Scheduled Jobs'
+          name: 'Scheduled Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.jobs
           delay: '0'
@@ -245,7 +245,7 @@ zabbix_export:
             - tag: component
               value: reports
         - uuid: 599a25d753ce4f5d8542d08569f2a136
-          name: 'Veeam Manager: Scheduled Replica Jobs'
+          name: 'Scheduled Replica Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.replica.jobs
           delay: '0'
@@ -265,7 +265,7 @@ zabbix_export:
             - tag: component
               value: reports
         - uuid: 7d96ebb849c94d5b89656bdfa6398a1d
-          name: 'Veeam Manager: Total Job Runs'
+          name: 'Total Job Runs'
           type: DEPENDENT
           key: veeam.manager.scheduled.total.jobs
           delay: '0'
@@ -285,7 +285,7 @@ zabbix_export:
             - tag: component
               value: reports
         - uuid: b39d33c9d5c544a2996736dbdccfcaff
-          name: 'Veeam Manager: Warnings Job Runs'
+          name: 'Warnings Job Runs'
           type: DEPENDENT
           key: veeam.manager.warning.jobs
           delay: '0'
@@ -307,8 +307,8 @@ zabbix_export:
           triggers:
             - uuid: f65998e99bb24e02a2810b632a4a3f4e
               expression: 'last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.warning.jobs)>{$VEEAM.MANAGER.JOB.MAX.WARN}'
-              name: 'Veeam Manager: Warning job runs is too high'
-              event_name: 'Veeam Manager: Warning job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.WARN})'
+              name: 'Warning job runs is too high'
+              event_name: 'Warning job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.WARN})'
               priority: WARNING
               manual_close: 'YES'
               tags:
@@ -340,7 +340,7 @@ zabbix_export:
           description: 'Discovery of all backup files created on, or imported to the backup servers that are connected to Veeam Backup Enterprise Manager.'
           item_prototypes:
             - uuid: d3f87401602c48d3a837504ed08902db
-              name: 'Veeam Manager: Compression ratio [{#NAME}]'
+              name: 'Compression ratio [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.compress.ratio[{#NAME}]'
               delay: '0'
@@ -359,7 +359,7 @@ zabbix_export:
                 - tag: component
                   value: backups
             - uuid: 0c5be137b40949c4946a09c57ccc7796
-              name: 'Veeam Manager: Data Size [{#NAME}]'
+              name: 'Data Size [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.data.size[{#NAME}]'
               delay: '0'
@@ -380,7 +380,7 @@ zabbix_export:
                 - tag: component
                   value: backups
             - uuid: 62d0b0341bac40f9a63f0fbf3639e0d0
-              name: 'Veeam Manager: Deduplication Ratio [{#NAME}]'
+              name: 'Deduplication Ratio [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.deduplication.ratio[{#NAME}]'
               delay: '0'
@@ -399,7 +399,7 @@ zabbix_export:
                 - tag: component
                   value: backups
             - uuid: 098cc39afb88483f93a98c96fc1450d1
-              name: 'Veeam Manager: Backup Size [{#NAME}]'
+              name: 'Backup Size [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.file.size[{#NAME}]'
               delay: '0'

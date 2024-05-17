@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-04-26 10:49+0000\n"
+"PO-Revision-Date: 2024-05-13 17:22+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -88,6 +88,11 @@ msgstr "%1$d spojení pro %2$s bylo nalezeno"
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
 msgstr "%1$d z %1$d+ hostů zobrazeno"
+
+#: widgets/itemnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ items are shown"
+msgstr "Je zobrazeno %1$d z %1$d+ itemů"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -1121,7 +1126,7 @@ msgstr "Adresa"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Adresa pro aktivní agenty"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1492,6 +1497,14 @@ msgstr "Veškeré změny provedené v aktuálním formuláři budou ztraceny."
 msgid "Any character string included"
 msgstr "Obsahuje libovolný řetězec"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "Chyba aplikace."
@@ -1588,7 +1601,7 @@ msgstr "Inventární číslo"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Přidělený proxy"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -2090,6 +2103,11 @@ msgstr "Předložit"
 msgid "Bring to front"
 msgstr "Přenést dopředu"
 
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
+
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
 msgstr "Bulharsky (bg_BG)"
@@ -2340,7 +2358,7 @@ msgstr "Nelze přidat proxy"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "Nelze přidat skupinu proxy"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2822,13 +2840,13 @@ msgstr[2] "Nelze smazat proxy"
 #: app/controllers/CControllerProxyGroupDelete.php:78
 msgid "Cannot delete proxy group"
 msgid_plural "Cannot delete proxy groups"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze smazat skupinu proxy"
+msgstr[1] "Nelze smazat skupiny proxy"
+msgstr[2] "Nelze smazat skupiny proxy"
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
 msgid "Cannot delete proxy groups"
-msgstr ""
+msgstr "Nelze smazat skupiny proxy"
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -2943,6 +2961,11 @@ msgid_plural "Cannot delete user groups"
 msgstr[0] "Nelze smazat skupinu uživatelů"
 msgstr[1] "Nelze smazat skupiny uživatelů"
 msgstr[2] "Nelze smazat skupiny uživatelů"
+
+#: include/classes/api/services/CUserGroup.php:1397
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
+msgstr "Uživatelskou skupinu \"%1$s\" nelze smazat, protože ji používá zřízený uživatel \"%2$s\"."
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -4146,7 +4169,7 @@ msgstr "Není možné aktualizovat proxy pro objeveného hosta \"%1$s\"."
 #: app/controllers/CControllerProxyGroupUpdate.php:43
 #: app/controllers/CControllerProxyGroupUpdate.php:82
 msgid "Cannot update proxy group"
-msgstr ""
+msgstr "Nelze aktualizovat skupinu proxy"
 
 #: include/classes/api/services/CRole.php:768
 #, c-format
@@ -4890,7 +4913,7 @@ msgstr "Nastavení proxy"
 
 #: app/controllers/CControllerProxyGroupList.php:131
 msgid "Configuration of proxy groups"
-msgstr ""
+msgstr "Konfigurace skupin proxy"
 
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
@@ -5508,7 +5531,7 @@ msgstr "Vytvořit proxy"
 
 #: app/views/administration.proxygroup.list.php:168
 msgid "Create proxy group"
-msgstr ""
+msgstr "Vytvořit skupinu proxy"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
@@ -5757,6 +5780,10 @@ msgstr "Univerzální výzva DUO"
 #: include/classes/helpers/CSlaHelper.php:39 report4.php:90
 msgid "Daily"
 msgstr "Denně"
+
+#: include/locales.inc.php:40
+msgid "Danish (da_DK)"
+msgstr "Dánština (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -6178,7 +6205,7 @@ msgstr "Výchozí časové pásmo"
 #: app/views/administration.proxygroup.list.php:55
 #: app/views/administration.proxygroup.list.php:111
 msgid "Degrading"
-msgstr ""
+msgstr "Degradováno"
 
 #: app/views/popup.lldoperation.php:160 app/views/popup.massupdate.item.php:276
 msgid "Delay"
@@ -6502,11 +6529,11 @@ msgstr "Smazat vybrané proxy?"
 #: app/views/js/administration.proxygroup.list.js.php:88
 #: app/views/popup.proxygroup.edit.php:147
 msgid "Delete selected proxy group?"
-msgstr ""
+msgstr "Smazat vybranou skupinu proxy?"
 
 #: app/views/js/administration.proxygroup.list.js.php:87
 msgid "Delete selected proxy groups?"
-msgstr ""
+msgstr "Smazat vybrané skupiny proxy?"
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -7099,7 +7126,7 @@ msgstr "Objevovací akce"
 
 #: app/views/configuration.discovery.edit.php:52
 msgid "Discovery by"
-msgstr ""
+msgstr "Objeveno"
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -7257,6 +7284,10 @@ msgstr "Zobrazovat spouštěče v stavu OK po dobu"
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "Zobrazit graf"
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -8403,7 +8434,7 @@ msgstr "Aktualizace vlastností widgetu se nezdařila."
 #: app/views/administration.proxygroup.list.php:79
 #: app/views/popup.proxygroup.edit.php:51
 msgid "Failover period"
-msgstr ""
+msgstr "Časování obnovy"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -8582,6 +8613,11 @@ msgstr "Filtr"
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
 msgstr "Filtr byl smazán"
+
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Filter is not set"
+msgstr "Filtr není nastaven"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -9355,6 +9391,10 @@ msgstr "Vysoký světlý kontrast"
 msgid "Highlight whole row"
 msgstr "Označ celý řádek"
 
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
 #: app/partials/configuration.filter.items.php:158
@@ -9504,7 +9544,7 @@ msgstr "Host \"%1$s\" je monitorovaný pomocí proxy \"%2$s\"."
 #: include/classes/api/services/CProxyGroup.php:456
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy group \"%2$s\"."
-msgstr ""
+msgstr "Host \"%1$s\" je monitorován skupinou proxy \"%2$s\"."
 
 #: include/actions.inc.php:57
 msgid "Host IP"
@@ -9741,6 +9781,10 @@ msgstr "Host navigátor"
 msgid "Host networks"
 msgstr "Sítě hosta"
 
+#: widgets/hostnavigator/includes/WidgetForm.php:65
+msgid "Host patterns"
+msgstr "Vzory hosta"
+
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
 msgstr "Oprávnění hostitele"
@@ -9822,6 +9866,14 @@ msgstr "Stav hosta"
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
 msgstr "Maska podsítě hosta"
+
+#: widgets/itemnavigator/Widget.php:43
+msgid "Host tag"
+msgstr "Tag hosta"
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
+msgid "Host tag value"
+msgstr "Hodnota tagu hosta"
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11902,9 +11954,17 @@ msgstr[0] "Položka povolená"
 msgstr[1] "Položky povolené"
 msgstr[2] "Položky povolené"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "Položka je v \"not supported\" stavu"
+
+#: widgets/itemnavigator/includes/WidgetForm.php:107
+msgid "Item limit"
+msgstr "Limit itemu"
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11915,6 +11975,10 @@ msgstr "Seznam položek"
 msgid "Item name"
 msgstr "Název itemu"
 
+#: widgets/itemnavigator/Widget.php:29
+msgid "Item navigator"
+msgstr "Navigator itemu"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Položka nevybraná"
@@ -11923,6 +11987,13 @@ msgstr "Položka nevybraná"
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
 msgstr "Vzor položky"
+
+#: widgets/honeycomb/includes/WidgetForm.php:90
+#: widgets/itemnavigator/includes/WidgetForm.php:78
+#: widgets/piechart/views/widget.edit.js.php:208
+#: widgets/svggraph/views/widget.edit.js.php:279
+msgid "Item patterns"
+msgstr "Vzory itemu"
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11968,6 +12039,14 @@ msgstr "Prototyp položky s ID\"%1$s\" není dostupný."
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
 msgstr "Prototypy položky"
+
+#: widgets/itemnavigator/Widget.php:44
+msgid "Item tag"
+msgstr "Tag itemu"
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
+msgid "Item tag value"
+msgstr "Hodnota tagu itemu"
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12400,6 +12479,10 @@ msgstr "Graf za poslední týden"
 msgid "Latest data"
 msgstr "Poslední hodnoty"
 
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
+
 #: jsLoader.php:376
 msgid "Latest values"
 msgstr "Poslední hodnoty"
@@ -12550,11 +12633,11 @@ msgstr "Seznam Zabbix proxy se jménem, režimem, šifrováním, kompresí, verz
 
 #: include/classes/data/CItemData.php:2877
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
-msgstr ""
+msgstr "Seznam Zabbix proxy serverů s názvem, režimem, šifrováním, kompresí, verzí, naposledy viděno, počtem hostů, počtem itemů, požadovanými hodnotami za sekundu (vps), kompatibilitou (aktuální/zastaralé/nepodporované), časovými limity, názvem skupiny proxy, pokud proxy patří do skupiny, stav (neznámý/offline/online). Vrátí JSON."
 
 #: include/classes/data/CItemData.php:2905
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
-msgstr ""
+msgstr "Seznam Zabbix proxy serverů s názvem, režimem, šifrováním, kompresí, verzí, naposledy viděným, počtem hostů, počtem itemů, požadovanými hodnotami za sekundu (vps), kompatibilitou (aktuální/zastaralé/nepodporované), časovými limity, názvem skupiny proxy, stavem (neznámý/offline/online). Vrátí JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -13349,6 +13432,10 @@ msgstr "Typy médií"
 msgid "Media types disabled by Administration."
 msgstr "Typy médií zakázané administrací."
 
+#: app/views/popup.media.php:78
+msgid "Media types disabled in Alerts."
+msgstr "Typy médií jsou v upozorněních zakázány."
+
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
 msgid "Media types used by action \"%1$s\"."
@@ -13486,7 +13573,7 @@ msgstr "Min"
 
 #: app/views/popup.proxygroup.edit.php:59
 msgid "Minimum number of proxies"
-msgstr ""
+msgstr "Minimální počet proxy"
 
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
@@ -13494,7 +13581,7 @@ msgstr "Minimální délka hesla"
 
 #: app/views/administration.proxygroup.list.php:81
 msgid "Minimum proxies"
-msgstr ""
+msgstr "Minimální proxy"
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -14188,7 +14275,7 @@ msgstr "Nový proxy"
 #: app/views/popup.proxygroup.edit.php:127
 #: app/views/popup.proxygroup.edit.php:156
 msgid "New proxy group"
-msgstr ""
+msgstr "Nová skupina proxy"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14236,9 +14323,18 @@ msgstr "Nový prototyp triggeru"
 msgid "New triggers"
 msgstr "Nové spouštěče"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "Nové mapování uživatelských skupin"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -14316,6 +14412,12 @@ msgstr "Žádná data"
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
 msgstr "Bez sběru dat"
+
+#: app/views/search.php:48 app/views/search.php:209 app/views/search.php:289
+#: app/views/search.php:394 include/classes/html/CTableInfo.php:72
+#: widgets/hostnavigator/Widget.php:40
+msgid "No data found"
+msgstr "Nenalezena žádná data"
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -14979,7 +15081,7 @@ msgstr "Počet monitorovaných hostů"
 
 #: include/classes/data/CItemData.php:2891
 msgid "Number of online proxies. Returns integer."
-msgstr ""
+msgstr "Počet online proxy. Vrátí celé číslo."
 
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
@@ -15165,7 +15267,7 @@ msgstr "Vypnuté"
 #: app/views/administration.proxygroup.list.php:99
 #: app/views/administration.proxy.list.php:166
 msgid "Offline"
-msgstr ""
+msgstr "Offline"
 
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
@@ -15226,11 +15328,11 @@ msgstr "Pouze jednou"
 #: app/views/administration.proxygroup.list.php:107
 #: app/views/administration.proxy.list.php:170
 msgid "Online"
-msgstr ""
+msgstr "Online"
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
-msgstr ""
+msgstr "Online proxy"
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -16018,7 +16120,7 @@ msgstr "Procento fyzické paměti hostitele, která byla spotřebována, \"url\"
 
 #: include/classes/data/CItemData.php:2898
 msgid "Percentage of online proxies. Returns float."
-msgstr ""
+msgstr "Procento online proxy serverů. Vrací float."
 
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
@@ -16147,6 +16249,14 @@ msgstr "Naskenujte prosím svůj ověřovací kód a nechte si jej zobrazit v ap
 #: jsLoader.php:261
 msgid "Please select two elements"
 msgstr "Vyberte, prosím, dva prvky"
+
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr "Aktualizujte prosím konfiguraci"
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
@@ -16650,37 +16760,37 @@ msgstr[2] "Proxy byla smazána"
 #: app/views/popup.proxygroup.edit.php:112
 #: include/views/configuration.host.prototype.edit.php:303
 msgid "Proxy group"
-msgstr ""
+msgstr "Skupina proxy"
 
 #: include/classes/api/services/CProxyGroup.php:369
 #, c-format
 msgid "Proxy group \"%1$s\" already exists."
-msgstr ""
+msgstr "Skupina proxy \"%1$s\" již existuje."
 
 #: include/classes/import/importers/CHostImporter.php:348
 #, c-format
 msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "Skupina proxy \"%1$s\" pro hosta \"%2$s\" neexistuje."
 
 #: include/classes/api/services/CProxyGroup.php:437
 #, c-format
 msgid "Proxy group \"%1$s\" is used by proxy \"%2$s\"."
-msgstr ""
+msgstr "Skupinu proxy \"%1$s\" používá proxy \"%2$s\"."
 
 #: app/controllers/CControllerProxyGroupCreate.php:66
 msgid "Proxy group added"
-msgstr ""
+msgstr "Skupina proxy byla přidána"
 
 #: app/controllers/CControllerProxyGroupDelete.php:70
 msgid "Proxy group deleted"
 msgid_plural "Proxy groups deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Skupina proxy byla smazána"
+msgstr[1] "Skupiny proxy byly smazány"
+msgstr[2] "Skupiny proxy byly smazány"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
-msgstr ""
+msgstr "Skupina proxy byla aktualizována"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/views/administration.proxygroup.list.php:163
@@ -16688,11 +16798,11 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:378
 #: include/classes/helpers/CRoleHelper.php:512
 msgid "Proxy groups"
-msgstr ""
+msgstr "Skupiny proxy"
 
 #: app/partials/configuration.host.edit.html.php:334
 msgid "Proxy is not assigned yet."
-msgstr ""
+msgstr "Proxy zatím není přiřazen."
 
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
@@ -16930,7 +17040,7 @@ msgstr "ID sady záznamů"
 #: app/views/administration.proxygroup.list.php:57
 #: app/views/administration.proxygroup.list.php:103
 msgid "Recovering"
-msgstr ""
+msgstr "Obnovování"
 
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
 #: app/views/trigger.prototype.list.php:146
@@ -16972,6 +17082,10 @@ msgstr "Referenční atribut"
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr "Odkazovaný widget je nedostupný. Aktualizujte prosím konfiguraci."
+
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr "Odkazovaný widget je nedostupný"
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -17047,6 +17161,10 @@ msgstr "Regulární výrazy"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "Související reporty"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18819,6 +18937,10 @@ msgstr "Zobrazit agregační funkce"
 msgid "Show arc"
 msgstr "Zobrazit oblouk"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18889,6 +19011,10 @@ msgstr "Zobrazit vybrané"
 msgid "Show sidebar"
 msgstr "Zobrazit postranní panel"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18920,11 +19046,19 @@ msgstr "Zobrazit technické chyby"
 msgid "Show text as HTML"
 msgstr "Zobrazit text jako HTML"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "Ukaž časovou osu"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18961,6 +19095,10 @@ msgstr "Sobraz"
 #: app/views/mfa.edit.php:67
 msgid "Shown as the account name to all MFA users in authenticator apps."
 msgstr "Zobrazuje se jako název účtu všem uživatelům MFA v ověřovacích aplikacích."
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the label to all MFA users in authenticator apps."
+msgstr "Zobrazuje se jako štítek všem uživatelům MFA v aplikacích pro ověřování."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -19020,6 +19158,14 @@ msgstr "Jednoduché spouštěče"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "Jednotlivé"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19127,6 +19273,10 @@ msgstr "Software aplikace E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "Software architektura. Vrátí řetězec"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -19263,7 +19413,7 @@ msgstr "Stav"
 
 #: include/classes/data/CItemData.php:2912
 msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
-msgstr ""
+msgstr "Stav skupiny proxy. Vrátí celé číslo: 0 - neznámé; 1 - offline; 2 - obnovování; 3 - online; 4 - degradované."
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -20115,7 +20265,7 @@ msgstr "Test uživatelského vstupu"
 #: app/controllers/CControllerPopupItemTestSend.php:256
 #: app/views/popup.itemtestedit.view.php:256
 msgid "Test with"
-msgstr ""
+msgstr "Test s"
 
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
@@ -20342,6 +20492,10 @@ msgstr "Toto nastavení by mělo být povoleno, protože tabulky historie obsahu
 #: app/views/administration.housekeeping.edit.php:157
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "Toto nastavení by mělo být povoleno, protože tabulky trendů obsahují komprimovaný části."
+
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -21331,6 +21485,10 @@ msgstr "Pouze nepotvrzené"
 msgid "Unavailable"
 msgstr "Nedostupné"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr "Nedostupný widget"
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "Odblokovat"
@@ -21632,6 +21790,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Dostupný"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21814,6 +21977,15 @@ msgstr "Použít pro závažnost"
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
 msgstr "Použít iframe sandboxing"
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
+
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Use the filter to display results"
+msgstr "K zobrazení výsledků použijte filtr"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -22047,6 +22219,10 @@ msgstr "Atribut příjmení uživatele"
 #: widgets/item/views/widget.edit.php:90
 msgid "User macros"
 msgstr "Uživatelská makra"
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "User media"
+msgstr "Média uživatele"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22810,6 +22986,13 @@ msgstr "Certifikáty trezoru"
 #: include/classes/vaults/CVaultHashiCorp.php:85 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Připojení k trezoru selhalo"
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:640
+#: include/classes/setup/CSetupWizard.php:843
+#: include/classes/setup/CSetupWizard.php:863
+msgid "Vault prefix"
+msgstr "Předpona trezoru"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -23815,6 +23998,10 @@ msgstr "řada či znakový řetězec je očekáván"
 msgid "an array or object is expected"
 msgstr "očekává se pole nebo objekt"
 
+#: include/classes/api/services/CUser.php:990
+msgid "an email address is expected"
+msgstr "očekává se e-mailová adresa"
+
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
 msgid "an empty string is expected"
@@ -24212,6 +24399,15 @@ msgstr "nelze aktualizovat parametr pouze pro čtení \"%1$s\" objeveného objek
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
 msgstr "nelze aktualizovat parametr pouze pro čtení \"%1$s\" zděděného objektu"
 
+#: include/classes/api/services/CUserGroup.php:501
+#: include/classes/api/services/CUser.php:451
+#: include/classes/api/services/CUser.php:614
+#: include/classes/api/services/CUser.php:794
+#: include/classes/api/services/CUser.php:1066
+#, c-format
+msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
+msgstr "nelze aktualizovat parametr pouze pro čtení \"%1$s\" zřízeného uživatele"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr "cbrt() - Kubický kořen"
@@ -24579,6 +24775,13 @@ msgstr "skupina hostů se stejným UUID již existuje"
 msgid "host pattern"
 msgstr "vzorec hosta"
 
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:155
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:159
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
+#: widgets/svggraph/views/widget.edit.php:292
+msgid "host patterns"
+msgstr "Vzory hosta"
+
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "prototyp hosta se stejným UUID již existuje"
@@ -24816,6 +25019,15 @@ msgstr "položka \"%1$s\" na hostu \"%2$s\" není monitorována"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:329
 msgid "item pattern"
 msgstr "vzorec položky"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:134
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:172
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:138
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:176
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
+msgid "item patterns"
+msgstr "Vzory itemu"
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -25334,6 +25546,11 @@ msgstr "výstup"
 msgid "pattern"
 msgstr "vzorec"
 
+#: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
+#: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
+msgid "patterns"
+msgstr "vzory"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile() - Percentil P pro periodu T"
@@ -25396,6 +25613,11 @@ msgstr "odkaz na neexistující prvek stromu"
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "odkazovaný objekt neexistuje"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr "odkazovaný widget není k dispozici"
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -99,7 +94,8 @@ class WidgetForm extends CWidgetForm {
 		if (array_key_exists('units', $this->values) && $this->values['units'] !== '') {
 			$this->is_binary_units = isBinaryUnits($this->values['units']);
 		}
-		elseif (array_key_exists('itemid', $this->values)) {
+		elseif (array_key_exists('itemid', $this->values) && is_array($this->values['itemid'])
+				&& !array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $this->values['itemid'])) {
 			$items = API::Item()->get([
 				'output' => ['units'],
 				'itemids' => $this->values['itemid'],
@@ -198,6 +194,9 @@ class WidgetForm extends CWidgetForm {
 						Widget::SHOW_VALUE_ARC
 					])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			)
 			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
@@ -312,9 +311,6 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldIntegerBox('th_arc_size', _('Arc size'), self::SIZE_PERCENT_MIN,
 					self::SIZE_PERCENT_MAX
 				))->setDefault(self::DEFAULT_TH_ARC_SIZE_PERCENT)
-			)
-			->addField(
-				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }
