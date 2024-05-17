@@ -500,7 +500,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testDiscoveryRules_snmpErrorViaServer
+	 * @depends testDiscoveryRules_snmpErrorViaProxyMemoryMode
 	 * @required-components server,proxy
 	 * @configurationDataProvider proxyHybridModeconfigurationProvider
 	 */
