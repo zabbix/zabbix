@@ -50,7 +50,7 @@ require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
 require_once dirname(__FILE__).'/testPermissions.php';
 require_once dirname(__FILE__).'/testFunctionChangeCount.php';
 require_once dirname(__FILE__).'/testProxyHa.php';
-require_once dirname(__FILE__).'/testWebMonitoring.php';
+require_once dirname(__FILE__).'/testBrowserMonitoring.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -97,7 +97,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testPermissions');
 		$suite->addTestSuite('testFunctionChangeCount');
 		$suite->addTestSuite('testProxyHa');
-		$suite->addTestSuite('testWebMonitoring');
+		$suite->addTestSuite('testBrowserMonitoring');
 
 		return $suite;
 	}

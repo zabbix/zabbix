@@ -16,18 +16,18 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
- * Test case to check if an item preprocessing "custom on fail" supports
- * macros in error handler parameter. Both "set value to" and "set error to"
- * are checked in this test case.
+ * Test scenario to check browser monitoring.
  *
  * @backup hosts,items,history_text
  *
  */
-class testWebMonitoring extends CIntegrationTest {
-	private static $hostid;
+class testBrowserMonitoring extends CIntegrationTest {
 	private static $itemid;
+
 	/**
-	 * Create a host with 1 macro and 3 items to test preprocessing.
+	 * 1 host, 1 browser item.
+	 * Item's parameter 'url' should contain URL to the frontend.
+	 * It should be accessible by the WebDriver.
 	 */
 	public function prepareData() {
 		$response = $this->call('host.create', [
@@ -37,12 +37,12 @@ class testWebMonitoring extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		self::$hostid = $response['result']['hostids'][0];
+		$hostid = $response['result']['hostids'][0];
 
 		$script = file_get_contents('integration/data/browser.js');
 
 		$response = $this->call('item.create', [
-			'hostid' => self::$hostid,
+			'hostid' => $hostid,
 			'type' => ITEM_TYPE_BROWSER,
 			'name' => 'WebMonItem',
 			'key_' => 'webmonitem',
@@ -79,12 +79,12 @@ class testWebMonitoring extends CIntegrationTest {
 
 
 	/**
-	 * Test unassigned group assignment
+	 * Wait for successful execution of data/browser.js.
 	 *
 	 * @configurationDataProvider configurationProvider
 	 * @required-components server
 	 */
-	public function testWebMonitoring_tc1() {
+	public function testBrowserMonitoring_tc1() {
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'output' => 'extend',
