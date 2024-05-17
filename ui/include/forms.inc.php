@@ -27,7 +27,7 @@ function getItemFormData(array $item = []) {
 var browser = new Browser(Browser.chromeOptions());
 
 try {
-	browser.navigate("http://example.com");
+	browser.navigate("https://example.com");
 	browser.collectPerfEntries();
 }
 finally {
