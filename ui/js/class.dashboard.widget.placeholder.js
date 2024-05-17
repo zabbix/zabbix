@@ -95,7 +95,7 @@ class CDashboardWidgetPlaceholder {
 	/**
 	 * Get node of the new widget placeholder.
 	 *
-	 * @returns {HTMLElement}
+	 * @returns {HTMLDivElement}
 	 */
 	getNode() {
 		return this.#target;
@@ -104,7 +104,7 @@ class CDashboardWidgetPlaceholder {
 	/**
 	 * Set state of the new widget placeholder.
 	 *
-	 * @param {int} state  WIDGET_PLACEHOLDER_STATE_* constant.
+	 * @param {number} state  WIDGET_PLACEHOLDER_STATE_* constant.
 	 *
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
@@ -220,7 +220,7 @@ class CDashboardWidgetPlaceholder {
 
 			this.fire(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET);
 		}
-	};
+	}
 
 	/**
 	 * Attach event listener to widget placeholder events.
