@@ -22,9 +22,9 @@
 
 header('Content-type: image/png');
 
-if ($data['image'] !== '') {
-	echo imagepng($data['image']);
+if (!$data['image']) {
+	header('HTTP/1.1 404 Not Found');
 }
-else {
-	echo $data['image'];
+elseif (!imagepng($data['image'])) {
+	header('HTTP/1.1 500 Internal Server Error');
 }
