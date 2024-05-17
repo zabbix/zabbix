@@ -1415,7 +1415,7 @@ int	main(int argc, char **argv)
 			log_file_cfg.log_type, log_file_cfg.log_file_name, NULL, get_zbx_threads, get_zbx_threads_num);
 }
 
-static void	zbx_check_db(void)
+static int	zbx_check_db(void)
 {
 	struct zbx_json	db_version_json;
 	int		ret;
@@ -1477,8 +1477,8 @@ out:
 		zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 				ZABBIX_VERSION, ZABBIX_REVISION);
 		zbx_db_version_info_clear(&db_version_info);
-		exit(EXIT_FAILURE);
 	}
+	return ret;
 }
 
 /******************************************************************************
@@ -2267,13 +2267,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 	else if (ZBX_DB_SERVER != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": its \"users\" table is empty (is this the"
 				" Zabbix proxy database?)", zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
@@ -2281,22 +2281,24 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	zbx_db_check_character_set();
-	zbx_check_db();
+	if (SUCCEED != zbx_check_db())
+		goto out;
 
 	if (1 == config_allow_software_update_check)
 	{
 		if (SUCCEED != zbx_db_update_software_update_checkid())
-			exit(EXIT_FAILURE);
+			goto out;
 	}
 
 	zbx_db_save_server_status();
 
 	if (SUCCEED != zbx_db_check_instanceid())
-		exit(EXIT_FAILURE);
+		goto out;
+
 	zbx_db_close();
 
 	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))
@@ -2506,4 +2508,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
 	return SUCCEED;
+out:
+	zbx_db_close();
+	exit(EXIT_FAILURE);
 }
