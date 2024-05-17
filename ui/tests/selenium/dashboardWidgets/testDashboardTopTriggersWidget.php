@@ -234,16 +234,16 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::DEFAULT_WIDGET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							],
 							[
 								'type' => 'toptriggers',
 								'name' => self::DELETE_WIDGET,
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
@@ -260,8 +260,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
@@ -278,8 +278,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::DATA_WIDGET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
