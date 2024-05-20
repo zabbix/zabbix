@@ -353,7 +353,8 @@ char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
-char	*CONFIG_NODE_ADDRESS	= NULL;
+char	*CONFIG_NODE_ADDRESS		= NULL;
+char	*CONFIG_GSM_MODEM		= NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
@@ -983,10 +984,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			INT_MAX},
 		{"HANodeName",			&CONFIG_HA_NODE_NAME,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"NodeAddress",			&CONFIG_NODE_ADDRESS,		TYPE_STRING,
+		{"NodeAddress",			&CONFIG_NODE_ADDRESS,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"StartODBCPollers",		&CONFIG_ODBCPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"GsmModem",			&CONFIG_GSM_MODEM,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 

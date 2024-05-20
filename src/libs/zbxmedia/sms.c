@@ -24,6 +24,8 @@
 
 #include <termios.h>
 
+extern char	*CONFIG_GSM_MODEM;
+
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
 	int	i, wlen, len, ret = SUCCEED;
@@ -210,7 +212,7 @@ typedef struct
 }
 zbx_sms_scenario;
 
-int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len)
+int	send_sms(const char *number, const char *message, char *error, int max_error_len)
 {
 #define	ZBX_AT_ESC	"\x1B"
 #define ZBX_AT_CTRL_Z	"\x1A"
@@ -237,23 +239,31 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (-1 == (f = open(device, O_RDWR | O_NOCTTY | O_NDELAY)))
+	if (NULL == CONFIG_GSM_MODEM)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "error in open(%s): %s", device, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "GsmModem is not configured");
+		zbx_snprintf(error, max_error_len, "GsmModem is not configured");
+		return FAIL;
+	}
+
+	if (-1 == (f = open(CONFIG_GSM_MODEM, O_RDWR | O_NOCTTY | O_NDELAY)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "error in open(%s): %s", CONFIG_GSM_MODEM, zbx_strerror(errno));
 		if (NULL != error)
-			zbx_snprintf(error, max_error_len, "error in open(%s): %s", device, zbx_strerror(errno));
+			zbx_snprintf(error, max_error_len, "error in open(%s): %s", CONFIG_GSM_MODEM,
+				zbx_strerror(errno));
 		return FAIL;
 	}
 
 	if (-1 == fcntl(f, F_SETFL, 0))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "error in setting the status flag to 0 (for %s): %s", device,
+		zabbix_log(LOG_LEVEL_DEBUG, "error in setting the status flag to 0 (for %s): %s", CONFIG_GSM_MODEM,
 				zbx_strerror(errno));
 
 		if (NULL != error)
 		{
-			zbx_snprintf(error, max_error_len, "error in setting the status flag to 0 (for %s): %s", device,
-					zbx_strerror(errno));
+			zbx_snprintf(error, max_error_len, "error in setting the status flag to 0 (for %s): %s",
+					CONFIG_GSM_MODEM, zbx_strerror(errno));
 		}
 	}
 
