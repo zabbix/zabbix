@@ -1,3 +1,5 @@
+include ../Makefile.common
+
 if SERVER
 SERVER_tests = \
 	zbx_eval_parse_expression \
@@ -19,8 +21,6 @@ COMMON_SRC_FILES = \
 
 # zbxeval depends on zbxalgo, zbxexpr, zbxjson, zbxnum, zbxregexp, zbxserialize, zbxstr, zbxtime,
 #                    zbxvariant, zbxxml and zbxcommon
-# 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
-# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
 
 EXPR_LIBS = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
@@ -80,25 +80,6 @@ XML_LIBS = \
         $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
         $(JSON_LIBS) \
         $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
-
-MOCK_DATA_DEPS = \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
-
-MOCK_TEST_DEPS = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 EVAL_LIBS = \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
