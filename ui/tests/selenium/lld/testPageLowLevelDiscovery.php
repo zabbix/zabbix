@@ -466,13 +466,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Eleventh LLD',
 						'fifth LLD',
 						'forth LLD',
-						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
+						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
 						'LLD for Discovered host tests',
 						'LLD for host group test',
 						'LLD number 8',
 						'LLD rule for item types',
 						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
-						'Linux by Zabbix agent: Linux: Get filesystems: Mounted filesystem discovery',
+						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
 						'Mūsu desmitais LLD',
 						'Linux by Zabbix agent: Network interface discovery',
 						'sevenths LLD',
@@ -482,7 +482,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Test of discovered host Template: Template discovery rule',
 						'Trapper LLD for filter',
 						'Trīspadsmitais LLD',
-						'Zabbix server health: Zabbix server: Zabbix proxies stats: Zabbix proxy discovery',
+						'Zabbix server health: Zabbix proxies stats: Zabbix proxy discovery',
 						'Četrpadsmitais LLD'
 					]
 				]

@@ -521,13 +521,13 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		$widgets = [];
 		$id = 1;
 		for ($y = 0; $y <= 39; $y += 3) {
-			for ($x = 0; $x <= 12; $x += 12) {
+			for ($x = 0; $x <= 36; $x += 36) {
 				$widgets[] = [
 					'type' => 'problemsbysv',
 					'name' => 'Reference widget '.$id,
 					'x' => $x,
 					'y' => $y,
-					'width' => 12,
+					'width' => 36,
 					'height' => 3,
 					'view_mode' => 0
 				];
@@ -538,8 +538,8 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 		// Form an array with configuration of widgets with "Show" = "Totals"
 		$id = 1;
-		for ($y = 42; $y <= 48; $y += 3) {
-			for ($x = 0; $x <= 18; $x += 6) {
+		for ($y = 42; $y <= 48; $y += 4) {
+			for ($x = 0; $x <= 70; $x += 12) {
 				if ($id > 10) {
 					break 2;
 				}
@@ -548,8 +548,8 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'name' => 'Totals reference widget '.$id,
 					'x' => $x,
 					'y' => $y,
-					'width' => 6,
-					'height' => 3,
+					'width' => 12,
+					'height' => 4,
 					'view_mode' => 0,
 					'fields' => [
 						[

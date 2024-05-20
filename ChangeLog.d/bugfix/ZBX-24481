@@ -1,0 +1,1 @@
+A......... [ZBX-24481] fixed inability to unset value map from existing item or item prototype by passing a version without valuemap parameter into configuration.import (vmaksimovs)

@@ -121,6 +121,11 @@ type Scheduler interface {
 	QueryUserParams() (status string)
 }
 
+type systemOptions struct {
+	ForceActiveChecksOnStart *int `conf:"optional"`
+	Capacity                 int  `conf:"optional"`
+}
+
 // cleanupClient performs deactivation of plugins the client is not using anymore.
 // It's called after client update and once per hour for the client associated to
 // single passive checks.
@@ -667,12 +672,85 @@ run:
 	monitor.Unregister(monitor.Scheduler)
 }
 
-type pluginOptions struct {
-	Capacity int `conf:"optional"`
-	System   struct {
-		ForceActiveChecksOnStart *int `conf:"optional"`
-		Capacity                 int  `conf:"optional"`
-	} `conf:"optional"`
+func (m *Manager) init() {
+	m.input = make(chan interface{}, 10)
+	m.pluginQueue = make(pluginHeap, 0, len(plugin.Metrics))
+	m.clients = make(map[uint64]*client)
+	m.plugins = make(map[string]*pluginAgent)
+	m.shutdownSeconds = shutdownInactive
+
+	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
+
+	for _, metric := range plugin.Metrics {
+		metrics = append(metrics, metric)
+	}
+	sort.Slice(metrics, func(i, j int) bool {
+		return metrics[i].Plugin.Name() < metrics[j].Plugin.Name()
+	})
+
+	pagent := &pluginAgent{}
+	for _, metric := range metrics {
+		if metric.Plugin != pagent.impl {
+			capacity, forceActiveChecksOnStart := getPluginOptions(
+				agent.Options.Plugins[metric.Plugin.Name()],
+				metric.Plugin.Name(),
+			)
+			if capacity > metric.Plugin.Capacity() {
+				log.Warningf(
+					"lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
+					metric.Plugin.Name(),
+					metric.Plugin.Capacity(),
+					capacity,
+				)
+
+				capacity = metric.Plugin.Capacity()
+			}
+
+			pagent = &pluginAgent{
+				impl:                     metric.Plugin,
+				tasks:                    make(performerHeap, 0),
+				maxCapacity:              capacity,
+				usedCapacity:             0,
+				forceActiveChecksOnStart: forceActiveChecksOnStart,
+				index:                    -1,
+				refcount:                 0,
+				usrprm:                   metric.UsrPrm,
+			}
+
+			interfaces := ""
+			if _, ok := metric.Plugin.(plugin.Exporter); ok {
+				interfaces += "exporter, "
+			}
+			if _, ok := metric.Plugin.(plugin.Collector); ok {
+				interfaces += "collector, "
+			}
+			if _, ok := metric.Plugin.(plugin.Runner); ok {
+				interfaces += "runner, "
+			}
+			if _, ok := metric.Plugin.(plugin.Watcher); ok {
+				interfaces += "watcher, "
+			}
+			if _, ok := metric.Plugin.(plugin.Configurator); ok {
+				interfaces += "configurator, "
+			}
+			interfaces = interfaces[:len(interfaces)-2]
+
+			if metric.Plugin.IsExternal() {
+				ext := metric.Plugin.(*external.Plugin)
+				metric.Plugin.SetCapacity(1)
+				log.Infof(
+					"using plugin '%s' (%s) providing following interfaces: %s",
+					metric.Plugin.Name(),
+					ext.Path,
+					interfaces,
+				)
+			} else {
+				log.Infof("using plugin '%s' (built-in) providing following interfaces: %s", metric.Plugin.Name(),
+					interfaces)
+			}
+		}
+		m.plugins[metric.Key] = pagent
+	}
 }
 
 func (m *Manager) Start() {
@@ -932,76 +1010,43 @@ func peekTask(tasks performerHeap) performer {
 	return tasks[0]
 }
 
-func getPluginOptions(
-	optsRaw interface{},
-	name string,
-) (capacity, forceActiveChecksOnStart int) {
-	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(
-		optsRaw,
-		name,
-	)
-
-	if pluginSystemCap > 0 {
-		if pluginCap > 0 {
-			log.Warningf(
-				"both Plugins.%s.Capacity and Plugins.%s.System.Capacity "+
-					"configuration parameters are set, using System.Capacity: %d",
-				name,
-				name,
-				pluginSystemCap,
-			)
-		}
-		capacity = pluginSystemCap
-	} else if pluginCap > 0 {
-		log.Warningf(
-			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
-			name, name, name,
-		)
-		capacity = pluginCap
-	} else {
-		capacity = plugin.DefaultCapacity
+func getPluginOptions(optsRaw any, pluginName string) (int, int) {
+	var opt struct {
+		System systemOptions `conf:"optional"`
 	}
 
-	if nil != pluginForceActiveChecksOnStart {
-		if *pluginForceActiveChecksOnStart > 1 ||
-			*pluginForceActiveChecksOnStart < 0 {
-			log.Warningf(
-				"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
-				name,
-				*pluginForceActiveChecksOnStart,
-			)
-			forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
-		} else {
-			forceActiveChecksOnStart = *pluginForceActiveChecksOnStart
-		}
-	} else {
-		forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
-	}
-
-	return
-}
-
-func getPluginOpts(
-	optsRaw interface{},
-	name string,
-) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
-	var opt pluginOptions
+	capacity := plugin.DefaultCapacity
 
 	if optsRaw == nil {
-		return
+		return capacity, agent.Options.ForceActiveChecksOnStart
 	}
 
-	if err := conf.Unmarshal(optsRaw, &opt, false); err != nil {
-		log.Warningf("invalid plugin %s configuration: %s", name, err)
+	err := conf.Unmarshal(optsRaw, &opt, false)
+	if err != nil {
+		log.Warningf("invalid plugin %s configuration: %s", pluginName, err)
 
-		return
+		return capacity, agent.Options.ForceActiveChecksOnStart
 	}
 
-	pluginCap = opt.Capacity
-	pluginSystemCap = opt.System.Capacity
-	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
+	if opt.System.Capacity > 0 {
+		capacity = opt.System.Capacity
+	}
 
-	return
+	if opt.System.ForceActiveChecksOnStart == nil {
+		return capacity, agent.Options.ForceActiveChecksOnStart
+	}
+
+	if *opt.System.ForceActiveChecksOnStart > 1 || *opt.System.ForceActiveChecksOnStart < 0 {
+		log.Warningf(
+			"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
+			pluginName,
+			*opt.System.ForceActiveChecksOnStart,
+		)
+
+		return capacity, agent.Options.ForceActiveChecksOnStart
+	}
+
+	return capacity, *opt.System.ForceActiveChecksOnStart
 }
 
 func getPluginInterfaceNames(p plugin.Accessor) string {

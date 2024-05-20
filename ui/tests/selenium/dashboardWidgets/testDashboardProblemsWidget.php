@@ -62,9 +62,9 @@ class testDashboardProblemsWidget extends CWebTest {
 							'type' => 'problems',
 							'name' => 'Problem widget for updating',
 							'x' => 0,
-							'y' => 0,
-							'width' => 11,
-							'height' => 6,
+							'y' => 6,
+							'width' => 37,
+							'height' => 4,
 							'view_mode' => 0,
 							'fields' => [
 								['type' => 0, 'name' => 'severities', 'value' => 0],
@@ -97,10 +97,10 @@ class testDashboardProblemsWidget extends CWebTest {
 						[
 							'type' => 'problems',
 							'name' => 'Problem widget for delete',
-							'x' => 11,
+							'x' => 0,
 							'y' => 0,
-							'width' => 10,
-							'height' => 5,
+							'width' => 44,
+							'height' => 6,
 							'view_mode' => 0
 						]
 					]

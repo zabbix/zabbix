@@ -194,6 +194,11 @@ class TopHostsWidget {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columnsthresholds.0.threshold.1',
 										'value' => '600'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EDTTA'
 									]
 								]
 							]

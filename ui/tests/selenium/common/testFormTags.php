@@ -1339,7 +1339,7 @@ class testFormTags extends CWebTest {
 				: [['tag' => '', 'operator' => 'Equals', 'value' => '']];
 
 		$data = ['name' => $this->remove_name, 'tags' => $tags];
-		$this->page->login()->open($this->link);
+		$this->page->login()->open($this->link)->waitUntilReady();
 
 		if ($object === 'service') {
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
