@@ -32,7 +32,6 @@
 #define WD_PERF_ATTR_COUNT				"count"
 #define WD_PERF_ATTR_REDIRECT_TIME			"redirect_time"
 #define WD_PERF_ATTR_REDIRECT_COUNT			"redirect_count"
-#define WD_PERF_ATTR_SERVICE_WORKER_PROCESSING_TIME	"service_worker_processing_time"
 #define WD_PERF_ATTR_DNS_LOOKUP_TIME			"dns_lookup_time"
 #define WD_PERF_ATTR_TCP_HANDSHAKE_TIME			"tcp_handshake_time"
 #define WD_PERF_ATTR_TLS_NEGOTIATION_TIME		"tls_negotiation_time"
@@ -615,7 +614,6 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_common_data(zbx_wd_perf_entr
 	wd_perf_entry_copy_attr(out, WD_PERF_ATTR_LOAD_FINISHED, in, "load_event_end");
 
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_REDIRECT_TIME, in, "redirect_start", "redirect_end");
-	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_SERVICE_WORKER_PROCESSING_TIME, in, "worker_start", "fetch_start");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_DNS_LOOKUP_TIME, in, "domain_lookup_start", "domain_lookup_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_TCP_HANDSHAKE_TIME, in, "connect_start", "connect_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_TLS_NEGOTIATION_TIME, in, "secure_connection_start",

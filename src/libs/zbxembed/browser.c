@@ -912,6 +912,36 @@ out:
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: collect performance data                                          *
+ *                                                                            *
+ * Return value: array of performance entry objects                           *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
+{
+	zbx_webdriver_t		*wd;
+	char			*error = NULL;
+	struct zbx_json_parse	jp;
+
+	wd = es_webdriver(ctx);
+
+	if (SUCCEED != webdriver_get_perf_data(wd, &jp, &error))
+	{
+		(void)browser_push_error(ctx, wd, "cannot get performance data: %s", error);
+		return duk_throw(ctx);
+	}
+
+	duk_get_global_string(ctx, "JSON");
+	duk_push_string(ctx, "parse");
+	duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
+	duk_pcall_prop(ctx, -3, 1);
+	duk_remove(ctx, -2);	/* remove global JSON object from stack */
+
+	return 1;
+}
+
 #ifdef BROWSER_EXECUTE_SCRIPT
 /******************************************************************************
  *                                                                            *
@@ -986,6 +1016,7 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"getError", es_browser_get_error, 0},
 	{"discardError", es_browser_discard_error, 0},
 	{"collectPerfEntries", es_browser_collect_perf_entries, 1},
+	{"getRawPerfEntries", es_browser_get_raw_perf_entries, 0},
 	{"getPageSource", es_browser_get_page_source, 0},
 	{"getAlert", es_browser_get_alert, 0},
 #ifdef BROWSER_EXECUTE_SCRIPT

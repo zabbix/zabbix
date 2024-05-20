@@ -1000,8 +1000,33 @@ out:
  *                                                                            *
  * Purpose: get performance entries from performance object                   *
  *                                                                            *
+ * Parameters: wd    - [IN] webdriver object                                  *
+ *             jp    - [OUT] performance entries                              *
+ *                              (optional, can be null)                       *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - query was performed successfully                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error)
+{
+	int			ret = FAIL;
+	const char		*script = "return window.performance.getEntries().filter("
+							"(value, index, array)=>{"
+								"return value.entryType!=='long-animation-frame'"
+							"}"
+						");";
+
+	return webdriver_execute_script(wd, script, jp, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get performance entries from performance object                   *
+ *                                                                            *
  * Parameters: wd       - [IN] webdriver object                               *
- *             bookmark - [OUT] performance entry bookmark                    *
+ *             bookmark - [IN] performance entry bookmark                     *
  *                              (optional, can be null)                       *
  *             error    - [OUT] error message                                 *
  *                                                                            *
@@ -1013,13 +1038,8 @@ int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char 
 {
 	struct zbx_json_parse	jp;
 	int			ret = FAIL;
-	const char		*script = "return window.performance.getEntries().filter("
-							"(value, index, array)=>{"
-								"return value.entryType!=='long-animation-frame'"
-							"}"
-						");";
 
-	if (SUCCEED != webdriver_execute_script(wd, script, &jp, error))
+	if (SUCCEED != webdriver_get_perf_data(wd , &jp, error))
 		goto out;
 
 	wd_perf_collect(&wd->perf, bookmark, &jp);
