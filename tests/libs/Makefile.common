@@ -111,7 +111,7 @@ DB_DEPS = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(JSON_DEPS) \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 DBHIGH_DEPS = \
