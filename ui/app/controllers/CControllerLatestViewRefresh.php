@@ -43,7 +43,6 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 					continue;
 				}
 
-
 				$prepared_data = $this->prepareData($tabfilter, $tabfilter['sort'], $tabfilter['sortorder']);
 				$subfilters_fields = self::getSubfilterFields($tabfilter);
 				self::getSubfilters($subfilters_fields, $prepared_data);
