@@ -71,15 +71,25 @@ static int	wd_perf_attr_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static int	wd_perf_is_time_based_attribute(const char *name)
 {
-	/* attributes MUST be sorted as they are used in binary search */
-	static const char	*attributes[] = {"x1activation_start", "connect_end", "connect_start",
-					"critical_ch_restart", "domain_lookup_end", "domain_lookup_start",
-					"dom_complete", "dom_content_loaded_event_end",
-					"dom_content_loaded_event_start", "dom_interactive", "duration", "fetch_start",
+	static const char	*attributes[] = {"activation_start", "connect_end", "connect_start",
+					"critical_ch_restart", "dom_complete", "dom_content_loaded_event_end",
+					"dom_content_loaded_event_start", "dom_interactive", "domain_lookup_end",
+					"domain_lookup_start", "duration", "fetch_start",
 					"first_interim_response_start", "load_event_end", "load_event_start",
 					"redirect_end", "redirect_start", "request_start", "response_end",
 					"response_start", "secure_connection_start", "start_time", "unload_event_end",
 					"unload_event_start", "worker_start"};
+	static int		sorted = 0;
+
+	if (0 == sorted)
+	{
+		/* attributes MUST be sorted as they are used in binary search, sort */
+		/* it once to avoid possible sorting mistakes in array declaration   */
+
+		qsort(attributes, ARRSIZE(attributes), sizeof(attributes[0]), wd_perf_attr_compare);
+		sorted = 1;
+	}
+
 
 	if (NULL == bsearch(&name, attributes, ARRSIZE(attributes), sizeof(attributes[0]), wd_perf_attr_compare))
 		return FAIL;
