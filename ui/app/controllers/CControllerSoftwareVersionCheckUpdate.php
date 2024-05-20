@@ -21,6 +21,8 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 	private const NEXTCHECK_DELAY_ON_FAIL = 259200; // 72 hours
 	private const MAX_NO_DATA_PERIOD = 604800; // 1 week
 
+	private array $versions = [];
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -30,19 +32,11 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 			'versions' =>	'required|array'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateVersions();
-
-		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
-			);
+		if ($this->validateInput($fields) && $this->validateVersions()) {
+			$this->versions = $this->getInput('versions');
 		}
 
-		return $ret;
+		return true;
 	}
 
 	private function validateVersions(): bool {
@@ -113,9 +107,9 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 
 	protected function doAction(): void {
 		$lastcheck = time();
-		$versions = $this->getInput('versions');
+		$versions = $this->versions;
 
-		if ($versions && in_array(ZABBIX_EXPORT_VERSION, array_column($versions, 'version'))) {
+		if (in_array(ZABBIX_EXPORT_VERSION, array_column($versions, 'version'))) {
 			$delay = self::NEXTCHECK_DELAY;
 			$lastcheck_success = $lastcheck;
 			$nextcheck = $lastcheck + $delay;
@@ -141,17 +135,16 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 			'versions' => $versions
 		]];
 
-		$result = CSettings::updatePrivate($settings);
+		$delay = CSettings::updatePrivate($settings) ? $delay : self::NEXTCHECK_DELAY_ON_FAIL;
 
-		$output = [];
+		$output = [
+			'delay' => $delay + random_int(1, SEC_PER_MIN)
+		];
 
-		if ($result) {
-			$output['delay'] = $delay + random_int(1, SEC_PER_MIN);
-		}
-		else {
+		if ($errors = array_column(get_and_clear_messages(), 'message')) {
 			$output['error'] = [
 				'title' => 'Cannot update software update check data',
-				'messages' => array_column(get_and_clear_messages(), 'message')
+				'messages' => $errors
 			];
 		}
 

@@ -18,6 +18,7 @@ class CSoftwareVersionCheck {
 
 	static URL = 'https://services.zabbix.com/updates/v1';
 	static TYPE = 'software_update_check';
+	static DELAY_ON_ERROR = 60; // 1 minute
 
 	#data = {};
 
@@ -59,6 +60,8 @@ class CSoftwareVersionCheck {
 			})
 			.catch(exception => {
 				console.log('Could not get data', exception);
+
+				this.#startUpdating(CSoftwareVersionCheck.DELAY_ON_ERROR);
 			});
 	}
 
@@ -97,13 +100,15 @@ class CSoftwareVersionCheck {
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					throw {error: response.error};
+					console.log('Could not update data', {error: response.error});
 				}
 
 				this.#startUpdating(response.delay);
 			})
 			.catch(exception => {
 				console.log('Could not update data', exception);
+
+				this.#startUpdating(CSoftwareVersionCheck.DELAY_ON_ERROR);
 			});
 	}
 }
