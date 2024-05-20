@@ -16,3 +16,145 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+TIME_DEPS = \
+        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+MUTEX_DEPS = \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
+	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+CFG_DEPS = \
+	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+LOG_DEPS = \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(MUTEX_DEPS) \
+	$(CFG_DEPS) \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+REGEXP_DEPS = \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(LOG_DEPS) \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+VARIANT_DEPS = \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+EXPR_DEPS = \
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+JSON_DEPS = \
+	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(REGEXP_DEPS) \
+	$(VARIANT_DEPS) \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(EXPR_DEPS) \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+CRYPTO_DEPS = \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+XML_DEPS = \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(JSON_DEPS) \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+EVAL_DEPS = \
+	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
+	$(EXPR_DEPS) \
+	$(JSON_DEPS) \
+	$(VARIANT_DEPS) \
+	$(XML_DEPS) \
+	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+TAGFILTER_DEPS = \
+        $(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
+        $(EXPR_DEPS) \
+        $(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
+
+DB_DEPS = \
+        $(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
+        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+        $(JSON_DEPS) \
+        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+DBHIGH_DEPS = \
+        $(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+        $(DB_DEPS) \
+        $(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
+        $(TAGFILTER_DEPS) \
+        $(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
+        $(CRYPTO_DEPS) \
+        $(CFG_DEPS) \
+        $(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+        $(LOG_DEPS) \
+        $(top_srcdir)/src/libs/zbxversion/libzbxversion.a \
+        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+        $(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+NIX_DEPS = \
+        $(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+        $(COMMS_DEPS) \
+        $(MUTEX_DEPS) \
+        $(LOG_DEPS) \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+COMMS_DEPS = \
+        $(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+        $(top_srcdir)/src/libs/zbxip/libzbxip.a \
+        $(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+        $(CRYPTO_DEPS) \
+        $(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
+        $(LOG_DEPS) \
+        $(MUTEX_DEPS) \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+COMMSHIGH_DEPS = \
+        $(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
+        $(COMMS_DEPS) \
+        $(CFG_DEPS) \
+        $(JSON_DEPS) \
+        $(LOG_DEPS) \
+        $(TIME_DEPS) \
+        $(NIX_DEPS) \
+        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a

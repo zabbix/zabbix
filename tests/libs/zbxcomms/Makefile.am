@@ -9,45 +9,8 @@ endif
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-MUTEX_LIBS = \
-	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
-	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
-
-CFG_LIBS = \
-        $(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
-        $(top_srcdir)/src/libs/zbxip/libzbxip.a \
-        $(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-        $(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-        $(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
-        $(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
-
-LOG_LIBS = \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(MUTEX_LIBS) \
-	$(CFG_LIBS) \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
-
-CRYPTO_LIBS = \
-	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
-
-# comms depends on zbxalgo, zbxtime, zbxcrypto, zbxstr, zbxlog, zbxmutexs, zbxcompress, zbxip and zbxcommon
-
 COMMS_LIBS = \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(CRYPTO_LIBS) \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(LOG_LIBS) \
-	$(MUTEX_LIBS) \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(COMMS_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

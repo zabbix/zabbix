@@ -11,14 +11,8 @@ if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# zbxvariant depends on zbxalgo, zbxstr, zbxnum and zbxcommon
-
 VARIANT_LIBS = \
-	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(VARIANT_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

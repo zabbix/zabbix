@@ -3,8 +3,6 @@ include ../Makefile.common
 noinst_PROGRAMS = \
 	zbx_buf_readln
 
-# zbxfile depends on zbxcommon
-
 FILE_LIBS = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \

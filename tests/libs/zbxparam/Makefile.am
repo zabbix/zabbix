@@ -8,11 +8,9 @@ noinst_PROGRAMS = $(BINARIES_tests)
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# zbxparam depends on zbxexpr, zbxnum, zbxstr and zbxcommon
-
 PARAM_LIBS = \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
-	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(EXPR_DEPS) \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
