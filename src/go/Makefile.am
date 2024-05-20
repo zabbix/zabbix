@@ -41,7 +41,7 @@ dist_sysconf_DATA += conf/zabbix_agent2.conf
 endif
 
 if WEBSERVICE
-TARGETS += zabbix.com/cmd/zabbix_web_service
+TARGETS += golang.zabbix.com/agent2/cmd/zabbix_web_service
 INSTALL_TARGETS += install-golang.zabbix.com/agent2/cmd/zabbix_web_service
 dist_sysconf_DATA += conf/zabbix_web_service.conf
 endif

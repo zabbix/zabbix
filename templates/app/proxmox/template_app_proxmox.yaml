@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-14T11:02:00Z'
+  date: '2024-05-07T21:02:38Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -211,7 +211,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: cpu
@@ -252,7 +252,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: storage
@@ -282,10 +282,31 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: storage
+                - tag: lxc
+                  value: '{#LXC.ID}'
+                - tag: name
+                  value: '{#LXC.NAME}'
+                - tag: node
+                  value: '{#NODE.NAME}'
+            - uuid: 58efec1a4bb94bfab59d5985d036811e
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: Get data'
+              type: HTTP_AGENT
+              key: 'proxmox.lxc.get.data[{#LXC.ID}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get LXC status data.'
+              url: 'https://{$PVE.URL.HOST}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/{#LXC.ID}/status/current'
+              headers:
+                - name: Authorization
+                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+              tags:
+                - tag: component
+                  value: raw
                 - tag: lxc
                   value: '{#LXC.ID}'
                 - tag: name
@@ -309,7 +330,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: memory
@@ -336,7 +357,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: memory
@@ -369,7 +390,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: network
@@ -402,7 +423,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: network
@@ -412,21 +433,6 @@ zabbix_export:
                   value: '{#LXC.NAME}'
                 - tag: node
                   value: '{#NODE.NAME}'
-            - uuid: 58efec1a4bb94bfab59d5985d036811e
-              name: 'Proxmox: LXC [{#LXC.NAME}/{#LXC.NAME}]: Status'
-              type: HTTP_AGENT
-              key: 'proxmox.lxc.status[{#LXC.ID}]'
-              history: '0'
-              trends: '0'
-              value_type: TEXT
-              description: 'Read LXC status.'
-              url: 'https://{$PVE.URL.HOST}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/{#LXC.ID}/status/current'
-              headers:
-                - name: Authorization
-                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
-              tags:
-                - tag: component
-                  value: raw
             - uuid: bd213f6de4db4e1e84894b80acffa330
               name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Uptime'
               type: DEPENDENT
@@ -441,10 +447,16 @@ zabbix_export:
                   parameters:
                     - $.data.uptime
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: system
+                - tag: lxc
+                  value: '{#LXC.ID}'
+                - tag: name
+                  value: '{#LXC.NAME}'
+                - tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 0e55935a79b94bc096b6213d500f4f59
                   expression: 'last(/Proxmox VE by HTTP/proxmox.lxc.uptime[{#LXC.ID}])<10m'
@@ -467,15 +479,22 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
+              description: 'Status of LXC container.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.data.status
               master_item:
-                key: 'proxmox.lxc.status[{#LXC.ID}]'
+                key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               tags:
                 - tag: component
                   value: system
+                - tag: lxc
+                  value: '{#LXC.ID}'
+                - tag: name
+                  value: '{#LXC.NAME}'
+                - tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 71623950edf44bcb9453b2e8e63cb97b
                   expression: 'last(/Proxmox VE by HTTP/proxmox.lxc.vmstatus[{#LXC.ID}])<>"running"'
@@ -655,6 +674,8 @@ zabbix_export:
               tags:
                 - tag: component
                   value: system
+                - tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 4020236474e840acb1bc480eb8c52a1f
                   expression: 'last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}],#1)<>last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}],#2) and length(last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}]))>0'
@@ -673,15 +694,11 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              units: '%'
               description: 'CPU average load.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.loadavg
-                - type: MULTIPLIER
-                  parameters:
-                    - '100'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
@@ -863,6 +880,8 @@ zabbix_export:
               tags:
                 - tag: component
                   value: system
+                - tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 5b92af55dbd84181bcab0f39e6effbe0
                   expression: 'last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}],#1)<>last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}],#2) and length(last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}]))>0'
@@ -946,6 +965,8 @@ zabbix_export:
               tags:
                 - tag: component
                   value: raw
+                - tag: node
+                  value: '{#NODE.NAME}'
             - uuid: c1ea4d4f83114c9b96fe81069602f060
               name: 'Proxmox: Node [{#NODE.NAME}]: Status'
               type: HTTP_AGENT
@@ -961,6 +982,8 @@ zabbix_export:
               tags:
                 - tag: component
                   value: raw
+                - tag: node
+                  value: '{#NODE.NAME}'
             - uuid: 0dce6e5edd6d4ddab69932796b4301c0
               name: 'Proxmox: Node [{#NODE.NAME}]: Swap filesystem, total'
               type: DEPENDENT
@@ -1045,6 +1068,8 @@ zabbix_export:
               tags:
                 - tag: component
                   value: raw
+                - tag: node
+                  value: '{#NODE.NAME}'
             - uuid: fc7f5811d338484bba5393a8a5718f67
               name: 'Proxmox: Node [{#NODE.NAME}]: Uptime'
               type: DEPENDENT
@@ -1063,6 +1088,8 @@ zabbix_export:
               tags:
                 - tag: component
                   value: system
+                - tag: node
+                  value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 529b69b98a86409d914d3464569b7901
                   expression: 'last(/Proxmox VE by HTTP/proxmox.node.uptime[{#NODE.NAME}])<10m'
@@ -1243,7 +1270,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: cpu
@@ -1284,7 +1311,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: storage
@@ -1314,10 +1341,31 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: storage
+                - tag: name
+                  value: '{#QEMU.NAME}'
+                - tag: node
+                  value: '{#NODE.NAME}'
+                - tag: qemu
+                  value: '{#QEMU.ID}'
+            - uuid: a3562f2f48834a88842da612fb6f464c
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: Get data'
+              type: HTTP_AGENT
+              key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get VM status data.'
+              url: 'https://{$PVE.URL.HOST}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/{#QEMU.ID}/status/current'
+              headers:
+                - name: Authorization
+                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+              tags:
+                - tag: component
+                  value: raw
                 - tag: name
                   value: '{#QEMU.NAME}'
                 - tag: node
@@ -1341,7 +1389,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: memory
@@ -1368,7 +1416,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: memory
@@ -1401,7 +1449,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: network
@@ -1434,7 +1482,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: network
@@ -1444,21 +1492,6 @@ zabbix_export:
                   value: '{#NODE.NAME}'
                 - tag: qemu
                   value: '{#QEMU.ID}'
-            - uuid: a3562f2f48834a88842da612fb6f464c
-              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: Status'
-              type: HTTP_AGENT
-              key: 'proxmox.qemu.status[{#QEMU.ID}]'
-              history: '0'
-              trends: '0'
-              value_type: TEXT
-              description: 'Read VM status.'
-              url: 'https://{$PVE.URL.HOST}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/{#QEMU.ID}/status/current'
-              headers:
-                - name: Authorization
-                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
-              tags:
-                - tag: component
-                  value: raw
             - uuid: 77ba70e0ce6f486585f870d3b57033ba
               name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Uptime'
               type: DEPENDENT
@@ -1473,10 +1506,16 @@ zabbix_export:
                   parameters:
                     - $.data.uptime
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: system
+                - tag: name
+                  value: '{#QEMU.NAME}'
+                - tag: node
+                  value: '{#NODE.NAME}'
+                - tag: qemu
+                  value: '{#QEMU.ID}'
               trigger_prototypes:
                 - uuid: d4ba1faeb67940a192c1b50460793813
                   expression: 'last(/Proxmox VE by HTTP/proxmox.qemu.uptime[{#QEMU.ID}])<10m'
@@ -1499,15 +1538,22 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
+              description: 'Status of Virtual Machine.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.data.status
               master_item:
-                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+                key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               tags:
                 - tag: component
                   value: system
+                - tag: name
+                  value: '{#QEMU.NAME}'
+                - tag: node
+                  value: '{#NODE.NAME}'
+                - tag: qemu
+                  value: '{#QEMU.ID}'
               trigger_prototypes:
                 - uuid: 8f57d13f278b459299c565846b4091f5
                   expression: 'last(/Proxmox VE by HTTP/proxmox.qemu.vmstatus[{#QEMU.ID}])<>"running"'
