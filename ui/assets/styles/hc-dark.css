@@ -1706,8 +1706,6 @@ button {
       content: "";
       margin: 0 -4px;
       font-size: 46px; }
-    .dashboard-widget-placeholder .dashboard-widget-placeholder-label .hidden {
-      display: none; }
     .dashboard-widget-placeholder .dashboard-widget-placeholder-label div {
       padding: 0 5px 5px; }
   .dashboard-widget-placeholder .dashboard-widget-placeholder-resizing {
@@ -1719,8 +1717,6 @@ button {
     opacity: 1; }
     .dashboard-widget-placeholder.disabled .dashboard-widget-placeholder-box {
       background-color: rgba(0, 0, 0, 0.7); }
-  .dashboard-widget-placeholder.hidden {
-    display: none; }
 
 .dashboard-grid-widget-container {
   position: absolute;
@@ -4213,7 +4209,11 @@ div.dashboard-widget-geomap {
   div.dashboard-widget-geomap .leaflet-container {
     height: 100%;
     z-index: 1; }
-  div.dashboard-widget-geomap .geomap-hosts-table [data-hostid] {
+
+.geomap-hintbox {
+  overflow: auto;
+  white-space: normal; }
+  .geomap-hintbox tr[data-hostid] {
     cursor: pointer; }
 
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {

@@ -698,7 +698,7 @@ class CDashboardPage {
 				);
 
 				this._widget_placeholder
-					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
+					.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_RESIZING)
 					.showAtPosition(this._widget_placeholder_pos);
 			}
 			else {
@@ -791,7 +791,7 @@ class CDashboardPage {
 					);
 
 					this._widget_placeholder
-						.setState(WIDGET_PLACEHOLDER_STATE_POSITIONING)
+						.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_POSITIONING)
 						.showAtPosition(this._widget_placeholder_pos);
 
 					this._leaveWidgets();
@@ -828,7 +828,7 @@ class CDashboardPage {
 				this._widget_placeholder_clicked_pos = getGridEventPos(e, {width: 1, height: 1});
 
 				this._widget_placeholder
-					.setState(WIDGET_PLACEHOLDER_STATE_RESIZING)
+					.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_RESIZING)
 					.showAtPosition(this._widget_placeholder_pos);
 
 				document.addEventListener('mouseup', this._widget_placeholder_events.mouseUp);
@@ -900,7 +900,7 @@ class CDashboardPage {
 
 		if (this._is_editable && this._widgets.size === 0) {
 			this._widget_placeholder
-				.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW)
+				.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_ADD_NEW)
 				.showAtDefaultPosition();
 		}
 		else {
@@ -909,7 +909,7 @@ class CDashboardPage {
 	}
 
 	_activateWidgetPlaceholder() {
-		this._widget_placeholder.on(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET,
+		this._widget_placeholder.on(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET,
 			this._widget_placeholder_events.addNewWidget
 		);
 
@@ -927,7 +927,7 @@ class CDashboardPage {
 	}
 
 	_deactivateWidgetPlaceholder({do_hide = true} = {}) {
-		this._widget_placeholder.off(WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET,
+		this._widget_placeholder.off(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET,
 			this._widget_placeholder_events.addNewWidget
 		);
 

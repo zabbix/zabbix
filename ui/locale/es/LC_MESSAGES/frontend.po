@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-10 22:47+0000\n"
+"PO-Revision-Date: 2024-05-15 14:48+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1476,11 +1476,11 @@ msgstr "Cualquier cadena incluida"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Se eliminarán todas las entidades de equipo existentes que no estén presentes en el archivo de importación. Haga clic en Aceptar para continuar."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Se eliminarán todas las entidades de plantilla existentes que no estén presentes en el archivo de importación. Haga clic en Aceptar para continuar."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -2081,7 +2081,7 @@ msgstr "Traer al frente"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Navegador"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -7174,7 +7174,7 @@ msgstr "Mostrar gráfica"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
-msgstr ""
+msgstr "Mostrar hora local"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9273,7 +9273,7 @@ msgstr "Resaltar toda la fila"
 
 #: widgets/itemhistory/views/column.edit.php:132
 msgid "Highlights"
-msgstr ""
+msgstr "Aspectos más destacados"
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -11822,7 +11822,7 @@ msgstr[1] "Métricas activadas"
 
 #: widgets/itemhistory/Widget.php:26
 msgid "Item history"
-msgstr ""
+msgstr "Historial de la métrica"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
@@ -12338,7 +12338,7 @@ msgstr "Última fecha"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"
-msgstr ""
+msgstr "Última versión"
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -14172,7 +14172,7 @@ msgstr "Nuevos iniciadores"
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
 msgid "New update available"
-msgstr ""
+msgstr "Nueva actualización disponible"
 
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
@@ -14180,7 +14180,7 @@ msgstr "Nuevo mapeo de grupos de usuarios"
 
 #: widgets/itemhistory/includes/WidgetForm.php:96
 msgid "New values"
-msgstr ""
+msgstr "Nuevos valores"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -16101,7 +16101,7 @@ msgstr "Por favor actualice la configuración"
 
 #: app/partials/administration.system.info.php:47
 msgid "Please upgrade to latest major release."
-msgstr ""
+msgstr "Actualice a la última versión principal."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
@@ -17006,7 +17006,7 @@ msgstr "Informes relacionados"
 
 #: app/partials/administration.system.info.php:72
 msgid "Release notes"
-msgstr ""
+msgstr "Notas de la versión"
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18773,7 +18773,7 @@ msgstr "Mostrar arco"
 
 #: widgets/itemhistory/includes/WidgetForm.php:105
 msgid "Show column header"
-msgstr ""
+msgstr "Mostrar encabezado de columna"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
@@ -18847,7 +18847,7 @@ msgstr "Mostrar barra lateral"
 
 #: widgets/systeminfo/includes/WidgetForm.php:42
 msgid "Show software update check details"
-msgstr ""
+msgstr "Mostrar detalles de comprobación de actualización de software"
 
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
@@ -18882,7 +18882,7 @@ msgstr "Mostrar texto como HTML"
 
 #: widgets/itemhistory/views/column.edit.php:251
 msgid "Show thumbnail"
-msgstr ""
+msgstr "Mostrar miniatura"
 
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
@@ -18892,7 +18892,7 @@ msgstr "Mostrar línea de tiempo"
 
 #: widgets/itemhistory/includes/WidgetForm.php:102
 msgid "Show timestamp"
-msgstr ""
+msgstr "Mostrar marca de tiempo"
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18995,11 +18995,11 @@ msgstr "Único"
 
 #: widgets/itemhistory/views/column.edit.php:150
 msgid "Single line"
-msgstr ""
+msgstr "Linea única"
 
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
-msgstr ""
+msgstr "Línea única: el resultado se mostrará en una sola línea y se truncará a la longitud especificada."
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19110,7 +19110,7 @@ msgstr "Información de arquitectura de software. Devuelve una cadena"
 
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
-msgstr ""
+msgstr "Actualización de software comprobada por última vez"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20324,7 +20324,7 @@ msgstr "Esta configuración debe estar habilitada porque las tablas de tendencia
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Esta configuración mostrará la hora local en lugar de la marca de tiempo. También se debe marcar \"Mostrar marca de tiempo\" en la configuración avanzada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -21614,7 +21614,7 @@ msgstr "Arriba"
 #: app/partials/administration.system.info.php:59
 #: app/partials/administration.system.info.php:64
 msgid "Up to date"
-msgstr ""
+msgstr "Actualizado"
 
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
@@ -21801,7 +21801,7 @@ msgstr "Usar aislamiento en iframe"
 
 #: widgets/itemhistory/views/column.edit.php:232
 msgid "Use monospace font"
-msgstr ""
+msgstr "Utilizar fuente monoespaciada"
 
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180

@@ -5,7 +5,7 @@ New features:
 A.F....PS. [ZBXNEXT-9150] added browser item for browser monitoring (gcalenko, wiper)
 .........T [ZBXNEXT-8746] removed template name prefix from items, triggers (abakaldin)
 ....I..... [ZBXNEXT-9168] replaced the software license with AGPL-3.0-only (Sasha)
-........S. [ZBXNEXT-9103] added 202, 203 and 204 to the HTTP reponse codes accepted by connectors (Sasha)
+........S. [ZBXNEXT-9103] added 202, 203 and 204 to the HTTP response codes accepted by connectors (Sasha)
 A.F....... [ZBXNEXT-9057] added software update check functionality (agriscenko)
 ...G...... [ZBXNEXT-9149] extended proc.get[] to get PSS (proportional set size) memory on Linux (sboidenko)
 ..F....... [ZBXNEXT-8956] enabled communication framework for existing widgets (apoga, ashubin, averza, ddauksa, miks)
