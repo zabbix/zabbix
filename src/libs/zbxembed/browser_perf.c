@@ -616,8 +616,6 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_common_data(zbx_wd_perf_entr
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_REDIRECT_TIME, in, "redirect_start", "redirect_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_DNS_LOOKUP_TIME, in, "domain_lookup_start", "domain_lookup_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_TCP_HANDSHAKE_TIME, in, "connect_start", "connect_end");
-	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_TLS_NEGOTIATION_TIME, in, "secure_connection_start",
-			"request_start");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_REQUEST_TIME, in, "request_start", "response_start");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_RESPONSE_TIME, in, "response_start", "response_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_RESOURCE_FETCH_TIME, in, "fetch_start", "response_end");
@@ -626,6 +624,26 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_common_data(zbx_wd_perf_entr
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_LOAD_EVENT_HANDLER_TIME, in, "load_event_start", "load_event_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_DOM_CONTENT_LOADING_TIME, in, "dom_content_loaded_event_start",
 			"dom_content_loaded_event_end");
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return new performance entry with aggregated navigation data      *
+ *                                                                            *
+ * Parameters: in - [IN] performance entry with attributes to aggregate       *
+ *                                                                            *
+ * Return value: new performance entry with aggregated data                   *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_navigation_data(zbx_wd_perf_entry_t *in)
+{
+	zbx_wd_perf_entry_t	*out;
+	zbx_wd_attr_t		attr;
+
+	out = wd_perf_entry_aggregate_common_data(in);
+	wd_perf_entry_copy_attr(out, WD_PERF_ATTR_TLS_NEGOTIATION_TIME, in, WD_PERF_ATTR_TLS_NEGOTIATION_TIME);
 
 	return out;
 }
@@ -748,7 +766,10 @@ void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struc
 			}
 			details.navigation = wd_perf_entry_create_from_json(&jp_entry);
 
-			entry = wd_perf_entry_aggregate_common_data(details.navigation);
+			wd_perf_entry_diff_attrs(details.navigation, WD_PERF_ATTR_TLS_NEGOTIATION_TIME,
+					details.navigation, "secure_connection_start", "request_start");
+
+			entry = wd_perf_entry_aggregate_navigation_data(details.navigation);
 			wd_perf_entry_merge(perf->navigation_summary, entry);
 			wd_perf_entry_free(entry);
 
