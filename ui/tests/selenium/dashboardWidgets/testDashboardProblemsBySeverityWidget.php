@@ -19,6 +19,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup widget, profiles
+ *
+ * @dataSource UserPermissions
  */
 class testDashboardProblemsBySeverityWidget extends CWebTest {
 
@@ -46,16 +48,16 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid';
+		' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+		' w.width, w.height'.
+		' FROM widget_field wf'.
+		' INNER JOIN widget w'.
+		' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+		' wf.value_itemid, wf.value_graphid';
 
 	public function getCreateWidgetData() {
 		return [
-			// Create a widget with default values.
+			// #0 Create a widget with default values.
 			[
 				[
 					'fields' => [
@@ -67,7 +69,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: 4 tags with Or operator, at least one of them should be present.
+			// #1 Host groups: 4 tags with Or operator, at least one of them should be present.
 			[
 				[
 					'fields' => [
@@ -95,7 +97,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget with selected 'show latest values' option and removed 'show timeline' option.
+			// #2 Create a widget with selected 'show latest values' option and removed 'show timeline' option.
 			[
 				[
 					'fields' => [
@@ -110,7 +112,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget that shows only hosts with problems with problem filtering by their severity.
+			// #3 Create a widget that shows only hosts with problems with problem filtering by their severity.
 			[
 				[
 					'fields' => [
@@ -132,7 +134,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget with selected 'show suppressed problems' option.
+			// #4 Create a widget with selected 'show suppressed problems' option.
 			[
 				[
 					'fields' => [
@@ -142,7 +144,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget with selected 'show suppressed problems' option that shows only hosts with problems.
+			// #5 Create a widget with selected 'show suppressed problems' option that shows only hosts with problems.
 			[
 				[
 					'fields' => [
@@ -180,12 +182,12 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget with 'Zabbix servers' and 'Another group to check Overview' host group problems.
+			// #6 Create a widget with 'Zabbix servers' and 'Another group to check Overview' host group problems.
 			[
 				[
 					'fields' => [
 						'Type' => 'Problems by severity',
-						'Name' => 'Show only "Zabbix servers" and "Another group to check Overview" problems',
+						'Name' => 'Show only problems from 2 groups',
 						'Host groups' => ['Zabbix servers', 'Another group to check Overview'],
 						'Show operational data' => 'With problem name'
 					],
@@ -203,17 +205,17 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget that excludes several host groups.
+			// #7 Create a widget that excludes "Zabbix servers" host group.
 			[
 				[
 					'fields' => [
 						'Type' => 'Problems by severity',
-						'Name' => 'Exclude "Zabbix servers"',
+						'Name' => 'Exclude one group',
 						'Exclude host groups' => ['Zabbix servers', 'Empty group', 'Group to check Overview']
 					]
 				]
 			],
-			// Create a widget that shows only '1_Hos_to_check_Monitoring_Overview' host problems.
+			// #8 Create a widget that shows only '1_Hos_to_check_Monitoring_Overview' host problems.
 			[
 				[
 					'fields' => [
@@ -238,7 +240,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget that shows only 'Third test trigger with tag priority' problem.
+			// #9 Create a widget that shows only 'Third test trigger with tag priority' problem.
 			[
 				[
 					'fields' => [
@@ -254,7 +256,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget that shows only problems that contain 'Test trigger with tag'.
+			// #10 Create a widget that shows only problems that contain 'Test trigger with tag'.
 			[
 				[
 					'fields' => [
@@ -269,7 +271,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Create a widget that shows only unacknowledged problems.
+			// #11 Create a widget that shows only unacknowledged problems.
 			[
 				[
 					'fields' => [
@@ -298,7 +300,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget with default values.
+			// #12 Totals: Create a widget with default values.
 			[
 				[
 					'fields' => [
@@ -320,7 +322,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: widget with 3 tags set up in tag filter with Or operator.
+			// #13 Totals: widget with 3 tags set up in tag filter with Or operator.
 			[
 				[
 					'fields' => [
@@ -341,7 +343,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 				]
 			],
 			/*
-			 * Totals: Create a widget with selected 'show supprossed problems and ''show operational data' option
+			 * #14 Totals: Create a widget with selected 'show supprossed problems and ''show operational data' option
 			 * and removed 'show timeline' option.
 			 */
 			[
@@ -368,7 +370,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget that shows only problems with Disaster, Warning and Information severities with Vertical layout.
+			// #15 Totals: Create a widget that shows only problems with Disaster, Warning and Information severities with Vertical layout.
 			[
 				[
 					'fields' => [
@@ -386,7 +388,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget with 'Zabbix servers' and 'Another group to check Overview' host group problems.
+			// #16 Totals: Create a widget with 'Zabbix servers' and 'Another group to check Overview' host group problems.
 			[
 				[
 					'fields' => [
@@ -402,7 +404,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget that excludes several host groups and displays unacknowledged problems separately.
+			// #17 Totals: Create a widget that excludes several host groups and displays unacknowledged problems separately.
 			[
 				[
 					'fields' => [
@@ -423,7 +425,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget that shows only '1_Hos_to_check_Monitoring_Overview' host problems.
+			// #18 Totals: Create a widget that shows only '1_Hos_to_check_Monitoring_Overview' host problems.
 			[
 				[
 					'fields' => [
@@ -446,7 +448,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget that shows only problems that contain 'Test trigger with tag'.
+			// #19 Totals: Create a widget that shows only problems that contain 'Test trigger with tag'.
 			[
 				[
 					'fields' => [
@@ -460,7 +462,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Create a widget that shows only unacknowledged problems.
+			// #20 Totals: Create a widget that shows only unacknowledged problems.
 			[
 				[
 					'fields' => [
@@ -584,7 +586,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 	public function getUpdateWidgetData() {
 		return [
-			// Update widget to have a default name.
+			// #0 Update widget to have a default name.
 			[
 				[
 					'widget to update' => 'Reference widget 1',
@@ -593,7 +595,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Hide host groups without problems and remove timeline.
+			// #1 Hide host groups without problems and remove timeline.
 			[
 				[
 					'widget to update' => 'Reference widget 2',
@@ -632,7 +634,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Show only average problems including suppressed ones, problem display - separated, exclude hostgroups without problems.
+			// #2 Show only average problems including suppressed ones, problem display - separated, exclude hostgroups without problems.
 			[
 				[
 					'widget to update' => 'Reference widget 3',
@@ -662,7 +664,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to display only unacknowledged problems and to show latest values.
+			// #3 Update widget to display only unacknowledged problems and to show latest values.
 			[
 				[
 					'widget to update' => 'Reference widget 4',
@@ -695,12 +697,12 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update the widget to return only "Group to check Overview" hostgroup problems.
+			// #4 Update the widget to return only "Group to check Overview" hostgroup problems.
 			[
 				[
 					'widget to update' => 'Reference widget 5',
 					'fields' => [
-						'Name' => 'Show only problems of hostgroup Group to check Overview',
+						'Name' => 'Show only problems of one hostgroup',
 						'Host groups' => 'Group to check Overview'
 					],
 					'expected' => [
@@ -715,7 +717,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Empty widget output: return problems of 'Zabbix servers' hostroup and a host that doesn't belong to it.
+			// #5 Empty widget output: return problems of 'Zabbix servers' hostroup and a host that doesn't belong to it.
 			[
 				[
 					'widget to update' => 'Reference widget 6',
@@ -733,12 +735,12 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to exclude 'Group to check Overview' host group.
+			// #6 Update widget to exclude 'Group to check Overview' host group.
 			[
 				[
 					'widget to update' => 'Reference widget 7',
 					'fields' => [
-						'Name' => 'Exclude "Group to check Overview"',
+						'Name' => 'Widget with excluded group',
 						'Exclude host groups' => ['Group to check Overview']
 					],
 					'expected' => [
@@ -758,7 +760,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to return problems of 'ЗАББИКС Сервер' host.
+			// #7 Update widget to return problems of 'ЗАББИКС Сервер' host.
 			[
 				[
 					'widget to update' => 'Reference widget 8',
@@ -777,7 +779,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Empty widget output: problems of "ЗАББИКС Сервер" host with excluded "Zabbix servers" hostgroup.
+			// #8 Empty widget output: problems of "ЗАББИКС Сервер" host with excluded "Zabbix servers" hostgroup.
 			[
 				[
 					'widget to update' => 'Reference widget 9',
@@ -796,7 +798,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to show a non existing problem.
+			// #9 Update widget to show a non existing problem.
 			[
 				[
 					'widget to update' => 'Reference widget 10',
@@ -807,7 +809,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Update widget to show only warning and information problems that contain '_trigger_'.
+			// #10 Update widget to show only warning and information problems that contain '_trigger_'.
 			[
 				[
 					'widget to update' => 'Reference widget 11',
@@ -824,7 +826,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Change "Show" from "Host groups" to "Totals"
+			// #11 Change "Show" from "Host groups" to "Totals"
 			[
 				[
 					'widget to update' => 'Reference widget 12',
@@ -845,7 +847,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: Use tag filter option with a single tag that is equal to a certain value.
+			// #12 Host groups: Use tag filter option with a single tag that is equal to a certain value.
 			[
 				[
 					'widget to update' => 'Reference widget 13',
@@ -868,7 +870,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: Display all problems that have a certain tag.
+			// #13 Host groups: Display all problems that have a certain tag.
 			[
 				[
 					'widget to update' => 'Reference widget 14',
@@ -890,7 +892,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: Show all problems that have 2 specific tags, one of them contains a specific value.
+			// #14 Host groups: Show all problems that have 2 specific tags, one of them contains a specific value.
 			[
 				[
 					'widget to update' => 'Reference widget 15',
@@ -909,7 +911,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: Show all problems that have at least one of 2 specific tags, one of them contains a value.
+			// #15 Host groups: Show all problems that have at least one of 2 specific tags, one of them contains a value.
 			[
 				[
 					'widget to update' => 'Reference widget 16',
@@ -935,7 +937,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: 2 tags with And/Or operator, one of them contains a value and the other is equal to a value.
+			// #16 Host groups: 2 tags with And/Or operator, one of them contains a value and the other is equal to a value.
 			[
 				[
 					'widget to update' => 'Reference widget 17',
@@ -954,7 +956,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: 2 tags with Or operator, one of them contains a value and the other is equal to a value.
+			// #17 Host groups: 2 tags with Or operator, one of them contains a value and the other is equal to a value.
 			[
 				[
 					'widget to update' => 'Reference widget 18',
@@ -975,7 +977,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: 2 tags with Or operator, both of them equal to specific values.
+			// #18 Host groups: 2 tags with Or operator, both of them equal to specific values.
 			[
 				[
 					'widget to update' => 'Reference widget 19',
@@ -995,7 +997,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Host groups: A tag that doesn't exist.
+			// #19 Host groups: A tag that doesn't exist.
 			[
 				[
 					'widget to update' => 'Reference widget 20',
@@ -1009,7 +1011,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Totals: Use tag filter option with a single tag that is equal to a certain value.
+			// #20 Totals: Use tag filter option with a single tag that is equal to a certain value.
 			[
 				[
 					'widget to update' => 'Reference widget 21',
@@ -1032,7 +1034,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Display all problems that have a certain tag.
+			// #21 Totals: Display all problems that have a certain tag.
 			[
 				[
 					'widget to update' => 'Reference widget 22',
@@ -1051,7 +1053,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Show all problems that have 2 specific tags, one of them contains a specific value.
+			// #22 Totals: Show all problems that have 2 specific tags, one of them contains a specific value.
 			[
 				[
 					'widget to update' => 'Reference widget 23',
@@ -1069,7 +1071,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: Show all problems that have at least one of 2 specific tags, one of them contains a value.
+			// #23 Totals: Show all problems that have at least one of 2 specific tags, one of them contains a value.
 			[
 				[
 					'widget to update' => 'Reference widget 24',
@@ -1092,7 +1094,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: 2 tags with And/Or operator, one of them contains a value and the other is equal to a value.
+			// #24 Totals: 2 tags with And/Or operator, one of them contains a value and the other is equal to a value.
 			[
 				[
 					'widget to update' => 'Reference widget 25',
@@ -1106,11 +1108,11 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 						['name' => 'Tag5', 'operator' => 'Equals', 'value' => '5']
 					],
 					'expected' => [
-							'Average' => '1'
+						'Average' => '1'
 					]
 				]
 			],
-			// Totals: 2 tags with Or operator, one of them contains a value and the other is equal to a value.
+			// #25 Totals: 2 tags with Or operator, one of them contains a value and the other is equal to a value.
 			[
 				[
 					'widget to update' => 'Reference widget 26',
@@ -1130,7 +1132,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: 2 tags with Or operator, both of them equal to specific values.
+			// #26 Totals: 2 tags with Or operator, both of them equal to specific values.
 			[
 				[
 					'widget to update' => 'Reference widget 27',
@@ -1149,7 +1151,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Totals: A tag that doesn't exist.
+			// #27 Totals: A tag that doesn't exist.
 			[
 				[
 					'widget to update' => 'Reference widget 28',
@@ -1164,7 +1166,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Show only average problems including suppressed ones, problem display - separated.
+			// #28 Show only average problems including suppressed ones, problem display - separated.
 			[
 				[
 					'widget to update' => 'Totals reference widget 1',
@@ -1179,7 +1181,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to display only unacknowledged problems and to show latest values without timeline.
+			// #29 Update widget to display only unacknowledged problems and to show latest values without timeline.
 			[
 				[
 					'widget to update' => 'Totals reference widget 2',
@@ -1203,7 +1205,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update the widget to return only "Group to check Overview" hostgroup problems.
+			// #30 Update the widget to return only "Group to check Overview" hostgroup problems.
 			[
 				[
 					'widget to update' => 'Totals reference widget 3',
@@ -1221,7 +1223,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Empty widget output: return problems of 'Zabbix servers' hostroup and a host that doesn't belong to it.
+			// #31 Empty widget output: return problems of 'Zabbix servers' hostroup and a host that doesn't belong to it.
 			[
 				[
 					'widget to update' => 'Totals reference widget 4',
@@ -1236,7 +1238,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Update widget to exclude 'Group to check Overview' host group.
+			// #32 Update widget to exclude 'Group to check Overview' host group.
 			[
 				[
 					'widget to update' => 'Totals reference widget 5',
@@ -1251,7 +1253,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Update widget to return problems of 'ЗАББИКС Сервер' host.
+			// #33 Update widget to return problems of 'ЗАББИКС Сервер' host.
 			[
 				[
 					'widget to update' => 'Totals reference widget 6',
@@ -1268,7 +1270,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Empty widget output: problems of "ЗАББИКС Сервер" host with excluded "Zabbix servers" hostgroup.
+			// #34 Empty widget output: problems of "ЗАББИКС Сервер" host with excluded "Zabbix servers" hostgroup.
 			[
 				[
 					'widget to update' => 'Totals reference widget 7',
@@ -1284,7 +1286,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Update widget to show a non existing problem.
+			// #35 Update widget to show a non existing problem.
 			[
 				[
 					'widget to update' => 'Totals reference widget 8',
@@ -1295,7 +1297,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Update widget to show only warning and information problems that contain '_trigger_'.
+			// #36 Update widget to show only warning and information problems that contain '_trigger_'.
 			[
 				[
 					'widget to update' => 'Totals reference widget 9',
@@ -1310,7 +1312,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 					]
 				]
 			],
-			// Change "Show" from "Totals" to "Host groups"
+			// #37 Change "Show" from "Totals" to "Host groups"
 			[
 				[
 					'widget to update' => 'Totals reference widget 10',
@@ -1514,7 +1516,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 
 	private function checkWidgetContent($data, $widget) {
 		$table = $widget->getContent()->asTable();
-		// Defining expected results in case if no filterint is applied.
+		// Defining expected results in case if no filtering is applied.
 		$default_values = [
 			'values' => [
 				'Another group to check Overview' => [
@@ -1654,8 +1656,8 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 		];
 
 		$rows_count = (CTestArrayHelper::get($data, 'check.rows', false))
-				? CTestArrayHelper::get($data['check'], 'rows')
-				: CTestArrayHelper::get($expected_popup['rows'], $show);
+			? CTestArrayHelper::get($data['check'], 'rows')
+			: CTestArrayHelper::get($expected_popup['rows'], $show);
 
 		// Open the pop-up for severity "Average"
 		if ($show === 'Host groups') {
