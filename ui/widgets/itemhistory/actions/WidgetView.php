@@ -18,6 +18,7 @@
 namespace Widgets\ItemHistory\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CItemHelper,
@@ -38,6 +39,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getInput('name', $name),
 			'layout' => $this->fields_values['layout'],
 			'columns' => [],
+			'item_values' => [],
 			'show_thumbnail' => false,
 			'show_lines' => $this->fields_values['show_lines'],
 			'sortorder' => $this->fields_values['sortorder'],
@@ -59,12 +61,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return;
 		}
 
-		$columns_config = $this->fields_values['columns'];
+		$columns = $this->fields_values['columns'];
 
-		$itemids = array_column($columns_config, 'itemid');
+		$itemids = array_column($columns, 'itemid');
 		$db_items = [];
 
-		if ($columns_config) {
+		if ($columns) {
 			if (!$this->isTemplateDashboard()) {
 				$db_items = API::Item()->get([
 					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
@@ -98,7 +100,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					if ($db_items) {
 						$itemid_per_key = array_column($db_items, 'itemid', 'key_');
 
-						foreach ($columns_config as &$column) {
+						foreach ($columns as &$column) {
 							if (array_key_exists($column['itemid'], $db_item_keys)
 									&& array_key_exists($db_item_keys[$column['itemid']]['key_'], $itemid_per_key)) {
 								$column['itemid'] = $itemid_per_key[$db_item_keys[$column['itemid']]['key_']];
@@ -118,17 +120,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return;
 		}
 
-		$columns_config = array_filter($columns_config, static function($column) use ($db_items) {
+		$columns = array_filter($columns, static function($column) use ($db_items) {
 			return array_key_exists($column['itemid'], $db_items);
 		});
 
-		if (!$columns_config) {
+		if (!$columns) {
 			$this->setResponse(new CControllerResponseData($data));
 
 			return;
 		}
 
-		$item_values_by_source = $this->getItemValuesByDataSource($db_items, $columns_config);
+		$item_values_by_source = $this->getItemValuesByDataSource($db_items, $columns);
+		$item_values = [];
 
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
@@ -144,52 +147,51 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$show_thumbnail = false;
 
-		foreach ($columns_config as &$column) {
-			$column['has_bar'] = false;
-			$column['item_values'] = [];
+		foreach ($columns as $index => &$column) {
+			if (array_key_exists('show_thumbnail', $column) && $column['show_thumbnail'] == 1) {
+				$show_thumbnail = true;
+			}
 
 			if (array_key_exists($column['itemid'], $item_values_by_source[$column['history']])) {
-				$column['item_values'] = [...$item_values_by_source[$column['history']][$column['itemid']]];
+				$column_item_values = $item_values_by_source[$column['history']][$column['itemid']];
 
-				if (in_array($column['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+				$value_type_number = in_array($column['item_value_type'],
+					[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+				);
+
+				if ($value_type_number) {
 					$column['has_binary_units'] = isBinaryUnits($db_items[$column['itemid']]['units']);
 
 					if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
-						|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS) {
+							|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS) {
+
+						$values = array_column($column_item_values, 'value');
 
 						if (!array_key_exists('min', $column) || $column['min'] === '') {
-							$column['min'] = min(array_column($column['item_values'], 'value'));
+							$column['min'] = min($values);
+							$column['min_binary'] = $column['min'];
 						}
 
-						if (!array_key_exists('max', $column) || $column['max'] === '') {
-							$column['max'] = max(array_column($column['item_values'], 'value'));
-						}
-
-						if (array_key_exists('min', $column) && $column['min'] !== '') {
+						if ($column['min'] !== '') {
 							$number_parser_binary->parse($column['min']);
 							$column['min_binary'] = $number_parser_binary->calcValue();
 
 							$number_parser->parse($column['min']);
 							$column['min'] = $number_parser->calcValue();
 						}
-						else {
-							$column['min'] = min(array_column($column['item_values'], 'value'));
-							$column['min_binary'] = $column['min'];
+
+						if (!array_key_exists('max', $column) || $column['max'] === '') {
+							$column['max'] = max($values);
+							$column['max_binary'] = $column['max'];
 						}
 
-						if (array_key_exists('max', $column) && $column['max'] !== '') {
+						if ($column['max'] !== '') {
 							$number_parser_binary->parse($column['max']);
 							$column['max_binary'] = $number_parser_binary->calcValue();
 
 							$number_parser->parse($column['max']);
 							$column['max'] = $number_parser->calcValue();
 						}
-						else {
-							$column['max'] = max(array_column($column['item_values'], 'value'));
-							$column['max_binary'] = $column['max'];
-						}
-
-						$column['has_bar'] = true;
 					}
 
 					if (array_key_exists('thresholds', $column)) {
@@ -202,26 +204,30 @@ class WidgetView extends CControllerDashboardWidgetView {
 						}
 						unset($threshold);
 					}
-
-					foreach ($column['item_values'] as &$item_value) {
-						$item_value['formatted_value'] = formatHistoryValue($item_value['value'],
-							$db_items[$column['itemid']], false
-						);
-					}
-					unset($item_value);
 				}
-			}
 
-			if (array_key_exists('show_thumbnail', $column) && $column['show_thumbnail'] == 1) {
-				$show_thumbnail = true;
+				foreach ($column_item_values as $item_value) {
+					$item_values[] = array_merge($item_value, [
+						'column_index' => $index,
+						'formatted_value' => $value_type_number
+							? formatHistoryValue($item_value['value'], $db_items[$column['itemid']], false)
+							: ''
+					]);
+				}
 			}
 		}
 		unset($column);
 
+		CArrayHelper::sort($item_values, [
+			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+			['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+		]);
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
 			'layout' => $this->fields_values['layout'],
-			'columns' => $columns_config,
+			'columns' => $columns,
+			'item_values' => $item_values,
 			'show_lines' => $this->fields_values['show_lines'],
 			'show_thumbnail' => $show_thumbnail,
 			'sortorder' => $this->fields_values['sortorder'],
