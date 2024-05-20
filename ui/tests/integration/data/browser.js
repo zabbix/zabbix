@@ -282,7 +282,6 @@ try
 		{
 			Zabbix.log(5, "Duration of test: " +browserDashboardResult.duration+" is less than response time: " + JSON.stringify(summary.resource));
 		}
-		
 	}
 	catch (error)
 	{
