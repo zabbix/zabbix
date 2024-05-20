@@ -88,10 +88,13 @@ div.dashboard-widget-geomap {
 		height: 100%;
 		z-index: 1;
 	}
+}
 
-	.geomap-hosts-table {
-		[data-hostid] {
-			cursor: pointer;
-		}
+.geomap-hintbox {
+	overflow: auto;
+	white-space: normal;
+
+	tr[data-hostid] {
+		cursor: pointer;
 	}
 }
