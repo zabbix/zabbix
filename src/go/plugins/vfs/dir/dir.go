@@ -25,12 +25,17 @@ import (
 	"regexp"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 var impl Plugin
+
+type inodeData struct {
+	Dev uint64
+	Ino uint64
+}
 
 type common struct {
 	path          string
@@ -39,7 +44,7 @@ type common struct {
 	regExclude    *regexp.Regexp
 	regInclude    *regexp.Regexp
 	dirRegExclude *regexp.Regexp
-	files         []fs.FileInfo
+	files         map[inodeData]bool
 }
 
 func init() {

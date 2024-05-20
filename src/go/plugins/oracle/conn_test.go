@@ -27,9 +27,9 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/uri"
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
+	"golang.zabbix.com/sdk/uri"
 )
 
 func TestConnManager_closeUnused(t *testing.T) {

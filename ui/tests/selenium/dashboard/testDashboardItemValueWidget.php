@@ -583,7 +583,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Name' => 'New Single Item Widget',
-						'Refresh interval' => '2 minutes',
+						'Refresh interval' => 'Default (1 minute)',
 						'Item' => 'Http agent item form',
 						// Description checkbox.
 						'id:show_1' => true,
@@ -763,7 +763,7 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check new widget update interval.
 			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
-				? '15 minutes'
+				? '1 minute'
 				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
 			$this->assertEquals($refresh, CDashboardElement::find()->one()->getWidget($header)->getRefreshInterval());
 
@@ -846,7 +846,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$values = $form->getFields()->asValues();
 		}
 		else {
-			$form->fill(['Type' => 'Item value']);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 		}
 
 		if ($cancel || !$save_dashboard) {

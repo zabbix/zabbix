@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
@@ -136,6 +136,7 @@ func (sp *sizeParams) skip(path string, d fs.DirEntry) (bool, error) {
 
 func getSizeParams(params []string) (out sizeParams, err error) {
 	out.maxDepth = -1
+	out.files = make(map[inodeData]bool)
 
 	switch len(params) {
 	case sixthParam:

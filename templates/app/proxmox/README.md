@@ -5,8 +5,9 @@
 
 This template is designed for the effortless deployment of Proxmox VE monitoring by Zabbix via HTTP and doesn't require any external scripts.
 
-Proxmox VE uses a REST like API. The concept is described in (Resource Oriented Architecture - ROA).
-You can explore the API documentation at http://pve.proxmox.com/pve-docs/api-viewer/index.html
+Proxmox VE uses a REST like API. The concept is described in Resource Oriented Architecture (ROA).
+
+Check the [`API documentation`](https://pve.proxmox.com/pve-docs/api-viewer/index.html) for details.
 
 ## Requirements
 
@@ -23,22 +24,23 @@ This template has been tested on:
 
 ## Setup
 
-Create an API token for the monitoring user. Important note: for security reasons, it is recommended to create a separate user (Datacenter - Permissions).
+1. Create an API token for the monitoring user. Important note: for security reasons, it is recommended to create a separate user (Datacenter - Permissions).
 
-Please provide the necessary access levels for both the User and the Token.
+Please provide the necessary access levels for both the User and the Token:
 
 * Check: ["perm","/",["Sys.Audit"]]
-
 * Check: ["perm","/storage",["Datastore.Audit"]]
-
 * Check: ["perm","/vms",["VM.Audit"]]
 
-Copy the resulting Token ID and Secret into host macros.
+2. Copy the resulting Token ID and Secret into the host macros `{$PVE.TOKEN.ID}` and `{$PVE.TOKEN.SECRET}`.
+
+3. Set the hostname or IP address of the Proxmox API VE host in the `{$PVE.URL.HOST}` macro. You can also change the API port in the `{$PVE.URL.PORT}` macro if necessary.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$PVE.URL.HOST}|<p>The hostname or IP address of the Proxmox VE API host.</p>|`<SET PVE HOST>`|
 |{$PVE.URL.PORT}|<p>The API uses the HTTPS protocol and the server listens to port 8006 by default.</p>|`8006`|
 |{$PVE.TOKEN.ID}|<p>API tokens allow stateless access to most parts of the REST API by another system, software or API client.</p>|`USER@REALM!TOKENID`|
 |{$PVE.TOKEN.SECRET}|<p>Secret key.</p>|`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`|
@@ -108,7 +110,7 @@ Copy the resulting Token ID and Secret into host macros.
 |Proxmox: Node [{#NODE.NAME}]: CPU, usage|<p>CPU usage.</p>|Dependent item|proxmox.node.cpu[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu`</p></li><li><p>Custom multiplier: `100`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: Node [{#NODE.NAME}]: Outgoing data, rate|<p>Network usage.</p>|Dependent item|proxmox.node.netout[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.netout`</p></li><li><p>Custom multiplier: `8`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: Node [{#NODE.NAME}]: Incoming data, rate|<p>Network usage.</p>|Dependent item|proxmox.node.netin[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.netin`</p></li><li><p>Custom multiplier: `8`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|Proxmox: Node [{#NODE.NAME}]: CPU, loadavg|<p>CPU average load.</p>|Dependent item|proxmox.node.loadavg[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.loadavg`</p></li><li><p>Custom multiplier: `100`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Proxmox: Node [{#NODE.NAME}]: CPU, loadavg|<p>CPU average load.</p>|Dependent item|proxmox.node.loadavg[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.loadavg`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: Node [{#NODE.NAME}]: CPU, iowait|<p>CPU iowait time.</p>|Dependent item|proxmox.node.iowait[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iowait`</p></li><li><p>Custom multiplier: `100`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: Node [{#NODE.NAME}]: Swap filesystem, total|<p>Swap total.</p>|Dependent item|proxmox.node.swaptotal[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.swaptotal`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: Node [{#NODE.NAME}]: Swap filesystem, used|<p>Swap used.</p>|Dependent item|proxmox.node.swapused[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.swapused`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
@@ -127,7 +129,7 @@ Copy the resulting Token ID and Secret into host macros.
 |Proxmox: Node [{#NODE.NAME}] high root filesystem space usage|<p>Root filesystem space usage.</p>|`min(/Proxmox VE by HTTP/proxmox.node.rootused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.roottotal[{#NODE.NAME}]) * 100 >{$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}`|Warning||
 |Proxmox: Node [{#NODE.NAME}] high memory usage|<p>Memory usage.</p>|`min(/Proxmox VE by HTTP/proxmox.node.memused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.memtotal[{#NODE.NAME}]) * 100 >{$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}`|Warning||
 |Proxmox: Node [{#NODE.NAME}] high CPU usage|<p>CPU usage.</p>|`min(/Proxmox VE by HTTP/proxmox.node.cpu[{#NODE.NAME}],5m) > {$PVE.CPU.PUSE.MAX.WARN:"{#NODE.NAME}"}`|Warning||
-|Proxmox: Node [{#NODE.NAME}] high root filesystem space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`min(/Proxmox VE by HTTP/proxmox.node.swapused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) * 100 > {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"} and last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) > 0`|Warning||
+|Proxmox: Node [{#NODE.NAME}] high swap space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`min(/Proxmox VE by HTTP/proxmox.node.swapused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) * 100 > {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"} and last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) > 0`|Warning||
 
 ### LLD rule Storage discovery
 
@@ -167,9 +169,9 @@ Copy the resulting Token ID and Secret into host macros.
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Incoming data, rate|<p>Incoming data rate.</p>|Dependent item|proxmox.qemu.netin[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.netin`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Outgoing data, rate|<p>Outgoing data rate.</p>|Dependent item|proxmox.qemu.netout[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.netout`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: CPU usage|<p>CPU load.</p>|Dependent item|proxmox.qemu.cpu[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.cpu`</p></li><li><p>Custom multiplier: `100`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: Status|<p>Read VM status.</p>|HTTP agent|proxmox.qemu.status[{#QEMU.ID}]|
+|Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: Get data|<p>Get VM status data.</p>|HTTP agent|proxmox.qemu.get.data[{#QEMU.ID}]|
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|proxmox.qemu.uptime[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.uptime`</p></li></ul>|
-|Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Status||Dependent item|proxmox.qemu.vmstatus[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
+|Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Status|<p>Status of Virtual Machine.</p>|Dependent item|proxmox.qemu.vmstatus[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
 
 ### Trigger prototypes for QEMU discovery
 
@@ -190,9 +192,9 @@ Copy the resulting Token ID and Secret into host macros.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Proxmox: LXC [{#LXC.NAME}/{#LXC.NAME}]: Status|<p>Read LXC status.</p>|HTTP agent|proxmox.lxc.status[{#LXC.ID}]|
+|Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: Get data|<p>Get LXC status data.</p>|HTTP agent|proxmox.lxc.get.data[{#LXC.ID}]|
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|proxmox.lxc.uptime[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.uptime`</p></li></ul>|
-|Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Status||Dependent item|proxmox.lxc.vmstatus[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
+|Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Status|<p>Status of LXC container.</p>|Dependent item|proxmox.lxc.vmstatus[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk write, rate|<p>Disk write.</p>|Dependent item|proxmox.lxc.diskwrite[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.diskwrite`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk read, rate|<p>Disk read.</p>|Dependent item|proxmox.lxc.diskread[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.diskread`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Memory usage|<p>Used memory in bytes.</p>|Dependent item|proxmox.lxc.mem[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.mem`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|

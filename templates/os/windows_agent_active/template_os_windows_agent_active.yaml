@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:58:55Z'
+  date: '2024-05-07T08:24:06Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -1228,6 +1228,32 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+              trigger_prototypes:
+                - uuid: 5bed682545044584852888d96454df86
+                  expression: 'last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
+                  event_name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  opdata: 'Space used: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'The volume''s space usage exceeds the `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}` limit.'
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: capacity
+                - uuid: 1e5e9718c5a14099b9421ff7956b2f33
+                  expression: 'last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}'
+                  name: '{#FSLABEL}({#FSNAME}): Disk space is low'
+                  event_name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                  opdata: 'Space used: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'The volume''s space usage exceeds the `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}` limit.'
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
+                      expression: 'last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  tags:
+                    - tag: scope
+                      value: capacity
             - uuid: d45f2c3469dd424486bdee586e4a61eb
               name: '{#FSLABEL}({#FSNAME}): Total space'
               type: ZABBIX_ACTIVE
@@ -1252,48 +1278,6 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
-          trigger_prototypes:
-            - uuid: 5bed682545044584852888d96454df86
-              expression: |
-                last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
-              event_name: '{#FSLABEL}({#FSNAME}): Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: AVERAGE
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: capacity
-            - uuid: 1e5e9718c5a14099b9421ff7956b2f33
-              expression: |
-                last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              name: '{#FSLABEL}({#FSNAME}): Disk space is low'
-              event_name: '{#FSLABEL}({#FSNAME}): Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: WARNING
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              dependencies:
-                - name: '{#FSLABEL}({#FSNAME}): Disk space is critically low'
-                  expression: |
-                    last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent active/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)
-              tags:
-                - tag: scope
-                  value: capacity
           graph_prototypes:
             - uuid: 8d0581d07b92406aa9f007f6d03ad24e
               name: '{#FSLABEL}({#FSNAME}): Disk space usage'
@@ -1372,7 +1356,7 @@ zabbix_export:
           value: '^.*$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv|edgeupdate)$'
+          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv|edgeupdate|cbdhsvc_.+)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.STARTUPNAME.MATCHES}'
           value: '^(?:automatic|automatic delayed)$'
@@ -1401,12 +1385,6 @@ zabbix_export:
         - macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
           value: '0.02'
           description: 'Disk write average response time (in s) before the trigger would fire.'
-        - macro: '{$VFS.FS.FREE.MIN.CRIT}'
-          value: 5G
-          description: 'The critical threshold of the filesystem utilization.'
-        - macro: '{$VFS.FS.FREE.MIN.WARN}'
-          value: 10G
-          description: 'The warning threshold of the filesystem utilization.'
         - macro: '{$VFS.FS.FSDRIVETYPE.MATCHES}'
           value: fixed
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'

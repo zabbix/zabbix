@@ -61,7 +61,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 		// Check hintbox.
 		$form->getLabel('Enable HTTP authentication')->query('class:icon-help-hint')->one()->click();
-		$hintbox = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+		$hintbox = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
 		$this->assertEquals('If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal)'.
 			' will be authenticated by the web server, not by Zabbix.', $hintbox->one()->getText());
 
@@ -316,11 +316,6 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					],
 					'pages' => [
 						[
-							'page' => 'zabbix.php?action=dashboard.view',
-							'action' => self::LOGIN_GUEST,
-							'target' => 'Global view'
-						],
-						[
 							'page' => 'index.php',
 							'action' => self::LOGIN_HTTP,
 							'target' => 'Global view'
@@ -359,11 +354,6 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						[
 							'page' => 'index.php?form=default',
 							'action' => self::LOGIN_USER,
-							'target' => 'Global view'
-						],
-						[
-							'page' => 'zabbix.php?action=dashboard.view',
-							'action' => self::LOGIN_GUEST,
 							'target' => 'Global view'
 						],
 						[
@@ -521,6 +511,13 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		switch (CTestArrayHelper::get($page, 'action', self::LOGIN_GUEST)) {
 			case self::LOGIN_GUEST:
 				$this->page->open($page['page']);
+
+				if ($page['page'] !== 'zabbix.php?action=user.list') {
+					$this->query('button:Login')->one()->click();
+					$this->page->waitUntilReady();
+					$this->query('link:sign in as guest')->one()->click();
+					$this->page->waitUntilReady();
+				}
 
 				return 'guest';
 
