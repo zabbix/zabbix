@@ -1011,12 +1011,11 @@ out:
  ******************************************************************************/
 int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error)
 {
-	int			ret = FAIL;
-	const char		*script = "return window.performance.getEntries().filter("
-							"(value, index, array)=>{"
-								"return value.entryType!=='long-animation-frame'"
-							"}"
-						");";
+	const char	*script = "return window.performance.getEntries().filter("
+						"(value, index, array)=>{"
+							"return value.entryType!=='long-animation-frame'"
+						"}"
+					");";
 
 	return webdriver_execute_script(wd, script, jp, error);
 }
