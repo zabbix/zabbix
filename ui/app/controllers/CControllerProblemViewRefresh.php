@@ -87,7 +87,7 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			$data['filter_counters'] = [];
 
 			foreach ($filters as $index => $tabfilter) {
-				$this->sanitizeFilter($tabfilter);
+				$tabfilter = self::sanitizeFilter($tabfilter);
 
 				if (!$tabfilter['filter_custom_time']) {
 					$tabfilter = [
@@ -146,7 +146,7 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 				'to' => $this->hasInput('to') ? $this->getInput('to') : null
 			];
 
-			$this->sanitizeFilter($filter);
+			$filter = self::sanitizeFilter($filter);
 
 			$data = [
 				'page' => $this->getInput('page', 1),
