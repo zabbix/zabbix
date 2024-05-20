@@ -451,81 +451,84 @@ static duk_ret_t	es_browser_get_result(duk_context *ctx)
 		duk_put_prop_string(ctx, idx_result, "error");
 	}
 
-	idx_perf = duk_push_object(ctx);
-
-	idx_details = duk_push_array(ctx);
-	for (int i = 0; i < wd->perf.details.values_num; i++)
+	if (0 < wd->perf.details.values_num)
 	{
-		duk_idx_t		idx;
-		zbx_wd_perf_details_t	*details = &wd->perf.details.values[i];
+		idx_perf = duk_push_object(ctx);
 
-		idx = duk_push_object(ctx);
-
-		for (int j = 0; j < wd->perf.bookmarks.values_num; j++)
+		idx_details = duk_push_array(ctx);
+		for (int i = 0; i < wd->perf.details.values_num; i++)
 		{
+			duk_idx_t		idx;
+			zbx_wd_perf_details_t	*details = &wd->perf.details.values[i];
+
+			idx = duk_push_object(ctx);
+
+			for (int j = 0; j < wd->perf.bookmarks.values_num; j++)
+			{
+				zbx_wd_perf_bookmark_t	*bookmark = &wd->perf.bookmarks.values[i];
+
+				if (bookmark->details == details)
+				{
+					duk_push_string(ctx, bookmark->name);
+					duk_put_prop_string(ctx, idx, "mark");
+
+					break;
+				}
+			}
+
+			if (NULL != details->navigation)
+			{
+				es_browser_push_performance_entry(ctx, details->navigation);
+				duk_put_prop_string(ctx, idx, "navigation");
+			}
+
+			es_browser_push_performance_entry(ctx, details->resource);
+			duk_put_prop_string(ctx, idx, "resource");
+
+			if (0 != details->user.values_num)
+			{
+				duk_idx_t	idx_user;
+
+				idx_user = duk_push_array(ctx);
+				for (int j = 0; j < details->user.values_num; j++)
+				{
+					es_browser_push_performance_entry(ctx, details->user.values[j]);
+					duk_put_prop_index(ctx, idx_user, (duk_uarridx_t)j);
+				}
+
+				duk_put_prop_string(ctx, idx, "user");
+			}
+
+			duk_put_prop_index(ctx, idx_details, (duk_uarridx_t)i);
+		}
+
+		duk_put_prop_string(ctx, idx_perf, "details");
+
+		idx_summary = duk_push_object(ctx);
+		es_browser_push_performance_entry(ctx, wd->perf.navigation_summary);
+		duk_put_prop_string(ctx, idx_summary, "navigation");
+		es_browser_push_performance_entry(ctx, wd->perf.resource_summary);
+		duk_put_prop_string(ctx, idx_summary, "resource");
+		duk_put_prop_string(ctx, idx_perf, "summary");
+
+		idx_marks = duk_push_array(ctx);
+		for (int i = 0; i < wd->perf.bookmarks.values_num; i++)
+		{
+			duk_idx_t	idx;
 			zbx_wd_perf_bookmark_t	*bookmark = &wd->perf.bookmarks.values[i];
 
-			if (bookmark->details == details)
-			{
-				duk_push_string(ctx, bookmark->name);
-				duk_put_prop_string(ctx, idx, "mark");
+			idx = duk_push_object(ctx);
+			duk_push_string(ctx, bookmark->name);
+			duk_put_prop_string(ctx, idx, "name");
+			duk_push_number(ctx, (double)i);
+			duk_put_prop_string(ctx, idx, "index");
 
-				break;
-			}
+			duk_put_prop_index(ctx, idx_marks, (duk_uarridx_t)i);
 		}
+		duk_put_prop_string(ctx, idx_perf, "marks");
 
-		if (NULL != details->navigation)
-		{
-			es_browser_push_performance_entry(ctx, details->navigation);
-			duk_put_prop_string(ctx, idx, "navigation");
-		}
-
-		es_browser_push_performance_entry(ctx, details->resource);
-		duk_put_prop_string(ctx, idx, "resource");
-
-		if (0 != details->user.values_num)
-		{
-			duk_idx_t	idx_user;
-
-			idx_user = duk_push_array(ctx);
-			for (int j = 0; j < details->user.values_num; j++)
-			{
-				es_browser_push_performance_entry(ctx, details->user.values[j]);
-				duk_put_prop_index(ctx, idx_user, (duk_uarridx_t)j);
-			}
-
-			duk_put_prop_string(ctx, idx, "user");
-		}
-
-		duk_put_prop_index(ctx, idx_details, (duk_uarridx_t)i);
+		duk_put_prop_string(ctx, idx_result, "performance_data");
 	}
-
-	duk_put_prop_string(ctx, idx_perf, "details");
-
-	idx_summary = duk_push_object(ctx);
-	es_browser_push_performance_entry(ctx, wd->perf.navigation_summary);
-	duk_put_prop_string(ctx, idx_summary, "navigation");
-	es_browser_push_performance_entry(ctx, wd->perf.resource_summary);
-	duk_put_prop_string(ctx, idx_summary, "resource");
-	duk_put_prop_string(ctx, idx_perf, "summary");
-
-	idx_marks = duk_push_array(ctx);
-	for (int i = 0; i < wd->perf.bookmarks.values_num; i++)
-	{
-		duk_idx_t	idx;
-		zbx_wd_perf_bookmark_t	*bookmark = &wd->perf.bookmarks.values[i];
-
-		idx = duk_push_object(ctx);
-		duk_push_string(ctx, bookmark->name);
-		duk_put_prop_string(ctx, idx, "name");
-		duk_push_number(ctx, (double)i);
-		duk_put_prop_string(ctx, idx, "index");
-
-		duk_put_prop_index(ctx, idx_marks, (duk_uarridx_t)i);
-	}
-	duk_put_prop_string(ctx, idx_perf, "marks");
-
-	duk_put_prop_string(ctx, idx_result, "performance_data");
 
 	return 1;
 }
