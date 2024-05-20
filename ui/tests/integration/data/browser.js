@@ -265,20 +265,24 @@ try
 		Zabbix.log(5, "screenshot: " + browser2.getScreenshot());
 
 		el = browser2.findElement("link text", "Sign out");
+
 		browser2.collectPerfEntries();
-		result = browser2.getResult();
+		raw = browser2.getRawPerfEntries();
+		browserDashboardResult = browser2.getResult();
+		browserDashboardResult.raw = raw
 
-		summary = result.performance_data.summary;
+		summary = browserDashboardResult.performance_data.summary;
 
-		if (summary.resource.response_time > result.duration ||
-			summary.resource.tcp_handshake_time > result.duration ||
-			summary.resource.service_worker_processing_time > result.duration ||
-			summary.resource.tls_negotiation_time > result.duration ||
-			summary.resource.resource_fetch_time > result.duration ||
-			summary.resource.request_time > result.duration)
+		if (summary.resource.response_time > browserDashboardResult.duration ||
+			summary.resource.tcp_handshake_time > browserDashboardResult.duration ||
+			summary.resource.service_worker_processing_time > browserDashboardResult.duration ||
+			summary.resource.tls_negotiation_time > browserDashboardResult.duration ||
+			summary.resource.resource_fetch_time > browserDashboardResult.duration ||
+			summary.resource.request_time > browserDashboardResult.duration)
 		{
-			Zabbix.log(5, "Duration of test: " +result.duration+" is less than response time: " + JSON.stringify(summary.resource));
+			Zabbix.log(5, "Duration of test: " +browserDashboardResult.duration+" is less than response time: " + JSON.stringify(summary.resource));
 		}
+		
 	}
 	catch (error)
 	{
@@ -317,4 +321,6 @@ catch (err)
 
 }
 
-return JSON.stringify(browser.getResult());
+result = browser.getResult();
+result.browserDashboard = browserDashboardResult;
+return JSON.stringify(result);
