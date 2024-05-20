@@ -68,11 +68,11 @@ window.item_history_column_edit = new class {
 
 		// Initialize item multiselect
 		$('#itemid').on('change', () => {
-			this.#overlay.setLoading();
-
 			const ms_item_data = jQuery('#itemid').multiSelect('getData');
 
 			if (ms_item_data.length > 0) {
+				this.#overlay.setLoading();
+
 				this.#promiseGetItemType(ms_item_data[0].id)
 					.then((type) => {
 						if (this.#form.isConnected) {
