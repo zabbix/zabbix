@@ -955,7 +955,7 @@ static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 static duk_ret_t	es_browser_execute_script(duk_context *ctx)
 {
 	zbx_webdriver_t		*wd;
-	char			*script = NULL, error = NULL;
+	char			*script = NULL, *error = NULL;
 	int			err_index = -1;
 	struct zbx_json_parse	jp;
 
