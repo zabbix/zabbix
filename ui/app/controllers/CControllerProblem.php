@@ -210,53 +210,52 @@ abstract class CControllerProblem extends CController {
 	 * Clean the filter from non-existing host, host group and trigger IDs.
 	 *
 	 * @param array $filter
-	 * @param array $filter['groupids']     Groupids from filter to check.
-	 * @param array $filter['hostids']      Hostids from filter to check.
-	 * @param array $filter['triggerids']   Triggerids from filter to check.
 	 *
-	 * @return void
+	 * $filter = [
+	 *     'groupids' =>   (array)  Group IDs from filter to check.
+	 *     'hostids' =>    (array)  Host IDs from filter to check.
+	 *     'triggerids' => (array)  Trigger IDs from filter to check.
+	 * ]
+	 *
+	 * @return array
 	 */
-	protected function sanitizeFilter(array &$filter): void {
+	protected static function sanitizeFilter(array $filter): array {
 		if ($filter['hostids']) {
 			$hosts = API::Host()->get([
 				'output' => [],
-				'hostids' => $filter['hostids'] ?: null,
+				'hostids' => $filter['hostids'],
 				'preservekeys' => true
 			]);
 
-			foreach ($filter['hostids'] as $index => $hostid) {
-				if (!array_key_exists($hostid, $hosts)) {
-					unset($filter['hostids'][$index]);
-				}
-			}
+			$filter['hostids'] = array_filter($filter['hostids'], function($hostid) use ($hosts) {
+				return array_key_exists($hostid, $hosts);
+			});
 		}
 
 		if ($filter['triggerids']) {
 			$triggers = API::Trigger()->get([
 				'output' => [],
-				'triggerids' => $filter['triggerids'] ?: null,
+				'triggerids' => $filter['triggerids'],
 				'preservekeys' => true
 			]);
 
-			foreach ($filter['triggerids'] as $index => $triggerid) {
-				if (!array_key_exists($triggerid, $triggers)) {
-					unset($filter['triggerids'][$index]);
-				}
-			}
+			$filter['triggerids'] = array_filter($filter['triggerids'], function($triggerid) use ($triggers) {
+				return array_key_exists($triggerid, $triggers);
+			});
 		}
 
 		if ($filter['groupids']) {
 			$groups = API::HostGroup()->get([
 				'output' => [],
-				'groupids' => $filter['groupids'] ?: null,
+				'groupids' => $filter['groupids'],
 				'preservekeys' => true
 			]);
 
-			foreach ($filter['groupids'] as $index => $groupid) {
-				if (!array_key_exists($groupid, $groups)) {
-					unset($filter['groupids'][$index]);
-				}
-			}
+			$filter['groupids'] = array_filter($filter['groupids'], function($groupid) use ($groups) {
+				return array_key_exists($groupid, $groups);
+			});
 		}
+
+		return $filter;
 	}
 }

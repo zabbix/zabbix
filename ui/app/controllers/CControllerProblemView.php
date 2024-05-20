@@ -110,7 +110,7 @@ class CControllerProblemView extends CControllerProblem {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
-		$this->sanitizeFilter($filter);
+		$filter = self::sanitizeFilter($filter);
 
 		$refresh_curl = new CUrl('zabbix.php');
 		$filter['action'] = 'problem.view.refresh';

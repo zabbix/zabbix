@@ -143,7 +143,7 @@ class CControllerLatestView extends CControllerLatest {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
-		$this->sanitizeFilter($filter);
+		$filter = self::sanitizeFilter($filter);
 
 		$refresh_curl = new CUrl('zabbix.php');
 		$refresh_curl_params = ['action' => 'latest.view.refresh'] + $filter;
