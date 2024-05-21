@@ -139,13 +139,20 @@ window.widget_item_form = new class {
 	/**
 	 * Fetch type of currently selected item.
 	 *
-	 * @return {Promise<any>}  Resolved promise will contain item type, or null in case of error or if no item is
-	 *                         currently selected.
+	 * Will return null if outer data source (widget) is selected instead of item.
+	 *
+	 * @return {Promise<any>}  Resolved promise will contain item type, or null if item type can't be established.
 	 */
 	#promiseGetItemType() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
 
-		if (ms_item_data.length == 0) {
+		if (ms_item_data.length === 0) {
+			return Promise.resolve(null);
+		}
+
+		const {reference} = CWidgetBase.parseTypedReference(ms_item_data[0].id);
+
+		if (reference !== '') {
 			return Promise.resolve(null);
 		}
 

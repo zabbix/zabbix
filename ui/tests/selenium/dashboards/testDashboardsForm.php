@@ -450,7 +450,7 @@ class testDashboardsForm extends CWebTest {
 		$dashboard->cancelEditing();
 
 		if (CTestArrayHelper::get($data, 'opened_dashboard', false)) {
-			$url = 'zabbix.php?action=dashboard.view&cancel=1';
+			$url = 'zabbix.php?action=dashboard.view&dashboardid=1';
 			$title = $data['opened_dashboard'];
 		}
 		else {

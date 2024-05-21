@@ -13,8 +13,6 @@
 **/
 
 
-const ZBX_STYLE_DISPLAY_NONE = 'display-none';
-
 const ZBX_DB_MYSQL		= 'MYSQL';
 const ZBX_DB_POSTGRESQL	= 'POSTGRESQL';
 const ZBX_DB_ORACLE		= 'ORACLE';

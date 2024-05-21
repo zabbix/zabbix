@@ -5,7 +5,7 @@ New features:
 A.F....PS. [ZBXNEXT-9150] added browser item for browser monitoring (gcalenko, wiper)
 .........T [ZBXNEXT-8746] removed template name prefix from items, triggers (abakaldin)
 ....I..... [ZBXNEXT-9168] replaced the software license with AGPL-3.0-only (Sasha)
-........S. [ZBXNEXT-9103] added 202, 203 and 204 to the HTTP reponse codes accepted by connectors (Sasha)
+........S. [ZBXNEXT-9103] added 202, 203 and 204 to the HTTP response codes accepted by connectors (Sasha)
 A.F....... [ZBXNEXT-9057] added software update check functionality (agriscenko)
 ...G...... [ZBXNEXT-9149] extended proc.get[] to get PSS (proportional set size) memory on Linux (sboidenko)
 ..F....... [ZBXNEXT-8956] enabled communication framework for existing widgets (apoga, ashubin, averza, ddauksa, miks)
@@ -23,7 +23,7 @@ A.F....PS. [ZBXNEXT-9077] added support of custom vault prefix for HashiCorp and
 ..F....... [ZBXNEXT-7743] implemented changes in Latest data page when filter is not set, updated message and added icon in widgets, in filter popups and in all list pages when there is no data found (ashubin, dpetra)
 ....I...S. [ZBXNEXT-9108] added server side software update check functionality (dgoloscapov)
 ........S. [ZBXNEXT-7930] added user macro support for username and password fields in email media type (asestakovs)
-...G...... [ZBXNEXT-9132] updated Zabbix agent to be fully compatibile with Zabix agent 2 active checks protocol (wiper)
+...G...... [ZBXNEXT-9132] updated Zabbix agent to be fully compatible with Zabix agent 2 active checks protocol (wiper)
 A.FG...PS. [ZBXNEXT-8758] added proxy load balancing and HA (agriscenko, wiper)
 .........T [ZBXNEXT-9098] added AWS ELB Network Load Balancer by HTTP template (egordymov)
 .........T [ZBXNEXT-6864] replaced {HOST.CONN} with user macros in templates (drasikhov)
@@ -67,6 +67,7 @@ A......... [ZBX-24258] fixed issue causing error when removing the old MFA metho
 .......PS. [ZBX-24354] fixed item status flapping (vso)
 ........S. [ZBX-24363] fixed proxyid being ignored in item test (kprutkovs)
 ....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta3
@@ -712,6 +713,11 @@ Bug fixes:
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.4.15
+
+6.4.15rc1 was released as 6.4.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.4.15rc1
 
 New features:
@@ -751,6 +757,7 @@ A......... [ZBX-23407] improved performance of retrieving last history values wh
 ........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
 .........T [ZBX-24275] fixed item prototype JSONPath preprocessing, added missing volume health metric and triggers in HPE MSA templates (drasikhov)
 .........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.14
@@ -2494,6 +2501,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.30
+
+6.0.30rc1 was released as 6.0.30 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.30rc1
 
 New features:
@@ -2529,6 +2541,7 @@ A......... [ZBX-23407] improved performance of retrieving last history values wh
 ........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
 .........T [ZBX-24275] fixed item prototype JSONPath preprocessing, added missing volume health metric and triggers in HPE MSA templates (drasikhov)
 .........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.29
