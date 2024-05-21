@@ -23,8 +23,8 @@
 header('Content-type: image/png');
 
 if (!$data['image']) {
-	header('HTTP/1.1 404 Not Found');
+	http_response_code(404);
 }
 elseif (!imagepng($data['image'])) {
-	header('HTTP/1.1 500 Internal Server Error');
+	http_response_code(500);
 }
