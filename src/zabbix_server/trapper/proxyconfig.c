@@ -113,7 +113,9 @@ clean:
 out:
 	zbx_free(error);
 	zbx_free(buffer);
-
+#ifdef HAVE_MALLOC_TRIM
+	malloc_trim(0);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -158,5 +160,8 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	}
 	zbx_send_proxy_response(sock, ret, NULL, CONFIG_TIMEOUT);
 out:
+#ifdef HAVE_MALLOC_TRIM
+	malloc_trim(0);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
