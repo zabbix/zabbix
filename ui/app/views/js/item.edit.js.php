@@ -204,6 +204,7 @@ window.item_edit_form = new class {
 		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
+		this.field.timeout.addEventListener('keyup', () => this.override_timeout = this.field.timeout.value);
 		this.form.addEventListener('click', e => {
 			const target = e.target;
 
@@ -646,6 +647,13 @@ window.item_edit_form = new class {
 		const custom_timeout = [].filter.call(this.field.custom_timeout, e => e.matches(':checked')).pop();
 		const inherited_hidden = custom_timeout.value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 
+		if (document.querySelector('[name=custom_timeout]:checked').value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+			this.field.timeout.value = this.override_timeout;
+		}
+		else {
+			this.field.timeout.value = this.field.inherited_timeout.value;
+		}
+
 		this.form.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
 		this.form.timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
 	}
@@ -772,6 +780,11 @@ window.item_edit_form = new class {
 
 	#typeChangeHandler(e) {
 		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value]||'';
+
+		if (this.field.timeout.value === '' || this.override_timeout === undefined) {
+			this.override_timeout = this.field.inherited_timeout.value;
+		}
+
 		this.updateFieldsVisibility();
 	}
 
