@@ -62,7 +62,7 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 				return false;
 			}
 
-			if (!preg_match('/^\d+\.\d+$/', $version['version'])) {
+			if (strlen($version['version']) > 5 || !preg_match('/^\d+\.\d+$/', $version['version'])) {
 				error(sprintf('Invalid parameter "%1$s": %2$s.', $path.'/version', 'invalid version'));
 
 				return false;
@@ -88,7 +88,8 @@ class CControllerSoftwareVersionCheckUpdate extends CController {
 				return false;
 			}
 
-			if (!preg_match('/^\d+\.\d+\.\d+(?:(alpha|beta|rc)\d+)?$/', $version['latest_release']['release'])) {
+			if (strlen($version['latest_release']['release']) > 16
+					|| !preg_match('/^\d+\.\d+\.\d+(?:(alpha|beta|rc)\d+)?$/', $version['latest_release']['release'])) {
 				error(sprintf('Invalid parameter "%1$s": %2$s.', $path.'/latest_release/release',
 					'invalid release version'
 				));
