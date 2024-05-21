@@ -167,7 +167,7 @@ EXEC_DEPS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-# HTTP also depends on dbhigh, not included yet, to allow agent only tests pass
+# HTTP also depends on dbhigh, not included yet, need to allow agent only tests pass
 HTTP_DEPS = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(EXPR_DEPS) \
