@@ -1,5 +1,5 @@
 # This file contains dependencies for public Zabbix libraries.
-# To get such list for a particular library - run grep_dependencies.sh .
+# To get such list for a particular library - run "grep_dependencies.sh <public library name e.g. zbxeval>" .
 # Ignore Windows dependencies for now.
 # Libraries that depend only on zbxcommon - are listed as they are.
 # More complex libraries that depend on other libraries in addition to zbxcommon - need all their dependencies
