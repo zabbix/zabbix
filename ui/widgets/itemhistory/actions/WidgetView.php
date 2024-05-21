@@ -220,14 +220,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
-			'layout' => $this->fields_values['layout'],
 			'columns' => $columns,
 			'item_values' => $item_values,
+			'layout' => $this->fields_values['layout'],
 			'show_lines' => $this->fields_values['show_lines'],
-			'show_thumbnail' => $show_thumbnail,
-			'sortorder' => $this->fields_values['sortorder'],
-			'show_timestamp' => (bool) $this->fields_values['show_timestamp'],
 			'show_column_header' => $this->fields_values['show_column_header'],
+			'show_thumbnail' => $show_thumbnail,
+			'show_timestamp' => (bool) $this->fields_values['show_timestamp'],
+			'sortorder' => $this->fields_values['sortorder'],
 			'error' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
