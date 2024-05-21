@@ -713,8 +713,8 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		if (SUCCEED == zbx_db_is_null(trow[3]))
 		{
 			zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" of "
-					"template \"%s\" and LLD rule \"%s\", because an item prototype with the "
-					"same key already exists", trow[0], trow[1], trow[2]);
+					"template \"%s\" and LLD rule \"%s\", because an item with the same key already"
+					" exists", trow[0], trow[1], trow[2]);
 		}
 		else
 		{
