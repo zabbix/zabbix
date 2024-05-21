@@ -122,9 +122,8 @@ void	zbx_mock_test_entry(void **state)
 	static zbx_config_icmpping_t	mock_config_icmpping = {
 		mock_get_source_ip,
 		NULL,
-#ifdef HAVE_IPV6
 		NULL,
-#endif
+		NULL,
 		NULL};
 
 	ZBX_UNUSED(state);

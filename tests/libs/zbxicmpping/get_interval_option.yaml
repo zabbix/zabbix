@@ -2,7 +2,6 @@
 test case: 'fping 2.4 and 3.0 <= X < 3.14; root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
 
     Usage: /usr/bin/fping [options] [targets...]
@@ -41,14 +40,11 @@ in:
 
     127.0.0.1 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.04/0.04/0.04
 out:
-  return: 'SUCCEED'
   value: 1
-  error_msg: ''
 ---
 test case: 'fping 2.4 and 3.0 <= X < 3.14; non-root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
 
     Usage: /usr/bin/fping [options] [targets...]
@@ -115,14 +111,11 @@ in:
 
     127.0.0.1 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.03/0.03/0.03
 out:
-  return: 'SUCCEED'
   value: 10
-  error_msg: ''
 ---
 test case: 'fping 3.14 <= X < 4.0; root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     127.0.0.1 : [0], 84 bytes, 0.03 ms (0.03 avg, 0% loss)
 
@@ -136,14 +129,11 @@ in:
 
     127.0.0.1 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.03/0.03/0.03
 out:
-  return: 'SUCCEED'
   value: 0
-  error_msg: ''
 ---
 test case: 'fping 3.14 <= X < 4.0; non-root; safe limits: N/A; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     /usr/bin/fping: these options are too risky for mere mortals.
     /usr/bin/fping: You need i >= 1, p >= 20, r < 20, and t >= 50
@@ -156,14 +146,11 @@ in:
 
     127.0.0.1 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.02/0.02/0.02
 out:
-  return: 'SUCCEED'
   value: 1
-  error_msg: ''
 ---
 test case: 'fping 4.0 <= X <= 5.1; root; safe limits: YES; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     127.0.0.1 : [0], 84 bytes, 0.02 ms (0.02 avg, 0% loss)
 
@@ -177,14 +164,11 @@ in:
 
     127.0.0.1 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.02/0.02/0.02
 out:
-  return: 'SUCCEED'
   value: 0
-  error_msg: ''
 ---
 test case: 'fping 4.0 <= X <= 5.1; non-root; safe limits: YES; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     /usr/bin/fping: these options are too risky for mere mortals.
     /usr/bin/fping: You need -i >= 1 and -p >= 10
@@ -197,14 +181,11 @@ in:
 
     127.0.0.1 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.03/0.03/0.03
 out:
-  return: 'SUCCEED'
   value: 1
-  error_msg: ''
 ---
 test case: 'fping 4.0 <= X <= 5.1; root or non-root; safe limits: NO; redirect: NO'
 in:
   target_host_addr: "127.0.0.1"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     127.0.0.1 : [0], 64 bytes, 0.010 ms (0.010 avg, 0% loss)
 
@@ -218,14 +199,11 @@ in:
 
     127.0.0.1 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.010/0.010/0.010
 out:
-  return: 'SUCCEED'
   value: 0
-  error_msg: ''
 ---
 test case: 'fping 2.4 and 3.0 <= X < 3.11; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
 
   Usage: /usr/bin/fping  [options] [targets...]
@@ -263,14 +241,11 @@ in:
 
     192.168.202.10 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.86/0.86/0.86
 out:
-  return: 'SUCCEED'
   value: 10
-  error_msg: ''
 ---
 test case: 'fping 3.11 <= X < 3.14; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
 
     Usage: /usr/bin/fping  [options] [targets...]
@@ -315,14 +290,11 @@ in:
 
     192.168.202.10 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.73/0.73/0.73
 out:
-  return: 'SUCCEED'
   value: 10
-  error_msg: ''
 ---
 test case: 'fping 3.14 <= X < 4.0; non-root; safe limits: N/A; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
     /usr/bin/fping : these options are too risky for mere mortals.
     /usr/bin/fping : You need i >= 1, p >= 20, r < 20, and t >= 50
@@ -335,14 +307,11 @@ in:
 
     192.168.202.10 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.57/0.57/0.57
 out:
-  return: 'SUCCEED'
   value: 1
-  error_msg: ''
 ---
 test case: 'fping 4.0 <= X <= 5.1; non-root; safe limits: NO; redirect: YES'
 in:
   target_host_addr: "192.168.202.10"
-  zbx_execute_ret: 'SUCCEED'
   fping_out_i0: |+2
      [<- 192.168.201.10]192.168.202.10 : [0], 84 bytes, 0.63 ms (0.63 avg, 0% loss)
 
@@ -356,34 +325,5 @@ in:
 
     192.168.202.10 : xmt/rcv/%loss = 1/1/0%, min/avg/max = 0.63/0.63/0.63
 out:
-  return: 'SUCCEED'
   value: 0
-  error_msg: ''
----
-test case: 'Timeout error'
-in:
-  target_host_addr: "7.7.7.7"
-  zbx_execute_ret: 'TIMEOUT_ERROR'
-out:
-  return: 'FAIL'
-  value: 0
-  error_msg: 'Timeout while executing "/usr/bin/fping -c1 -t50 -i0 7.7.7.7"'
----
-test case: 'Signal error'
-in:
-  target_host_addr: "7.7.7.7"
-  zbx_execute_ret: 'SIG_ERROR'
-out:
-  return: 'FAIL'
-  value: 0
-  error_msg: 'Cannot execute "/usr/bin/fping -c1 -t50 -i0 7.7.7.7": Signal received while executing a shell script.'
----
-test case: 'General failure error'
-in:
-  target_host_addr: "7.7.7.7"
-  zbx_execute_ret: 'FAIL'
-out:
-  return: 'FAIL'
-  value: 0
-  error_msg: 'Cannot execute "/usr/bin/fping -c1 -t50 -i0 7.7.7.7": General failure error.'
 ...

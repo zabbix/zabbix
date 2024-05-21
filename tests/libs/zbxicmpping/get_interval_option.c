@@ -26,64 +26,54 @@
 
 #include "../../../src/libs/zbxicmpping/icmpping.c"
 
-#define PIPE_BUFFER_SIZE	4096
+int	__wrap_mkstemp(void);
+FILE	*__wrap_popen(const char *command, const char *type);
+ssize_t	__wrap_write(int fd, const void *buf, size_t n);
+const char	*mock_get_tmpdir(void);
+const char	*mock_get_progname(void);
 
-char	*__wrap_zbx_fgets(char *buffer, int size, FILE *fp);
-int	__wrap_zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
-		unsigned char flag, const char *dir);
-
-char	*__wrap_zbx_fgets(char *buffer, int size, FILE *fp)
+int	__wrap_mkstemp(void)
 {
-	ZBX_UNUSED(buffer);
-	ZBX_UNUSED(size);
-	ZBX_UNUSED(fp);
+	return INT_MAX;
+}
 
+FILE *__wrap_popen(const char *command, const char *type)
+{
+	const char	*str;
+	size_t		f_size;
+
+	ZBX_UNUSED(type);
+
+	if (NULL != strstr(command, "-i0"))
+		str = zbx_mock_get_parameter_string("in.fping_out_i0");
+	else if (NULL != strstr(command, "-i1"))
+		str = zbx_mock_get_parameter_string("in.fping_out_i1");
+	else if (NULL != strstr(command, "-i10"))
+		str = zbx_mock_get_parameter_string("in.fping_out_i10");
+	else
+		fail_msg("This should never happen: unexpected command '%s' in %s().", command, __func__);
+
+	f_size = strlen(str);
+
+	return fmemopen((void *)str, f_size * sizeof(char), "r");
+}
+
+ssize_t	__wrap_write(int fd, const void *buf, size_t n)
+{
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(buf);
+
+	return n;
+}
+
+const char	*mock_get_tmpdir(void)
+{
 	return "";
 }
 
-int	__wrap_zbx_execute(const char *command, char **output, char *error, size_t max_error_len, int timeout,
-		unsigned char flag, const char *dir)
+const char	*mock_get_progname(void)
 {
-	int		ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("in.zbx_execute_ret"));
-	const char	*str;
-
-	ZBX_UNUSED(timeout);
-	ZBX_UNUSED(flag);
-	ZBX_UNUSED(dir);
-
-	if (NULL != output)
-		zbx_free(*output);
-
-	*output = (char *)zbx_malloc(*output, PIPE_BUFFER_SIZE);
-
-	switch (ret)
-	{
-		case SUCCEED:
-			*error = '\0';
-			if (NULL != strstr(command, "-i0"))
-				str = zbx_mock_get_parameter_string("in.fping_out_i0");
-			else if (NULL != strstr(command, "-i1"))
-				str = zbx_mock_get_parameter_string("in.fping_out_i1");
-			else if (NULL != strstr(command, "-i10"))
-				str = zbx_mock_get_parameter_string("in.fping_out_i10");
-			else
-				fail_msg("This should never happen: unknown interval.");
-			zbx_strlcpy(*output, str, PIPE_BUFFER_SIZE);
-			break;
-		case FAIL:
-			zbx_snprintf(error, max_error_len, "General failure error.");
-			break;
-		case TIMEOUT_ERROR:
-			zbx_snprintf(error, max_error_len, "Timeout error.");
-			break;
-		case SIG_ERROR:
-			zbx_snprintf(error, max_error_len, "Signal received while executing a shell script.");
-			break;
-		default:
-			fail_msg("This should never happen: unexpected return code in %s().", __func__);
-	}
-
-	return ret;
+	return "";
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -95,7 +85,16 @@ void	zbx_mock_test_entry(void **state)
 	char 			error[ZBX_ITEM_ERROR_LEN_MAX];
 	char			status[1];
 
+	static zbx_config_icmpping_t	mock_config_icmpping = {
+		NULL,
+		NULL,
+		NULL,
+		mock_get_tmpdir,
+		mock_get_progname};
+
 	ZBX_UNUSED(state);
+
+	zbx_init_library_icmpping(&mock_config_icmpping);
 
 	error[0] = '\0';
 	status[0] = '\0';
@@ -110,14 +109,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ret = get_interval_option("/usr/bin/fping", hosts, 1, &value, error, ZBX_ITEM_ERROR_LEN_MAX);
 
-	zbx_mock_assert_int_eq("get_interval_option() return value",
-			zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")), ret);
-	zbx_mock_assert_str_eq("error message returned by get_interval_option()",
-			zbx_mock_get_parameter_string("out.error_msg"), error);
-
-	if (SUCCEED == ret)
-	{
-		zbx_mock_assert_int_eq("minimal detected interval", (int)zbx_mock_get_parameter_uint64("out.value"),
-				value);
-	}
+	zbx_mock_assert_int_eq("get_interval_option() return value", zbx_mock_str_to_return_code("SUCCEED"), ret);
+	zbx_mock_assert_str_eq("error message returned by get_interval_option()", "", error);
+	zbx_mock_assert_int_eq("minimal detected interval", (int)zbx_mock_get_parameter_uint64("out.value"), value);
 }
