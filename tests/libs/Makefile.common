@@ -159,3 +159,76 @@ COMMSHIGH_DEPS = \
 	$(TIME_DEPS) \
 	$(NIX_DEPS) \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+EXEC_DEPS = \
+	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(LOG_DEPS) \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+HTTP_DEPS = \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(DBHIGH_DEPS) \
+	$(EXPR_DEPS) \
+	$(LOG_DEPS) \
+	$(TIME_DEPS) \
+	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+PARAM_DEPS = \
+	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
+	$(EXPR_DEPS) \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+SYSINFO_BASE_DEPS = \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(CFG_DEPS) \
+	$(COMMS_DEPS) \
+	$(CRYPTO_DEPS) \
+	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
+	$(EXEC_DEPS) \
+	$(EXPR_DEPS) \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
+	$(HTTP_DEPS) \
+	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(JSON_DEPS) \
+	$(LOG_DEPS) \
+	$(MUTEX_DEPS) \
+	$(NIX_DEPS) \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(PARAM_DEPS) \
+	$(REGEXP_DEPS) \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+SYSINFO_SERVER_DEPS = \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
+	$(SYSINFO_BASE_DEPS)
+
+SYSINFO_AGENT_DEPS = \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
+	$(SYSINFO_BASE_DEPS)

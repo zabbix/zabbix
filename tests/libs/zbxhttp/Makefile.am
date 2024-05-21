@@ -4,16 +4,7 @@ noinst_PROGRAMS = \
 	zbx_determine_charset
 
 HTTP_LIBS = \
-	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
-	$(DBHIGH_DEPS) \
-	$(EXPR_DEPS) \
-	$(LOG_DEPS) \
-	$(TIME_DEPS) \
-	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(HTTP_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
