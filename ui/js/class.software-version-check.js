@@ -17,11 +17,16 @@ class CSoftwareVersionCheck {
 
 	static URL = 'https://services.zabbix.com/updates/v1';
 	static TYPE = 'software_update_check';
+	static DELAY_ON_ERROR = 60; // 1 minute
 
 	#data = {};
 
 	constructor() {
-		this.#getSavedData();
+		this.#startUpdating(ZBX_SOFTWARE_VERSION_CHECK_DELAY);
+	}
+
+	#startUpdating(delay) {
+		setTimeout(() => this.#getSavedData(), delay * 1000);
 	}
 
 	#getSavedData() {
@@ -41,9 +46,10 @@ class CSoftwareVersionCheck {
 				}
 
 				if ('delay' in response) {
-					setTimeout(() => this.#getSavedData(), response.delay * 1000);
+					this.#startUpdating(response.delay);
 				}
 				else {
+					this.#data.versions = [];
 					this.#data.major_version = response.major_version;
 					this.#data.check_hash = response.check_hash;
 					this.#data._csrf_token = response._csrf_token;
@@ -53,6 +59,8 @@ class CSoftwareVersionCheck {
 			})
 			.catch(exception => {
 				console.log('Could not get data', exception);
+
+				this.#startUpdating(CSoftwareVersionCheck.DELAY_ON_ERROR);
 			});
 	}
 
@@ -70,6 +78,9 @@ class CSoftwareVersionCheck {
 					this.#data.versions = response.versions;
 				}
 			})
+			.catch(exception => {
+				console.log('Could not get data', exception);
+			})
 			.finally(() => {
 				this.#update();
 			});
@@ -80,26 +91,26 @@ class CSoftwareVersionCheck {
 
 		curl.setArgument('action', 'softwareversioncheck.update');
 
-		const data = {
-			versions: this.#data.versions || [],
-			_csrf_token: this.#data._csrf_token
-		};
-
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify({
+				versions: this.#data.versions,
+				_csrf_token: this.#data._csrf_token
+			})
 		})
 			.then(response => response.json())
 			.then(response => {
 				if ('error' in response) {
-					throw {error: response.error};
+					console.log('Could not update data', {error: response.error});
 				}
 
-				setTimeout(() => this.#getSavedData(), response.delay * 1000);
+				this.#startUpdating(response.delay);
 			})
 			.catch(exception => {
 				console.log('Could not update data', exception);
+
+				this.#startUpdating(CSoftwareVersionCheck.DELAY_ON_ERROR);
 			});
 	}
 }
