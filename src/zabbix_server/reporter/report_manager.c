@@ -2307,8 +2307,6 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 			zbx_ipc_client_release(client);
 	}
 
-	zbx_ipc_service_close(&manager.ipc);
-
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
