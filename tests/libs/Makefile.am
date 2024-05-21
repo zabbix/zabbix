@@ -8,7 +8,8 @@ SUBDIRS = \
 	zbxxml \
 	zbxparam \
 	zbxcfg \
-	zbxdbcache \
+	zbxcachevalue \
+	zbxcacheconfig \
 	zbxdbhigh \
 	zbxhistory \
 	zbxjson \
