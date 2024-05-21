@@ -558,8 +558,16 @@ typedef struct
 	/* linked jobs count */
 	int				jobs_num;
 
-	/* linked eventlog job */
-	zbx_vmware_job_t		*eventlog_job_ref;
+	/* linked jobs types */
+#define ZBX_VMWARE_REQ				(8*2)
+#define ZBX_VMWARE_REQ_UPDATE_CONF		(ZBX_VMWARE_UPDATE_CONF		<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	(ZBX_VMWARE_UPDATE_PERFCOUNTERS	<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		(ZBX_VMWARE_UPDATE_REST_TAGS	<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_REQ_UPDATE_EVENTLOG		(ZBX_VMWARE_UPDATE_EVENTLOG	<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_REQ_UPDATE_ALL										\
+					(ZBX_VMWARE_REQ_UPDATE_CONF | ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS |	\
+					ZBX_VMWARE_REQ_UPDATE_REST_TAGS | ZBX_VMWARE_REQ_UPDATE_EVENTLOG)
+	int				jobs_type;
 
 	/* vmware entity (vm, hv etc) and linked tags */
 	zbx_vmware_data_tags_t		data_tags;
@@ -574,8 +582,8 @@ struct zbx_vmware_job
 	time_t				ttl;
 #define ZBX_VMWARE_UPDATE_CONF		1
 #define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
-#define ZBX_VMWARE_UPDATE_REST_TAGS	3
-#define ZBX_VMWARE_UPDATE_EVENTLOG	4
+#define ZBX_VMWARE_UPDATE_REST_TAGS	4
+#define ZBX_VMWARE_UPDATE_EVENTLOG	8
 	int				type;
 	int				expired;
 	zbx_vmware_service_t		*service;

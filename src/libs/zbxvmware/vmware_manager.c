@@ -168,7 +168,9 @@ out:
 static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t time_now,
 		int cache_update_period, int perf_update_period)
 {
-#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
+#define ZBX_VMWARE_SERVICE_TTL			SEC_PER_HOUR
+#define ZBX_VMWARE_EVENTLOG_MIN_INTERVAL	5
+
 	zbx_binary_heap_elem_t	elem_new = {0, job};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queue:%d type:%s", __func__, vmw->jobs_queue.elems_num,
@@ -201,7 +203,8 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 				job->ttl = cache_update_period * 2;
 
 			job->nextcheck = time_now + (0 == job->service->eventlog.interval ? perf_update_period :
-					job->service->eventlog.interval);
+					(ZBX_VMWARE_EVENTLOG_MIN_INTERVAL > job->service->eventlog.interval ?
+					ZBX_VMWARE_EVENTLOG_MIN_INTERVAL : job->service->eventlog.interval));
 			break;
 	}
 
@@ -210,6 +213,8 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s nextcheck:%s", __func__, vmware_job_type_string(job),
 			zbx_time2str(job->nextcheck, NULL));
+
+#undef ZBX_VMWARE_EVENTLOG_MIN_INTERVAL
 #undef ZBX_VMWARE_SERVICE_TTL
 }
 

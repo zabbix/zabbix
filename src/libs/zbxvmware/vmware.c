@@ -2709,7 +2709,7 @@ static void	zbx_vmware_service_remove(zbx_vmware_service_t *service)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
+static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service);
 
 /*
  * Public API
@@ -2738,22 +2738,24 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 {
 	int			now;
 	zbx_vmware_service_t	*service = NULL;
+	zbx_vmware_t		*vmw = zbx_vmware_get_vmware();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, username, url);
 
-	if (NULL == vmware)
+	if (NULL == vmw)
 		goto out;
 
 	now = time(NULL);
 
-	for (int i = 0; i < vmware->services.values_num; i++)
+	for (int i = 0; i < vmw->services.values_num; i++)
 	{
-		service = (zbx_vmware_service_t *)vmware->services.values[i];
+		service = (zbx_vmware_service_t *)vmw->services.values[i];
 
 		if (0 == strcmp(service->url, url) && 0 == strcmp(service->username, username) &&
 				0 == strcmp(service->password, password))
 		{
 			service->lastaccess = now;
+			zbx_vmware_jobs_create(vmw, service);
 
 			/* return NULL if the service is not ready yet */
 			if (0 == (service->state & (ZBX_VMWARE_STATE_READY | ZBX_VMWARE_STATE_FAILED)))
@@ -2780,14 +2782,12 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->jobs_num = 0;
 	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;
+	service->jobs_type = ZBX_VMWARE_REQ_UPDATE_ALL;
 
 	vmware_shmem_service_hashset_create(service);
 
-	zbx_vector_vmware_service_ptr_append(&vmware->services, service);
-	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_CONF);
-	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_PERFCOUNTERS);
-	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_REST_TAGS);
-	zbx_vmware_eventlog_job_create(service);
+	zbx_vector_vmware_service_ptr_append(&vmw->services, service);
+	zbx_vmware_jobs_create(vmw, service);
 
 	/* new service does not have any data - return NULL */
 	service = NULL;
@@ -2986,7 +2986,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 	job->type = job_type;
 	job->service = service;
 	service->jobs_num++;
-	service->eventlog_job_ref = ZBX_VMWARE_UPDATE_EVENTLOG == job_type ? job : NULL;
+	service->jobs_type |= job_type;
 	job->expired = FAIL;
 	elem_new.data = job;
 	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
@@ -2994,15 +2994,27 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates job to update vmware event log data periodically and      *
- *          increase service ref counter                                      *
+ * Purpose: creates array of jobs to update vmware data periodically          *
  *                                                                            *
- * Parameters: service  - [IN] vmware service                                 *
+ * Parameters: vmw      - [IN] vmware object                                  *
+ *             service  - [IN] vmware service                                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service)
+static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service)
 {
-	zbx_vmware_job_create(zbx_vmware_get_vmware(), service, ZBX_VMWARE_UPDATE_EVENTLOG);
+	int	type = 0x1, jobs_type = service->jobs_type >> ZBX_VMWARE_REQ;
+
+	while (0 != jobs_type)
+	{
+		if (0 != (jobs_type & type))
+		{
+			zbx_vmware_job_create(vmw, service, type);
+			service->jobs_type &= ~ (type << ZBX_VMWARE_REQ);
+			jobs_type &= ~ type;
+		}
+
+		type <<= 0x1;
+	}
 }
 
 /******************************************************************************
@@ -3017,7 +3029,7 @@ void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service)
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 {
 	zbx_vmware_service_t	*service = job->service;
-	int			jobs_num;
+	int			jobs_num, job_type;
 
 	zbx_vmware_lock();
 
@@ -3025,9 +3037,10 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 	{
 		job->service->eventlog.lastaccess = 0;
 		job->service->eventlog.interval = 0;
-		job->service->eventlog_job_ref = NULL;
 	}
 
+	job_type = job->type;
+	job->service->jobs_type &= ~ job->type;
 	job->service->jobs_num--;
 	jobs_num = job->service->jobs_num;
 	vmware_shmem_vmware_job_free(job);
@@ -3036,7 +3049,7 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 	if (0 == jobs_num)
 		zbx_vmware_service_remove(service);
 
-	zabbix_log(LOG_LEVEL_WARNING, "%s() service jobs_num:%d", __func__, jobs_num);
+	zabbix_log(LOG_LEVEL_WARNING, "%s() service jobs_num:%d job_type:%X", __func__, jobs_num, job_type);
 
 	return 0 == jobs_num ? 1 : 0;
 }
