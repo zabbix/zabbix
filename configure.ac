@@ -1,25 +1,20 @@
 dnl
-dnl Zabbix
 dnl Copyright (C) 2001-2024 Zabbix SIA
 dnl
-dnl This program is free software; you can redistribute it and/or modify
-dnl it under the terms of the GNU General Public License as published by
-dnl the Free Software Foundation; either version 2 of the License, or
-dnl (at your option) any later version.
+dnl This program is free software: you can redistribute it and/or modify it under the terms of
+dnl the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 dnl
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-dnl GNU General Public License for more details.
+dnl This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+dnl without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+dnl See the GNU Affero General Public License for more details.
 dnl
-dnl You should have received a copy of the GNU General Public License
-dnl along with this program; if not, write to the Free Software
-dnl Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+dnl You should have received a copy of the GNU Affero General Public License along with this program.
+dnl If not, see <https://www.gnu.org/licenses/>.
 dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0beta3])
+AC_INIT([Zabbix],[7.0.0rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -2003,6 +1998,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
+	src/libs/zbxbincommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
@@ -2043,6 +2039,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxmedia/Makefile
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxmutexs/Makefile
+	src/libs/zbxpgservice/Makefile
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
@@ -2136,6 +2133,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/lld/Makefile
+	src/zabbix_server/pgmanager/Makefile
 	src/zabbix_server/operations/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile

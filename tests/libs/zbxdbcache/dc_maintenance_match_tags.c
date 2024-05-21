@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxmocktest.h"
@@ -67,7 +62,7 @@ static void	get_maintenance_tags(zbx_mock_handle_t handle, zbx_vector_ptr_t *tag
 	zbx_vector_ptr_sort(tags, dc_compare_maintenance_tags);
 }
 
-static void	get_tags(zbx_mock_handle_t handle, zbx_vector_tags_t *tags)
+static void	get_tags(zbx_mock_handle_t handle, zbx_vector_tags_ptr_t *tags)
 {
 	zbx_mock_error_t	mock_err;
 	zbx_mock_handle_t	htag;
@@ -83,10 +78,10 @@ static void	get_tags(zbx_mock_handle_t handle, zbx_vector_tags_t *tags)
 		tag->tag = zbx_strdup(NULL, key);
 		tag->value = zbx_strdup(NULL, value);
 
-		zbx_vector_tags_append(tags, tag);
+		zbx_vector_tags_ptr_append(tags, tag);
 	}
 
-	zbx_vector_tags_sort(tags, zbx_compare_tags);
+	zbx_vector_tags_ptr_sort(tags, zbx_compare_tags);
 }
 
 static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
@@ -107,13 +102,13 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_vector_tags_t	tags;
+	zbx_vector_tags_ptr_t	tags;
 	zbx_dc_maintenance_t	maintenance;
 	int			returned_ret, expected_ret;
 
 	ZBX_UNUSED(state);
 
-	zbx_vector_tags_create(&tags);
+	zbx_vector_tags_ptr_create(&tags);
 	zbx_vector_ptr_create(&maintenance.tags);
 
 	get_maintenance(&maintenance);
@@ -127,6 +122,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_ptr_clear_ext(&maintenance.tags, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&maintenance.tags);
 
-	zbx_vector_tags_clear_ext(&tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&tags);
+	zbx_vector_tags_ptr_clear_ext(&tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&tags);
 }

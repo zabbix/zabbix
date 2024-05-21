@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_ZBXCOMMS_H
@@ -252,6 +247,7 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
 
 void	zbx_socket_clean(zbx_socket_t *s);
+char	*zbx_socket_detach_buffer(zbx_socket_t *s);
 int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout);
 
@@ -442,6 +438,7 @@ void	zbx_tls_version(void);
 #endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 typedef struct
 {
+	unsigned int	connection_type;
 	const char	*psk_identity;
 	size_t		psk_identity_len;
 	char		issuer[HOST_TLS_ISSUER_LEN_MAX];
@@ -452,12 +449,28 @@ zbx_tls_conn_attr_t;
 int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char **error);
-int		zbx_tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *attr, const char *tls_issuer,
-				const char *tls_subject, const char *tls_psk_identity, const char **msg);
+int		zbx_tls_validate_attr(const zbx_tls_conn_attr_t *attr, const char *tls_issuer, const char *tls_subject,
+				const char *tls_psk_identity, const char **msg);
 int		zbx_check_server_issuer_subject(const zbx_socket_t *sock, const char *allowed_issuer,
 				const char *allowed_subject, char **error);
 unsigned int	zbx_tls_get_psk_usage(void);
 
 /* TLS BLOCK END */
+
+#define ZBX_REDIRECT_ADDRESS_LEN	255
+#define ZBX_REDIRECT_ADDRESS_LEN_MAX	(ZBX_REDIRECT_ADDRESS_LEN + 1)
+
+#define ZBX_REDIRECT_NONE		0
+#define ZBX_REDIRECT_RESET		1
+#define ZBX_REDIRECT_RETRY		2
+
+typedef struct
+{
+	char		address[ZBX_REDIRECT_ADDRESS_LEN_MAX];
+	zbx_uint64_t	revision;
+	unsigned char	reset;
+}
+zbx_comms_redirect_t;
+
 
 #endif /* ZABBIX_ZBXCOMMS_H */

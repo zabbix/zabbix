@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -28,7 +23,13 @@ $form = (new CForm('GET', 'history.php'))
 	->setName('items')
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 
-$table = (new CTableInfo())->addClass(ZBX_STYLE_LIST_TABLE_FIXED);
+$table = (new CTableInfo())
+	->addClass(ZBX_STYLE_LIST_TABLE_FIXED)
+	->setPageNavigation($data['paging']);
+
+if (!$data['mandatory_filter_set'] && !$data['subfilter_set']) {
+	$table->setNoDataMessage(_('Filter is not set'), _('Use the filter to display results'), ZBX_ICON_FILTER_LARGE);
+}
 
 // Latest data header.
 $col_check_all = new CColHeader(
@@ -340,6 +341,6 @@ $button_list = [
 	]
 ];
 
-$form->addItem([$table, $data['paging'], new CActionButtonList('graphtype', 'itemids', $button_list, 'latest')]);
+$form->addItem([$table, new CActionButtonList('graphtype', 'itemids', $button_list, 'latest')]);
 
 echo $form;

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "taskmanager_proxy.h"
@@ -57,6 +52,7 @@
  *             config_ssh_key_location       - [IN]                                   *
  *             config_enable_remote_commands - [IN]                                   *
  *             config_log_remote_commands    - [IN]                                   *
+ *             config_enable_global_scripts  - [IN]                                   *
  *             get_config_forks              - [IN]                                   *
  *             program_type                  - [IN]                                   *
  *                                                                                    *
@@ -66,7 +62,7 @@
  **************************************************************************************/
 static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, time_t now, int config_timeout,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssh_key_location,
-		int config_enable_remote_commands, int config_log_remote_commands,
+		int config_enable_remote_commands, int config_log_remote_commands, int config_enable_global_scripts,
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type)
 {
 	zbx_db_row_t	row;
@@ -148,8 +144,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	}
 
 	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, config_trapper_timeout,
-			config_source_ip, config_ssh_key_location, get_config_forks, program_type, 0 == alertid ?
-			&info : NULL, error, sizeof(error), NULL)))
+			config_source_ip, config_ssh_key_location, config_enable_global_scripts, get_config_forks,
+			program_type, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	}
@@ -243,7 +239,8 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 static int	tm_execute_data_json(int type, const char *data, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
-		int config_java_gateway_port, const char *config_externalscripts, const char *config_ssh_key_location)
+		int config_java_gateway_port, const char *config_externalscripts, const char *config_ssh_key_location,
+		const char *config_webdriver_url)
 {
 	struct zbx_json_parse	jp_data;
 
@@ -259,7 +256,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
 			return zbx_trapper_item_test_run(&jp_data, 0, info, config_comms,
 					config_startup_time, program_type, progname, get_config_forks,
 					config_java_gateway, config_java_gateway_port, config_externalscripts,
-					zbx_get_value_internal_ext_proxy, config_ssh_key_location);
+					zbx_get_value_internal_ext_proxy, config_ssh_key_location, config_webdriver_url);
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			return zbx_diag_get_info(&jp_data, info);
 	}
@@ -282,7 +279,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 		const zbx_config_comms_args_t *config_comms, int config_startup_time,
 		unsigned char program_type, const char *progname, zbx_get_config_forks_f get_config_forks,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
-		const char *config_ssh_key_location)
+		const char *config_ssh_key_location, const char *config_webdriver_url)
 {
 	zbx_db_row_t		row;
 	zbx_tm_task_t		*task = NULL;
@@ -316,7 +313,8 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			ret = tm_execute_data_json(data_type, row[1], &info, config_comms, config_startup_time,
 					program_type, progname, get_config_forks, config_java_gateway,
-					config_java_gateway_port, config_externalscripts, config_ssh_key_location);
+					config_java_gateway_port, config_externalscripts, config_ssh_key_location,
+					config_webdriver_url);
 			break;
 		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
@@ -359,7 +357,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands,
 		unsigned char program_type, const char *progname, zbx_get_config_forks_f get_config_forks,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
-		const char *config_ssh_key_location)
+		int config_enable_global_scripts, const char *config_ssh_key_location, const char *config_webdriver_url)
 {
 	zbx_db_row_t		row;
 	int			processed_num = 0, clock, ttl;
@@ -390,7 +388,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 						config_comms->config_timeout, config_comms->config_trapper_timeout,
 						config_comms->config_source_ip, config_ssh_key_location,
 						config_enable_remote_commands, config_log_remote_commands,
-						get_config_forks, program_type))
+						config_enable_global_scripts, get_config_forks, program_type))
 				{
 					processed_num++;
 				}
@@ -402,7 +400,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now, config_comms,
 						config_startup_time, program_type, progname, get_config_forks,
 						config_java_gateway, config_java_gateway_port, config_externalscripts,
-						config_ssh_key_location))
+						config_ssh_key_location, config_webdriver_url))
 				{
 					processed_num++;
 				}
@@ -544,7 +542,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				taskmanager_args_in->config_java_gateway,
 				taskmanager_args_in->config_java_gateway_port,
 				taskmanager_args_in->config_externalscripts,
-				taskmanager_args_in->config_ssh_key_location);
+				taskmanager_args_in->config_enable_global_scripts,
+				taskmanager_args_in->config_ssh_key_location,
+				taskmanager_args_in->config_webdriver_url);
 
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{

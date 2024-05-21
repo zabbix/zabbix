@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -26,6 +21,8 @@ use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup globalmacro, config
+ *
+ * @dataSource GlobalMacros
  */
 class testFormMacrosAdministrationGeneral extends testFormMacros {
 
@@ -893,21 +890,10 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	}
 
 	/**
-	 * Check vault macros validation after changing vault type.
+	 * Check vault macros validation after changing vault type. Works only for CyberArk. Right now, there is almost NO
+	 * incorrect validation for HashiCorp.
 	 */
 	public function testFormMacrosAdministrationGeneral_checkVaultValidation() {
-		$cyberark = [
-			'fields' =>
-				[
-				'macro' => '{$VAULT}',
-				'value' => [
-					'text' => 'AppID=zabbix:key',
-					'type' => 'Vault secret'
-				],
-				'description' => 'CyberArk vault description'
-			],
-			'error' => 'Invalid parameter "/1/value": incorrect syntax near "AppID=zabbix:key".'
-		];
 		$hashicorp = [
 			'fields' =>
 				[
@@ -922,34 +908,32 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		];
 
 		$this->page->login();
-		for ($i=0; $i<=1; $i++) {
-			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 
-			// Check in setting what Vault is enabled.
-			$setting_form = $this->query('name:otherForm')->asForm()->one();
-			$vault = $setting_form->getField('Vault provider')->getText();
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
 
-			// Try to create macros with Vault type different from settings.
-			$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
-			$vault_values = ($vault === 'CyberArk Vault') ? $hashicorp : $cyberark;
-			$this->fillMacros([$vault_values['fields']]);
-			$this->query('button:Update')->one()->click();
-			$this->assertMessage(TEST_BAD, 'Cannot update macros', $vault_values['error']);
+		// Check in setting what Vault is enabled.
+		$setting_form = $this->query('name:otherForm')->asForm()->one();
+		$setting_form->fill(['Vault provider' => 'CyberArk Vault']);
+		$setting_form->submit();
 
-			// Change Vault in settings to correct one and create macros with this Vault.
-			$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
-			$vault_settings = ($vault === 'CyberArk Vault') ? 'HashiCorp Vault' : 'CyberArk Vault';
-			$setting_form->fill(['Vault provider' => $vault_settings])->submit();
-			$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
-			$this->fillMacros([$vault_values['fields']]);
-			$this->query('button:Update')->one()->click();
-			$this->assertMessage(TEST_GOOD, 'Macros updated');
+		// Try to create macros with Vault type different from settings.
+		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
+		$this->fillMacros([$hashicorp['fields']]);
+		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_BAD, 'Cannot update macros', $hashicorp['error']);
 
-			// Remove created macros.
-			$this->removeMacro([$vault_values['fields']]);
-			$this->query('button:Update')->one()->click();
-			$this->page->acceptAlert();
-			$this->assertMessage(TEST_GOOD, 'Macros updated');
-		}
+		// Change Vault in settings to correct one and create macros with this Vault.
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$setting_form->fill(['Vault provider'=> 'HashiCorp Vault'])->submit();
+		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();
+		$this->fillMacros([$hashicorp['fields']]);
+		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
+
+		// Remove created macros.
+		$this->removeMacro([$hashicorp['fields']]);
+		$this->query('button:Update')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 	}
 }

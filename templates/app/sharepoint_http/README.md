@@ -49,18 +49,18 @@ It is recommended to fill in the values of the filter macros to avoid getting re
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Sharepoint: Get directory structure|<p>Used to get directory structure information</p>|Script|sharepoint.get_dir<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"status":520,"data":{},"time":0}`</p></li></ul>|
-|Sharepoint: Get directory structure: Status|<p>HTTP response (status) code. Indicates whether the HTTP request was successfully completed. Additional information is available in the server log file.</p>|Dependent item|sharepoint.get_dir.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set error to: `DISCARD_VALUE`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Sharepoint: Get directory structure: Exec time|<p>The time taken to execute the script for obtaining the data structure (in ms). Less is better.</p>|Dependent item|sharepoint.get_dir.time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.time`</p><p>⛔️Custom on fail: Set error to: `DISCARD_VALUE`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Sharepoint: Health score|<p>This item specifies a value between 0 and 10, where 0 represents a low load and a high ability to process requests and 10 represents a high load and that the server is throttling requests to maintain adequate throughput.</p>|HTTP agent|sharepoint.health_score<p>**Preprocessing**</p><ul><li><p>Regular expression: `X-SharePointHealthScore\b:\s(\d+) \1`</p></li><li><p>In range: `0 -> 10`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get directory structure|<p>Used to get directory structure information</p>|Script|sharepoint.get_dir<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `{"status":520,"data":{},"time":0}`</p></li></ul>|
+|Get directory structure: Status|<p>HTTP response (status) code. Indicates whether the HTTP request was successfully completed. Additional information is available in the server log file.</p>|Dependent item|sharepoint.get_dir.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set error to: `DISCARD_VALUE`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get directory structure: Exec time|<p>The time taken to execute the script for obtaining the data structure (in ms). Less is better.</p>|Dependent item|sharepoint.get_dir.time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.time`</p><p>⛔️Custom on fail: Set error to: `DISCARD_VALUE`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Health score|<p>This item specifies a value between 0 and 10, where 0 represents a low load and a high ability to process requests and 10 represents a high load and that the server is throttling requests to maintain adequate throughput.</p>|HTTP agent|sharepoint.health_score<p>**Preprocessing**</p><ul><li><p>Regular expression: `X-SharePointHealthScore\b:\s(\d+) \1`</p></li><li><p>In range: `0 -> 10`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Sharepoint: Error getting directory structure.|<p>Error getting directory structure. Check the Zabbix server log for more details.</p>|`last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.status)<>200`|Warning|**Manual close**: Yes|
-|Sharepoint: Server responds slowly to API request||`last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.time)>2000`|Warning|**Manual close**: Yes|
-|Sharepoint: Bad health score||`last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALTH_SCORE}"`|Average||
+|Error getting directory structure.|<p>Error getting directory structure. Check the Zabbix server log for more details.</p>|`last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.status)<>200`|Warning|**Manual close**: Yes|
+|Server responds slowly to API request||`last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.time)>2000`|Warning|**Manual close**: Yes|
+|Bad health score||`last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALTH_SCORE}"`|Average||
 
 ### LLD rule Directory discovery
 
@@ -72,15 +72,15 @@ It is recommended to fill in the values of the filter macros to avoid getting re
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Sharepoint: Size ({#SHAREPOINT.LLD.FULL_PATH})|<p>Size of:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p>|Dependent item|sharepoint.size["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `{{#SHAREPOINT.LLD.JSON_PATH}.regsub("(.*)", \1)}.meta.size`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `24h`</p></li></ul>|
-|Sharepoint: Modified ({#SHAREPOINT.LLD.FULL_PATH})|<p>Date of change:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p>|Dependent item|sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Sharepoint: Created ({#SHAREPOINT.LLD.FULL_PATH})|<p>Date of creation:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p>|Dependent item|sharepoint.created["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Size ({#SHAREPOINT.LLD.FULL_PATH})|<p>Size of:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p>|Dependent item|sharepoint.size["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `{{#SHAREPOINT.LLD.JSON_PATH}.regsub("(.*)", \1)}.meta.size`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `24h`</p></li></ul>|
+|Modified ({#SHAREPOINT.LLD.FULL_PATH})|<p>Date of change:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p>|Dependent item|sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Created ({#SHAREPOINT.LLD.FULL_PATH})|<p>Date of creation:</p><p>{#SHAREPOINT.LLD.FULL_PATH}</p>|Dependent item|sharepoint.created["{#SHAREPOINT.LLD.FULL_PATH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Directory discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Sharepoint: Sharepoint object is changed|<p>Updated date of modification of folder / file</p>|`last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#1)<>last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#2)`|Info|**Manual close**: Yes|
+|Sharepoint object is changed|<p>Updated date of modification of folder / file</p>|`last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#1)<>last(/Microsoft SharePoint by HTTP/sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"],#2)`|Info|**Manual close**: Yes|
 
 ## Feedback
 

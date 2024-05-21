@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -53,6 +48,10 @@ class CXmlConstantValue {
 	const SNMP = INTERFACE_TYPE_SNMP;
 	const IPMI = INTERFACE_TYPE_IPMI;
 	const JMX = INTERFACE_TYPE_JMX;
+
+	const SERVER = ZBX_MONITORED_BY_SERVER;
+	const PROXY = ZBX_MONITORED_BY_PROXY;
+	const PROXY_GROUP = ZBX_MONITORED_BY_PROXY_GROUP;
 
 	const INV_MODE_DISABLED = HOST_INVENTORY_DISABLED; // Duplicate.
 	const INV_MODE_MANUAL = HOST_INVENTORY_MANUAL;
@@ -235,6 +234,7 @@ class CXmlConstantValue {
 	const ITEM_TYPE_HTTP_AGENT = ITEM_TYPE_HTTPAGENT;
 	const ITEM_TYPE_SNMP = ITEM_TYPE_SNMP;
 	const ITEM_TYPE_SCRIPT = ITEM_TYPE_SCRIPT;
+	const ITEM_TYPE_BROWSER = ITEM_TYPE_BROWSER;
 
 	const SNMP_V1 = SNMP_V1;
 	const SNMP_V2 = SNMP_V2C;
@@ -313,8 +313,8 @@ class CXmlConstantValue {
 	const SMTP_AUTHENTICATION_NONE = SMTP_AUTHENTICATION_NONE;
 	const SMTP_AUTHENTICATION_PASSWORD = SMTP_AUTHENTICATION_NORMAL;
 
-	const CONTENT_TYPE_TEXT = SMTP_MESSAGE_FORMAT_PLAIN_TEXT;
-	const CONTENT_TYPE_HTML = SMTP_MESSAGE_FORMAT_HTML;
+	const MESSAGE_FORMAT_TEXT = ZBX_MEDIA_MESSAGE_FORMAT_TEXT;
+	const MESSAGE_FORMAT_HTML = ZBX_MEDIA_MESSAGE_FORMAT_HTML;
 
 	const EVENT_SOURCE_TRIGGERS = EVENT_SOURCE_TRIGGERS;
 	const EVENT_SOURCE_DISCOVERY = EVENT_SOURCE_DISCOVERY;
@@ -375,7 +375,7 @@ class CXmlConstantValue {
 	const DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC = WIDGET_GRAPH;
 	const DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE = WIDGET_GRAPH_PROTOTYPE;
 	const DASHBOARD_WIDGET_TYPE_ITEM = WIDGET_ITEM;
-	const DASHBOARD_WIDGET_TYPE_PLAIN_TEXT = WIDGET_PLAIN_TEXT;
+	const DASHBOARD_WIDGET_TYPE_PLAIN_TEXT = WIDGET_ITEM_HISTORY;
 	const DASHBOARD_WIDGET_TYPE_URL = WIDGET_URL;
 
 	// Dashboard field types.

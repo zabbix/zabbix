@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -60,11 +55,13 @@ class CControllerPopupProxyEdit extends CController {
 
 		if ($this->hasInput('proxyid')) {
 			$db_proxies = API::Proxy()->get([
-				'output' => ['name', 'operating_mode', 'allowed_addresses', 'description', 'tls_connect', 'tls_accept',
-					'tls_issuer', 'tls_subject', 'address', 'port', 'custom_timeouts', 'timeout_zabbix_agent',
-					'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'compatibility'
+				'output' => ['proxyid', 'name', 'proxy_groupid', 'local_address', 'local_port', 'operating_mode',
+					'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
+					'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
+					'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
+					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'compatibility'
 				],
+				'selectProxyGroup' => ['name'],
 				'proxyids' => $this->getInput('proxyid'),
 				'editable' => true
 			]);
@@ -82,11 +79,16 @@ class CControllerPopupProxyEdit extends CController {
 	protected function doAction(): void {
 		if ($this->proxy !== null) {
 			$data = [
-				'proxyid' => $this->getInput('proxyid'),
+				'proxyid' => $this->proxy['proxyid'],
+				'ms_proxy_group' => $this->proxy['proxyGroup']
+					? [['id' => $this->proxy['proxy_groupid'], 'name' => $this->proxy['proxyGroup']['name']]]
+					: [],
 				'version_mismatch' => $this->proxy['compatibility'] == ZBX_PROXY_VERSION_OUTDATED
 					|| $this->proxy['compatibility'] == ZBX_PROXY_VERSION_UNSUPPORTED,
 				'form' => [
 					'name' => $this->proxy['name'],
+					'local_address' => $this->proxy['local_address'],
+					'local_port' => $this->proxy['local_port'],
 					'operating_mode' => (int) $this->proxy['operating_mode'],
 					'address' => $this->proxy['operating_mode'] == PROXY_OPERATING_MODE_PASSIVE
 						? $this->proxy['address']
@@ -116,7 +118,8 @@ class CControllerPopupProxyEdit extends CController {
 					'timeout_http_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_HTTP_AGENT),
 					'timeout_ssh_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SSH_AGENT),
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
-					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
+					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
+					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
 				]
 				: [
 					'timeout_zabbix_agent' => $this->proxy['timeout_zabbix_agent'],
@@ -127,15 +130,19 @@ class CControllerPopupProxyEdit extends CController {
 					'timeout_http_agent' => $this->proxy['timeout_http_agent'],
 					'timeout_ssh_agent' => $this->proxy['timeout_ssh_agent'],
 					'timeout_telnet_agent' => $this->proxy['timeout_telnet_agent'],
-					'timeout_script' => $this->proxy['timeout_script']
+					'timeout_script' => $this->proxy['timeout_script'],
+					'timeout_browser' => $this->proxy['timeout_browser']
 				];
 		}
 		else {
 			$data = [
 				'proxyid' => null,
+				'ms_proxy_group' => [],
 				'version_mismatch' => false,
 				'form' => [
 					'name' => DB::getDefault('proxy', 'name'),
+					'local_address' => DB::getDefault('proxy', 'local_address'),
+					'local_port' => DB::getDefault('proxy', 'local_port'),
 					'operating_mode' => (int) DB::getDefault('proxy', 'operating_mode'),
 					'allowed_addresses' => DB::getDefault('proxy', 'allowed_addresses'),
 					'address' => DB::getDefault('proxy', 'address'),
@@ -156,7 +163,8 @@ class CControllerPopupProxyEdit extends CController {
 					'timeout_http_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_HTTP_AGENT),
 					'timeout_ssh_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SSH_AGENT),
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
-					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
+					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
+					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
 				]
 			];
 		}

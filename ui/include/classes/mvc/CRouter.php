@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -234,6 +229,7 @@ class CRouter {
 		'popup.mediatypemapping.check'				=> ['CControllerPopupMediaTypeMappingCheck',			'layout.json',			null],
 		'popup.mediatypemapping.edit'				=> ['CControllerPopupMediaTypeMappingEdit',				'layout.json',			'popup.mediatypemapping.edit'],
 		'popup.proxy.edit'							=> ['CControllerPopupProxyEdit',						'layout.json',			'popup.proxy.edit'],
+		'popup.proxygroup.edit'						=> ['CControllerPopupProxyGroupEdit',					'layout.json',			'popup.proxygroup.edit'],
 		'popup.usergroupmapping.check'				=> ['CControllerPopupUserGroupMappingCheck',			'layout.json',			null],
 		'popup.usergroupmapping.edit'				=> ['CControllerPopupUserGroupMappingEdit',				'layout.json',			'popup.usergroupmapping.edit'],
 		'popup.scheduledreport.create'				=> ['CControllerPopupScheduledReportCreate',			'layout.json',			null],
@@ -268,6 +264,10 @@ class CRouter {
 		'proxy.host.enable'							=> ['CControllerProxyHostEnable',						'layout.json',			null],
 		'proxy.list'								=> ['CControllerProxyList',								'layout.htmlpage',		'administration.proxy.list'],
 		'proxy.update'								=> ['CControllerProxyUpdate',							'layout.json',			null],
+		'proxygroup.create'							=> ['CControllerProxyGroupCreate',						'layout.json',			null],
+		'proxygroup.delete'							=> ['CControllerProxyGroupDelete',						'layout.json',			null],
+		'proxygroup.list'							=> ['CControllerProxyGroupList',						'layout.htmlpage',		'administration.proxygroup.list'],
+		'proxygroup.update'							=> ['CControllerProxyGroupUpdate',						'layout.json',			null],
 		'queue.details'								=> ['CControllerQueueDetails',							'layout.htmlpage',		'administration.queue.details'],
 		'queue.overview'							=> ['CControllerQueueOverview',							'layout.htmlpage',		'administration.queue.overview'],
 		'queue.overview.proxy'						=> ['CControllerQueueOverviewProxy',					'layout.htmlpage',		'administration.queue.overview.proxy'],
@@ -309,6 +309,8 @@ class CRouter {
 		'sla.list'									=> ['CControllerSlaList',								'layout.htmlpage',		'sla.list'],
 		'sla.update'								=> ['CControllerSlaUpdate',								'layout.json',			null],
 		'slareport.list'							=> ['CControllerSlaReportList',							'layout.htmlpage',		'slareport.list'],
+		'softwareversioncheck.get'					=> ['CControllerSoftwareVersionCheckGet',				'layout.json',			null],
+		'softwareversioncheck.update'				=> ['CControllerSoftwareVersionCheckUpdate',			'layout.json',			null],
 		'system.warning'							=> ['CControllerSystemWarning',							'layout.warning',		'system.warning'],
 		'tabfilter.profile.update'					=> ['CControllerTabFilterProfileUpdate',				'layout.json',			null],
 		'template.create'							=> ['CControllerTemplateCreate',						'layout.json',			null],
@@ -384,6 +386,7 @@ class CRouter {
 		'web.view'									=> ['CControllerWebView',								'layout.htmlpage',		'monitoring.web.view'],
 		'webscenario.step.check'					=> ['CControllerWebScenarioStepCheck',					'layout.json',			null],
 		'webscenario.step.edit'						=> ['CControllerWebScenarioStepEdit',					'layout.json',			'webscenario.step.edit'],
+		'widget.navigation.tree.toggle'				=> ['CControllerWidgetNavigationTreeToggle',			'layout.json',			null],
 
 		// legacy actions
 		'auditacts.php'					=> ['CLegacyAction', null, null],

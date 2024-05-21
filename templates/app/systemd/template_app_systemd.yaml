@@ -299,7 +299,7 @@ zabbix_export:
             - name: Services
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '20'
                   fields:
                     - type: ITEM_PROTOTYPE
@@ -319,7 +319,7 @@ zabbix_export:
             - name: Sockets
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '20'
                   fields:
                     - type: ITEM_PROTOTYPE

@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -35,10 +30,16 @@ class CSystemInfoHelper {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
+			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
+			'is_software_update_check_enabled' => CSettingsHelper::isSoftwareUpdateCheckEnabled(),
 			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
 			'failover_delay' => 0
 		];
+
+		if ($data['is_software_update_check_enabled']) {
+			$data['software_update_check_data'] = static::getSoftwareUpdateCheckData();
+		}
 
 		$db_backend = DB::getDbBackend();
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
@@ -274,5 +275,53 @@ class CSystemInfoHelper {
 		$status['server_version'] = $server_status['server stats']['version'];
 
 		return $status;
+	}
+
+	private static function getSoftwareUpdateCheckData(): array {
+		$check_data = CSettingsHelper::getSoftwareUpdateCheckData();
+
+		if (!$check_data) {
+			return [];
+		}
+
+		$data = [
+			'lastcheck' => $check_data['lastcheck']
+		];
+
+		if (!$check_data['versions']) {
+			return $data;
+		}
+
+		CArrayHelper::sort($check_data['versions'], [['field' => 'version', 'order' => ZBX_SORT_DOWN]]);
+
+		$latest_release = null;
+		$is_lts_version = explode('.', ZABBIX_EXPORT_VERSION)[1] === '0';
+
+		foreach ($check_data['versions'] as $version) {
+			if (version_compare($version['version'], ZABBIX_EXPORT_VERSION, '<')) {
+				break;
+			}
+
+			if ($version['version'] === ZABBIX_EXPORT_VERSION) {
+				if (!$version['end_of_full_support']) {
+					$data['end_of_full_support'] = $version['end_of_full_support'];
+					$data['latest_release'] = $version['latest_release']['release'];
+				}
+				elseif ($latest_release !== null) {
+					$data['end_of_full_support'] = $version['end_of_full_support'];
+					$data['latest_release'] = $latest_release;
+				}
+
+				break;
+			}
+
+			if ($latest_release === null && !$version['end_of_full_support']) {
+				if (!$is_lts_version || explode('.', $version['version'])[1] === '0') {
+					$latest_release = $version['latest_release']['release'];
+				}
+			}
+		}
+
+		return $data;
 	}
 }

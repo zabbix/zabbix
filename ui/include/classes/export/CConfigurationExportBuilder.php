@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -333,7 +328,9 @@ class CConfigurationExportBuilder {
 				'host' => $host['host'],
 				'name' => $host['name'],
 				'description' => $host['description'],
+				'monitored_by' => $host['monitored_by'],
 				'proxy' => $host['proxy'],
+				'proxy_group' => $host['proxy_group'],
 				'status' => $host['status'],
 				'ipmi_authtype' => $host['ipmi_authtype'],
 				'ipmi_privilege' => $host['ipmi_privilege'],
@@ -450,7 +447,7 @@ class CConfigurationExportBuilder {
 				'smtp_authentication' => $media_type['smtp_authentication'],
 				'username' => $media_type['username'],
 				'password' => $media_type['passwd'],
-				'content_type' => $media_type['content_type'],
+				'message_format' => $media_type['message_format'],
 				'script_name' => $media_type['exec_path'],
 				'parameters' => self::formatMediaTypeParameters($media_type),
 				'gsm_modem' => $media_type['gsm_modem'],
@@ -636,7 +633,7 @@ class CConfigurationExportBuilder {
 				'password' => $discoveryRule['password'],
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
-				'filter' => self::formatLldFilter($discoveryRule['filter']),
+				'filter' => $discoveryRule['filter'],
 				'lifetime_type' => $discoveryRule['lifetime_type'],
 				'lifetime' => $discoveryRule['lifetime'],
 				'enabled_lifetime_type' => $discoveryRule['enabled_lifetime_type'],
@@ -689,19 +686,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format the LLD filter.
-	 *
-	 * @param array $filter
-	 *
-	 * @return array
-	 */
-	private static function formatLldFilter(array $filter): array {
-		$filter['conditions'] = sortLldRuleFilterConditions($filter['conditions'], $filter['evaltype']);
-
-		return $filter;
-	}
-
-	/**
 	 * Format the LLD macro paths.
 	 *
 	 * @param array $lld_macro_paths
@@ -726,8 +710,6 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($overrides, ['step']);
 
 		foreach ($overrides as &$override) {
-			$override['filter'] = self::formatLldFilter($override['filter']);
-
 			unset($override['filter']['eval_formula']);
 
 			if (!$override['filter']['conditions']) {

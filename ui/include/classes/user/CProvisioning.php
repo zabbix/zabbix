@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -73,7 +68,9 @@ class CProvisioning {
 				'group_filter', 'group_membership'
 			],
 			'userdirectoryids' => [$userdirectoryid],
-			'selectProvisionMedia' => ['name', 'mediatypeid', 'attribute'],
+			'selectProvisionMedia' => ['userdirectory_mediaid', 'mediatypeid', 'name', 'attribute', 'active',
+				'severity', 'period'
+			],
 			'selectProvisionGroups' => ['name', 'roleid', 'user_groups']
 		]);
 		$userdirectory = reset($userdirectories);
@@ -212,14 +209,43 @@ class CProvisioning {
 	}
 
 	/**
+	 * Get userdirectory media mappings defined for attributes in $idp_attrs.
+	 *
+	 * @param array $idp_attrs       Array of strings with attributes names from IdP.
+	 * @param bool  $case_sensitive  How IdP attributes should be matched.
+	 *
+	 * @return array
+	 */
+	public function getUserMediaMappingByAttribute(array $idp_attrs, bool $case_sensitive = true): array {
+		$mappings = [];
+
+		if (!$case_sensitive) {
+			$idp_attrs += array_flip(array_map('strtolower', array_keys($idp_attrs)));
+		}
+
+		foreach ($this->userdirectory['provision_media'] as $provision_media) {
+			if (array_key_exists($provision_media['attribute'], $idp_attrs)) {
+				$mappings[$provision_media['userdirectory_mediaid']] = $provision_media;
+			}
+		}
+
+		return $mappings;
+	}
+
+	/**
 	 * Return array with user media created from matched provision_media on external user data attributes.
 	 *
 	 * @param array $idp_user        User data from external source, LDAP/SAML.
 	 * @param bool  $case_sensitive  How IdP attributes should be matched.
 	 *
-	 * @return array
+	 * @return array of medias, media properties
+	 *         []['name']
 	 *         []['mediatypeid']
 	 *         []['sendto']
+	 *         []['active']
+	 *         []['severity']
+	 *         []['period']
+	 *         []['userdirectory_mediaid']
 	 */
 	public function getUserMedias(array $idp_user, bool $case_sensitive = true): array {
 		$user_medias = [];
@@ -238,7 +264,11 @@ class CProvisioning {
 				$user_medias[] = [
 					'name' => $idp_attributes['name'],
 					'mediatypeid' => $idp_attributes['mediatypeid'],
-					'sendto' =>	[$idp_user[$idp_field]]
+					'sendto' =>	[$idp_user[$idp_field]],
+					'active' => $idp_attributes['active'],
+					'severity' => $idp_attributes['severity'],
+					'period' => $idp_attributes['period'],
+					'userdirectory_mediaid' => $idp_attributes['userdirectory_mediaid']
 				];
 
 				continue;
@@ -250,7 +280,11 @@ class CProvisioning {
 				$user_medias[] = [
 					'name' => $idp_attributes['name'],
 					'mediatypeid' => $idp_attributes['mediatypeid'],
-					'sendto' =>	[$idp_user_lowercased[$idp_field]]
+					'sendto' =>	[$idp_user_lowercased[$idp_field]],
+					'active' => $idp_attributes['active'],
+					'severity' => $idp_attributes['severity'],
+					'period' => $idp_attributes['period'],
+					'userdirectory_mediaid' => $idp_attributes['userdirectory_mediaid']
 				];
 			}
 		}

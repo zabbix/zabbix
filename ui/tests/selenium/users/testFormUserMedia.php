@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -58,6 +53,35 @@ class testFormUserMedia extends CWebTest {
 				]
 			]);
 		}
+
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 1,
+				'medias' => [
+					[
+						'mediatypeid' => 1, // Email.
+						'sendto' => ['test@zabbix.com'],
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 63,
+						'period' => '1-7,00:00-24:00'
+					],
+					[
+						'mediatypeid' => 1, // Email.
+						'sendto' => ['test2@zabbix.com'],
+						'active' => MEDIA_TYPE_STATUS_DISABLED,
+						'severity' => 63,
+						'period' => '1-7,00:00-24:00'
+					],
+					[
+						'mediatypeid' => 10, // Discord.
+						'sendto' => 'user@test.domain1.com',
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 16,
+						'period' => '1-7,00:00-24:00'
+					]
+				]
+			]
+		]);
 	}
 
 	public function getMediaData() {
@@ -702,7 +726,7 @@ class testFormUserMedia extends CWebTest {
 		// Check the value of the "Send to" field.
 		if (array_key_exists('emails', $data)) {
 			$row->getColumn('Send to')->hoverMouse();
-			$get_send_to = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one()->getText();
+			$get_send_to = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one()->getText();
 
 			$media_emails = [];
 			foreach ($data['emails'] as $email) {

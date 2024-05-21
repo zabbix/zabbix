@@ -28,7 +28,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 87224dc0114446689f0fcfc4f0f83c17
-          name: 'Veeam: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: veeam.get.errors
           delay: '0'
@@ -52,7 +52,7 @@ zabbix_export:
           triggers:
             - uuid: 3487d31a2aa540009f006c6a4eff8c79
               expression: 'length(last(/Veeam Backup and Replication by HTTP/veeam.get.errors))>0'
-              name: 'Veeam: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -60,7 +60,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: f8ef587e6d204e7da6e27e56b1131ca4
-          name: 'Veeam: Get metrics'
+          name: 'Get metrics'
           type: SCRIPT
           key: veeam.get.metrics
           delay: 5m
@@ -217,7 +217,7 @@ zabbix_export:
           description: 'Discovery of the jobs states.'
           item_prototypes:
             - uuid: 120a6bf888e74e0c9b054c3bdd50473f
-              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Last result'
+              name: 'Job states [{#NAME}] [{#TYPE}]: Last result'
               type: DEPENDENT
               key: 'veeam.jobs.last.result[{#ID}]'
               delay: '0'
@@ -241,15 +241,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 337b1cafc2674b4fb44e5baf1076183b
                   expression: 'find(/Veeam Backup and Replication by HTTP/veeam.jobs.last.result[{#ID}],,"like","Failed")=1'
-                  name: 'Veeam: Last result job failed'
-                  event_name: 'Veeam: Failed job [{#NAME}]'
+                  name: 'Last result job failed'
+                  event_name: 'Failed job [{#NAME}]'
                   priority: AVERAGE
                   manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: cd2bc50b71184c5ebf39b75a2dafa483
-              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Get data'
+              name: 'Job states [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.jobs.states.raw[{#ID}]'
               delay: '0'
@@ -269,7 +269,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 6f3837f27334466b814728036dd65c1d
-              name: 'Veeam: Job states [{#NAME}] [{#TYPE}]: Status'
+              name: 'Job states [{#NAME}] [{#TYPE}]: Status'
               type: DEPENDENT
               key: 'veeam.jobs.status[{#ID}]'
               delay: '0'
@@ -337,7 +337,7 @@ zabbix_export:
           description: 'Discovery of proxies.'
           item_prototypes:
             - uuid: 1daea1ba8ac144fc9e22296720af0b22
-              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Max Task Count'
+              name: 'Proxy [{#NAME}] [{#TYPE}]: Max Task Count'
               type: DEPENDENT
               key: 'veeam.proxy.maxtask[{#NAME}]'
               delay: '0'
@@ -355,7 +355,7 @@ zabbix_export:
                 - tag: proxy
                   value: '{#NAME}'
             - uuid: 40d85eb402274838b00765ab91de3896
-              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Get data'
+              name: 'Proxy [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.proxy.raw[{#NAME}]'
               delay: '0'
@@ -377,7 +377,7 @@ zabbix_export:
                 - tag: proxy
                   value: '{#NAME}'
             - uuid: 4c304283f1ad480b8251a72ade27620f
-              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Host name'
+              name: 'Proxy [{#NAME}] [{#TYPE}]: Host name'
               type: DEPENDENT
               key: 'veeam.proxy.server.name[{#NAME}]'
               delay: '0'
@@ -397,7 +397,7 @@ zabbix_export:
                 - tag: proxy
                   value: '{#NAME}'
             - uuid: 83e2e092ae1f4e1a9b4a426076f76467
-              name: 'Veeam: Server [{#NAME}]: Get data'
+              name: 'Server [{#NAME}]: Get data'
               type: DEPENDENT
               key: 'veeam.proxy.server.raw[{#NAME}]'
               delay: '0'
@@ -419,7 +419,7 @@ zabbix_export:
                 - tag: proxy
                   value: '{#NAME}'
             - uuid: 7dca605f25854e89a7e18702e8a48fc7
-              name: 'Veeam: Proxy [{#NAME}] [{#TYPE}]: Host type'
+              name: 'Proxy [{#NAME}] [{#TYPE}]: Host type'
               type: DEPENDENT
               key: 'veeam.proxy.server.type[{#NAME}]'
               delay: '0'
@@ -483,7 +483,7 @@ zabbix_export:
           description: 'Discovery of repositories.'
           item_prototypes:
             - uuid: 1c925cfa0a2b46838588471aa58a1591
-              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Get data'
+              name: 'Repository [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.repositories.raw[{#NAME}]'
               delay: '0'
@@ -505,7 +505,7 @@ zabbix_export:
                 - tag: repository
                   value: '{#NAME}'
             - uuid: 80a13587e8cc40ba886f987fcde23c13
-              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]'
+              name: 'Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]'
               type: DEPENDENT
               key: 'veeam.repository.capacity[{#NAME}]'
               delay: '0'
@@ -525,7 +525,7 @@ zabbix_export:
                 - tag: repository
                   value: '{#NAME}'
             - uuid: 882451efee0a4ce8aabc2d2f3955d0be
-              name: 'Veeam: Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]'
+              name: 'Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]'
               type: DEPENDENT
               key: 'veeam.repository.free.space[{#NAME}]'
               delay: '0'
@@ -593,7 +593,7 @@ zabbix_export:
           description: 'Discovery of sessions.'
           item_prototypes:
             - uuid: 7224f41e5c614268bf6997ad8a49710b
-              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Message'
+              name: 'Session [{#NAME}] [{#TYPE}]: Message'
               type: DEPENDENT
               key: 'veeam.sessions.message[{#ID}]'
               delay: '0'
@@ -615,7 +615,7 @@ zabbix_export:
                 - tag: session
                   value: '{#NAME}'
             - uuid: 3f449f47943b4877a32e89774712510f
-              name: 'Veeam: Session progress percent [{#NAME}] [{#TYPE}]'
+              name: 'Session progress percent [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.sessions.progress.percent[{#ID}]'
               delay: '0'
@@ -637,7 +637,7 @@ zabbix_export:
                 - tag: session
                   value: '{#NAME}'
             - uuid: f82984e1180946c6b4bff1f46987555d
-              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Get data'
+              name: 'Session [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.sessions.raw[{#ID}]'
               delay: '0'
@@ -658,7 +658,7 @@ zabbix_export:
                 - tag: session
                   value: '{#NAME}'
             - uuid: 5fb9dcb62bfe4d1dae94beefa329691d
-              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: Result'
+              name: 'Session [{#NAME}] [{#TYPE}]: Result'
               type: DEPENDENT
               key: 'veeam.sessions.result[{#ID}]'
               delay: '0'
@@ -682,15 +682,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: eeb93a10f3d04eee819587c6fa4ce8f8
                   expression: 'find(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}],,"like","Failed")=1'
-                  name: 'Veeam: Last result session failed'
-                  event_name: 'Veeam: Failed session [{#NAME}]'
+                  name: 'Last result session failed'
+                  event_name: 'Failed session [{#NAME}]'
                   priority: AVERAGE
                   manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 8c7092e721eb4f8f8b53a07f0fb710a0
-              name: 'Veeam: Session [{#NAME}] [{#TYPE}]: State'
+              name: 'Session [{#NAME}] [{#TYPE}]: State'
               type: DEPENDENT
               key: 'veeam.sessions.state[{#ID}]'
               delay: '0'

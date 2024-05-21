@@ -1,0 +1,47 @@
+{
+	"manifest_version": 2.0,
+	"id": "itemhistory",
+	"type": "widget",
+	"name": "Item history",
+	"namespace": "ItemHistory",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Displays the latest data for the selected items with an option to add progress bar visualizations, customize report columns, and display images for binary data types.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/item_history",
+	"widget": {
+		"size": {
+			"width": 6,
+			"height": 3
+		},
+		"js_class": "CWidgetItemHistory",
+		"out": [
+			{
+				"type": "_itemid"
+			},
+			{
+				"type": "_itemids"
+			}
+		]
+	},
+	"actions": {
+		"widget.itemhistory.view": {
+			"class": "WidgetView"
+		},
+		"widget.itemhistory.column.edit": {
+			"class": "ColumnEdit",
+			"view": "column.edit",
+			"layout": "layout.json"
+		},
+		"widget.itemhistory.binary_value.get": {
+			"class": "BinaryValueGet",
+			"layout": "layout.json"
+		},
+		"widget.itemhistory.image_value.get": {
+			"class": "ImageValueGet",
+			"layout": "layout.image"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

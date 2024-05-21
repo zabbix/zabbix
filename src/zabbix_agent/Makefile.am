@@ -7,9 +7,6 @@ SUBDIRS = \
 	logfiles \
 	metrics
 
-EXTRA_DIST = \
-	eventlog
-
 sbin_PROGRAMS = zabbix_agentd
 
 zabbix_agentd_SOURCES = zabbix_agentd.c
@@ -58,6 +55,7 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
+	$(top_builddir)/src/libs/zbxbincommon/libzbxbincommon.a \
 	$(AGENT_LIBS)
 
 zabbix_agentd_LDFLAGS = $(AGENT_LDFLAGS)

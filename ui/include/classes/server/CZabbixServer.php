@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -197,36 +192,13 @@ class CZabbixServer {
 	}
 
 	/**
-	 * Request server to test item preprocessing steps.
-	 *
-	 * @param array  $data                                     Array of preprocessing steps test.
-	 * @param string $data['value']                            Value to use for preprocessing step testing.
-	 * @param int    $data['value_type']                       Item value type.
-	 * @param array  $data['history']                          Previous value object.
-	 * @param string $data['history']['value']                 Previous value.
-	 * @param string $data['history']['timestamp']             Previous value time.
-	 * @param array  $data['steps']                            Preprocessing step object.
-	 * @param int    $data['steps'][]['type']                  Type of preprocessing step.
-	 * @param string $data['steps'][]['params']                Parameters of preprocessing step.
-	 * @param int    $data['steps'][]['error_handler']         Error handler selected as "custom on fail".
-	 * @param string $data['steps'][]['error_handler_params']  Parameters configured for selected error handler.
-	 * @param string $sid                                      User session ID.
-	 *
-	 * @return array
-	 */
-	public function testPreprocessingSteps(array $data, $sid) {
-		return $this->request([
-			'request' => 'preprocessing.test',
-			'data' => $data,
-			'sid' => $sid
-		]);
-	}
-
-	/**
 	 * Request server to test item.
 	 *
-	 * @param array  $data  Array of item properties to test.
-	 * @param string $sid   User session ID.
+	 * @param array  $data
+	 * @param array  $data['item']     Array of item parameters.
+	 * @param array  $data['host']     (optional) Array of host parameters.
+	 * @param array  $data['options']  (optional) Array of test parameters.
+	 * @param string $sid              User session ID.
 	 *
 	 * @return array|bool
 	 */

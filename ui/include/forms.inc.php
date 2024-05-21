@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -128,7 +123,7 @@ function getItemFormData(array $item = []) {
 		$data['query_fields'] = [];
 	}
 
-	if ($data['type'] == ITEM_TYPE_SCRIPT) {
+	if (in_array($data['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 		CArrayHelper::sort($data['parameters'], ['name']);
 		$data['parameters'] = array_values($data['parameters']);
 	}
@@ -235,7 +230,7 @@ function getItemFormData(array $item = []) {
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
 
-		if ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
+		if (in_array($data['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]) && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);
 			$data['parameters'] = array_values($data['parameters']);
 		}
@@ -338,7 +333,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')
 		->addClass('preprocessing-list')
-		->addClass('list-numbered')
+		->addClass(ZBX_STYLE_LIST_NUMBERED)
 		->setAttribute('data-readonly', $readonly)
 		->addItem(
 			(new CListItem([
@@ -717,7 +712,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 					(new CDiv(new CVar('preprocessing['.$i.'][sortorder]', $step['sortorder'])))
 						->addClass(ZBX_STYLE_DRAG_ICON),
 					(new CDiv($preproc_types_select))
-						->addClass('list-numbered-item')
+						->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)
 						->addClass('step-name'),
 					(new CDiv($params))->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),

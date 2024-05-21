@@ -24,7 +24,7 @@ zabbix_export:
         - name: Templates/SAN
       items:
         - uuid: 86d978c810024643829d3192156e9e6c
-          name: 'OceanStor 5300 V5: Status'
+          name: Status
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.34774.4.1.1.3.0
           key: 'huawei.5300.v5[status]'
@@ -40,7 +40,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 04c8d7f53668449ea32c4ed611b71237
-          name: 'OceanStor 5300 V5: Capacity total'
+          name: 'Capacity total'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.34774.4.1.1.5.0
           key: 'huawei.5300.v5[totalCapacity]'
@@ -58,7 +58,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: ef77f126052b4f9e9cddafdab20577d1
-          name: 'OceanStor 5300 V5: Capacity used'
+          name: 'Capacity used'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.34774.4.1.1.4.0
           key: 'huawei.5300.v5[usedCapacity]'
@@ -73,7 +73,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 0a2e129d84d14e88bf953f3a9ca76b46
-          name: 'OceanStor 5300 V5: Version'
+          name: Version
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.34774.4.1.1.6.0
           key: 'huawei.5300.v5[version]'
@@ -91,8 +91,8 @@ zabbix_export:
           triggers:
             - uuid: b6eb791cc14644dfb0a69a2cce150ab1
               expression: 'last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[version],#1)<>last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[version],#2) and length(last(/Huawei OceanStor 5300 V5 by SNMP/huawei.5300.v5[version]))>0'
-              name: 'OceanStor 5300 V5: Storage version has been changed'
-              event_name: 'OceanStor 5300 V5: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Storage version has been changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'OceanStor 5300 V5 version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -100,7 +100,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 030530f5193246f4b983ec802030e49b
-          name: 'OceanStor 5300 V5: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -114,14 +114,14 @@ zabbix_export:
           triggers:
             - uuid: ef6b5dc40f9a49599aae97c2cf68d3cb
               expression: 'max(/Huawei OceanStor 5300 V5 by SNMP/icmpping,#3)=0'
-              name: 'OceanStor 5300 V5: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: c82fa3f20c7443e4849ea8e8aec1e49d
-          name: 'OceanStor 5300 V5: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -135,11 +135,11 @@ zabbix_export:
           triggers:
             - uuid: c9765f7f271d46c99ad7dd45efa79849
               expression: 'min(/Huawei OceanStor 5300 V5 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 by SNMP/icmppingloss,5m)<100'
-              name: 'OceanStor 5300 V5: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'OceanStor 5300 V5: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei OceanStor 5300 V5 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -147,7 +147,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 0a95c43c70e54ad49f073fee69a2452d
-          name: 'OceanStor 5300 V5: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -161,13 +161,14 @@ zabbix_export:
           triggers:
             - uuid: b8815a9e952047e09d1e657cea5d538e
               expression: 'avg(/Huawei OceanStor 5300 V5 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'OceanStor 5300 V5: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'OceanStor 5300 V5: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Huawei OceanStor 5300 V5 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor 5300 V5 by SNMP/icmppingloss,5m)<100'
-                - name: 'OceanStor 5300 V5: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei OceanStor 5300 V5 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -175,7 +176,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 2ec396a7adf64637ae453d7f26cd5b20
-          name: 'OceanStor 5300 V5: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -188,7 +189,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e98719af84414ef5ab3dd788c7d2d72f
-          name: 'OceanStor 5300 V5: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -208,7 +209,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: cf59fb53834d4b14bdb0251e66c5143f
-          name: 'OceanStor 5300 V5: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -229,7 +230,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f54aca2b926e4d4d980f980acb0aefac
-          name: 'OceanStor 5300 V5: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -253,7 +254,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fed7a954ea614cb086b901b2e6957621
-          name: 'OceanStor 5300 V5: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -263,7 +264,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -273,7 +274,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 354fe7cd2632425b9f937e8714d79798
-          name: 'OceanStor 5300 V5: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -295,8 +296,8 @@ zabbix_export:
           triggers:
             - uuid: 72a31faa805b40e795a57649c724da1e
               expression: 'last(/Huawei OceanStor 5300 V5 by SNMP/system.name,#1)<>last(/Huawei OceanStor 5300 V5 by SNMP/system.name,#2) and length(last(/Huawei OceanStor 5300 V5 by SNMP/system.name))>0'
-              name: 'OceanStor 5300 V5: System name has changed'
-              event_name: 'OceanStor 5300 V5: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -306,7 +307,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: f14eaa207ac9480995d2a2a10bea1467
-          name: 'OceanStor 5300 V5: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -316,7 +317,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -325,7 +326,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: bf571c06cc264eca89d68f0b0b7559f7
-          name: 'OceanStor 5300 V5: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -344,13 +345,13 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 197767da1b3c4c4f8f3c59ab3c3fc5b8
-          name: 'OceanStor 5300 V5: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -364,12 +365,12 @@ zabbix_export:
           triggers:
             - uuid: b0c4103eac9447ee9f7f31627baf4eea
               expression: 'max(/Huawei OceanStor 5300 V5 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'OceanStor 5300 V5: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'OceanStor 5300 V5: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Huawei OceanStor 5300 V5 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1519,10 +1520,13 @@ zabbix_export:
           description: 'Maximum temperature of enclosure'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
       dashboards:
         - uuid: 8d8982eb9082421ea74ba92f1ea7018e
           name: 'OceanStor 5300 V5: Overview'
@@ -1531,7 +1535,7 @@ zabbix_export:
               widgets:
                 - type: graph
                   name: 'OceanStor 5300 V5: Capacity total'
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: GRAPH
@@ -1546,7 +1550,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Controller {#ID}: CPU utilization'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1562,8 +1566,8 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: 'Node {#NODE}: CPU utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1581,7 +1585,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Node {#NODE}: Node I/O'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1597,8 +1601,8 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   name: 'Node {#NODE}: Node traffic'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1616,7 +1620,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'LUN {#NAME}: LUN I/O'
-                  width: '12'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1632,8 +1636,8 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   name: 'LUN {#NAME}: LUN traffic'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -1945,13 +1949,13 @@ zabbix_export:
   triggers:
     - uuid: 0e3713bdf52e40d692cf256ac2a01988
       expression: '(last(/Huawei OceanStor 5300 V5 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei OceanStor 5300 V5 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei OceanStor 5300 V5 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei OceanStor 5300 V5 by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'OceanStor 5300 V5: Host has been restarted'
-      event_name: 'OceanStor 5300 V5: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'OceanStor 5300 V5: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Huawei OceanStor 5300 V5 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope
