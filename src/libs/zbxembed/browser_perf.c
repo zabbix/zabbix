@@ -31,7 +31,6 @@
 #define WD_PERF_ATTR_COUNT				"count"
 #define WD_PERF_ATTR_REDIRECT_TIME			"redirect_time"
 #define WD_PERF_ATTR_REDIRECT_COUNT			"redirect_count"
-#define WD_PERF_ATTR_SERVICE_WORKER_PROCESSING_TIME	"service_worker_processing_time"
 #define WD_PERF_ATTR_DNS_LOOKUP_TIME			"dns_lookup_time"
 #define WD_PERF_ATTR_TCP_HANDSHAKE_TIME			"tcp_handshake_time"
 #define WD_PERF_ATTR_TLS_NEGOTIATION_TIME		"tls_negotiation_time"
@@ -51,6 +50,50 @@ ZBX_PTR_VECTOR_IMPL(wd_attr_ptr, zbx_wd_attr_t *)
 ZBX_PTR_VECTOR_IMPL(wd_perf_entry_ptr, zbx_wd_perf_entry_t *)
 ZBX_VECTOR_IMPL(wd_perf_details, zbx_wd_perf_details_t)
 ZBX_VECTOR_IMPL(wd_perf_bookmark, zbx_wd_perf_bookmark_t)
+
+static int	wd_perf_attr_compare(const void *d1, const void *d2)
+{
+	const char *n1 = *(const char * const *)d1;
+	const char *n2 = *(const char * const *)d2;
+
+	return strcmp(n1, n2);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the attribute contains time based metric                 *
+ *                                                                            *
+ * Return value: SUCCEED - attribute contains time based metric               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	wd_perf_is_time_based_attribute(const char *name)
+{
+	static const char	*attributes[] = {"activation_start", "connect_end", "connect_start",
+					"critical_ch_restart", "dom_complete", "dom_content_loaded_event_end",
+					"dom_content_loaded_event_start", "dom_interactive", "domain_lookup_end",
+					"domain_lookup_start", "duration", "fetch_start",
+					"first_interim_response_start", "load_event_end", "load_event_start",
+					"redirect_end", "redirect_start", "request_start", "response_end",
+					"response_start", "secure_connection_start", "start_time", "unload_event_end",
+					"unload_event_start", "worker_start"};
+	static int		sorted = 0;
+
+	if (0 == sorted)
+	{
+		/* attributes MUST be sorted as they are used in binary search, sort */
+		/* it once to avoid possible sorting mistakes in array declaration   */
+
+		qsort(attributes, ARRSIZE(attributes), sizeof(attributes[0]), wd_perf_attr_compare);
+		sorted = 1;
+	}
+
+
+	if (NULL == bsearch(&name, attributes, ARRSIZE(attributes), sizeof(attributes[0]), wd_perf_attr_compare))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -88,6 +131,11 @@ static int	wd_perf_init_attribute_from_json(zbx_wd_attr_t *attr, const char *nam
 			case ZBX_JSON_TYPE_INT:
 			case ZBX_JSON_TYPE_NUMBER:
 				(void)zbx_is_double(value, &value_dbl);
+
+				/* convert time based attribute values to seconds */
+				if (SUCCEED == wd_perf_is_time_based_attribute(name))
+					value_dbl /= 1000;
+
 				zbx_variant_set_dbl(&attr->value, value_dbl);
 				zbx_free(value);
 				break;
@@ -169,7 +217,7 @@ static zbx_wd_attr_t	*wd_perf_entry_get_attribute(zbx_wd_perf_entry_t *entry, co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: attribute hasshet support functions                               *
+ * Purpose: attribute hashset support functions                               *
  *                                                                            *
  ******************************************************************************/
 static zbx_hash_t	wd_attr_hash(const void *d)
@@ -321,7 +369,7 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_create_from_json(const struct zbx_json
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free peformance entry                                             *
+ * Purpose: free performance entry                                            *
  *                                                                            *
  ******************************************************************************/
 static void	wd_perf_entry_free(zbx_wd_perf_entry_t *entry)
@@ -338,7 +386,7 @@ static void	wd_perf_entry_free(zbx_wd_perf_entry_t *entry)
  * Purpose: merge attribute src into dst                                      *
  *                                                                            *
  * Comments: numeric values are added                                         *
- *           string/error values are concatenaded with newline separator      *
+ *           string/error values are concatenated with newline separator      *
  *           vectors are appended                                             *
  *                                                                            *
  ******************************************************************************/
@@ -565,11 +613,8 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_common_data(zbx_wd_perf_entr
 	wd_perf_entry_copy_attr(out, WD_PERF_ATTR_LOAD_FINISHED, in, "load_event_end");
 
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_REDIRECT_TIME, in, "redirect_start", "redirect_end");
-	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_SERVICE_WORKER_PROCESSING_TIME, in, "worker_start", "fetch_start");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_DNS_LOOKUP_TIME, in, "domain_lookup_start", "domain_lookup_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_TCP_HANDSHAKE_TIME, in, "connect_start", "connect_end");
-	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_TLS_NEGOTIATION_TIME, in, "secure_connection_start",
-			"request_start");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_REQUEST_TIME, in, "request_start", "response_start");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_RESPONSE_TIME, in, "response_start", "response_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_RESOURCE_FETCH_TIME, in, "fetch_start", "response_end");
@@ -578,6 +623,26 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_common_data(zbx_wd_perf_entr
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_LOAD_EVENT_HANDLER_TIME, in, "load_event_start", "load_event_end");
 	wd_perf_entry_diff_attrs(out, WD_PERF_ATTR_DOM_CONTENT_LOADING_TIME, in, "dom_content_loaded_event_start",
 			"dom_content_loaded_event_end");
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return new performance entry with aggregated navigation data      *
+ *                                                                            *
+ * Parameters: in - [IN] performance entry with attributes to aggregate       *
+ *                                                                            *
+ * Return value: new performance entry with aggregated data                   *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_navigation_data(zbx_wd_perf_entry_t *in)
+{
+	zbx_wd_perf_entry_t	*out;
+	zbx_wd_attr_t		attr;
+
+	out = wd_perf_entry_aggregate_common_data(in);
+	wd_perf_entry_copy_attr(out, WD_PERF_ATTR_TLS_NEGOTIATION_TIME, in, WD_PERF_ATTR_TLS_NEGOTIATION_TIME);
 
 	return out;
 }
@@ -657,7 +722,7 @@ static void	wd_perf_dump(zbx_wd_perf_t *perf)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collect performance entires from json data                        *
+ * Purpose: collect performance entries from json data                        *
  *                                                                            *
  ******************************************************************************/
 void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp)
@@ -700,7 +765,10 @@ void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struc
 			}
 			details.navigation = wd_perf_entry_create_from_json(&jp_entry);
 
-			entry = wd_perf_entry_aggregate_common_data(details.navigation);
+			wd_perf_entry_diff_attrs(details.navigation, WD_PERF_ATTR_TLS_NEGOTIATION_TIME,
+					details.navigation, "secure_connection_start", "request_start");
+
+			entry = wd_perf_entry_aggregate_navigation_data(details.navigation);
 			wd_perf_entry_merge(perf->navigation_summary, entry);
 			wd_perf_entry_free(entry);
 

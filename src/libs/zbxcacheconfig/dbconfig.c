@@ -3075,9 +3075,9 @@ do													\
 }													\
 while(0)
 
-static zbx_vector_ptr_t	*dc_item_parameters(const ZBX_DC_ITEM *item)
+static zbx_vector_ptr_t	*dc_item_parameters(const ZBX_DC_ITEM *item, unsigned char type)
 {
-	switch (item->type)
+	switch (type)
 	{
 		case ITEM_TYPE_SCRIPT:
 			return &item->itemtype.scriptitem->params;
@@ -3206,7 +3206,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 
 	if (1 == found && *old_type != item->type)
 	{
-		if (NULL != (parameters = dc_item_parameters(item)))
+		if (NULL != (parameters = dc_item_parameters(item, *old_type)))
 			parameters_local = *parameters;
 
 		dc_item_type_free(item, *old_type);
@@ -3222,7 +3222,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			{
 				if (1 == found)
 				{
-					if (NULL != (parameters = dc_item_parameters(item)))
+					if (NULL != (parameters = dc_item_parameters(item, item->type)))
 						parameters_local = *parameters;
 
 					dc_item_type_free(item, item->type);
@@ -3887,7 +3887,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		zbx_vector_ptr_t	*parameters;
 
-		if (NULL != (parameters = dc_item_parameters(item)))
+		if (NULL != (parameters = dc_item_parameters(item, item->type)))
 			zbx_vector_ptr_destroy(parameters);
 
 		dc_item_type_free(item, item->type);
@@ -6092,7 +6092,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UINT64(itemid, row[1]);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)) ||
-				NULL == (params = dc_item_parameters(item)))
+				NULL == (params = dc_item_parameters(item, item->type)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,
 					"cannot find parent item for item parameters (itemid=" ZBX_FS_UI64")", itemid);
@@ -6128,7 +6128,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 
 		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &item_param->itemid)) &&
-				NULL != (params = dc_item_parameters(item)))
+				NULL != (params = dc_item_parameters(item, item->type)))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(params, item_param, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
@@ -6154,7 +6154,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		dc_item = (ZBX_DC_ITEM *)items.values[i];
 		dc_item_update_revision(dc_item, revision);
 
-		params = dc_item_parameters(item);
+		params = dc_item_parameters(item, item->type);
 
 		if (NULL != params && 0 < params->values_num)
 			zbx_vector_ptr_sort(params, dc_compare_items_param);

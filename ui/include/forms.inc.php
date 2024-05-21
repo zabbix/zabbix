@@ -22,6 +22,18 @@
  * @return array
  */
 function getItemFormData(array $item = []) {
+	// Default script value for browser type items.
+	$browser_script = <<<'JAVASCRIPT'
+var browser = new Browser(Browser.chromeOptions());
+
+try {
+	browser.navigate("https://example.com");
+	browser.collectPerfEntries();
+}
+finally {
+	return JSON.stringify(browser.getResult());
+}
+JAVASCRIPT;
 	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
@@ -45,6 +57,7 @@ function getItemFormData(array $item = []) {
 		'units' => getRequest('units', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
+		'browser_script' => getRequest('browser_script', $browser_script),
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'delay_flex' => array_values(getRequest('delay_flex', [])),
 		'ipmi_sensor' => getRequest('ipmi_sensor', ''),
@@ -198,7 +211,6 @@ function getItemFormData(array $item = []) {
 		$data['units'] = $data['item']['units'];
 		$data['valuemapid'] = $data['item']['valuemapid'];
 		$data['hostid'] = $data['item']['hostid'];
-		$data['params'] = $data['item']['params'];
 		$data['ipmi_sensor'] = $data['item']['ipmi_sensor'];
 		$data['authtype'] = $data['item']['authtype'];
 		$data['username'] = $data['item']['username'];
@@ -229,6 +241,13 @@ function getItemFormData(array $item = []) {
 		$data['http_authtype'] = $data['item']['authtype'];
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
+
+		if ($data['item']['type'] == ITEM_TYPE_BROWSER) {
+			$data['browser_script'] = $data['item']['params'];
+		}
+		else {
+			$data['params'] = $data['item']['params'];
+		}
 
 		if (in_array($data['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]) && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);

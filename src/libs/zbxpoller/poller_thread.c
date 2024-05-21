@@ -851,7 +851,6 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
-	browseritem_es_engine_init();
 
 	zbx_get_program_type_cb = poller_args_in->zbx_get_program_type_cb_arg;
 	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
@@ -945,7 +944,6 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	}
 
 	scriptitem_es_engine_destroy();
-	browseritem_es_engine_destroy();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
