@@ -89,7 +89,7 @@ class BinaryValueGet extends CController {
 						if ($image) {
 							ob_start();
 
-							imagepng($preview == 1 ? imageThumb($image, 0, 112) : $image);
+							imagepng(imageThumb($image, 0, 112));
 
 							$result['thumbnail'] = base64_encode(ob_get_clean());
 						}
