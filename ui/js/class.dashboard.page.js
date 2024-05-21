@@ -40,6 +40,12 @@ class CDashboardPage {
 	static PLACEHOLDER_DEFAULT_WIDTH = 6;
 	static PLACEHOLDER_DEFAULT_HEIGHT = 2;
 
+	// Minimum distance of mouse movement in pixels to assume that user is interacting intentionally.
+	static PLACEHOLDER_RESIZE_TRIGGER_DISTANCE = 25;
+
+	// Minimum time of mouse movement in milliseconds to assume that user is interacting intentionally.
+	static PLACEHOLDER_RESIZE_TRIGGER_TIME = 250;
+
 	constructor(target, {
 		data,
 		dashboard,
@@ -660,8 +666,11 @@ class CDashboardPage {
 		this._widget_placeholder = new CDashboardWidgetPlaceholder(this._cell_width, this._cell_height);
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
+		this._widget_placeholder_clicked_pos_px = null;
+		this._widget_placeholder_clicked_time = null;
 		this._widget_placeholder_is_active = false;
 		this._widget_placeholder_is_edit_mode = null;
+		this._widget_placeholder_is_resizing = false;
 		this._widget_placeholder_move_animation_frame = null;
 
 		this._dashboard_grid.appendChild(this._widget_placeholder.getNode());
@@ -681,6 +690,22 @@ class CDashboardPage {
 
 		const move = e => {
 			if (this._widget_placeholder_clicked_pos !== null) {
+				if (!this._widget_placeholder_is_resizing) {
+					const interaction_distance = Math.sqrt(
+						Math.pow(this._widget_placeholder_clicked_pos_px.y - e.pageY, 2)
+							+ Math.pow(this._widget_placeholder_clicked_pos_px.x - e.pageX, 2)
+					);
+
+					const interaction_time = Date.now() - this._widget_placeholder_clicked_time;
+
+					if (interaction_distance < CDashboardPage.PLACEHOLDER_RESIZE_TRIGGER_DISTANCE
+							&& interaction_time < CDashboardPage.PLACEHOLDER_RESIZE_TRIGGER_TIME) {
+						return;
+					}
+
+					this._widget_placeholder_is_resizing = true;
+				}
+
 				const event_pos = getGridEventPos(e, {width: 1, height: 1});
 
 				this._widget_placeholder_pos = this.accommodatePos({
@@ -698,7 +723,7 @@ class CDashboardPage {
 				);
 
 				this._widget_placeholder
-					.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_RESIZING)
+					.setState(CDashboardWidgetPlaceholder.STATE_RESIZING)
 					.showAtPosition(this._widget_placeholder_pos);
 			}
 			else {
@@ -791,7 +816,7 @@ class CDashboardPage {
 					);
 
 					this._widget_placeholder
-						.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_POSITIONING)
+						.setState(CDashboardWidgetPlaceholder.STATE_POSITIONING)
 						.showAtPosition(this._widget_placeholder_pos);
 
 					this._leaveWidgets();
@@ -826,9 +851,11 @@ class CDashboardPage {
 				this.blockInteraction();
 
 				this._widget_placeholder_clicked_pos = getGridEventPos(e, {width: 1, height: 1});
+				this._widget_placeholder_clicked_pos_px = {x: e.pageX, y: e.pageY};
+				this._widget_placeholder_clicked_time = Date.now();
 
 				this._widget_placeholder
-					.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_RESIZING)
+					.setState(CDashboardWidgetPlaceholder.STATE_RESIZING)
 					.showAtPosition(this._widget_placeholder_pos);
 
 				document.addEventListener('mouseup', this._widget_placeholder_events.mouseUp);
@@ -900,7 +927,7 @@ class CDashboardPage {
 
 		if (this._is_editable && this._widgets.size === 0) {
 			this._widget_placeholder
-				.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_ADD_NEW)
+				.setState(CDashboardWidgetPlaceholder.STATE_ADD_NEW)
 				.showAtDefaultPosition();
 		}
 		else {
@@ -909,7 +936,7 @@ class CDashboardPage {
 	}
 
 	_activateWidgetPlaceholder() {
-		this._widget_placeholder.on(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET,
+		this._widget_placeholder.on(CDashboardWidgetPlaceholder.EVENT_ADD_NEW_WIDGET,
 			this._widget_placeholder_events.addNewWidget
 		);
 
@@ -927,7 +954,7 @@ class CDashboardPage {
 	}
 
 	_deactivateWidgetPlaceholder({do_hide = true} = {}) {
-		this._widget_placeholder.off(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET,
+		this._widget_placeholder.off(CDashboardWidgetPlaceholder.EVENT_ADD_NEW_WIDGET,
 			this._widget_placeholder_events.addNewWidget
 		);
 
@@ -954,6 +981,7 @@ class CDashboardPage {
 
 		this._widget_placeholder_is_active = false;
 		this._widget_placeholder_is_edit_mode = null;
+		this._widget_placeholder_is_resizing = false;
 	}
 
 	// Widget dragging methods.
