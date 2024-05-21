@@ -82,7 +82,11 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 	while (*sbuf < *ebuf && FAIL == ret);
 
 	if (FAIL == ret && NULL != error)
-		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]", expect, rcv);
+	{
+		zbx_snprintf(error, (size_t)max_error_len, "modem communication error");
+		zabbix_log(LOG_LEVEL_WARNING, "modem communication error: expected [%s] received [%s] %s():%s",
+				expect, rcv);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -246,8 +250,9 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 
 		if (NULL != error)
 		{
-			zbx_snprintf(error, max_error_len, "error in setting the status flag to 0 (for %s): %s", device,
-					zbx_strerror(errno));
+			zbx_snprintf(error, (size_t)max_error_len,
+					"error in setting the status flag to 0 (for %s): %s",
+					device, zbx_strerror(errno));
 		}
 	}
 
