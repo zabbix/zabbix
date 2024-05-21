@@ -1,0 +1,1 @@
+.......PS. [ZBX-24453] implemented socket file cleanup when shutting down, added blocking of signals during important stages of Server and Proxy startup (dgoloscapov)
