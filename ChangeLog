@@ -23,7 +23,7 @@ A.F....PS. [ZBXNEXT-9077] added support of custom vault prefix for HashiCorp and
 ..F....... [ZBXNEXT-7743] implemented changes in Latest data page when filter is not set, updated message and added icon in widgets, in filter popups and in all list pages when there is no data found (ashubin, dpetra)
 ....I...S. [ZBXNEXT-9108] added server side software update check functionality (dgoloscapov)
 ........S. [ZBXNEXT-7930] added user macro support for username and password fields in email media type (asestakovs)
-...G...... [ZBXNEXT-9132] updated Zabbix agent to be fully compatibile with Zabix agent 2 active checks protocol (wiper)
+...G...... [ZBXNEXT-9132] updated Zabbix agent to be fully compatible with Zabix agent 2 active checks protocol (wiper)
 A.FG...PS. [ZBXNEXT-8758] added proxy load balancing and HA (agriscenko, wiper)
 .........T [ZBXNEXT-9098] added AWS ELB Network Load Balancer by HTTP template (egordymov)
 .........T [ZBXNEXT-6864] replaced {HOST.CONN} with user macros in templates (drasikhov)
