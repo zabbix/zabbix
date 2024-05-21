@@ -693,7 +693,8 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 	sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.key_,ihr.key_,ir.key_ from items ir,item_discovery id,items i"
+			"select i.key_,h.name,ir.key_,ihr.key_ from items ir,item_discovery id,items i"
+			" inner join hosts h on i.hostid=h.hostid"
 			" left join items ih on ih.key_=i.key_"
 			" left join item_discovery ihd on ih.itemid=ihd.itemid"
 			" left join items ihr on ihr.itemid=ihd.parent_itemid"
@@ -708,9 +709,21 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 	if (NULL != (trow = zbx_db_fetch(tresult)))
 	{
 		ret = FAIL;
-		zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" and LLD "
-				"rule \"%s\", because an item prototype with the same key already belongs "
-				"to LLD rule \"%s\"",  trow[0], trow[1], trow[2]);
+
+		if (SUCCEED == zbx_db_is_null(trow[3]))
+		{
+			zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" of "
+					"template \"%s\" and LLD rule \"%s\", because an item prototype with the "
+					"same key already exists", trow[0], trow[1], trow[2]);
+		}
+		else
+		{
+			zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" of "
+					"template \"%s\" and LLD rule \"%s\", because an item prototype with the "
+					"same key already belongs to LLD rule \"%s\"", trow[0], trow[1], trow[2],
+					trow[3]);
+		}
+
 		zbx_db_free_result(tresult);
 		goto out;
 	}
