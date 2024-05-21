@@ -66,11 +66,7 @@ class ImageValueGet extends CController {
 				]);
 
 				if ($history_value) {
-					$image = imagecreatefromstring(base64_decode($history_value[0]['value'])) ?: '';
-
-					if ($image) {
-						$result['image'] = $image;
-					}
+					$result['image']= @imagecreatefromstring(base64_decode($history_value[0]['value']));
 				}
 			}
 		}

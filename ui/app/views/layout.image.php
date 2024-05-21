@@ -21,9 +21,9 @@
 
 header('Content-type: image/png');
 
-if ($data['image'] !== '') {
-	echo imagepng($data['image']);
+if (!$data['image']) {
+	http_response_code(404);
 }
-else {
-	echo $data['image'];
+elseif (!imagepng($data['image'])) {
+	http_response_code(500);
 }

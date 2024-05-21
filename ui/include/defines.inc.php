@@ -1736,7 +1736,7 @@ define('WIDGET_CLOCK',				'clock');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
 define('WIDGET_ITEM',				'item');
-define('WIDGET_ITEM_HISTORY',		'itemhistory');
+define('WIDGET_PLAIN_TEXT',			'plaintext');
 define('WIDGET_URL',				'url');
 
 // Inaccessible widget type.

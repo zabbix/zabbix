@@ -56,6 +56,8 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 				$column_data[] = new CVar($this->field->getName().'['.$column_index.']['.$key.']', $value);
 			}
 
+			$column_name = array_key_exists('name', $column) ? $column['name'] : '';
+
 			$inaccessible_item = !array_key_exists('itemid', $column)
 				|| !array_key_exists($column['itemid'], $item_names);
 
@@ -63,8 +65,8 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 
 			$view->addRow([
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				(new CDiv($column['name']))
-					->setTitle($column['name'])
+				(new CDiv($column_name))
+					->setTitle($column_name)
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 				(new CDiv($item_name))
 					->setTitle($item_name)
