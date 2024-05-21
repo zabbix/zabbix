@@ -40,6 +40,11 @@ class CDashboardPage {
 	static PLACEHOLDER_DEFAULT_WIDTH = 6;
 	static PLACEHOLDER_DEFAULT_HEIGHT = 2;
 
+	// Minimum distance of mouse movement in pixels to assume that user is interacting intentionally.
+	static PLACEHOLDER_INTERACTION_MIN_DISTANCE = 20;
+	// Minimum time of mouse movement in milliseconds to assume that user is interacting intentionally.
+	static PLACEHOLDER_INTERACTION_MIN_TIME = 500;
+
 	constructor(target, {
 		data,
 		dashboard,
@@ -660,6 +665,8 @@ class CDashboardPage {
 		this._widget_placeholder = new CDashboardWidgetPlaceholder(this._cell_width, this._cell_height);
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
+		this._widget_placeholder_clicked_pos_client = {x: 0, y: 0};
+		this._widget_placeholder_clicked_time = null;
 		this._widget_placeholder_is_active = false;
 		this._widget_placeholder_is_edit_mode = null;
 		this._widget_placeholder_move_animation_frame = null;
@@ -826,6 +833,8 @@ class CDashboardPage {
 				this.blockInteraction();
 
 				this._widget_placeholder_clicked_pos = getGridEventPos(e, {width: 1, height: 1});
+				this._widget_placeholder_clicked_pos_client = {x: e.clientX, y: e.clientY};
+				this._widget_placeholder_clicked_time = Date.now();
 
 				this._widget_placeholder
 					.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_RESIZING)
@@ -840,6 +849,20 @@ class CDashboardPage {
 				this._deactivateWidgetPlaceholder({do_hide: false});
 
 				this.unblockInteraction();
+
+				const interaction_distance = Math.sqrt(
+					Math.pow(this._widget_placeholder_clicked_pos_client.y - e.clientY, 2)
+					+ Math.pow(this._widget_placeholder_clicked_pos_client.x - e.clientX, 2)
+				);
+				const interaction_time = Date.now() - this._widget_placeholder_clicked_time;
+
+				if (interaction_distance < CDashboardPage.PLACEHOLDER_INTERACTION_MIN_DISTANCE
+						&& interaction_time < CDashboardPage.PLACEHOLDER_INTERACTION_MIN_TIME) {
+					this._widget_placeholder_pos.width = CDashboardPage.PLACEHOLDER_DEFAULT_WIDTH;
+					this._widget_placeholder_pos.height = CDashboardPage.PLACEHOLDER_DEFAULT_HEIGHT;
+
+					this._widget_placeholder.showAtPosition(this._widget_placeholder_pos);
+				}
 
 				const new_widget_pos = {...this._widget_placeholder_pos};
 
