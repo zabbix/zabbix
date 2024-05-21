@@ -43,9 +43,6 @@ class CDashboardPage {
 	// Minimum distance of mouse movement in pixels to assume that user is interacting intentionally.
 	static PLACEHOLDER_RESIZE_TRIGGER_DISTANCE = 25;
 
-	// Minimum time of mouse movement in milliseconds to assume that user is interacting intentionally.
-	static PLACEHOLDER_RESIZE_TRIGGER_TIME = 250;
-
 	constructor(target, {
 		data,
 		dashboard,
@@ -667,7 +664,6 @@ class CDashboardPage {
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
 		this._widget_placeholder_clicked_pos_px = null;
-		this._widget_placeholder_clicked_time = null;
 		this._widget_placeholder_is_active = false;
 		this._widget_placeholder_is_edit_mode = null;
 		this._widget_placeholder_is_resizing = false;
@@ -696,10 +692,7 @@ class CDashboardPage {
 							+ Math.pow(this._widget_placeholder_clicked_pos_px.x - e.pageX, 2)
 					);
 
-					const interaction_time = Date.now() - this._widget_placeholder_clicked_time;
-
-					if (interaction_distance < CDashboardPage.PLACEHOLDER_RESIZE_TRIGGER_DISTANCE
-							&& interaction_time < CDashboardPage.PLACEHOLDER_RESIZE_TRIGGER_TIME) {
+					if (interaction_distance < CDashboardPage.PLACEHOLDER_RESIZE_TRIGGER_DISTANCE) {
 						return;
 					}
 
@@ -852,7 +845,6 @@ class CDashboardPage {
 
 				this._widget_placeholder_clicked_pos = getGridEventPos(e, {width: 1, height: 1});
 				this._widget_placeholder_clicked_pos_px = {x: e.pageX, y: e.pageY};
-				this._widget_placeholder_clicked_time = Date.now();
 
 				this._widget_placeholder
 					.setState(CDashboardWidgetPlaceholder.STATE_RESIZING)
