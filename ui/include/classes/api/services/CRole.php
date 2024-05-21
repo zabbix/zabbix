@@ -427,7 +427,7 @@ class CRole extends CApiService {
 
 			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
 
-			$this->checkUiRules($name, (int) $type, $role['rules'], $db_rules);
+			self::checkUiRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkServicesRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkModulesRules($name, $role['rules']);
 			$this->checkApiRules($name, $role['rules']);
@@ -443,7 +443,7 @@ class CRole extends CApiService {
 
 	 * @throws APIException
 	 */
-	private function checkUiRules(string $name, int $type, array $rules, array $db_rules = null): void {
+	private static function checkUiRules(string $name, int $type, array $rules, array $db_rules = null): void {
 		if (!array_key_exists('ui', $rules)) {
 			return;
 		}
