@@ -1,27 +1,17 @@
-MOCK_DATA_DEPS = \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
-
-MOCK_TEST_DEPS = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+# This file contains dependencies for public Zabbix libraries.
+# To get such list for a particular library - run grep_dependencies.sh .
+# Ignore Windows dependencies for now.
+# Libraries that depend only on zbxcommon - are listed as they are.
+# More complex libraries that depend on other libraries in addition to zbxcommon - need all their dependencies
+#    being listed using $(*DEPS) variable.
+# Order in which libraries are listed must not be important.
 
 TIME_DEPS = \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
+# Windows build also depends on sysinfo and logs, but ignore it for now.
 MUTEX_DEPS = \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
@@ -45,7 +35,6 @@ LOG_DEPS = \
 
 REGEXP_DEPS = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(LOG_DEPS) \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
@@ -75,6 +64,7 @@ JSON_DEPS = \
 
 CRYPTO_DEPS = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(TIME_DEPS) \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
@@ -167,7 +157,8 @@ EXEC_DEPS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-# HTTP also depends on dbhigh, not included yet, need to allow agent only tests pass
+# HTTP also depends on DBHIGH, not included yet, need to allow agent only tests pass.
+# HTTP library dependency on DBHIGH can be easily removed.
 HTTP_DEPS = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(EXPR_DEPS) \
@@ -232,3 +223,23 @@ SYSINFO_AGENT_DEPS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(SYSINFO_COMMON_DEPS)
+
+# cmocka dependencies
+MOCK_DATA_DEPS = \
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+MOCK_TEST_DEPS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
