@@ -78,6 +78,9 @@ class CSoftwareVersionCheck {
 					this.#data.versions = response.versions;
 				}
 			})
+			.catch(exception => {
+				console.log('Could not get data', exception);
+			})
 			.finally(() => {
 				this.#update();
 			});
