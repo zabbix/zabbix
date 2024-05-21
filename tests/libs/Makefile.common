@@ -167,9 +167,9 @@ EXEC_DEPS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
+# HTTP also depends on dbhigh, not included yet, to allow agent only tests pass
 HTTP_DEPS = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
-	$(DBHIGH_DEPS) \
 	$(EXPR_DEPS) \
 	$(LOG_DEPS) \
 	$(TIME_DEPS) \
@@ -187,7 +187,7 @@ PARAM_DEPS = \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-SYSINFO_BASE_DEPS = \
+SYSINFO_COMMON_DEPS = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(CFG_DEPS) \
 	$(COMMS_DEPS) \
@@ -197,7 +197,6 @@ SYSINFO_BASE_DEPS = \
 	$(EXPR_DEPS) \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
-	$(HTTP_DEPS) \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(JSON_DEPS) \
 	$(LOG_DEPS) \
@@ -219,7 +218,8 @@ SYSINFO_SERVER_DEPS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
-	$(SYSINFO_BASE_DEPS)
+	$(HTTP_DEPS) \
+	$(SYSINFO_COMMON_DEPS)
 
 SYSINFO_AGENT_DEPS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
@@ -231,4 +231,4 @@ SYSINFO_AGENT_DEPS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
-	$(SYSINFO_BASE_DEPS)
+	$(SYSINFO_COMMON_DEPS)
