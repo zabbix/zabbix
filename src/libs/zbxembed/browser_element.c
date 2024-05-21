@@ -206,6 +206,13 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 
 	el = wd_element(ctx);
 
+	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	{
+		err_index = browser_push_error(ctx,  el->wd, "missing name parameter");
+
+		goto out;
+	}
+
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
 	{
 		err_index = browser_push_error(ctx, el->wd, "cannot convert name parameter to utf8");
@@ -246,6 +253,13 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 	int			err_index = -1;
 
 	el = wd_element(ctx);
+
+	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	{
+		err_index = browser_push_error(ctx,  el->wd, "missing name parameter");
+
+		goto out;
+	}
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
 	{
@@ -288,7 +302,7 @@ static duk_ret_t	wd_element_get_text(duk_context *ctx)
 
 	if (SUCCEED != webdriver_get_element_info(el->wd, el->id, "text", NULL, &value, &error))
 	{
-		err_index = browser_push_error(ctx, el->wd, "cannot get element property: %s", error);
+		err_index = browser_push_error(ctx, el->wd, "cannot get element text: %s", error);
 		zbx_free(error);
 
 		goto out;
