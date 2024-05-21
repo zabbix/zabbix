@@ -212,11 +212,13 @@ zbx_sms_scenario;
 
 int	check_phone_number(const char *number)
 {
-	char *valid_chars = "01234567890+()[].-*/ ";
+	const char *ptr;
 
-	for(size_t i = 0; i < strlen(number); i++)
-		if(NULL == strchr(valid_chars, number[i]))
+	for (ptr = number; '\0' != *ptr; ptr++)
+	{
+		if (0 == isprint(*ptr) || '"' == *ptr)
 			return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -247,7 +249,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	int			f, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	if(SUCCEED != check_phone_number(number))
+	if (SUCCEED != check_phone_number(number))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "error not valid phone number: %s",number);
 		if (NULL != error)
