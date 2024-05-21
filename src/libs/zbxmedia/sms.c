@@ -210,7 +210,7 @@ typedef struct
 }
 zbx_sms_scenario;
 
-int	check_phone_number(const char *number)
+static int	check_phone_number(const char *number)
 {
 	const char *ptr;
 
@@ -251,9 +251,9 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	if (SUCCEED != check_phone_number(number))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "error not valid phone number: %s",number);
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid phone number \"%s\"", number);
 		if (NULL != error)
-			zbx_snprintf(error, max_error_len, "error not valid phone number: %s",number);
+			zbx_snprintf(error, max_error_len, "invalid phone number \"%s\"", number);
 
 		return FAIL;
 	}
