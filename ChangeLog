@@ -67,6 +67,7 @@ A......... [ZBX-24258] fixed issue causing error when removing the old MFA metho
 .......PS. [ZBX-24354] fixed item status flapping (vso)
 ........S. [ZBX-24363] fixed proxyid being ignored in item test (kprutkovs)
 ....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta3
@@ -751,6 +752,7 @@ A......... [ZBX-23407] improved performance of retrieving last history values wh
 ........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
 .........T [ZBX-24275] fixed item prototype JSONPath preprocessing, added missing volume health metric and triggers in HPE MSA templates (drasikhov)
 .........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.14
@@ -2529,6 +2531,7 @@ A......... [ZBX-23407] improved performance of retrieving last history values wh
 ........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
 .........T [ZBX-24275] fixed item prototype JSONPath preprocessing, added missing volume health metric and triggers in HPE MSA templates (drasikhov)
 .........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.29
