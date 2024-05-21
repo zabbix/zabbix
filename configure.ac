@@ -45,7 +45,7 @@ dnl *****************************************************************
 
 AC_PROG_EGREP
 
-AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
+AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h malloc.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
   fcntl.h sys/param.h arpa/inet.h \
@@ -847,6 +847,13 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 ]], [[struct rlimit rlim;
 getrlimit(RLIMIT_NOFILE, &rlim);
 ]])],[AC_DEFINE(HAVE_GETRLIMIT,1,Define to 1 if function 'getrlimit' exists.)
+AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(for function malloc_trim in malloc.h)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <malloc.h>
+]], [[malloc_trim(0);
+]])],[AC_DEFINE(HAVE_MALLOC_TRIM,1,Define to 1 if function 'malloc_trim' exists.)
 AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
 dnl *****************************************************************

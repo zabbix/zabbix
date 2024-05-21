@@ -2316,5 +2316,8 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);
 out:
+#ifdef HAVE_MALLOC_TRIM
+	malloc_trim(0);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
