@@ -31,29 +31,25 @@ use	Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
-		$error = null;
-
 		$name = $this->widget->getDefaultName();
 
 		$data = [
 			'name' => $this->getInput('name', $name),
-			'layout' => $this->fields_values['layout'],
 			'columns' => [],
 			'item_values' => [],
-			'show_thumbnail' => false,
+			'layout' => $this->fields_values['layout'],
 			'show_lines' => $this->fields_values['show_lines'],
-			'sortorder' => $this->fields_values['sortorder'],
-			'show_timestamp' => $this->fields_values['show_timestamp'],
 			'show_column_header' => $this->fields_values['show_column_header'],
-			'error' => $error,
+			'show_thumbnail' => false,
+			'show_timestamp' => $this->fields_values['show_timestamp'],
+			'sortorder' => $this->fields_values['sortorder'],
+			'error' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		$override_hostid = $this->fields_values['override_hostid'] ? $this->fields_values['override_hostid'][0] : '';
-
-		if ($override_hostid === '' && $this->isTemplateDashboard()) {
+		if (!$this->fields_values['override_hostid'] && $this->isTemplateDashboard()) {
 			$data['error'] = _('No data.');
 
 			$this->setResponse(new CControllerResponseData($data));
@@ -62,75 +58,74 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$columns = $this->fields_values['columns'];
-
-		$itemids = array_column($columns, 'itemid');
 		$db_items = [];
 
 		if ($columns) {
-			if (!$this->isTemplateDashboard()) {
-				$db_items = API::Item()->get([
-					'output' => ['itemid', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
-					'selectValueMap' => ['mappings'],
-					'hostids' => $override_hostid !== '' ? [$override_hostid] : null,
-					'itemids' => $itemids,
-					'webitems' => true,
-					'preservekeys' => true
-				]);
-			}
-			else {
+			if ($this->fields_values['override_hostid']) {
 				$db_item_keys = API::Item()->get([
 					'output' => ['key_'],
-					'itemids' => $itemids,
+					'itemids' => array_column($columns, 'itemid'),
 					'webitems' => true,
 					'preservekeys' => true
 				]);
 
 				if ($db_item_keys) {
 					$db_items = API::Item()->get([
-						'output' => ['itemid', 'key_', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
+						'output' => ['key_', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
 						'selectValueMap' => ['mappings'],
-						'hostids' => [$override_hostid],
+						'hostids' => $this->fields_values['override_hostid'],
 						'filter' => [
-							'key_' => array_keys(array_column($db_item_keys, null, 'key_'))
+							'key_' => array_column($db_item_keys, 'key_')
 						],
 						'webitems' => true,
 						'preservekeys' => true
 					]);
 
-					if ($db_items) {
-						$itemid_per_key = array_column($db_items, 'itemid', 'key_');
+					$itemid_by_key = $db_items
+						? array_combine(array_column($db_items, 'key_'), array_keys($db_items))
+						: [];
 
-						foreach ($columns as &$column) {
-							if (array_key_exists($column['itemid'], $db_item_keys)
-									&& array_key_exists($db_item_keys[$column['itemid']]['key_'], $itemid_per_key)) {
-								$column['itemid'] = $itemid_per_key[$db_item_keys[$column['itemid']]['key_']];
-							}
-						}
-						unset($column);
+					foreach ($columns as &$column) {
+						$column['itemid'] = array_key_exists($column['itemid'], $db_item_keys)
+							? $itemid_by_key[$db_item_keys[$column['itemid']]['key_']] ?? null
+							: null;
 					}
+					unset($column);
 				}
 			}
+			else {
+				$db_items = API::Item()->get([
+					'output' => ['key_', 'value_type', 'units', 'valuemapid', 'history', 'trends'],
+					'selectValueMap' => ['mappings'],
+					'itemids' => array_column($columns, 'itemid'),
+					'webitems' => true,
+					'preservekeys' => true
+				]);
+
+				foreach ($columns as &$column) {
+					if (!array_key_exists($column['itemid'], $db_items)) {
+						$column['itemid'] = null;
+					}
+				}
+				unset($column);
+			}
+
+			$columns = $db_items
+				? array_filter($columns, static function($column) {
+					return $column['itemid'] !== null;
+				})
+				: [];
 		}
-
-		if (!$db_items) {
-			$data['error'] = _('No permissions to referred object or it does not exist!');
-
-			$this->setResponse(new CControllerResponseData($data));
-
-			return;
-		}
-
-		$columns = array_filter($columns, static function($column) use ($db_items) {
-			return array_key_exists($column['itemid'], $db_items);
-		});
 
 		if (!$columns) {
+			$data['error'] = _('No data.');
+
 			$this->setResponse(new CControllerResponseData($data));
 
 			return;
 		}
 
-		$item_values_by_source = $this->getItemValuesByDataSource($db_items, $columns);
+		$item_values_by_source = $this->getItemValuesByDataSource($columns, $db_items);
 		$item_values = [];
 
 		$number_parser = new CNumberParser([
@@ -233,18 +228,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'sortorder' => $this->fields_values['sortorder'],
 			'show_timestamp' => (bool) $this->fields_values['show_timestamp'],
 			'show_column_header' => $this->fields_values['show_column_header'],
-			'error' => $error,
+			'error' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
 	}
 
-	private function getItemValuesByDataSource(array $items, array &$columns_config): array {
+	private function getItemValuesByDataSource(array &$columns_config, array $items): array {
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$time_from = time() - $history_period;
 
-		$items_by_source = $this->addDataSourceAndPrepareColumns($items, $columns_config, $time_from);
+		$items_by_source = $this->addDataSourceAndPrepareColumns($columns_config, $items, $time_from);
 
 		$result = [
 			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
@@ -286,14 +281,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $result;
 	}
 
-	private function addDataSourceAndPrepareColumns(array $items, array &$columns_config, int $time): array {
+	private function addDataSourceAndPrepareColumns(array &$columns, array $items, int $time): array {
 		$items_with_source = [
 			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
 			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
 			'binary_items' => []
 		];
 
-		foreach ($columns_config as &$column) {
+		foreach ($columns as &$column) {
 			$itemid = $column['itemid'];
 			$item = $items[$itemid];
 			$column['item_value_type'] = $item['value_type'];

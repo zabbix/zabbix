@@ -87,15 +87,19 @@ else {
 				break;
 			}
 
-			$clock = $item_value['clock'];
-
 			if ($row) {
 				$rows[] = $row;
-				$row = [];
 			}
+
+			$clock = $item_value['clock'];
+			$row = [];
 		}
 
 		$row[$column_index] = $item_value;
+	}
+
+	if ($row) {
+		$rows[] = $row;
 	}
 
 	if ($data['sortorder'] == WidgetForm::NEW_VALUES_BOTTOM) {
@@ -193,11 +197,11 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 				return [
 					(new CCol($bar_gauge))
 						->addClass($cell_class)
-						->setAttribute('data-itemid', $column['itemid'])
+						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']),
 					(new CCol(new CDiv($item_value['formatted_value'])))
 						->addClass($cell_class)
-						->setAttribute('data-itemid', $column['itemid'])
+						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 						->addStyle('width: 0;')
 						->addClass(ZBX_STYLE_NOWRAP)
@@ -222,7 +226,7 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 				return [
 					(new CCol($item_value['formatted_value']))
 						->addClass($cell_class)
-						->setAttribute('data-itemid', $column['itemid'])
+						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 						->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 						->setHint((new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
@@ -257,7 +261,7 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 					)
 					->addClass($column['monospace_font'] ? ZBX_STYLE_MONOSPACE_FONT : null)
 					->addClass($cell_class)
-					->setAttribute('data-itemid', $column['itemid'])
+					->setAttribute('data-itemid', $item_value['itemid'])
 					->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 					->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 					->setColSpan(2)
@@ -269,7 +273,7 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 					->addClass('binary-thumbnail')
 					->addClass($cell_class)
 					->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
-					->setAttribute('data-itemid', $column['itemid'])
+					->setAttribute('data-itemid', $item_value['itemid'])
 					->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 					->setColSpan(2)
 			];
