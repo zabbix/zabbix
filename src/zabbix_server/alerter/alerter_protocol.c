@@ -254,13 +254,15 @@ zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alerti
 	return data_len;
 }
 
-void	zbx_alerter_deserialize_sms(const unsigned char *data, zbx_uint64_t *alertid, char **sendto, char **message)
+void	zbx_alerter_deserialize_sms(const unsigned char *data, zbx_uint64_t *alertid, char **sendto, char **message,
+		char **gsm_modem)
 {
 	zbx_uint32_t	len;
 
 	data += zbx_deserialize_value(data, alertid);
 	data += zbx_deserialize_str(data, sendto, len);
-	(void)zbx_deserialize_str(data, message, len);
+	data += zbx_deserialize_str(data, message, len);
+	(void)zbx_deserialize_str(data, gsm_modem, len);
 }
 
 zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alertid, const char *command)

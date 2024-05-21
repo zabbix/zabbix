@@ -213,7 +213,8 @@ void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *aler
 zbx_uint32_t	zbx_alerter_serialize_sms(unsigned char **data, zbx_uint64_t alertid,  const char *sendto,
 		const char *message, const char *gsm_modem);
 
-void	zbx_alerter_deserialize_sms(const unsigned char *data, zbx_uint64_t *alertid, char **sendto, char **message);
+void	zbx_alerter_deserialize_sms(const unsigned char *data, zbx_uint64_t *alertid, char **sendto, char **message,
+		char **gsm_modem);
 
 zbx_uint32_t	zbx_alerter_serialize_exec(unsigned char **data, zbx_uint64_t alertid, const char *command);
 

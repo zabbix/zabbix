@@ -206,18 +206,19 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
 {
 	zbx_uint64_t	alertid;
-	char		*sendto, *message;
+	char		*sendto, *message, *gsm_modem;
 	int		ret;
 	char		error[MAX_STRING_LEN];
 
-	zbx_alerter_deserialize_sms(ipc_message->data, &alertid, &sendto, &message);
+	zbx_alerter_deserialize_sms(ipc_message->data, &alertid, &sendto, &message, &gsm_modem);
 
 	/* SMS uses its own timeouts */
-	ret = send_sms(sendto, message, error, sizeof(error));
+	ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(sendto);
 	zbx_free(message);
+	zbx_free(gsm_modem);
 }
 
 /******************************************************************************
