@@ -113,6 +113,13 @@ static duk_ret_t	wd_element_send_keys(duk_context *ctx)
 
 	el = wd_element(ctx);
 
+	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	{
+		err_index = browser_push_error(ctx,  el->wd, "missing keys parameter");
+
+		goto out;
+	}
+
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &keys))
 	{
 		err_index = browser_push_error(ctx,  el->wd, "cannot convert keys parameter to utf8");
