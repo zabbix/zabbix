@@ -36,6 +36,7 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
 	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
+	const USER_PARAM_RELOAD_DELAY			= 3; // User parameters reload delay.
 	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
@@ -260,13 +261,17 @@ class CIntegrationTest extends CAPITest {
 			self::stopComponent($component);
 		}
 
+		$case_name = strtr($this->getName(true), [' ' => '-']);
+		mkdir(PHPUNIT_COMPONENT_DIR.'all/'.$case_name, 0775, true);
 		if ($this->hasFailed()) {
-			$case_name = strtr($this->getName(true), [' ' => '-']);
 			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
+		}
 
-			foreach ($components as $component) {
-				$log_file = self::getLogPath($component);
-				if (file_exists($log_file)) {
+		foreach (self::getComponents() as $component) {
+			$log_file = self::getLogPath($component);
+			if (file_exists($log_file)) {
+				copy($log_file, PHPUNIT_COMPONENT_DIR.'all/'.$case_name.'/'.basename($log_file));
+				if ($this->hasFailed()) {
 					rename($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
 				}
 			}
@@ -825,6 +830,21 @@ class CIntegrationTest extends CAPITest {
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
 
 		sleep(self::CACHE_RELOAD_DELAY);
+	}
+
+	/**
+	 * Reload user parameters.
+	 *
+	 * @param string $component    component name or null for active component
+	 */
+	protected function reloadUserParameters($component = null) {
+		if ($component === null) {
+			$component = $this->getActiveComponent();
+		}
+
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'userparameter_reload']);
+
+		sleep(self::USER_PARAM_RELOAD_DELAY);
 	}
 
 	/**

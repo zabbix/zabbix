@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T16:01:13Z'
+  date: '2024-05-07T07:51:51Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -9,7 +9,16 @@ zabbix_export:
       template: 'Linux by Prom'
       name: 'Linux by Prom'
       description: |
-        Official Linux template using node exporter.
+        This template collects Linux metrics from node_exporter 0.18 and above. Support for older node_exporter versions is provided as 'best effort'.
+        
+        Setup:
+        
+        1. Set up the node_exporter according to the official documentation:
+        https://prometheus.io/docs/guides/node-exporter/
+        
+        Use node_exporter v0.18.0 or above.
+        
+        2. Set the hostname or IP address of the node_exporter host in the '{$NODE_EXPORTER_HOST}' macro. You can also change the Prometheus endpoint port in the '{$NODE_EXPORTER_PORT}' macro if necessary.
         
         Known Issues:
         
@@ -107,7 +116,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          url: 'http://{HOST.CONN}:{$NODE_EXPORTER_PORT}/metrics'
+          url: 'http://{$NODE_EXPORTER_HOST}:{$NODE_EXPORTER_PORT}/metrics'
           tags:
             - tag: component
               value: raw
@@ -1775,6 +1784,22 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+              trigger_prototypes:
+                - uuid: d5687d7aa0484b389f0bd168d50ee1e6
+                  expression: 'last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  name: '{#FSNAME}: Disk space is critically low'
+                  event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                - uuid: 8f765148cfd64d5ebda93f39d0b20e36
+                  expression: 'last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}'
+                  name: '{#FSNAME}: Disk space is low'
+                  event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                  priority: WARNING
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: '{#FSNAME}: Disk space is critically low'
+                      expression: 'last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
             - uuid: acb3d42ae23b48cbacd0e99c27697798
               name: '{#FSNAME}: Total space'
               type: DEPENDENT
@@ -1811,52 +1836,6 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
-          trigger_prototypes:
-            - uuid: d5687d7aa0484b389f0bd168d50ee1e6
-              expression: |
-                last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low'
-              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: AVERAGE
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: capacity
-            - uuid: 8f765148cfd64d5ebda93f39d0b20e36
-              expression: |
-                last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low'
-              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: WARNING
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              dependencies:
-                - name: '{#FSNAME}: Disk space is critically low'
-                  expression: |
-                    last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: capacity
           graph_prototypes:
             - uuid: aa350a426fcd40af96cd15f778cdf62d
               name: '{#FSNAME}: Disk space usage'
@@ -1927,8 +1906,11 @@ zabbix_export:
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-          value: ^7$
-          description: 'Ignore notPresent(7).'
+          value: ^notpresent$
+          description: 'Ignore notpresent(1).'
+        - macro: '{$NODE_EXPORTER_HOST}'
+          value: '<SET NODE EXPORTER HOST>'
+          description: 'The hostname or IP address of the node_exporter host.'
         - macro: '{$NODE_EXPORTER_PORT}'
           value: '9100'
           description: 'TCP Port node_exporter is listening on.'
@@ -1948,12 +1930,6 @@ zabbix_export:
         - macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
           value: '20'
           description: 'Disk write average response time (in ms) before the trigger would fire.'
-        - macro: '{$VFS.FS.FREE.MIN.CRIT}'
-          value: 5G
-          description: 'The critical threshold of the filesystem utilization.'
-        - macro: '{$VFS.FS.FREE.MIN.WARN}'
-          value: 10G
-          description: 'The warning threshold of the filesystem utilization.'
         - macro: '{$VFS.FS.FSDEVICE.MATCHES}'
           value: ^.+$
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'

@@ -31,7 +31,7 @@ import (
 	"strings"
 	"syscall"
 
-	"zabbix.com/pkg/procfs"
+	"golang.zabbix.com/agent2/pkg/procfs"
 )
 
 func read2k(filename string) (data []byte, err error) {

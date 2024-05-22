@@ -25,9 +25,9 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 type mockWriter struct {

@@ -949,8 +949,8 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/uri"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/uri"
 )
 
 // TLS initialization

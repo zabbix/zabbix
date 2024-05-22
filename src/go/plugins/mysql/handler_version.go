@@ -22,7 +22,7 @@ package mysql
 import (
 	"context"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func versionHandler(ctx context.Context, conn MyClient, params map[string]string, _ ...string) (interface{}, error) {

@@ -96,7 +96,7 @@ const char	*help_message[] = {};
 ZBX_METRIC	parameters_agent[] = {NULL};
 ZBX_METRIC	parameters_specific[] = {NULL};
 
-void zbx_on_exit(int ret)
+void zbx_on_exit(int ret, void *on_exit_args)
 {
 }
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:20:47Z'
+  date: '2024-03-06T08:28:31Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -30,6 +30,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
@@ -40,13 +41,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -253,6 +254,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
@@ -263,13 +265,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -518,7 +520,7 @@ zabbix_export:
           description: 'Discovery of monthly costs by services.'
           item_prototypes:
             - uuid: d01ee8df0e204f1a857b8188df47402a
-              name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+              name: 'AWS Cost: [{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
               type: DEPENDENT
               key: 'aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]'
               delay: '0'
@@ -546,7 +548,7 @@ zabbix_export:
                   value: '{#AWS.BILLING.SERVICE.NAME}'
           graph_prototypes:
             - uuid: b267e0ae08d34a7dae730848577aea68
-              name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+              name: 'AWS Cost: [{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 2E7D32
@@ -584,7 +586,7 @@ zabbix_export:
           description: 'Discovery of daily blended costs by services.'
           item_prototypes:
             - uuid: b6e121c3a1eb49858e942beab12660e2
-              name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+              name: 'AWS Cost: Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
               type: DEPENDENT
               key: 'aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]'
               delay: '0'
@@ -606,7 +608,7 @@ zabbix_export:
                   value: '{#AWS.BILLING.SERVICE.NAME}'
           graph_prototypes:
             - uuid: 71646982ab55405dbc10f200e8050c93
-              name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+              name: 'AWS Cost: Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 2E7D32
@@ -632,7 +634,7 @@ zabbix_export:
           description: 'Discovery of monthly costs.'
           item_prototypes:
             - uuid: aaf85a53d1804c858fc20189f0483bad
-              name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Blended cost per month'
+              name: 'AWS Cost: [{#AWS.BILLING.MONTH}]: Blended cost per month'
               type: DEPENDENT
               key: 'aws.monthly.cost["{#AWS.BILLING.MONTH}"]'
               delay: '0'
@@ -657,7 +659,7 @@ zabbix_export:
                   value: '{#AWS.BILLING.MONTH}'
           graph_prototypes:
             - uuid: 3e01a98ed70149e3a6a083bb103aa496
-              name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Monthly blended cost'
+              name: 'AWS Cost: [{#AWS.BILLING.MONTH}]: Monthly blended cost'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 2E7D32
@@ -719,7 +721,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
-                        name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Monthly blended cost'
+                        name: 'AWS Cost: [{#AWS.BILLING.MONTH}]: Monthly blended cost'
                     - type: INTEGER
                       name: rows
                       value: '6'
@@ -733,7 +735,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
-                        name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+                        name: 'AWS Cost: [{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
                     - type: INTEGER
                       name: rows
                       value: '6'
@@ -747,7 +749,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
-                        name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+                        name: 'AWS Cost: Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
                     - type: INTEGER
                       name: rows
                       value: '5'

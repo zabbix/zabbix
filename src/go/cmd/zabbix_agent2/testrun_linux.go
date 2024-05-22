@@ -20,7 +20,7 @@
 package main
 
 import (
-	"zabbix.com/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
 )
 
 func checkMetrics(s scheduler.Scheduler) {

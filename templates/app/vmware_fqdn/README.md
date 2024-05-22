@@ -15,7 +15,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- VMWare 6.0
+- VMware 6.0
 
 ## Configuration
 
@@ -23,16 +23,18 @@ This template has been tested on:
 
 ## Setup
 
-1. Compile zabbix server with required options (--with-libxml2 and --with-libcurl)
-2. Set the StartVMwareCollectors option in Zabbix server configuration file to 1 or more
+1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
+2. Set the `StartVMwareCollectors` option in Zabbix server configuration file to "1" or more
 3. Create a new host
-4. Set the host macros (on host or template level) required for VMware authentication:
+4. Set the host macros (on the host or template level) required for VMware authentication:
 ```text
 {$VMWARE.URL}
 {$VMWARE.USERNAME}
 {$VMWARE.PASSWORD}
 ```
-5. Link the template to host created early
+5. Link the template to host created earlier
+
+Note: To enable discovery of hardware sensors of VMware Hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the host level.
 
 ### Macros used
 
@@ -41,6 +43,9 @@ This template has been tested on:
 |{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p>||
 |{$VMWARE.USERNAME}|<p>VMware service user name</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service {$USERNAME} user password</p>||
+|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
+|{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to allow in discovery.</p>|`.*`|
+|{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -61,6 +66,13 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |VMware: Status of "{#CLUSTER.NAME}" cluster|<p>VMware cluster status.</p>|Simple check|vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]|
+
+### Trigger prototypes for Discover VMware clusters
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|VMware: The {#CLUSTER.NAME} status is Red|<p>A cluster enabled for DRS becomes invalid (red) when the tree is no longer internally consistent, that is, resource constraints are not observed. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-C7417CAA-BD38-41D0-9529-9E7A5898BB12.html</p>|`last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3`|High||
+|VMware: The {#CLUSTER.NAME} status is Yellow|<p>A cluster becomes overcommitted (yellow) when the tree of resource pools and virtual machines is internally consistent but the cluster does not have the capacity to support all resources reserved by the child resource pools. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-ED8240A0-FB54-4A31-BD3D-F23FE740F10C.html</p>|`last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=2`|Average|**Depends on**:<br><ul><li>VMware: The {#CLUSTER.NAME} status is Red</li></ul>|
 
 ### LLD rule Discover VMware datastores
 
@@ -193,9 +205,12 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p>||
-|{$VMWARE.USERNAME}|<p>VMware service user name</p>||
-|{$VMWARE.PASSWORD}|<p>VMware service {$USERNAME} user password</p>||
+|{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk).</p>||
+|{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
+|{$VMWARE.PASSWORD}|<p>VMware service {$USERNAME} user password.</p>||
+|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
+|{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to allow in discovery.</p>|`.*`|
+|{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
@@ -263,7 +278,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Healthcheck discovery|<p>VMware Rollup Health State sensor discovery</p>|Dependent item|vmware.hv.healthcheck.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Healthcheck discovery|<p>VMware Rollup Health State sensor discovery.</p>|Dependent item|vmware.hv.healthcheck.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Healthcheck discovery
 
@@ -277,6 +292,25 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |VMware: The {$VMWARE.HV.UUID} health is Red|<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"`|High|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
 |VMware: The {$VMWARE.HV.UUID} health is Yellow|<p>One or more components in the appliance might become overloaded soon.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"`|Average|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li><li>VMware: The {$VMWARE.HV.UUID} health is Yellow</li><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
+
+### LLD rule Sensor discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Sensor discovery|<p>VMware hardware sensor discovery. The data is retrieved from numeric sensor probes and provides information about the health of the physical system.</p>|Dependent item|vmware.hv.sensors.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for Sensor discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|VMware: Sensor [{#NAME}] health state|<p>VMware hardware sensor health state. One of the following:</p><p>- Unknown</p><p>- Green</p><p>- Yellow</p><p>- Red</p>|Dependent item|vmware.hv.sensor.state["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Trigger prototypes for Sensor discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|VMware: Sensor [{#NAME}] health state is Red|<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=3`|High|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
+|VMware: Sensor [{#NAME}] health state is Yellow|<p>One or more components in the appliance might become overloaded soon.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=2`|Average|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li><li>VMware: The {$VMWARE.HV.UUID} health is Yellow</li><li>VMware: Sensor [{#NAME}] health state is Red</li></ul>|
 
 ## Feedback
 

@@ -26,7 +26,7 @@ import (
 	"os"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 type Conn struct {

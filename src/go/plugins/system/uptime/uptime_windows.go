@@ -20,7 +20,7 @@
 package uptime
 
 import (
-	"zabbix.com/pkg/pdh"
+	"golang.zabbix.com/agent2/pkg/pdh"
 )
 
 func getUptime() (uptime int, err error) {

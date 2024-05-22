@@ -12,7 +12,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Redis, version 3.0.6, 4.0.14, 5.0.6, 7.0.8
+- Redis, version 3.0.6, 4.0.14, 5.0.6, 7.2.4
 
 ## Configuration
 
@@ -20,9 +20,13 @@ This template has been tested on:
 
 ## Setup
 
-Setup and configure zabbix-agent2 compiled with the Redis monitoring plugin (ZBXNEXT-5428-4.3).
+Setup and configure zabbix-agent2 compiled with the Redis monitoring plugin.
 
-Test availability: `zabbix_get -s redis-master -k redis.ping`
+Redis' default user should have permissions to run CONFIG, INFO, PING, CLIENT and SLOWLOG commands.
+
+Or default user ACL should have @admin, @slow, @dangerous, @fast and @connection categories.
+
+Test availability: `zabbix_get -s 127.0.0.1 -k redis.ping[tcp://127.0.0.1:6379]`
 
 
 ### Macros used
@@ -145,7 +149,7 @@ Test availability: `zabbix_get -s redis-master -k redis.ping`
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|DB {#DB}: Get Keyspace info|<p>The item gets information about keyspace of {#DB} database.</p>|Dependent item|redis.db.info_raw["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Keyspace["{#DB}"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|DB {#DB}: Get Keyspace info|<p>The item gets information about keyspace of {#DB} database.</p>|Dependent item|redis.db.info_raw["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DB}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |DB {#DB}: Average TTL|<p>Average TTL</p>|Dependent item|redis.db.avg_ttl["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.avg_ttl`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |DB {#DB}: Expires|<p>Number of keys with an expiration</p>|Dependent item|redis.db.expires["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expires`</p></li></ul>|
 |DB {#DB}: Keys|<p>Total number of keys</p>|Dependent item|redis.db.keys["{#DB}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.keys`</p></li></ul>|

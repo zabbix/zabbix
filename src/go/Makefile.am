@@ -6,7 +6,7 @@ BUILD_TIME=`date +%H:%M:%S`
 BUILD_DATE=`date +"%b %_d %Y"`
 GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
-PKG=zabbix.com/pkg/version
+PKG=golang2.zabbix.com/gent2/pkg/version
 NEW_FROM_REV=""
 
 GOLDFLAGS = -X '${PKG}.compileDate=${BUILD_DATE}'
@@ -34,25 +34,25 @@ TARGETS =
 INSTALL_TARGETS =
 
 if AGENT2
-TARGETS += zabbix.com/cmd/zabbix_agent2
-INSTALL_TARGETS += install-zabbix.com/cmd/zabbix_agent2
-DBGTARGETS = zabbix.com/cmd/mock_server
+TARGETS += golang.zabbix.com/agent2/cmd/zabbix_agent2
+INSTALL_TARGETS += install-golang.zabbix.com/agent2/cmd/zabbix_agent2
+DBGTARGETS = golang.zabbix.com/agent2/cmd/mock_server
 dist_sysconf_DATA += conf/zabbix_agent2.conf
 endif
 
 if WEBSERVICE
-TARGETS += zabbix.com/cmd/zabbix_web_service
-INSTALL_TARGETS += install-zabbix.com/cmd/zabbix_web_service
+TARGETS += golang.zabbix.com/agent2/cmd/zabbix_web_service
+INSTALL_TARGETS += install-golang.zabbix.com/agent2/cmd/zabbix_web_service
 dist_sysconf_DATA += conf/zabbix_web_service.conf
 endif
 
 all: build
 
-zabbix.com/cmd/zabbix_agent2:
-	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -tags="${AGENT_GOTAGS}" -ldflags="${AGENT_GOLDFLAGS}" -o bin zabbix.com/cmd/zabbix_agent2
+golang.zabbix.com/agent2/cmd/zabbix_agent2:
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go build -tags="${AGENT_GOTAGS}" -ldflags="${AGENT_GOLDFLAGS}" -o bin golang.zabbix.com/agent2/cmd/zabbix_agent2
 
-zabbix.com/cmd/zabbix_web_service:
-	go build -ldflags="${WEBSERVICE_GOLDFLAGS}" -o bin zabbix.com/cmd/zabbix_web_service
+golang.zabbix.com/agent2/cmd/zabbix_web_service:
+	go build -ldflags="${WEBSERVICE_GOLDFLAGS}" -o bin golang.zabbix.com/agent2/cmd/zabbix_web_service
 
 build: ${TARGETS}
 
@@ -72,7 +72,7 @@ clean-sbom:
 	-rm -f sbom-zws.json
 	-rm -f sbom-zws.xml
 
-install-zabbix.com/cmd/zabbix_agent2:
+install-golang.zabbix.com/agent2/cmd/zabbix_agent2:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" GOBIN=${GOBIN} \
 		go install -ldflags="${AGENT_GOLDFLAGS}" ${TARGETS}
 	$(MKDIR_P) "$(DESTDIR)$(AGENT2_CONFIG_PLUGINS_PATH)"
@@ -82,8 +82,8 @@ install-zabbix.com/cmd/zabbix_agent2:
 		cp "$$cfg" "$(DESTDIR)$(AGENT2_CONFIG_PLUGINS_PATH)/"`basename $$cfg`; \
 	done
 
-install-zabbix.com/cmd/zabbix_web_service:
-	GOBIN=${GOBIN} go install -ldflags="${WEBSERVICE_GOLDFLAGS}" zabbix.com/cmd/zabbix_web_service
+install-golang.zabbix.com/agent2/cmd/zabbix_web_service:
+	GOBIN=${GOBIN} go install -ldflags="${WEBSERVICE_GOLDFLAGS}" golang.zabbix.com/agent2/cmd/zabbix_web_service
 
 install-exec-local: ${INSTALL_TARGETS}
 

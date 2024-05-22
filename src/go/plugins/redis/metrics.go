@@ -20,10 +20,10 @@
 package redis
 
 import (
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/metric"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/uri"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/metric"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/uri"
 )
 
 const (

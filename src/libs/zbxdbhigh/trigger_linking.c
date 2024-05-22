@@ -1576,6 +1576,8 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 
 	if (SUCCEED == res)
 	{
+		/* temp_host_triggerids - list of host triggerids that have DESCRIPTION ONLY (trigger name)  */
+		/* matches with triggers from templates, not FULL matches (description + expression).        */
 		res = get_target_host_main_data(hostid, &templates_triggers_descriptions, &zbx_host_triggers_main_data,
 				&temp_host_triggerids, &host_triggers_descriptions);
 	}
@@ -1614,7 +1616,7 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 
 	if (SUCCEED == res)
 	{
-		res = DBsync_template_dependencies_for_triggers(hostid, &temp_host_triggerids,
+		res = DBsync_template_dependencies_for_triggers(hostid, &cur_triggerids,
 				TRIGGER_DEP_SYNC_UPDATE_OP);
 	}
 
