@@ -66,7 +66,7 @@ typedef struct
 {
 	const char	*config_source_ip;
 	const char	*config_ssl_ca_location;
-	int		config_enable_modem;
+	const char	*config_sms_devices;
 }
 zbx_thread_alerter_args;
 

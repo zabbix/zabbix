@@ -375,7 +375,7 @@ static char	*config_file				= NULL;
 static int	config_allow_root			= 0;
 static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
-static int	config_enable_modem			= 0;
+static char	*config_sms_devices			= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -1134,7 +1134,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"EnableModem",			&config_enable_modem,			ZBX_CFG_TYPE_INT,
+		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{0}
 	};
@@ -1589,7 +1589,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_ssl_ca_location, config_ssl_cert_location,
 							config_ssl_key_location};
 	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location,
-							config_enable_modem};
+							config_sms_devices};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
 						.workers_num = config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],

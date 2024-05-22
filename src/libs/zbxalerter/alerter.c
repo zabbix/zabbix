@@ -217,28 +217,48 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
  *                                                                            *
  * Purpose: processes SMS alert                                               *
  *                                                                            *
- * Parameters: socket       - [IN] connection socket                          *
- *             ipc_message  - [IN] ipc message with media type and alert data *
- *             enable_modem - [IN] modem usage config                         *
+ * Parameters: socket      - [IN] connection socket                           *
+ *             ipc_message - [IN] ipc message with media type and alert data  *
+ *             allowed     - [IN] allowed list of modem devices               *
  *                                                                            *
  ******************************************************************************/
 static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
-					const int enable_modem)
+					const char* allowed)
 {
 	zbx_uint64_t	alertid;
-	char		*sendto, *message, *gsm_modem, error[MAX_STRING_LEN];
+	char		*sendto, *message, *gsm_modem, error[MAX_STRING_LEN],
+			*start = NULL, *end = NULL, tmp[MAX_STRING_LEN];
 	int		ret;
 
 	zbx_alerter_deserialize_sms(ipc_message->data, &alertid, &sendto, &message, &gsm_modem);
-	if (0 != enable_modem)
+	if (NULL != allowed)
 	{
-		/* SMS uses its own timeouts */
-		ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
-	} else {
-		zbx_snprintf(error, sizeof(error), "modem usage disabled");
-		zabbix_log(LOG_LEVEL_DEBUG, error);
-		ret = FAIL;
+		/* check list of allowed modem devices */
+		zbx_strscpy(tmp, allowed);
+
+		for (start = tmp; '\0' != *start;)
+		{
+			if (NULL != (end = strchr(start, ',')))
+				*end = '\0';
+
+			if (0 == strcmp(start, gsm_modem))
+			{
+				/* SMS uses its own timeouts */
+				ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
+				goto out;
+			}
+
+			if (NULL != end)
+				start = end + 1;
+			else
+				break;
+		}
 	}
+	zabbix_log(LOG_LEVEL_WARNING, "error: SMSDevices not configured for %s", gsm_modem);
+	zbx_snprintf(error, sizeof(error), "error: SMSDevices not configured for %s", gsm_modem);
+
+	ret = FAIL;
+out:
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(sendto);
@@ -411,7 +431,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 						alerter_args_in->config_ssl_ca_location);
 				break;
 			case ZBX_IPC_ALERTER_SMS:
-				alerter_process_sms(&alerter_socket, &message, alerter_args_in->config_enable_modem);
+				alerter_process_sms(&alerter_socket, &message, alerter_args_in->config_sms_devices);
 				break;
 			case ZBX_IPC_ALERTER_EXEC:
 				alerter_process_exec(&alerter_socket, &message);
