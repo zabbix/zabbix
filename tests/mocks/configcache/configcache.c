@@ -1,26 +1,26 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "configcache.h"
 #include "configcache_mock.h"
 
-zbx_mock_config_t	mock_config;
+static zbx_mock_config_t	mock_config;
+
+zbx_mock_config_t	*get_mock_config(void)
+{
+	return &mock_config;
+}
 
 void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 void	*__real_zbx_hashset_search(zbx_hashset_t *hs, const void *data);
@@ -106,7 +106,7 @@ void	free_string(const char *str)
 void	mock_config_init(void)
 {
 	memset(&mock_config, 0, sizeof(mock_config));
-	config = &mock_config.dc;
+	set_dc_config(&mock_config.dc);
 }
 
 void	mock_config_free(void)

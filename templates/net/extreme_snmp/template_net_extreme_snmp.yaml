@@ -27,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: ba27dc4ef9bf4c639b224b4e4881073e
-          name: 'Extreme EXOS: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -41,14 +41,14 @@ zabbix_export:
           triggers:
             - uuid: 445766fc99c1480eac4d3d403c3ede2b
               expression: 'max(/Extreme EXOS by SNMP/icmpping,#3)=0'
-              name: 'Extreme EXOS: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: bd39116401f249008d21e4109a34c6c7
-          name: 'Extreme EXOS: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -62,11 +62,11 @@ zabbix_export:
           triggers:
             - uuid: fb0abe322fd644b4bb3c1255d564bb47
               expression: 'min(/Extreme EXOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Extreme EXOS by SNMP/icmppingloss,5m)<100'
-              name: 'Extreme EXOS: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Extreme EXOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Extreme EXOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -74,7 +74,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: c59f57d99c7045b6920e26c8c1b58e52
-          name: 'Extreme EXOS: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -88,13 +88,14 @@ zabbix_export:
           triggers:
             - uuid: d29defd9360c489a892821989eeda10c
               expression: 'avg(/Extreme EXOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Extreme EXOS: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Extreme EXOS: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Extreme EXOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Extreme EXOS by SNMP/icmppingloss,5m)<100'
-                - name: 'Extreme EXOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Extreme EXOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -102,7 +103,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: b17bfccc91f1489fb9f85d719ca19d70
-          name: 'Device: Temperature status'
+          name: 'Temperature status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1916.1.1.1.7.0
           key: 'sensor.temp.status[extremeOverTemperatureAlarm.0]'
@@ -118,7 +119,7 @@ zabbix_export:
             - tag: component
               value: temperature
         - uuid: 2e8384090e304767bc6bba60d822e223
-          name: 'Device: Temperature'
+          name: Temperature
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1916.1.1.1.8.0
           key: 'sensor.temp.value[extremeCurrentTemperature.0]'
@@ -138,13 +139,13 @@ zabbix_export:
               expression: 'avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_WARN}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_WARN}-3'
-              name: 'Device: Temperature is above warning threshold'
-              event_name: 'Device: Temperature is above warning threshold: >{$TEMP_WARN}'
+              name: 'Temperature is above warning threshold'
+              event_name: 'Temperature is above warning threshold: >{$TEMP_WARN}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
               dependencies:
-                - name: 'Device: Temperature is above critical threshold'
+                - name: 'Temperature is above critical threshold'
                   expression: |
                     avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT}
                     or
@@ -159,8 +160,8 @@ zabbix_export:
               expression: 'avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT_LOW}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'min(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT_LOW}+3'
-              name: 'Device: Temperature is too low'
-              event_name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW}'
+              name: 'Temperature is too low'
+              event_name: 'Temperature is too low: <{$TEMP_CRIT_LOW}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               tags:
@@ -169,7 +170,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: da2bc25bb40642feaaff04b1cd5f85a0
-          name: 'Extreme EXOS: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -182,7 +183,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: aa2eb0947ea34b2bbb739d6025d914ea
-          name: 'Extreme EXOS: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -202,7 +203,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fd93c5fb3e054f84b052d7f682a87655
-          name: 'Extreme EXOS: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1916.1.32.1.2.0
           key: 'system.cpu.util[extremeCpuMonitorTotalUtilization.0]'
@@ -218,8 +219,8 @@ zabbix_export:
           triggers:
             - uuid: a77bbfe0755f4901b67a7957805bc566
               expression: 'min(/Extreme EXOS by SNMP/system.cpu.util[extremeCpuMonitorTotalUtilization.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'Extreme EXOS: High CPU utilization'
-              event_name: 'Extreme EXOS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -227,7 +228,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: e23764de0cda451d959e73ca0ea211ae
-          name: 'Extreme EXOS: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -248,7 +249,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7f6260a568644e89ba87ccca63102357
-          name: 'Extreme EXOS: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.9.1
           key: system.hw.firmware
@@ -267,7 +268,7 @@ zabbix_export:
           triggers:
             - uuid: dd9fbc501f9047fd8fae9dfd741e3778
               expression: 'last(/Extreme EXOS by SNMP/system.hw.firmware,#1)<>last(/Extreme EXOS by SNMP/system.hw.firmware,#2) and length(last(/Extreme EXOS by SNMP/system.hw.firmware))>0'
-              name: 'Extreme EXOS: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -276,7 +277,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 42ec93c3013d428c9f72fe721ea46db5
-          name: 'Extreme EXOS: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.2.1
           key: system.hw.model
@@ -294,7 +295,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 93882ec52eed40778858e52dc7153093
-          name: 'Extreme EXOS: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
           key: system.hw.serialnumber
@@ -314,8 +315,8 @@ zabbix_export:
           triggers:
             - uuid: db1760a34c884b1aa36e4fc4639791dd
               expression: 'last(/Extreme EXOS by SNMP/system.hw.serialnumber,#1)<>last(/Extreme EXOS by SNMP/system.hw.serialnumber,#2) and length(last(/Extreme EXOS by SNMP/system.hw.serialnumber))>0'
-              name: 'Extreme EXOS: Device has been replaced'
-              event_name: 'Extreme EXOS: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -323,7 +324,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 9e9db5d7fe5f4f4e8fc6581813699c1e
-          name: 'Extreme EXOS: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -347,7 +348,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8ec263e1593e48d18b3e50f215e94196
-          name: 'Extreme EXOS: Hardware version(revision)'
+          name: 'Hardware version(revision)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.9.1
           key: system.hw.version
@@ -364,7 +365,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d8c7f5611f544299a95eedc0c80cedb5
-          name: 'Extreme EXOS: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -374,7 +375,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -384,7 +385,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7345ee5a5db545a9a5bb90ab5626a2aa
-          name: 'Extreme EXOS: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -406,8 +407,8 @@ zabbix_export:
           triggers:
             - uuid: 2923c342e8474e3ea3d7411c104a6988
               expression: 'last(/Extreme EXOS by SNMP/system.name,#1)<>last(/Extreme EXOS by SNMP/system.name,#2) and length(last(/Extreme EXOS by SNMP/system.name))>0'
-              name: 'Extreme EXOS: System name has changed'
-              event_name: 'Extreme EXOS: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -417,7 +418,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 92f8e91c4d2c423984cb14440bc83328
-          name: 'Extreme EXOS: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -427,7 +428,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -436,7 +437,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 041115a5c3f44c8c9a9e1e0c7bc7203e
-          name: 'Extreme EXOS: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -455,7 +456,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 0ba6360ecf4c4487a249e3efabca2e0c
-          name: 'Extreme EXOS: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1916.1.1.1.13.0
           key: 'system.sw.os[extremePrimarySoftwareRev.0]'
@@ -479,24 +480,24 @@ zabbix_export:
           triggers:
             - uuid: af6a823b8f2d4fddae970828d0a3a9c9
               expression: 'last(/Extreme EXOS by SNMP/system.sw.os[extremePrimarySoftwareRev.0],#1)<>last(/Extreme EXOS by SNMP/system.sw.os[extremePrimarySoftwareRev.0],#2) and length(last(/Extreme EXOS by SNMP/system.sw.os[extremePrimarySoftwareRev.0]))>0'
-              name: 'Extreme EXOS: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Extreme EXOS: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Extreme EXOS by SNMP/system.name,#1)<>last(/Extreme EXOS by SNMP/system.name,#2) and length(last(/Extreme EXOS by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 62a022d402c24da29c1aa7cb0eb64244
-          name: 'Extreme EXOS: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -510,12 +511,12 @@ zabbix_export:
           triggers:
             - uuid: ecc42656a3d845ee8ad42d0fe45319c2
               expression: 'max(/Extreme EXOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Extreme EXOS: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Extreme EXOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Extreme EXOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -917,8 +918,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1128,7 +1129,7 @@ zabbix_export:
                   expression: 'last(/Extreme EXOS by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
-                  description: 'Please check autonegotiation settings and cabling'
+                  description: 'Please check autonegotiation settings and cabling.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1200,10 +1201,13 @@ zabbix_export:
           value: '2'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
         - macro: '{$IFCONTROL}'
@@ -1241,6 +1245,7 @@ zabbix_export:
           value: '3'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '65'
         - macro: '{$TEMP_CRIT_LOW}'
@@ -1255,7 +1260,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1911,6 +1916,19 @@ zabbix_export:
             - value: '2'
               newvalue: unknown
   triggers:
+    - uuid: bb967f81aaad4a00ae7916ea80574ae0
+      expression: '(last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Extreme EXOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        - name: 'No SNMP data collection'
+          expression: 'max(/Extreme EXOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        - tag: scope
+          value: notice
     - uuid: 132d3e7a1fab4cc08fcbb12eef4e9494
       expression: |
         avg(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)>{$TEMP_CRIT}
@@ -1918,8 +1936,8 @@ zabbix_export:
         last(/Extreme EXOS by SNMP/sensor.temp.status[extremeOverTemperatureAlarm.0])={$TEMP_CRIT_STATUS}
       recovery_mode: RECOVERY_EXPRESSION
       recovery_expression: 'max(/Extreme EXOS by SNMP/sensor.temp.value[extremeCurrentTemperature.0],5m)<{$TEMP_CRIT}-3'
-      name: 'Device: Temperature is above critical threshold'
-      event_name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT}'
+      name: 'Temperature is above critical threshold'
+      event_name: 'Temperature is above critical threshold: >{$TEMP_CRIT}'
       opdata: 'Current value: {ITEM.LASTVALUE1}'
       priority: HIGH
       description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
@@ -1928,19 +1946,6 @@ zabbix_export:
           value: availability
         - tag: scope
           value: performance
-    - uuid: bb967f81aaad4a00ae7916ea80574ae0
-      expression: '(last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Extreme EXOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Extreme EXOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Extreme EXOS: Host has been restarted'
-      event_name: 'Extreme EXOS: {HOST.NAME} has been restarted (uptime < 10m)'
-      priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
-      manual_close: 'YES'
-      dependencies:
-        - name: 'Extreme EXOS: No SNMP data collection'
-          expression: 'max(/Extreme EXOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-      tags:
-        - tag: scope
-          value: notice
   graphs:
     - uuid: 9dc8bc10d4044889bd53c56f1da45c60
       name: 'Extreme EXOS: CPU utilization'

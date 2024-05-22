@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "audit/zbxaudit_trigger.h"
@@ -31,11 +26,11 @@ static int	trigger_flag_to_resource_type(int flag)
 {
 	if (ZBX_FLAG_DISCOVERY_NORMAL == flag || ZBX_FLAG_DISCOVERY_CREATED == flag)
 	{
-		return AUDIT_RESOURCE_TRIGGER;
+		return ZBX_AUDIT_RESOURCE_TRIGGER;
 	}
 	else if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flag)
 	{
-		return AUDIT_RESOURCE_TRIGGER_PROTOTYPE;
+		return ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE;
 	}
 	else
 	{
@@ -45,7 +40,7 @@ static int	trigger_flag_to_resource_type(int flag)
 	}
 }
 
-#define TR_OR_TRP(s) (AUDIT_RESOURCE_TRIGGER == resource_type) ? "trigger."#s : "triggerprototype."#s
+#define TR_OR_TRP(s) (ZBX_AUDIT_RESOURCE_TRIGGER == resource_type) ? "trigger."#s : "triggerprototype."#s
 
 void	zbx_audit_trigger_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t triggerid,
 		const char *name, int flags)
@@ -103,7 +98,7 @@ void	zbx_audit_trigger_update_json_add_data(int audit_context_mode, zbx_uint64_t
 
 	resource_type = trigger_flag_to_resource_type(flags);
 
-	zbx_snprintf(audit_key, sizeof(audit_key), (AUDIT_RESOURCE_TRIGGER == resource_type) ? "trigger" :
+	zbx_snprintf(audit_key, sizeof(audit_key), (ZBX_AUDIT_RESOURCE_TRIGGER == resource_type) ? "trigger" :
 			"triggerprototype");
 #define AUDIT_KEY_SNPRINTF(r) zbx_snprintf(audit_key_##r, sizeof(audit_key_##r), TR_OR_TRP(r));
 	AUDIT_KEY_SNPRINTF(event_name)
@@ -122,7 +117,7 @@ void	zbx_audit_trigger_update_json_add_data(int audit_context_mode, zbx_uint64_t
 	AUDIT_KEY_SNPRINTF(correlation_mode)
 	AUDIT_KEY_SNPRINTF(correlation_tag)
 	AUDIT_KEY_SNPRINTF(manual_close)
-	if (AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
+	if (ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
 		AUDIT_KEY_SNPRINTF(discover)
 #undef AUDIT_KEY_SNPRINTF
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
@@ -150,7 +145,7 @@ void	zbx_audit_trigger_update_json_add_data(int audit_context_mode, zbx_uint64_t
 	ADD_STR(correlation_tag, AUDIT_TABLE_NAME, "correlation_tag")
 	ADD_INT(manual_close, AUDIT_TABLE_NAME, "manual_close")
 
-	if (AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
+	if (ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
 		ADD_UINT64(discover, AUDIT_TABLE_NAME, "discover")
 
 #undef AUDIT_TABLE_NAME
@@ -269,7 +264,7 @@ void	zbx_audit_trigger_update_json_add_dependency(int audit_context_mode, int fl
 
 	resource_type = trigger_flag_to_resource_type(flags);
 
-	if (AUDIT_RESOURCE_TRIGGER == resource_type)
+	if (ZBX_AUDIT_RESOURCE_TRIGGER == resource_type)
 	{
 		zbx_snprintf(audit_key, sizeof(audit_key), "trigger.dependencies[" ZBX_FS_UI64 "]", triggerdepid);
 		zbx_snprintf(audit_key_triggerid_up, sizeof(audit_key_triggerid_up), "trigger.dependencies["
@@ -299,7 +294,7 @@ void	zbx_audit_trigger_update_json_remove_dependency(int audit_context_mode, int
 	resource_type = trigger_flag_to_resource_type(flags);
 
 	zbx_snprintf(audit_key, sizeof(audit_key), "trigger%s.dependencies[" ZBX_FS_UI64 "]",
-			(AUDIT_RESOURCE_TRIGGER == resource_type) ? "" : "prototype", triggerdepid);
+			(ZBX_AUDIT_RESOURCE_TRIGGER == resource_type) ? "" : "prototype", triggerdepid);
 
 	zbx_audit_update_json_append_no_value(triggerid, AUDIT_TRIGGER_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
@@ -315,14 +310,14 @@ void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, z
 
 	resource_type = trigger_flag_to_resource_type(flags);
 
-	if (AUDIT_RESOURCE_TRIGGER == resource_type)
+	if (ZBX_AUDIT_RESOURCE_TRIGGER == resource_type)
 	{
 		zbx_snprintf(audit_key, sizeof(audit_key), "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);
 		zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "trigger.tags[" ZBX_FS_UI64 "].tag", triggertagid);
 		zbx_snprintf(audit_key_value, sizeof(audit_key_value), "trigger.tags[" ZBX_FS_UI64 "].value",
 				triggertagid);
 	}
-	else if(AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
+	else if(ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)
 	{
 		zbx_snprintf(audit_key, sizeof(audit_key), "triggerprototype.tags[" ZBX_FS_UI64 "]", triggertagid);
 		zbx_snprintf(audit_key_tag, sizeof(audit_key_tag), "triggerprototype.tags[" ZBX_FS_UI64 "].tag",
@@ -356,7 +351,7 @@ void	zbx_audit_trigger_update_json_delete_tags(int audit_context_mode, zbx_uint6
 
 	resource_type = trigger_flag_to_resource_type(flags);
 
-	if (AUDIT_RESOURCE_TRIGGER == resource_type)
+	if (ZBX_AUDIT_RESOURCE_TRIGGER == resource_type)
 		zbx_snprintf(audit_key, sizeof(audit_key), "trigger.tags[" ZBX_FS_UI64 "]", triggertagid);
 	else
 		zbx_snprintf(audit_key, sizeof(audit_key), "triggerprototype.tags[" ZBX_FS_UI64 "]", triggertagid);
@@ -365,12 +360,12 @@ void	zbx_audit_trigger_update_json_delete_tags(int audit_context_mode, zbx_uint6
 }
 
 #define TRIGGER_RESOURCE_KEY_RESOLVE_TAG(resource, nested)							\
-	if (AUDIT_RESOURCE_TRIGGER == resource_type)								\
+	if (ZBX_AUDIT_RESOURCE_TRIGGER == resource_type)							\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "trigger.tag[" ZBX_FS_UI64	\
 				"]"#nested#resource, triggertagid);						\
 	}													\
-	else if (AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)						\
+	else if (ZBX_AUDIT_RESOURCE_TRIGGER_PROTOTYPE == resource_type)						\
 	{													\
 		zbx_snprintf(audit_key_##resource, sizeof(audit_key_##resource), "triggerprototype.tag["	\
 				ZBX_FS_UI64 "]"#nested#resource, triggertagid);					\

@@ -40,58 +40,58 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Docker: Ping||Zabbix agent|docker.ping<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|Docker: Get info||Zabbix agent|docker.info|
-|Docker: Get containers||Zabbix agent|docker.containers|
-|Docker: Get images||Zabbix agent|docker.images|
-|Docker: Get data_usage||Zabbix agent|docker.data_usage|
-|Docker: Containers total|<p>Total number of containers on this host.</p>|Dependent item|docker.containers.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Containers`</p></li></ul>|
-|Docker: Containers running|<p>Total number of containers running on this host.</p>|Dependent item|docker.containers.running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ContainersRunning`</p></li></ul>|
-|Docker: Containers stopped|<p>Total number of containers stopped on this host.</p>|Dependent item|docker.containers.stopped<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ContainersStopped`</p></li></ul>|
-|Docker: Containers paused|<p>Total number of containers paused on this host.</p>|Dependent item|docker.containers.paused<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ContainersPaused`</p></li></ul>|
-|Docker: Images total|<p>Number of images with intermediate image layers.</p>|Dependent item|docker.images.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Images`</p></li></ul>|
-|Docker: Storage driver|<p>Docker storage driver.</p><p>https://docs.docker.com/storage/storagedriver/</p>|Dependent item|docker.driver<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Driver`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Memory limit enabled||Dependent item|docker.mem_limit.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MemoryLimit`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Swap limit enabled||Dependent item|docker.swap_limit.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.SwapLimit`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Kernel memory enabled||Dependent item|docker.kernel_mem.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.KernelMemory`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Kernel memory TCP enabled||Dependent item|docker.kernel_mem_tcp.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.KernelMemoryTCP`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: CPU CFS Period enabled|<p>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</p>|Dependent item|docker.cpu_cfs_period.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CpuCfsPeriod`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: CPU CFS Quota enabled|<p>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</p>|Dependent item|docker.cpu_cfs_quota.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CpuCfsQuota`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: CPU Shares enabled|<p>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</p>|Dependent item|docker.cpu_shares.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CPUShares`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: CPU Set enabled|<p>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</p>|Dependent item|docker.cpu_set.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CPUSet`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Pids limit enabled||Dependent item|docker.pids_limit.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.PidsLimit`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: IPv4 Forwarding enabled||Dependent item|docker.ipv4_forwarding.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.IPv4Forwarding`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Debug enabled||Dependent item|docker.debug.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Debug`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Nfd|<p>Number of used File Descriptors.</p>|Dependent item|docker.nfd<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NFd`</p></li></ul>|
-|Docker: OomKill disabled||Dependent item|docker.oomkill.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OomKillDisable`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Goroutines|<p>Number of goroutines.</p>|Dependent item|docker.goroutines<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NGoroutines`</p></li></ul>|
-|Docker: Logging driver||Dependent item|docker.logging_driver<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LoggingDriver`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Cgroup driver||Dependent item|docker.cgroup_driver<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CgroupDriver`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: NEvents listener||Dependent item|docker.nevents_listener<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NEventsListener`</p></li></ul>|
-|Docker: Kernel version||Dependent item|docker.kernel_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.KernelVersion`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Operating system||Dependent item|docker.operating_system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OperatingSystem`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: OS type||Dependent item|docker.os_type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OSType`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Architecture||Dependent item|docker.architecture<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Architecture`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: NCPU||Dependent item|docker.ncpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NCPU`</p></li></ul>|
-|Docker: Memory total||Dependent item|docker.mem.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MemTotal`</p></li></ul>|
-|Docker: Docker root dir||Dependent item|docker.root_dir<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DockerRootDir`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Name||Dependent item|docker.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Name`</p></li></ul>|
-|Docker: Server version||Dependent item|docker.server_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ServerVersion`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Default runtime||Dependent item|docker.default_runtime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DefaultRuntime`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Live restore enabled||Dependent item|docker.live_restore.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LiveRestoreEnabled`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Docker: Layers size||Dependent item|docker.layers_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LayersSize`</p></li></ul>|
-|Docker: Images size||Dependent item|docker.images_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Images[*].Size.sum()`</p></li></ul>|
-|Docker: Containers size||Dependent item|docker.containers_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Containers[*].SizeRw.sum()`</p></li></ul>|
-|Docker: Volumes size||Dependent item|docker.volumes_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Volumes[*].UsageData.Size.sum()`</p></li></ul>|
-|Docker: Images available|<p>Number of top-level images.</p>|Dependent item|docker.images.top_level<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
+|Ping||Zabbix agent|docker.ping<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Get info||Zabbix agent|docker.info|
+|Get containers||Zabbix agent|docker.containers|
+|Get images||Zabbix agent|docker.images|
+|Get data_usage||Zabbix agent|docker.data_usage|
+|Containers total|<p>Total number of containers on this host.</p>|Dependent item|docker.containers.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Containers`</p></li></ul>|
+|Containers running|<p>Total number of containers running on this host.</p>|Dependent item|docker.containers.running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ContainersRunning`</p></li></ul>|
+|Containers stopped|<p>Total number of containers stopped on this host.</p>|Dependent item|docker.containers.stopped<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ContainersStopped`</p></li></ul>|
+|Containers paused|<p>Total number of containers paused on this host.</p>|Dependent item|docker.containers.paused<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ContainersPaused`</p></li></ul>|
+|Images total|<p>Number of images with intermediate image layers.</p>|Dependent item|docker.images.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Images`</p></li></ul>|
+|Storage driver|<p>Docker storage driver.</p><p>https://docs.docker.com/storage/storagedriver/</p>|Dependent item|docker.driver<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Driver`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Memory limit enabled||Dependent item|docker.mem_limit.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MemoryLimit`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Swap limit enabled||Dependent item|docker.swap_limit.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.SwapLimit`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Kernel memory enabled||Dependent item|docker.kernel_mem.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.KernelMemory`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Kernel memory TCP enabled||Dependent item|docker.kernel_mem_tcp.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.KernelMemoryTCP`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|CPU CFS Period enabled|<p>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</p>|Dependent item|docker.cpu_cfs_period.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CpuCfsPeriod`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|CPU CFS Quota enabled|<p>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</p>|Dependent item|docker.cpu_cfs_quota.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CpuCfsQuota`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|CPU Shares enabled|<p>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</p>|Dependent item|docker.cpu_shares.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CPUShares`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|CPU Set enabled|<p>https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler</p>|Dependent item|docker.cpu_set.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CPUSet`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Pids limit enabled||Dependent item|docker.pids_limit.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.PidsLimit`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|IPv4 Forwarding enabled||Dependent item|docker.ipv4_forwarding.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.IPv4Forwarding`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Debug enabled||Dependent item|docker.debug.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Debug`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Nfd|<p>Number of used File Descriptors.</p>|Dependent item|docker.nfd<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NFd`</p></li></ul>|
+|OomKill disabled||Dependent item|docker.oomkill.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OomKillDisable`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Goroutines|<p>Number of goroutines.</p>|Dependent item|docker.goroutines<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NGoroutines`</p></li></ul>|
+|Logging driver||Dependent item|docker.logging_driver<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LoggingDriver`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Cgroup driver||Dependent item|docker.cgroup_driver<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.CgroupDriver`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|NEvents listener||Dependent item|docker.nevents_listener<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NEventsListener`</p></li></ul>|
+|Kernel version||Dependent item|docker.kernel_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.KernelVersion`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Operating system||Dependent item|docker.operating_system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OperatingSystem`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|OS type||Dependent item|docker.os_type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.OSType`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Architecture||Dependent item|docker.architecture<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Architecture`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|NCPU||Dependent item|docker.ncpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.NCPU`</p></li></ul>|
+|Memory total||Dependent item|docker.mem.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.MemTotal`</p></li></ul>|
+|Docker root dir||Dependent item|docker.root_dir<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DockerRootDir`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Name||Dependent item|docker.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Name`</p></li></ul>|
+|Server version||Dependent item|docker.server_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ServerVersion`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Default runtime||Dependent item|docker.default_runtime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DefaultRuntime`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Live restore enabled||Dependent item|docker.live_restore.enabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LiveRestoreEnabled`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Layers size||Dependent item|docker.layers_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.LayersSize`</p></li></ul>|
+|Images size||Dependent item|docker.images_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Images[*].Size.sum()`</p></li></ul>|
+|Containers size||Dependent item|docker.containers_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Containers[*].SizeRw.sum()`</p></li></ul>|
+|Volumes size||Dependent item|docker.volumes_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Volumes[*].UsageData.Size.sum()`</p></li></ul>|
+|Images available|<p>Number of top-level images.</p>|Dependent item|docker.images.top_level<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Docker: Service is down||`last(/Docker by Zabbix agent 2/docker.ping)=0`|Average|**Manual close**: Yes|
-|Docker: Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Docker: Service is down</li></ul>|
-|Docker: Version has changed|<p>Docker version has changed. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0`|Info|**Manual close**: Yes|
+|Service is down||`last(/Docker by Zabbix agent 2/docker.ping)=0`|Average|**Manual close**: Yes|
+|Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|Version has changed|<p>Docker version has changed. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Images discovery
 

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "operations.h"
@@ -27,6 +22,7 @@
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxinterface.h"
 #include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 #include "zbx_discoverer_constants.h"
@@ -196,6 +192,38 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: find host monitoring settings by the data source                  *
+ *                                                                            *
+ * Parameters: proxyid           - [IN] proxyid of the data source            *
+ *             new_proxyid       - [OUT]                                      *
+ *             new_proxy_groupid - [OUT]                                      *
+ *                                                                            *
+ * Return value: The host monitored_by setting (see HOST_MONITORED_BY_*       *
+ *               defines).                                                    *
+ *                                                                            *
+ * Comments: This function is used to determine the entity the host is        *
+ *           monitored by (server, proxy or proxy group) since both - proxy   *
+ *           and proxy group - will have proxy as data source.                *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned char	get_host_monitored_by(zbx_uint64_t src_proxyid, zbx_uint64_t *proxyid,
+		zbx_uint64_t *proxy_groupid)
+{
+	if (0 == (*proxy_groupid = zbx_dc_get_proxy_groupid(src_proxyid)))
+	{
+		if (0 == (*proxyid = src_proxyid))
+			return HOST_MONITORED_BY_SERVER;
+
+		return HOST_MONITORED_BY_PROXY;
+	}
+
+	*proxyid = 0;
+
+	return HOST_MONITORED_BY_PROXY_GROUP;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: adds discovered host if it was not added already                  *
  *                                                                            *
  * Parameters: event          - [IN] source event                             *
@@ -209,7 +237,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 {
 	zbx_db_result_t		result, result2;
 	zbx_db_row_t		row, row2;
-	zbx_uint64_t		hostid = 0, proxyid;
+	zbx_uint64_t		hostid = 0, proxyid, new_proxy_groupid;
 	char			*host_visible, *hostname = NULL;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
@@ -263,12 +291,15 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_uint64_t	interfaceid, dhostid, druleid;
-			unsigned char	svc_type, interface_type;
+			zbx_uint64_t	interfaceid, dhostid, druleid, new_proxyid;
+			unsigned char	svc_type, interface_type, monitored_by;
 
 			ZBX_STR2UINT64(dhostid, row[0]);
 			ZBX_STR2UINT64(druleid, row[8]);
 			ZBX_DBROW2UINT64(proxyid, row[1]);
+
+			monitored_by = get_host_monitored_by(proxyid, &new_proxyid, &new_proxy_groupid);
+
 			svc_type = (unsigned char)atoi(row[5]);
 
 			switch (svc_type)
@@ -290,19 +321,34 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 			if (0 == hostid)
 			{
-				result2 = zbx_db_select(
+				char	*sql = NULL;
+				size_t	sql_alloc = 0, sql_offset = 0;
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"select distinct h.hostid,h.name,h.status"
 						" from hosts h,interface i,dservices ds"
 						" where h.hostid=i.hostid"
 							" and i.ip=ds.ip"
 							" and h.status in (%d,%d)"
 							" and h.flags<>%d"
-							" and h.proxyid%s"
-							" and ds.dhostid=" ZBX_FS_UI64
-						" order by h.hostid",
-						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-						ZBX_FLAG_DISCOVERY_PROTOTYPE,
-						zbx_db_sql_id_cmp(proxyid), dhostid);
+							" and h.monitored_by=%u"
+							" and ds.dhostid=" ZBX_FS_UI64,
+							HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+							ZBX_FLAG_DISCOVERY_PROTOTYPE, monitored_by, dhostid);
+
+				if (HOST_MONITORED_BY_PROXY == monitored_by)
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and h.proxyid=" ZBX_FS_UI64,
+							new_proxyid);
+				}
+				else if (HOST_MONITORED_BY_PROXY_GROUP == monitored_by)
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and h.proxy_groupid="
+							ZBX_FS_UI64, new_proxy_groupid);
+				}
+
+				result2 = zbx_db_select("%s", sql);
+				zbx_free(sql);
 
 				if (NULL != (row2 = zbx_db_fetch(result2)))
 				{
@@ -433,10 +479,10 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				hostid = zbx_db_get_maxid("hosts");
 
-				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "host", "name",
-						(char *)NULL);
-				zbx_db_insert_add_values(&db_insert, hostid, proxyid, host_unique,
-						hostname);
+				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "proxy_groupid", "host",
+						"name", "monitored_by", (char *)NULL);
+				zbx_db_insert_add_values(&db_insert, hostid, new_proxyid, new_proxy_groupid,
+						host_unique, hostname, monitored_by);
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
@@ -457,8 +503,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 							zbx_map_db_event_to_audit_context(event));
 				}
 
-				zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(
-						zbx_map_db_event_to_audit_context(event), hostid, proxyid, host_unique,
+				zbx_audit_host_update_json_add_monitoring_and_hostname_and_inventory_mode(
+						zbx_map_db_event_to_audit_context(event), hostid, monitored_by,
+						new_proxyid, new_proxy_groupid, host_unique,
 						cfg->default_inventory_mode);
 
 				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
@@ -508,12 +555,15 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
 			char			*host_esc, *sql = NULL;
-			zbx_uint64_t		host_proxyid;
+			zbx_uint64_t		host_proxyid, new_proxyid;
 			zbx_conn_flags_t	flags;
 			int			flags_int, tls_accepted;
-			unsigned char		useip = 1;
+			unsigned char		useip = 1, new_monitored_by;
 
 			ZBX_DBROW2UINT64(proxyid, row[0]);
+
+			new_monitored_by = get_host_monitored_by(proxyid, &new_proxyid, &new_proxy_groupid);
+
 			host_esc = zbx_db_dyn_escape_field("hosts", "host", row[1]);
 			port = (unsigned short)atoi(row[4]);
 			flags_int = atoi(row[5]);
@@ -553,7 +603,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			zbx_db_free_result(result2);
 
 			sql = zbx_dsprintf(sql,
-					"select hostid,proxyid,name,status"
+					"select hostid,proxyid,name,status,proxy_groupid,monitored_by"
 					" from hosts"
 					" where host='%s'"
 						" and flags<>%d"
@@ -579,11 +629,12 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
 							(unsigned char *)psk, sizeof(psk));
 
-					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid",
+					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "proxy_groupid",
 							"host", "name", "tls_connect", "tls_accept",
-							"tls_psk_identity", "tls_psk", (char *)NULL);
-					zbx_db_insert_add_values(&db_insert, hostid, proxyid, hostname, hostname,
-						tls_accepted, tls_accepted, psk_identity, psk);
+							"tls_psk_identity", "tls_psk", "monitored_by", (char *)NULL);
+					zbx_db_insert_add_values(&db_insert, hostid, new_proxyid, new_proxy_groupid,
+							hostname, hostname, tls_accepted, tls_accepted, psk_identity,
+							psk, new_monitored_by);
 
 					zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 							ZBX_AUDIT_ACTION_ADD, hostid, hostname);
@@ -593,13 +644,13 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				}
 				else
 				{
-					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "host",
-							"name", (char *)NULL);
+					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "proxy_groupid",
+							"host", "name", "monitored_by", (char *)NULL);
 
 					zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 							ZBX_AUDIT_ACTION_ADD, hostid, hostname);
-					zbx_db_insert_add_values(&db_insert, hostid, proxyid, hostname,
-							hostname);
+					zbx_db_insert_add_values(&db_insert, hostid, new_proxyid, new_proxy_groupid,
+							hostname, hostname, new_monitored_by);
 				}
 
 				zbx_db_insert_execute(&db_insert);
@@ -619,9 +670,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 							zbx_map_db_event_to_audit_context(event));
 				}
 
-				zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(
-						zbx_map_db_event_to_audit_context(event), hostid, proxyid, hostname,
-						cfg->default_inventory_mode);
+				zbx_audit_host_update_json_add_monitoring_and_hostname_and_inventory_mode(
+						zbx_map_db_event_to_audit_context(event), hostid, new_monitored_by,
+						new_proxyid, new_proxy_groupid, hostname, cfg->default_inventory_mode);
 
 				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags,
 						zbx_map_db_event_to_audit_context(event));
@@ -630,24 +681,67 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			}
 			else
 			{
+				zbx_uint64_t	proxy_groupid;
+				unsigned char	monitored_by;
+
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_DBROW2UINT64(host_proxyid, row2[1]);
 				hostname = zbx_strdup(hostname, row2[2]);
 				*status = atoi(row2[3]);
+				ZBX_DBROW2UINT64(proxy_groupid, row2[4]);
+				ZBX_STR2UCHAR(monitored_by, row2[5]);
 
 				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
 						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
-				if (host_proxyid != proxyid)
+				if (host_proxyid != new_proxyid || proxy_groupid != new_proxy_groupid ||
+						monitored_by != new_monitored_by)
 				{
-					zbx_db_execute("update hosts"
-							" set proxyid=%s"
-							" where hostid=" ZBX_FS_UI64,
-							zbx_db_sql_id_ins(proxyid), hostid);
+					char	delim = ' ';
+					size_t	sql_alloc = 0, sql_offset = 0;
 
-					zbx_audit_host_update_json_update_proxyid(
-							zbx_map_db_event_to_audit_context(event), hostid, host_proxyid,
-							proxyid);
+					sql_offset = 0;
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set");
+
+					if (host_proxyid != new_proxyid)
+					{
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+								"%cproxyid=%s", delim,
+								zbx_db_sql_id_ins(new_proxyid));
+						delim = ',';
+
+						zbx_audit_host_update_json_update_proxyid(
+								zbx_map_db_event_to_audit_context(event), hostid,
+								host_proxyid, new_proxyid);
+					}
+
+					if (proxy_groupid != new_proxy_groupid)
+					{
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+								"%cproxy_groupid=%s", delim,
+								zbx_db_sql_id_ins(new_proxy_groupid));
+						delim = ',';
+
+						zbx_audit_host_update_json_update_proxy_groupid(
+								zbx_map_db_event_to_audit_context(event), hostid,
+								proxy_groupid, new_proxy_groupid);
+					}
+
+					if (monitored_by != new_monitored_by)
+					{
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+								"%cmonitored_by=%d", delim, (int)new_monitored_by);
+
+						zbx_audit_host_update_json_update_monitored_by(
+								zbx_map_db_event_to_audit_context(event), hostid,
+								(int)monitored_by, (int)new_monitored_by);
+					}
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							" where hostid=" ZBX_FS_UI64, hostid);
+
+					(void)zbx_db_execute("%s", sql);
+					zbx_free(sql);
 				}
 
 				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags,
@@ -984,7 +1078,6 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 	{
 		char		*sql;
 		zbx_db_result_t	result;
-		zbx_db_row_t	row;
 
 		zbx_db_execute(
 				"update hosts"
@@ -1003,7 +1096,7 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 		result = zbx_db_select_n(sql, 1);
 		zbx_free(sql);
 
-		if (NULL != (row = zbx_db_fetch(result)))
+		if (NULL != zbx_db_fetch(result))
 		{
 			zbx_db_execute("update host_discovery"
 					" set disable_source=%d"

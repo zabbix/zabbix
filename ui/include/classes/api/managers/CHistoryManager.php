@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -234,74 +229,19 @@ class CHistoryManager {
 			$period = $period !== null ? min($period, $hk_history) : $hk_history;
 		}
 
-		if ($period !== null) {
-			$period = time() - $period;
-		}
+		$period_condition = $period === null ? '' : ' AND h.clock>'.(time() - $period);
 
-		$items_by_type = [];
+		foreach ($items as $item) {
+			$db_values = DBselect('SELECT *'.
+				' FROM '.self::getTableName($item['value_type']).' h'.
+				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
+					$period_condition.
+				' ORDER BY h.clock DESC,h.ns DESC',
+				$limit
+			);
 
-		foreach ($items as $key => $item) {
-			$value_type = $item['value_type'];
-
-			if (!array_key_exists($value_type, $items_by_type)) {
-				$items_by_type[$value_type] = [];
-			}
-
-			$items_by_type[$value_type][] = $item;
-			unset($items[$key]);
-		}
-
-		if ($limit == 1) {
-			foreach ($items_by_type as $value_type => $items) {
-				$history_table = self::getTableName($value_type);
-
-				$max_clock_per_item = DBselect(
-					'SELECT h.itemid,MAX(h.clock) AS clock'.
-					' FROM '.$history_table.' h'.
-					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
-						($period !== null ? ' AND h.clock>'.$period : '').
-					' GROUP BY h.itemid'
-				);
-
-				while ($itemid_clock = DBfetch($max_clock_per_item, false)) {
-					$db_value = DBfetchArray(DBselect(
-						'SELECT *'.
-						' FROM '.$history_table.' h'.
-						' WHERE h.itemid='.zbx_dbstr($itemid_clock['itemid']).
-							' AND h.clock='.zbx_dbstr($itemid_clock['clock']).
-						' ORDER BY h.ns DESC',
-						$limit
-					));
-
-					if ($db_value) {
-						$results[$itemid_clock['itemid']] = $db_value;
-					}
-				}
-			}
-		}
-		else {
-			foreach ($items_by_type as $value_type => $items) {
-				$history_table = self::getTableName($value_type);
-
-				foreach ($items as $item) {
-					$db_values = DBselect('SELECT *'.
-						' FROM '.$history_table.' h'.
-						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-							($period !== null ? ' AND h.clock>'.$period : '').
-						' ORDER BY h.clock DESC,h.ns DESC',
-						$limit
-					);
-
-					$values = [];
-
-					while ($db_value = DBfetch($db_values, false)) {
-						$values[] = $db_value;
-					}
-
-					if ($values) {
-						$results[$item['itemid']] = $values;
-					}
-				}
+			while ($db_value = DBfetch($db_values, false)) {
+				$results[$db_value['itemid']][] = $db_value;
 			}
 		}
 

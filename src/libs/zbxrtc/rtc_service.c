@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcommon.h"
@@ -27,6 +22,10 @@
 #include "zbxdiag.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
+#include "zbxipcservice.h"
+#include "zbxprof.h"
+#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
@@ -328,6 +327,43 @@ int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, 
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: notifies remote subscribers                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_rtc_notify_generic(zbx_ipc_async_socket_t *rtc, unsigned char process_type, int process_num,
+		zbx_uint32_t code, const char *data, zbx_uint32_t size)
+{
+	unsigned char	*notify_data, *ptr;
+	zbx_uint32_t	notify_data_size;
+	int		ret = FAIL;
+
+	/* <process type:uchar><process num:int><code:uint32><data size:uint32><data> */
+	notify_data_size = (zbx_uint32_t)(sizeof(process_type) + sizeof(process_num) +  sizeof(code) + 2 * sizeof(size))
+			+ size;
+	notify_data = (unsigned char *)zbx_malloc(NULL, notify_data_size);
+
+	ptr = notify_data;
+	ptr += zbx_serialize_value(ptr, process_type);
+	ptr += zbx_serialize_int(ptr, process_num);
+	ptr += zbx_serialize_value(ptr, code);
+	ptr += zbx_serialize_value(ptr, size);
+	(void)zbx_serialize_str(ptr, data, size);
+
+	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_NOTIFY, notify_data, notify_data_size))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send %s notification", get_process_type_string(process_type));
+		goto out;
+	}
+
+	ret = (int)notify_data_size;
+out:
+	zbx_free(notify_data);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: deserialize subscription target notification codes                *
  *                                                                            *
  ******************************************************************************/
@@ -410,6 +446,11 @@ static void	rtc_subscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
 static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data,
 		char **result)
 {
+	zbx_uint32_t	notify_code, notify_size;
+	int		process_num;
+	char		*notify_data = NULL;
+	unsigned char	process_type;
+
 	switch (code)
 	{
 #if defined(HAVE_SIGQUEUE)
@@ -442,6 +483,15 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			return;
 		case ZBX_RTC_DIAGINFO:
 			rtc_process_diaginfo((const char *)data, result);
+			return;
+		case ZBX_RTC_NOTIFY:
+			data += zbx_deserialize_value(data, &process_type);
+			data += zbx_deserialize_int(data, &process_num);
+			data += zbx_deserialize_value(data, &notify_code);
+			data += zbx_deserialize_value(data, &notify_size);
+			(void)zbx_deserialize_str(data, &notify_data, notify_size);
+			zbx_rtc_notify(rtc, process_type, process_num, notify_code, notify_data, notify_size);
+			zbx_free(notify_data);
 			return;
 		default:
 			*result = zbx_strdup(*result, "Unknown runtime control option\n");

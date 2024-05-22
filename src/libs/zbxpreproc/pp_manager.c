@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "pp_manager.h"
@@ -48,6 +43,7 @@
 #	include <libxml/parser.h>
 #endif
 
+static zbx_prepare_value_func_t	prepare_value_func_cb = NULL;
 static zbx_flush_value_func_t	flush_value_func_cb = NULL;
 static zbx_get_progname_f	get_progname_func_cb = NULL;
 
@@ -99,8 +95,10 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_progname_f get_progname_cb)
+void	zbx_init_library_preproc(zbx_prepare_value_func_t prepare_value_cb, zbx_flush_value_func_t flush_value_cb,
+		zbx_get_progname_f get_progname_cb)
 {
+	prepare_value_func_cb = prepare_value_cb;
 	flush_value_func_cb = flush_value_cb;
 	get_progname_func_cb = get_progname_cb;
 }
@@ -119,13 +117,14 @@ zbx_get_progname_f	preproc_get_progname_cb(void)
  *                                     task (optional)                        *
  *             finished_data    - [IN] callback data (optional)               *
  *             config_source_ip - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *             error            - [OUT]                                       *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
 static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
-		void *finished_data, const char *config_source_ip, char **error)
+		void *finished_data, const char *config_source_ip, int config_timeout, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
 	time_t			time_start;
@@ -164,6 +163,9 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			(zbx_clean_func_t)zbx_pp_item_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	if (FAIL == zbx_ipc_async_socket_open(&manager->rtc, ZBX_IPC_SERVICE_RTC, config_timeout, error))
+		goto out;
 
 	/* wait for threads to start */
 	time_start = time(NULL);
@@ -239,6 +241,8 @@ static void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 #endif
 	pp_curl_destroy();
 	pp_xml_destroy();
+
+	zbx_ipc_async_socket_close(&manager->rtc);
 
 	zbx_free(manager);
 }
@@ -878,6 +882,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 
 		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
+			/* allow empty values */
 			preprocessing_flush_value(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
 
@@ -950,7 +955,9 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
 	zbx_pp_value_opt_t	*value_opt;
 
 	zbx_pp_value_task_get_data(task, &value_type, &flags, &value, &ts, &value_opt);
-	preprocessing_flush_value(manager, task->itemid, value_type, flags, value, ts, value_opt);
+
+	if (SUCCEED == prepare_value_func_cb(value, value_opt))
+		preprocessing_flush_value(manager, task->itemid, value_type, flags, value, ts, value_opt);
 }
 
 /******************************************************************************
@@ -1203,7 +1210,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	}
 
 	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
-			(void *)&service, pp_manager_args_in->config_source_ip, &error)))
+			(void *)&service, pp_manager_args_in->config_source_ip, pp_manager_args_in->config_timeout,
+			&error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);
@@ -1298,6 +1306,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		{
 			processed_num += (unsigned int)tasks.values_num;
 			preprocessor_flush_tasks(manager, &tasks);
+			zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
+					ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
 			zbx_pp_tasks_clear(&tasks);
 		}
 

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxnix.h"
@@ -28,6 +23,18 @@
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
+static int	sig_parent_pid = -1;
+
+void	set_sig_parent_pid(int in)
+{
+	sig_parent_pid = in;
+}
+
+int	get_sig_parent_pid(void)
+{
+	return sig_parent_pid;
+}
+
 typedef struct
 {
 	int	sig;
@@ -38,7 +45,6 @@ typedef struct
 }
 zbx_siginfo_t;
 
-int				sig_parent_pid = -1;
 static volatile sig_atomic_t	sig_exiting;
 static volatile sig_atomic_t	sig_exit_on_terminate = 1;
 static zbx_on_exit_t		zbx_on_exit_cb = NULL;

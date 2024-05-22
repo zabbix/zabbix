@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcommon.h"
@@ -27,8 +22,8 @@
  *          database                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff,
-		zbx_uint64_t mask)
+void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_vector_item_diff_ptr_t *item_diff, zbx_uint64_t mask)
 {
 	int			i;
 	const zbx_item_diff_t	*diff;
@@ -39,7 +34,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 	{
 		char	delim = ' ';
 
-		diff = (const zbx_item_diff_t *)item_diff->values[i];
+		diff = item_diff->values[i];
 		flags = diff->flags & mask;
 
 		if (0 == (ZBX_FLAGS_ITEM_DIFF_UPDATE_DB & flags))

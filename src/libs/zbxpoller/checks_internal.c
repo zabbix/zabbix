@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "checks_internal.h"
@@ -37,6 +32,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
 #include "zbxpreproc.h"
+#include "zbxinterface.h"
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {
@@ -285,7 +281,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		goto out;
 	}
 
-	if (FAIL != (ret = get_value_internal_ext_cb(tmp, &request, result)))
+	if (FAIL != (ret = get_value_internal_ext_cb(item, tmp, &request, result)))
 		goto out;
 
 	ret = NOTSUPPORTED;
@@ -434,42 +430,6 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			}
 
 			result->ui64 = 2 - result->ui64;
-		}
-		else if (0 == strcmp(tmp, "maintenance"))	/* zabbix["host",,"maintenance"] */
-		{
-			/* this item is always processed by server */
-			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-				goto out;
-			}
-
-			if (HOST_MAINTENANCE_STATUS_ON == item->host.maintenance_status)
-				SET_UI64_RESULT(result, item->host.maintenance_type + 1);
-			else
-				SET_UI64_RESULT(result, 0);
-		}
-		else if (0 == strcmp(tmp, "items"))	/* zabbix["host",,"items"] */
-		{
-			/* this item is always processed by server */
-			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-				goto out;
-			}
-
-			SET_UI64_RESULT(result, zbx_dc_get_item_count(item->host.hostid));
-		}
-		else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
-		{
-			/* this item is always processed by server */
-			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-				goto out;
-			}
-
-			SET_UI64_RESULT(result, zbx_dc_get_item_unsupported_count(item->host.hostid));
 		}
 		else if (0 == strcmp(tmp, "interfaces"))	/* zabbix["host","discovery","interfaces"] */
 		{

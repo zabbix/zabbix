@@ -11,6 +11,7 @@ PINGER_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
@@ -28,7 +29,6 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
-	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
@@ -55,10 +55,11 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
-	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
+	$(top_srcdir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
@@ -78,10 +79,12 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxinterface/libzbxinterface.a \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/tests/libzbxmockdummy.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_pinger_test_SOURCES = \

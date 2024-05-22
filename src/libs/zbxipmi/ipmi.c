@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "config.h"
@@ -29,27 +24,30 @@
 #include "zbxnum.h"
 #include "ipmi.h"
 #include "zbxipmi.h"
+#include "zbxinterface.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxtime.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expands user macros in IPMI port value and converts the result to *
- *          to unsigned short value                                           *
+ * Purpose: expands user macros in IPMI port value and converts result to     *
+ *          unsigned short value                                              *
  *                                                                            *
- * Parameters: hostid    - [IN] the host identifier                           *
- *             port_orig - [IN] the original port value                       *
- *             port      - [OUT] the resulting port value                     *
- *             error     - [OUT] the error message                            *
+ * Parameters: hostid    - [IN]                                               *
+ *             port_orig - [IN] original port value                           *
+ *             port      - [OUT] resulting port value                         *
+ *             error     - [OUT]                                              *
  *                                                                            *
- * Return value: SUCCEED - the value was converted successfully               *
+ * Return value: SUCCEED - value was converted successfully                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsigned short *port, char **error)
 {
-	char	*tmp;
+	char	*tmp = zbx_strdup(NULL, port_orig);
 	int	ret = SUCCEED;
 
-	tmp = zbx_strdup(NULL, port_orig);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
@@ -68,12 +66,12 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
  *                                                                            *
  * Purpose: executes IPMI command                                             *
  *                                                                            *
- * Parameters: host          - [IN] the target host                           *
- *             command       - [IN] the command to execute                    *
- *             error         - [OUT] the error message buffer                 *
- *             max_error_len - [IN] the size of error message buffer          *
+ * Parameters: host          - [IN] target host                               *
+ *             command       - [IN] command to execute                        *
+ *             error         - [OUT] error message buffer                     *
+ *             max_error_len - [IN] size of error message buffer              *
  *                                                                            *
- * Return value: SUCCEED - the command was executed successfully              *
+ * Return value: SUCCEED - command was executed successfully                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -156,12 +154,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: test IPMI item                                                    *
+ * Purpose: tests IPMI item                                                   *
  *                                                                            *
- * Parameters: item - [IN] IPMI item                                          *
+ * Parameters: item - [IN]                                                    *
  *             info - [OUT] result or error reason                            *
  *                                                                            *
- * Return value: SUCCEED - the test executed without errors                   *
+ * Return value: SUCCEED - test executed without errors                       *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/

@@ -21,7 +21,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 7ca108eafb0d4b65a304815ee637174e
-          name: 'AWS S3: Get alarms check'
+          name: 'Get alarms check'
           type: DEPENDENT
           key: aws.s3.alarms.check
           delay: '0'
@@ -45,14 +45,14 @@ zabbix_export:
           triggers:
             - uuid: a8f8a7518aad4e32b23a8611afc8f48c
               expression: 'length(last(/AWS S3 bucket by HTTP/aws.s3.alarms.check))>0'
-              name: 'AWS S3: Failed to get alarms data'
+              name: 'Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: fceb9927715443059269fa4589f90f67
-          name: 'AWS S3: Bucket Size'
+          name: 'Bucket Size'
           type: DEPENDENT
           key: aws.s3.bucket_size_bytes
           delay: '0'
@@ -74,7 +74,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6da0ea7130e64a7fb8ae32ee02290cbf
-          name: 'AWS S3: Get alarms data'
+          name: 'Get alarms data'
           type: SCRIPT
           key: aws.s3.get_alarms
           delay: 0s;m/1
@@ -353,7 +353,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 598e9dc563334ad6b1d72245a6f8679f
-          name: 'AWS S3: Get metrics data'
+          name: 'Get metrics data'
           type: SCRIPT
           key: aws.s3.get_metrics
           delay: 0s;h/8
@@ -682,7 +682,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0e22c196ae834d2899068f25316ffed2
-          name: 'AWS S3: Get metrics check'
+          name: 'Get metrics check'
           type: DEPENDENT
           key: aws.s3.metrics.check
           delay: '0'
@@ -706,14 +706,14 @@ zabbix_export:
           triggers:
             - uuid: a8a0b4187f5f4e22b868dd038f53a2ba
               expression: 'length(last(/AWS S3 bucket by HTTP/aws.s3.metrics.check))>0'
-              name: 'AWS S3: Failed to get metrics data'
+              name: 'Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 75b467e2079c41c5b3e8f79df8c5a9ba
-          name: 'AWS S3: Number of objects'
+          name: 'Number of objects'
           type: DEPENDENT
           key: aws.s3.number_of_objects
           delay: '0'
@@ -752,7 +752,7 @@ zabbix_export:
           description: 'Discovery of bucket alarms.'
           item_prototypes:
             - uuid: b38bd6e4566445acb52e8ecce4014f0f
-              name: 'AWS S3 Alarms: [{#ALARM_NAME}]: State'
+              name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.s3.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -783,13 +783,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7f0ba96047784510b734c0064d434edc
                   expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS S3 Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
+                  name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 7e536a43faf742058d303ffe21cd9a8c
-              name: 'AWS S3 Alarms: [{#ALARM_NAME}]: State reason'
+              name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.s3.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -816,7 +816,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: c1b94199b7ac4cc9889ff0e724f7057d
               expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS S3 Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
+              name: '[{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -865,7 +865,7 @@ zabbix_export:
           description: 'Discovery of request metrics.'
           item_prototypes:
             - uuid: 7c746594159f4f1c94e8790ed1bdf2af
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Errors, 4xx'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Errors, 4xx'
               type: DEPENDENT
               key: 'aws.s3.4xx_errors["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -890,7 +890,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 806de74ed57b4797b294ebe8fa509429
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Errors, 5xx'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Errors, 5xx'
               type: DEPENDENT
               key: 'aws.s3.5xx_errors["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -915,7 +915,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 7530d7ebe61942f4abc29a8ccb3b5516
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: All'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: All'
               type: DEPENDENT
               key: 'aws.s3.all_requests["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -935,7 +935,7 @@ zabbix_export:
                 - tag: component
                   value: requests
             - uuid: 8758c16faef9477d8e3ff41426c2761b
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Bytes downloaded'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Bytes downloaded'
               type: DEPENDENT
               key: 'aws.s3.bytes_downloaded["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -958,7 +958,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 3f5141a7448b43d288a37dfe41a52288
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Replication: Bytes pending'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Replication: Bytes pending'
               type: DEPENDENT
               key: 'aws.s3.bytes_pending_replication["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -979,7 +979,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 99eefab6b9be405ead0e6ea57394a7e3
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Bytes uploaded'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Bytes uploaded'
               type: DEPENDENT
               key: 'aws.s3.bytes_uploaded["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1002,7 +1002,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: d9deb58254be4add996d3dec97344132
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Delete'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Delete'
               type: DEPENDENT
               key: 'aws.s3.delete_requests["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1024,7 +1024,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: d8c8e91f383747e5b6e73f922f5b3278
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: First byte latency, avg'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: First byte latency, avg'
               type: DEPENDENT
               key: 'aws.s3.first_byte_latency.avg["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1049,7 +1049,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 55cb2316171e43a0aa94e0d203832577
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: First byte latency, p90'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: First byte latency, p90'
               type: DEPENDENT
               key: 'aws.s3.first_byte_latency.p90["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1074,7 +1074,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: eabbd51547cb4a0484182d42601728c3
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Get request metrics'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Get request metrics'
               type: SCRIPT
               key: 'aws.s3.get_metrics["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '{$AWS.S3.UPDATE.INTERVAL}'
@@ -1375,7 +1375,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: f2cff8aa3c3c4a308296550561b02829
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Get'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Get'
               type: DEPENDENT
               key: 'aws.s3.get_requests["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1397,7 +1397,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 0d9f59f099cb47c8991cc2e353154dc7
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Head'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Head'
               type: DEPENDENT
               key: 'aws.s3.head_requests["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1417,7 +1417,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: f9b09dbbf0a44ea9b34a86853a6ebfd0
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: List'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: List'
               type: DEPENDENT
               key: 'aws.s3.list_requests["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1437,7 +1437,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: ad753554ca7e45629e7eb144a3595228
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Replication: Operations pending'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Replication: Operations pending'
               type: DEPENDENT
               key: 'aws.s3.operations_pending_replication["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1457,7 +1457,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 9bb4416c7c454e5486a7ce4e4b4b90f0
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Post'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Post'
               type: DEPENDENT
               key: 'aws.s3.post_requests["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1479,7 +1479,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 88a67025c835410eb54d74be96cf5b4c
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Put'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Put'
               type: DEPENDENT
               key: 'aws.s3.put_requests["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1499,7 +1499,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: ac0f6d6f6f2247379d99fa2f4f0ecc11
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Replication: Latency'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Replication: Latency'
               type: DEPENDENT
               key: 'aws.s3.replication_latency["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1520,7 +1520,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 23c13e717a2845399068e7c2e627df4f
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Select, bytes returned'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Select, bytes returned'
               type: DEPENDENT
               key: 'aws.s3.select_bytes_returned["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1543,7 +1543,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 042e84dc68c54390a3d0427b87d89e47
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Select, bytes scanned'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Select, bytes scanned'
               type: DEPENDENT
               key: 'aws.s3.select_bytes_scanned["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1566,7 +1566,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 616ec102597447cdbe2f21186937dcfe
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Select'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Requests: Select'
               type: DEPENDENT
               key: 'aws.s3.select_requests["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1586,7 +1586,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: effa8475024843249ad213d726323e72
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Total request latency, avg'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Total request latency, avg'
               type: DEPENDENT
               key: 'aws.s3.total_request_latency.avg["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'
@@ -1612,7 +1612,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: 886b748066834f01aa2f6f9327fceba0
-              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Total request latency, p90'
+              name: 'Filter [{#AWS.S3.FILTER.ID.NAME}]: Total request latency, p90'
               type: DEPENDENT
               key: 'aws.s3.total_request_latency.p90["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '0'

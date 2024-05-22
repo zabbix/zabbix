@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxvault.h"
@@ -26,10 +21,10 @@
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
-typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
-		long timeout, zbx_kvs_t *kvs, char **error);
+typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *prefix, const char *token,
+		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
 
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
 static const char		*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
@@ -91,9 +86,10 @@ int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t
 		const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **error)
 {
-	return zbx_vault_kvs_get_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,
-			config_vault->tls_key_file, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
-			config_ssl_key_location, path, ZBX_VAULT_TIMEOUT, kvs, error);
+	return zbx_vault_kvs_get_cb(config_vault->url, config_vault->prefix, config_vault->token,
+			config_vault->tls_cert_file, config_vault->tls_key_file, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, path,
+			ZBX_VAULT_TIMEOUT, kvs, error);
 }
 
 int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,
@@ -124,10 +120,10 @@ int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **
 
 	zbx_kvs_create(&kvs, 2);
 
-	if (SUCCEED != zbx_vault_kvs_get_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,
-			config_vault->tls_key_file, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
-			config_ssl_key_location, config_vault->db_path, ZBX_VAULT_TIMEOUT, &kvs,
-			error))
+	if (SUCCEED != zbx_vault_kvs_get_cb(config_vault->url, config_vault->prefix, config_vault->token,
+			config_vault->tls_cert_file, config_vault->tls_key_file, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			config_vault->db_path, ZBX_VAULT_TIMEOUT, &kvs, error))
 	{
 		goto fail;
 	}

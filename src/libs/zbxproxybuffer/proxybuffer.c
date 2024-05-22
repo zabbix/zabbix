@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "proxybuffer.h"
@@ -37,7 +32,7 @@
 ZBX_PTR_VECTOR_IMPL(pb_history_ptr, zbx_pb_history_t *)
 ZBX_PTR_VECTOR_IMPL(pb_discovery_ptr, zbx_pb_discovery_t *)
 
-zbx_pb_t		*pb_data = NULL;
+static zbx_pb_t		*pb_data = NULL;
 static zbx_shmem_info_t	*pb_mem = NULL;
 
 ZBX_SHMEM_FUNC_IMPL(__pb, pb_mem)
@@ -47,8 +42,18 @@ static void	pb_init_state(zbx_pb_t *pb);
 /* remap states to incoming data destination - database or memory */
 zbx_pb_state_t	pb_dst[] = {PB_DATABASE, PB_MEMORY, PB_MEMORY, PB_DATABASE};
 
+zbx_pb_state_t	get_pb_dst(int i)
+{
+	return pb_dst[i];
+}
+
 /* remap states to outgoing data source - database or memory */
 zbx_pb_state_t	pb_src[] = {PB_DATABASE, PB_DATABASE, PB_MEMORY, PB_MEMORY};
+
+zbx_pb_state_t	get_pb_src(int i)
+{
+	return pb_src[i];
+}
 
 const char	*pb_state_desc[] = {"database", "database->memory", "memory", "memory->database"};
 
@@ -321,6 +326,11 @@ static void	pb_init_state(zbx_pb_t *pb)
 		pb_set_state(pb, PB_MEMORY, "no unsent database records found");
 
 	zbx_db_close();
+}
+
+zbx_pb_t	*get_pb_data(void)
+{
+	return pb_data;
 }
 
 zbx_uint64_t	pb_get_lastid(const char *table_name, const char *lastidfield)

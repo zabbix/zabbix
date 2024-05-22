@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -215,7 +210,7 @@ $steps_tab = (new CFormGrid())->addItem([
 		(new CDiv([
 			(new CTable())
 				->setId('steps')
-				->addClass('list-numbered')
+				->addClass(ZBX_STYLE_LIST_NUMBERED)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->setHeader([
 					(new CColHeader())->setWidth('12'),
@@ -252,7 +247,7 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][retrieve_mode]', '#{retrieve_mode}'))->removeId(),
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]),
-						(new CSpan(':'))->addClass('list-numbered-item'),
+						(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 						(new CCol(
 							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
 						))->addClass(ZBX_STYLE_WORDBREAK),
@@ -278,7 +273,7 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][retrieve_mode]', '#{retrieve_mode}'))->removeId(),
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CSpan(':'))->addClass('list-numbered-item'),
+						(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 						(new CCol(
 							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
 						))->addClass(ZBX_STYLE_WORDBREAK),

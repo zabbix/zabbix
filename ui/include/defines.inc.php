@@ -1,28 +1,23 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0beta3');
+define('ZABBIX_VERSION',		'7.0.0rc2');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050253);
+define('ZABBIX_DB_VERSION',		6050304);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -120,6 +115,15 @@ define('TOTP_CODE_LENGTH_8',	8);
 define('TOTP_VERIFICATION_DELAY_WINDOW', 1);
 define('TOTP_SECRET_LENGTH_32', 32);
 
+/**
+ * The number of TOTP used codes stored in database. Depends on TOTP_VERIFICATION_DELAY_WINDOW. If it is 1, it means
+ * that current, previous and future codes are valid and they should be stored if entered correctly.
+ */
+define('TOTP_MAX_USED_CODES', 3);
+
+define('TOTP_SECRET_CONFIRMATION_REQUIRED', 0);
+define('TOTP_SECRET_CONFIRMED', 1);
+
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
@@ -155,6 +159,16 @@ define('ZBX_PROXY_VERSION_UNSUPPORTED', 3);
 
 define('ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED',	0);
 define('ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED',		1);
+
+define('ZBX_PROXY_STATE_UNKNOWN',	0);
+define('ZBX_PROXY_STATE_OFFLINE',	1);
+define('ZBX_PROXY_STATE_ONLINE',	2);
+
+define('ZBX_PROXYGROUP_STATE_UNKNOWN',		0);
+define('ZBX_PROXYGROUP_STATE_OFFLINE',		1);
+define('ZBX_PROXYGROUP_STATE_RECOVERING',	2);
+define('ZBX_PROXYGROUP_STATE_ONLINE',		3);
+define('ZBX_PROXYGROUP_STATE_DEGRADING',	4);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
@@ -591,6 +605,7 @@ define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
 define('ITEM_TYPE_SNMP',			20);
 define('ITEM_TYPE_SCRIPT',			21);
+define('ITEM_TYPE_BROWSER',			22);
 
 define('SNMP_V1', 1);
 define('SNMP_V2C', 2);
@@ -880,8 +895,8 @@ define('SMTP_SECURITY_SSL',			2);
 define('SMTP_AUTHENTICATION_NONE',		0);
 define('SMTP_AUTHENTICATION_NORMAL',	1);
 
-define('SMTP_MESSAGE_FORMAT_PLAIN_TEXT',	0);
-define('SMTP_MESSAGE_FORMAT_HTML',			1);
+define('ZBX_MEDIA_MESSAGE_FORMAT_TEXT',	0);
+define('ZBX_MEDIA_MESSAGE_FORMAT_HTML',	1);
 
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
@@ -959,10 +974,9 @@ define('ZBX_MAX_WIDGET_LINES', 100);
 
 // dashboards
 define('DASHBOARD_MAX_PAGES',		50);
-define('DASHBOARD_MAX_COLUMNS',		24);
+define('DASHBOARD_MAX_COLUMNS',		72);
 define('DASHBOARD_MAX_ROWS',		64);
-define('DASHBOARD_WIDGET_MIN_ROWS',	2);
-define('DASHBOARD_WIDGET_MAX_ROWS',	32);
+
 define('DASHBOARD_ROW_HEIGHT',		70);
 define('DASHBOARD_FILTER_SHOW_ALL',	0);
 define('DASHBOARD_FILTER_SHOW_MY',	1);
@@ -1029,6 +1043,9 @@ define('ZBX_SERVICE_STATUS_PROPAGATION_FIXED',		4);
 define('SERVICE_TIME_TYPE_UPTIME',				0);
 define('SERVICE_TIME_TYPE_DOWNTIME',			1);
 define('SERVICE_TIME_TYPE_ONETIME_DOWNTIME',	2);
+
+define('ZBX_DISCOVERY_BY_SERVER',	0);
+define('ZBX_DISCOVERY_BY_PROXY',	1);
 
 define('ZBX_DISCOVERY_UNSPEC',	0);
 define('ZBX_DISCOVERY_DNS',		1);
@@ -1485,7 +1502,8 @@ define('VALUEMAP_MAPPING_TYPE_IN_RANGE',		3);
 define('VALUEMAP_MAPPING_TYPE_REGEXP',			4);
 define('VALUEMAP_MAPPING_TYPE_DEFAULT',			5);
 
-define('ZBX_SOCKET_BYTES_LIMIT',    ZBX_MEBIBYTE * 32); // socket response size limit
+// Socket response size limit.
+define('ZBX_SOCKET_BYTES_LIMIT', ZBX_MEBIBYTE * 16);
 
 // value is also used in servercheck.js file
 define('SERVER_CHECK_INTERVAL', 10);
@@ -1588,6 +1606,7 @@ define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);
 define('API_HOST_ADDRESS',			69);
 define('API_ESCAPED_STRING_UTF8',	70);
+define('API_NUMBER',				71);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1801,9 +1820,10 @@ define('AVAILABILITY_REPORT_BY_HOST', 0);
 define('AVAILABILITY_REPORT_BY_TEMPLATE', 1);
 
 // monitoring modes
-define('ZBX_MONITORED_BY_ANY', 0);
-define('ZBX_MONITORED_BY_SERVER', 1);
-define('ZBX_MONITORED_BY_PROXY', 2);
+define('ZBX_MONITORED_BY_ANY',			-1);
+define('ZBX_MONITORED_BY_SERVER',		0);
+define('ZBX_MONITORED_BY_PROXY',		1);
+define('ZBX_MONITORED_BY_PROXY_GROUP',	2);
 
 // queue modes
 define('QUEUE_OVERVIEW', 0);
@@ -2039,8 +2059,10 @@ define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
 define('ZBX_STYLE_LEFT', 'left');
+define('ZBX_STYLE_LINK', 'link');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
+define('ZBX_STYLE_LINK_EXTERNAL', 'link-external');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
@@ -2057,6 +2079,8 @@ define('ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED', 'list-accordion-item-closed');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD', 'list-accordion-item-head');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_BODY', 'list-accordion-item-body');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE', 'list-accordion-item-toggle');
+define('ZBX_STYLE_LIST_NUMBERED', 'list-numbered');
+define('ZBX_STYLE_LIST_NUMBERED_ITEM', 'list-numbered-item');
 define('ZBX_STYLE_LOCAL_CLOCK', 'local-clock');
 define('ZBX_STYLE_LOG_NA_BG', 'log-na-bg');
 define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');
@@ -2075,7 +2099,10 @@ define('ZBX_STYLE_MSG_GLOBAL_FOOTER', 'msg-global-footer');
 define('ZBX_STYLE_MSG_DETAILS', 'msg-details');
 define('ZBX_STYLE_NA_BG', 'na-bg');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
-define('ZBX_STYLE_NOTHING_TO_SHOW', 'nothing-to-show');
+define('ZBX_STYLE_NO_DATA', 'no-data');
+define('ZBX_STYLE_NO_DATA_WITHOUT_ICON', 'no-data-without-icon');
+define('ZBX_STYLE_NO_DATA_DESCRIPTION', 'no-data-description');
+define('ZBX_STYLE_NO_DATA_MESSAGE', 'no-data-message');
 define('ZBX_STYLE_NO_INDENT', 'no-indent');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_WORDWRAP', 'wordwrap');
@@ -2312,6 +2339,7 @@ define('ZBX_ICON_EXPAND', 'zi-expand');
 define('ZBX_ICON_EYE', 'zi-eye');
 define('ZBX_ICON_EYE_OFF', 'zi-eye-off');
 define('ZBX_ICON_FILTER', 'zi-filter');
+define('ZBX_ICON_FILTER_LARGE', 'zi-filter-large');
 define('ZBX_ICON_FULLSCREEN', 'zi-fullscreen');
 define('ZBX_ICON_HELP', 'zi-help');
 define('ZBX_ICON_HELP_CIRCLED', 'zi-help-circled');
@@ -2324,6 +2352,8 @@ define('ZBX_ICON_I_POSITIVE', 'zi-i-positive');
 define('ZBX_ICON_I_WARNING', 'zi-i-warning');
 define('ZBX_ICON_INTEGRATIONS', 'zi-integrations');
 define('ZBX_ICON_INVENTORY', 'zi-inventory');
+define('ZBX_ICON_LINK_EXTERNAL', 'zi-link-external');
+define('ZBX_ICON_LINK_EXTERNAL_SMALL', 'zi-link-external-small');
 define('ZBX_ICON_LOCK', 'zi-lock');
 define('ZBX_ICON_MENU', 'zi-menu');
 define('ZBX_ICON_MONITORING', 'zi-monitoring');
@@ -2340,6 +2370,7 @@ define('ZBX_ICON_REMOVE_SMALL', 'zi-remove-small');
 define('ZBX_ICON_REMOVE_SMALLER', 'zi-remove-smaller');
 define('ZBX_ICON_REPORTS', 'zi-reports');
 define('ZBX_ICON_SEARCH', 'zi-search');
+define('ZBX_ICON_SEARCH_LARGE', 'zi-search-large');
 define('ZBX_ICON_SERVICES', 'zi-services');
 define('ZBX_ICON_SIGN_OUT', 'zi-sign-out');
 define('ZBX_ICON_SPEAKER', 'zi-speaker');

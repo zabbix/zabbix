@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "lld.h"
@@ -51,7 +46,7 @@ void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate when to delete lost resources in an overflow-safe way   *
+ * Purpose: calculates when to delete lost resources in overflow-safe way     *
  *                                                                            *
  ******************************************************************************/
 int	lld_end_of_life(int lastcheck, int lifetime)
@@ -59,7 +54,7 @@ int	lld_end_of_life(int lastcheck, int lifetime)
 	return ZBX_JAN_2038 - lastcheck > lifetime ? lastcheck + lifetime : ZBX_JAN_2038;
 }
 
-static int	lld_get_lifetime_ts(int obj_lastcheck, zbx_lld_lifetime_t *lifetime)
+static int	lld_get_lifetime_ts(int obj_lastcheck, const zbx_lld_lifetime_t *lifetime)
 {
 	int	ts;
 
@@ -128,9 +123,10 @@ static void	lld_prepare_object_delete(zbx_uint64_t id, const char *name, zbx_vec
  *                                                                            *
  ******************************************************************************/
 void	lld_process_lost_objects(const char *table, const char *table_obj, const char *id_name,
-		zbx_vector_ptr_t *objects, zbx_lld_lifetime_t *lifetime, zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck, delete_ids_f cb, get_object_info_f cb_info, get_object_status_val cb_status,
-		object_audit_entry_create_f cb_audit_create, object_audit_entry_update_status_f cb_audit_update_status)
+		zbx_vector_ptr_t *objects, const zbx_lld_lifetime_t *lifetime,
+		const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck, delete_ids_f cb, get_object_info_f cb_info,
+		get_object_status_val cb_status, object_audit_entry_create_f cb_audit_create,
+		object_audit_entry_update_status_f cb_audit_update_status)
 {
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;

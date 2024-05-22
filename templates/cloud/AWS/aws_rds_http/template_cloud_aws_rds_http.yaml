@@ -21,7 +21,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 94471806c4cf482fb66cbe305a0e87a5
-          name: 'AWS RDS: Get alarms check'
+          name: 'Get alarms check'
           type: DEPENDENT
           key: aws.rds.alarms.check
           delay: '0'
@@ -45,14 +45,14 @@ zabbix_export:
           triggers:
             - uuid: 112da2ba956740fda7edcd9bd3a8651c
               expression: 'length(last(/AWS RDS instance by HTTP/aws.rds.alarms.check))>0'
-              name: 'AWS RDS: Failed to get alarms data'
+              name: 'Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 9e40764a74e54c3b8bf0e7f75fe5f115
-          name: 'AWS RDS: Disk: Binlog Usage'
+          name: 'Disk: Binlog Usage'
           type: DEPENDENT
           key: aws.rds.bin_log_disk_usage
           delay: '0'
@@ -75,7 +75,7 @@ zabbix_export:
             - tag: engine
               value: mysql
         - uuid: 7b7273f5d9144dd1b82c8c3fb649f593
-          name: 'AWS RDS: Burst balance'
+          name: 'Burst balance'
           type: DEPENDENT
           key: aws.rds.burst_balance
           delay: '0'
@@ -96,15 +96,15 @@ zabbix_export:
           triggers:
             - uuid: 730337e340cf4b129d4b38f1c7c82cf6
               expression: 'max(/AWS RDS instance by HTTP/aws.rds.burst_balance,5m)<{$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}'
-              name: 'AWS RDS: Burst balance is too low'
-              event_name: 'AWS RDS: Burst balance is too low (less {$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+              name: 'Burst balance is too low'
+              event_name: 'Burst balance is too low (less {$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}% for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 975ee74af92c4b589f2488d403fdb18d
-          name: 'AWS RDS: Class'
+          name: Class
           type: DEPENDENT
           key: aws.rds.class
           delay: '0'
@@ -125,7 +125,7 @@ zabbix_export:
             - tag: component
               value: instance
         - uuid: 83d19e8a062b4890a4897e97bb1d5a24
-          name: 'AWS RDS: Credit CPU: Balance'
+          name: 'Credit CPU: Balance'
           type: DEPENDENT
           key: aws.rds.cpu.credit_balance
           delay: '0'
@@ -152,8 +152,8 @@ zabbix_export:
           triggers:
             - uuid: 32994f2b06b8491b9b13d0b280e09001
               expression: 'max(/AWS RDS instance by HTTP/aws.rds.cpu.credit_balance,5m)<{$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN}'
-              name: 'AWS RDS: Instance CPU Credit balance is too low'
-              event_name: 'AWS RDS: Instance CPU Credit balance is too low (less {$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN} for 5m)'
+              name: 'Instance CPU Credit balance is too low'
+              event_name: 'Instance CPU Credit balance is too low (less {$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN} for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The number of earned CPU credits has been less than {$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.'
@@ -161,7 +161,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 14c1c44a312b4343b0ded785a7ae910c
-          name: 'AWS RDS: Credit CPU: Usage'
+          name: 'Credit CPU: Usage'
           type: DEPENDENT
           key: aws.rds.cpu.credit_usage
           delay: '0'
@@ -185,7 +185,7 @@ zabbix_export:
             - tag: component
               value: credit
         - uuid: b69d180c94a34882bd3faa58f8847f65
-          name: 'AWS RDS: CPU: Utilization'
+          name: 'CPU: Utilization'
           type: DEPENDENT
           key: aws.rds.cpu.utilization
           delay: '0'
@@ -206,8 +206,8 @@ zabbix_export:
           triggers:
             - uuid: 0272980a53e14f22b06db30af49a1233
               expression: 'min(/AWS RDS instance by HTTP/aws.rds.cpu.utilization,15m)>{$AWS.RDS.CPU.UTIL.WARN.MAX}'
-              name: 'AWS RDS: High CPU utilization'
-              event_name: 'AWS RDS: High CPU utilization (over {$AWS.RDS.CPU.UTIL.WARN.MAX}% for 15m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$AWS.RDS.CPU.UTIL.WARN.MAX}% for 15m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -217,7 +217,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 8b4cbe054bd04d67bf7bcca006740599
-          name: 'AWS RDS: Create time'
+          name: 'Create time'
           type: DEPENDENT
           key: aws.rds.create_time
           delay: '0'
@@ -235,7 +235,7 @@ zabbix_export:
             - tag: component
               value: instance
         - uuid: 9def6dbb88c249e8bdbac484f2e1cfb0
-          name: 'AWS RDS: Connections'
+          name: Connections
           type: DEPENDENT
           key: aws.rds.database_connections
           delay: '0'
@@ -261,7 +261,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: a60833d27daf49329c58a4ca0d9affa5
-          name: 'AWS RDS: Disk: Queue depth'
+          name: 'Disk: Queue depth'
           type: DEPENDENT
           key: aws.rds.disk_queue_depth
           delay: '0'
@@ -279,7 +279,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 1fb56b1936024dfca328660471827ce2
-          name: 'AWS RDS: EBS: Byte balance'
+          name: 'EBS: Byte balance'
           type: DEPENDENT
           key: aws.rds.ebs_byte_balance
           delay: '0'
@@ -302,15 +302,15 @@ zabbix_export:
           triggers:
             - uuid: b878ee69a01a47a09677b184f8352668
               expression: 'max(/AWS RDS instance by HTTP/aws.rds.ebs_byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}'
-              name: 'AWS RDS: Byte Credit balance is too low'
-              event_name: 'AWS RDS: Byte Credit balance is too low (less {$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+              name: 'Byte Credit balance is too low'
+              event_name: 'Byte Credit balance is too low (less {$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}% for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 44eadf0d51244375a302110cb00e8e88
-          name: 'AWS RDS: EBS: IO balance'
+          name: 'EBS: IO balance'
           type: DEPENDENT
           key: aws.rds.ebs_io_balance
           delay: '0'
@@ -333,15 +333,15 @@ zabbix_export:
           triggers:
             - uuid: 556100b7e8414543bf88017e13fb718f
               expression: 'max(/AWS RDS instance by HTTP/aws.rds.ebs_io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}'
-              name: 'AWS RDS: I/O Credit balance is too low'
-              event_name: 'AWS RDS: I/O Credit balance is too low (less {$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+              name: 'I/O Credit balance is too low'
+              event_name: 'I/O Credit balance is too low (less {$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}% for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: capacity
         - uuid: cad47e37ddc04100a8a7c3bca5f9049f
-          name: 'AWS RDS: Engine'
+          name: Engine
           type: DEPENDENT
           key: aws.rds.engine
           delay: '0'
@@ -362,7 +362,7 @@ zabbix_export:
             - tag: component
               value: instance
         - uuid: fefdac322230485cb792f295bb1420af
-          name: 'AWS RDS: Engine version'
+          name: 'Engine version'
           type: DEPENDENT
           key: aws.rds.engine.version
           delay: '0'
@@ -383,7 +383,7 @@ zabbix_export:
             - tag: component
               value: instance
         - uuid: 5e83a36bcbf64098938ab7bb4725c39c
-          name: 'AWS RDS: Get events check'
+          name: 'Get events check'
           type: DEPENDENT
           key: aws.rds.events.check
           delay: '0'
@@ -407,14 +407,14 @@ zabbix_export:
           triggers:
             - uuid: 600805420f704d4daca1ac20903f27f5
               expression: 'length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0'
-              name: 'AWS RDS: Failed to get events data'
+              name: 'Failed to get events data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 641677b6f7c147058b1e77967754028f
-          name: 'AWS RDS: SQLServer: Failed agent jobs'
+          name: 'SQLServer: Failed agent jobs'
           type: DEPENDENT
           key: aws.rds.failed_sql_server_agent_jobs_count
           delay: '0'
@@ -435,7 +435,7 @@ zabbix_export:
             - tag: engine
               value: sqlserver
         - uuid: df8b49f346f8468b887526700295a6c4
-          name: 'AWS RDS: Memory, freeable'
+          name: 'Memory, freeable'
           type: DEPENDENT
           key: aws.rds.freeable_memory
           delay: '0'
@@ -457,7 +457,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 33dfd559dd93470cabf27f3a9a0968f1
-          name: 'AWS RDS: Storage: Local free'
+          name: 'Storage: Local free'
           type: DEPENDENT
           key: aws.rds.free_local_storage
           delay: '0'
@@ -481,7 +481,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: fc3fbf1da0b9481c9eee00838c05157f
-          name: 'AWS RDS: Storage: Space free'
+          name: 'Storage: Space free'
           type: DEPENDENT
           key: aws.rds.free_storage_space
           delay: '0'
@@ -500,7 +500,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: a2f85e777eae4fe789446de21136c510
-          name: 'AWS CloudWatch: Get instance alarms data'
+          name: 'Get instance alarms data'
           type: SCRIPT
           key: aws.rds.get_alarms
           delay: 0s;m/1
@@ -748,7 +748,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f0d1041fa09d4ba38c9d0b39c4b76b0b
-          name: 'AWS RDS: Get instance events data'
+          name: 'Get instance events data'
           type: SCRIPT
           key: aws.rds.get_events
           delay: 0s;m/10
@@ -986,7 +986,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 85ac4a5313994e0f94fe6480d3c85193
-          name: 'AWS RDS: Get instance info'
+          name: 'Get instance info'
           type: SCRIPT
           key: aws.rds.get_instance_info
           delay: 5m
@@ -1205,7 +1205,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b22171fe7de44ac3952468ceb0c1a9b0
-          name: 'AWS RDS: Get metrics data'
+          name: 'Get metrics data'
           type: SCRIPT
           key: aws.rds.get_metrics
           delay: 0s;m/5
@@ -1529,7 +1529,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 72fb52bfbcf44ad58df0d49525654cde
-          name: 'AWS RDS: Get instance info check'
+          name: 'Get instance info check'
           type: DEPENDENT
           key: aws.rds.instance_info.check
           delay: '0'
@@ -1553,14 +1553,14 @@ zabbix_export:
           triggers:
             - uuid: 452195309f1f4211aeb71b43a373f86f
               expression: 'length(last(/AWS RDS instance by HTTP/aws.rds.instance_info.check))>0'
-              name: 'AWS RDS: Failed to get instance data'
+              name: 'Failed to get instance data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 8f651a01cd1d4639b6a4ef443285b24c
-          name: 'AWS RDS: Get metrics check'
+          name: 'Get metrics check'
           type: DEPENDENT
           key: aws.rds.metrics.check
           delay: '0'
@@ -1584,14 +1584,14 @@ zabbix_export:
           triggers:
             - uuid: 54c70842bf314ce2a9c95e0cfc57cc21
               expression: 'length(last(/AWS RDS instance by HTTP/aws.rds.metrics.check))>0'
-              name: 'AWS RDS: Failed to get metrics data'
+              name: 'Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 4d5ce2d0bb0648a6b4e4df98dc20fb49
-          name: 'AWS RDS: Network: Receive throughput'
+          name: 'Network: Receive throughput'
           type: DEPENDENT
           key: aws.rds.network_receive_throughput.rate
           delay: '0'
@@ -1610,7 +1610,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 8de924155ca646e0a63de9fb4184e2b7
-          name: 'AWS RDS: Network: Throughput'
+          name: 'Network: Throughput'
           type: DEPENDENT
           key: aws.rds.network_throughput.rate
           delay: '0'
@@ -1629,7 +1629,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: a97083537fce49c99caf71d1b0b2926f
-          name: 'AWS RDS: Network: Transmit throughput'
+          name: 'Network: Transmit throughput'
           type: DEPENDENT
           key: aws.rds.network_transmit_throughput.rate
           delay: '0'
@@ -1648,7 +1648,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3f9ac8ce149e4fb2a65580941c4d5428
-          name: 'AWS RDS: Disk: Read IOPS'
+          name: 'Disk: Read IOPS'
           type: DEPENDENT
           key: aws.rds.read_iops.rate
           delay: '0'
@@ -1667,7 +1667,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: bd55865999364de890e87da30676adea
-          name: 'AWS RDS: Disk: Read IOPS, local storage'
+          name: 'Disk: Read IOPS, local storage'
           type: DEPENDENT
           key: aws.rds.read_iops_local_storage.rate
           delay: '0'
@@ -1686,7 +1686,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 3ad5d0d0bbbb4e579c74dd54923ccd8b
-          name: 'AWS RDS: Disk: Read latency'
+          name: 'Disk: Read latency'
           type: DEPENDENT
           key: aws.rds.read_latency
           delay: '0'
@@ -1705,7 +1705,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 2d85eb0d8e2641bf95b3c5dbbb125089
-          name: 'AWS RDS: Disk: Read latency, local storage'
+          name: 'Disk: Read latency, local storage'
           type: DEPENDENT
           key: aws.rds.read_latency_local_storage
           delay: '0'
@@ -1724,7 +1724,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 9253279ef6c34d86a2b1750c8d8b29d0
-          name: 'AWS RDS: Read replica: State'
+          name: 'Read replica: State'
           type: DEPENDENT
           key: aws.rds.read_replica_state
           delay: '0'
@@ -1755,7 +1755,7 @@ zabbix_export:
           triggers:
             - uuid: 1f4767ba167f43b7ae9730ec834152a4
               expression: 'last(/AWS RDS instance by HTTP/aws.rds.read_replica_state)=0'
-              name: 'AWS RDS: Read replica in error state'
+              name: 'Read replica in error state'
               priority: AVERAGE
               description: |
                 The status of a read replica.
@@ -1764,7 +1764,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 8fd266a7e4744395b21638b58c939072
-          name: 'AWS RDS: Read replica: Status'
+          name: 'Read replica: Status'
           type: DEPENDENT
           key: aws.rds.read_replica_status
           delay: '0'
@@ -1788,7 +1788,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 14b63bcb60fd4c91b87357d3f77e71df
-          name: 'AWS RDS: Disk: Read throughput'
+          name: 'Disk: Read throughput'
           type: DEPENDENT
           key: aws.rds.read_throughput.rate
           delay: '0'
@@ -1807,7 +1807,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: bc963bae1664421c8874d77b085006a6
-          name: 'AWS RDS: Disk: Read throughput, local storage'
+          name: 'Disk: Read throughput, local storage'
           type: DEPENDENT
           key: aws.rds.read_throughput_local_storage.rate
           delay: '0'
@@ -1826,7 +1826,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 7be22cd083bc401bbbd2d75f2f6816de
-          name: 'AWS RDS: Replication: Lag'
+          name: 'Replication: Lag'
           type: DEPENDENT
           key: aws.rds.replica_lag
           delay: '0'
@@ -1855,7 +1855,7 @@ zabbix_export:
             - tag: engine
               value: sqlserver
         - uuid: f6fe45dc205241cb99b1822d3f78cce6
-          name: 'AWS RDS: Status'
+          name: Status
           type: DEPENDENT
           key: aws.rds.status
           delay: '0'
@@ -1878,7 +1878,7 @@ zabbix_export:
             - tag: component
               value: instance
         - uuid: 2694163a440f40e4a5ec41111f9abf59
-          name: 'AWS RDS: Storage: Allocated'
+          name: 'Storage: Allocated'
           type: DEPENDENT
           key: aws.rds.storage.allocated
           delay: '0'
@@ -1899,7 +1899,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 1aafa7a752274a1abb30b7b2e067b857
-          name: 'AWS RDS: Storage: Max allocated'
+          name: 'Storage: Max allocated'
           type: DEPENDENT
           key: aws.rds.storage.max_allocated
           delay: '0'
@@ -1924,7 +1924,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 842f80f586794da39562ceb3cb09d5a4
-          name: 'AWS RDS: Network: Receive throughput'
+          name: 'Network: Receive throughput'
           type: DEPENDENT
           key: aws.rds.storage_network_receive_throughput
           delay: '0'
@@ -1945,7 +1945,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: bab141cde0114edf8b02211565df5b1f
-          name: 'AWS RDS: Network: Transmit throughput'
+          name: 'Network: Transmit throughput'
           type: DEPENDENT
           key: aws.rds.storage_network_transmit_throughput
           delay: '0'
@@ -1966,7 +1966,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 6b3a8fd76fe6466395dcc4926d7177b4
-          name: 'AWS RDS: Storage type'
+          name: 'Storage type'
           type: DEPENDENT
           key: aws.rds.storage_type
           delay: '0'
@@ -1987,7 +1987,7 @@ zabbix_export:
             - tag: component
               value: instance
         - uuid: f9d1a5169ec54f648937eac63b3ebcbb
-          name: 'AWS RDS: Swap usage'
+          name: 'Swap usage'
           type: DEPENDENT
           key: aws.rds.swap_usage
           delay: '0'
@@ -2010,7 +2010,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: a64c2caccd884f0f9bb7c9c9295baf45
-          name: 'AWS RDS: Disk: Write IOPS'
+          name: 'Disk: Write IOPS'
           type: DEPENDENT
           key: aws.rds.write_iops.rate
           delay: '0'
@@ -2029,7 +2029,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 19dc221c59ec4587af496bd644830869
-          name: 'AWS RDS: Disk: Write IOPS, local storage'
+          name: 'Disk: Write IOPS, local storage'
           type: DEPENDENT
           key: aws.rds.write_iops_local_storage.rate
           delay: '0'
@@ -2048,7 +2048,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 57e84381425d4706a2bcea41e0373157
-          name: 'AWS RDS: Disk: Write latency'
+          name: 'Disk: Write latency'
           type: DEPENDENT
           key: aws.rds.write_latency
           delay: '0'
@@ -2067,7 +2067,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: b34b656492e8479ea03b97815d368752
-          name: 'AWS RDS: Disk: Write latency, local storage'
+          name: 'Disk: Write latency, local storage'
           type: DEPENDENT
           key: aws.rds.write_latency_local_storage
           delay: '0'
@@ -2086,7 +2086,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: db6932f63f7843508bb9e5559a69e8c3
-          name: 'AWS RDS: Disk: Write throughput'
+          name: 'Disk: Write throughput'
           type: DEPENDENT
           key: aws.rds.write_throughput.rate
           delay: '0'
@@ -2105,7 +2105,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: f30df9f386be49948bce7817d56dae09
-          name: 'AWS RDS: Disk: Write throughput, local storage'
+          name: 'Disk: Write throughput, local storage'
           type: DEPENDENT
           key: aws.rds.write_throughput_local_storage.rate
           delay: '0'
@@ -2149,7 +2149,7 @@ zabbix_export:
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: aab5aaf6e27740c6ac92f5494b3aef4b
-              name: 'AWS RDS Alarms: [{#ALARM_NAME}]: State'
+              name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.rds.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -2180,13 +2180,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7d87b8d84fef4aff8aa9c0fd49e49619
                   expression: 'last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS RDS Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
+                  name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 6e95f834b2284447b5ab0f6516d29946
-              name: 'AWS RDS Alarms: [{#ALARM_NAME}]: State reason'
+              name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.rds.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -2213,7 +2213,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 0f70f3d91d9c403c9d4c3cfb3283865f
               expression: 'last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS RDS Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
+              name: '[{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -2255,7 +2255,7 @@ zabbix_export:
             https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
           item_prototypes:
             - uuid: 28df1a214515425099514140a1244cc4
-              name: 'AWS RDS: Replication: Lag, max'
+              name: 'Replication: Lag, max'
               type: DEPENDENT
               key: 'aws.rds.aurora_replica_lag.max[{#SINGLETON}]'
               delay: '0'
@@ -2276,7 +2276,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora
             - uuid: 39e226420be740bd81712624d4d86882
-              name: 'AWS RDS: Replication: Lag, min'
+              name: 'Replication: Lag, min'
               type: DEPENDENT
               key: 'aws.rds.aurora_replica_lag.min[{#SINGLETON}]'
               delay: '0'
@@ -2297,7 +2297,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora
             - uuid: 966022d4bc484918b9497d3515c35f9d
-              name: 'AWS RDS: Replication: Lag'
+              name: 'Replication: Lag'
               type: DEPENDENT
               key: 'aws.rds.aurora_replica_lag[{#SINGLETON}]'
               delay: '0'
@@ -2318,7 +2318,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora
             - uuid: 4a76341c354540b48677c29a92270d57
-              name: 'AWS RDS: Buffer Cache hit ratio'
+              name: 'Buffer Cache hit ratio'
               type: DEPENDENT
               key: 'aws.rds.buffer_cache_hit_ratio[{#SINGLETON}]'
               delay: '0'
@@ -2339,7 +2339,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora
             - uuid: a988ecbcb5804916a37e2c4270cf1261
-              name: 'AWS RDS: Operations: Commit latency'
+              name: 'Operations: Commit latency'
               type: DEPENDENT
               key: 'aws.rds.commit_latency[{#SINGLETON}]'
               delay: '0'
@@ -2360,7 +2360,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora
             - uuid: 0892af875af04dbebd3954b37a196605
-              name: 'AWS RDS: Operations: Commit throughput'
+              name: 'Operations: Commit throughput'
               type: DEPENDENT
               key: 'aws.rds.commit_throughput.rate[{#SINGLETON}]'
               delay: '0'
@@ -2380,7 +2380,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora
             - uuid: febdffdd64974deb91185af1bbc78ffd
-              name: 'AWS RDS: Deadlocks, rate'
+              name: 'Deadlocks, rate'
               type: DEPENDENT
               key: 'aws.rds.deadlocks.rate[{#SINGLETON}]'
               delay: '0'
@@ -2400,7 +2400,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora
             - uuid: 24d139d74b034e2096f50943fa003e4f
-              name: 'AWS RDS: Engine uptime'
+              name: 'Engine uptime'
               type: DEPENDENT
               key: 'aws.rds.engine_uptime[{#SINGLETON}]'
               delay: '0'
@@ -2421,7 +2421,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora
             - uuid: 65ee7a93945d4c7baf6c20137e62b9dc
-              name: 'AWS RDS: Rollback segment history list length'
+              name: 'Rollback segment history list length'
               type: DEPENDENT
               key: 'aws.rds.rollback_segment_history_list_length[{#SINGLETON}]'
               delay: '0'
@@ -2441,7 +2441,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 2c1b3f9701f343e5845c78c52e71f72f
-              name: 'AWS RDS: Row lock time'
+              name: 'Row lock time'
               type: DEPENDENT
               key: 'aws.rds.row_locktime[{#SINGLETON}]'
               delay: '0'
@@ -2462,7 +2462,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 05218f79a137466392af0652acfe2db5
-              name: 'AWS RDS: Operations: Select latency'
+              name: 'Operations: Select latency'
               type: DEPENDENT
               key: 'aws.rds.select_latency[{#SINGLETON}]'
               delay: '0'
@@ -2483,7 +2483,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 849c0bd9b5d940568bc1e71eb6318738
-              name: 'AWS RDS: Operations: Select throughput'
+              name: 'Operations: Select throughput'
               type: DEPENDENT
               key: 'aws.rds.select_throughput.rate[{#SINGLETON}]'
               delay: '0'
@@ -2504,7 +2504,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 62e6fa21b2f54030bbbd04f268de5737
-              name: 'AWS RDS: Network: Throughput'
+              name: 'Network: Throughput'
               type: DEPENDENT
               key: 'aws.rds.storage_network_throughput[{#SINGLETON}]'
               delay: '0'
@@ -2583,7 +2583,7 @@ zabbix_export:
           description: 'Discovery instance events.'
           item_prototypes:
             - uuid: 21b9df85f2e841c48204c7cb4fb5caeb
-              name: 'AWS RDS Events: [{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID} : Date'
+              name: '[{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID} : Date'
               type: DEPENDENT
               key: 'aws.rds.event_date["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]'
               delay: '0'
@@ -2610,7 +2610,7 @@ zabbix_export:
                 - tag: event-categories
                   value: '{#EVENT_CATEGORY}'
             - uuid: 10cf420329fa42c08266a5d38bc7678b
-              name: 'AWS RDS Events: [{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}: Message'
+              name: '[{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}: Message'
               type: DEPENDENT
               key: 'aws.rds.event_message["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]'
               delay: '0'
@@ -2673,7 +2673,7 @@ zabbix_export:
              aurora-mysql (for MySQL 5.7-compatible and MySQL 8.0-compatible Aurora)
           item_prototypes:
             - uuid: 3842a935bedf446d8b8b9a7fd58fc24b
-              name: 'AWS RDS: Connections: Aborted'
+              name: 'Connections: Aborted'
               type: DEPENDENT
               key: 'aws.rds.aurora_clients_aborted[{#SINGLETON}]'
               delay: '0'
@@ -2693,7 +2693,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 8b87e0f4f1fc4290a7c72ec382b74941
-              name: 'AWS RDS: Replication: Binlog lag'
+              name: 'Replication: Binlog lag'
               type: DEPENDENT
               key: 'aws.rds.aurora_replication_binlog_lag[{#SINGLETON}]'
               delay: '0'
@@ -2721,7 +2721,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 97f85bd65fc64b66b57b122f8689bc38
-              name: 'AWS RDS: Transactions: Active, rate'
+              name: 'Transactions: Active, rate'
               type: DEPENDENT
               key: 'aws.rds.aurora_transactions_active.rate[{#SINGLETON}]'
               delay: '0'
@@ -2744,7 +2744,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 44ca3ca16bd1450790099a0354e78f13
-              name: 'AWS RDS: Backtrack: Window, actual'
+              name: 'Backtrack: Window, actual'
               type: DEPENDENT
               key: 'aws.rds.backtrack_window_actual[{#SINGLETON}]'
               delay: '0'
@@ -2765,7 +2765,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 20de520b7f53459db765eb221fcef248
-              name: 'AWS RDS: Backtrack: Window, alert'
+              name: 'Backtrack: Window, alert'
               type: DEPENDENT
               key: 'aws.rds.backtrack_window_alert[{#SINGLETON}]'
               delay: '0'
@@ -2785,7 +2785,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 570e88d397524dfeb10d6c46cc859404
-              name: 'AWS RDS: Transactions: Blocked, rate'
+              name: 'Transactions: Blocked, rate'
               type: DEPENDENT
               key: 'aws.rds.blocked_transactions.rate[{#SINGLETON}]'
               delay: '0'
@@ -2806,7 +2806,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 3033650e795943bfab73e9d7347f3d24
-              name: 'AWS RDS: DDL: Latency'
+              name: 'DDL: Latency'
               type: DEPENDENT
               key: 'aws.rds.ddl_latency[{#SINGLETON}]'
               delay: '0'
@@ -2827,7 +2827,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 1ee5fdb6ed004e708ebe5ec8b2d039ba
-              name: 'AWS RDS: DDL: Throughput'
+              name: 'DDL: Throughput'
               type: DEPENDENT
               key: 'aws.rds.ddl_throughput.rate[{#SINGLETON}]'
               delay: '0'
@@ -2848,7 +2848,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: ab6a2d6f9c04497c86464f10aafa178c
-              name: 'AWS RDS: Operations: Delete latency'
+              name: 'Operations: Delete latency'
               type: DEPENDENT
               key: 'aws.rds.delete_latency[{#SINGLETON}]'
               delay: '0'
@@ -2869,7 +2869,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 9a28a1a0e1194d4fb55a5c2e926a7142
-              name: 'AWS RDS: Operations: Delete throughput'
+              name: 'Operations: Delete throughput'
               type: DEPENDENT
               key: 'aws.rds.delete_throughput.rate[{#SINGLETON}]'
               delay: '0'
@@ -2890,7 +2890,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 0ff7f102065a450cb77030c5f2e9cc76
-              name: 'AWS RDS: DML: Latency'
+              name: 'DML: Latency'
               type: DEPENDENT
               key: 'aws.rds.dml_latency[{#SINGLETON}]'
               delay: '0'
@@ -2911,7 +2911,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 97ce5f3d119c4381a99ead5effe6af44
-              name: 'AWS RDS: DML: Throughput'
+              name: 'DML: Throughput'
               type: DEPENDENT
               key: 'aws.rds.dml_throughput.rate[{#SINGLETON}]'
               delay: '0'
@@ -2932,7 +2932,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 182efdd016e9473eb4791e5343043b57
-              name: 'AWS RDS: Operations: Insert latency'
+              name: 'Operations: Insert latency'
               type: DEPENDENT
               key: 'aws.rds.insert_latency[{#SINGLETON}]'
               delay: '0'
@@ -2953,7 +2953,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: db20ce55abbf4f248b8ac40a6f5576ec
-              name: 'AWS RDS: Operations: Insert throughput'
+              name: 'Operations: Insert throughput'
               type: DEPENDENT
               key: 'aws.rds.insert_throughput.rate[{#SINGLETON}]'
               delay: '0'
@@ -2974,7 +2974,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: c68d9d4496a84bf883330b1a82b62171
-              name: 'AWS RDS: Login failures, rate'
+              name: 'Login failures, rate'
               type: DEPENDENT
               key: 'aws.rds.login_failures.rate[{#SINGLETON}]'
               delay: '0'
@@ -2994,7 +2994,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: c932d4f773c04499b045ddb4b767decb
-              name: 'AWS RDS: Binary log files, number'
+              name: 'Binary log files, number'
               type: DEPENDENT
               key: 'aws.rds.num_binary_log_files[{#SINGLETON}]'
               delay: '0'
@@ -3016,7 +3016,7 @@ zabbix_export:
                 - tag: engine
                   value: mysql
             - uuid: c7a191af58644441bfe9aa8579dd9190
-              name: 'AWS RDS: Queries, rate'
+              name: 'Queries, rate'
               type: DEPENDENT
               key: 'aws.rds.queries.rate[{#SINGLETON}]'
               delay: '0'
@@ -3036,7 +3036,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 886f68d6a1eb4953aef3fc4cf1296c62
-              name: 'AWS RDS: Resultset cache hit ratio'
+              name: 'Resultset cache hit ratio'
               type: DEPENDENT
               key: 'aws.rds.result_set_cache_hit_ratio[{#SINGLETON}]'
               delay: '0'
@@ -3057,7 +3057,7 @@ zabbix_export:
                 - tag: engine
                   value: aurora-mysql
             - uuid: 3b66ac67006b4229b1d523dfe19fcb1f
-              name: 'AWS RDS: Binary log files, size'
+              name: 'Binary log files, size'
               type: DEPENDENT
               key: 'aws.rds.sum_binary_log_files[{#SINGLETON}]'
               delay: '0'
@@ -3080,7 +3080,7 @@ zabbix_export:
                 - tag: engine
                   value: mysql
             - uuid: 44dcd553afe641d1b147426e614a7b41
-              name: 'AWS RDS: Operations: Update latency'
+              name: 'Operations: Update latency'
               type: DEPENDENT
               key: 'aws.rds.update_latency[{#SINGLETON}]'
               delay: '0'
@@ -3103,7 +3103,7 @@ zabbix_export:
                 - tag: engine
                   value: mysql
             - uuid: 3a3548d63e1a4aab8853e13645f5898f
-              name: 'AWS RDS: Operations: Update throughput'
+              name: 'Operations: Update throughput'
               type: DEPENDENT
               key: 'aws.rds.update_throughput.rate[{#SINGLETON}]'
               delay: '0'

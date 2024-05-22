@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -76,15 +71,17 @@ class CRadioButtonList extends CList {
 	 * @param string $value      Input element value.
 	 * @param string $id         Input element id.
 	 * @param string $on_change  Javascript handler for onchange event.
+	 * @param bool   $disabled   Disables the input element.
 	 *
 	 * @return CRadioButtonList
 	 */
-	public function addValue($name, $value, $id = null, $on_change = null) {
+	public function addValue($name, $value, $id = null, $on_change = null, $disabled = false) {
 		$this->values[] = [
 			'name' => $name,
 			'value' => $value,
 			'id' => ($id === null ? null : zbx_formatDomId($id)),
-			'on_change' => $on_change
+			'on_change' => $on_change,
+			'disabled' => $disabled
 		];
 
 		return $this;
@@ -138,7 +135,7 @@ class CRadioButtonList extends CList {
 
 			$radio = (new CInput('radio', $this->name, $value['value']))
 				// Read-only for radioboxes is simulated by disabling control and adding CVar with value.
-				->setEnabled($this->enabled && !$this->readonly)
+				->setEnabled($this->enabled && !$this->readonly && !$value['disabled'])
 				->onChange($value['on_change'])
 				->setId($value['id']);
 

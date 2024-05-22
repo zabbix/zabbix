@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcomms.h"
@@ -46,10 +41,6 @@
 
 #ifndef SOCK_CLOEXEC
 #	define SOCK_CLOEXEC 0	/* SOCK_CLOEXEC is Linux-specific, available since 2.6.23 */
-#endif
-
-#ifdef HAVE_OPENSSL
-extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
 static int	socket_set_nonblocking(ZBX_SOCKET s);
@@ -387,6 +378,33 @@ static void	zbx_socket_free(zbx_socket_t *s)
 {
 	if (ZBX_BUF_TYPE_DYN == s->buf_type)
 		zbx_free(s->buffer);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: detach receive buffer                                             *
+ *                                                                            *
+ * Return value: Detached dynamic buffer or copy of static buffer.            *
+ *                                                                            *
+ * Comments: The socket buffer is reset.                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_socket_detach_buffer(zbx_socket_t *s)
+{
+	char	*out;
+
+	if (ZBX_BUF_TYPE_DYN == s->buf_type)
+	{
+		out = s->buffer;
+		s->buf_type = ZBX_BUF_TYPE_STAT;
+		s->buffer = s->buf_stat;
+	}
+	else
+		out = zbx_strdup(NULL, s->buf_stat);
+
+	*s->buffer = '\0';
+
+	return out;
 }
 
 /******************************************************************************

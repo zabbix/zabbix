@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxscripts.h"
@@ -40,6 +35,7 @@
 #include "zbxdb.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 
 #define REMOTE_COMMAND_NEW		0
 #define REMOTE_COMMAND_RESULT_OOM	1
@@ -545,7 +541,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	for (int i = 0; INTERFACE_TYPE_COUNT > i; i++)
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid,
-				INTERFACE_TYPE_PRIORITY[i])))
+				zbx_get_interface_type_priority(i))))
 		{
 			break;
 		}
@@ -840,32 +836,34 @@ out:
 	return ret;
 }
 
-/***********************************************************************************
- *                                                                                 *
- * Purpose: executes user scripts or remote commands                               *
- *                                                                                 *
- * Parameters:  script                  - [IN] script to be executed               *
- *              host                    - [IN] host the script will be executed on *
- *              params                  - [IN] parameters for the script           *
- *              config_timeout          - [IN]                                     *
- *              config_trapper_timeout  - [IN]                                     *
- *              config_source_ip        - [IN]                                     *
- *              config_ssh_key_location - [IN]                                     *
- *              get_config_forks        - [IN]                                     *
- *              result                  - [OUT] result of a script execution       *
- *              error                   - [OUT] error reported by the script       *
- *              max_error_len           - [IN] maximum error length                *
- *              debug                   - [OUT] debug data (optional)              *
- *                                                                                 *
- * Return value:  SUCCEED - processed successfully                                 *
- *                FAIL - error occurred                                            *
- *                TIMEOUT_ERROR - timeout occurred                                 *
- *                                                                                 *
- ***********************************************************************************/
+/****************************************************************************************
+ *                                                                                      *
+ * Purpose: executes user scripts or remote commands                                    *
+ *                                                                                      *
+ * Parameters:  script                       - [IN] script to be executed               *
+ *              host                         - [IN] host the script will be executed on *
+ *              params                       - [IN] parameters for the script           *
+ *              config_timeout               - [IN]                                     *
+ *              config_trapper_timeout       - [IN]                                     *
+ *              config_source_ip             - [IN]                                     *
+ *              config_ssh_key_location      - [IN]                                     *
+ *              config_enable_global_scripts - [IN]                                     *
+ *              get_config_forks             - [IN]                                     *
+ *              result                       - [OUT] result of a script execution       *
+ *              error                        - [OUT] error reported by the script       *
+ *              max_error_len                - [IN] maximum error length                *
+ *              debug                        - [OUT] debug data (optional)              *
+ *                                                                                      *
+ * Return value:  SUCCEED - processed successfully                                      *
+ *                FAIL - error occurred                                                 *
+ *                TIMEOUT_ERROR - timeout occurred                                      *
+ *                                                                                      *
+ ***************************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
-		unsigned char program_type, char **result, char *error, size_t max_error_len, char **debug)
+		const char *config_ssh_key_location, int config_enable_global_scripts,
+		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char *error,
+		size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -889,7 +887,13 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
+					if (0 == config_enable_global_scripts)
+					{
+						zbx_snprintf(error, max_error_len, "Global script execution on Zabbix "
+								"server is disabled by server configuration");
+						ret = FAIL;
+					}
+					else if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
 							config_trapper_timeout, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
 					{
 						ret = FAIL;

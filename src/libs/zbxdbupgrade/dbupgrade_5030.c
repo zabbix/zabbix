@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbupgrade.h"
@@ -3886,15 +3881,15 @@ static int	DBpatch_5030127(void)
 
 static int	DBpatch_5030128(void)
 {
-#define AUDIT_RESOURCE_APPLICATION	12
+#define ZBX_AUDIT_RESOURCE_APPLICATION	12
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > zbx_db_execute("delete from auditlog where resourcetype=%d", AUDIT_RESOURCE_APPLICATION))
+	if (ZBX_DB_OK > zbx_db_execute("delete from auditlog where resourcetype=%d", ZBX_AUDIT_RESOURCE_APPLICATION))
 		return FAIL;
 
 	return SUCCEED;
-#undef AUDIT_RESOURCE_APPLICATION
+#undef ZBX_AUDIT_RESOURCE_APPLICATION
 }
 
 static int	DBpatch_5030129(void)

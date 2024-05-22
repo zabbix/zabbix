@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxmocktest.h"
@@ -27,23 +22,6 @@
 #include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
-
-int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
-{
-	ZBX_UNUSED(local_server_num);
-	ZBX_UNUSED(local_process_type);
-	ZBX_UNUSED(local_process_num);
-
-	return 0;
-}
-
-int	MAIN_ZABBIX_ENTRY(int flags)
-{
-	ZBX_UNUSED(flags);
-
-	return 0;
-}
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
@@ -202,34 +180,149 @@ int	__wrap_zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cach
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*request;
-	char			*error = NULL;
-	struct zbx_json_parse	jp;
+	const char		*request, *response = NULL, *value_append = NULL, *expected_truncation = NULL;
+	char			*error = NULL, *value_override = NULL, buffer[MAX_STRING_LEN],
+				*request_override = NULL, *response_override = NULL, *value = NULL;
+	struct zbx_json_parse	jp, jp_data, jp_item, jp_host, jp_options, jp_steps;
 	struct zbx_json		out;
-	int			returned_ret, expected_ret;
+	int			returned_ret, expected_ret, item_state = 0;
+	zbx_mock_handle_t	handle;
+	zbx_uint64_t		value_gen_length = 0, expected_data_len = 0;
+	size_t			tmp_alloc = 0, tmp_offset = 0, value_size = 0;
 
 	ZBX_UNUSED(state);
 
 	zbx_json_init(&out, 1024);
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	request = zbx_mock_get_parameter_string("in.request");
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.value_gen_length", &handle) &&
+			ZBX_MOCK_SUCCESS == zbx_mock_uint64(handle, &value_gen_length))
+	{
+		#define RANG_GEN_REQUEST "{\
+			\"data\": {\
+				\"item\": {\
+					\"steps\": [],\
+					\"value_type\": 1,\
+					\"value\": \"%s\"\
+				}\
+			},\
+			\"request\": \"preprocessing.test\",\
+			\"sid\": \"6ed71f17963a881bd010e63b01c39484\"\
+		}"
+		#define RANG_GEN_RESPONSE_TRUNCATED "{\
+			\"steps\": [],\
+			\"truncated\": %s,\
+			\"result\": \"%s\",\
+			\"original_size\": %zu\
+		}"
+		#define RANG_GEN_RESPONSE_UNTRUNCATED "{\
+			\"steps\": [],\
+			\"result\": \"%s\"\
+		}"
+
+		size_t	append_len, required_length;
+
+		required_length = value_gen_length;
+		value_append = zbx_mock_get_parameter_string("in.value_append");
+		expected_data_len = zbx_mock_get_parameter_uint64("out.expected_len");
+		expected_truncation = zbx_mock_get_parameter_string("out.expected_truncated");
+
+		required_length += append_len = strlen(value_append);
+		value_override = (char *)malloc((required_length + 1) * sizeof(char));
+
+		memset(value_override, (int)'a', value_gen_length);
+
+		for (size_t i = 0; i < append_len; i++)
+			value_override[i + value_gen_length] = value_append[i];
+
+		value_override[required_length] = '\0';
+		zbx_snprintf_alloc(&request_override, &tmp_alloc, &tmp_offset, RANG_GEN_REQUEST, value_override);
+		request = request_override;
+
+		tmp_alloc = 0;
+		tmp_offset = 0;
+		value_override[expected_data_len] = '\0';
+
+		if (0 == strcmp("true", expected_truncation))
+		{
+			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE_TRUNCATED,
+					expected_truncation, value_override, required_length);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE_UNTRUNCATED,
+					value_override);
+		}
+
+		response = response_override;
+
+		#undef RANG_GEN_REQUEST
+		#undef RANG_GEN_RESPONSE_TRUNCATED
+		#undef RANG_GEN_RESPONSE_UNTRUNCATED
+	}
+	else
+	{
+		request = zbx_mock_get_parameter_string("in.request");
+
+		if (SUCCEED == expected_ret)
+			response = zbx_mock_get_parameter_string("out.response");
+	}
+
 	if (FAIL == zbx_json_open(request, &jp))
 		fail_msg("Invalid request format: %s", zbx_json_strerror());
 
-	returned_ret = trapper_preproc_test_run(&jp, &out, &error);
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+		fail_msg("Invalid request format: missing \"data\" JSON object");
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
+		fail_msg("Invalid request format: missing \"item\" JSON object");
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
+		zbx_json_open("{}", &jp_host);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_OPTIONS, &jp_options))
+		zbx_json_open("{}", &jp_options);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
+		fail_msg("Invalid request format: missing \"steps\" JSON object");
+
+	if (SUCCEED == zbx_json_value_by_name(&jp_options, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
+			item_state = atoi(buffer);
+
+	if (1 == item_state)
+	{
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_options, ZBX_PROTO_TAG_RUNTIME_ERROR, &value, &value_size,
+				NULL) && FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_VALUE, &value,
+				&value_size, NULL))
+		{
+			fail_msg("Invalid request format: missing value or runtime_error in preprocess request");
+		}
+	}
+	else
+	{
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_VALUE, &value, &value_size, NULL))
+			fail_msg("Invalid request format: missing value in preprocess request");
+	}
+
+	returned_ret = zbx_trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, item_state,
+			&out, &error);
+
 	if (FAIL == returned_ret)
 		printf("trapper_preproc_test_run error: %s\n", error);
 	else
 		printf("trapper_preproc_test_run output: %s\n", out.buffer);
 
-	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("Return value", expected_ret, returned_ret);
 
 	if (FAIL == returned_ret)
 		zbx_mock_assert_ptr_ne("Error pointer", NULL, error);
 	else
-		zbx_mock_assert_json_eq("Output", zbx_mock_get_parameter_string("out.response"), out.buffer);
+		zbx_mock_assert_json_eq("Output", response, out.buffer);
 
+	zbx_free(value);
+	zbx_free(value_override);
+	zbx_free(request_override);
+	zbx_free(response_override);
 	zbx_free(error);
 	zbx_json_free(&out);
 }

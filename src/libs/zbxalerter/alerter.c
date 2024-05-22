@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxalerter.h"
@@ -33,6 +28,8 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxexpression.h"
+#include "zbxdbwrap.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -158,21 +155,49 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
 		const char *config_source_ip, const char *config_ssl_ca_location)
 {
-	zbx_uint64_t	alertid, mediatypeid, eventid;
+	zbx_uint64_t	alertid, mediatypeid, eventid, objectid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password,
-			*inreplyto, *error = NULL;
+			*inreplyto, *expression, *recovery_expression, *error = NULL;
 	unsigned short	smtp_port;
-	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
-	int		ret;
+	unsigned char	smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format;
+	int		object, source, ret;
 
-	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &sendto, &subject, &message,
-			&smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security, &smtp_verify_peer,
-			&smtp_verify_host, &smtp_authentication, &username, &password, &content_type);
+	zbx_alerter_deserialize_email(ipc_message->data, &alertid, &mediatypeid, &eventid, &source, &object, &objectid,
+			&sendto, &subject, &message, &smtp_server, &smtp_port, &smtp_helo, &smtp_email, &smtp_security,
+			&smtp_verify_peer, &smtp_verify_host, &smtp_authentication, &username, &password,
+			&message_format, &expression, &recovery_expression);
 
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
+
+	if (SMTP_AUTHENTICATION_NORMAL_PASSWORD == smtp_authentication)
+	{
+		/* fill data required by substitute_simple_macros_unmasked() for ZBX_MACRO_TYPE_ALERT_EMAIL */
+
+		zbx_db_event	event = {.eventid = eventid, .source = source, .object = object, .objectid = objectid};
+
+		memset(&event.trigger, 0, sizeof(zbx_db_trigger));
+		event.trigger.expression = expression;
+		event.trigger.recovery_expression = recovery_expression;
+
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+
+		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, NULL, &username, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+		zbx_substitute_simple_macros_unmasked(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, NULL, &password, ZBX_MACRO_TYPE_ALERT_EMAIL, NULL, 0);
+
+		zbx_dc_close_user_macros(um_handle);
+		zbx_db_trigger_clean(&event.trigger);
+	}
+	else
+	{
+		zbx_free(expression);
+		zbx_free(recovery_expression);
+	}
+
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
-			content_type, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
+			message_format, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, &error);
 
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
@@ -360,7 +385,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 		if (SUCCEED != zbx_ipc_socket_read(&alerter_socket, &message))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
+			if (ZBX_IS_RUNNING())
+				zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
 			exit(EXIT_FAILURE);
 		}
 

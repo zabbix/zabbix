@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 use Duo\DuoUniversal\Client;
@@ -38,7 +33,8 @@ class CUser extends CApiService {
 		'login' => [],
 		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'unblock' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'resettotp' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'users';
@@ -50,7 +46,7 @@ class CUser extends CApiService {
 		'roleid', 'userdirectoryid', 'ts_provisioned'
 	];
 
-	protected const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid', 'passwd'];
+	private const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid'];
 
 	/**
 	 * Get users data.
@@ -278,7 +274,6 @@ class CUser extends CApiService {
 		self::updateGroups($users);
 		self::updateUgSets($users);
 		self::updateMedias($users);
-		self::updateMfaTotpSecrets($users);
 
 		foreach ($users as &$user) {
 			unset($user['role_type']);
@@ -322,18 +317,7 @@ class CUser extends CApiService {
 			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'medias' =>			['type' => API_OBJECTS, 'fields' => [
-				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
-				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
-				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
-				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
-			]],
-			'userdirectoryid' =>	['type' => API_ID, 'default' => 0],
-			'mfa_totp_secrets' =>	['type' => API_OBJECTS, 'uniq' => [['mfaid']], 'fields' => [
-				'mfaid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-				'totp_secret' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('mfa_totp_secret', 'totp_secret')]
-			]]
+			'medias' =>			['type' => API_OBJECTS, 'fields' => self::getMediaValidationFields()]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -344,12 +328,6 @@ class CUser extends CApiService {
 			$user = $this->checkLoginOptions($user);
 
 			if (array_key_exists('passwd', $user)) {
-				if ($user['userdirectoryid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Not allowed to update field "%1$s" for provisioned user.', 'passwd')
-					);
-				}
-
 				$this->checkPassword($user, '/'.($i + 1).'/passwd');
 			}
 
@@ -366,12 +344,10 @@ class CUser extends CApiService {
 		self::checkRoles($users, $db_roles);
 		self::addRoleType($users, $db_roles);
 
-		$this->checkUserdirectories($users);
-		$this->checkUserGroups($users, $db_user_groups);
+		self::checkUserGroups($users, $db_user_groups);
 		self::checkEmptyPassword($users, $db_user_groups);
-		$this->checkMfaids($users);
-		$db_mediatypes = $this->checkMediaTypes($users);
-		$this->validateMediaRecipients($users, $db_mediatypes);
+		self::checkMediaTypes($users, $db_mediatypes);
+		self::checkMediaRecipients($users, $db_mediatypes);
 	}
 
 	/**
@@ -416,17 +392,8 @@ class CUser extends CApiService {
 			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'medias' =>	['type' => API_OBJECTS, 'fields' => [
-				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
-				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
-				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
-				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
-			]],
-			'userdirectoryid' =>	['type' => API_ID],
-			'mfa_totp_secrets' =>	['type' => API_OBJECTS, 'uniq' => [['mfaid']], 'fields' => [
-				'mfaid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-				'totp_secret' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('mfa_totp_secret', 'totp_secret')]
+			'medias' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['mediaid']], 'fields' => [
+				'mediaid' =>		['type' => API_ID]
 			]]
 		]];
 
@@ -464,18 +431,20 @@ class CUser extends CApiService {
 
 		$superadminids_to_update = [];
 		$usernames = [];
-		$readonly_fields = array_fill_keys(['username', 'passwd'], 1);
 
 		foreach ($users as $i => &$user) {
 			$db_user = $db_users[$user['userid']];
 
-			if (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid'] != 0) {
-				$provisioned_field = array_key_first(array_intersect_key($readonly_fields, $user));
+			if ($db_user['userdirectoryid'] != 0) {
+				$upd_user = DB::getUpdatedValues('users',
+					array_intersect_key($user, array_flip(['username', 'passwd'])), $db_users[$user['userid']]
+				);
 
-				if ($provisioned_field !== null) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Not allowed to update field "%1$s" for provisioned user.', $provisioned_field)
-					);
+				if ($upd_user) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1),
+						_s('cannot update readonly parameter "%1$s" of provisioned user', key($upd_user))
+					));
 				}
 			}
 
@@ -507,25 +476,23 @@ class CUser extends CApiService {
 				}
 			}
 
-			if ($db_user['username'] !== ZBX_GUEST_USER) {
-				continue;
-			}
+			if ($db_user['username'] === ZBX_GUEST_USER) {
+				// Additional validation for guest user.
+				if (array_key_exists('username', $user) && $user['username'] !== $db_user['username']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot rename guest user.'));
+				}
 
-			// Additional validation for guest user.
-			if (array_key_exists('username', $user) && $user['username'] !== $db_user['username']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot rename guest user.'));
-			}
+				if (array_key_exists('lang', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set language for user "guest".'));
+				}
 
-			if (array_key_exists('lang', $user)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set language for user "guest".'));
-			}
+				if (array_key_exists('theme', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set theme for user "guest".'));
+				}
 
-			if (array_key_exists('theme', $user)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set theme for user "guest".'));
-			}
-
-			if (array_key_exists('passwd', $user)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
+				if (array_key_exists('passwd', $user)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Not allowed to set password for user "guest".'));
+				}
 			}
 		}
 		unset($user);
@@ -556,23 +523,108 @@ class CUser extends CApiService {
 		}
 
 		$db_roles = self::getDbRoles($users, $db_users);
-		self::checkRoles($users, $db_roles);
+		self::checkRoles($users, $db_roles, $db_users);
 		self::addRoleType($users, $db_roles, $db_users);
 
 		self::addAffectedObjects($users, $db_users);
+
+		self::validateMedias($users, $db_users);
 
 		if ($usernames) {
 			$this->checkDuplicates($usernames);
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
 
-		$this->checkUserdirectories($users);
-		$this->checkMfaids($users);
-		$this->checkUserGroups($users, $db_user_groups);
+		self::checkUserGroups($users, $db_user_groups, $db_users);
 		self::checkEmptyPassword($users, $db_user_groups, $db_users);
-		$db_mediatypes = $this->checkMediaTypes($users);
-		$this->validateMediaRecipients($users, $db_mediatypes);
+		self::checkMediaTypes($users, $db_mediatypes);
+		self::checkMediaRecipients($users, $db_mediatypes);
 		$this->checkHimself($users);
+	}
+
+	private static function getMediaValidationFields(bool $is_update = false): array {
+		$api_required = $is_update ? 0 : API_REQUIRED;
+
+		$specific_rules = $is_update
+			? [
+				'mediaid' =>	['type' => API_ANY]
+			]
+			: [];
+
+		return $specific_rules + [
+			'mediatypeid' =>	['type' => API_ID, 'flags' => $api_required],
+			'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE],
+			'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
+			'severity' =>		['type' => API_INT32, 'in' => '0:63'],
+			'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
+		];
+	}
+
+	private static function validateMedias(array &$users, array &$db_users): void {
+		foreach ($users as $i1 => &$user) {
+			if (!array_key_exists('medias', $user)) {
+				continue;
+			}
+
+			$path = '/'.($i1 + 1).'/medias';
+			$db_medias = $db_users[$user['userid']]['medias'];
+
+			foreach ($user['medias'] as $i2 => &$media) {
+				$is_update = array_key_exists('mediaid', $media);
+
+				if ($is_update) {
+					if (!array_key_exists($media['mediaid'], $db_users[$user['userid']]['medias'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/'.($i2 + 1).'/mediaid', _('object does not exist or belongs to another object')
+						));
+					}
+				}
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getMediaValidationFields($is_update)];
+
+				if (!CApiInputValidator::validate($api_input_rules, $media, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if ($is_update) {
+					$db_media = $db_medias[$media['mediaid']];
+					unset($db_medias[$media['mediaid']]);
+
+					if ($db_media['userdirectory_mediaid'] != 0) {
+						$_media = [];
+
+						if (array_key_exists('mediatypeid', $media)) {
+							$_media['mediatypeid'] = $media['mediatypeid'];
+						}
+
+						if (array_key_exists('sendto', $media)) {
+							$_media['sendto'] = implode("\n", $media['sendto']);
+						}
+
+						$upd_media = DB::getUpdatedValues('media', $_media, $db_media);
+
+						if ($upd_media) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								$path.'/'.($i2 + 1),
+								_s('cannot update readonly parameter "%1$s" of provisioned user', key($upd_media))
+							));
+						}
+					}
+
+					if (!array_key_exists('mediatypeid', $media)) {
+						$media['mediatypeid'] = $db_media['mediatypeid'];
+					}
+				}
+			}
+			unset($media);
+
+			foreach ($db_medias as $db_media) {
+				if ($db_media['userdirectory_mediaid'] != 0) {
+					unset($db_users[$user['userid']]['medias'][$db_media['mediaid']]);
+				}
+			}
+		}
+		unset($user);
 	}
 
 	/**
@@ -601,7 +653,6 @@ class CUser extends CApiService {
 		self::updateGroups($users, $db_users);
 		self::updateUgSets($users, $db_users);
 		self::updateMedias($users, $db_users);
-		self::updateMfaTotpSecrets($users, $db_users);
 
 		foreach ($users as &$user) {
 			unset($user['role_type']);
@@ -622,7 +673,6 @@ class CUser extends CApiService {
 	private static function addAffectedObjects(array $users, array &$db_users): void {
 		self::addAffectedUserGroups($users, $db_users);
 		self::addAffectedMedias($users, $db_users);
-		self::addAffectedMfaTotpSecrets($users, $db_users);
 	}
 
 	private static function addAffectedUserGroups(array $users, array &$db_users): void {
@@ -690,7 +740,9 @@ class CUser extends CApiService {
 		}
 
 		$options = [
-			'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
+			'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period',
+				'userdirectory_mediaid'
+			],
 			'filter' => ['userid' => $userids]
 		];
 		$db_medias = DBselect(DB::makeSql('media', $options));
@@ -698,31 +750,6 @@ class CUser extends CApiService {
 		while ($db_media = DBfetch($db_medias)) {
 			$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] =
 				array_diff_key($db_media, array_flip(['userid']));
-		}
-	}
-
-	private static function addAffectedMfaTotpSecrets(array $users, array &$db_users): void {
-		$userids = [];
-
-		foreach ($users as $user) {
-			if (array_key_exists('mfa_totp_secrets', $user)) {
-				$userids[] = $user['userid'];
-				$db_users[$user['userid']]['mfa_totp_secrets'] = [];
-			}
-		}
-
-		if (!$userids) {
-			return;
-		}
-
-		$db_mfa_totp_secrets = DB::select('mfa_totp_secret', [
-			'output' => ['mfa_totp_secretid', 'mfaid', 'userid', 'totp_secret'],
-			'filter' => ['userid' => $userids]
-		]);
-
-		foreach ($db_mfa_totp_secrets as $db_mfa_totp_secret) {
-			$db_users[$db_mfa_totp_secret['userid']]['mfa_totp_secrets'][$db_mfa_totp_secret['mfa_totp_secretid']] =
-				array_diff_key($db_mfa_totp_secret, array_flip(['userid']));
 		}
 	}
 
@@ -747,91 +774,20 @@ class CUser extends CApiService {
 		}
 	}
 
-	/**
-	 * Check user directories, used in users data, exist.
-	 *
-	 * @param array $users
-	 * @param int   $users[]['userdirectoryid']  (optional)
-	 *
-	 * @throws APIException  if user directory do not exists.
-	 */
-	private function checkUserdirectories(array $users) {
-		$userdirectoryids = array_column($users, 'userdirectoryid', 'userdirectoryid');
-		unset($userdirectoryids[0]);
-
-		if (!$userdirectoryids) {
-			return;
-		}
-
-		$db_userdirectoryids = API::UserDirectory()->get([
-			'output' => [],
-			'userdirectoryids' => $userdirectoryids,
-			'preservekeys' => true
-		]);
-		$ids = array_diff_key($userdirectoryids, $db_userdirectoryids);
-
-		if ($ids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('User directory with ID "%1$s" is not available.', reset($ids))
-			);
-		}
-	}
-
-	/**
-	 * Checks if MFA TOTP method exists that is used in users data.
-	 *
-	 * @param array $users
-	 *
-	 * @throws APIException  if mfa method does not exist.
-	 */
-	private function checkMfaids(array $users): void {
-		$user_indexes = [];
-
-		foreach ($users as $i1 => $user) {
-			if (!array_key_exists('mfa_totp_secrets', $user)) {
-				continue;
-			}
-
-			foreach ($user['mfa_totp_secrets'] as $i2 => $secret) {
-				$user_indexes[$secret['mfaid']][$i1] = $i2;
-			}
-		}
-
-		if (!$user_indexes) {
-			return;
-		}
-
-		$db_mfas = DB::select('mfa', [
-			'output' => ['type'],
-			'mfaids' => array_keys($user_indexes),
-			'preservekeys' => true
-		]);
-
-		foreach ($user_indexes as $mfaid => $indexes) {
-			if (!array_key_exists($mfaid, $db_mfas)) {
-				$i1 = key($indexes);
-				$i2 = reset($indexes);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i1 + 1).'/mfa_totp_secrets/'.($i2 + 1).'/mfaid',
-					_('object does not exist')
-				));
-			}
-			elseif ($db_mfas[$mfaid]['type'] != MFA_TYPE_TOTP) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/'.($i1 + 1).'/mfa_totp_secrets/'.($i2 + 1).'/mfaid',
-					_('object of TOTP type is expected')
-				));
-			}
-		}
-	}
-
-	private function checkUserGroups(array $users, array &$db_user_groups = null): void {
+	private static function checkUserGroups(array $users, array &$db_user_groups = null, array $db_users = null): void {
 		$user_group_indexes = [];
 
 		foreach ($users as $i1 => $user) {
 			if (!array_key_exists('usrgrps', $user)) {
 				continue;
+			}
+
+			if ($db_users !== null && $db_users[$user['userid']]['userdirectoryid'] != 0
+					&& self::userGroupsChanged($user, $db_users[$user['userid']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1),
+					_s('cannot update readonly parameter "%1$s" of provisioned user', 'usrgrps')
+				));
 			}
 
 			foreach ($user['usrgrps'] as $i2 => $user_group) {
@@ -868,30 +824,21 @@ class CUser extends CApiService {
 			$check = false;
 
 			if ($db_users === null) {
-				if (!array_key_exists('passwd', $user)
-						&& (!array_key_exists('userdirectoryid', $user) || $user['userdirectoryid'] == 0)) {
-					$check = true;
-				}
+				$check = !array_key_exists('passwd', $user);
 			}
 			else {
 				$db_user = $db_users[$user['userid']];
 
 				if (!array_key_exists('passwd', $user) && $db_user['passwd'] === ''
-						&& ((!array_key_exists('userdirectoryid', $user) && $db_user['userdirectoryid'] == 0)
-							|| (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid'] == 0))) {
-					$userdirectory_changed = array_key_exists('userdirectoryid', $user)
-						&& bccomp($user['userdirectoryid'], $db_user['userdirectoryid']) != 0;
-
+						&& $db_user['userdirectoryid'] == 0) {
 					$user_groups_changed = array_key_exists('usrgrps', $user)
 						&& self::userGroupsChanged($user, $db_user);
 
 					$user_groups_empty = array_key_exists('usrgrps', $user) ? !$user['usrgrps'] : !$db_user['usrgrps'];
 
-					if (!$userdirectory_changed && !$user_groups_changed && !$user_groups_empty) {
-						continue;
+					if ($user_groups_changed || $user_groups_empty) {
+						$check = true;
 					}
-
-					$check = true;
 				}
 			}
 
@@ -948,6 +895,109 @@ class CUser extends CApiService {
 	}
 
 	/**
+	 * Check if 'mediatypeid' parameter of the given users with medias is valid.
+	 *
+	 * @param array      $users
+	 * @param array|null $db_media_types
+	 *
+	 * @throws APIException
+	 */
+	private static function checkMediaTypes(array $users, array &$db_media_types = null): void {
+		$media_indexes = [];
+
+		foreach ($users as $i1 => &$user) {
+			if (!array_key_exists('medias', $user)) {
+				continue;
+			}
+
+			foreach ($user['medias'] as $i2 => &$media) {
+				$media_indexes[$media['mediatypeid']][$i1][] = $i2;
+			}
+			unset($media);
+		}
+		unset($user);
+
+		if (!$media_indexes) {
+			return;
+		}
+
+		$db_media_types = DB::select('media_type', [
+			'output' => ['type'],
+			'mediatypeids' => array_keys($media_indexes),
+			'preservekeys' => true
+		]);
+
+		foreach ($media_indexes as $mediatypeid => $indexes) {
+			if (!array_key_exists($mediatypeid, $db_media_types)) {
+				$i1 = key($indexes);
+				$i2 = reset($indexes[$i1]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i1 + 1).'/medias/'.($i2 + 1).'/mediatypeid', _('object does not exist')
+				));
+			}
+		}
+	}
+
+	/**
+	 * Check if 'sendto' parameter value of the given users with medias is valid.
+	 *
+	 * @param array      $users
+	 * @param array|null $db_media_types
+	 *
+	 * @throws APIException
+	 */
+	private static function checkMediaRecipients(array $users, ?array $db_media_types): void {
+		if (!$db_media_types) {
+			return;
+		}
+
+		$email_validator = new CEmailValidator();
+		$length = DB::getFieldLength('media', 'sendto');
+
+		foreach ($users as $i1 => $user) {
+			if (!array_key_exists('medias', $user)) {
+				continue;
+			}
+
+			foreach ($user['medias'] as $i2 => $media) {
+				if (!array_key_exists('sendto', $media)) {
+					continue;
+				}
+
+				if ($db_media_types[$media['mediatypeid']]['type'] != MEDIA_TYPE_EMAIL && count($media['sendto']) > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto', _('a character string is expected')
+					));
+				}
+
+				if ($db_media_types[$media['mediatypeid']]['type'] == MEDIA_TYPE_EMAIL) {
+					foreach ($media['sendto'] as $i3 => $email) {
+						if ($email === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto/'.($i3 + 1), _('cannot be empty')
+							));
+						}
+
+						if (!$email_validator->validate($email)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto/'.($i3 + 1),
+								_('an email address is expected')
+							));
+						}
+					}
+				}
+
+				if (mb_strlen(implode("\n", $media['sendto'])) > $length) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto', _('value is too long')
+					));
+				}
+			}
+		}
+	}
+
+	/**
 	 * Check if specified language has dependent locale installed.
 	 *
 	 * @param array $languages
@@ -995,13 +1045,24 @@ class CUser extends CApiService {
 	 *
 	 * @param array      $users
 	 * @param array      $db_roles
+	 * @param array|null $db_users
 	 *
 	 * @throws APIException
 	 */
-	private static function checkRoles(array $users, array $db_roles): void {
+	private static function checkRoles(array $users, array $db_roles, array $db_users = null): void {
 		foreach ($users as $i => $user) {
-			if (array_key_exists('roleid', $user) && $user['roleid'] != 0
-					&& !array_key_exists($user['roleid'], $db_roles)) {
+			if (!array_key_exists('roleid', $user)) {
+				continue;
+			}
+
+			if ($db_users !== null && $db_users[$user['userid']]['userdirectoryid'] != 0
+					&& bccomp($user['roleid'], $db_users[$user['userid']]['roleid']) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_s('cannot update readonly parameter "%1$s" of provisioned user', 'roleid')
+				));
+			}
+
+			if ($user['roleid'] != 0 && !array_key_exists($user['roleid'], $db_roles)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/roleid',
 					_('object does not exist')
 				));
@@ -1035,131 +1096,6 @@ class CUser extends CApiService {
 			}
 		}
 		unset($user);
-	}
-
-	/**
-	 * Check for valid media types.
-	 *
-	 * @param array $users                               Array of users.
-	 * @param array $users[]['medias']       (optional)  Array of user medias.
-	 *
-	 * @throws APIException if user media type does not exist.
-	 *
-	 * @return array                                     Returns valid media types.
-	 */
-	private function checkMediaTypes(array $users) {
-		$mediatypeids = [];
-
-		foreach ($users as $user) {
-			if (array_key_exists('medias', $user)) {
-				foreach ($user['medias'] as $media) {
-					$mediatypeids[$media['mediatypeid']] = true;
-				}
-			}
-		}
-
-		if (!$mediatypeids) {
-			return [];
-		}
-
-		$mediatypeids = array_keys($mediatypeids);
-
-		$db_mediatypes = DB::select('media_type', [
-			'output' => ['mediatypeid', 'type'],
-			'mediatypeids' => $mediatypeids,
-			'preservekeys' => true
-		]);
-
-		foreach ($mediatypeids as $mediatypeid) {
-			if (!array_key_exists($mediatypeid, $db_mediatypes)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Media type with ID "%1$s" is not available.', $mediatypeid)
-				);
-			}
-		}
-
-		return $db_mediatypes;
-	}
-
-	/**
-	 * Check if the passed 'sendto' value is a valid input according to the mediatype. Currently validates
-	 * only e-mail media types.
-	 *
-	 * @param array         $users                                    Array of users.
-	 * @param string        $users[]['medias'][]['mediatypeid']       Media type ID.
-	 * @param array|string  $users[]['medias'][]['sendto']            Address where to send the alert.
-	 * @param array         $db_mediatypes                            List of available media types.
-	 *
-	 * @throws APIException if e-mail is not valid or exceeds maximum DB field length.
-	 */
-	private function validateMediaRecipients(array $users, array $db_mediatypes) {
-		if ($db_mediatypes) {
-			$email_mediatypes = [];
-
-			foreach ($db_mediatypes as $db_mediatype) {
-				if ($db_mediatype['type'] == MEDIA_TYPE_EMAIL) {
-					$email_mediatypes[$db_mediatype['mediatypeid']] = true;
-				}
-			}
-
-			$max_length = DB::getFieldLength('media', 'sendto');
-			$email_validator = new CEmailValidator();
-
-			foreach ($users as $user) {
-				if (array_key_exists('medias', $user)) {
-					foreach ($user['medias'] as $media) {
-						/*
-						 * For non-email media types only one value allowed. Since value is normalized, need to validate
-						 * if array contains only one item. If there are more than one string, error message is
-						 * displayed, indicating that passed value is not a string.
-						 */
-						if (!array_key_exists($media['mediatypeid'], $email_mediatypes)
-								&& count($media['sendto']) > 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('a character string is expected'))
-							);
-						}
-
-						/*
-						 * If input value is an array with empty string, ApiInputValidator identifies it as valid since
-						 * values are normalized. That's why value must be revalidated.
-						 */
-						foreach ($media['sendto'] as $sendto) {
-							if ($sendto === '') {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Invalid parameter "%1$s": %2$s.', 'sendto', _('cannot be empty'))
-								);
-							}
-						}
-
-						/*
-						 * If media type is email, validate each given string against email pattern.
-						 * Additionally, total length of emails must be checked, because all media type emails are
-						 * separated by newline and stored as a string in single database field. Newline characters
-						 * consumes extra space, so additional validation must be made.
-						 */
-						if (array_key_exists($media['mediatypeid'], $email_mediatypes)) {
-							foreach ($media['sendto'] as $sendto) {
-								if (!$email_validator->validate($sendto)) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Invalid email address for media type with ID "%1$s".',
-											$media['mediatypeid']
-										)
-									);
-								}
-								elseif (strlen(implode("\n", $media['sendto'])) > $max_length) {
-									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('Maximum total length of email address exceeded for media type with ID "%1$s".',
-											$media['mediatypeid']
-										)
-									);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	/**
@@ -1667,25 +1603,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Auxiliary function for updateMedias().
-	 *
-	 * @param array  $medias
-	 * @param string $mediatypeid
-	 * @param string $sendto
-	 *
-	 * @return int
-	 */
-	private static function findMediaIndex(array $medias, $mediatypeid, $sendto) {
-		foreach ($medias as $index => $media) {
-			if (bccomp($media['mediatypeid'], $mediatypeid) == 0 && $media['sendto'] === $sendto) {
-				return $index;
-			}
-		}
-
-		return -1;
-	}
-
-	/**
 	 * @param array      $users
 	 * @param null|array $db_users
 	 */
@@ -1702,12 +1619,12 @@ class CUser extends CApiService {
 			$db_medias = $db_users !== null ? $db_users[$user['userid']]['medias'] : [];
 
 			foreach ($user['medias'] as &$media) {
-				$media['sendto'] = implode("\n", $media['sendto']);
+				if (array_key_exists('sendto', $media)) {
+					$media['sendto'] = implode("\n", $media['sendto']);
+				}
 
-				$index = self::findMediaIndex($db_medias, $media['mediatypeid'], $media['sendto']);
-
-				if ($index != -1) {
-					$db_media = $db_medias[$index];
+				if (array_key_exists('mediaid', $media)) {
+					$db_media = $db_medias[$media['mediaid']];
 					$upd_media = DB::getUpdatedValues('media', $media, $db_media);
 
 					if ($upd_media) {
@@ -1717,8 +1634,7 @@ class CUser extends CApiService {
 						];
 					}
 
-					$media['mediaid'] = $db_media['mediaid'];
-					unset($db_medias[$index]);
+					unset($db_medias[$media['mediaid']]);
 				}
 				else {
 					$ins_medias[] = ['userid' => $user['userid']] + $media;
@@ -1726,7 +1642,7 @@ class CUser extends CApiService {
 			}
 			unset($media);
 
-			$del_mediaids = array_merge($del_mediaids, array_column($db_medias, 'mediaid'));
+			$del_mediaids = array_merge($del_mediaids, array_keys($db_medias));
 		}
 		unset($user);
 
@@ -1756,72 +1672,6 @@ class CUser extends CApiService {
 		}
 		unset($user);
 	}
-
-	private static function updateMfaTotpSecrets(array &$users, array $db_users = null): void {
-		$ins_secrets = [];
-		$upd_secrets = [];
-		$del_secretids = [];
-
-		foreach ($users as &$user) {
-			if (!array_key_exists('mfa_totp_secrets', $user)) {
-				continue;
-			}
-
-			$db_secrets = $db_users !== null
-				? array_column($db_users[$user['userid']]['mfa_totp_secrets'], null, 'mfaid')
-				: [];
-
-			foreach ($user['mfa_totp_secrets'] as &$secret) {
-				if (array_key_exists($secret['mfaid'], $db_secrets)) {
-					$upd_secret = DB::getUpdatedValues('mfa_totp_secret', $secret, $db_secrets[$secret['mfaid']]);
-
-					if ($upd_secret) {
-						$upd_secrets[] = [
-							'values' => $upd_secret,
-							'where' => ['mfa_totp_secretid' => $db_secrets[$secret['mfaid']]['mfa_totp_secretid']]
-						];
-					}
-
-					$secret['mfa_totp_secretid'] = $db_secrets[$secret['mfaid']]['mfa_totp_secretid'];
-					unset($db_secrets[$secret['mfaid']]);
-				}
-				else {
-					$ins_secrets[] = ['userid' => $user['userid']] + $secret;
-				}
-			}
-			unset($secret);
-
-			$del_secretids = array_merge($del_secretids, array_column($db_secrets, 'mfa_totp_secretid'));
-		}
-		unset($user);
-
-		if ($del_secretids) {
-			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_secretids]);
-		}
-
-		if ($upd_secrets) {
-			DB::update('mfa_totp_secret', $upd_secrets);
-		}
-
-		if ($ins_secrets) {
-			$mfa_totp_secretids = DB::insert('mfa_totp_secret', $ins_secrets);
-		}
-
-		foreach ($users as &$user) {
-			if (!array_key_exists('mfa_totp_secrets', $user)) {
-				continue;
-			}
-
-			foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
-				if (!array_key_exists('mfa_totp_secretid', $mfa_totp_secret)) {
-					$mfa_totp_secret['mfa_totp_secretid'] = array_shift($mfa_totp_secretids);
-				}
-			}
-			unset($mfa_totp_secret);
-		}
-		unset($user);
-	}
-
 
 	/**
 	 * @param array $userids
@@ -3039,11 +2889,30 @@ class CUser extends CApiService {
 		self::addRoleType($users, $db_roles, $db_users);
 
 		if (array_key_exists('medias', $user)) {
-			$users[$userid]['medias'] = $this->sanitizeUserMedia($user['medias']);
+			$idp_medias = $this->sanitizeUserMedia($user['medias']);
+			$idp_medias = array_column($idp_medias, null, 'userdirectory_mediaid');
 			$db_users[$userid]['medias'] = DB::select('media', [
-				'output' => ['mediatypeid', 'mediaid', 'sendto'],
-				'filter' => ['userid' => $userid]
+				'output' => ['mediatypeid', 'mediaid', 'sendto', 'userdirectory_mediaid'],
+				'filter' => ['userid' => $userid],
+				'preservekeys' => true
 			]);
+			$users[$userid]['medias'] = [];
+
+			foreach ($db_users[$userid]['medias'] as $db_media) {
+				if ($db_media['userdirectory_mediaid'] == 0) {
+					$users[$userid]['medias'][] = ['mediaid' => $db_media['mediaid']];
+				}
+				else if (array_key_exists($db_media['userdirectory_mediaid'], $idp_medias)) {
+					$users[$userid]['medias'][] = [
+						'mediatypeid' => $idp_medias[$db_media['userdirectory_mediaid']]['mediatypeid'],
+						'sendto' => $idp_medias[$db_media['userdirectory_mediaid']]['sendto']
+					] + $db_media;
+
+					unset($idp_medias[$db_media['userdirectory_mediaid']]);
+				}
+			}
+
+			$users[$userid]['medias'] = array_merge($users[$userid]['medias'], $idp_medias);
 		}
 
 		if (array_key_exists('usrgrps', $user)) {
@@ -3255,33 +3124,44 @@ class CUser extends CApiService {
 	/**
 	 * Remove invalid medias.
 	 *
-	 * @param array $medias
-	 * @param array $medias[]['mediatypeid']
+	 * @param array  $medias
+	 * @param string $medias[]['name']
+	 * @param string $medias[]['mediatypeid']
+	 * @param array  $medias[]['sendto']
+	 * @param string $medias[]['active']
+	 * @param string $medias[]['severity']
+	 * @param string $medias[]['period']
+	 * @param string $medias[]['userdirectory_mediaid']
+	 *
+	 * @return array
 	 */
 	protected function sanitizeUserMedia(array $medias): array {
 		if (!$medias) {
 			return $medias;
 		}
 
-		$user_medias = [];
 		$email_mediatypeids = [];
-		$max_length = DB::getFieldLength('media', 'sendto');
-		$mediatypeids = array_column($medias, 'mediatypeid', 'mediatypeid');
-		$email_validator = new CEmailValidator();
+		$mediatypeids = array_unique(array_column($medias, 'mediatypeid'));
 
 		if ($mediatypeids) {
-			$email_mediatypeids = array_keys(DB::select('media_type', [
-				'output' => ['mediatypeid'],
+			$email_mediatypeids = DB::select('media_type', [
+				'output' => [],
 				'filter' => ['type' => MEDIA_TYPE_EMAIL],
 				'mediatypeids' => $mediatypeids,
 				'preservekeys' => true
-			]));
+			]);
 		}
+
+		$user_medias = [];
+
+		$email_validator = new CEmailValidator();
+		$max_length = DB::getFieldLength('media', 'sendto');
+		$fields = array_flip(['mediatypeid', 'sendto', 'active', 'severity', 'period', 'userdirectory_mediaid']);
 
 		foreach ($medias as $media) {
 			$sendto = array_filter($media['sendto'], 'strlen');
 
-			if (in_array($media['mediatypeid'], $email_mediatypeids)) {
+			if (array_key_exists($media['mediatypeid'], $email_mediatypeids)) {
 				$sendto = array_filter($media['sendto'], [$email_validator, 'validate']);
 
 				while (mb_strlen(implode("\n", $sendto)) > $max_length && count($sendto) > 0) {
@@ -3290,10 +3170,8 @@ class CUser extends CApiService {
 			}
 
 			if ($sendto) {
-				$user_medias[] = [
-					'mediatypeid' => $media['mediatypeid'],
-					'sendto' => $sendto
-				];
+				$media['sendto'] = $sendto;
+				$user_medias[] = array_intersect_key($media, $fields);
 			}
 		}
 
@@ -3327,8 +3205,8 @@ class CUser extends CApiService {
 			'output' => ['userid', 'userdirectoryid', 'username'],
 			'userids' => $db_sessions[0]['userid']
 		])[0];
-		static::addUserGroupFields($db_user, $group_status);
 
+		self::addUserGroupFields($db_user, $group_status);
 		self::checkGroupStatus($db_user, $group_status);
 
 		if ($db_user['mfaid'] == 0) {
@@ -3351,16 +3229,38 @@ class CUser extends CApiService {
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
 			$user_totp_secret = DB::select('mfa_totp_secret', [
-				'output' => ['totp_secret'],
+				'output' => ['mfa_totp_secretid', 'totp_secret', 'status'],
 				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $db_user['userid']]
 			]);
 
-			if (!$user_totp_secret) {
+			// Delete previously saved totp_secret for this specific user which are not related to current MFA method.
+			DBexecute(
+				'DELETE FROM mfa_totp_secret'.
+					' WHERE '.dbConditionId('userid', [$db_user['userid']]).
+						' AND '.dbConditionId('mfaid', [$mfa['mfaid']], true)
+			);
+
+			if (!$user_totp_secret || $user_totp_secret[0]['status'] == TOTP_SECRET_CONFIRMATION_REQUIRED) {
 				$totp_generator = self::createTotpGenerator($data['mfa']);
 				$data['totp_secret'] = $totp_generator->generateSecretKey(TOTP_SECRET_LENGTH_32);
-				$data['qr_code_url'] = $totp_generator->getQRCodeUrl('Zabbix', $data['mfa']['name'],
+				$data['qr_code_url'] = $totp_generator->getQRCodeUrl($data['mfa']['name'], $db_user['username'],
 					$data['totp_secret']
 				);
+
+				if (!$user_totp_secret) {
+					DB::insert('mfa_totp_secret', [[
+						'mfaid' => $data['mfa']['mfaid'],
+						'userid' => $data['userid'],
+						'totp_secret' => $data['totp_secret'],
+						'status' => TOTP_SECRET_CONFIRMATION_REQUIRED
+					]]);
+				}
+				else {
+					DB::update('mfa_totp_secret', [
+						'values' => ['totp_secret' => $data['totp_secret']],
+						'where' => ['mfa_totp_secretid' => $user_totp_secret[0]['mfa_totp_secretid']]
+					]);
+				}
 			}
 		}
 
@@ -3394,7 +3294,7 @@ class CUser extends CApiService {
 	 * @param string $data['sessionid']                               User's sessionid passed in session data.
 	 * @param string $data['redirect_uri']                            Redirect uri that will be used for Duo MFA.
 	 * @param array  $data['mfa_response_data']                       Array with data for MFA response confirmation.
-	 * @param int    $data['mfa_response_data']['verification_code']  TOTP MFA verification code.
+	 * @param string $data['mfa_response_data']['verification_code']  TOTP MFA verification code.
 	 * @param string $data['mfa_response_data']['totp_secret']        TOTP MFA secret at initial registration.
 	 * @param string $data['mfa_response_data']['duo_code']           DUO MFA response code.
 	 * @param string $data['mfa_response_data']['duo_state']          DUO MFA response state.
@@ -3419,8 +3319,8 @@ class CUser extends CApiService {
 			'output' => ['userid', 'userdirectoryid', 'username', 'attempt_failed', 'attempt_clock'],
 			'userids' => $db_sessions[0]['userid']
 		])[0];
-		static::addUserGroupFields($db_user, $group_status);
 
+		self::addUserGroupFields($db_user, $group_status);
 		self::checkGroupStatus($db_user, $group_status);
 
 		if ($db_user['mfaid'] == 0) {
@@ -3438,33 +3338,44 @@ class CUser extends CApiService {
 		$mfa_response = $data['mfa_response_data'];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
+			$enrollment_filter = $mfa_response['totp_secret'] != null
+				? ['totp_secret' => $mfa_response['totp_secret'], 'status' => TOTP_SECRET_CONFIRMATION_REQUIRED]
+				: [];
+
 			$db_user_secrets = DB::select('mfa_totp_secret', [
-				'output' => ['totp_secret'],
-				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']]
+				'output' => ['mfa_totp_secretid', 'totp_secret', 'status', 'used_codes'],
+				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $db_user['userid']] + $enrollment_filter
 			]);
 
-			if ($db_user_secrets && array_key_exists('totp_secret', $mfa_response)
-					&& $mfa_response['totp_secret'] != null
-					&& $db_user_secrets[0]['totp_secret'] !== $mfa_response['totp_secret']) {
+			if (!$db_user_secrets) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You must login to view this page.'));
 			}
 
-			$user_secret = $db_user_secrets ? $db_user_secrets[0]['totp_secret'] : $mfa_response['totp_secret'];
+			$db_user_secret = $db_user_secrets[0];
+			$used_codes = explode(',', $db_user_secret['used_codes']);
 
 			$valid_code = (self::createTotpGenerator($mfa))
-				->verifyKey($user_secret, $mfa_response['verification_code']);
+				->verifyKey($db_user_secret['totp_secret'], $mfa_response['verification_code']);
 
 			if ($valid_code) {
-				if (!$db_user_secrets) {
-					// Delete any previously saved totp_secret for this specific user.
-					DB::delete('mfa_totp_secret', ['userid' => $db_user['userid']]);
+				$valid_code = !array_key_exists($mfa_response['verification_code'], array_flip($used_codes));
+			}
 
-					DB::insert('mfa_totp_secret', [[
-						'mfaid' => $mfa['mfaid'],
-						'userid' => $db_user['userid'],
-						'totp_secret' => $mfa_response['totp_secret']
-					]]);
+			if ($valid_code) {
+				$used_codes = array_slice(
+					array_merge($used_codes, [$mfa_response['verification_code']]), -TOTP_MAX_USED_CODES
+				);
+
+				$upd_totp_secret = [
+					'values' => ['used_codes' => implode(',', $used_codes)],
+					'where' => ['mfa_totp_secretid' => $db_user_secret['mfa_totp_secretid']]
+				];
+
+				if ($mfa_response['totp_secret'] != null) {
+					$upd_totp_secret['values']['status'] = TOTP_SECRET_CONFIRMED;
 				}
+
+				DB::update('mfa_totp_secret', [$upd_totp_secret]);
 			}
 			else {
 				self::increaseFailedLoginAttempts($db_user);
@@ -3578,19 +3489,30 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Returns the list of userids that have enrolled to TOTP mfa and have TOTP secrets.
+	 * Reset TOTP secret of provided users and terminate active session.
 	 *
-	 * @param array $userids  Userids to check for TOTP secrets.
+	 * @param array $userids
 	 */
-	public static function getUseridsWithMfaTotpSecrets(array $userids = []): array {
-		$options = ['output' => ['userid']];
-
-		if ($userids) {
-			$options['filter'] = ['userid' => $userids];
+	public function resetTotp(array $userids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $userids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$userids_with_totp = DB::select('mfa_totp_secret', $options);
+		$db_users_secrets = DB::select('mfa_totp_secret', [
+			'output' => ['userid'],
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
 
-		return array_column($userids_with_totp, 'userid');
+		if ($db_users_secrets) {
+			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => array_keys($db_users_secrets)]);
+
+			self::terminateActiveSessions(array_filter($userids,
+				static fn (string $userid): bool => bccomp($userid, self::$userData['userid']) != 0
+			));
+		}
+
+		return ['userids' => $userids];
 	}
 }

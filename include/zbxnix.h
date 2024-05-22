@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_ZBXNIX_H
@@ -38,7 +33,11 @@ int	zbx_coredump_disable(void);
 #	error "This module allowed only for Unix OS"
 #endif
 
-void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb);
+typedef int	(*zbx_get_process_info_by_thread_f)(int local_server_num, unsigned char *local_process_type,
+		int *local_process_num);
+
+void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb, zbx_get_process_info_by_thread_f
+		get_process_info_by_thread_cb);
 
 typedef void	(*zbx_on_exit_t)(int, void*);
 typedef void	(*zbx_signal_handler_f)(int flags);
@@ -128,4 +127,6 @@ void	zbx_set_on_exit_args(void *args);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);
+
+void	zbx_backtrace(void);
 #endif	/* ZABBIX_ZBXNIX_H */

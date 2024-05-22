@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -83,7 +78,9 @@ class CImportDataAdapterTest extends TestCase {
 		$this->assertEquals([
 			[
 				'inventory' => [],
+				'monitored_by' => '0',
 				'proxy' => [],
+				'proxy_group' => [],
 				'groups' => [
 					[
 						'name' => 'Linux servers'
@@ -188,7 +185,9 @@ class CImportDataAdapterTest extends TestCase {
 					'poc_2_screen' => '',
 					'poc_2_notes' => ''
 				],
+				'monitored_by' => '0',
 				'proxy' => [],
+				'proxy_group' => [],
 				'groups' => [
 						[
 							'name' => 'Linux servers'
@@ -1524,7 +1523,9 @@ class CImportDataAdapterTest extends TestCase {
 					]
 				],
 				'templates' => [],
+				'monitored_by' => '0',
 				'proxy' => [],
+				'proxy_group' => [],
 				'description' => '',
 				'name' => 'host',
 				'tags' => [],
@@ -1899,7 +1900,9 @@ class CImportDataAdapterTest extends TestCase {
 						'details' => []
 					]
 				],
+				'monitored_by' => '0',
 				'proxy' => [],
+				'proxy_group' => [],
 				'inventory_mode' => '-1',
 				'description' => '',
 				'inventory' => [],
@@ -2493,7 +2496,9 @@ class CImportDataAdapterTest extends TestCase {
 		$this->assertEquals([
 			[
 				'inventory' => [],
+				'monitored_by' => '0',
 				'proxy' => [],
+				'proxy_group' => [],
 				'groups' => [
 					[
 						'name' => 'Templates'
@@ -2972,6 +2977,92 @@ class CImportDataAdapterTest extends TestCase {
 				'valuemaps' => []
 			]
 		], $adapter->getTemplates());
+	}
+
+	public function testHostMonitoredBy(): void {
+		$adapter = $this->getAdapter($this->getFile('hosts_monitored_by.xml'));
+
+		$this->assertEquals([
+			[
+				'host' => 'host1',
+				'name' => 'host1',
+				'monitored_by' => '0', // ZBX_MONITORED_BY_SERVER
+				'proxy' => [],
+				'proxy_group' => [],
+				'description' => '',
+				'status' => '0',
+				'ipmi_authtype' => '-1',
+				'ipmi_privilege' => '2',
+				'ipmi_username' => '',
+				'ipmi_password' => '',
+				'templates' => [],
+				'groups' => [
+					[
+						'name' => 'Hosts'
+					]
+				],
+				'interfaces' => [],
+				'tags' => [],
+				'macros' => [],
+				'inventory' => [],
+				'inventory_mode' => '-1',
+				'valuemaps' => []
+			],
+			[
+				'host' => 'host2',
+				'name' => 'host2',
+				'monitored_by' => '1', // ZBX_MONITORED_BY_PROXY
+				'proxy' => [
+					'name' => 'Proxy'
+				],
+				'proxy_group' => [],
+				'description' => '',
+				'status' => '0',
+				'ipmi_authtype' => '-1',
+				'ipmi_privilege' => '2',
+				'ipmi_username' => '',
+				'ipmi_password' => '',
+				'templates' => [],
+				'groups' => [
+					[
+						'name' => 'Hosts'
+					]
+				],
+				'interfaces' => [],
+				'tags' => [],
+				'macros' => [],
+				'inventory' => [],
+				'inventory_mode' => '-1',
+				'valuemaps' => []
+			],
+			[
+				'host' => 'host3',
+				'name' => 'host3',
+				'monitored_by' => '2', // ZBX_MONITORED_BY_PROXY_GROUP
+				'proxy' => [],
+				'proxy_group' => [
+					'name' => 'Proxy group'
+				],
+				'description' => '',
+				'status' => '0',
+				'ipmi_authtype' => '-1',
+				'ipmi_privilege' => '2',
+				'ipmi_username' => '',
+				'ipmi_password' => '',
+				'templates' => [],
+				'groups' => [
+					[
+						'name' => 'Hosts'
+					]
+				],
+				'interfaces' => [],
+				'tags' => [],
+				'macros' => [],
+				'inventory' => [],
+				'inventory_mode' => '-1',
+				'valuemaps' => []
+			]
+		], $adapter->getHosts());
 	}
 
 	protected function getAdapter($source) {

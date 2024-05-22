@@ -26,7 +26,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 70dab03a327a4dc0ab9fe8031052584d
-          name: 'Kubernetes: Get nodes'
+          name: 'Get nodes'
           type: SCRIPT
           key: kube.nodes
           delay: 0;s00
@@ -87,35 +87,50 @@ zabbix_export:
             		return response;
             	},
             
-            	parseFilters: function (filter) {
-            		var pairs = {};
+            	parseFilters: function (csv) {
+            		if (!csv)
+            			return [];
             
-            		filter.split(/\s*,\s*/).forEach(function (kv) {
-            			if (/!?([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]\s*:\s*.+/.test(kv)) {
-            				var pair = kv.split(/\s*:\s*/);
-            				pairs[pair[0]] = pair[1];
+            		var filters = [];
+            		const filterCapture = /([!\w\-\.\/]+)\s*:\s*(.*)/;
+            		const onComma = /\s*,\s*/;
+            
+            		csv.split(onComma).forEach(function (kv) {
+            			var match = kv.match(filterCapture);
+            			if (!match) {
+            				Zabbix.log(3, 'Cannot parse filter from: "' + kv + '"');
+            				return;
             			}
+            
+            			filters.push({ key: match[1], expression: match[2] });
             		});
-            		return pairs;
+            
+            		return filters;
             	},
             
             	filter: function (name, data, filters) {
-            		var filtered = true;
-            		if (typeof data === 'object') {
-            			Object.keys(filters).some(function (filter) {
-            				var exclude = filter.match(/^!(.+)/);
-            				if (filter in data || (exclude && exclude[1] in data)) {
-            					if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
-            						|| (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-            						Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
-            
-            						filtered = false;
-            						return true;
-            					}
-            				};
-            			});
+            		if (typeof data !== 'object') {
+            			return true;
             		}
-            		return filtered;
+            
+            		return filters.every(function (filter) {
+            			const filter_key = filter.key.startsWith('!') ? filter.key.substring(1) : filter.key;
+            
+            			if (!(filter_key in data)) {
+            				return true;
+            			}
+            
+            			const isExcludingFilter = filter.key.startsWith('!');
+            			const isMatchForFilter = new RegExp(filter.expression).test(data[filter_key]);
+            
+            			if ((isExcludingFilter && isMatchForFilter) ||
+            				(!isExcludingFilter && !isMatchForFilter)) {
+            				Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter.key + ': ' + filter.expression + '"');
+            				return false;
+            			}
+            
+            			return true;
+            		});
             	},
             
             	getField: function (data, path) {
