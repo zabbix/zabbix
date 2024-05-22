@@ -1582,7 +1582,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	zbx_dc_proxy_t			proxy;
 	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel, version_int;
 	size_t				buffer_size, reserved = 0;
-	zbx_proxyconfig_status_t	status;
+	zbx_proxyconfig_status_t	status = ZBX_PROXYCONFIG_STATUS_EMPTY;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1659,7 +1659,10 @@ out:
 	zbx_free(buffer);
 	zbx_free(version_str);
 #ifdef	HAVE_MALLOC_TRIM
-	malloc_trim(ZBX_MALLOC_TRIM);
+	if (ZBX_PROXYCONFIG_STATUS_EMPTY != status)
+	{
+		malloc_trim(ZBX_MALLOC_TRIM);
+	}
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
