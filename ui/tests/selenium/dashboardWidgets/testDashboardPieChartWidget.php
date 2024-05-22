@@ -289,7 +289,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Space between sectors' => '1',
 			'id:merge' => false,         // 'Merge sectors smaller than' checkbox
 			'id:merge_percent' => '1',   // 'Merge sectors smaller than' input
-			'id:merge_color' => 'FFD54F' // 'Merge sectors smaller than' color picker
+			'id:merge_color' => '768D99' // 'Merge sectors smaller than' color picker
 		];
 		$form->checkValue($expected_values);
 		$expected_labels = ['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than'];
@@ -317,6 +317,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$form->invalidate();
 		$inputs_enabled = [
 			'Width' => true,
+			'Stroke width' => true,
 			'Show total value' => true,
 			'Size' => false,
 			'Decimal places' => false,
@@ -327,7 +328,8 @@ class testDashboardPieChartWidget extends testWidgets {
 		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled));
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
-		$form->checkValue(['Space between sectors' => 1, 'Width' => 50]);
+		$this->assertRangeSliderParameters($form, 'Stroke width', ['min' => '0', 'max' => '10', 'step' => '1']);
+		$form->checkValue(['Space between sectors' => 1, 'Width' => 50, 'Stroke width' => 0]);
 		$expected_values = [
 			'Show total value' => false,
 			'Size' => 'Auto',
@@ -348,7 +350,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'id:merge_percent' => 2,
 			'id:width' => 2,
 			'Decimal places' => 1,
-			'id:units' => 2048
+			'id:units' => 255
 		];
 		foreach ($field_maxlengths as $field_selector => $maxlength) {
 			$this->assertFieldAttributes($form, $field_selector, ['maxlength' => $maxlength]);
