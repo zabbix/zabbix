@@ -268,8 +268,11 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 
 		case ITEM_VALUE_TYPE_BINARY:
 			return [
-				(new CCol((new CButton(null, _('Show')))->addClass(ZBX_STYLE_BTN)))
-					->addClass('binary-thumbnail')
+				(new CCol(
+					(new CButton(null, _('Show')))
+						->addClass($column['show_thumbnail'] ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
+						->addClass('js-show-binary')
+				))
 					->addClass($cell_class)
 					->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 					->setAttribute('data-itemid', $item_value['itemid'])

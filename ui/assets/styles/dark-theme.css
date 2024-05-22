@@ -4509,16 +4509,16 @@ div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
   vertical-align: middle; }
 div.dashboard-widget-itemhistory .list-table .has-broadcast-data {
   cursor: pointer; }
-div.dashboard-widget-itemhistory .binary-thumbnail .btn {
+div.dashboard-widget-itemhistory .btn-thumbnail {
   overflow: hidden; }
-  div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link) {
+  div.dashboard-widget-itemhistory .btn-thumbnail:not(.btn-link) {
     width: 100px;
     height: 56px;
     background: transparent var(--thumbnail) no-repeat center;
     background-size: cover;
     border-color: transparent;
     text-indent: -9999px; }
-    div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link):not(.is-loading) {
+    div.dashboard-widget-itemhistory .btn-thumbnail:not(.btn-link):not(.is-loading) {
       border: 1px solid #303030;
       border-radius: 3px; }
 div.dashboard-widget-itemhistory z-bar-gauge {

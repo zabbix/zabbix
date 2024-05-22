@@ -77,14 +77,15 @@ class CWidgetItemHistory extends CWidget {
 	#makeUrls() {
 		const urls = [];
 
-		for (const thumbnail of this._body.querySelectorAll('.binary-thumbnail')) {
+		for (const button of this._body.querySelectorAll('.js-show-binary')) {
+			const cell = button.closest('td');
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'widget.itemhistory.binary_value.get');
 			curl.setArgument('preview', 1);
-			curl.setArgument('itemid', thumbnail.dataset.itemid);
+			curl.setArgument('itemid', cell.dataset.itemid);
 
-			const [clock, ns] = thumbnail.dataset.clock.split('.');
+			const [clock, ns] = cell.dataset.clock.split('.');
 			curl.setArgument('clock', clock);
 			curl.setArgument('ns', ns);
 
@@ -92,8 +93,7 @@ class CWidgetItemHistory extends CWidget {
 
 			this.#binary_data_cache.set(url, {
 				...(this.#binary_data_cache.get(url) || {}),
-				button: thumbnail.querySelector(`.${ZBX_STYLE_BTN}`),
-				itemid: thumbnail.dataset.itemid, clock, ns
+				button, clock, ns, itemid: cell.dataset.itemid
 			});
 
 			urls.push(url);
