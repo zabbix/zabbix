@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
+ *
  * @onBefore prepareInterfacesData
  */
 class testPageHostInterfaces extends CWebTest {
@@ -32,7 +33,6 @@ class testPageHostInterfaces extends CWebTest {
 	const ORANGE = 'rgba(241, 165, 11, 1)';
 	const GREY = 'rgba(235, 235, 235, 1)';
 
-
 	public static function prepareInterfacesData() {
 		$interfaces = [
 			[
@@ -41,8 +41,7 @@ class testPageHostInterfaces extends CWebTest {
 				'useip' => 0,
 				'ip' => '127.1.1.1',
 				'dns' => '1available.zabbix.com',
-				'port' => '10050',
-				'available' => 1
+				'port' => '10050'
 			],
 			[
 				'type' => 1,
@@ -50,8 +49,7 @@ class testPageHostInterfaces extends CWebTest {
 				'useip' => 0,
 				'ip' => '127.1.1.2',
 				'dns' => '2available.zabbix.com',
-				'port' => '10051',
-				'available' => 1
+				'port' => '10051'
 			],
 			[
 				'type' => 2,
@@ -65,8 +63,7 @@ class testPageHostInterfaces extends CWebTest {
 					'bulk' => '1',
 					'securityname' => 'zabbix',
 					'max_repetitions' => 10
-				],
-				'available' => 1
+				]
 			],
 			[
 				'type' => 2,
@@ -82,8 +79,7 @@ class testPageHostInterfaces extends CWebTest {
 					'authprotocol' => 2,
 					'privprotocol' => 4,
 					'max_repetitions' => 10
-				],
-				'available' => 1
+				]
 			],
 			[
 				'type' => 2,
@@ -97,8 +93,7 @@ class testPageHostInterfaces extends CWebTest {
 					'bulk' => '1',
 					'community' => '{$SNMP_COMMUNITY}',
 					'max_repetitions' => 10
-				],
-				'available' => 2
+				]
 			],
 			[
 				'type' => 3,
@@ -106,9 +101,7 @@ class testPageHostInterfaces extends CWebTest {
 				'useip' => 0,
 				'ip' => '127.0.0.1',
 				'dns' => '1unavail.IPMI.zabbix.com',
-				'port' => '623',
-				'available' => 2,
-				'error' => '1 Error IPMI'
+				'port' => '623'
 			],
 			[
 				'type' => 3,
@@ -116,9 +109,7 @@ class testPageHostInterfaces extends CWebTest {
 				'useip' => 0,
 				'ip' => '127.0.0.1',
 				'dns' => '2unavail.IPMI.zabbix.com',
-				'port' => '624',
-				'available' => 2,
-				'error' => '2 Error IPMI'
+				'port' => '624'
 			]
 		];
 
@@ -138,6 +129,23 @@ class testPageHostInterfaces extends CWebTest {
 				'status' => HOST_STATUS_MONITORED
 			]
 		]);
+
+		$interfaces_availability = [
+			'1available.zabbix.com' => ['available' => 1],
+			'2available.zabbix.com' => ['available' => 1],
+			'snmpv3zabbix.com' => ['available' => 1],
+			'snmpv3auth.com' => ['available' => 1],
+			'snmpv2zabbix.com' => ['available' => 2],
+			'1unavail.IPMI.zabbix.com' => ['available' => 2, 'error' => '1 Error IPMI'],
+			'2unavail.IPMI.zabbix.com' => ['available' => 2, 'error' => '2 Error IPMI']
+		];
+
+		foreach ($interfaces_availability as $dns => $parameters) {
+			DBexecute('UPDATE interface SET available='.zbx_dbstr($parameters['available']).','.
+					' error='.zbx_dbstr(CTestArrayHelper::get($parameters, 'error', null)).
+					' WHERE dns='.zbx_dbstr($dns)
+			);
+		}
 	}
 
 	public function getCheckInterfacesData() {
