@@ -1660,9 +1660,7 @@ out:
 	zbx_free(version_str);
 #ifdef	HAVE_MALLOC_TRIM
 	if (ZBX_PROXYCONFIG_STATUS_EMPTY != status)
-	{
 		malloc_trim(ZBX_MALLOC_TRIM);
-	}
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
