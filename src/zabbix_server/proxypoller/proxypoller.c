@@ -348,7 +348,7 @@ out:
 	zbx_free(error);
 	zbx_json_free(&j);
 #ifdef HAVE_MALLOC_TRIM
-	malloc_trim(0);
+	malloc_trim(ZBX_MALLOC_TRIM);
 #endif
 	return ret;
 }

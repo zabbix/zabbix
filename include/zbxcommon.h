@@ -99,6 +99,8 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
 
+#define ZBX_MALLOC_TRIM (128 * ZBX_KIBIBYTE)
+
 /******************************************************************************
  *                                                                            *
  * Macro: ZBX_UNUSED                                                          *

@@ -1659,7 +1659,7 @@ out:
 	zbx_free(buffer);
 	zbx_free(version_str);
 #ifdef	HAVE_MALLOC_TRIM
-	malloc_trim(0);
+	malloc_trim(ZBX_MALLOC_TRIM);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
