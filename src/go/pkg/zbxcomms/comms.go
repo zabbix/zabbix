@@ -116,7 +116,9 @@ func (c *Connection) write(w io.Writer, data []byte) (err error) {
 	if err = binary.Write(&b, binary.LittleEndian, uint32(buf.Len())); nil != err {
 		return err
 	}
-	if err = binary.Write(&b, binary.LittleEndian, uint32(len(data))); nil != err {
+	if !c.compress {
+		b.Write([]byte{0, 0, 0, 0})
+	} else if err = binary.Write(&b, binary.LittleEndian, uint32(len(data))); nil != err {
 		return err
 	}
 	b.Write(buf.Bytes())
