@@ -1582,7 +1582,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	zbx_dc_proxy_t			proxy;
 	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel, version_int;
 	size_t				buffer_size, reserved = 0;
-	zbx_proxyconfig_status_t	status = ZBX_PROXYCONFIG_STATUS_EMPTY;
+	zbx_proxyconfig_status_t	status = ZBX_PROXYCONFIG_STATUS_DATA;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
