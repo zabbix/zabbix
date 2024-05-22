@@ -58,6 +58,8 @@ class CWidgetMisconfigured extends CWidget {
 	}
 
 	_startUpdating({delay_sec = 0} = {}) {
+		this.broadcast(this.getBroadcastDefaults());
+
 		requestAnimationFrame(() => this.fire(CWidgetBase.EVENT_READY));
 	}
 
