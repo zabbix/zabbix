@@ -100,6 +100,13 @@ class CSVGHoneycomb {
 	#cells_max_count;
 
 	/**
+	 * Limit for maximum number of cells to display in the widget.
+	 *
+	 * @type {number}
+	 */
+	#cells_max_count_limit = 1000;
+
+	/**
 	 * Width of cell (inner radius).
 	 * It is large number because SVG works more precise that way (later it will be scaled according to widget size).
 	 *
@@ -309,7 +316,7 @@ class CSVGHoneycomb {
 		const {max_rows, max_columns} = CSVGHoneycomb.getContainerMaxParams({width: this.#width, height: this.#height});
 
 		this.#cells_max_count = this.#cells_data !== null
-			? Math.min(this.#cells_data.length, max_rows * max_columns)
+			? Math.min(this.#cells_max_count_limit, this.#cells_data.length, max_rows * max_columns)
 			: 0;
 
 		const rows = Math.max(1, Math.min(max_rows, this.#cells_max_count,

@@ -132,6 +132,10 @@ class CWidgetHoneycomb extends CWidget {
 		}
 	}
 
+	onDestroy() {
+		this.clearContents();
+	}
+
 	onFeedback({type, value, descriptor}) {
 		if (type === CWidgetsData.DATA_TYPE_ITEM_ID) {
 			return this.#honeycomb.selectCell(value);
@@ -189,6 +193,6 @@ class CWidgetHoneycomb extends CWidget {
 
 		const {max_rows, max_columns} = CSVGHoneycomb.getContainerMaxParams({width, height});
 
-		return max_rows * max_columns;
+		return Math.min(this.#items_max_count, max_rows * max_columns);
 	}
 }
