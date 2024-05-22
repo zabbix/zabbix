@@ -90,7 +90,7 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 	if (FAIL == ret && NULL != error)
 	{
 		zbx_snprintf(error, (size_t)max_error_len, "modem communication error");
-		zabbix_log(LOG_LEVEL_WARNING, "modem communication error: expected [%s] received [%s] %s():%s",
+		zabbix_log(LOG_LEVEL_WARNING, "modem communication error: expected [%s] received [%s]",
 				expect, rcv);
 	}
 
