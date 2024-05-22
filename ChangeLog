@@ -1,8 +1,17 @@
 Changes for 7.0.0rc2
 
 New features:
+.........T [ZBXNEXT-9167] added Website by Browser template (egordymov)
 
 Bug fixes:
+.........T [ZBX-24518] updated global dashboards (abakaldin)
+..F....... [ZBX-24506] fixed accidental creation of minimum size widget (apoga)
+..F....... [ZBX-24475] improved software update check functionality (agriscenko)
+..F....... [ZBX-24488] improved new Item history widget (ashubin, ddauksa, dfofanovs)
+.......PS. [ZBX-24473] fixed cookie setting in browser object (wiper)
+..F....... [ZBX-24478] fixed widget placeholder icon hiding in small sizes (apoga)
+..F....... [ZBX-24465] fixed hintboxes of Geomap widget (apoga)
+A......... [ZBX-24481] fixed inability to unset value map from existing item or item prototype by passing a version without valuemap parameter into configuration.import (vmaksimovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0rc1
