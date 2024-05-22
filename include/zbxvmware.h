@@ -353,29 +353,6 @@ zbx_vmware_resourcepool_t;
 
 ZBX_PTR_VECTOR_DECL(vmware_resourcepool_ptr, zbx_vmware_resourcepool_t *)
 
-/* vmware eventlog state */
-typedef struct
-{
-	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
-	unsigned char	skip_old;	/* skip old event log records */
-#define ZBX_VMWARE_EVTLOG_SEVERITY_ERR		"error"
-#define ZBX_VMWARE_EVTLOG_SEVERITY_WARN		"warning"
-#define ZBX_VMWARE_EVTLOG_SEVERITY_INFO		"info"
-#define ZBX_VMWARE_EVTLOG_SEVERITY_USER		"user"
-	unsigned char	severity;	/* bitmask for the event query filter */
-	zbx_hashset_t	evt_severities;	/* severity for event types */
-	unsigned char	oom;		/* no enough memory to store new events */
-	zbx_uint64_t	req_sz;		/* memory size required to store events */
-	time_t		last_ts;	/* timestamp of last vmware.eventlog[] item */
-	time_t		lastaccess;	/* timestamp when vmware.eventlog[] item was polled last time */
-	time_t		interval;	/* last interval of vmware.eventlog[] item */
-}
-zbx_vmware_eventlog_state_t;
-
-#define ZBX_VMWARE_EVTLOG_SEVERITIES								\
-		ZBX_VMWARE_EVTLOG_SEVERITY_ERR, ZBX_VMWARE_EVTLOG_SEVERITY_WARN,		\
-		ZBX_VMWARE_EVTLOG_SEVERITY_INFO, ZBX_VMWARE_EVTLOG_SEVERITY_USER
-
 /* vmware event data */
 typedef struct
 {
@@ -393,7 +370,33 @@ typedef struct
 	char				*error;
 	zbx_vector_vmware_event_ptr_t	events;
 }
-zbx_vmware_data_eventlog_t;
+zbx_vmware_eventlog_data_t;
+
+/* vmware eventlog state */
+typedef struct
+{
+	zbx_uint64_t	last_key;	/* lastlogsize when vmware.eventlog[] item was polled last time */
+	unsigned char	skip_old;	/* skip old event log records */
+#define ZBX_VMWARE_EVTLOG_SEVERITY_ERR		"error"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_WARN		"warning"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_INFO		"info"
+#define ZBX_VMWARE_EVTLOG_SEVERITY_USER		"user"
+	unsigned char	severity;	/* bitmask for the event query filter */
+	zbx_hashset_t	evt_severities;	/* severity for event types */
+	unsigned char	oom;		/* no enough memory to store new events */
+	zbx_uint64_t	req_sz;		/* memory size required to store events */
+	time_t		last_ts;	/* timestamp of last vmware.eventlog[] item */
+	time_t		lastaccess;	/* timestamp when vmware.eventlog[] item was polled last time */
+	time_t		interval;	/* last interval of vmware.eventlog[] item */
+
+	/* service event log data object that is swapped with new one during service event log update */
+	zbx_vmware_eventlog_data_t	*data;
+}
+zbx_vmware_eventlog_state_t;
+
+#define ZBX_VMWARE_EVTLOG_SEVERITIES								\
+		ZBX_VMWARE_EVTLOG_SEVERITY_ERR, ZBX_VMWARE_EVTLOG_SEVERITY_WARN,		\
+		ZBX_VMWARE_EVTLOG_SEVERITY_INFO, ZBX_VMWARE_EVTLOG_SEVERITY_USER
 
 /* vmware service data object */
 typedef struct
@@ -546,10 +549,7 @@ typedef struct
 	/* service data object that is swapped with new one during service update */
 	zbx_vmware_data_t		*data;
 
-	/* service event log data object that is swapped with new one during service event log update */
-	zbx_vmware_data_eventlog_t	*data_eventlog;
-
-	/* lastlogsize when vmware.eventlog[] item was polled last time and skip old flag*/
+	/* service event log data object and additional info about events system state */
 	zbx_vmware_eventlog_state_t	eventlog;
 
 	/* list of custom queries to monitor */

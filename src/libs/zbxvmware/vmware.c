@@ -602,20 +602,20 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
  * Purpose: frees shared resources allocated to store vmware service event    *
  *          log data                                                          *
  *                                                                            *
- * Parameters: data_eventlog - [IN] vmware service event log data             *
+ * Parameters: evt_data - [IN] vmware service event log data                  *
  *                                                                            *
  ******************************************************************************/
-void	vmware_data_eventlog_shared_free(zbx_vmware_data_eventlog_t *data_eventlog)
+void	vmware_eventlog_data_shared_free(zbx_vmware_eventlog_data_t *evt_data)
 {
-	if (NULL != data_eventlog)
+	if (NULL != evt_data)
 	{
-		zbx_vector_vmware_event_ptr_clear_ext(&data_eventlog->events, vmware_shmem_event_free);
-		zbx_vector_vmware_event_ptr_destroy(&data_eventlog->events);
+		zbx_vector_vmware_event_ptr_clear_ext(&evt_data->events, vmware_shmem_event_free);
+		zbx_vector_vmware_event_ptr_destroy(&evt_data->events);
 
-		if (NULL != data_eventlog->error)
-			vmware_shared_strfree(data_eventlog->error);
+		if (NULL != evt_data->error)
+			vmware_shared_strfree(evt_data->error);
 
-		vmware_shmem_data_eventlog_free(data_eventlog);
+		vmware_shmem_eventlog_data_free(evt_data);
 	}
 }
 
@@ -671,7 +671,7 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 		vmware_shared_strfree(service->fullname);
 
 	vmware_data_shared_free(service->data);
-	vmware_data_eventlog_shared_free(service->data_eventlog);
+	vmware_eventlog_data_shared_free(service->eventlog.data);
 
 	zbx_hashset_iter_reset(&service->entities, &iter);
 	while (NULL != (entity = (zbx_vmware_perf_entity_t *)zbx_hashset_iter_next(&iter)))

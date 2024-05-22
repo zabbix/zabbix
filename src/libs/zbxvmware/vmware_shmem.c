@@ -365,9 +365,9 @@ void	vmware_shmem_data_free(zbx_vmware_data_t *data)
 	__vm_shmem_free_func(data);
 }
 
-void	vmware_shmem_data_eventlog_free(zbx_vmware_data_eventlog_t *data_eventlog)
+void	vmware_shmem_eventlog_data_free(zbx_vmware_eventlog_data_t *evt_data)
 {
-	__vm_shmem_free_func(data_eventlog);
+	__vm_shmem_free_func(evt_data);
 }
 
 /******************************************************************************
@@ -1031,24 +1031,24 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
  * Return value: duplicated vmware event log data object                      *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_data_eventlog_t	*vmware_shmem_data_eventlog_dup(zbx_vmware_data_eventlog_t *src)
+zbx_vmware_eventlog_data_t	*vmware_shmem_eventlog_data_dup(zbx_vmware_eventlog_data_t *src)
 {
-	zbx_vmware_data_eventlog_t	*data_eventlog;
+	zbx_vmware_eventlog_data_t	*evt_data;
 
-	data_eventlog = (zbx_vmware_data_eventlog_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_data_eventlog_t));
+	evt_data = (zbx_vmware_eventlog_data_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_eventlog_data_t));
 
-	VMWARE_VECTOR_CREATE(&data_eventlog->events, vmware_event_ptr);
-	zbx_vector_vmware_event_ptr_reserve(&data_eventlog->events, (size_t)src->events.values_alloc);
+	VMWARE_VECTOR_CREATE(&evt_data->events, vmware_event_ptr);
+	zbx_vector_vmware_event_ptr_reserve(&evt_data->events, (size_t)src->events.values_alloc);
 
-	data_eventlog->error = vmware_shared_strdup(src->error);
+	evt_data->error = vmware_shared_strdup(src->error);
 
 	for (int i = 0; i < src->events.values_num; i++)
 	{
-		zbx_vector_vmware_event_ptr_append(&data_eventlog->events,
+		zbx_vector_vmware_event_ptr_append(&evt_data->events,
 				vmware_shmem_event_dup(src->events.values[i]));
 	}
 
-	return data_eventlog;
+	return evt_data;
 }
 
 zbx_vmware_service_t	*vmware_shmem_vmware_service_malloc(void)
