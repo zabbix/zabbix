@@ -158,6 +158,10 @@
 	}
 }
 
+.zi-link-external-small {
+	@extend %icon-small;
+}
+
 .zi-plus-small {
 	@extend .zi-plus;
 	@extend %icon-small;

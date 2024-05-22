@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -2159,7 +2154,7 @@ class CDashboard {
 					for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
 						const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
 
-						if (circular_references.has(reference)) {
+						if (reference !== '' && circular_references.has(reference)) {
 							circular_references_next.add(fields.reference);
 
 							referable_widgets.delete(widget);
@@ -2192,12 +2187,12 @@ class CDashboard {
 			},
 
 			dashboardPageRequireDataSource: e => {
-				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD) {
+				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD && this.#broadcast_cache.has(e.detail.type)) {
 					return;
 				}
 
 				ZABBIX.EventHub.publish({
-					data: null,
+					data: CWidgetsData.getDefault(e.detail.type),
 					descriptor: {
 						context: 'dashboard',
 						sender_unique_id: 'dashboard',
@@ -2209,7 +2204,7 @@ class CDashboard {
 					}
 				});
 
-				console.log('Could not find required data source', e.detail.reference);
+				console.log('Could not require referred data source', `${e.detail.reference}.${e.detail.type}`);
 			},
 
 			dashboardPageEdit: () => {
@@ -2278,8 +2273,9 @@ class CDashboard {
 			dashboardPageWidgetActions: e => {
 				const menu = e.detail.widget.getActionsContextMenu({
 					can_copy_widget: this._can_edit_dashboards
-						&& (this._data.templateid === null || !this.#broadcast_cache.has(CWidgetsData.DATA_TYPE_HOST_ID)
-							|| this.#broadcast_cache.get(CWidgetsData.DATA_TYPE_HOST_ID) === null
+						&& (this._data.templateid === null
+							|| this.#broadcast_cache.get(CWidgetsData.DATA_TYPE_HOST_ID)
+								=== CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_HOST_ID)
 						),
 					can_paste_widget: this._can_edit_dashboards && this.getStoredWidgetDataCopy() !== null
 				});

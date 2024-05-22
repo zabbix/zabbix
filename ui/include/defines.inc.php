@@ -1,28 +1,23 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0rc1');
+define('ZABBIX_VERSION',		'7.0.0rc2');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050298);
+define('ZABBIX_DB_VERSION',		6050304);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -610,6 +605,7 @@ define('ITEM_TYPE_DEPENDENT',		18);
 define('ITEM_TYPE_HTTPAGENT',		19);
 define('ITEM_TYPE_SNMP',			20);
 define('ITEM_TYPE_SCRIPT',			21);
+define('ITEM_TYPE_BROWSER',			22);
 
 define('SNMP_V1', 1);
 define('SNMP_V2C', 2);
@@ -2064,6 +2060,7 @@ define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINK', 'link');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
+define('ZBX_STYLE_LINK_EXTERNAL', 'link-external');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_DASHED', 'list-dashed');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
@@ -2353,6 +2350,8 @@ define('ZBX_ICON_I_POSITIVE', 'zi-i-positive');
 define('ZBX_ICON_I_WARNING', 'zi-i-warning');
 define('ZBX_ICON_INTEGRATIONS', 'zi-integrations');
 define('ZBX_ICON_INVENTORY', 'zi-inventory');
+define('ZBX_ICON_LINK_EXTERNAL', 'zi-link-external');
+define('ZBX_ICON_LINK_EXTERNAL_SMALL', 'zi-link-external-small');
 define('ZBX_ICON_LOCK', 'zi-lock');
 define('ZBX_ICON_MENU', 'zi-menu');
 define('ZBX_ICON_MONITORING', 'zi-monitoring');

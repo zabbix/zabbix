@@ -1,24 +1,21 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 class CWidgetGeoMap extends CWidget {
+
+	static ZBX_STYLE_HINTBOX = 'geomap-hintbox';
 
 	static SEVERITY_NO_PROBLEMS = -1;
 	static SEVERITY_NOT_CLASSIFIED = 0;
@@ -175,27 +172,21 @@ class CWidgetGeoMap extends CWidget {
 				return;
 			}
 
-			const container = this._map._container;
-			const style = 'left: 0px; top: 0px;';
+			const hintbox = document.createElement('div');
+			hintbox.classList.add(CWidgetGeoMap.ZBX_STYLE_HINTBOX);
+			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
+			hintbox.append(this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature)));
 
-			const content = document.createElement('div');
-			content.style.overflow = 'auto';
-			content.style.maxHeight = (cluster.originalEvent.clientY-60)+'px';
-			content.style.display = 'block';
-			content.appendChild(this.makePopupContent(cluster.layer.getAllChildMarkers().map(o => o.feature)));
+			node.hintBoxItem = hintBox.createBox(e, node, hintbox, '', true);
 
-			node.hintBoxItem = hintBox.createBox(e, node, content, '', true, style, container.parentNode);
+			// Adjust hintbox size in case if scrollbar is necessary.
+			hintBox.positionElement(e, node, node.hintBoxItem);
 
-			const cluster_bounds = cluster.originalEvent.target.getBoundingClientRect();
-			const hintbox_bounds = this._target.getBoundingClientRect();
-
-			let x = cluster_bounds.left + cluster_bounds.width / 2 - hintbox_bounds.left;
-			let y = cluster_bounds.top - hintbox_bounds.top - 10;
-
+			// Center hintbox relative to node.
 			node.hintBoxItem.position({
-				of: node.hintBoxItem,
 				my: 'center bottom',
-				at: `left+${x}px top+${y}px`,
+				at: 'center top',
+				of: node,
 				collision: 'fit'
 			});
 
@@ -219,23 +210,22 @@ class CWidgetGeoMap extends CWidget {
 				e.originalEvent.preventDefault();
 			}
 
-			const container = this._map._container;
-			const content = this.makePopupContent([e.layer.feature]);
-			const style = 'left: 0px; top: 0px;';
+			const hintbox = document.createElement('div');
+			hintbox.classList.add(CWidgetGeoMap.ZBX_STYLE_HINTBOX);
+			hintbox.style.maxHeight = `${node.getBoundingClientRect().top - 27}px`;
+			hintbox.append(this.makePopupContent([e.layer.feature]));
 
-			node.hintBoxItem = hintBox.createBox(e, node, content, '', true, style, container.parentNode);
+			node.hintBoxItem = hintBox.createBox(e, node, hintbox, '', true);
 			e.layer.hintBoxItem = node.hintBoxItem;
 
-			const marker_bounds = e.originalEvent.target.getBoundingClientRect();
-			const hintbox_bounds = this._target.getBoundingClientRect();
+			// Adjust hintbox size in case if scrollbar is necessary.
+			hintBox.positionElement(e, node, node.hintBoxItem);
 
-			let x = marker_bounds.left + marker_bounds.width / 2 - hintbox_bounds.left;
-			let y = marker_bounds.top - hintbox_bounds.top - 10;
-
+			// Center hintbox relative to node.
 			node.hintBoxItem.position({
-				of: node.hintBoxItem,
 				my: 'center bottom',
-				at: `left+${x}px top+${y}px`,
+				at: 'center top',
+				of: node,
 				collision: 'fit'
 			});
 
@@ -481,7 +471,7 @@ class CWidgetGeoMap extends CWidget {
 	 *
 	 * @param {array} hosts
 	 *
-	 * @return {string}
+	 * @returns {DocumentFragment}
 	 */
 	makePopupContent(hosts) {
 		const makeHostBtn = (host) => {
@@ -543,7 +533,7 @@ class CWidgetGeoMap extends CWidget {
 		};
 
 		const html = `
-			<table class="list-table geomap-hosts-table">
+			<table class="${ZBX_STYLE_LIST_TABLE}">
 			<thead>
 			<tr>
 				<th>${t('Host')}</th>
@@ -562,15 +552,19 @@ class CWidgetGeoMap extends CWidget {
 		const dom = document.createElement('template');
 		dom.innerHTML = html;
 
-		dom.content.querySelector('tbody').addEventListener('click', (e) => {
-			if (e.target.tagName === 'A') {
+		dom.content.querySelector('tbody').addEventListener('click', e => {
+			if (e.target.closest('a') !== null) {
 				return;
 			}
 
 			const row = e.target.closest('tr');
 
-			if (row.dataset.hostid !== undefined) {
-				this.#selectHost(row.dataset.hostid);
+			if (row !== null) {
+				const hostid = row.dataset.hostid;
+
+				if (hostid !== undefined) {
+					this.#selectHost(hostid);
+				}
 			}
 		});
 
@@ -650,20 +644,20 @@ class CWidgetGeoMap extends CWidget {
 
 			this._icons[severity] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(tmpl),
-				iconSize: [48, 64],
-				iconAnchor: [24, 32]
+				iconSize: [46, 61],
+				iconAnchor: [22, 44]
 			});
 
 			this._selected_icons[severity] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(selected_tmpl),
-				iconSize: [48, 64],
-				iconAnchor: [24, 32]
+				iconSize: [46, 61],
+				iconAnchor: [22, 44]
 			});
 
 			this._mouseover_icons[severity] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(mouseover_tmpl),
-				iconSize: [48, 64],
-				iconAnchor: [24, 32]
+				iconSize: [46, 61],
+				iconAnchor: [22, 44]
 			});
 		}
 	}

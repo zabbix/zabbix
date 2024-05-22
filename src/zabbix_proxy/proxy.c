@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbwrap.h"
@@ -311,6 +306,9 @@ static char	*config_user			= NULL;
 static char	*config_ssl_ca_location = NULL;
 static char	*config_ssl_cert_location = NULL;
 static char	*config_ssl_key_location = NULL;
+
+/* browser item */
+static char	*config_webdriver_url = NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_dbhigh_t	*zbx_config_dbhigh = NULL;
@@ -1092,6 +1090,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	1,			1000},
 		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
+		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1464,7 +1464,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks, config_java_gateway,
 								config_java_gateway_port, config_externalscripts,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location};
+								config_ssh_key_location, config_webdriver_url};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1481,7 +1481,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks, config_java_gateway,
 								config_java_gateway_port, config_externalscripts,
 								zbx_config_enable_remote_commands,
-								config_ssh_key_location};
+								config_ssh_key_location, config_webdriver_url};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
@@ -1502,7 +1502,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_externalscripts,
 								zbx_config_enable_remote_commands,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location, trapper_process_request_proxy,
+								config_ssh_key_location, config_webdriver_url,
+								trapper_process_request_proxy,
 								zbx_autoreg_update_host_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};

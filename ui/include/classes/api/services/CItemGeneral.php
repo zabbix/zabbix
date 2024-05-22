@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -184,7 +179,7 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				$params_types = [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
-					ITEM_TYPE_SCRIPT
+					ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 				];
 
 				if (in_array($item['type'], $params_types) && !in_array($db_item['type'], $params_types)) {
@@ -193,7 +188,8 @@ abstract class CItemGeneral extends CApiService {
 
 				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+					ITEM_TYPE_BROWSER
 				];
 
 				if (in_array($item['type'], $delay_types)) {
@@ -1461,7 +1457,8 @@ abstract class CItemGeneral extends CApiService {
 			$update = false;
 
 			if ($db_items === null) {
-				if ($item['type'] == ITEM_TYPE_SCRIPT && array_key_exists('parameters', $item) && $item['parameters']) {
+				if (in_array($item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])
+						&& array_key_exists('parameters', $item) && $item['parameters']) {
 					$update = true;
 				}
 			}
@@ -1470,12 +1467,10 @@ abstract class CItemGeneral extends CApiService {
 					continue;
 				}
 
-				if ($item['type'] == ITEM_TYPE_SCRIPT) {
-					if (array_key_exists('parameters', $item)) {
-						$update = true;
-					}
+				if (in_array($item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
+					$update = array_key_exists('parameters', $item);
 				}
-				elseif ($db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT
+				elseif (in_array($db_items[$item['itemid']]['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])
 						&& $db_items[$item['itemid']]['parameters']) {
 					$update = true;
 				}
@@ -2634,10 +2629,11 @@ abstract class CItemGeneral extends CApiService {
 		$itemids = [];
 
 		foreach ($items as $item) {
+			$type = $item['type'];
 			$db_type = $db_items[$item['itemid']]['type'];
 
-			if ((array_key_exists('parameters', $item) && $item['type'] == ITEM_TYPE_SCRIPT)
-					|| ($item['type'] != $db_type && $db_type == ITEM_TYPE_SCRIPT)) {
+			if ((array_key_exists('parameters', $item) && in_array($type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]))
+					|| ($type != $db_type && in_array($db_type, [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]))) {
 				$itemids[] = $item['itemid'];
 				$db_items[$item['itemid']]['parameters'] = [];
 			}

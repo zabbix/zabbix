@@ -27,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: df561a0cece94760a78704edf7da7326
-          name: 'Linux: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f94f9f4699e94c369e6c98b2a2f485ce
-          name: 'Linux: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
@@ -51,7 +51,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 27c42cf180b44632b5d9b8b5788165b3
-          name: 'Linux: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -65,7 +65,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: ef386d03ff2c42ffa236acd5215ad547
-          name: 'Linux: Maximum number of open file descriptors'
+          name: 'Maximum number of open file descriptors'
           key: kernel.maxfiles
           delay: 1h
           history: 7d
@@ -80,14 +80,14 @@ zabbix_export:
           triggers:
             - uuid: b9bdcf42f54a409a9a9a616dbd0eaed2
               expression: 'last(/Linux by Zabbix agent/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}'
-              name: 'Linux: Configured max number of open filedescriptors is too low'
-              event_name: 'Linux: Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
+              name: 'Configured max number of open filedescriptors is too low'
+              event_name: 'Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
               priority: INFO
               tags:
                 - tag: scope
                   value: performance
         - uuid: 678d70c041954ac8982fb5118b49f6e7
-          name: 'Linux: Maximum number of processes'
+          name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
           history: 7d
@@ -102,31 +102,31 @@ zabbix_export:
           triggers:
             - uuid: 8cf253ca3eea4109a90443f9cb76fc5c
               expression: 'last(/Linux by Zabbix agent/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}'
-              name: 'Linux: Configured max number of processes is too low'
-              event_name: 'Linux: Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN})'
+              name: 'Configured max number of processes is too low'
+              event_name: 'Configured max number of processes is too low (< {$KERNEL.MAXPROC.MIN})'
               priority: INFO
               dependencies:
-                - name: 'Linux: Getting closer to process limit'
+                - name: 'Getting closer to process limit'
                   expression: 'last(/Linux by Zabbix agent/proc.num)/last(/Linux by Zabbix agent/kernel.maxproc)*100>80'
               tags:
                 - tag: scope
                   value: performance
         - uuid: ab7d0471092544a6a950184d1bac906d
-          name: 'Linux: Number of processes'
+          name: 'Number of processes'
           key: proc.num
           history: 7d
           tags:
             - tag: component
               value: system
         - uuid: b2637293884d40108f41b11767dd5be0
-          name: 'Linux: Number of running processes'
+          name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
           tags:
             - tag: component
               value: system
         - uuid: 27cb0f66bb624146acfdd81b58f108a3
-          name: 'Linux: System boot time'
+          name: 'System boot time'
           key: system.boottime
           delay: 15m
           history: 7d
@@ -139,7 +139,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5d186a46867b4eaaafd6396d3239dd3b
-          name: 'Linux: Interrupts per second'
+          name: 'Interrupts per second'
           key: system.cpu.intr
           history: 7d
           value_type: FLOAT
@@ -152,7 +152,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 48528aa936a04c8189375a6eae4033da
-          name: 'Linux: Load average (1m avg)'
+          name: 'Load average (1m avg)'
           key: 'system.cpu.load[all,avg1]'
           history: 7d
           value_type: FLOAT
@@ -161,7 +161,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 953beb580df8418cb88b667b9dd37259
-          name: 'Linux: Load average (5m avg)'
+          name: 'Load average (5m avg)'
           key: 'system.cpu.load[all,avg5]'
           history: 7d
           value_type: FLOAT
@@ -170,7 +170,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 5716000e38e24dae8ead4ed98ede024b
-          name: 'Linux: Load average (15m avg)'
+          name: 'Load average (15m avg)'
           key: 'system.cpu.load[all,avg15]'
           history: 7d
           value_type: FLOAT
@@ -179,7 +179,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f72e115544eb4079b09fec8c3539241c
-          name: 'Linux: Number of CPUs'
+          name: 'Number of CPUs'
           key: system.cpu.num
           history: 7d
           preprocessing:
@@ -190,7 +190,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 73e85aa10a704fc7950d2d077f0c54ee
-          name: 'Linux: Context switches per second'
+          name: 'Context switches per second'
           key: system.cpu.switches
           history: 7d
           value_type: FLOAT
@@ -203,7 +203,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ca4235ec7607469cb0124a6253d3c489
-          name: 'Linux: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: system.cpu.util
           delay: '0'
@@ -223,13 +223,13 @@ zabbix_export:
           triggers:
             - uuid: b4e904559b694df0ad45bcce7930c3a6
               expression: 'min(/Linux by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'Linux: High CPU utilization'
-              event_name: 'Linux: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
               dependencies:
-                - name: 'Linux: Load average is too high'
+                - name: 'Load average is too high'
                   expression: |
                     min(/Linux by Zabbix agent/system.cpu.load[all,avg1],5m)/last(/Linux by Zabbix agent/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
                     and last(/Linux by Zabbix agent/system.cpu.load[all,avg5])>0
@@ -238,7 +238,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 69b187838fb74f319e47c2ff4f99ef54
-          name: 'Linux: CPU guest time'
+          name: 'CPU guest time'
           key: 'system.cpu.util[,guest]'
           history: 7d
           value_type: FLOAT
@@ -248,7 +248,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: a2b07497f2f343a99d26ad77e65bb54f
-          name: 'Linux: CPU guest nice time'
+          name: 'CPU guest nice time'
           key: 'system.cpu.util[,guest_nice]'
           history: 7d
           value_type: FLOAT
@@ -258,7 +258,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 7aad6d159baa4a24901847144f0d231b
-          name: 'Linux: CPU idle time'
+          name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
           history: 7d
           value_type: FLOAT
@@ -268,7 +268,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: cc4bc7693ae84f9bb18cee38d0814195
-          name: 'Linux: CPU interrupt time'
+          name: 'CPU interrupt time'
           key: 'system.cpu.util[,interrupt]'
           history: 7d
           value_type: FLOAT
@@ -278,7 +278,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 5df67d9162cc437585990cc8708be894
-          name: 'Linux: CPU iowait time'
+          name: 'CPU iowait time'
           key: 'system.cpu.util[,iowait]'
           history: 7d
           value_type: FLOAT
@@ -288,7 +288,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 8ee6e54c86ba44ab88bb9e83c632c1ed
-          name: 'Linux: CPU nice time'
+          name: 'CPU nice time'
           key: 'system.cpu.util[,nice]'
           history: 7d
           value_type: FLOAT
@@ -298,7 +298,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: a949a36004a449c58bef0cdc9d3fafd6
-          name: 'Linux: CPU softirq time'
+          name: 'CPU softirq time'
           key: 'system.cpu.util[,softirq]'
           history: 7d
           value_type: FLOAT
@@ -308,7 +308,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 3161dbd18e874e69b729c8e903cf7390
-          name: 'Linux: CPU steal time'
+          name: 'CPU steal time'
           key: 'system.cpu.util[,steal]'
           history: 7d
           value_type: FLOAT
@@ -318,7 +318,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: d93097ed5ce74d35b6041ef2b5ba18e8
-          name: 'Linux: CPU system time'
+          name: 'CPU system time'
           key: 'system.cpu.util[,system]'
           history: 7d
           value_type: FLOAT
@@ -328,7 +328,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 57f9e2e34fab41e18e2bc93e786c92c6
-          name: 'Linux: CPU user time'
+          name: 'CPU user time'
           key: 'system.cpu.util[,user]'
           history: 7d
           value_type: FLOAT
@@ -338,7 +338,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 207341f390134e37ad431e2823666eb9
-          name: 'Linux: System name'
+          name: 'System name'
           key: system.hostname
           delay: 1h
           history: 7d
@@ -356,8 +356,8 @@ zabbix_export:
           triggers:
             - uuid: 371a12f95a26438d8da659c84364631b
               expression: 'change(/Linux by Zabbix agent/system.hostname) and length(last(/Linux by Zabbix agent/system.hostname))>0'
-              name: 'Linux: System name has changed'
-              event_name: 'Linux: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -367,7 +367,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 6072902361404672a444841c786875e6
-          name: 'Linux: System local time'
+          name: 'System local time'
           key: system.localtime
           history: 7d
           units: unixtime
@@ -378,8 +378,8 @@ zabbix_export:
           triggers:
             - uuid: fb77b6ac381c4b5289584bd91e7da7d5
               expression: 'fuzzytime(/Linux by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'Linux: System time is out of sync'
-              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              name: 'System time is out of sync'
+              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
@@ -389,7 +389,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: fd21580a151246b0a340bf924c326aa8
-          name: 'Linux: Operating system architecture'
+          name: 'Operating system architecture'
           key: system.sw.arch
           delay: 1h
           history: 7d
@@ -404,7 +404,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 5e4c3d14634843e9b7b182e8fc08efbe
-          name: 'Linux: Operating system'
+          name: 'Operating system'
           key: system.sw.os
           delay: 1h
           history: 7d
@@ -421,18 +421,18 @@ zabbix_export:
           triggers:
             - uuid: b1998f98c06b49dd8d71e1c6df409371
               expression: 'change(/Linux by Zabbix agent/system.sw.os) and length(last(/Linux by Zabbix agent/system.sw.os))>0'
-              name: 'Linux: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Linux: System name has changed'
+                - name: 'System name has changed'
                   expression: 'change(/Linux by Zabbix agent/system.hostname) and length(last(/Linux by Zabbix agent/system.hostname))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 58818005e76d46dda14d6592f601ab00
-          name: 'Linux: Number of installed packages'
+          name: 'Number of installed packages'
           key: system.sw.packages.get
           delay: 1h
           history: 7d
@@ -449,14 +449,14 @@ zabbix_export:
           triggers:
             - uuid: b950c306394f4b3c902060a8273cbcde
               expression: 'change(/Linux by Zabbix agent/system.sw.packages.get)<>0'
-              name: 'Linux: Number of installed packages has been changed'
+              name: 'Number of installed packages has been changed'
               priority: WARNING
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 160b82c121b147cbbf18c34dbb01d3ce
-          name: 'Linux: Free swap space'
+          name: 'Free swap space'
           key: 'system.swap.size[,free]'
           history: 7d
           units: B
@@ -467,7 +467,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: ca423242172f4b20ba47c26f4a61aee7
-          name: 'Linux: Free swap space in %'
+          name: 'Free swap space in %'
           key: 'system.swap.size[,pfree]'
           history: 7d
           value_type: FLOAT
@@ -479,7 +479,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 102c81b5523c4be0b4beae3cb88ebde1
-          name: 'Linux: Total swap space'
+          name: 'Total swap space'
           key: 'system.swap.size[,total]'
           history: 7d
           units: B
@@ -490,7 +490,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: fc6898682f904c57ba28bcb3748b237f
-          name: 'Linux: System description'
+          name: 'System description'
           key: system.uname
           delay: 15m
           history: 7d
@@ -505,7 +505,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8537f6c6ac6b438c80caf227946df891
-          name: 'Linux: System uptime'
+          name: 'System uptime'
           key: system.uptime
           delay: 30s
           history: 7d
@@ -518,8 +518,8 @@ zabbix_export:
           triggers:
             - uuid: 1dbab80d7b6847e5b5a676cffba0fd1d
               expression: 'last(/Linux by Zabbix agent/system.uptime)<10m'
-              name: 'Linux: {HOST.NAME} has been restarted'
-              event_name: 'Linux: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: '{HOST.NAME} has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -527,7 +527,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 88056b3d2e424d5aba7cabcd4b043c9e
-          name: 'Linux: Number of logged in users'
+          name: 'Number of logged in users'
           key: system.users.num
           history: 7d
           description: 'The number of users who are currently logged in.'
@@ -535,7 +535,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 3b93d3590df24a46b29f6eb06f5e2446
-          name: 'Linux: Checksum of /etc/passwd'
+          name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
           history: 7d
@@ -551,19 +551,19 @@ zabbix_export:
           triggers:
             - uuid: 3a764881727b4e7eb01e137ccfc968a2
               expression: 'last(/Linux by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Linux by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
-              name: 'Linux: /etc/passwd has been changed'
+              name: '/etc/passwd has been changed'
               priority: INFO
               manual_close: 'YES'
               dependencies:
-                - name: 'Linux: Operating system description has changed'
+                - name: 'Operating system description has changed'
                   expression: 'change(/Linux by Zabbix agent/system.sw.os) and length(last(/Linux by Zabbix agent/system.sw.os))>0'
-                - name: 'Linux: System name has changed'
+                - name: 'System name has changed'
                   expression: 'change(/Linux by Zabbix agent/system.hostname) and length(last(/Linux by Zabbix agent/system.hostname))>0'
               tags:
                 - tag: scope
                   value: security
         - uuid: 868440292732425c8f9df52882822c82
-          name: 'Linux: Get filesystems'
+          name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
           trends: '0'
@@ -573,7 +573,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e811e6e2ae84461294e121f12e767b40
-          name: 'Linux: Available memory'
+          name: 'Available memory'
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
@@ -587,7 +587,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 20779a4c43374e5f9bea2584e93b85ef
-          name: 'Linux: Available memory in %'
+          name: 'Available memory in %'
           key: 'vm.memory.size[pavailable]'
           history: 7d
           value_type: FLOAT
@@ -597,7 +597,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d5c3541a7c0949ce812df1beb0732941
-          name: 'Linux: Total memory'
+          name: 'Total memory'
           key: 'vm.memory.size[total]'
           history: 7d
           units: B
@@ -606,7 +606,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 403cebed115441369e94d35d070ca7b8
-          name: 'Linux: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: vm.memory.utilization
           delay: '0'
@@ -626,12 +626,12 @@ zabbix_export:
           triggers:
             - uuid: cfd395b1cde74ef18a5e5f840bd5142a
               expression: 'min(/Linux by Zabbix agent/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Linux: High memory utilization'
-              event_name: 'Linux: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
-                - name: 'Linux: Lack of available memory'
+                - name: 'Lack of available memory'
                   expression: 'max(/Linux by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent/vm.memory.size[total])>0'
               tags:
                 - tag: scope
@@ -639,7 +639,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: ca48c53be1bf46ae9dd2707158a55139
-          name: 'Linux: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
@@ -652,8 +652,8 @@ zabbix_export:
           triggers:
             - uuid: 93594214371b4dc88b41663cad8537f0
               expression: 'max(/Linux by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'Linux: Zabbix agent is not available'
-              event_name: 'Linux: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive agents only, host availability is used with `{$AGENT.TIMEOUT}` as a time threshold.'
               manual_close: 'YES'
@@ -1672,7 +1672,7 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1688,7 +1688,7 @@ zabbix_export:
                       value: AAAEB
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2024,8 +2024,8 @@ zabbix_export:
   triggers:
     - uuid: ae5269e17d434927bfd6edc09a9a1f4d
       expression: 'last(/Linux by Zabbix agent/proc.num)/last(/Linux by Zabbix agent/kernel.maxproc)*100>80'
-      name: 'Linux: Getting closer to process limit'
-      event_name: 'Linux: Getting closer to process limit (over 80% used)'
+      name: 'Getting closer to process limit'
+      event_name: 'Getting closer to process limit (over 80% used)'
       opdata: '{ITEM.LASTVALUE1} active, {ITEM.LASTVALUE2} limit.'
       priority: WARNING
       tags:
@@ -2033,23 +2033,23 @@ zabbix_export:
           value: performance
     - uuid: f49fc01c5ac945d59455563bdbcc6469
       expression: 'max(/Linux by Zabbix agent/system.swap.size[,pfree],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Zabbix agent/system.swap.size[,total])>0'
-      name: 'Linux: High swap space usage'
-      event_name: 'Linux: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage'
+      event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'If there is no swap configured, this trigger is ignored.'
       dependencies:
-        - name: 'Linux: High memory utilization'
+        - name: 'High memory utilization'
           expression: 'min(/Linux by Zabbix agent/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}'
-        - name: 'Linux: Lack of available memory'
+        - name: 'Lack of available memory'
           expression: 'max(/Linux by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent/vm.memory.size[total])>0'
       tags:
         - tag: scope
           value: capacity
     - uuid: 686470cef97f48f6b017e9fc7a078afe
       expression: 'max(/Linux by Zabbix agent/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent/vm.memory.size[total])>0'
-      name: 'Linux: Lack of available memory'
-      event_name: 'Linux: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory'
+      event_name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'The system is running out of memory.'
@@ -2063,8 +2063,8 @@ zabbix_export:
         min(/Linux by Zabbix agent/system.cpu.load[all,avg1],5m)/last(/Linux by Zabbix agent/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux by Zabbix agent/system.cpu.load[all,avg5])>0
         and last(/Linux by Zabbix agent/system.cpu.load[all,avg15])>0
-      name: 'Linux: Load average is too high'
-      event_name: 'Linux: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      name: 'Load average is too high'
+      event_name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'The load average per CPU is too high. The system may be slow to respond.'

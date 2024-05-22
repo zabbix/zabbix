@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -67,6 +62,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Honeycomb' => 'Displays item values as a honeycomb.',
 		'Host availability' => 'Displays the host count by status (available/unavailable/unknown).',
 		'Host navigator' => 'Displays host hierarchy with ability to control other widgets based on selected host.',
+		'Item history' => 'Displays the latest data for the selected items with an option to add progress bar visualizations, '.
+				'customize report columns, and display images for binary data types.',
 		'Item navigator' => 'Displays item hierarchy with ability to control other widgets based on selected item.',
 		'Item value' => 'Displays the value of a single item prominently.',
 		'Map' => 'Displays either a single configured network map or one of the configured network maps in the map '.
@@ -74,7 +71,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Map navigation tree' => 'Allows to build a hierarchy of existing maps and display problem statistics for each '.
 				'included map and map group.',
 		'Pie chart' => 'Displays item values as a pie or doughnut chart.',
-		'Plain text' => 'Displays the latest data for the selected items in plain text.',
 		'Problem hosts' => 'Displays the problem count by host group and the highest problem severity within a group.',
 		'Problems' => 'Displays currently open problems with quick access links to the problem details.',
 		'Problems by severity' => 'Displays the problem count by severity.',

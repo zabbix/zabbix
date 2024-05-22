@@ -1,20 +1,15 @@
 --
--- Zabbix
 -- Copyright (C) 2001-2024 Zabbix SIA
 --
--- This program is free software; you can redistribute it and/or modify
--- it under the terms of the GNU General Public License as published by
--- the Free Software Foundation; either version 2 of the License, or
--- (at your option) any later version.
+-- This program is free software: you can redistribute it and/or modify it under the terms of
+-- the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 --
--- This program is distributed in the hope that it will be useful,
--- but WITHOUT ANY WARRANTY; without even the implied warranty of
--- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
--- GNU General Public License for more details.
+-- This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+-- without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+-- See the GNU Affero General Public License for more details.
 --
--- You should have received a copy of the GNU General Public License
--- along with this program; if not, write to the Free Software
--- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-- You should have received a copy of the GNU Affero General Public License along with this program.
+-- If not, see <https://www.gnu.org/licenses/>.
 --
 
 --
@@ -200,7 +195,7 @@ FIELD		|http_user	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|http_password	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|2|hosts	|		|RESTRICT
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|httptest	|httptestid	|RESTRICT
-FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|retries	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|ssl_cert_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|ssl_key_file	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
@@ -293,7 +288,7 @@ FIELD		|posts		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|status_codes	|t_varchar(255)	|'200'	|NOT NULL	|ZBX_PROXY
 FIELD		|follow_redirects|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
 FIELD		|post_type	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|http_proxy	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|headers	|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|retrieve_mode	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|request_method	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
@@ -674,7 +669,7 @@ FIELD		|mfa_status		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|mfaid			|t_id		|	|NULL		|0		|5|mfa	|	|RESTRICT
 FIELD		|software_update_checkid|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|software_update_check_data	|t_shorttext	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|timeout_browser	|t_varchar(255)	|'1m'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_browser	|t_varchar(255)	|'60s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
@@ -2324,4 +2319,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050298	|6050298
+ROW		|1		|6050304	|6050304

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-07 09:52+0000\n"
+"PO-Revision-Date: 2024-05-15 09:24+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -1497,6 +1497,14 @@ msgstr "Wszelkie zmiany dokonane w bieżącym formularzu zostaną utracone."
 msgid "Any character string included"
 msgstr "Dowolny ciąg znaków zawiera"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr "Wszelkie istniejące elementy hosta, których nie ma w pliku importu, zostaną usunięte. Kliknij OK, aby kontynuować."
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr "Wszelkie istniejące elementy szablonu, których nie ma w pliku importu, zostaną usunięte. Kliknij OK, aby kontynuować."
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "Błąd aplikacji."
@@ -2094,6 +2102,11 @@ msgstr "Przenieś na przód"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "Przenieś na zewnątrz"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr "Przeglądarka"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -7272,6 +7285,10 @@ msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 msgid "Display graph"
 msgstr "Wyświetl wykres"
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr "Wyświetl czas lokalny"
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Wyświetl min/śr/maks"
@@ -9373,6 +9390,10 @@ msgstr "Jasny mocny kontrast"
 #: app/partials/monitoring.problem.filter.php:312
 msgid "Highlight whole row"
 msgstr "Podkreśl cały wiersz"
+
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr "Wyróżnienie"
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -11933,6 +11954,10 @@ msgstr[0] "Włączono pozycję"
 msgstr[1] "Włączono pozycje"
 msgstr[2] "Włączono pozycje"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr "Historia pozycji"
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "Pozycja w stanie \"niewspierany\"."
@@ -12453,6 +12478,10 @@ msgstr "Wykres z ostatniego tygodnia"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "Ostatnie dane"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr "Ostatnia wersja"
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -14294,9 +14323,18 @@ msgstr "Nowy prototyp wyzwalacza"
 msgid "New triggers"
 msgstr "Nowe wyzwalacze"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr "Dostępna nowa aktualizacja"
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "Nowe mapowanie grup użytkowników"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr "Nowe wartości"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -16214,7 +16252,11 @@ msgstr "Proszę wybrać dwa elementy"
 
 #: jsLoader.php:194
 msgid "Please update configuration"
-msgstr ""
+msgstr "Proszę zaktualizować konfigurację"
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr "Proszę zaktualizować do najnowszej wersji głównej."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
@@ -17043,7 +17085,7 @@ msgstr "Wskazany widżet nie jest już dostępny. Proszę zaktualizować konfigu
 
 #: jsLoader.php:195
 msgid "Referred widget is unavailable"
-msgstr ""
+msgstr "Wskazany widżet jest niedostępny"
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -17119,6 +17161,10 @@ msgstr "Wyrażenia regularne"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "Powiązane raporty"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr "Informacje o wydaniu"
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18891,6 +18937,10 @@ msgstr "Pokaż funkcję agregującą"
 msgid "Show arc"
 msgstr "Pokaż łuk"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr "Pokaż nagłówek kolumny"
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18961,6 +19011,10 @@ msgstr "Wyświetl wybrane"
 msgid "Show sidebar"
 msgstr "Pokaż panel boczny"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr "Wyświetl szczegóły sprawdzania aktualizacji oprogramowania"
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18992,11 +19046,19 @@ msgstr "Pokaż błędy techniczne"
 msgid "Show text as HTML"
 msgstr "Wyświetl tekst jako HTML"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr "Pokaż miniaturkę"
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "Pokaż linię czasu"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr "Pokaż znacznik czasu"
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -19096,6 +19158,14 @@ msgstr "Proste wyzwalacze"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "Pojedynczy"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr "Pojedyncza linia"
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr "Pojedyncza linia - wynik zostanie wyświetlony w jednej linii i obcięty do określonej długości."
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19203,6 +19273,10 @@ msgstr "Oprogramowanie E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "Informacje o architekturze oprogramowania. Zwraca ciąg znaków"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr "Ostatnio sprawdzona aktualizacja oprogramowania"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20419,6 +20493,10 @@ msgstr "To ustawienie powinno być włączone, ponieważ tabele historii zawiera
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "To ustawienie powinno być włączone, ponieważ tabele trendu zawierają skompresowane dane."
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr "To ustawienie spowoduje wyświetlenie czasu lokalnego zamiast znacznika czasu. W konfiguracji zaawansowanej należy także zaznaczyć opcję \"Pokaż znacznik czasu\"."
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -21409,7 +21487,7 @@ msgstr "Niedostępne"
 
 #: jsLoader.php:206 jsLoader.php:211
 msgid "Unavailable widget"
-msgstr ""
+msgstr "Niedostępny widżet"
 
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
@@ -21712,6 +21790,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Działa"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr "Aktualny"
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21894,6 +21977,10 @@ msgstr "Użyj jeżeli poziom"
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
 msgstr "Użyj piaskownicy iframe"
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr "Użyj czcionki o stałej szerokości"
 
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
@@ -25530,7 +25617,7 @@ msgstr "wskazany obiekt nie istnieje"
 #: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
 msgid "referred widget is unavailable"
-msgstr ""
+msgstr "wskazany widżet jest niedostępny"
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

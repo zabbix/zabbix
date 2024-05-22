@@ -80,6 +80,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-hostnavigator";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
+@import "components/dashboard/widget-itemhistory";
 @import "components/dashboard/widget-itemnavigator";
 @import "components/dashboard/widget-map";
 @import "components/dashboard/widget-navtree";
@@ -149,6 +150,20 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	&:active {
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, .5);
+	}
+}
+
+.link-external {
+	position: relative;
+
+	&::after {
+		@extend %icons-font;
+
+		content: $zi-link-external-small;
+		position: absolute;
+		top: 0;
+		right: calc(-#{$icon-small-size} - 2px);
+		font-size: $icon-small-size;
 	}
 }
 
@@ -224,7 +239,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 .host-dashboard-header-navigation,
 .header-navigation {
-	min-height: 24px;
+	min-height: 29px;
 
 	& > ul {
 		display: flex;
@@ -312,34 +327,20 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			outline: none;
 		}
 
-		.filter-btn-container {
-			height: 29px;
-			z-index: 2;
-		}
-
 		.ui-tabs-nav {
-			height: 29px;
-			border-bottom: 0;
-
 			a {
 				display: inline-block;
 				box-sizing: border-box;
 				line-height: 22px;
-				margin-bottom: 5px;
 				text-align: center;
 			}
 		}
-	}
-
-	& + .list-table {
-		margin-top: 4px;
 	}
 }
 
 .header-navigation {
 	display: inline-block;
 	position: relative;
-	margin: 0 0 5px;
 	z-index: 3;
 	max-width: calc(100% - 200px);
 

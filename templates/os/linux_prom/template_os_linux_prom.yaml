@@ -43,7 +43,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: 9a60d1e53caa4049a33aa52f3f55ad75
-          name: 'Linux: Version of node_exporter running'
+          name: 'Version of node_exporter running'
           type: DEPENDENT
           key: 'agent.version[node_exporter]'
           delay: '0'
@@ -65,7 +65,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: d3631bd7effc4cd1bc45c991b3c3038f
-          name: 'Linux: Number of open file descriptors'
+          name: 'Number of open file descriptors'
           type: DEPENDENT
           key: 'fd.open[node_exporter]'
           delay: '0'
@@ -83,7 +83,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a8b78e776e1d4011bbcb6dd54e32b40b
-          name: 'Linux: Maximum number of open file descriptors'
+          name: 'Maximum number of open file descriptors'
           type: DEPENDENT
           key: 'kernel.maxfiles[node_exporter]'
           delay: '0'
@@ -107,17 +107,17 @@ zabbix_export:
           triggers:
             - uuid: c0002ad071d7497ab32633c93624e0c2
               expression: 'last(/Linux by Prom/kernel.maxfiles[node_exporter])<{$KERNEL.MAXFILES.MIN}'
-              name: 'Linux: Configured max number of open filedescriptors is too low'
-              event_name: 'Linux: Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
+              name: 'Configured max number of open filedescriptors is too low'
+              event_name: 'Configured max number of open filedescriptors is too low (< {$KERNEL.MAXFILES.MIN})'
               priority: INFO
               dependencies:
-                - name: 'Linux: Running out of file descriptors'
+                - name: 'Running out of file descriptors'
                   expression: 'last(/Linux by Prom/fd.open[node_exporter])/last(/Linux by Prom/kernel.maxfiles[node_exporter])*100>80'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 8b2fffcba0b24ca8a687361645ffaa1d
-          name: 'Linux: Get node_exporter metrics'
+          name: 'Get node_exporter metrics'
           type: HTTP_AGENT
           key: node_exporter.get
           history: 1h
@@ -130,7 +130,7 @@ zabbix_export:
           triggers:
             - uuid: e33fafc8476e404aa4150d0d491f4c83
               expression: 'nodata(/Linux by Prom/node_exporter.get,30m)=1'
-              name: 'Linux: node_exporter is not available'
+              name: 'node_exporter is not available'
               event_name: 'node_exporter is not available (or no data for 30m)'
               priority: WARNING
               description: 'Failed to fetch system metrics from node_exporter in time.'
@@ -139,7 +139,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 75afcb39d2d7496e9490cd14f1431600
-          name: 'Linux: System boot time'
+          name: 'System boot time'
           type: DEPENDENT
           key: 'system.boottime[node_exporter]'
           delay: '0'
@@ -158,7 +158,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a732c4df8af047fbb874e1fb363b5e9e
-          name: 'Linux: CPU guest time'
+          name: 'CPU guest time'
           type: DEPENDENT
           key: 'system.cpu.guest[node_exporter]'
           delay: '0'
@@ -189,7 +189,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 759809ee6c9e43cf8ff44f987221a90e
-          name: 'Linux: CPU guest nice time'
+          name: 'CPU guest nice time'
           type: DEPENDENT
           key: 'system.cpu.guest_nice[node_exporter]'
           delay: '0'
@@ -220,7 +220,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 7bb99c606c6b497aaef279663b60829b
-          name: 'Linux: CPU idle time'
+          name: 'CPU idle time'
           type: DEPENDENT
           key: 'system.cpu.idle[node_exporter]'
           delay: '0'
@@ -251,7 +251,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4d3f64c79c684d55bcde14ca5bf3022a
-          name: 'Linux: CPU interrupt time'
+          name: 'CPU interrupt time'
           type: DEPENDENT
           key: 'system.cpu.interrupt[node_exporter]'
           delay: '0'
@@ -282,7 +282,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 76206cf435fd4a979dbbf74807b532de
-          name: 'Linux: Interrupts per second'
+          name: 'Interrupts per second'
           type: DEPENDENT
           key: 'system.cpu.intr[node_exporter]'
           delay: '0'
@@ -304,7 +304,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 6a727e148a2c4956bcfb6de0a3486c2d
-          name: 'Linux: CPU iowait time'
+          name: 'CPU iowait time'
           type: DEPENDENT
           key: 'system.cpu.iowait[node_exporter]'
           delay: '0'
@@ -335,7 +335,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 78fb393fe3d64cd7bf79be5427715add
-          name: 'Linux: Load average (1m avg)'
+          name: 'Load average (1m avg)'
           type: DEPENDENT
           key: 'system.cpu.load.avg1[node_exporter]'
           delay: '0'
@@ -354,7 +354,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 7fc62b26b9ff43429632f1985dc07851
-          name: 'Linux: Load average (5m avg)'
+          name: 'Load average (5m avg)'
           type: DEPENDENT
           key: 'system.cpu.load.avg5[node_exporter]'
           delay: '0'
@@ -373,7 +373,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 35fb0319c599403bbea0e616c9066e27
-          name: 'Linux: Load average (15m avg)'
+          name: 'Load average (15m avg)'
           type: DEPENDENT
           key: 'system.cpu.load.avg15[node_exporter]'
           delay: '0'
@@ -392,7 +392,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 86de794832794f57ba428cca31031005
-          name: 'Linux: CPU nice time'
+          name: 'CPU nice time'
           type: DEPENDENT
           key: 'system.cpu.nice[node_exporter]'
           delay: '0'
@@ -423,7 +423,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: d7db65cfeaac4541bd98d06dc35f89e2
-          name: 'Linux: Number of CPUs'
+          name: 'Number of CPUs'
           type: DEPENDENT
           key: 'system.cpu.num[node_exporter]'
           delay: '0'
@@ -441,7 +441,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: cf3cd5840b91477d8e9254820896b978
-          name: 'Linux: CPU softirq time'
+          name: 'CPU softirq time'
           type: DEPENDENT
           key: 'system.cpu.softirq[node_exporter]'
           delay: '0'
@@ -472,7 +472,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2ee5885c4de646c0926f0c1a48890e68
-          name: 'Linux: CPU steal time'
+          name: 'CPU steal time'
           type: DEPENDENT
           key: 'system.cpu.steal[node_exporter]'
           delay: '0'
@@ -503,7 +503,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: b873e0d178d144fca3597d617fc119e7
-          name: 'Linux: Context switches per second'
+          name: 'Context switches per second'
           type: DEPENDENT
           key: 'system.cpu.switches[node_exporter]'
           delay: '0'
@@ -525,7 +525,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e296be976c5944b19a7178304ed6140c
-          name: 'Linux: CPU system time'
+          name: 'CPU system time'
           type: DEPENDENT
           key: 'system.cpu.system[node_exporter]'
           delay: '0'
@@ -556,7 +556,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 832698e707d14bad8171ca71a2533350
-          name: 'Linux: CPU user time'
+          name: 'CPU user time'
           type: DEPENDENT
           key: 'system.cpu.user[node_exporter]'
           delay: '0'
@@ -587,7 +587,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 76f60c7e4f1a482198ff4f101020bbcc
-          name: 'Linux: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: 'system.cpu.util[node_exporter]'
           delay: '0'
@@ -607,13 +607,13 @@ zabbix_export:
           triggers:
             - uuid: 4c924f8243a7431886a2d69368cb7142
               expression: 'min(/Linux by Prom/system.cpu.util[node_exporter],5m)>{$CPU.UTIL.CRIT}'
-              name: 'Linux: High CPU utilization'
-              event_name: 'Linux: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
               dependencies:
-                - name: 'Linux: Load average is too high'
+                - name: 'Load average is too high'
                   expression: |
                     min(/Linux by Prom/system.cpu.load.avg1[node_exporter],5m)/last(/Linux by Prom/system.cpu.num[node_exporter])>{$LOAD_AVG_PER_CPU.MAX.WARN}
                     and last(/Linux by Prom/system.cpu.load.avg5[node_exporter])>0
@@ -622,7 +622,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: c47995760ef3458eb6237e434ef4eef8
-          name: 'Linux: System description'
+          name: 'System description'
           type: DEPENDENT
           key: 'system.descr[node_exporter]'
           delay: '0'
@@ -648,7 +648,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9fcb3dd70dc244f2b2ff86560b37ec7e
-          name: 'Linux: System local time'
+          name: 'System local time'
           type: DEPENDENT
           key: 'system.localtime[node_exporter]'
           delay: '0'
@@ -670,8 +670,8 @@ zabbix_export:
           triggers:
             - uuid: e91c10be1c4a4c3fadfe06aec6c1e4e4
               expression: 'fuzzytime(/Linux by Prom/system.localtime[node_exporter],{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'Linux: System time is out of sync'
-              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              name: 'System time is out of sync'
+              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
@@ -681,7 +681,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: c70cfa2ad5754089935883c5b3172656
-          name: 'Linux: System name'
+          name: 'System name'
           type: DEPENDENT
           key: 'system.name[node_exporter]'
           delay: '0'
@@ -707,8 +707,8 @@ zabbix_export:
           triggers:
             - uuid: e827e944568b46e284820630482317bd
               expression: 'last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2) and length(last(/Linux by Prom/system.name[node_exporter]))>0'
-              name: 'Linux: System name has changed'
-              event_name: 'Linux: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -718,7 +718,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: ce4bb6c485cc4b739dce31b631634790
-          name: 'Linux: Operating system architecture'
+          name: 'Operating system architecture'
           type: DEPENDENT
           key: 'system.sw.arch[node_exporter]'
           delay: '0'
@@ -740,7 +740,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 11ff4e02245f4c2e9ce00e55c1a77b39
-          name: 'Linux: Operating system'
+          name: 'Operating system'
           type: DEPENDENT
           key: 'system.sw.os[node_exporter]'
           delay: '0'
@@ -760,18 +760,18 @@ zabbix_export:
           triggers:
             - uuid: 00974d5b128c4b1db64ca100770fb11b
               expression: 'last(/Linux by Prom/system.sw.os[node_exporter],#1)<>last(/Linux by Prom/system.sw.os[node_exporter],#2) and length(last(/Linux by Prom/system.sw.os[node_exporter]))>0'
-              name: 'Linux: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Linux: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Linux by Prom/system.name[node_exporter],#1)<>last(/Linux by Prom/system.name[node_exporter],#2) and length(last(/Linux by Prom/system.name[node_exporter]))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: ccc3c4d69fef412aa53c6a7320ef44fb
-          name: 'Linux: Free swap space'
+          name: 'Free swap space'
           type: DEPENDENT
           key: 'system.swap.free[node_exporter]'
           delay: '0'
@@ -793,7 +793,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 99feb76b7da04b00a0d191b92bf979a1
-          name: 'Linux: Free swap space in %'
+          name: 'Free swap space in %'
           type: CALCULATED
           key: 'system.swap.pfree[node_exporter]'
           history: 7d
@@ -807,7 +807,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d0c1ef0a679546d780df30a02a27df44
-          name: 'Linux: Total swap space'
+          name: 'Total swap space'
           type: DEPENDENT
           key: 'system.swap.total[node_exporter]'
           delay: '0'
@@ -829,7 +829,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7eeabdb6bf44483bab91faaab8bb24d5
-          name: 'Linux: System uptime'
+          name: 'System uptime'
           type: DEPENDENT
           key: 'system.uptime[node_exporter]'
           delay: '0'
@@ -854,8 +854,8 @@ zabbix_export:
           triggers:
             - uuid: 83311a7c73c441d39d88fe0fc7b55af9
               expression: 'last(/Linux by Prom/system.uptime[node_exporter])<10m'
-              name: 'Linux: {HOST.NAME} has been restarted'
-              event_name: 'Linux: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: '{HOST.NAME} has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The device uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -863,7 +863,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 70a75efafbc84cbebd1bb262ec797523
-          name: 'Linux: Available memory'
+          name: 'Available memory'
           type: DEPENDENT
           key: 'vm.memory.available[node_exporter]'
           delay: '0'
@@ -888,7 +888,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: e3ad296f16084e9caa923b449d8c725f
-          name: 'Linux: Total memory'
+          name: 'Total memory'
           type: DEPENDENT
           key: 'vm.memory.total[node_exporter]'
           delay: '0'
@@ -908,7 +908,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 60c716c692fb482f9abffb0fc9ce4324
-          name: 'Linux: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[node_exporter]'
           history: 7d
@@ -922,12 +922,12 @@ zabbix_export:
           triggers:
             - uuid: 72304b3a167e41ccbcdb75568c65294a
               expression: 'min(/Linux by Prom/vm.memory.util[node_exporter],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Linux: High memory utilization'
-              event_name: 'Linux: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
-                - name: 'Linux: Lack of available memory'
+                - name: 'Lack of available memory'
                   expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
               tags:
                 - tag: scope
@@ -2149,7 +2149,7 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2165,7 +2165,7 @@ zabbix_export:
                       value: AAAEB
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2486,23 +2486,23 @@ zabbix_export:
   triggers:
     - uuid: 16e6a4d340164dee9379a3fc0aac0576
       expression: 'max(/Linux by Prom/system.swap.pfree[node_exporter],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Prom/system.swap.total[node_exporter])>0'
-      name: 'Linux: High swap space usage'
-      event_name: 'Linux: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage'
+      event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'If there is no swap configured, this trigger is ignored.'
       dependencies:
-        - name: 'Linux: High memory utilization'
+        - name: 'High memory utilization'
           expression: 'min(/Linux by Prom/vm.memory.util[node_exporter],5m)>{$MEMORY.UTIL.MAX}'
-        - name: 'Linux: Lack of available memory'
+        - name: 'Lack of available memory'
           expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
       tags:
         - tag: scope
           value: capacity
     - uuid: f78ed17586964a46a9de0c4f183984f6
       expression: 'max(/Linux by Prom/vm.memory.available[node_exporter],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Prom/vm.memory.total[node_exporter])>0'
-      name: 'Linux: Lack of available memory'
-      event_name: 'Linux: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory'
+      event_name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       tags:
@@ -2515,8 +2515,8 @@ zabbix_export:
         min(/Linux by Prom/system.cpu.load.avg1[node_exporter],5m)/last(/Linux by Prom/system.cpu.num[node_exporter])>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux by Prom/system.cpu.load.avg5[node_exporter])>0
         and last(/Linux by Prom/system.cpu.load.avg15[node_exporter])>0
-      name: 'Linux: Load average is too high'
-      event_name: 'Linux: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      name: 'Load average is too high'
+      event_name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'The load average per CPU is too high. The system may be slow to respond.'
@@ -2527,8 +2527,8 @@ zabbix_export:
           value: performance
     - uuid: 7effa63c9c994a6786279802aa7328ad
       expression: 'last(/Linux by Prom/fd.open[node_exporter])/last(/Linux by Prom/kernel.maxfiles[node_exporter])*100>80'
-      name: 'Linux: Running out of file descriptors'
-      event_name: 'Linux: Running out of file descriptors (less than < 20% free)'
+      name: 'Running out of file descriptors'
+      event_name: 'Running out of file descriptors (less than < 20% free)'
       opdata: '{ITEM.LASTVALUE1} of {ITEM.LASTVALUE2} file descriptors are in use.'
       priority: WARNING
       tags:

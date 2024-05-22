@@ -71,14 +71,14 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam: Get metrics|<p>The result of API requests is expressed in the JSON.</p>|Script|veeam.get.metrics|
-|Veeam: Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get metrics|<p>The result of API requests is expressed in the JSON.</p>|Script|veeam.get.metrics|
+|Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Veeam: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Veeam Backup and Replication by HTTP/veeam.get.errors))>0`|Average||
+|There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Veeam Backup and Replication by HTTP/veeam.get.errors))>0`|Average||
 
 ### LLD rule Proxies discovery
 
@@ -90,11 +90,11 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam: Server [{#NAME}]: Get data|<p>Gets raw data collected by the proxy server.</p>|Dependent item|veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</p></li></ul>|
-|Veeam: Proxy [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.proxy.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.proxies.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
-|Veeam: Proxy [{#NAME}] [{#TYPE}]: Max Task Count|<p>The maximum number of concurrent tasks.</p>|Dependent item|veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.server.maxTaskCount`</p></li></ul>|
-|Veeam: Proxy [{#NAME}] [{#TYPE}]: Host name|<p>The name of the proxy server.</p>|Dependent item|veeam.proxy.server.name[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.name`</p></li></ul>|
-|Veeam: Proxy [{#NAME}] [{#TYPE}]: Host type|<p>The type of the proxy server.</p>|Dependent item|veeam.proxy.server.type[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.type`</p></li></ul>|
+|Server [{#NAME}]: Get data|<p>Gets raw data collected by the proxy server.</p>|Dependent item|veeam.proxy.server.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.managedServers.data.[?(@.id=='{#HOSTID}')].first()`</p></li></ul>|
+|Proxy [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.proxy.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.proxies.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
+|Proxy [{#NAME}] [{#TYPE}]: Max Task Count|<p>The maximum number of concurrent tasks.</p>|Dependent item|veeam.proxy.maxtask[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.server.maxTaskCount`</p></li></ul>|
+|Proxy [{#NAME}] [{#TYPE}]: Host name|<p>The name of the proxy server.</p>|Dependent item|veeam.proxy.server.name[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.name`</p></li></ul>|
+|Proxy [{#NAME}] [{#TYPE}]: Host type|<p>The type of the proxy server.</p>|Dependent item|veeam.proxy.server.type[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.type`</p></li></ul>|
 
 ### LLD rule Repositories discovery
 
@@ -106,9 +106,9 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam: Repository [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.repositories.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
-|Veeam: Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]|<p>Used space by repositories expressed in gigabytes (GB).</p>|Dependent item|veeam.repository.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usedSpaceGB`</p></li></ul>|
-|Veeam: Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]|<p>Free space of repositories expressed in gigabytes (GB).</p>|Dependent item|veeam.repository.free.space[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.freeGB`</p></li></ul>|
+|Repository [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.repositories.raw[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.repositories_states.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
+|Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]|<p>Used space by repositories expressed in gigabytes (GB).</p>|Dependent item|veeam.repository.capacity[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usedSpaceGB`</p></li></ul>|
+|Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]|<p>Free space of repositories expressed in gigabytes (GB).</p>|Dependent item|veeam.repository.free.space[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.freeGB`</p></li></ul>|
 
 ### LLD rule Sessions discovery
 
@@ -120,17 +120,17 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam: Session [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.sessions.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Veeam: Session [{#NAME}] [{#TYPE}]: State|<p>The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.</p>|Dependent item|veeam.sessions.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li></ul>|
-|Veeam: Session [{#NAME}] [{#TYPE}]: Result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.sessions.result[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.result`</p></li></ul>|
-|Veeam: Session [{#NAME}] [{#TYPE}]: Message|<p>A message that explains the session result.</p>|Dependent item|veeam.sessions.message[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.message`</p></li></ul>|
-|Veeam: Session progress percent [{#NAME}] [{#TYPE}]|<p>The progress of the session expressed as percentage.</p>|Dependent item|veeam.sessions.progress.percent[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.progressPercent`</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.</p>|Dependent item|veeam.sessions.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sessions.data.[?(@.id=='{#ID}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: State|<p>The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.</p>|Dependent item|veeam.sessions.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: Result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.sessions.result[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.result`</p></li></ul>|
+|Session [{#NAME}] [{#TYPE}]: Message|<p>A message that explains the session result.</p>|Dependent item|veeam.sessions.message[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.result.message`</p></li></ul>|
+|Session progress percent [{#NAME}] [{#TYPE}]|<p>The progress of the session expressed as percentage.</p>|Dependent item|veeam.sessions.progress.percent[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.progressPercent`</p></li></ul>|
 
 ### Trigger prototypes for Sessions discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Veeam: Last result session failed||`find(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}],,"like","Failed")=1`|Average|**Manual close**: Yes|
+|Last result session failed||`find(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}],,"like","Failed")=1`|Average|**Manual close**: Yes|
 
 ### LLD rule Jobs states discovery
 
@@ -142,15 +142,15 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam: Job states [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from the job states with the name `[{#NAME}]`.</p>|Dependent item|veeam.jobs.states.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs_states.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
-|Veeam: Job states [{#NAME}] [{#TYPE}]: Status|<p>The current status of the job. The enums used: `running`, `inactive`, `disabled`.</p>|Dependent item|veeam.jobs.status[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li></ul>|
-|Veeam: Job states [{#NAME}] [{#TYPE}]: Last result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.jobs.last.result[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastResult`</p></li></ul>|
+|Job states [{#NAME}] [{#TYPE}]: Get data|<p>Gets raw data from the job states with the name `[{#NAME}]`.</p>|Dependent item|veeam.jobs.states.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs_states.data.[?(@.id=='{#ID}')].first()`</p></li></ul>|
+|Job states [{#NAME}] [{#TYPE}]: Status|<p>The current status of the job. The enums used: `running`, `inactive`, `disabled`.</p>|Dependent item|veeam.jobs.status[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li></ul>|
+|Job states [{#NAME}] [{#TYPE}]: Last result|<p>The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.</p>|Dependent item|veeam.jobs.last.result[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastResult`</p></li></ul>|
 
 ### Trigger prototypes for Jobs states discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Veeam: Last result job failed||`find(/Veeam Backup and Replication by HTTP/veeam.jobs.last.result[{#ID}],,"like","Failed")=1`|Average|**Manual close**: Yes|
+|Last result job failed||`find(/Veeam Backup and Replication by HTTP/veeam.jobs.last.result[{#ID}],,"like","Failed")=1`|Average|**Manual close**: Yes|
 
 ## Feedback
 

@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 1831d0a9399d4e41a0fd1dc392241640
-          name: 'HPE ProLiant BL920: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'hp.server.contact[sysContact]'
@@ -46,7 +46,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 342a1fb4781d4f4fbafa7728f0c54d44
-          name: 'HPE ProLiant BL920: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'hp.server.descr[sysDescr]'
@@ -67,7 +67,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 1b4a890c4d244ce7920193f2fcd34cd0
-          name: 'HPE ProLiant BL920: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
           key: 'hp.server.hw.model[cpqSiProductName]'
@@ -86,7 +86,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e0da21845f8b49fd8c4471db20cf7a31
-          name: 'HPE ProLiant BL920: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
           key: 'hp.server.hw.serialnumber[cpqSiSysSerialNum]'
@@ -107,8 +107,8 @@ zabbix_export:
           triggers:
             - uuid: 9eb77df5f95149e49d63a7191e68756c
               expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant BL920 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant BL920 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
-              name: 'HPE ProLiant BL920: Device has been replaced'
-              event_name: 'HPE ProLiant BL920: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -116,7 +116,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 5cd1e01b10f3482e9ec5907bd2e55c26
-          name: 'HPE ProLiant BL920: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'hp.server.hw.uptime[hrSystemUptime]'
@@ -139,7 +139,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fa3cec21b4a64ba9990bb2adaaba8a00
-          name: 'HPE ProLiant BL920: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'hp.server.location[sysLocation]'
@@ -159,7 +159,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 01bf2613057541b082320fa81b07636f
-          name: 'HPE ProLiant BL920: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'hp.server.name[sysName]'
@@ -181,8 +181,8 @@ zabbix_export:
           triggers:
             - uuid: c0eed9d2eccc4ae99128a318de92df8d
               expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant BL920 by SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant BL920 by SNMP/hp.server.name[sysName]))>0'
-              name: 'HPE ProLiant BL920: System name has changed'
-              event_name: 'HPE ProLiant BL920: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -190,7 +190,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 244691064ba54bf186a44219077fc804
-          name: 'HPE ProLiant BL920: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'hp.server.net.uptime[sysUpTime]'
@@ -208,7 +208,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: abb51a946f5d4ee09895bef2e1df0fa6
-          name: 'HPE ProLiant BL920: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'hp.server.objectid[sysObjectID]'
@@ -227,7 +227,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2a1af5ba5ee643c7b63e5eae10703e9c
-          name: 'HPE ProLiant BL920: System temperature status'
+          name: 'System temperature status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
           key: 'hp.server.sensor.temp.status[cpqHeThermalCondition]'
@@ -251,7 +251,7 @@ zabbix_export:
             - tag: component
               value: temperature
         - uuid: 4b05f7e3700440ee81cb38851c561a09
-          name: 'HPE ProLiant BL920: Overall system health status'
+          name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
           key: 'hp.server.status[cpqHeMibCondition]'
@@ -274,7 +274,7 @@ zabbix_export:
           triggers:
             - uuid: 187f7a3872a2481f962f16c422911827
               expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
-              name: 'HPE ProLiant BL920: System status is in critical state'
+              name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors.'
@@ -283,18 +283,18 @@ zabbix_export:
                   value: available
             - uuid: 51c633cbed0d4684b2e0619e2f0ab64d
               expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}'
-              name: 'HPE ProLiant BL920: System status is in warning state'
+              name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings.'
               dependencies:
-                - name: 'HPE ProLiant BL920: System status is in critical state'
+                - name: 'System status is in critical state'
                   expression: 'last(/HPE ProLiant BL920 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
               tags:
                 - tag: scope
                   value: available
         - uuid: 356100e223784f398701839a2e74b6ff
-          name: 'HPE ProLiant BL920: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -307,7 +307,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 1924b196b0af4b0ba91519187bf22c78
-          name: 'HPE ProLiant BL920: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -325,7 +325,7 @@ zabbix_export:
           triggers:
             - uuid: 35cce5a461c04163a0575d7f831ea3d9
               expression: 'max(/HPE ProLiant BL920 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'HPE ProLiant BL920: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -2240,8 +2240,8 @@ zabbix_export:
   triggers:
     - uuid: 97f107c88b6048f1b74412e8dfedc857
       expression: '(last(/HPE ProLiant BL920 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant BL920 by SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant BL920 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant BL920 by SNMP/hp.server.net.uptime[sysUpTime])<10m)'
-      name: 'HPE ProLiant BL920: Host has been restarted'
-      event_name: 'HPE ProLiant BL920: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

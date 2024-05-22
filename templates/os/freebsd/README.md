@@ -49,54 +49,54 @@ Install Zabbix agent on FreeBSD according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FreeBSD: Maximum number of opened files|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxfiles|
-|FreeBSD: Maximum number of processes|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxproc|
-|FreeBSD: Number of running processes|<p>Number of processes in a running state.</p>|Zabbix agent|proc.num[,,run]|
-|FreeBSD: Number of processes|<p>Total number of processes in any state.</p>|Zabbix agent|proc.num[]|
-|FreeBSD: Host boot time||Zabbix agent|system.boottime|
-|FreeBSD: Interrupts per second|<p>Number of interrupts processed.</p>|Zabbix agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|
-|FreeBSD: Processor load (1 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg1]|
-|FreeBSD: Processor load (5 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg5]|
-|FreeBSD: Processor load (15 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg15]|
-|FreeBSD: Context switches per second|<p>The combined rate at which all processors on the computer are switched from one thread to another.</p>|Zabbix agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|
-|FreeBSD: CPU idle time|<p>Time the CPU has spent doing nothing.</p>|Zabbix agent|system.cpu.util[,idle]|
-|FreeBSD: CPU interrupt time|<p>Time the CPU has spent servicing hardware interrupts.</p>|Zabbix agent|system.cpu.util[,interrupt]|
-|FreeBSD: CPU nice time|<p>Time the CPU has spent running users' processes that have been niced.</p>|Zabbix agent|system.cpu.util[,nice]|
-|FreeBSD: CPU system time|<p>Time the CPU has spent running the kernel and its processes.</p>|Zabbix agent|system.cpu.util[,system]|
-|FreeBSD: CPU user time|<p>Time the CPU has spent running users' processes that are not niced.</p>|Zabbix agent|system.cpu.util[,user]|
-|FreeBSD: Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FreeBSD: Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
-|FreeBSD: Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,free]|
-|FreeBSD: Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Zabbix agent|system.swap.size[,pfree]|
-|FreeBSD: Total swap space|<p>Total space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,total]|
-|FreeBSD: System information|<p>Information as normally returned by `uname -a`.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FreeBSD: System uptime||Zabbix agent|system.uptime|
-|FreeBSD: Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
-|FreeBSD: Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|FreeBSD: Available memory|<p>Defined as free + cached + buffers.</p>|Zabbix agent|vm.memory.size[available]|
-|FreeBSD: Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent|vm.memory.size[total]|
-|FreeBSD: Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FreeBSD: Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|FreeBSD: Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent|agent.ping|
-|FreeBSD: Zabbix agent availability|<p>Used for monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
-|FreeBSD: Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
+|Maximum number of opened files|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxfiles|
+|Maximum number of processes|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent|kernel.maxproc|
+|Number of running processes|<p>Number of processes in a running state.</p>|Zabbix agent|proc.num[,,run]|
+|Number of processes|<p>Total number of processes in any state.</p>|Zabbix agent|proc.num[]|
+|Host boot time||Zabbix agent|system.boottime|
+|Interrupts per second|<p>Number of interrupts processed.</p>|Zabbix agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|
+|Processor load (1 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg1]|
+|Processor load (5 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg5]|
+|Processor load (15 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg15]|
+|Context switches per second|<p>The combined rate at which all processors on the computer are switched from one thread to another.</p>|Zabbix agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|
+|CPU idle time|<p>Time the CPU has spent doing nothing.</p>|Zabbix agent|system.cpu.util[,idle]|
+|CPU interrupt time|<p>Time the CPU has spent servicing hardware interrupts.</p>|Zabbix agent|system.cpu.util[,interrupt]|
+|CPU nice time|<p>Time the CPU has spent running users' processes that have been niced.</p>|Zabbix agent|system.cpu.util[,nice]|
+|CPU system time|<p>Time the CPU has spent running the kernel and its processes.</p>|Zabbix agent|system.cpu.util[,system]|
+|CPU user time|<p>Time the CPU has spent running users' processes that are not niced.</p>|Zabbix agent|system.cpu.util[,user]|
+|Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
+|Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,free]|
+|Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Zabbix agent|system.swap.size[,pfree]|
+|Total swap space|<p>Total space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,total]|
+|System information|<p>Information as normally returned by `uname -a`.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|System uptime||Zabbix agent|system.uptime|
+|Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
+|Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Available memory|<p>Defined as free + cached + buffers.</p>|Zabbix agent|vm.memory.size[available]|
+|Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent|vm.memory.size[total]|
+|Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent|agent.ping|
+|Zabbix agent availability|<p>Used for monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
+|Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|FreeBSD: Configured max number of opened files is too low on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/kernel.maxfiles)<1024`|Info||
-|FreeBSD: Configured max number of processes is too low on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/kernel.maxproc)<256`|Info||
-|FreeBSD: Too many processes running on {HOST.NAME}||`avg(/FreeBSD by Zabbix agent/proc.num[,,run],5m)>30`|Warning||
-|FreeBSD: Too many processes on {HOST.NAME}||`avg(/FreeBSD by Zabbix agent/proc.num[],5m)>300`|Warning||
-|FreeBSD: Processor load is too high on {HOST.NAME}||`avg(/FreeBSD by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5`|Warning||
-|FreeBSD: Hostname was changed on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/system.hostname,#1)<>last(/FreeBSD by Zabbix agent/system.hostname,#2)`|Info||
-|FreeBSD: Lack of free swap space on {HOST.NAME}|<p>The system might need more physical memory.</p>|`last(/FreeBSD by Zabbix agent/system.swap.size[,pfree])<50`|Warning||
-|FreeBSD: Host information was changed on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/system.uname,#1)<>last(/FreeBSD by Zabbix agent/system.uname,#2)`|Info||
-|FreeBSD: {HOST.NAME} has just been restarted||`change(/FreeBSD by Zabbix agent/system.uptime)<0`|Info||
-|FreeBSD: /etc/passwd has been changed on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
-|FreeBSD: Lack of available memory on server {HOST.NAME}||`last(/FreeBSD by Zabbix agent/vm.memory.size[available])<20M`|Average||
-|FreeBSD: Zabbix agent is not available|<p>For passive checks only. The availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.</p>|`max(/FreeBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
+|Configured max number of opened files is too low on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/kernel.maxfiles)<1024`|Info||
+|Configured max number of processes is too low on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/kernel.maxproc)<256`|Info||
+|Too many processes running on {HOST.NAME}||`avg(/FreeBSD by Zabbix agent/proc.num[,,run],5m)>30`|Warning||
+|Too many processes on {HOST.NAME}||`avg(/FreeBSD by Zabbix agent/proc.num[],5m)>300`|Warning||
+|Processor load is too high on {HOST.NAME}||`avg(/FreeBSD by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5`|Warning||
+|Hostname was changed on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/system.hostname,#1)<>last(/FreeBSD by Zabbix agent/system.hostname,#2)`|Info||
+|Lack of free swap space on {HOST.NAME}|<p>The system might need more physical memory.</p>|`last(/FreeBSD by Zabbix agent/system.swap.size[,pfree])<50`|Warning||
+|Host information was changed on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/system.uname,#1)<>last(/FreeBSD by Zabbix agent/system.uname,#2)`|Info||
+|{HOST.NAME} has just been restarted||`change(/FreeBSD by Zabbix agent/system.uptime)<0`|Info||
+|/etc/passwd has been changed on {HOST.NAME}||`last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
+|Lack of available memory on server {HOST.NAME}||`last(/FreeBSD by Zabbix agent/vm.memory.size[available])<20M`|Average||
+|Zabbix agent is not available|<p>For passive checks only. The availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.</p>|`max(/FreeBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
 
 ### LLD rule Network interface discovery
 

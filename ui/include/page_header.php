@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 global $page;
@@ -131,9 +126,20 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				->addStyle(getTriggerSeverityCss())
 				->addStyle(getTriggerStatusCss());
 
-			// perform Zabbix server check only for standard pages
-			if ($is_standard_page && CSettingsHelper::getPublic(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
-				$page['scripts'][] = 'servercheck.js';
+			if ($is_standard_page) {
+				if (CSettingsHelper::getPublic(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
+					$page['scripts'][] = 'servercheck.js';
+				}
+
+				if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
+					$page['scripts'][] = 'class.software-version-check.js';
+
+					$check_data = CSettingsHelper::getSoftwareUpdateCheckData() + ['nextcheck' => 0];
+					$now = time();
+					$delay = $check_data['nextcheck'] > $now ? $check_data['nextcheck'] - $now : 0;
+
+					$page_header->addJavaScript('const ZBX_SOFTWARE_VERSION_CHECK_DELAY = '.$delay.';');
+				}
 			}
 		}
 	}

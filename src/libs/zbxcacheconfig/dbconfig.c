@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbconfig.h"
@@ -3080,9 +3075,9 @@ do													\
 }													\
 while(0)
 
-static zbx_vector_ptr_t	*dc_item_parameters(const ZBX_DC_ITEM *item)
+static zbx_vector_ptr_t	*dc_item_parameters(const ZBX_DC_ITEM *item, unsigned char type)
 {
-	switch (item->type)
+	switch (type)
 	{
 		case ITEM_TYPE_SCRIPT:
 			return &item->itemtype.scriptitem->params;
@@ -3211,7 +3206,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 
 	if (1 == found && *old_type != item->type)
 	{
-		if (NULL != (parameters = dc_item_parameters(item)))
+		if (NULL != (parameters = dc_item_parameters(item, *old_type)))
 			parameters_local = *parameters;
 
 		dc_item_type_free(item, *old_type);
@@ -3227,7 +3222,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			{
 				if (1 == found)
 				{
-					if (NULL != (parameters = dc_item_parameters(item)))
+					if (NULL != (parameters = dc_item_parameters(item, item->type)))
 						parameters_local = *parameters;
 
 					dc_item_type_free(item, item->type);
@@ -3892,7 +3887,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		zbx_vector_ptr_t	*parameters;
 
-		if (NULL != (parameters = dc_item_parameters(item)))
+		if (NULL != (parameters = dc_item_parameters(item, item->type)))
 			zbx_vector_ptr_destroy(parameters);
 
 		dc_item_type_free(item, item->type);
@@ -6097,7 +6092,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UINT64(itemid, row[1]);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)) ||
-				NULL == (params = dc_item_parameters(item)))
+				NULL == (params = dc_item_parameters(item, item->type)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,
 					"cannot find parent item for item parameters (itemid=" ZBX_FS_UI64")", itemid);
@@ -6133,7 +6128,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 
 		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &item_param->itemid)) &&
-				NULL != (params = dc_item_parameters(item)))
+				NULL != (params = dc_item_parameters(item, item->type)))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(params, item_param, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
@@ -6159,7 +6154,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		dc_item = (ZBX_DC_ITEM *)items.values[i];
 		dc_item_update_revision(dc_item, revision);
 
-		params = dc_item_parameters(item);
+		params = dc_item_parameters(item, item->type);
 
 		if (NULL != params && 0 < params->values_num)
 			zbx_vector_ptr_sort(params, dc_compare_items_param);
@@ -9846,7 +9841,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 	struct zbx_json			json;
-	zbx_vector_ptr_t		*parameters;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -10029,32 +10023,26 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			zbx_json_free(&json);
 
 			dst_item->timeout = 0;
+
 			break;
 		case ITEM_TYPE_BROWSER:
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
 			dst_item->params = zbx_strdup(NULL, src_item->itemtype.browseritem->script);
 
-			parameters = dc_item_parameters(src_item);
+			for (i = 0; i < src_item->itemtype.browseritem->params.values_num; i++)
+			{
+				zbx_dc_item_param_t	*params;
+
+				params = (zbx_dc_item_param_t*)(src_item->itemtype.browseritem->params.values[i]);
+				zbx_json_addstring(&json, params->name, params->value, ZBX_JSON_TYPE_STRING);
+			}
+
+			dst_item->script_params = zbx_strdup(NULL, json.buffer);
+			zbx_json_free(&json);
+
 			dst_item->timeout = 0;
 
-			if (NULL != parameters && 0 != parameters->values_num)
-			{
-				dst_item->parameters = (zbx_vector_tags_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_tags_ptr_t));
-
-				zbx_vector_tags_ptr_create(dst_item->parameters);
-				zbx_vector_tags_ptr_reserve(dst_item->parameters, parameters->values_num);
-
-				for (i = 0; i < parameters->values_num; i++)
-				{
-					zbx_dc_item_param_t	*param = (zbx_dc_item_param_t*)(parameters->values[i]);
-					zbx_tag_t		*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-
-					tag->tag = zbx_strdup(NULL, param->name);
-					tag->value = zbx_strdup(NULL, param->value);
-					zbx_vector_tags_ptr_append(dst_item->parameters, tag);
-				}
-			}
-			else
-				dst_item->parameters = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
 			zbx_strscpy(dst_item->username_orig, src_item->itemtype.telnetitem->username);
@@ -10105,20 +10093,12 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 
 		switch (items[i].type)
 		{
-			case ITEM_TYPE_BROWSER:
-				zbx_free(items[i].params);
-				if (NULL != items[i].parameters)
-				{
-					zbx_vector_tags_ptr_clear_ext(items[i].parameters, zbx_free_tag);
-					zbx_vector_tags_ptr_destroy(items[i].parameters);
-				}
-				zbx_free(items[i].parameters);
-				break;
 			case ITEM_TYPE_HTTPAGENT:
 				zbx_free(items[i].headers);
 				zbx_free(items[i].posts);
 				break;
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 				zbx_free(items[i].script_params);
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_DB_MONITOR:
