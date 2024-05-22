@@ -164,7 +164,7 @@ class CWidgetGeoMap extends CWidget {
 
 		// Add event listeners.
 		this._map.getContainer().addEventListener('click', (e) => {
-			if (e.target.classList.contains('leaflet-container')) {
+			if (e.target.classList.contains('leaflet-container') && !this._map.severityFilterControl._disabled) {
 				this._map.severityFilterControl.close();
 			}
 		}, false);

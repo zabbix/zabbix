@@ -67,8 +67,8 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 
 	onAdd: function(map) {
 		this._geomap_filter_div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+
 		const btn = L.DomUtil.create('a', 'geomap-filter-button', this._geomap_filter_div);
-		this.bar = L.DomUtil.create('ul', 'checkbox-list geomap-filter', this._geomap_filter_div);
 
 		btn.ariaLabel = t('Severity filter');
 		btn.title = t('Severity filter');
@@ -76,6 +76,8 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 		btn.href = '#';
 
 		if (!this._disabled) {
+			this.bar = L.DomUtil.create('ul', 'checkbox-list geomap-filter', this._geomap_filter_div);
+
 			for (const [severity, prop] of this._severity_levels) {
 				const li = L.DomUtil.create('li', '', this.bar);
 				const chbox = L.DomUtil.create('input', '', li);
