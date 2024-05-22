@@ -39,7 +39,7 @@ int	__wrap_mkstemp(void)
 
 FILE *__wrap_popen(const char *command, const char *type)
 {
-	const char	*str;
+	const char	*str = NULL;
 	size_t		f_size;
 
 	ZBX_UNUSED(type);
@@ -99,12 +99,9 @@ void	zbx_mock_test_entry(void **state)
 	error[0] = '\0';
 	status[0] = '\0';
 
+	memset(hosts, 0, sizeof(zbx_fping_host_t) * hosts_cnt);
+
 	hosts[0].addr = (char *)zbx_mock_get_parameter_string("in.target_host_addr");
-	hosts[0].min = 0.0;
-	hosts[0].sum = 0.0;
-	hosts[0].max = 0.0;
-	hosts[0].rcv = 0;
-	hosts[0].cnt = 0;
 	hosts[0].status = status;
 
 	ret = get_interval_option("/usr/bin/fping", hosts, 1, &value, error, ZBX_ITEM_ERROR_LEN_MAX);
