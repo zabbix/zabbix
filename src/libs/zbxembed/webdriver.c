@@ -1000,6 +1000,7 @@ out:
  * Purpose: get performance entries from performance object                   *
  *                                                                            *
  * Parameters: wd    - [IN] webdriver object                                  *
+ *             type  - [IN] entry type                                        *
  *             jp    - [OUT] performance entries                              *
  *                              (optional, can be null)                       *
  *             error - [OUT] error message                                    *
@@ -1008,18 +1009,31 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error)
+int	webdriver_get_perf_data(zbx_webdriver_t *wd, const char *type, struct zbx_json_parse *jp, char **error)
 {
-	const char	*script = "return window.performance.getEntries().filter("
-						"(value, index, array)=>{"
-							"return value.entryType==='navigation' || "
-							"value.entryType==='resource' ||"
-							"value.entryType==='mark' ||"
-							"value.entryType==='measure'"
-						"}"
-					");";
+	char	*script;
+	int	ret;
 
-	return webdriver_execute_script(wd, script, jp, error);
+	if (NULL != type)
+	{
+		script = zbx_dsprintf(NULL, "return window.performance.getEntriesByType('%s')", type);
+	}
+	else
+	{
+		script = zbx_strdup(NULL, "return window.performance.getEntries().filter("
+				"(value, index, array)=>{"
+					"return value.entryType==='navigation' || "
+					"value.entryType==='resource' ||"
+					"value.entryType==='mark' ||"
+					"value.entryType==='measure'"
+				"}"
+			");");
+	}
+
+	ret = webdriver_execute_script(wd, script, jp, error);
+	zbx_free(script);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1040,7 +1054,7 @@ int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char 
 	struct zbx_json_parse	jp;
 	int			ret = FAIL;
 
-	if (SUCCEED != webdriver_get_perf_data(wd , &jp, error))
+	if (SUCCEED != webdriver_get_perf_data(wd, NULL, &jp, error))
 		goto out;
 
 	wd_perf_collect(&wd->perf, bookmark, &jp);

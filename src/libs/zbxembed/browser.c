@@ -916,7 +916,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collect performance data                                          *
+ * Purpose: get raw performance data                                          *
  *                                                                            *
  * Return value: array of performance entry objects                           *
  *                                                                            *
@@ -929,7 +929,7 @@ static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 
 	wd = es_webdriver(ctx);
 
-	if (SUCCEED != webdriver_get_perf_data(wd, &jp, &error))
+	if (SUCCEED != webdriver_get_perf_data(wd, NULL, &jp, &error))
 	{
 		(void)browser_push_error(ctx, wd, "cannot get performance data: %s", error);
 		return duk_throw(ctx);
@@ -940,6 +940,52 @@ static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 	duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
 	duk_pcall_prop(ctx, -3, 1);
 	duk_remove(ctx, -2);	/* remove global JSON object from stack */
+
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get performance data by type                                      *
+ *                                                                            *
+ * Stack 0 - performance entry type                                           *
+ *                                                                            *
+ * Return value: array of performance entry objects                           *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
+{
+	zbx_webdriver_t		*wd;
+	char			*error = NULL, *entry_type = NULL;
+	struct zbx_json_parse	jp;
+
+	wd = es_webdriver(ctx);
+
+	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	{
+		(void)browser_push_error(ctx,  wd, "missing entry type parameter");
+		return duk_throw(ctx);
+	}
+
+	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &entry_type))
+	{
+		(void)browser_push_error(ctx, wd, "cannot convert entry type parameter to utf8");
+		return duk_throw(ctx);
+	}
+
+	if (SUCCEED != webdriver_get_perf_data(wd, entry_type, &jp, &error))
+	{
+		(void)browser_push_error(ctx, wd, "cannot get performance data: %s", error);
+		return duk_throw(ctx);
+	}
+
+	duk_get_global_string(ctx, "JSON");
+	duk_push_string(ctx, "parse");
+	duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
+	duk_pcall_prop(ctx, -3, 1);
+	duk_remove(ctx, -2);	/* remove global JSON object from stack */
+
+	zbx_free(entry_type);
 
 	return 1;
 }
@@ -1019,6 +1065,7 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"discardError", es_browser_discard_error, 0},
 	{"collectPerfEntries", es_browser_collect_perf_entries, 1},
 	{"getRawPerfEntries", es_browser_get_raw_perf_entries, 0},
+	{"getRawPerfEntriesByType", es_browser_get_raw_perf_entries_by_type, 1},
 	{"getPageSource", es_browser_get_page_source, 0},
 	{"getAlert", es_browser_get_alert, 0},
 #ifdef BROWSER_EXECUTE_SCRIPT
