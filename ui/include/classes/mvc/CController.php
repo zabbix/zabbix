@@ -168,8 +168,6 @@ abstract class CController {
 
 	/**
 	 * Disables CSRF token validation.
-	 *
-	 * @return void
 	 */
 	protected function disableCsrfValidation(): void {
 		$this->validate_csrf_token = false;

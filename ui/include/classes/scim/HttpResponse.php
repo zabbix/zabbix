@@ -90,8 +90,6 @@ class HttpResponse {
 
 	/**
 	 * Send HTTP response.
-	 *
-	 * @return void
 	 */
 	public function send(): void {
 		header('Content-Type: application/json', true, $this->http_code);

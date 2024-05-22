@@ -418,8 +418,6 @@ class CControllerHostEdit extends CController {
 	 * Function to prepare data for Linked templates list.
 	 *
 	 * @param array $editable_templates
-	 *
-	 * @return void
 	 */
 	protected function extendLinkedTemplates(?array &$editable_templates): void {
 		$editable_templates = $this->host['parentTemplates']
@@ -437,8 +435,6 @@ class CControllerHostEdit extends CController {
 	 *
 	 * @param array $inventory_items
 	 * @param array $inventory_fields
-	 *
-	 * @return void
 	 */
 	protected function extendInventory(?array &$inventory_items, ?array &$inventory_fields): void {
 		// Select inventory fields and extend each field with details of database schema.

@@ -1751,7 +1751,6 @@ class testScimUser extends CAPIScimTest {
 	 * Accepts test data and returns data with substituted ids and userNames from the database.
 	 *
 	 * @param array $user_data
-	 * @return void
 	 */
 	public function resolveData(array &$user_data): void {
 		foreach ($user_data as $key => $data) {

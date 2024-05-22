@@ -566,8 +566,6 @@ class Group extends ScimApiService {
 	 *
 	 * @param string $userid
 	 * @param array  $userdirectoryid
-	 *
-	 * @return void
 	 */
 	private function updateProvisionedUserGroups(string $userid, string $userdirectoryid): void {
 		$provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);

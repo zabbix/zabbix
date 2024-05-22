@@ -1853,8 +1853,6 @@ class testScimGroup extends CAPIScimTest {
 	 * Resolves unknown parameters in the input data or expected results.
 	 *
 	 * @param array $group_data  Data to be resolved.
-	 *
-	 * @return void
 	 */
 	public function resolveData(array &$group_data): void {
 		foreach ($group_data as $attribute_name => &$attribute_value) {
