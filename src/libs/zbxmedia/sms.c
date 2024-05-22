@@ -261,13 +261,13 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	/* get ta parameters */
 	if (0 != tcgetattr(f, &old_options))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "error in getting modem atributes (for %s): %s", device,
+		zabbix_log(LOG_LEVEL_DEBUG, "error in getting modem attributes (for %s): %s", device,
 				zbx_strerror(errno));
 
 		if (NULL != error)
 		{
 			zbx_snprintf(error, (size_t)max_error_len,
-					"error in getting modem atributes (for %s): %s",
+					"error in getting modem attributes (for %s): %s",
 					device, zbx_strerror(errno));
 		}
 		ret = FAIL;
@@ -323,6 +323,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	}
 
 	tcsetattr(f, TCSANOW, &old_options);
+out:
 	close(f);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
