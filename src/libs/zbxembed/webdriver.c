@@ -1012,7 +1012,10 @@ int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char
 {
 	const char	*script = "return window.performance.getEntries().filter("
 						"(value, index, array)=>{"
-							"return value.entryType!=='long-animation-frame'"
+							"return value.entryType==='navigation' || "
+							"value.entryType==='resource' ||"
+							"value.entryType==='mark' ||"
+							"value.entryType==='measure'"
 						"}"
 					");";
 
