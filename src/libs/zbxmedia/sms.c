@@ -254,7 +254,8 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 					"error in setting the status flag to 0 (for %s): %s",
 					device, zbx_strerror(errno));
 		}
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
 
 	/* get ta parameters */
@@ -269,7 +270,8 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 					"error in getting modem atributes (for %s): %s",
 					device, zbx_strerror(errno));
 		}
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
 
 	memset(&options, 0, sizeof(options));
