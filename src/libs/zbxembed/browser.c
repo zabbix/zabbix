@@ -929,7 +929,7 @@ static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 
 	wd = es_webdriver(ctx);
 
-	if (SUCCEED != webdriver_get_perf_data(wd, NULL, &jp, &error))
+	if (SUCCEED != webdriver_get_raw_perf_data(wd, NULL, &jp, &error))
 	{
 		(void)browser_push_error(ctx, wd, "cannot get performance data: %s", error);
 		return duk_throw(ctx);
@@ -973,7 +973,7 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	if (SUCCEED != webdriver_get_perf_data(wd, entry_type, &jp, &error))
+	if (SUCCEED != webdriver_get_raw_perf_data(wd, entry_type, &jp, &error))
 	{
 		(void)browser_push_error(ctx, wd, "cannot get performance data: %s", error);
 		return duk_throw(ctx);

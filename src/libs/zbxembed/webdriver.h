@@ -98,7 +98,8 @@ int	webdriver_accept_alert(zbx_webdriver_t *wd, char **error);
 int	webdriver_dismiss_alert(zbx_webdriver_t *wd, char **error);
 
 int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char **error);
-int	webdriver_get_perf_data(zbx_webdriver_t *wd, const char *type, struct zbx_json_parse *jp, char **error);
+int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error);
+int	webdriver_get_raw_perf_data(zbx_webdriver_t *wd, const char *type, struct zbx_json_parse *jp, char **error);
 int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, struct zbx_json_parse *jp,
 		char **error);
 
