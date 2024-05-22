@@ -1,1 +1,1 @@
-...G...... [ZBX-24460] removed sending length of data in reserved field when compression is not used in Agent2 (dgoloscapov)
+...G...... [ZBX-24460] removed sending length of data in reserved field when compression is not used in Zabbix agent 2 (dgoloscapov)
