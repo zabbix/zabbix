@@ -895,7 +895,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$fields['Data set'][1] = $fields['Data set'][0];
 		$fields['Data set'][1]['color'] = 'FF465C';
 		$fields['Data set'][3] = $fields['Data set'][2];
-		$fields['Data set'][3]['items'][0]['il_color'] = '0EC9AC';
+		$fields['Data set'][3]['items'][0]['il_color'] = 'FFD54F';
 
 		// Assert the result.
 		$this->assertEditFormAfterSave($dashboard, ['fields' => $fields]);
