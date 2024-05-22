@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -64,7 +59,7 @@ class CControllerPopupProxyEdit extends CController {
 					'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
 					'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
 					'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
-					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'compatibility'
+					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'compatibility'
 				],
 				'selectProxyGroup' => ['name'],
 				'proxyids' => $this->getInput('proxyid'),
@@ -123,7 +118,8 @@ class CControllerPopupProxyEdit extends CController {
 					'timeout_http_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_HTTP_AGENT),
 					'timeout_ssh_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SSH_AGENT),
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
-					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
+					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
+					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
 				]
 				: [
 					'timeout_zabbix_agent' => $this->proxy['timeout_zabbix_agent'],
@@ -134,7 +130,8 @@ class CControllerPopupProxyEdit extends CController {
 					'timeout_http_agent' => $this->proxy['timeout_http_agent'],
 					'timeout_ssh_agent' => $this->proxy['timeout_ssh_agent'],
 					'timeout_telnet_agent' => $this->proxy['timeout_telnet_agent'],
-					'timeout_script' => $this->proxy['timeout_script']
+					'timeout_script' => $this->proxy['timeout_script'],
+					'timeout_browser' => $this->proxy['timeout_browser']
 				];
 		}
 		else {
@@ -166,7 +163,8 @@ class CControllerPopupProxyEdit extends CController {
 					'timeout_http_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_HTTP_AGENT),
 					'timeout_ssh_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SSH_AGENT),
 					'timeout_telnet_agent' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
-					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
+					'timeout_script' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
+					'timeout_browser' => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
 				]
 			];
 		}

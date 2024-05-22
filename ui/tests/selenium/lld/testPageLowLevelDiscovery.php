@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -471,13 +466,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Eleventh LLD',
 						'fifth LLD',
 						'forth LLD',
-						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
+						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
 						'LLD for Discovered host tests',
 						'LLD for host group test',
 						'LLD number 8',
 						'LLD rule for item types',
 						'LLD 🙂🙃 !@#$%^&*()_+ 祝你今天过得愉快',
-						'Linux by Zabbix agent: Linux: Get filesystems: Mounted filesystem discovery',
+						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
 						'Mūsu desmitais LLD',
 						'Linux by Zabbix agent: Network interface discovery',
 						'sevenths LLD',
@@ -487,7 +482,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Test of discovered host Template: Template discovery rule',
 						'Trapper LLD for filter',
 						'Trīspadsmitais LLD',
-						'Zabbix server health: Zabbix server: Zabbix proxies stats: Zabbix proxy discovery',
+						'Zabbix server health: Zabbix proxies stats: Zabbix proxy discovery',
 						'Četrpadsmitais LLD'
 					]
 				]

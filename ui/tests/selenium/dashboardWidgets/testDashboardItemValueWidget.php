@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -431,7 +426,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:show_4' => false // Change indicator.
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => ['Invalid parameter "Show": at least one option must be selected.']
 				]
@@ -454,7 +449,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_size' => '0'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Size": value must be one of 1-100.',
@@ -483,7 +478,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_size' => '105'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Size": value must be one of 1-100.',
@@ -512,7 +507,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_size' => '-5'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Size": value must be one of 1-100.',
@@ -541,7 +536,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_size' => '_+(*'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Size": value must be one of 1-100.',
@@ -561,7 +556,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:decimal_places' => '-1'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Decimal places": value must be one of 0-10.'
@@ -577,7 +572,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:decimal_places' => '99'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Decimal places": value must be one of 0-10.'
@@ -593,7 +588,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:description' => ''
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Description": cannot be empty.'
@@ -608,7 +603,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '-']
@@ -626,7 +621,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => 'a']
@@ -644,7 +639,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1a%?']
@@ -662,7 +657,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1.79E+400']
@@ -680,7 +675,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1'],
@@ -699,7 +694,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1'],
@@ -718,7 +713,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1', 'color' => '']
@@ -736,7 +731,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '1', 'color' => 'AABBCC'],
@@ -755,7 +750,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => 'a', 'color' => 'AABBCC']
@@ -776,7 +771,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_from' => 'now-58s'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Minimum time period to display is 1 minute.'
@@ -794,7 +789,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_from' => 'now-63158401' // 731 days and 1 second.
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Maximum time period to display is {days} days.'
@@ -813,7 +808,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_from' => ''
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Time period/From": cannot be empty.'
@@ -831,7 +826,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_from' => 'a'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Time period/From": a time is expected.'
@@ -849,7 +844,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => 'now-59m-2s'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Minimum time period to display is 1 minute.'
@@ -868,7 +863,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => 'now-1y'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Maximum time period to display is {days} days.'
@@ -887,7 +882,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => ''
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Time period/To": cannot be empty.'
@@ -905,7 +900,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => 'b'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Time period/To": a time is expected.'
@@ -924,7 +919,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => 'b'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Time period/From": a time is expected.',
@@ -944,7 +939,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => ''
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'error' => [
 						'Invalid parameter "Time period/From": cannot be empty.',
@@ -959,7 +954,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory'
+						'ЗАББИКС Сервер' => 'Available memory'
 					]
 				]
 			],
@@ -972,7 +967,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Refresh interval' => 'No refresh'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory'
+						'ЗАББИКС Сервер' => 'Available memory'
 					]
 				]
 			],
@@ -1144,7 +1139,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => '0.01']
@@ -1161,7 +1156,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['color' => 'EF6C00', 'threshold' => '0.02']
@@ -1178,7 +1173,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['threshold' => ' 0.9999 '],
@@ -1201,7 +1196,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Aggregation function' => 'min'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					]
 				]
 			],
@@ -1218,7 +1213,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_from' => 'now-1h-30m'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					]
 				]
 			],
@@ -1235,7 +1230,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => 'now-2d/d'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					]
 				]
 			],
@@ -1253,7 +1248,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'History data' => 'History'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					]
 				]
 			],
@@ -1271,7 +1266,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'History data' => 'Trends'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					]
 				]
 			],
@@ -1289,7 +1284,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'History data' => 'Auto'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					]
 				]
 			],
@@ -1306,7 +1301,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => 'now-1y'
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					]
 				]
 			],
@@ -1331,7 +1326,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:time_period_to' => ' now-1w '
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'trim' => true
 				]
@@ -1361,7 +1356,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['action' => USER_ACTION_UPDATE, 'index' => 0, 'color' => 'AABBCC', 'threshold' => '1'],
@@ -1380,7 +1375,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true
 					],
 					'item' => [
-						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
+						'ЗАББИКС Сервер' => 'Available memory in %'
 					],
 					'thresholds' => [
 						['action' => USER_ACTION_REMOVE, 'index' => 0],
@@ -1797,7 +1792,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'numeric' => false,
 					'any_type_of_information' => true,
 					'fields' => [
-						'Item' => 'Linux: Operating system',
+						'Item' => 'Operating system',
 						'Name' => 'Type of information - characters & aggregation function - not used',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
@@ -1811,7 +1806,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'numeric' => false,
 					'any_type_of_information' => true,
 					'fields' => [
-						'Item' => 'Linux: Operating system',
+						'Item' => 'Operating system',
 						'Name' => 'Type of information - characters & aggregation function - count',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
@@ -1825,7 +1820,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'numeric' => false,
 					'any_type_of_information' => true,
 					'fields' => [
-						'Item' => 'Zabbix server: Zabbix proxies stats',
+						'Item' => 'Zabbix proxies stats',
 						'Name' => 'Type of information - text & aggregation function - first',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
@@ -1876,7 +1871,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => true,
 					'fields' => [
-						'Item' => 'Linux: Available memory',
+						'Item' => 'Available memory',
 						'Name' => 'Type of information - Numeric (unsigned) & aggregation function - not used',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
@@ -1928,7 +1923,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => true,
 					'fields' => [
-						'Item' => 'Linux: Available memory in %',
+						'Item' => 'Available memory in %',
 						'Name' => 'Type of information - Numeric (float) & aggregation function - count',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
@@ -1941,7 +1936,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => true,
 					'fields' => [
-						'Item' => 'Linux: Free swap space',
+						'Item' => 'Free swap space',
 						'Name' => 'Type of information - Numeric (unsigned) & aggregation function - sum',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
@@ -1967,7 +1962,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => true,
 					'fields' => [
-						'Item' => 'Linux: System local time',
+						'Item' => 'System local time',
 						'Name' => 'Type of information - Numeric (unsigned) & aggregation function - last',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
@@ -2712,7 +2707,7 @@ class testDashboardItemValueWidget extends testWidgets {
 							'widget_type' => 'Graph (classic)',
 							'fields' => [
 								'Name' => 'Graph widget with "Custom" time period',
-								'Graph' => 'Linux: System load',
+								'Graph' => 'System load',
 								'Time period' => 'Custom',
 								'id:time_period_from' => 'now-5400',
 								'id:time_period_to' => 'now-1800'

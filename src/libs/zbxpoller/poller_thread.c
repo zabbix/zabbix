@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "poller.h"
@@ -83,7 +78,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		const char *config_ssh_key_location)
+		const char *config_ssh_key_location, const char *config_webdriver_url)
 {
 	int	res = FAIL, version = item->interface.version;
 
@@ -144,7 +139,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 			res = get_value_script(item, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_BROWSER:
-			res = get_value_browser(item, config_comms->config_source_ip, result);
+			res = get_value_browser(item, config_webdriver_url, config_comms->config_source_ip, result);
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
@@ -361,6 +356,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						0);
 				break;
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
@@ -369,16 +365,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].script_params,
 						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].params,
-						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				break;
-			case ITEM_TYPE_BROWSER:
-				if (ZBX_MACRO_EXPAND_NO == expand_macros)
-					break;
-
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].params,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
@@ -565,7 +551,8 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts,
-		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location)
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb, const char *config_ssh_key_location,
+		const char *config_webdriver_url)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -599,7 +586,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 			errcodes[0] = get_value(&items[0], &results[0], add_results, config_comms,
 					config_startup_time, program_type, get_config_forks, config_java_gateway,
 					config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb,
-					config_ssh_key_location);
+					config_ssh_key_location, config_webdriver_url);
 		}
 	}
 	else
@@ -680,6 +667,7 @@ ZBX_PTR_VECTOR_IMPL(agent_result_ptr, AGENT_RESULT*)
  *             config_externalscripts     - [IN]                                   *
  *             get_value_internal_ext_cb  - [IN]                                   *
  *             config_ssh_key_location    - [IN]                                   *
+ *             config_webdriver_url       - [IN]                                   *
  *                                                                                 *
  * Return value: number of items processed                                         *
  *                                                                                 *
@@ -692,7 +680,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		int config_unreachable_delay, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
 		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
-		const char *config_ssh_key_location)
+		const char *config_ssh_key_location, const char *config_webdriver_url)
 {
 	zbx_dc_item_t			item, *items;
 	AGENT_RESULT			results[ZBX_MAX_POLLER_ITEMS];
@@ -719,7 +707,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
 	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
 			program_type, progname, get_config_forks, config_java_gateway, config_java_gateway_port,
-			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location);
+			config_externalscripts, get_value_internal_ext_cb, config_ssh_key_location,
+			config_webdriver_url);
 
 	zbx_timespec(&timespec);
 
@@ -862,7 +851,6 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
-	browseritem_es_engine_init();
 
 	zbx_get_program_type_cb = poller_args_in->zbx_get_program_type_cb_arg;
 	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
@@ -908,7 +896,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 					poller_args_in->config_java_gateway, poller_args_in->config_java_gateway_port,
 					poller_args_in->config_externalscripts,
 					poller_args_in->zbx_get_value_internal_ext_cb,
-					poller_args_in->config_ssh_key_location);
+					poller_args_in->config_ssh_key_location, poller_args_in->config_webdriver_url);
 
 			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 		}
@@ -956,7 +944,6 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	}
 
 	scriptitem_es_engine_destroy();
-	browseritem_es_engine_destroy();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

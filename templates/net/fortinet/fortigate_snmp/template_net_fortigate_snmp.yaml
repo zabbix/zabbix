@@ -25,7 +25,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: ea59bff13fd44c37aa5bd711146fe3d9
-          name: 'FortiGate: HA config sync'
+          name: 'HA config sync'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.13.1.5.0
           key: 'ha.auto.sync[fgHaAutoSync.0]'
@@ -44,7 +44,7 @@ zabbix_export:
             - tag: component
               value: ha
         - uuid: dbc47cff3e60401d9a52f590e1ed6281
-          name: 'FortiGate: HA cluster group ID'
+          name: 'HA cluster group ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.13.1.2.0
           key: 'ha.cluster.group_id[fgHaGroupId.0]'
@@ -62,7 +62,7 @@ zabbix_export:
             - tag: component
               value: ha
         - uuid: 4e2b57a68243445e87ca0e23277bafd6
-          name: 'FortiGate: HA cluster group name'
+          name: 'HA cluster group name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.13.1.7.0
           key: 'ha.cluster.group_name[fgHaGroupName.0]'
@@ -81,7 +81,7 @@ zabbix_export:
             - tag: component
               value: ha
         - uuid: b6bdf8c8d09140ffa4087d0204a0711d
-          name: 'FortiGate: HA cluster primary override'
+          name: 'HA cluster primary override'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.13.1.4.0
           key: 'ha.cluster.override[fgHaOverride.0]'
@@ -100,7 +100,7 @@ zabbix_export:
             - tag: component
               value: ha
         - uuid: 3f1d2dfb8fd74e80aedb6fa0b7ff7215
-          name: 'FortiGate: HA cluster priority'
+          name: 'HA cluster priority'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.13.1.3.0
           key: 'ha.cluster.priority[fgHaPriority.0]'
@@ -117,7 +117,7 @@ zabbix_export:
             - tag: component
               value: ha
         - uuid: ff27aa75a1d84aa5a472fbf114f8dec0
-          name: 'FortiGate: SNMP walk HA members'
+          name: 'SNMP walk HA members'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.12356.101.13.2.1.1]'
           key: ha.members.walk
@@ -129,7 +129,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3d9bb1ddb4924d5ba4dc75fb4103cc10
-          name: 'FortiGate: HA mode'
+          name: 'HA mode'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.13.1.1.0
           key: 'ha.mode[fgHaSystemMode.0]'
@@ -149,7 +149,7 @@ zabbix_export:
             - tag: component
               value: ha
         - uuid: bd3dc8fdcb8e41569f1f81b2624e1462
-          name: 'FortiGate: HA load-balancing schedule'
+          name: 'HA load-balancing schedule'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.13.1.6.0
           key: 'ha.schedule[fgHaSchedule.0]'
@@ -168,7 +168,7 @@ zabbix_export:
             - tag: component
               value: ha
         - uuid: bb422f92e3ad4eafb9f43f0167a250ee
-          name: 'FortiGate: SNMP walk hardware sensors'
+          name: 'SNMP walk hardware sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.12356.101.4.3.2.1]'
           key: hw.sensor.walk
@@ -180,7 +180,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5686859d4317437c9c23160b987a3468
-          name: 'FortiGate: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -198,14 +198,14 @@ zabbix_export:
           triggers:
             - uuid: a25a713c59ec44689831c2c636757603
               expression: 'max(/FortiGate by SNMP/icmpping,#3)=0'
-              name: 'FortiGate: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout. Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 60ba9ecc198840a3a92ef3221e21a97e
-          name: 'FortiGate: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -220,12 +220,12 @@ zabbix_export:
           triggers:
             - uuid: d1106ac3337548bda97fb89ce36c5ee5
               expression: 'min(/FortiGate by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/FortiGate by SNMP/icmppingloss,5m)<100'
-              name: 'FortiGate: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'ICMP ping loss detected.'
               dependencies:
-                - name: 'FortiGate: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/FortiGate by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -233,7 +233,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: c5c3cde736544304a76c5fe1774c1fc7
-          name: 'FortiGate: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -248,14 +248,14 @@ zabbix_export:
           triggers:
             - uuid: e04a8517551740d8b47a5dfc88dfe779
               expression: 'avg(/FortiGate by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'FortiGate: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'FortiGate: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/FortiGate by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/FortiGate by SNMP/icmppingloss,5m)<100'
-                - name: 'FortiGate: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/FortiGate by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -263,7 +263,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 04f58b6b63b945a08a27799bee741702
-          name: 'FortiGate: Blocked intrusions'
+          name: 'Blocked intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.2.1
           key: 'ips.blocked[fgIpsIntrusionsBlocked.0]'
@@ -280,7 +280,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: 9a42006208224b94a64ecc13437516b6
-          name: 'FortiGate: IPS database version'
+          name: 'IPS database version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.2.2.0
           key: 'ips.database.version[fgSysVersionIps.0]'
@@ -299,7 +299,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: afa9709de4c34d0c82aaf87c5b4f4572
-          name: 'FortiGate: Detected anomaly based intrusions'
+          name: 'Detected anomaly based intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.9.1
           key: 'ips.detected.anomaly[fgIpsAnomalyDetections.0]'
@@ -316,7 +316,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: 20ceeb0c520d454bba3d032d10a5db11
-          name: 'FortiGate: Detected critical intrusions'
+          name: 'Detected critical intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.3.1
           key: 'ips.detected.crit[fgIpsCritSevDetections.0]'
@@ -333,7 +333,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: badcc4a4fe3d4b219a2c67cda182ff4c
-          name: 'FortiGate: Detected high intrusions'
+          name: 'Detected high intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.4.1
           key: 'ips.detected.high[fgIpsHighSevDetections.0]'
@@ -350,7 +350,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: f570cf723b904be593a99a8338e577de
-          name: 'FortiGate: Detected info intrusions'
+          name: 'Detected info intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.7.1
           key: 'ips.detected.info[fgIpsInfoSevDetections.0]'
@@ -367,7 +367,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: 5edd46eba610442888acf0c8bdcde2c1
-          name: 'FortiGate: Detected low intrusions'
+          name: 'Detected low intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.6.1
           key: 'ips.detected.low[fgIpsLowSevDetections.0]'
@@ -384,7 +384,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: 0e4f211aa2b6492fa461e2bc5af1723f
-          name: 'FortiGate: Detected medium intrusions'
+          name: 'Detected medium intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.5.1
           key: 'ips.detected.med[fgIpsMedSevDetections.0]'
@@ -401,7 +401,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: bf7ab7c7fdfd42a28e15545904baa6dc
-          name: 'FortiGate: Detected signature based intrusions'
+          name: 'Detected signature based intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.8.1
           key: 'ips.detected.sign[fgIpsSignatureDetections.0]'
@@ -418,7 +418,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: f35dea442cbe4578a221571b2dbd676f
-          name: 'FortiGate: Total detected intrusions'
+          name: 'Total detected intrusions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.9.2.1.1.1.1
           key: 'ips.detected.total[fgIpsIntrusionsDetected.0]'
@@ -435,7 +435,7 @@ zabbix_export:
             - tag: component
               value: ips
         - uuid: abd3f407b66946dab2b05f7ec8a2daf2
-          name: 'FortiGate: SNMP walk network interfaces'
+          name: 'SNMP walk network interfaces'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.31.1.1.1.6,1.3.6.1.2.1.31.1.1.1.10,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.31.1.1.1.15]'
           key: net.if.walk
@@ -447,7 +447,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: ba89be1a4a01484f955fc6d740d1c736
-          name: 'FortiGate: IPv4 Active sessions'
+          name: 'IPv4 Active sessions'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.1.8.0
           key: 'net.ipv4.sessions[fgSysSesCount.0]'
@@ -462,7 +462,7 @@ zabbix_export:
             - tag: component
               value: sessions
         - uuid: de401c1befce453bb9de93cb154026d4
-          name: 'FortiGate: SNMP walk SD-WAN health-checks'
+          name: 'SNMP walk SD-WAN health-checks'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.12356.101.4.9.2.1]'
           key: sdwan_health.walk
@@ -474,7 +474,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b00ecb6f04a04f579ce0a8e6a1c0984e
-          name: 'FortiGate: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -487,7 +487,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: cc57314e0cd143c79654e53d16f341ca
-          name: 'FortiGate: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -507,7 +507,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c728a8f64cff450ebc445d9abc03486d
-          name: 'FortiGate: Number of CPUs'
+          name: 'Number of CPUs'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.4.1.0
           key: system.cpu.num
@@ -523,7 +523,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e6c36e1b4fac4242a3c3ddd4a5483dde
-          name: 'FortiGate: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.1.3.0
           key: 'system.cpu.util[fgSysCpuUsage.0]'
@@ -539,8 +539,8 @@ zabbix_export:
           triggers:
             - uuid: 86f157c9a85448cbac41ab5f8ee3d668
               expression: 'min(/FortiGate by SNMP/system.cpu.util[fgSysCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'FortiGate: High CPU utilization'
-              event_name: 'FortiGate: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -548,7 +548,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 47d06309bad546b0b303c0c602c76415
-          name: 'FortiGate: SNMP walk CPU'
+          name: 'SNMP walk CPU'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.12356.101.4.4.2.1]'
           key: system.cpu.walk
@@ -560,7 +560,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c2a2247eaddf4908b731ef0c42627d47
-          name: 'FortiGate: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -579,7 +579,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 277fdc82a6d04e53a0da7bb29d087de7
-          name: 'FortiGate: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.1.1.0
           key: system.hw.firmware
@@ -599,7 +599,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d1cde0e8780a455db0f7aec7b6b3bc7a
-          name: 'FortiGate: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.2.1.1.2.1
           key: system.hw.model
@@ -619,7 +619,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 4ad23a8963e64a7da8b064463631a2f9
-          name: 'FortiGate: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
           key: system.hw.serialnumber
@@ -643,8 +643,8 @@ zabbix_export:
               expression: |
                 last(/FortiGate by SNMP/system.hw.serialnumber,#1)<>last(/FortiGate by SNMP/system.hw.serialnumber,#2) and
                 length(last(/FortiGate by SNMP/system.hw.serialnumber))>0
-              name: 'FortiGate: Device has been replaced'
-              event_name: 'FortiGate: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -652,7 +652,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 8adf6927a2ba4c26b31a1a527cfd33f7
-          name: 'FortiGate: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -672,7 +672,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 07256dfb73794eaea91c9c622e617200
-          name: 'FortiGate: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -694,8 +694,8 @@ zabbix_export:
           triggers:
             - uuid: 9db3ed37da594694a560e8a85a3f7aae
               expression: 'last(/FortiGate by SNMP/system.name,#1)<>last(/FortiGate by SNMP/system.name,#2) and length(last(/FortiGate by SNMP/system.name))>0'
-              name: 'FortiGate: System name has changed'
-              event_name: 'FortiGate: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -705,7 +705,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 53aee5ecb43b4fe29a2e172f48577fa5
-          name: 'FortiGate: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -724,7 +724,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6b85f5f1738b46acb17157d8fbf60ecf
-          name: 'FortiGate: System uptime'
+          name: 'System uptime'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.1.20.0
           key: 'system.uptime[fgSysUpTime.0]'
@@ -743,8 +743,8 @@ zabbix_export:
           triggers:
             - uuid: 5c16d6334cea466386455a7c5d071d18
               expression: 'last(/FortiGate by SNMP/system.uptime[fgSysUpTime.0])<10m'
-              name: 'FortiGate: Device has been restarted'
-              event_name: 'FortiGate: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Device has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -752,7 +752,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 14d4584977a74e0791bf063652bf4c39
-          name: 'FortiGate: SNMP walk virtual domain'
+          name: 'SNMP walk virtual domain'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.12356.101.3.2.1.1]'
           key: vdom.walk
@@ -764,7 +764,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c702bedf91d74cd8b2346ea0abca37c5
-          name: 'FortiGate: Free disk space'
+          name: 'Free disk space'
           type: CALCULATED
           key: vfs.fs.free
           history: 7d
@@ -775,7 +775,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b7001a7fd88040fe8a11512df1d9ec07
-          name: 'FortiGate: Free disk percentage'
+          name: 'Free disk percentage'
           type: CALCULATED
           key: vfs.fs.pfree
           history: 7d
@@ -789,12 +789,12 @@ zabbix_export:
           triggers:
             - uuid: 424ab075f1ff46e1b64f9416dee4f3f7
               expression: 'last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.WARN}'
-              name: 'FortiGate: Free disk space is low'
-              event_name: 'FortiGate: Free disk space is less than {$DISK.FREE.WARN}%'
+              name: 'Free disk space is low'
+              event_name: 'Free disk space is less than {$DISK.FREE.WARN}%'
               priority: WARNING
               description: 'Available disk space is not enough.'
               dependencies:
-                - name: 'FortiGate: Free disk space is too low'
+                - name: 'Free disk space is too low'
                   expression: 'last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.CRIT}'
               tags:
                 - tag: scope
@@ -803,8 +803,8 @@ zabbix_export:
                   value: performance
             - uuid: a323a6c7a5a54ad1bf0db0ec9441bf83
               expression: 'last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.CRIT}'
-              name: 'FortiGate: Free disk space is too low'
-              event_name: 'FortiGate: Free disk space is less than {$DISK.FREE.CRIT}%'
+              name: 'Free disk space is too low'
+              event_name: 'Free disk space is less than {$DISK.FREE.CRIT}%'
               priority: HIGH
               description: 'Available disk space is too low.'
               tags:
@@ -813,7 +813,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 84318818c417403bbfadff759f87e4f4
-          name: 'FortiGate: Total disk space'
+          name: 'Total disk space'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.1.7.0
           key: 'vfs.fs.total[fgSysDiskCapacity.0]'
@@ -831,7 +831,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3a96f25d233e49039eb03b78fc8fd509
-          name: 'FortiGate: Used disk space'
+          name: 'Used disk space'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.1.6.0
           key: 'vfs.fs.used[fgSysDiskUsage.0]'
@@ -846,7 +846,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: bbc42709b2d2467e8fd7963309c6090a
-          name: 'FortiGate: Available memory'
+          name: 'Available memory'
           type: CALCULATED
           key: 'vm.memory.available[fgSysMemFree.0]'
           history: 7d
@@ -857,7 +857,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 5ccef71de6944c91bf7d1e330782b542
-          name: 'FortiGate: Total memory'
+          name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.1.5.0
           key: 'vm.memory.total[fgSysMemCapacity.0]'
@@ -874,7 +874,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 15fb0d4185f04b4fb8e2efc6d0ef514c
-          name: 'FortiGate: Used memory'
+          name: 'Used memory'
           type: CALCULATED
           key: 'vm.memory.used[fgSysMemUsage.0]'
           history: 7d
@@ -888,7 +888,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 29a7ec8007ef44b0b473f1c16be11059
-          name: 'FortiGate: Memory utilization'
+          name: 'Memory utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.4.1.4.0
           key: 'vm.memory.util[memoryUsedPercentage.0]'
@@ -902,8 +902,8 @@ zabbix_export:
           triggers:
             - uuid: 1ee0af9b389d4e5fafc5c08f46c9cc09
               expression: 'min(/FortiGate by SNMP/vm.memory.util[memoryUsedPercentage.0],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'FortiGate: High memory utilization'
-              event_name: 'FortiGate: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -912,7 +912,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 08bf282b9b3c4e78b139f3f6fe3bcd97
-          name: 'FortiGate: SSL VPN state'
+          name: 'SSL VPN state'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.12.2.3.1.1.1
           key: 'vpn.ssl.state[fgVpnSslState.0]'
@@ -932,7 +932,7 @@ zabbix_export:
             - tag: component
               value: vpn
         - uuid: 1699dd171a1f41d5896ac766477033ca
-          name: 'FortiGate: Active IPsec VPN tunnels'
+          name: 'Active IPsec VPN tunnels'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.12.1.1.0
           key: 'vpn.tunnel.active[fgVpnTunnelUpCount.0]'
@@ -948,7 +948,7 @@ zabbix_export:
             - tag: component
               value: vpn
         - uuid: 349a383498cd42729940d1b9e5176e3e
-          name: 'FortiGate: SNMP walk VPN tunnels'
+          name: 'SNMP walk VPN tunnels'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.12356.101.12.2.2.1.3,1.3.6.1.4.1.12356.101.12.2.2.1.20]'
           key: vpn.tunnel.walk
@@ -960,7 +960,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c9a78b70b0f54fdc92d5efbfd38a32c5
-          name: 'FortiGate: Active SSL VPN users'
+          name: 'Active SSL VPN users'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12356.101.12.2.3.1.2.1
           key: 'vpn.users.count[fgVpnSslStatsLoginUsers.0]'
@@ -978,7 +978,7 @@ zabbix_export:
             - tag: component
               value: vpn
         - uuid: 5135b14791f844e4b1e1cdef4817a5d2
-          name: 'FortiGate: SNMP walk wireless AP'
+          name: 'SNMP walk wireless AP'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.12356.101.14.4.3.1]'
           key: wireless.ap.walk
@@ -990,7 +990,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3e37679441344327bf86ae38cd62f580
-          name: 'FortiGate: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -1010,12 +1010,12 @@ zabbix_export:
           triggers:
             - uuid: e8dfc8ddd1a145ea92ab6446514a0ed5
               expression: 'max(/FortiGate by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'FortiGate: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'FortiGate: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/FortiGate by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope

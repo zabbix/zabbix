@@ -32,7 +32,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 836a8ccc430a4ede87906b9f9eef8471
-          name: 'ZYXEL MES-3528: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -48,7 +48,7 @@ zabbix_export:
           triggers:
             - uuid: 0e38d148fc29439488b3b23ee308b1d9
               expression: 'max(/ZYXEL MES-3528 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'ZYXEL MES-3528: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -56,7 +56,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 7f947ff733314b23be2cea634a1fba75
-          name: 'ZYXEL MES-3528: Contact'
+          name: Contact
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.3528.contact
@@ -78,7 +78,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: c7bd32a8835842d7b469f2323cc8a308
-          name: 'ZYXEL MES-3528: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.51.12.7.0
           key: zyxel.3528.cpuusage
@@ -95,8 +95,8 @@ zabbix_export:
           triggers:
             - uuid: 247a25a4976a45eca78853aea112cdd6
               expression: 'min(/ZYXEL MES-3528 by SNMP/zyxel.3528.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL MES-3528: High CPU utilization'
-              event_name: 'ZYXEL MES-3528: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -104,7 +104,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: c650e217f92c4e2ca1ec94f391dfe706
-          name: 'ZYXEL MES-3528: ZyNOS F/W Version'
+          name: 'ZyNOS F/W Version'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.51.1]'
           key: zyxel.3528.fwversion
@@ -136,7 +136,7 @@ zabbix_export:
           triggers:
             - uuid: 7c4cfa75447a4eeda874d916d052eb6e
               expression: 'last(/ZYXEL MES-3528 by SNMP/zyxel.3528.fwversion,#1)<>last(/ZYXEL MES-3528 by SNMP/zyxel.3528.fwversion,#2) and length(last(/ZYXEL MES-3528 by SNMP/zyxel.3528.fwversion))>0'
-              name: 'ZYXEL MES-3528: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -145,7 +145,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 9293989c2bd14bc4a12cdd40a9c7f229
-          name: 'ZYXEL MES-3528: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.25.1.1.0
           key: zyxel.3528.hw.uptime
@@ -172,7 +172,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 679445d352f14db4b5401efa5661447d
-          name: 'ZYXEL MES-3528: Location'
+          name: Location
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.3528.location
@@ -193,7 +193,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 1b4f56edba2a486a9c48ccafaa10eb09
-          name: 'ZYXEL MES-3528: MAC address'
+          name: 'MAC address'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.3528.mac
@@ -217,7 +217,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 050fbf9b7c544678b79b37572984f698
-          name: 'ZYXEL MES-3528: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.3528.model
@@ -244,14 +244,14 @@ zabbix_export:
           triggers:
             - uuid: b98e244abe2a4bd481be50048234afe6
               expression: 'last(/ZYXEL MES-3528 by SNMP/zyxel.3528.model)<>"MES-3528"'
-              name: 'ZYXEL MES-3528: Template does not match hardware'
+              name: 'Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel MES-3528, but connected to {ITEM.VALUE}'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 2411ebd40ee94b6285f4a6abf6127e04
-          name: 'ZYXEL MES-3528: Host name'
+          name: 'Host name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.3528.name
@@ -273,7 +273,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 351295fe155543c18930541c20ccac58
-          name: 'ZYXEL MES-3528: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
           key: zyxel.3528.net.uptime
@@ -294,7 +294,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ea25cf79e45f40398580afd48e0bb9c8
-          name: 'ZYXEL MES-3528: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.51.1.10.0
           key: zyxel.3528.serialnumber
@@ -316,8 +316,8 @@ zabbix_export:
           triggers:
             - uuid: d08bc1ffb11e4bbc98851c30595e996c
               expression: 'last(/ZYXEL MES-3528 by SNMP/zyxel.3528.serialnumber,#1)<>last(/ZYXEL MES-3528 by SNMP/zyxel.3528.serialnumber,#2) and length(last(/ZYXEL MES-3528 by SNMP/zyxel.3528.serialnumber))>0'
-              name: 'ZYXEL MES-3528: Device has been replaced'
-              event_name: 'ZYXEL MES-3528: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -350,7 +350,7 @@ zabbix_export:
                 formulaid: D
           item_prototypes:
             - uuid: 6dc0efb31738415a884d15020d9e30a9
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Administrative status'
+              name: 'Port {#SNMPINDEX}: Administrative status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.adminstatus[{#SNMPINDEX}]'
@@ -374,7 +374,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: e719364c125048e8a1fb6712e507863b
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Interface name'
+              name: 'Port {#SNMPINDEX}: Interface name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.descr[{#SNMPINDEX}]'
@@ -396,7 +396,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: b2225fa57c0d468b9b0a40b220d50639
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Link speed'
+              name: 'Port {#SNMPINDEX}: Link speed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.highspeed[{#SNMPINDEX}]'
@@ -420,7 +420,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 9f1720f6286a4b038724563a32f97844
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming broadcast packages'
+              name: 'Port {#SNMPINDEX}: Incoming broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.in.broadcastpkts[{#SNMPINDEX}]'
@@ -443,7 +443,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 184f7cfcfe964ea9b2b310a666c77420
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming multicast packages'
+              name: 'Port {#SNMPINDEX}: Incoming multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.in.multicastpkts[{#SNMPINDEX}]'
@@ -467,7 +467,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 41f4b8bb9e1c461e8ef834348589e468
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming traffic'
+              name: 'Port {#SNMPINDEX}: Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.in.traffic[{#SNMPINDEX}]'
@@ -492,7 +492,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 681460dffc9242fba072eacd503fd190
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming unicast packages'
+              name: 'Port {#SNMPINDEX}: Incoming unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.in.ucastpkts[{#SNMPINDEX}]'
@@ -515,7 +515,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: c2792996d52045c9ad4c955f6330264e
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Incoming utilization'
+              name: 'Port {#SNMPINDEX}: Incoming utilization'
               type: CALCULATED
               key: 'zyxel.3528.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
@@ -540,7 +540,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 9a45866adc3043ad81c7778b4334b317
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Link type'
+              name: 'Port {#SNMPINDEX}: Link type'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.24.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.link_type[{#SNMPINDEX}]'
@@ -562,7 +562,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 5a30094c57b54d89b1d61a73616e186e
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Interface description'
+              name: 'Port {#SNMPINDEX}: Interface description'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.24.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.name[{#SNMPINDEX}]'
@@ -584,7 +584,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 1ed72a56523b48e89b964f6c4afc8800
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Operational status'
+              name: 'Port {#SNMPINDEX}: Operational status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.operstatus[{#SNMPINDEX}]'
@@ -612,7 +612,7 @@ zabbix_export:
                   expression: 'last(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.if.operstatus[{#SNMPINDEX}])<>2'
-                  name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Link down'
+                  name: 'Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -627,7 +627,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 873ba4c47c1c4525b52d53e6d98e8b6e
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing broadcast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.out.broadcastpkts[{#SNMPINDEX}]'
@@ -651,7 +651,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 9dae4fa8d9c2494aa01478dc9605b066
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing multicast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.out.multicastpkts[{#SNMPINDEX}]'
@@ -676,7 +676,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 63f92516450d4dbcbea481231caf89f6
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing traffic'
+              name: 'Port {#SNMPINDEX}: Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.out.traffic[{#SNMPINDEX}]'
@@ -702,7 +702,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: d7b17c5521a94b13b3ef6528fedcf5e0
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing unicast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.out.ucastpkts[{#SNMPINDEX}]'
@@ -726,7 +726,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 3dd1d62e9cdb402b888b7ccbe3cbb182
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Outgoing utilization'
+              name: 'Port {#SNMPINDEX}: Outgoing utilization'
               type: CALCULATED
               key: 'zyxel.3528.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
@@ -751,7 +751,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 284e41a49397492590bbcf34e1881553
-              name: 'ZYXEL MES-3528: Port {#SNMPINDEX}: Speed Duplex'
+              name: 'Port {#SNMPINDEX}: Speed Duplex'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.24.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.speed_duplex[{#SNMPINDEX}]'
@@ -864,7 +864,7 @@ zabbix_export:
           description: 'SFP DDM module discovery.'
           item_prototypes:
             - uuid: 732084ce0daf4e8085c43e16982e4aba
-              name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              name: 'SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.117.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.3528.sfp.ddm[{#SNMPINDEX}]'
@@ -892,8 +892,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: f9e2991ea38343c8b2c9815bf733aef8
                   expression: 'last(/ZYXEL MES-3528 by SNMP/zyxel.3528.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
-                  event_name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
@@ -901,8 +901,8 @@ zabbix_export:
                       value: notice
                 - uuid: 341bff907cd943219bbed92773d9b005
                   expression: 'last(/ZYXEL MES-3528 by SNMP/zyxel.3528.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
-                  event_name: 'ZYXEL MES-3528: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
@@ -956,7 +956,7 @@ zabbix_export:
           description: 'SFP module discovery.'
           item_prototypes:
             - uuid: 2d09724ecd8147d298ae2a2486921ccb
-              name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Date code'
+              name: 'SFP {#SNMPINDEX}: Date code'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.117.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3528.sfp.datecode[{#SNMPINDEX}]'
@@ -979,7 +979,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 9d9e08755fa444efb408d3db30843098
-              name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Part number'
+              name: 'SFP {#SNMPINDEX}: Part number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.117.1.1.4.{#SNMPINDEX}'
               key: 'zyxel.3528.sfp.part[{#SNMPINDEX}]'
@@ -1002,7 +1002,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 90952405b1504eabb6e5436eaa179f5a
-              name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Revision'
+              name: 'SFP {#SNMPINDEX}: Revision'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.117.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3528.sfp.revision[{#SNMPINDEX}]'
@@ -1025,7 +1025,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 83d084e9a0554e8eae31b0bd38aefe72
-              name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Serial number'
+              name: 'SFP {#SNMPINDEX}: Serial number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.117.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3528.sfp.serialnumber[{#SNMPINDEX}]'
@@ -1050,8 +1050,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 5cd22f26211a428099d2a41c5c41efab
                   expression: 'last(/ZYXEL MES-3528 by SNMP/zyxel.3528.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES-3528 by SNMP/zyxel.3528.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES-3528 by SNMP/zyxel.3528.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL MES-3528: SFP {#SNMPINDEX} has been replaced'
-                  event_name: 'ZYXEL MES-3528: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -1059,7 +1059,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: ecbd3db41592408d8e9fe0d1d6078a3f
-              name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Status'
+              name: 'SFP {#SNMPINDEX}: Status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.117.1.1.2.{#SNMPINDEX}'
               key: 'zyxel.3528.sfp.status[{#SNMPINDEX}]'
@@ -1082,7 +1082,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 049cbbcea720493f9638d08f928710cb
-              name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Transceiver'
+              name: 'SFP {#SNMPINDEX}: Transceiver'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.117.1.1.8.{#SNMPINDEX}'
               key: 'zyxel.3528.sfp.transceiver[{#SNMPINDEX}]'
@@ -1105,7 +1105,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 5ece25cae49f47169a335be40dee744a
-              name: 'ZYXEL MES-3528: SFP {#SNMPINDEX}: Vendor'
+              name: 'SFP {#SNMPINDEX}: Vendor'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.117.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3528.sfp.vendor[{#SNMPINDEX}]'
@@ -1275,8 +1275,8 @@ zabbix_export:
   triggers:
     - uuid: d138c874f4de4f3a97a0c615d589826a
       expression: '(last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)>0 and last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)<10m) or (last(/ZYXEL MES-3528 by SNMP/zyxel.3528.hw.uptime)=0 and last(/ZYXEL MES-3528 by SNMP/zyxel.3528.net.uptime)<10m)'
-      name: 'ZYXEL MES-3528: Host has been restarted'
-      event_name: 'ZYXEL MES-3528: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

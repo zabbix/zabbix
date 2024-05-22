@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: e5cf73357ca349818155522325a7c6bc
-          name: 'Juniper: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -40,14 +40,14 @@ zabbix_export:
           triggers:
             - uuid: d90e80fd900246dcab90447ee2a6a7a1
               expression: 'max(/Juniper by SNMP/icmpping,#3)=0'
-              name: 'Juniper: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 3a1c4412bb9340169827209df2554a50
-          name: 'Juniper: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -61,11 +61,11 @@ zabbix_export:
           triggers:
             - uuid: d3911ede372e4eb3b89b30e8e340a716
               expression: 'min(/Juniper by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Juniper by SNMP/icmppingloss,5m)<100'
-              name: 'Juniper: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Juniper: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Juniper by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -73,7 +73,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: ad350f912d2f4ead90aacdefa245cdf3
-          name: 'Juniper: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -87,13 +87,14 @@ zabbix_export:
           triggers:
             - uuid: 751d9855903f4f00b674b511fe992121
               expression: 'avg(/Juniper by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Juniper: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Juniper: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Juniper by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Juniper by SNMP/icmppingloss,5m)<100'
-                - name: 'Juniper: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Juniper by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -101,7 +102,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: e5470bc511a5499e9b8dc8bf4de8f054
-          name: 'Juniper: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -114,7 +115,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: b8583eaf0353493ba18e751c9355dfa7
-          name: 'Juniper: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -134,7 +135,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ca8d30d561184ff4bf1b4ef07feb7302
-          name: 'Juniper: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -155,7 +156,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7a472141ebcf4816bffe9bb49f003db6
-          name: 'Juniper: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2636.3.1.2.0
           key: system.hw.model
@@ -175,7 +176,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b836efdbd3ac4becac319030250c1beb
-          name: 'Juniper: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2636.3.1.3.0
           key: system.hw.serialnumber
@@ -197,8 +198,8 @@ zabbix_export:
           triggers:
             - uuid: 9f1f3316ed6f4d50a4c9f71a15f35d50
               expression: 'last(/Juniper by SNMP/system.hw.serialnumber,#1)<>last(/Juniper by SNMP/system.hw.serialnumber,#2) and length(last(/Juniper by SNMP/system.hw.serialnumber))>0'
-              name: 'Juniper: Device has been replaced'
-              event_name: 'Juniper: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -206,7 +207,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 833dd7b3b4e94dc89b4e7098cec3fce2
-          name: 'Juniper: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -230,7 +231,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7a0062fa788c4abdbeb83df30276a0fd
-          name: 'Juniper: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -240,7 +241,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -250,7 +251,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 87d8d5844b044be1a2a3261f98116fb0
-          name: 'Juniper: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -272,8 +273,8 @@ zabbix_export:
           triggers:
             - uuid: 97157acd882944e29d6fb9fa1a2d9506
               expression: 'last(/Juniper by SNMP/system.name,#1)<>last(/Juniper by SNMP/system.name,#2) and length(last(/Juniper by SNMP/system.name))>0'
-              name: 'Juniper: System name has changed'
-              event_name: 'Juniper: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -283,7 +284,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: bd29b0df96ac4b93bbd0746257d3601d
-          name: 'Juniper: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -293,7 +294,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -302,7 +303,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ebfd8c6f87d3401197bb8d9835206878
-          name: 'Juniper: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -321,7 +322,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 414a29c595b2439dacb15b4fa0734ab4
-          name: 'Juniper: Overall system health status'
+          name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2636.3.4.2.3.1.0
           key: 'system.status[jnxRedAlarmState.0]'
@@ -347,7 +348,7 @@ zabbix_export:
           triggers:
             - uuid: 1190bb9c05424ac5a0052bd191c274f2
               expression: 'count(/Juniper by SNMP/system.status[jnxRedAlarmState.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
-              name: 'Juniper: System status is in critical state'
+              name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
@@ -357,7 +358,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 24cd5862c2de4cbaad0b3bbce7f26a65
-          name: 'Juniper: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.sw.os[sysDescr.0]'
@@ -381,24 +382,24 @@ zabbix_export:
           triggers:
             - uuid: 9249511ecf4a4a2d952aa0c4fe55a5d0
               expression: 'last(/Juniper by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Juniper by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Juniper by SNMP/system.sw.os[sysDescr.0]))>0'
-              name: 'Juniper: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Juniper: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Juniper by SNMP/system.name,#1)<>last(/Juniper by SNMP/system.name,#2) and length(last(/Juniper by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 80ff69518e07493aac6059e1009d9a9f
-          name: 'Juniper: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -412,12 +413,12 @@ zabbix_export:
           triggers:
             - uuid: 417527b3749c4a1c891d761c0978fb2e
               expression: 'max(/Juniper by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Juniper: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Juniper: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Juniper by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -916,8 +917,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1127,7 +1128,7 @@ zabbix_export:
                   expression: 'last(/Juniper by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
-                  description: 'Please check autonegotiation settings and cabling'
+                  description: 'Please check autonegotiation settings and cabling.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1163,10 +1164,13 @@ zabbix_export:
           value: '3'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
         - macro: '{$IFCONTROL}'
@@ -1204,6 +1208,7 @@ zabbix_export:
           value: '6'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
         - macro: '{$TEMP_CRIT:"Routing Engine"}'
@@ -1898,13 +1903,13 @@ zabbix_export:
   triggers:
     - uuid: 23e25e580543411ab8ffc2a4c1ca3c54
       expression: '(last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Juniper by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Juniper: Host has been restarted'
-      event_name: 'Juniper: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Juniper: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Juniper by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

@@ -1,0 +1,78 @@
+// Widget configuration.
+
+form.dashboard-widget-itemhistory {
+	#list_columns {
+		.overflow-ellipsis {
+			max-width: 250px;
+		}
+
+		.inaccessible {
+			color: $form-disabled-font-color;
+		}
+	}
+}
+
+// Widget view.
+
+$bar-gauge-height: 20px;
+$thumbnail-height: 56px;
+
+div.dashboard-widget-itemhistory {
+	.list-table {
+		&.show-thumbnail {
+			tbody td {
+				height: $thumbnail-height;
+				vertical-align: middle;
+			}
+		}
+
+		.has-broadcast-data {
+			cursor: pointer;
+		}
+
+		tr.selected td,
+		td.selected {
+			@extend %found-bg;
+
+			&:hover {
+				@extend %found-bg;
+			}
+		}
+	}
+
+	.binary-thumbnail {
+		.btn {
+			overflow: hidden;
+
+			&:not(.btn-link) {
+				width: 100px;
+				height: 56px;
+				background: transparent var(--thumbnail) no-repeat center top;
+				background-size: cover;
+				border-color: transparent;
+				text-indent: -9999px;
+
+				&:not(.is-loading) {
+					border: 1px solid $ui-border-color;
+					border-radius: 3px;
+				}
+			}
+		}
+	}
+
+	z-bar-gauge {
+		min-width: 64px;
+		height: $bar-gauge-height;
+	}
+}
+
+.dashboard-widget-itemhistory-hintbox {
+	max-height: 90vh;
+	overflow: auto;
+
+	img {
+		display: block;
+		max-width: 80vw;
+		max-height: 80vh;
+	}
+}

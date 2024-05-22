@@ -37,7 +37,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Mantis BT: Get projects|<p>Get projects from Mantis BT.</p>|HTTP agent|mantisbt.get.projects|
+|Get projects|<p>Get projects from Mantis BT.</p>|HTTP agent|mantisbt.get.projects|
 
 ### LLD rule Projects discovery
 

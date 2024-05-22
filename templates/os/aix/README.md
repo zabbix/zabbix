@@ -49,65 +49,65 @@ Install Zabbix agent on the AIX OS according to Zabbix documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AIX: Number of running processes|<p>Number of processes in a running state.</p>|Zabbix agent|proc.num[,,run]|
-|AIX: Number of processes|<p>Total number of processes in any state.</p>|Zabbix agent|proc.num[]|
-|AIX: Interrupts per second|<p>Number of interrupts processed.</p>|Zabbix agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|
-|AIX: Processor load (1 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg1]|
-|AIX: Processor load (5 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg5]|
-|AIX: Processor load (15 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg15]|
-|AIX: Context switches per second|<p>The combined rate at which all processors on the computer are switched from one thread to another.</p>|Zabbix agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|
-|AIX: Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|AIX: Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
-|AIX: CPU available physical processors in the shared pool||Zabbix agent|system.stat[cpu,app]|
-|AIX: CPU entitled capacity consumed||Zabbix agent|system.stat[cpu,ec]|
-|AIX: CPU idle time||Zabbix agent|system.stat[cpu,id]|
-|AIX: CPU logical processor utilization||Zabbix agent|system.stat[cpu,lbusy]|
-|AIX: CPU number of physical processors consumed||Zabbix agent|system.stat[cpu,pc]|
-|AIX: CPU system time||Zabbix agent|system.stat[cpu,sy]|
-|AIX: CPU user time||Zabbix agent|system.stat[cpu,us]|
-|AIX: CPU iowait time||Zabbix agent|system.stat[cpu,wa]|
-|AIX: Amount of data transferred||Zabbix agent|system.stat[disk,bps]|
-|AIX: Number of transfers||Zabbix agent|system.stat[disk,tps]|
-|AIX: Processor units is entitled to receive||Zabbix agent|system.stat[ent]|
-|AIX: Kernel thread context switches||Zabbix agent|system.stat[faults,cs]|
-|AIX: Device interrupts||Zabbix agent|system.stat[faults,in]|
-|AIX: System calls||Zabbix agent|system.stat[faults,sy]|
-|AIX: Length of the swap queue||Zabbix agent|system.stat[kthr,b]|
-|AIX: Length of the run queue||Zabbix agent|system.stat[kthr,r]|
-|AIX: Active virtual pages||Zabbix agent|system.stat[memory,avm]|
-|AIX: Free real memory||Zabbix agent|system.stat[memory,fre]|
-|AIX: File page-ins per second||Zabbix agent|system.stat[page,fi]|
-|AIX: File page-outs per second||Zabbix agent|system.stat[page,fo]|
-|AIX: Pages freed (page replacement)||Zabbix agent|system.stat[page,fr]|
-|AIX: Pages paged in from paging space||Zabbix agent|system.stat[page,pi]|
-|AIX: Pages paged out to paging space||Zabbix agent|system.stat[page,po]|
-|AIX: Pages scanned by page-replacement algorithm||Zabbix agent|system.stat[page,sr]|
-|AIX: System information|<p>Information as normally returned by `uname -a`.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|AIX: System uptime||Zabbix agent|system.uptime|
-|AIX: Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
-|AIX: Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|AIX: Available memory|<p>Defined as free + cached + buffers.</p>|Zabbix agent|vm.memory.size[available]|
-|AIX: Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent|vm.memory.size[total]|
-|AIX: Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|AIX: Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|AIX: Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent|agent.ping|
-|AIX: Zabbix agent availability|<p>Used for monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
-|AIX: Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
+|Number of running processes|<p>Number of processes in a running state.</p>|Zabbix agent|proc.num[,,run]|
+|Number of processes|<p>Total number of processes in any state.</p>|Zabbix agent|proc.num[]|
+|Interrupts per second|<p>Number of interrupts processed.</p>|Zabbix agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|
+|Processor load (1 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg1]|
+|Processor load (5 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg5]|
+|Processor load (15 min average per core)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent|system.cpu.load[percpu,avg15]|
+|Context switches per second|<p>The combined rate at which all processors on the computer are switched from one thread to another.</p>|Zabbix agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|
+|Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
+|CPU available physical processors in the shared pool||Zabbix agent|system.stat[cpu,app]|
+|CPU entitled capacity consumed||Zabbix agent|system.stat[cpu,ec]|
+|CPU idle time||Zabbix agent|system.stat[cpu,id]|
+|CPU logical processor utilization||Zabbix agent|system.stat[cpu,lbusy]|
+|CPU number of physical processors consumed||Zabbix agent|system.stat[cpu,pc]|
+|CPU system time||Zabbix agent|system.stat[cpu,sy]|
+|CPU user time||Zabbix agent|system.stat[cpu,us]|
+|CPU iowait time||Zabbix agent|system.stat[cpu,wa]|
+|Amount of data transferred||Zabbix agent|system.stat[disk,bps]|
+|Number of transfers||Zabbix agent|system.stat[disk,tps]|
+|Processor units is entitled to receive||Zabbix agent|system.stat[ent]|
+|Kernel thread context switches||Zabbix agent|system.stat[faults,cs]|
+|Device interrupts||Zabbix agent|system.stat[faults,in]|
+|System calls||Zabbix agent|system.stat[faults,sy]|
+|Length of the swap queue||Zabbix agent|system.stat[kthr,b]|
+|Length of the run queue||Zabbix agent|system.stat[kthr,r]|
+|Active virtual pages||Zabbix agent|system.stat[memory,avm]|
+|Free real memory||Zabbix agent|system.stat[memory,fre]|
+|File page-ins per second||Zabbix agent|system.stat[page,fi]|
+|File page-outs per second||Zabbix agent|system.stat[page,fo]|
+|Pages freed (page replacement)||Zabbix agent|system.stat[page,fr]|
+|Pages paged in from paging space||Zabbix agent|system.stat[page,pi]|
+|Pages paged out to paging space||Zabbix agent|system.stat[page,po]|
+|Pages scanned by page-replacement algorithm||Zabbix agent|system.stat[page,sr]|
+|System information|<p>Information as normally returned by `uname -a`.</p>|Zabbix agent|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|System uptime||Zabbix agent|system.uptime|
+|Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent|system.users.num|
+|Checksum of /etc/passwd||Zabbix agent|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Available memory|<p>Defined as free + cached + buffers.</p>|Zabbix agent|vm.memory.size[available]|
+|Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent|vm.memory.size[total]|
+|Version of Zabbix agent running||Zabbix agent|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Host name of Zabbix agent running||Zabbix agent|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent|agent.ping|
+|Zabbix agent availability|<p>Used for monitoring the availability status of the agent.</p>|Zabbix internal|zabbix[host,agent,available]|
+|Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent|vfs.fs.get|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|AIX: Too many processes running||`avg(/AIX by Zabbix agent/proc.num[,,run],5m)>30`|Warning||
-|AIX: Too many processes||`avg(/AIX by Zabbix agent/proc.num[],5m)>300`|Warning||
-|AIX: Processor load is too high||`avg(/AIX by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5`|Warning||
-|AIX: Hostname was changed||`last(/AIX by Zabbix agent/system.hostname,#1)<>last(/AIX by Zabbix agent/system.hostname,#2)`|Info||
-|AIX: Disk I/O is overloaded|<p>Extended OS wait times for I/O operations may signal potential performance issues with the storage system.</p>|`avg(/AIX by Zabbix agent/system.stat[cpu,wa],5m)>20`|Warning||
-|AIX: Host information was changed||`last(/AIX by Zabbix agent/system.uname,#1)<>last(/AIX by Zabbix agent/system.uname,#2)`|Info||
-|AIX: Server has just been restarted||`change(/AIX by Zabbix agent/system.uptime)<0`|Info||
-|AIX: /etc/passwd has been changed||`last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
-|AIX: Lack of available memory on server||`last(/AIX by Zabbix agent/vm.memory.size[available])<20M`|Average||
-|AIX: Zabbix agent is not available|<p>For passive checks only. The availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.</p>|`max(/AIX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
+|Too many processes running||`avg(/AIX by Zabbix agent/proc.num[,,run],5m)>30`|Warning||
+|Too many processes||`avg(/AIX by Zabbix agent/proc.num[],5m)>300`|Warning||
+|Processor load is too high||`avg(/AIX by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5`|Warning||
+|Hostname was changed||`last(/AIX by Zabbix agent/system.hostname,#1)<>last(/AIX by Zabbix agent/system.hostname,#2)`|Info||
+|Disk I/O is overloaded|<p>Extended OS wait times for I/O operations may signal potential performance issues with the storage system.</p>|`avg(/AIX by Zabbix agent/system.stat[cpu,wa],5m)>20`|Warning||
+|Host information was changed||`last(/AIX by Zabbix agent/system.uname,#1)<>last(/AIX by Zabbix agent/system.uname,#2)`|Info||
+|Server has just been restarted||`change(/AIX by Zabbix agent/system.uptime)<0`|Info||
+|/etc/passwd has been changed||`last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/AIX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)`|Warning||
+|Lack of available memory on server||`last(/AIX by Zabbix agent/vm.memory.size[available])<20M`|Average||
+|Zabbix agent is not available|<p>For passive checks only. The availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.</p>|`max(/AIX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0`|Average|**Manual close**: Yes|
 
 ### LLD rule Network interface discovery
 

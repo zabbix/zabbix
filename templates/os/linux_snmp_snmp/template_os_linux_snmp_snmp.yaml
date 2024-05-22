@@ -35,7 +35,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: 28f98683b9af4558813287cfa151719b
-          name: 'Linux: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -49,14 +49,14 @@ zabbix_export:
           triggers:
             - uuid: 28927c3715714a77a259d48943ddb8fe
               expression: 'max(/Linux by SNMP/icmpping,#3)=0'
-              name: 'Linux: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: bc5a3fbab2834f8bb012325071c5b2e0
-          name: 'Linux: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -70,11 +70,11 @@ zabbix_export:
           triggers:
             - uuid: f6d63c03e6f34888897464102fa369ec
               expression: 'min(/Linux by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Linux by SNMP/icmppingloss,5m)<100'
-              name: 'Linux: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Linux: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Linux by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -82,7 +82,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: b1e02fd733c14d71935e24fbe8786d40
-          name: 'Linux: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -96,14 +96,14 @@ zabbix_export:
           triggers:
             - uuid: 1c1b86790d6442e59f50d94f9844c337
               expression: 'avg(/Linux by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Linux: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Linux: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Linux by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Linux by SNMP/icmppingloss,5m)<100'
-                - name: 'Linux: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Linux by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -135,7 +135,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 85a597b741bb4e6e8fa9806e8737caf4
-          name: 'Linux: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e45c4b2df4a640a1a36154cb2b717e9d
-          name: 'Linux: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -168,7 +168,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fdb0807c4a9a452f8a3cbab01a4ddb2e
-          name: 'Linux: Interrupts per second'
+          name: 'Interrupts per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.11.59.0
           key: 'system.cpu.intr[ssRawInterrupts.0]'
@@ -183,7 +183,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: eeaba506dee342518660c03d422faa2a
-          name: 'Linux: Load average (1m avg)'
+          name: 'Load average (1m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-1"]'
           key: 'system.cpu.load.avg1[laLoad.1]'
@@ -194,7 +194,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e0c8a351d59f42b78e6db4a0c50aa5d2
-          name: 'Linux: Load average (5m avg)'
+          name: 'Load average (5m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-5"]'
           key: 'system.cpu.load.avg5[laLoad.2]'
@@ -205,7 +205,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 0a5c406d4e434dbba248a18318f6a869
-          name: 'Linux: Load average (15m avg)'
+          name: 'Load average (15m avg)'
           type: SNMP_AGENT
           snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-15"]'
           key: 'system.cpu.load.avg15[laLoad.3]'
@@ -216,7 +216,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f835f2d2e65c4efc8934a61870d907ca
-          name: 'Linux: Number of CPUs'
+          name: 'Number of CPUs'
           type: DEPENDENT
           key: 'system.cpu.num[snmp]'
           delay: '0'
@@ -237,7 +237,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e10a890dc6724cbda96f7c40c49cd730
-          name: 'Linux: Context switches per second'
+          name: 'Context switches per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.11.60.0
           key: 'system.cpu.switches[ssRawContexts.0]'
@@ -252,7 +252,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: fb2a968ed48f4c6287da2b06bc3b95f3
-          name: 'Linux: SNMP walk system CPUs'
+          name: 'SNMP walk system CPUs'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.25.3.3.1.1,1.3.6.1.4.1.2021.11.53.0,1.3.6.1.4.1.2021.11.52.0,1.3.6.1.4.1.2021.11.50.0,1.3.6.1.4.1.2021.11.64.0,1.3.6.1.4.1.2021.11.61.0,1.3.6.1.4.1.2021.11.51.0,1.3.6.1.4.1.2021.11.54.0,1.3.6.1.4.1.2021.11.56.0,1.3.6.1.4.1.2021.11.65.0,1.3.6.1.4.1.2021.11.66.0]'
           key: system.cpu.walk
@@ -266,7 +266,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: abd4d4b7097644478329b578dfa7bf09
-          name: 'Linux: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -287,7 +287,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d1a9af129dbb4fed8e67efcca383aeae
-          name: 'Linux: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -311,7 +311,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9f2b3de3245e4ffea5aefc636e0f3da1
-          name: 'Linux: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -331,7 +331,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3ee68ecd1edc4f5d9cddefa78f8d502e
-          name: 'Linux: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -353,8 +353,8 @@ zabbix_export:
           triggers:
             - uuid: eeb0355174d74892a4e3a078e6ac7952
               expression: 'last(/Linux by SNMP/system.name,#1)<>last(/Linux by SNMP/system.name,#2) and length(last(/Linux by SNMP/system.name))>0'
-              name: 'Linux: System name has changed'
-              event_name: 'Linux: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -364,7 +364,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: d3fba18851db4be08df04ab85536bb14
-          name: 'Linux: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -383,7 +383,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5b17833c4646423d8fd4115fa19d2ffe
-          name: 'Linux: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -402,7 +402,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a8ad10709a6e457187f58695de20b027
-          name: 'Linux: Free swap space'
+          name: 'Free swap space'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.4.0
           key: 'system.swap.free[memAvailSwap.0]'
@@ -421,7 +421,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 52ae3f1d7b3d4b669b40f0fddbb0e326
-          name: 'Linux: Free swap space in %'
+          name: 'Free swap space in %'
           type: CALCULATED
           key: 'system.swap.pfree[snmp]'
           history: 7d
@@ -435,7 +435,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7db5193027794961840c228c6280fe5b
-          name: 'Linux: Total swap space'
+          name: 'Total swap space'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.3.0
           key: 'system.swap.total[memTotalSwap.0]'
@@ -454,7 +454,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 94c5ede90a50467989a4559e51c0bcef
-          name: 'Linux: SNMP walk block devices'
+          name: 'SNMP walk block devices'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2021.13.15.1.1.2,1.3.6.1.4.1.2021.13.15.1.1.5,1.3.6.1.4.1.2021.13.15.1.1.6,1.3.6.1.4.1.2021.13.15.1.1.9]'
           key: vfs.dev.walk
@@ -466,7 +466,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8ad72047f03a452f9698254fe6b4ffd2
-          name: 'Linux: SNMP walk mounted filesystems'
+          name: 'SNMP walk mounted filesystems'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.2021.9.1.1,1.3.6.1.4.1.2021.9.1.2,1.3.6.1.4.1.2021.9.1.3,1.3.6.1.4.1.2021.9.1.10,1.3.6.1.4.1.2021.9.1.11,1.3.6.1.4.1.2021.9.1.12,1.3.6.1.4.1.2021.9.1.13,1.3.6.1.4.1.2021.9.1.14,1.3.6.1.4.1.2021.9.1.15,1.3.6.1.4.1.2021.9.1.16]'
           key: vfs.fs.walk
@@ -515,7 +515,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: ad8a3857e8b04dffbc0c052a0d36fe08
-          name: 'Linux: Available memory'
+          name: 'Available memory'
           type: CALCULATED
           key: 'vm.memory.available[snmp]'
           history: 7d
@@ -526,7 +526,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: c071dae605b64cce886df7d2865e77e0
-          name: 'Linux: Memory (buffers)'
+          name: 'Memory (buffers)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.14.0
           key: 'vm.memory.buffers[memBuffer.0]'
@@ -543,7 +543,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d5e0a99bfd9844108c3d26d53d1a3d0c
-          name: 'Linux: Memory (cached)'
+          name: 'Memory (cached)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.15.0
           key: 'vm.memory.cached[memCached.0]'
@@ -560,7 +560,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: fc3fb5310e8f4af7a093b9df9eede403
-          name: 'Linux: Free memory'
+          name: 'Free memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.6.0
           key: 'vm.memory.free[memAvailReal.0]'
@@ -575,7 +575,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: de35484e53b24894aa050f15e1941106
-          name: 'Linux: Total memory'
+          name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2021.4.5.0
           key: 'vm.memory.total[memTotalReal.0]'
@@ -592,7 +592,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 640d893d48d44f2ebe2c9e9bb0158f76
-          name: 'Linux: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[snmp]'
           history: 7d
@@ -606,12 +606,12 @@ zabbix_export:
           triggers:
             - uuid: 063b87d246b04e74a439114a05f00fe5
               expression: 'min(/Linux by SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Linux: High memory utilization'
-              event_name: 'Linux: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               dependencies:
-                - name: 'Linux: Lack of available memory'
+                - name: 'Lack of available memory'
                   expression: 'max(/Linux by SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by SNMP/vm.memory.total[memTotalReal.0])>0'
               tags:
                 - tag: scope
@@ -619,7 +619,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 03491bb9b98f4267bf1ff56cc226d819
-          name: 'Linux: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -639,12 +639,12 @@ zabbix_export:
           triggers:
             - uuid: 63d99e49b3584fb2bf61a7d56725fb3c
               expression: 'max(/Linux by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Linux: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Linux: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Linux by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -658,7 +658,7 @@ zabbix_export:
           description: 'This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That''s the only reason why LLD is used.'
           item_prototypes:
             - uuid: 528c02f7e0414cb5a97def6702fceb2a
-              name: 'Linux: CPU guest time'
+              name: 'CPU guest time'
               type: DEPENDENT
               key: 'system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]'
               delay: '0'
@@ -685,7 +685,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: ce514c83afb345b2b0f3b85d6ec89dc3
-              name: 'Linux: CPU guest nice time'
+              name: 'CPU guest nice time'
               type: DEPENDENT
               key: 'system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]'
               delay: '0'
@@ -712,7 +712,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: 394bffd2086545af806f4ad990f853a1
-              name: 'Linux: CPU idle time'
+              name: 'CPU idle time'
               type: DEPENDENT
               key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
               delay: '0'
@@ -739,7 +739,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: 88e9044abe71483a8670b572517ff4ad
-              name: 'Linux: CPU interrupt time'
+              name: 'CPU interrupt time'
               type: DEPENDENT
               key: 'system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]'
               delay: '0'
@@ -766,7 +766,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: 87d1467c79cc4a3d8e5caf3b35de7e17
-              name: 'Linux: CPU iowait time'
+              name: 'CPU iowait time'
               type: DEPENDENT
               key: 'system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]'
               delay: '0'
@@ -793,7 +793,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: d35896698d2a459fb682eb170e7005de
-              name: 'Linux: CPU nice time'
+              name: 'CPU nice time'
               type: DEPENDENT
               key: 'system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]'
               delay: '0'
@@ -820,7 +820,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: b48b79d7c2464bd996776477e55ce724
-              name: 'Linux: CPU softirq time'
+              name: 'CPU softirq time'
               type: DEPENDENT
               key: 'system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]'
               delay: '0'
@@ -847,7 +847,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: f0e15f783b434cc49c97681e15def25c
-              name: 'Linux: CPU steal time'
+              name: 'CPU steal time'
               type: DEPENDENT
               key: 'system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]'
               delay: '0'
@@ -874,7 +874,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: 9f063ab6a217459e9e1ae95cc77071ff
-              name: 'Linux: CPU system time'
+              name: 'CPU system time'
               type: DEPENDENT
               key: 'system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]'
               delay: '0'
@@ -901,7 +901,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: e07c1afe5f8c4db0bae364933df3e571
-              name: 'Linux: CPU user time'
+              name: 'CPU user time'
               type: DEPENDENT
               key: 'system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]'
               delay: '0'
@@ -928,7 +928,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: dfd150b9966c49e6b8bf08570438f17c
-              name: 'Linux: CPU utilization'
+              name: 'CPU utilization'
               type: DEPENDENT
               key: 'system.cpu.util[snmp,{#SNMPINDEX}]'
               delay: '0'
@@ -948,8 +948,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 34b29a2e43b347d0ada6b80a472a659e
                   expression: 'min(/Linux by SNMP/system.cpu.util[snmp,{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: 'Linux: High CPU utilization'
-                  event_name: 'Linux: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  name: 'High CPU utilization'
+                  event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -2165,7 +2165,7 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2181,7 +2181,7 @@ zabbix_export:
                       value: AAAEB
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2959,36 +2959,36 @@ zabbix_export:
   triggers:
     - uuid: 8d66563ff7744cd6847325d473eaacfe
       expression: 'max(/Linux by SNMP/system.swap.pfree[snmp],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by SNMP/system.swap.total[memTotalSwap.0])>0'
-      name: 'Linux: High swap space usage'
-      event_name: 'Linux: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage'
+      event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'If there is no swap configured, this trigger is ignored.'
       dependencies:
-        - name: 'Linux: High memory utilization'
+        - name: 'High memory utilization'
           expression: 'min(/Linux by SNMP/vm.memory.util[snmp],5m)>{$MEMORY.UTIL.MAX}'
-        - name: 'Linux: Lack of available memory'
+        - name: 'Lack of available memory'
           expression: 'max(/Linux by SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by SNMP/vm.memory.total[memTotalReal.0])>0'
       tags:
         - tag: scope
           value: capacity
     - uuid: e129fb90ec084a83806aec27141cd6eb
       expression: '(last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Linux by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Linux by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Linux: Host has been restarted'
-      event_name: 'Linux: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Linux: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Linux by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope
           value: notice
     - uuid: b0a04a6a01854d0eb6f9f225c1108261
       expression: 'max(/Linux by SNMP/vm.memory.available[snmp],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by SNMP/vm.memory.total[memTotalReal.0])>0'
-      name: 'Linux: Lack of available memory'
-      event_name: 'Linux: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      name: 'Lack of available memory'
+      event_name: 'Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
       opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'The system is running out of memory.'
@@ -3002,8 +3002,8 @@ zabbix_export:
         min(/Linux by SNMP/system.cpu.load.avg1[laLoad.1],5m)/last(/Linux by SNMP/system.cpu.num[snmp])>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Linux by SNMP/system.cpu.load.avg5[laLoad.2])>0
         and last(/Linux by SNMP/system.cpu.load.avg15[laLoad.3])>0
-      name: 'Linux: Load average is too high'
-      event_name: 'Linux: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      name: 'Load average is too high'
+      event_name: 'Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'The load average per CPU is too high. The system may be slow to respond.'

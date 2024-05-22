@@ -23,7 +23,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 64b8a28c1a904540930ebfec5af04872
-          name: 'VMware: Event log'
+          name: 'Event log'
           type: SIMPLE
           key: 'vmware.eventlog[{$VMWARE.URL},skip]'
           history: 7d
@@ -36,7 +36,7 @@ zabbix_export:
             - tag: component
               value: log
         - uuid: ebb8417eceb541b1b51909c745642f05
-          name: 'VMware: Full name'
+          name: 'Full name'
           type: SIMPLE
           key: 'vmware.fullname[{$VMWARE.URL}]'
           delay: 1h
@@ -54,7 +54,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: edfdedd78e9c4c299a1555bd13b2f677
-          name: 'VMware: Version'
+          name: Version
           type: SIMPLE
           key: 'vmware.version[{$VMWARE.URL}]'
           delay: 1h
@@ -82,7 +82,7 @@ zabbix_export:
           description: 'Discovery of clusters'
           item_prototypes:
             - uuid: 41fbb29592f9495e92d88240ce2ba7a5
-              name: 'VMware: Status of "{#CLUSTER.NAME}" cluster'
+              name: 'Status of "{#CLUSTER.NAME}" cluster'
               type: SIMPLE
               key: 'vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]'
               history: 7d
@@ -99,7 +99,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 962adf853de24f589e34df7ddd560885
                   expression: 'last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3'
-                  name: 'VMware: The {#CLUSTER.NAME} status is Red'
+                  name: 'The {#CLUSTER.NAME} status is Red'
                   priority: HIGH
                   description: 'A cluster enabled for DRS becomes invalid (red) when the tree is no longer internally consistent, that is, resource constraints are not observed. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-C7417CAA-BD38-41D0-9529-9E7A5898BB12.html'
                   tags:
@@ -109,11 +109,11 @@ zabbix_export:
                       value: performance
                 - uuid: 44d12ca67931452194d1e1071136015d
                   expression: 'last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=2'
-                  name: 'VMware: The {#CLUSTER.NAME} status is Yellow'
+                  name: 'The {#CLUSTER.NAME} status is Yellow'
                   priority: AVERAGE
                   description: 'A cluster becomes overcommitted (yellow) when the tree of resource pools and virtual machines is internally consistent but the cluster does not have the capacity to support all resources reserved by the child resource pools. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-ED8240A0-FB54-4A31-BD3D-F23FE740F10C.html'
                   dependencies:
-                    - name: 'VMware: The {#CLUSTER.NAME} status is Red'
+                    - name: 'The {#CLUSTER.NAME} status is Red'
                       expression: 'last(/VMware FQDN/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3'
                   tags:
                     - tag: scope
@@ -129,7 +129,7 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           item_prototypes:
             - uuid: 0ed09f26cbad4d96bea297da4215d73b
-              name: 'VMware: Average read latency of the datastore {#DATASTORE}'
+              name: 'Average read latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]'
               history: 7d
@@ -142,7 +142,7 @@ zabbix_export:
                 - tag: datastore
                   value: '{#DATASTORE}'
             - uuid: a2b1785fc773404e9ce69bcd868c5b88
-              name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
+              name: 'Free space on datastore {#DATASTORE} (percentage)'
               type: SIMPLE
               key: 'vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]'
               delay: 5m
@@ -158,7 +158,7 @@ zabbix_export:
                 - tag: datastore
                   value: '{#DATASTORE}'
             - uuid: 78fb4b4b0eec44a99207f8354773269d
-              name: 'VMware: Total size of datastore {#DATASTORE}'
+              name: 'Total size of datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]'
               delay: 5m
@@ -173,7 +173,7 @@ zabbix_export:
                 - tag: datastore
                   value: '{#DATASTORE}'
             - uuid: d9570c0822cc4996a7dda1ddb9426404
-              name: 'VMware: Average write latency of the datastore {#DATASTORE}'
+              name: 'Average write latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]'
               history: 7d
@@ -293,7 +293,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 061eed2d40d5427092b50172ea0a9c41
-          name: 'VMware: Cluster name'
+          name: 'Cluster name'
           type: SIMPLE
           key: 'vmware.vm.cluster.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
@@ -311,7 +311,7 @@ zabbix_export:
             - tag: component
               value: cluster
         - uuid: 31389342688f4b0696a49431923a528f
-          name: 'VMware: CPU latency in percents'
+          name: 'CPU latency in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -324,7 +324,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: bbfb146e74144160b2e47c0f2cdc6c20
-          name: 'VMware: Number of virtual CPUs'
+          name: 'Number of virtual CPUs'
           type: SIMPLE
           key: 'vmware.vm.cpu.num[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
@@ -340,7 +340,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f4d72109b7ee4e0bb65aab1de85b6b05
-          name: 'VMware: CPU readiness latency in percents'
+          name: 'CPU readiness latency in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -353,7 +353,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ff0a31df94784cfbbf10deca55f76145
-          name: 'VMware: CPU ready'
+          name: 'CPU ready'
           type: SIMPLE
           key: 'vmware.vm.cpu.ready[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -365,7 +365,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 50de05f27f33425cb207a3fdece7ecb1
-          name: 'VMware: CPU swap-in latency in percents'
+          name: 'CPU swap-in latency in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -377,7 +377,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 50606be978814b51b4bae54340965cdc
-          name: 'VMware: CPU usage in percents'
+          name: 'CPU usage in percents'
           type: SIMPLE
           key: 'vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -390,7 +390,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ea416ff054cc4031ac6b5cf446156540
-          name: 'VMware: CPU usage'
+          name: 'CPU usage'
           type: SIMPLE
           key: 'vmware.vm.cpu.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -402,7 +402,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 3e70b5d443b942db974b5f92a7acce19
-          name: 'VMware: Datacenter name'
+          name: 'Datacenter name'
           type: SIMPLE
           key: 'vmware.vm.datacenter.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
@@ -420,7 +420,7 @@ zabbix_export:
             - tag: component
               value: datacenter
         - uuid: e645130999db470fbbf14a8055c95b23
-          name: 'VMware: Guest memory swapped'
+          name: 'Guest memory swapped'
           type: SIMPLE
           key: 'vmware.vm.guest.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -432,7 +432,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 521a0396514845e3bc5d3dc54ec3d940
-          name: 'VMware: Uptime of guest OS'
+          name: 'Uptime of guest OS'
           type: SIMPLE
           key: 'vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -446,8 +446,8 @@ zabbix_export:
           triggers:
             - uuid: da703e83e2e146569c173fd9bc6988dd
               expression: 'last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m'
-              name: 'VMware: VM has been restarted'
-              event_name: 'VMware: VM has been restarted (uptime < 10m)'
+              name: 'VM has been restarted'
+              event_name: 'VM has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -455,7 +455,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: fedec469a1d040ae971e0013102e1e7c
-          name: 'VMware: Hypervisor name'
+          name: 'Hypervisor name'
           type: SIMPLE
           key: 'vmware.vm.hv.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
@@ -473,7 +473,7 @@ zabbix_export:
             - tag: component
               value: hypervisor
         - uuid: fbe7477fd85a4ee39a9226b2c6995446
-          name: 'VMware: Ballooned memory'
+          name: 'Ballooned memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -485,7 +485,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 9e7b9360e4d84e9397b5f0a7ab074726
-          name: 'VMware: Compressed memory'
+          name: 'Compressed memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.compressed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -497,7 +497,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 04a40f805fed4ddfa1590274a996a019
-          name: 'VMware: Host memory consumed'
+          name: 'Host memory consumed'
           type: SIMPLE
           key: 'vmware.vm.memory.size.consumed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -509,7 +509,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 6563409185804ed89b49dfde92edfa10
-          name: 'VMware: Private memory'
+          name: 'Private memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.private[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -521,7 +521,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: c6a539ee57bf48f78342358c391c65ea
-          name: 'VMware: Shared memory'
+          name: 'Shared memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.shared[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -533,7 +533,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: b064f0e0a53f4f6588827100becb4335
-          name: 'VMware: Swapped memory'
+          name: 'Swapped memory'
           type: SIMPLE
           key: 'vmware.vm.memory.size.swapped[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -545,7 +545,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: e960399726a240de9ecc12eff65415ae
-          name: 'VMware: Guest memory usage'
+          name: 'Guest memory usage'
           type: SIMPLE
           key: 'vmware.vm.memory.size.usage.guest[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -557,7 +557,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 6fcbe4e95fce445aa417b9738004391f
-          name: 'VMware: Host memory usage'
+          name: 'Host memory usage'
           type: SIMPLE
           key: 'vmware.vm.memory.size.usage.host[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -569,7 +569,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 9533bc39366443fe8a3808190801441a
-          name: 'VMware: Memory size'
+          name: 'Memory size'
           type: SIMPLE
           key: 'vmware.vm.memory.size[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
@@ -586,7 +586,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: e82daa73e03e43b9838d9e414d710e38
-          name: 'VMware: Host memory usage in percents'
+          name: 'Host memory usage in percents'
           type: SIMPLE
           key: 'vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -599,7 +599,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 0943ff346c9d4cc69fc773843066c473
-          name: 'VMware: Power state'
+          name: 'Power state'
           type: SIMPLE
           key: 'vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -616,7 +616,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 13173517c99e4a87aa6750392d14b255
-          name: 'VMware: Committed storage space'
+          name: 'Committed storage space'
           type: SIMPLE
           key: 'vmware.vm.storage.committed[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -628,7 +628,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 8183cf2c54774d7eb544f645d5c26b8c
-          name: 'VMware: Uncommitted storage space'
+          name: 'Uncommitted storage space'
           type: SIMPLE
           key: 'vmware.vm.storage.uncommitted[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -640,7 +640,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 35aa9ee1743e4c1787c426da20f48097
-          name: 'VMware: Unshared storage space'
+          name: 'Unshared storage space'
           type: SIMPLE
           key: 'vmware.vm.storage.unshared[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -652,7 +652,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 4c3b010d7ea74da6b0dc1dd4e625bbb0
-          name: 'VMware: Uptime'
+          name: Uptime
           type: SIMPLE
           key: 'vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           history: 7d
@@ -674,7 +674,7 @@ zabbix_export:
           description: 'Discovery of all network devices.'
           item_prototypes:
             - uuid: 1a7452a0061b45b1b1904e3ff64cf49f
-              name: 'VMware: Number of bytes received on interface {#IFDESC}'
+              name: 'Number of bytes received on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]'
               history: 7d
@@ -688,7 +688,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFDESC}'
             - uuid: 863c3aee5d9248d48adbf86832fa6c8e
-              name: 'VMware: Number of packets received on interface {#IFDESC}'
+              name: 'Number of packets received on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]'
               history: 7d
@@ -701,7 +701,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFDESC}'
             - uuid: 0993e42664a14cd7936351c55b1d64a4
-              name: 'VMware: Number of bytes transmitted on interface {#IFDESC}'
+              name: 'Number of bytes transmitted on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps]'
               history: 7d
@@ -715,7 +715,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFDESC}'
             - uuid: 144a2ed3f76e49af92462e0fea275ede
-              name: 'VMware: Number of packets transmitted on interface {#IFDESC}'
+              name: 'Number of packets transmitted on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.out[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps]'
               history: 7d
@@ -728,7 +728,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFDESC}'
             - uuid: 9c3cd13576cc4c0a8972fa188f911e96
-              name: 'VMware: Network utilization on interface {#IFDESC}'
+              name: 'Network utilization on interface {#IFDESC}'
               type: SIMPLE
               key: 'vmware.vm.net.if.usage[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME}]'
               history: 7d
@@ -755,7 +755,7 @@ zabbix_export:
           description: 'Discovery of all disk devices.'
           item_prototypes:
             - uuid: a4886b1072314819aaf21183949c94bb
-              name: 'VMware: Average number of outstanding read requests to the disk {#DISKDESC}'
+              name: 'Average number of outstanding read requests to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.storage.readoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
               history: 7d
@@ -768,7 +768,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DISKDESC}'
             - uuid: 172e4882d39f49d486ab5590163fdd4b
-              name: 'VMware: Average read latency to the disk {#DISKDESC}'
+              name: 'Average read latency to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.storage.totalreadlatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
               history: 7d
@@ -782,7 +782,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DISKDESC}'
             - uuid: 4fe54828be084b15bb92507106756a5f
-              name: 'VMware: Average write latency to the disk {#DISKDESC}'
+              name: 'Average write latency to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.storage.totalwritelatency[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
               history: 7d
@@ -796,7 +796,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DISKDESC}'
             - uuid: a74614af101c404eb7ebec10319dca05
-              name: 'VMware: Average number of outstanding write requests to the disk {#DISKDESC}'
+              name: 'Average number of outstanding write requests to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.storage.writeoio[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME}]'
               history: 7d
@@ -809,7 +809,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DISKDESC}'
             - uuid: bd151efc8a0b41e9b64cbf21303fc659
-              name: 'VMware: Average number of bytes read from the disk {#DISKDESC}'
+              name: 'Average number of bytes read from the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps]'
               history: 7d
@@ -823,7 +823,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DISKDESC}'
             - uuid: e6248013150d4f23a0774f6cc80e8df3
-              name: 'VMware: Average number of reads from the disk {#DISKDESC}'
+              name: 'Average number of reads from the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.vfs.dev.read[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops]'
               history: 7d
@@ -836,7 +836,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DISKDESC}'
             - uuid: 7ea68380b855460b8e51281223659661
-              name: 'VMware: Average number of bytes written to the disk {#DISKDESC}'
+              name: 'Average number of bytes written to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},bps]'
               history: 7d
@@ -850,7 +850,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DISKDESC}'
             - uuid: 8344a1066f5c4ef49894d2d18fac2339
-              name: 'VMware: Average number of writes to the disk {#DISKDESC}'
+              name: 'Average number of writes to the disk {#DISKDESC}'
               type: SIMPLE
               key: 'vmware.vm.vfs.dev.write[{$VMWARE.URL},{$VMWARE.VM.UUID},{#DISKNAME},ops]'
               history: 7d
@@ -872,7 +872,7 @@ zabbix_export:
           description: 'Discovery of all guest file systems.'
           item_prototypes:
             - uuid: 622e96310f9d4f54b4ed82f655fa153b
-              name: 'VMware: Free disk space on {#FSNAME}'
+              name: 'Free disk space on {#FSNAME}'
               type: SIMPLE
               key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},free]'
               history: 7d
@@ -886,7 +886,7 @@ zabbix_export:
                 - tag: filesystem
                   value: '{#FSNAME}'
             - uuid: 3103537bb1d24633a064d173b3b530f2
-              name: 'VMware: Free disk space on {#FSNAME} (percentage)'
+              name: 'Free disk space on {#FSNAME} (percentage)'
               type: SIMPLE
               key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree]'
               history: 7d
@@ -901,7 +901,7 @@ zabbix_export:
                 - tag: filesystem
                   value: '{#FSNAME}'
             - uuid: 08d05eac03994b56867ec302a346735c
-              name: 'VMware: Total disk space on {#FSNAME}'
+              name: 'Total disk space on {#FSNAME}'
               type: SIMPLE
               key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},total]'
               delay: 1h
@@ -920,7 +920,7 @@ zabbix_export:
                 - tag: filesystem
                   value: '{#FSNAME}'
             - uuid: 09bb15da42464d8295d5e94b1d42cc87
-              name: 'VMware: Used disk space on {#FSNAME}'
+              name: 'Used disk space on {#FSNAME}'
               type: SIMPLE
               key: 'vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},used]'
               history: 7d
@@ -968,7 +968,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 3010cb082f23478b858912f944347530
-          name: 'VMware: Hypervisor ping'
+          name: 'Hypervisor ping'
           type: SIMPLE
           key: 'icmpping[]'
           history: 7d
@@ -987,7 +987,7 @@ zabbix_export:
           triggers:
             - uuid: ab84a61566a5402db59efd40d20714a5
               expression: 'last(/VMware Hypervisor/icmpping[])=0'
-              name: 'VMware: Hypervisor is down'
+              name: 'Hypervisor is down'
               priority: AVERAGE
               description: 'The service is unavailable or does not accept ICMP ping.'
               manual_close: 'YES'
@@ -995,7 +995,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: af4d0877fda84753816c817ad76162f1
-          name: 'VMware: Cluster name'
+          name: 'Cluster name'
           type: SIMPLE
           key: 'vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1013,7 +1013,7 @@ zabbix_export:
             - tag: component
               value: cluster
         - uuid: c4ebd62118464e7a8d1945f80d70f8ae
-          name: 'VMware: CPU usage in percents'
+          name: 'CPU usage in percents'
           type: SIMPLE
           key: 'vmware.hv.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
@@ -1026,7 +1026,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 1bff6fbd300d4455a787a273d957bba3
-          name: 'VMware: CPU usage'
+          name: 'CPU usage'
           type: SIMPLE
           key: 'vmware.hv.cpu.usage[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
@@ -1038,7 +1038,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: aad168c33cd14f76aa14ab5ca26498ec
-          name: 'VMware: CPU utilization'
+          name: 'CPU utilization'
           type: SIMPLE
           key: 'vmware.hv.cpu.utilization[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
@@ -1051,7 +1051,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e4d27d7f9b9048d4ae6c60cbdd6c0091
-          name: 'VMware: Datacenter name'
+          name: 'Datacenter name'
           type: SIMPLE
           key: 'vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1069,7 +1069,7 @@ zabbix_export:
             - tag: component
               value: datacenter
         - uuid: 5c29837f75f04d7f9a5786691b3dd991
-          name: 'VMware: Full name'
+          name: 'Full name'
           type: SIMPLE
           key: 'vmware.hv.fullname[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1087,7 +1087,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ad0053d57b834e6a9776c08e1c455d55
-          name: 'VMware: CPU frequency'
+          name: 'CPU frequency'
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.freq[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1100,7 +1100,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 3f0c35fcef9e4699ac5a1c51d80f8da4
-          name: 'VMware: CPU model'
+          name: 'CPU model'
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1114,7 +1114,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: c99a5bf2e3904f97b3d361ca20af7883
-          name: 'VMware: CPU cores'
+          name: 'CPU cores'
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1130,7 +1130,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 89cb0a4809e7454a862f398a0e9d6bed
-          name: 'VMware: CPU threads'
+          name: 'CPU threads'
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.threads[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1142,7 +1142,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ce89c38e6e5d4338a30ee150be1b2b67
-          name: 'VMware: Total memory'
+          name: 'Total memory'
           type: SIMPLE
           key: 'vmware.hv.hw.memory[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1155,7 +1155,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 7ed7ac26da384bcda976badf24ebbec1
-          name: 'VMware: Model'
+          name: Model
           type: SIMPLE
           key: 'vmware.hv.hw.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1169,7 +1169,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6c4aab55b3e640779a25ac90b9ca2a43
-          name: 'VMware: Bios UUID'
+          name: 'Bios UUID'
           type: SIMPLE
           key: 'vmware.hv.hw.uuid[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1183,7 +1183,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: aec06090d16d4bdd8ed3494b448f19d8
-          name: 'VMware: Vendor'
+          name: Vendor
           type: SIMPLE
           key: 'vmware.hv.hw.vendor[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1197,7 +1197,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 21020a79436a49c38caf8941f6b68da3
-          name: 'VMware: Ballooned memory'
+          name: 'Ballooned memory'
           type: SIMPLE
           key: 'vmware.hv.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
@@ -1209,7 +1209,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 93d680d6886d446badbbe995ddd9ba9c
-          name: 'VMware: Used memory'
+          name: 'Used memory'
           type: SIMPLE
           key: 'vmware.hv.memory.used[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
@@ -1221,7 +1221,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 33f78ab6ee6c4e7585a83a60cdecab6f
-          name: 'VMware: Number of bytes received'
+          name: 'Number of bytes received'
           type: SIMPLE
           key: 'vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
           history: 7d
@@ -1233,7 +1233,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: b013afcba08b47f4a5b590a59f464a58
-          name: 'VMware: Number of bytes transmitted'
+          name: 'Number of bytes transmitted'
           type: SIMPLE
           key: 'vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},bps]'
           history: 7d
@@ -1245,7 +1245,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e4116d7c7e234c5ebd5784f42ade1f2e
-          name: 'VMware: Power usage maximum allowed'
+          name: 'Power usage maximum allowed'
           type: SIMPLE
           key: 'vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID},max]'
           history: 7d
@@ -1261,7 +1261,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 179a981cf30f4f77869e3b50dc2bc333
-          name: 'VMware: Power usage'
+          name: 'Power usage'
           type: SIMPLE
           key: 'vmware.hv.power[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
@@ -1273,7 +1273,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 3c9d6ffb53624758ad888bf70f69218c
-          name: 'VMware: Get sensors'
+          name: 'Get sensors'
           type: SIMPLE
           key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: '0'
@@ -1286,7 +1286,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0cec294521314c5482233b5b96e90c8d
-          name: 'VMware: Overall status'
+          name: 'Overall status'
           type: SIMPLE
           key: 'vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
@@ -1301,7 +1301,7 @@ zabbix_export:
           triggers:
             - uuid: 378511e0f1794874a68aef1b43561ee5
               expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-              name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+              name: 'The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
               description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
               tags:
@@ -1311,11 +1311,11 @@ zabbix_export:
                   value: performance
             - uuid: ef6ca4d7033c4c8cb963eb7d493b3c7b
               expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
-              name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+              name: 'The {$VMWARE.HV.UUID} health is Yellow'
               priority: AVERAGE
               description: 'One or more components in the appliance might become overloaded soon.'
               dependencies:
-                - name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                - name: 'The {$VMWARE.HV.UUID} health is Red'
                   expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
               tags:
                 - tag: scope
@@ -1323,7 +1323,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: ecad96137494476293b57a0440de3f65
-          name: 'VMware: Uptime'
+          name: Uptime
           type: SIMPLE
           key: 'vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: 7d
@@ -1337,8 +1337,8 @@ zabbix_export:
           triggers:
             - uuid: 01d316b0a8cf4998b344f0c4ef1daa32
               expression: 'last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m'
-              name: 'VMware: Hypervisor has been restarted'
-              event_name: 'VMware: Hypervisor has been restarted (uptime < 10m)'
+              name: 'Hypervisor has been restarted'
+              event_name: 'Hypervisor has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1346,7 +1346,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 222ad20887cf479b8e81a4c338078d17
-          name: 'VMware: Version'
+          name: Version
           type: SIMPLE
           key: 'vmware.hv.version[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1360,7 +1360,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2045df572e864834bd4bd97046353f4e
-          name: 'VMware: Number of guest VMs'
+          name: 'Number of guest VMs'
           type: SIMPLE
           key: 'vmware.hv.vm.num[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -1381,7 +1381,7 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           item_prototypes:
             - uuid: 65e6c165c3674953b2845d4101a9a6bf
-              name: 'VMware: Multipath count for datastore {#DATASTORE}'
+              name: 'Multipath count for datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]'
               history: 7d
@@ -1396,7 +1396,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 8f1de4827ba446ef902ca5fa44109c6d
                   expression: 'last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}'
-                  name: 'VMware: The multipath count has been changed'
+                  name: 'The multipath count has been changed'
                   opdata: 'Current: {ITEM.LASTVALUE}, Registered: {#MULTIPATH.COUNT}'
                   priority: AVERAGE
                   description: 'The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).'
@@ -1405,7 +1405,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 259d1ff4bde143248f7ee2f7f880cb62
-              name: 'VMware: Average read latency of the datastore {#DATASTORE}'
+              name: 'Average read latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
               history: 7d
@@ -1418,7 +1418,7 @@ zabbix_export:
                 - tag: datastore
                   value: '{#DATASTORE}'
             - uuid: f36245398cc4460a9cb4ec741612693b
-              name: 'VMware: Free space on datastore {#DATASTORE} (percentage)'
+              name: 'Free space on datastore {#DATASTORE} (percentage)'
               type: SIMPLE
               key: 'vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]'
               delay: 5m
@@ -1434,7 +1434,7 @@ zabbix_export:
                 - tag: datastore
                   value: '{#DATASTORE}'
             - uuid: cc83e8f5ec08483db75482706bf01aba
-              name: 'VMware: Total size of datastore {#DATASTORE}'
+              name: 'Total size of datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]'
               delay: 5m
@@ -1449,7 +1449,7 @@ zabbix_export:
                 - tag: datastore
                   value: '{#DATASTORE}'
             - uuid: 9db980d8f5f44af5ad11a5949d80031d
-              name: 'VMware: Average write latency of the datastore {#DATASTORE}'
+              name: 'Average write latency of the datastore {#DATASTORE}'
               type: SIMPLE
               key: 'vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]'
               history: 7d
@@ -1469,7 +1469,7 @@ zabbix_export:
           description: 'VMware Rollup Health State sensor discovery.'
           item_prototypes:
             - uuid: fabb7524dd454daa942266e5565ce40e
-              name: 'VMware: Health state rollup'
+              name: 'Health state rollup'
               type: DEPENDENT
               key: 'vmware.hv.sensor.health.state[{#SINGLETON}]'
               delay: '0'
@@ -1489,11 +1489,11 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 9f2a65161946436986aacf6c9a637673
                   expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"'
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                  name: 'The {$VMWARE.HV.UUID} health is Red'
                   priority: HIGH
                   description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
                   dependencies:
-                    - name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                    - name: 'The {$VMWARE.HV.UUID} health is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
                   tags:
                     - tag: scope
@@ -1502,15 +1502,15 @@ zabbix_export:
                       value: performance
                 - uuid: dc4f84eb8d2143bb80999fbc58f38928
                   expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"'
-                  name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+                  name: 'The {$VMWARE.HV.UUID} health is Yellow'
                   priority: AVERAGE
                   description: 'One or more components in the appliance might become overloaded soon.'
                   dependencies:
-                    - name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                    - name: 'The {$VMWARE.HV.UUID} health is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"'
-                    - name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                    - name: 'The {$VMWARE.HV.UUID} health is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-                    - name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+                    - name: 'The {$VMWARE.HV.UUID} health is Yellow'
                       expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
                   tags:
                     - tag: scope
@@ -1553,7 +1553,7 @@ zabbix_export:
           description: 'VMware hardware sensor discovery. The data is retrieved from numeric sensor probes and provides information about the health of the physical system.'
           item_prototypes:
             - uuid: d9a7725ccb0647069b331c5e3e51aeaf
-              name: 'VMware: Sensor [{#NAME}] health state'
+              name: 'Sensor [{#NAME}] health state'
               type: DEPENDENT
               key: 'vmware.hv.sensor.state["{#NAME}"]'
               delay: '0'
@@ -1564,7 +1564,7 @@ zabbix_export:
                 - Green
                 - Yellow
                 - Red
-
+                
               valuemap:
                 name: 'Sensor health status'
               preprocessing:
@@ -1596,11 +1596,11 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: f591aa480fb94996be8225176bc9c95c
                   expression: 'last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=3'
-                  name: 'VMware: Sensor [{#NAME}] health state is Red'
+                  name: 'Sensor [{#NAME}] health state is Red'
                   priority: HIGH
                   description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon.'
                   dependencies:
-                    - name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                    - name: 'The {$VMWARE.HV.UUID} health is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
                   tags:
                     - tag: scope
@@ -1609,15 +1609,15 @@ zabbix_export:
                       value: performance
                 - uuid: c49e1b853f07417abb3812fd03da0bc3
                   expression: 'last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=2'
-                  name: 'VMware: Sensor [{#NAME}] health state is Yellow'
+                  name: 'Sensor [{#NAME}] health state is Yellow'
                   priority: AVERAGE
                   description: 'One or more components in the appliance might become overloaded soon.'
                   dependencies:
-                    - name: 'VMware: Sensor [{#NAME}] health state is Red'
+                    - name: 'Sensor [{#NAME}] health state is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=3'
-                    - name: 'VMware: The {$VMWARE.HV.UUID} health is Red'
+                    - name: 'The {$VMWARE.HV.UUID} health is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
-                    - name: 'VMware: The {$VMWARE.HV.UUID} health is Yellow'
+                    - name: 'The {$VMWARE.HV.UUID} health is Yellow'
                       expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
                   tags:
                     - tag: scope
