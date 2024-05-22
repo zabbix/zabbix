@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -37,10 +32,11 @@ function getLocales(): array {
 		'zh_CN' => ['name' => _('Chinese (zh_CN)'),	'display' => true],
 		'zh_TW' => ['name' => _('Chinese (zh_TW)'),	'display' => false],
 		'cs_CZ' => ['name' => _('Czech (cs_CZ)'),	'display' => true],
+		'da_DK' => ['name' => _('Danish (da_DK)'),	'display' => true],
 		'nl_NL' => ['name' => _('Dutch (nl_NL)'),	'display' => false],
 		'fi_FI' => ['name' => _('Finnish (fi_FI)'),	'display' => false],
 		'fr_FR' => ['name' => _('French (fr_FR)'),	'display' => true],
-		'ka_GE' => ['name' => _('Georgian (ka_GE)'),	'display' => false],
+		'ka_GE' => ['name' => _('Georgian (ka_GE)'),	'display' => true],
 		'de_DE' => ['name' => _('German (de_DE)'),	'display' => true],
 		'el_GR' => ['name' => _('Greek (el_GR)'),	'display' => false],
 		'he_IL' => ['name' => _('Hebrew (he_IL)'),	'display' => true],
@@ -59,7 +55,7 @@ function getLocales(): array {
 		'ro_RO' => ['name' => _('Romanian (ro_RO)'),	'display' => false],
 		'ru_RU' => ['name' => _('Russian (ru_RU)'),	'display' => true],
 		'sk_SK' => ['name' => _('Slovak (sk_SK)'),	'display' => true],
-		'es_ES' => ['name' => _('Spanish (es_ES)'),	'display' => false],
+		'es_ES' => ['name' => _('Spanish (es_ES)'),	'display' => true],
 		'sv_SE' => ['name' => _('Swedish (sv_SE)'),	'display' => false],
 		'tr_TR' => ['name' => _('Turkish (tr_TR)'),	'display' => true],
 		'uk_UA' => ['name' => _('Ukrainian (uk_UA)'),	'display' => true],
@@ -182,6 +178,7 @@ function zbx_locale_variants_win($language) {
 		'zh_cn' => ['Chinese (Simplified)_People\'s Republic of China.936', 'chinese'],
 		'zh_tw' => ['Chinese_Taiwan.950', 'chinese'],
 		'cs_cz' => ['Czech_Czech Republic.1250', 'czech'],
+		'da_dk' => ['Danish_Denmark.1252', 'danish'],
 		'nl_nl' => ['Dutch_Netherlands.1252', 'dutch'],
 		'fi_fi' => ['Finnish_Finland.1252', 'finnish'],
 		'fr_fr' => ['French_France.1252', 'french'],

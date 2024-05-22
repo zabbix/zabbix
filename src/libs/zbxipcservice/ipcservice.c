@@ -1,3 +1,17 @@
+/*
+** Copyright (C) 2001-2024 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
 #include "zbxcommon.h"
 
 #ifdef HAVE_IPCSERVICE
@@ -1533,7 +1547,8 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s", __func__, service->path);
 
-	close(service->fd);
+	if (0 != close(service->fd))
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot close path \"%s\": %s", service->path, zbx_strerror(errno));
 
 	for (int i = 0; i < service->clients.values_num; i++)
 		ipc_client_free(service->clients.values[i]);

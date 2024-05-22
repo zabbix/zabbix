@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -60,7 +55,8 @@ class CControllerProxyCreate extends CController {
 			'timeout_http_agent' =>		'db proxy.timeout_http_agent',
 			'timeout_ssh_agent' =>		'db proxy.timeout_ssh_agent',
 			'timeout_telnet_agent' =>	'db proxy.timeout_telnet_agent',
-			'timeout_script' =>			'db proxy.timeout_script'
+			'timeout_script' =>			'db proxy.timeout_script',
+			'timeout_browser' =>		'db proxy.timeout_browser'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -151,7 +147,8 @@ class CControllerProxyCreate extends CController {
 					'timeout_http_agent' =>		'required|not_empty',
 					'timeout_ssh_agent' =>		'required|not_empty',
 					'timeout_telnet_agent' =>	'required|not_empty',
-					'timeout_script' =>			'required|not_empty'
+					'timeout_script' =>			'required|not_empty',
+					'timeout_browser' =>		'required|not_empty'
 				];
 
 				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
@@ -244,7 +241,7 @@ class CControllerProxyCreate extends CController {
 		if ($custom_timeouts == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
 			$this->getInputs($proxy, ['custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
 				'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
-				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			]);
 		}
 

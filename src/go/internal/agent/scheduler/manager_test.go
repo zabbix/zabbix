@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package scheduler
@@ -27,13 +22,14 @@ import (
 	"testing"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/alias"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/alias"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/pkg/itemutil"
 )
 
 // getNextCheck calculates simplified nextcheck based on the specified delay string and current time
@@ -72,9 +68,14 @@ type mockExporterPlugin struct {
 	mockPlugin
 }
 
-func (p *mockExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *mockExporterPlugin) Export(
+	key string,
+	params []string,
+	ctx plugin.ContextProvider,
+) (any, error) {
 	p.call(key)
-	return
+
+	return nil, nil //nolint:nilnil
 }
 
 type mockCollectorPlugin struct {
@@ -98,9 +99,14 @@ type mockCollectorExporterPlugin struct {
 	period int
 }
 
-func (p *mockCollectorExporterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *mockCollectorExporterPlugin) Export(
+	key string,
+	params []string,
+	ctx plugin.ContextProvider,
+) (any, error) {
 	p.call(key)
-	return
+
+	return nil, nil //nolint:nilnil
 }
 
 func (p *mockCollectorExporterPlugin) Collect() (err error) {
@@ -130,9 +136,14 @@ type mockPassiveRunnerPlugin struct {
 	mockPlugin
 }
 
-func (p *mockPassiveRunnerPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	return
+func (p *mockPassiveRunnerPlugin) Export(
+	key string,
+	params []string,
+	ctx plugin.ContextProvider,
+) (any, error) {
+	return nil, nil //nolint:nilnil
 }
+
 func (p *mockPassiveRunnerPlugin) Start() {
 	p.call("$start")
 }
@@ -215,6 +226,7 @@ func (pc *resultCacheMock) SlotsAvailable() int {
 func (pc *resultCacheMock) PersistSlotsAvailable() int {
 	return 1
 }
+
 func (pc *resultCacheMock) WriteCommand(cr *resultcache.CommandResult) {
 }
 
@@ -245,7 +257,13 @@ func (m *mockManager) iterate(t *testing.T, iters int) {
 }
 
 func (m *mockManager) mockInit(t *testing.T) {
-	m.init()
+	mgr, err := NewManager(&agent.Options)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to create manager"))
+	}
+
+	m.Manager = *mgr
+
 	m.aliases, _ = alias.NewManager(nil)
 	clock := time.Now().Unix()
 	m.startTime = time.Unix(clock-clock%10, 100)
@@ -377,6 +395,8 @@ func (m *mockManager) mockTasks() {
 
 // checks if the times timestamps match the offsets within the specified range
 func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time, offsets []int, iters int) {
+	t.Helper()
+
 	start := m.now.Add(-time.Second * time.Duration(iters-1))
 	to := int(m.now.Sub(m.startTime) / time.Second)
 	from := to - iters + 1
@@ -435,7 +455,14 @@ func (m *mockManager) checkTimeline(t *testing.T, name string, times []time.Time
 }
 
 // checks plugin call timeline within the specified range
-func (m *mockManager) checkPluginTimeline(t *testing.T, plugins []plugin.Accessor, calls []map[string][]int, iters int) {
+func (m *mockManager) checkPluginTimeline(
+	t *testing.T,
+	plugins []plugin.Accessor,
+	calls []map[string][]int,
+	iters int,
+) {
+	t.Helper()
+
 	for i, p := range plugins {
 		tracker := p.(callTracker).called()
 		for key, offsets := range calls[i] {
@@ -666,15 +693,15 @@ func TestTaskCreate(t *testing.T) {
 	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "151", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "103", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "79", key: "debug3", timeout: 3},
-		&clientItem{itemid: 4, delay: "17", key: "debug1", timeout: 3},
-		&clientItem{itemid: 5, delay: "7", key: "debug2", timeout: 3},
-		&clientItem{itemid: 6, delay: "1", key: "debug3", timeout: 3},
-		&clientItem{itemid: 7, delay: "63", key: "debug1", timeout: 3},
-		&clientItem{itemid: 8, delay: "47", key: "debug2", timeout: 3},
-		&clientItem{itemid: 9, delay: "31", key: "debug3", timeout: 3},
+		{itemid: 1, delay: "151", key: "debug1"},
+		{itemid: 2, delay: "103", key: "debug2"},
+		{itemid: 3, delay: "79", key: "debug3"},
+		{itemid: 4, delay: "17", key: "debug1"},
+		{itemid: 5, delay: "7", key: "debug2"},
+		{itemid: 6, delay: "1", key: "debug3"},
+		{itemid: 7, delay: "63", key: "debug1"},
+		{itemid: 8, delay: "47", key: "debug2"},
+		{itemid: 9, delay: "31", key: "debug3"},
 	}
 
 	var cache resultCacheMock
@@ -721,15 +748,15 @@ func TestTaskUpdate(t *testing.T) {
 	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "151", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "103", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "79", key: "debug3", timeout: 3},
-		&clientItem{itemid: 4, delay: "17", key: "debug1", timeout: 3},
-		&clientItem{itemid: 5, delay: "7", key: "debug2", timeout: 3},
-		&clientItem{itemid: 6, delay: "1", key: "debug3", timeout: 3},
-		&clientItem{itemid: 7, delay: "63", key: "debug1", timeout: 3},
-		&clientItem{itemid: 8, delay: "47", key: "debug2", timeout: 3},
-		&clientItem{itemid: 9, delay: "31", key: "debug3", timeout: 3},
+		{itemid: 1, delay: "151", key: "debug1"},
+		{itemid: 2, delay: "103", key: "debug2"},
+		{itemid: 3, delay: "79", key: "debug3"},
+		{itemid: 4, delay: "17", key: "debug1"},
+		{itemid: 5, delay: "7", key: "debug2"},
+		{itemid: 6, delay: "1", key: "debug3"},
+		{itemid: 7, delay: "63", key: "debug1"},
+		{itemid: 8, delay: "47", key: "debug2"},
+		{itemid: 9, delay: "31", key: "debug3"},
 	}
 
 	var cache resultCacheMock
@@ -794,8 +821,8 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "151", key: "debug1"},
-		&clientItem{itemid: 2, delay: "103", key: "debug2"},
+		{itemid: 1, delay: "151", key: "debug1"},
+		{itemid: 2, delay: "103", key: "debug2"},
 	}
 
 	var cache resultCacheMock
@@ -853,15 +880,15 @@ func TestTaskDelete(t *testing.T) {
 	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "151", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "103", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "79", key: "debug3", timeout: 3}, // remove
-		&clientItem{itemid: 4, delay: "17", key: "debug1", timeout: 3},
-		&clientItem{itemid: 5, delay: "7", key: "debug2", timeout: 3},
-		&clientItem{itemid: 6, delay: "1", key: "debug3", timeout: 3}, // remove
-		&clientItem{itemid: 7, delay: "63", key: "debug1", timeout: 3},
-		&clientItem{itemid: 8, delay: "47", key: "debug2", timeout: 3}, // remove
-		&clientItem{itemid: 9, delay: "31", key: "debug3", timeout: 3}, // remove
+		{itemid: 1, delay: "151", key: "debug1"},
+		{itemid: 2, delay: "103", key: "debug2"},
+		{itemid: 3, delay: "79", key: "debug3"}, // remove
+		{itemid: 4, delay: "17", key: "debug1"},
+		{itemid: 5, delay: "7", key: "debug2"},
+		{itemid: 6, delay: "1", key: "debug3"}, // remove
+		{itemid: 7, delay: "63", key: "debug1"},
+		{itemid: 8, delay: "47", key: "debug2"}, // remove
+		{itemid: 9, delay: "31", key: "debug3"}, // remove
 	}
 
 	var cache resultCacheMock
@@ -924,15 +951,15 @@ func TestSchedule(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "1", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "2", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "5", key: "debug3", timeout: 3},
+		{itemid: 1, delay: "1", key: "debug1"},
+		{itemid: 2, delay: "2", key: "debug2"},
+		{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"debug1": []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
-		map[string][]int{"debug2": []int{2, 4, 6, 8, 10, 12, 14, 16, 18, 20}},
-		map[string][]int{"debug3": []int{5, 10, 15, 20}},
+		{"debug1": {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
+		{"debug2": {2, 4, 6, 8, 10, 12, 14, 16, 18, 20}},
+		{"debug3": {5, 10, 15, 20}},
 	}
 
 	var cache resultCacheMock
@@ -979,15 +1006,15 @@ func TestScheduleCapacity(t *testing.T) {
 	p.maxCapacity = 2
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "1", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "2", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "2", key: "debug2", timeout: 3},
-		&clientItem{itemid: 4, delay: "2", key: "debug2", timeout: 3},
+		{itemid: 1, delay: "1", key: "debug1"},
+		{itemid: 2, delay: "2", key: "debug2"},
+		{itemid: 3, delay: "2", key: "debug2"},
+		{itemid: 4, delay: "2", key: "debug2"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"debug1": []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
-		map[string][]int{"debug2": []int{2, 2, 3, 4, 4, 5, 6, 6, 7, 8, 8, 9, 10, 10}},
+		{"debug1": {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+		{"debug2": {2, 2, 3, 4, 4, 5, 6, 6, 7, 8, 8, 9, 10, 10}},
 	}
 
 	var cache resultCacheMock
@@ -1031,15 +1058,15 @@ func TestScheduleUpdate(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "1", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "1", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "1", key: "debug3", timeout: 3},
+		{itemid: 1, delay: "1", key: "debug1"},
+		{itemid: 2, delay: "1", key: "debug2"},
+		{itemid: 3, delay: "1", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"debug1": []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20}},
-		map[string][]int{"debug2": []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20}},
-		map[string][]int{"debug3": []int{1, 2, 3, 4, 5, 16, 17, 18, 19, 20}},
+		{"debug1": {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20}},
+		{"debug2": {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20}},
+		{"debug3": {1, 2, 3, 4, 5, 16, 17, 18, 19, 20}},
 	}
 
 	var cache resultCacheMock
@@ -1100,11 +1127,11 @@ func TestCollectorSchedule(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "1", key: "debug1", timeout: 3},
+		{itemid: 1, delay: "1", key: "debug1"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$collect": []int{2, 4, 6, 8, 10, 12, 14, 16, 18, 20}},
+		{"$collect": {2, 4, 6, 8, 10, 12, 14, 16, 18, 20}},
 	}
 
 	var cache resultCacheMock
@@ -1147,15 +1174,15 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "5", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "5", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "5", key: "debug3", timeout: 3},
+		{itemid: 1, delay: "5", key: "debug1"},
+		{itemid: 2, delay: "5", key: "debug2"},
+		{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$collect": []int{2, 4, 6, 8, 10, 12, 14}},
-		map[string][]int{"$collect": []int{2, 4, 6, 8, 10, 22, 24}},
-		map[string][]int{"$collect": []int{2, 4, 22, 24}},
+		{"$collect": {2, 4, 6, 8, 10, 12, 14}},
+		{"$collect": {2, 4, 6, 8, 10, 22, 24}},
+		{"$collect": {2, 4, 22, 24}},
 	}
 
 	var cache resultCacheMock
@@ -1222,15 +1249,15 @@ func TestRunner(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "5", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "5", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "5", key: "debug3", timeout: 3},
+		{itemid: 1, delay: "5", key: "debug1"},
+		{itemid: 2, delay: "5", key: "debug2"},
+		{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$start": []int{1, 5}, "$stop": []int{4, 6}},
-		map[string][]int{"$start": []int{1, 5, 7}, "$stop": []int{3, 6, 8}},
-		map[string][]int{"$start": []int{1, 5, 8}, "$stop": []int{2, 6}},
+		{"$start": {1, 5}, "$stop": {4, 6}},
+		{"$start": {1, 5, 7}, "$stop": {3, 6, 8}},
+		{"$start": {1, 5, 8}, "$stop": {2, 6}},
 	}
 
 	var cache resultCacheMock
@@ -1345,18 +1372,18 @@ func TestWatcher(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "5", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "5", key: "debug2[1]", timeout: 3},
-		&clientItem{itemid: 3, delay: "5", key: "debug2[2]", timeout: 3},
-		&clientItem{itemid: 4, delay: "5", key: "debug3[1]", timeout: 3},
-		&clientItem{itemid: 5, delay: "5", key: "debug3[2]", timeout: 3},
-		&clientItem{itemid: 6, delay: "5", key: "debug3[3]", timeout: 3},
+		{itemid: 1, delay: "5", key: "debug1"},
+		{itemid: 2, delay: "5", key: "debug2[1]"},
+		{itemid: 3, delay: "5", key: "debug2[2]"},
+		{itemid: 4, delay: "5", key: "debug3[1]"},
+		{itemid: 5, delay: "5", key: "debug3[2]"},
+		{itemid: 6, delay: "5", key: "debug3[3]"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$watch": []int{1, 2, 3, 4, 5}},
-		map[string][]int{"$watch": []int{1, 2, 3, 4, 5}},
-		map[string][]int{"$watch": []int{1, 2, 3, 5}},
+		{"$watch": {1, 2, 3, 4, 5}},
+		{"$watch": {1, 2, 3, 4, 5}},
+		{"$watch": {1, 2, 3, 5}},
 	}
 
 	var cache resultCacheMock
@@ -1434,19 +1461,23 @@ func TestCollectorExporterSchedule(t *testing.T) {
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
-		plugins[i] = &mockCollectorExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
+		plugins[i] = &mockCollectorExporterPlugin{
+			Base:       plugin.Base{},
+			mockPlugin: mockPlugin{now: &manager.now},
+			period:     2,
+		}
 		plugin.RegisterMetrics(plugins[i], "debug", "debug", "Debug.")
 	}
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "2", key: "debug[1]", timeout: 3},
-		&clientItem{itemid: 2, delay: "2", key: "debug[2]", timeout: 3},
-		&clientItem{itemid: 3, delay: "2", key: "debug[3]", timeout: 3},
+		{itemid: 1, delay: "2", key: "debug[1]"},
+		{itemid: 2, delay: "2", key: "debug[2]"},
+		{itemid: 3, delay: "2", key: "debug[3]"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"debug": []int{3, 3, 3, 5, 5, 5, 7, 7, 7, 9, 9, 9}, "$collect": []int{2, 4, 6, 8, 10}},
+		{"debug": {3, 3, 3, 5, 5, 5, 7, 7, 7, 9, 9, 9}, "$collect": {2, 4, 6, 8, 10}},
 	}
 
 	var cache resultCacheMock
@@ -1490,18 +1521,18 @@ func TestRunnerWatcher(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "5", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "5", key: "debug2[1]", timeout: 3},
-		&clientItem{itemid: 3, delay: "5", key: "debug2[2]", timeout: 3},
-		&clientItem{itemid: 4, delay: "5", key: "debug3[1]", timeout: 3},
-		&clientItem{itemid: 5, delay: "5", key: "debug3[2]", timeout: 3},
-		&clientItem{itemid: 6, delay: "5", key: "debug3[3]", timeout: 3},
+		{itemid: 1, delay: "5", key: "debug1"},
+		{itemid: 2, delay: "5", key: "debug2[1]"},
+		{itemid: 3, delay: "5", key: "debug2[2]"},
+		{itemid: 4, delay: "5", key: "debug3[1]"},
+		{itemid: 5, delay: "5", key: "debug3[2]"},
+		{itemid: 6, delay: "5", key: "debug3[3]"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$watch": []int{2, 6, 11, 16}, "$start": []int{1}, "$stop": []int{17}},
-		map[string][]int{"$watch": []int{2, 6, 11, 22, 26}, "$start": []int{1, 21}, "$stop": []int{12, 27}},
-		map[string][]int{"$watch": []int{2, 6, 27}, "$start": []int{1, 26}, "$stop": []int{7}},
+		{"$watch": {2, 6, 11, 16}, "$start": {1}, "$stop": {17}},
+		{"$watch": {2, 6, 11, 22, 26}, "$start": {1, 21}, "$stop": {12, 27}},
+		{"$watch": {2, 6, 27}, "$start": {1, 26}, "$stop": {7}},
 	}
 
 	var cache resultCacheMock
@@ -1580,17 +1611,21 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 	plugin.ClearRegistry()
 	plugins := make([]plugin.Accessor, 1)
 	for i := range plugins {
-		plugins[i] = &mockCollectorExporterPlugin{Base: plugin.Base{}, mockPlugin: mockPlugin{now: &manager.now}, period: 2}
+		plugins[i] = &mockCollectorExporterPlugin{
+			Base:       plugin.Base{},
+			mockPlugin: mockPlugin{now: &manager.now},
+			period:     2,
+		}
 		plugin.RegisterMetrics(plugins[i], "debug", "debug", "Debug.")
 	}
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "2", key: "debug[1]", timeout: 3},
+		{itemid: 1, delay: "2", key: "debug[1]"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"debug": []int{3, 3, 5, 5, 7, 9}, "$collect": []int{2, 4, 6, 8, 10}},
+		{"debug": {3, 3, 5, 5, 7, 9}, "$collect": {2, 4, 6, 8, 10}},
 	}
 
 	var cache resultCacheMock
@@ -1646,13 +1681,13 @@ func TestMultiRunnerWatcher(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "5", key: "debug[1]", timeout: 3},
-		&clientItem{itemid: 2, delay: "5", key: "debug[2]", timeout: 3},
-		&clientItem{itemid: 3, delay: "5", key: "debug[3]", timeout: 3},
+		{itemid: 1, delay: "5", key: "debug[1]"},
+		{itemid: 2, delay: "5", key: "debug[2]"},
+		{itemid: 3, delay: "5", key: "debug[3]"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$watch": []int{2, 3, 6, 7, 11, 17, 21}, "$start": []int{1, 16}, "$stop": []int{12}},
+		{"$watch": {2, 3, 6, 7, 11, 17, 21}, "$start": {1, 16}, "$stop": {12}},
 	}
 
 	var cache resultCacheMock
@@ -1725,15 +1760,15 @@ func TestPassiveRunner(t *testing.T) {
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "5", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "5", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "5", key: "debug3", timeout: 3},
+		{itemid: 1, delay: "5", key: "debug1"},
+		{itemid: 2, delay: "5", key: "debug2"},
+		{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$start": []int{1}, "$stop": []int{}},
-		map[string][]int{"$start": []int{1}, "$stop": []int{3600*51 + 1}},
-		map[string][]int{"$start": []int{1}, "$stop": []int{3600*26 + 1}},
+		{"$start": {1}, "$stop": {}},
+		{"$start": {1}, "$stop": {3600*51 + 1}},
+		{"$start": {1}, "$stop": {3600*26 + 1}},
 	}
 
 	var cache resultCacheMock
@@ -1812,21 +1847,22 @@ func TestConfigurator(t *testing.T) {
 		plugins[i] = &mockConfiguratorPlugin{
 			Base:       plugin.Base{},
 			mockPlugin: mockPlugin{now: &manager.now},
-			options:    agent.Options.Plugins[name]}
+			options:    agent.Options.Plugins[name],
+		}
 		plugin.RegisterMetrics(plugins[i], name, name, "Debug.")
 	}
 	manager.mockInit(t)
 
 	items := []*clientItem{
-		&clientItem{itemid: 1, delay: "5", key: "debug1", timeout: 3},
-		&clientItem{itemid: 2, delay: "5", key: "debug2", timeout: 3},
-		&clientItem{itemid: 3, delay: "5", key: "debug3", timeout: 3},
+		{itemid: 1, delay: "5", key: "debug1"},
+		{itemid: 2, delay: "5", key: "debug2"},
+		{itemid: 3, delay: "5", key: "debug3"},
 	}
 
 	calls := []map[string][]int{
-		map[string][]int{"$configure": []int{1}},
-		map[string][]int{"$configure": []int{6}},
-		map[string][]int{"$configure": []int{11}},
+		{"$configure": {1}},
+		{"$configure": {6}},
+		{"$configure": {11}},
 	}
 
 	var cache resultCacheMock
@@ -1868,44 +1904,52 @@ func TestConfigurator(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 }
 
-func Test_getCapacity(t *testing.T) {
+func Test_getPluginOptions(t *testing.T) {
 	type args struct {
-		optsRaw interface{}
+		optsRaw any
 	}
 	tests := []struct {
-		name string
-		args args
-		want int
+		name                  string
+		args                  args
+		wantCapacity          int
+		wantForceActiveChecks int
 	}{
 		{
 			"default",
 			args{
 				&conf.Node{
 					Name:  "Test",
-					Nodes: []interface{}{},
+					Nodes: []any{},
 				},
 			},
 			1000,
+			0,
 		},
 		{
-			"both_cap",
+			"system_cap_active_checks_and_unexpected_param",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "Capacity",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Value{Value: []byte("10")},
 							},
 						},
 						&conf.Node{
 							Name: "System",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Node{
 									Name: "Capacity",
-									Nodes: []interface{}{
+									Nodes: []any{
 										&conf.Value{Value: []byte("50")},
+									},
+								},
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("1")},
 									},
 								},
 							},
@@ -1914,36 +1958,38 @@ func Test_getCapacity(t *testing.T) {
 				},
 			},
 			50,
+			1,
 		},
 		{
-			"deprecated_cap",
+			"unexpected_param",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "Capacity",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Value{Value: []byte("10")},
 							},
 						},
 					},
 				},
 			},
-			10,
+			1000,
+			0,
 		},
 		{
 			"system_cap",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "System",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Node{
 									Name: "Capacity",
-									Nodes: []interface{}{
+									Nodes: []any{
 										&conf.Value{Value: []byte("50")},
 									},
 								},
@@ -1953,17 +1999,78 @@ func Test_getCapacity(t *testing.T) {
 				},
 			},
 			50,
+			0,
+		},
+		{
+			"active_checks",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []any{
+						&conf.Node{
+							Name: "System",
+							Nodes: []any{
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("1")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			1000,
+			1,
+		},
+		{
+			"no_active_checks",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []any{
+						&conf.Node{
+							Name: "System",
+							Nodes: []any{
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("0")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			1000,
+			0,
 		},
 		{
 			"nil",
 			args{nil},
 			1000,
+			0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := getPluginOptions(tt.args.optsRaw, "test"); got != tt.want {
-				t.Errorf("getCapacity() = %v, want %v", got, tt.want)
+			gotCapacity, gotForceActiveChecks := getPluginOptions(tt.args.optsRaw, "test")
+			if gotCapacity != tt.wantCapacity {
+				t.Errorf(
+					"getPluginOptions() got Plugins.<PluginName>.System.Capacity = %v, want %v",
+					gotCapacity,
+					tt.wantCapacity,
+				)
+			}
+
+			if gotForceActiveChecks != tt.wantForceActiveChecks {
+				t.Errorf(
+					"getPluginOptions() got ForceActiveChecksOnStart = %v, want %v",
+					gotForceActiveChecks,
+					tt.wantForceActiveChecks,
+				)
 			}
 		})
 	}

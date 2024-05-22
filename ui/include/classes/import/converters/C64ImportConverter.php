@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -75,7 +70,8 @@ class C64ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('dashboards', $template)) {
-				$template['dashboards'] = self::convertDashboards($template['dashboards']);
+				$items = array_key_exists('items', $template) ? $template['items'] : [];
+				$template['dashboards'] = self::convertDashboards($template['dashboards'], $items);
 			}
 		}
 		unset($template);
@@ -195,6 +191,8 @@ class C64ImportConverter extends CConverter {
 				}
 				unset($message_template);
 			}
+
+			$media_type = CArrayHelper::renameKeys($media_type, ['content_type' => 'message_format']);
 		}
 		unset($media_type);
 
@@ -337,7 +335,9 @@ class C64ImportConverter extends CConverter {
 	 *
 	 * @return array
 	 */
-	private static function convertDashboards(array $dashboards): array {
+	private static function convertDashboards(array $dashboards, array $items): array {
+		$items_index = array_flip(array_column($items, 'key'));
+
 		foreach ($dashboards as &$dashboard) {
 			if (!array_key_exists('pages', $dashboard)) {
 				continue;
@@ -351,24 +351,17 @@ class C64ImportConverter extends CConverter {
 				}
 
 				foreach ($dashboard_page['widgets'] as &$widget) {
-					if (in_array($widget['type'], ['graph', 'svggraph', 'graphprototype'])) {
-						$reference = self::createWidgetReference($reference_index++);
+					if (array_key_exists('x', $widget) && is_numeric($widget['x'])) {
+						$widget['x'] = (string) ((int) $widget['x'] * 3);
+					}
 
-						if (!array_key_exists('fields', $widget)) {
-							$widget['fields'] = [];
+					if (array_key_exists('width', $widget)) {
+						if (is_numeric($widget['width'])) {
+							$widget['width'] = (string) ((int) $widget['width'] * 3);
 						}
-
-						$widget['fields'][] = [
-							'type' => 'STRING',
-							'name' => 'reference',
-							'value' => $reference
-						];
-
-						usort($widget['fields'],
-							static function(array $widget_field_a, array $widget_field_b): int {
-								return strnatcasecmp($widget_field_a['name'], $widget_field_b['name']);
-							}
-						);
+					}
+					else {
+						$widget['width'] = '3';
 					}
 
 					if (array_key_exists('fields', $widget)) {
@@ -381,6 +374,103 @@ class C64ImportConverter extends CConverter {
 							);
 						}
 						unset($field);
+					}
+
+					if (in_array($widget['type'], ['graph', 'graphprototype'])) {
+						if (!array_key_exists('fields', $widget)) {
+							$widget['fields'] = [];
+						}
+
+						$widget['fields'][] = [
+							'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
+							'name' => 'reference',
+							'value' => self::createWidgetReference($reference_index++)
+						];
+					}
+
+					if ($widget['type'] === 'plaintext') {
+						$widget['type'] = 'itemhistory';
+
+						$old_fields = array_key_exists('fields', $widget) ? $widget['fields'] : [];
+						$old_fields_by_name = array_column($old_fields, 'name');
+
+						$new_fields = [
+							[
+								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+								'name' => 'show_timestamp',
+								'value' => '1'
+							],
+							[
+								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
+								'name' => 'reference',
+								'value' => self::createWidgetReference($reference_index++)
+							]
+						];
+
+						foreach ($old_fields as $field) {
+							switch ($field['name']) {
+								case 'itemids':
+									if (array_key_exists($field['value']['key'], $items_index)) {
+										$item = $items[$items_index[$field['value']['key']]];
+
+										$new_fields[] = [
+											'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
+											'name' => 'columns.'.$items_index[$field['value']['key']].'.name',
+											'value' => $item['name']
+										];
+
+										$new_fields[] = [
+											'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
+											'name' => 'columns.'.$items_index[$field['value']['key']].'.itemid',
+											'value' => $field['value']
+										];
+
+										$is_textual = array_key_exists('value_type', $item)
+											&& in_array(
+												$item['value_type'],
+												[CXmlConstantName::CHAR, CXmlConstantName::LOG, CXmlConstantName::TEXT]
+											);
+
+										$show_as_html = array_key_exists('show_as_html', $old_fields_by_name)
+											&& $old_fields_by_name['show_as_html'] === '1';
+
+										if ($is_textual) {
+											$new_fields[] = [
+												'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+												'name' => 'columns.'.$items_index[$field['value']['key']].'.monospace_font',
+												'value' => '1'
+											];
+
+											if ($show_as_html) {
+												$new_fields[] = [
+													'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+													'name' => 'columns.'.$items_index[$field['value']['key']].'.display',
+													'value' => '4'
+												];
+											}
+										}
+									}
+									break;
+
+								case 'style':
+									$new_fields[] = ['name' => 'layout'] + $field;
+									break;
+
+								default:
+									$new_fields[] = $field;
+							}
+						}
+
+						$widget['fields'] = $new_fields;
+					}
+
+					if (array_key_exists('fields', $widget)) {
+						// Fields must be sorted not to trigger diff view.
+						usort($widget['fields'],
+							static function (array $widget_field_a, array $widget_field_b): int {
+								return strnatcasecmp($widget_field_a['name'], $widget_field_b['name']);
+							}
+						);
 					}
 				}
 				unset($widget);

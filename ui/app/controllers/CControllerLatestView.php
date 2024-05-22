@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -153,6 +148,8 @@ class CControllerLatestView extends CControllerLatest {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
+		$mandatory_filter_set = self::isMandatoryFilterFieldSet($filter);
+		$subfilter_set = self::isSubfilterSet($filter);
 
 		$refresh_curl = new CUrl('zabbix.php');
 		$refresh_curl_params = ['action' => 'latest.view.refresh'] + $filter;
@@ -161,7 +158,16 @@ class CControllerLatestView extends CControllerLatest {
 		// data sort and pager
 		$sort_field = $this->getInput('sort', 'name');
 		$sort_order = $this->getInput('sortorder', ZBX_SORT_UP);
-		$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
+
+		$prepared_data = [
+			'hosts' => [],
+			'items' => [],
+			'items_rw' => []
+		];
+
+		if ($mandatory_filter_set || $subfilter_set) {
+			$prepared_data = $this->prepareData($filter, $sort_field, $sort_order);
+		}
 
 		// Prepare subfilter data.
 		$subfilters_fields = self::getSubfilterFields($filter);
@@ -206,6 +212,8 @@ class CControllerLatestView extends CControllerLatest {
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'refresh_data' => $refresh_data,
 			'filter_defaults' => $profile->filter_defaults,
+			'mandatory_filter_set' => $mandatory_filter_set,
+			'subfilter_set' => $subfilter_set,
 			'filter_view' => 'monitoring.latest.filter',
 			'filter_tabs' => $filter_tabs,
 			'tabfilter_options' => [

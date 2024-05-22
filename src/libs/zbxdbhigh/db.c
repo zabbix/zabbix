@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbhigh.h"
@@ -3151,7 +3146,6 @@ retry_oracle:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 					decode_and_escape_binary_value_for_sql(&(value->str));
-					/* Oracle converts base64 to binary when it formats prepared statement */
 #endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
@@ -3618,6 +3612,42 @@ int	zbx_db_check_instanceid(void)
 	else
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot read instance id from database");
+		ret = FAIL;
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_close();
+
+	return ret;
+}
+
+int	zbx_db_update_software_update_checkid(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = SUCCEED;
+
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+
+	result = zbx_db_select("select software_update_checkid from config");
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (SUCCEED == zbx_db_is_null(row[0]) || '\0' == *row[0])
+		{
+			char	*token;
+
+			token = zbx_create_token(0);
+			if (ZBX_DB_OK > zbx_db_execute("update config set software_update_checkid='%s'", token))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot update software_update_checkid in config table");
+				ret = FAIL;
+			}
+			zbx_free(token);
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot read config record from database");
 		ret = FAIL;
 	}
 	zbx_db_free_result(result);

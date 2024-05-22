@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package main
@@ -29,25 +24,25 @@ import (
 	"strings"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/agent/runtimecontrol"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/agent/serverconnector"
+	"golang.zabbix.com/agent2/internal/agent/serverlistener"
+	"golang.zabbix.com/agent2/internal/agent/statuslistener"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/pidfile"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	_ "golang.zabbix.com/agent2/plugins"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin/comms"
 	"golang.zabbix.com/sdk/zbxerr"
 	"golang.zabbix.com/sdk/zbxflag"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/agent/runtimecontrol"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/agent/serverconnector"
-	"zabbix.com/internal/agent/serverlistener"
-	"zabbix.com/internal/agent/statuslistener"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/pidfile"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxlib"
-	_ "zabbix.com/plugins"
 )
 
 const runtimeCommandSendingTimeout = time.Second
@@ -573,7 +568,7 @@ func parseArgs() (string, *Arguments, error) {
 
 func usageMessage() string {
 	return fmt.Sprintf(
-		usageMessageFormat,
+		usageMessageFormat+osDependentUsageMessageFormat,
 		filepath.Base(os.Args[0]),
 	)
 }

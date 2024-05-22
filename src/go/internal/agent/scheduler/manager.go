@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package scheduler
@@ -29,18 +24,19 @@ import (
 	"strings"
 	"time"
 
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/alias"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/plugins/external"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/alias"
-	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/plugins/external"
 )
 
 const (
@@ -123,6 +119,11 @@ type Scheduler interface {
 	) (result *string, err error)
 	Query(command string) (status string)
 	QueryUserParams() (status string)
+}
+
+type systemOptions struct {
+	ForceActiveChecksOnStart *int `conf:"optional"`
+	Capacity                 int  `conf:"optional"`
 }
 
 // cleanupClient performs deactivation of plugins the client is not using anymore.
@@ -671,14 +672,6 @@ run:
 	monitor.Unregister(monitor.Scheduler)
 }
 
-type pluginOptions struct {
-	Capacity int `conf:"optional"`
-	System   struct {
-		ForceActiveChecksOnStart *int `conf:"optional"`
-		Capacity                 int  `conf:"optional"`
-	} `conf:"optional"`
-}
-
 func (m *Manager) init() {
 	m.input = make(chan interface{}, 10)
 	m.pluginQueue = make(pluginHeap, 0, len(plugin.Metrics))
@@ -893,13 +886,96 @@ func (m *Manager) configure(options *agent.AgentOptions) (err error) {
 	return
 }
 
-func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
-	var m Manager
-	m.init()
-	if err = m.validatePlugins(options); err != nil {
-		return
+// NewManager crates a new manager instance.
+func NewManager(options *agent.AgentOptions) (*Manager, error) {
+	m := &Manager{
+		input:           make(chan any, 10),
+		pluginQueue:     make(pluginHeap, 0, len(plugin.Metrics)),
+		clients:         make(map[uint64]*client),
+		plugins:         make(map[string]*pluginAgent),
+		shutdownSeconds: shutdownInactive,
 	}
-	return &m, m.configure(options)
+
+	metrics := make([]*plugin.Metric, 0, len(plugin.Metrics))
+
+	for _, metric := range plugin.Metrics {
+		metrics = append(metrics, metric)
+	}
+
+	sort.Slice(
+		metrics,
+		func(i, j int) bool {
+			return metrics[i].Plugin.Name() < metrics[j].Plugin.Name()
+		},
+	)
+
+	pagent := &pluginAgent{}
+	for _, metric := range metrics {
+		if metric.Plugin != pagent.impl { //nolint:nestif
+			capacity, forceActiveChecksOnStart := getPluginOptions(
+				agent.Options.Plugins[metric.Plugin.Name()],
+				metric.Plugin.Name(),
+			)
+			if capacity > metric.Plugin.Capacity() {
+				log.Warningf(
+					"lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
+					metric.Plugin.Name(),
+					metric.Plugin.Capacity(),
+					capacity,
+				)
+
+				capacity = metric.Plugin.Capacity()
+			}
+
+			pagent = &pluginAgent{
+				impl:                     metric.Plugin,
+				tasks:                    make(performerHeap, 0),
+				maxCapacity:              capacity,
+				usedCapacity:             0,
+				forceActiveChecksOnStart: forceActiveChecksOnStart,
+				index:                    -1,
+				refcount:                 0,
+				usrprm:                   metric.UsrPrm,
+			}
+
+			if metric.Plugin.IsExternal() {
+				ext, ok := metric.Plugin.(*external.Plugin)
+				if !ok {
+					return nil, errs.Errorf(
+						"unknown external plugin implementation for plugin - %q",
+						metric.Plugin.Name(),
+					)
+				}
+
+				log.Infof(
+					"using plugin '%s' (%s) providing following interfaces: %s",
+					metric.Plugin.Name(),
+					ext.Path,
+					getPluginInterfaceNames(metric.Plugin),
+				)
+			} else {
+				log.Infof(
+					"using plugin '%s' (built-in) providing following interfaces: %s",
+					metric.Plugin.Name(),
+					getPluginInterfaceNames(metric.Plugin),
+				)
+			}
+		}
+
+		m.plugins[metric.Key] = pagent
+	}
+
+	err := m.validatePlugins(options)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to validate plugins")
+	}
+
+	err = m.configure(options)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to configure manager")
+	}
+
+	return m, nil
 }
 
 func (m *Manager) addUserParamsPlugin(key string) {
@@ -934,74 +1010,67 @@ func peekTask(tasks performerHeap) performer {
 	return tasks[0]
 }
 
-func getPluginOptions(
-	optsRaw interface{},
-	name string,
-) (capacity, forceActiveChecksOnStart int) {
-	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(
-		optsRaw,
-		name,
-	)
-
-	if pluginSystemCap > 0 {
-		if pluginCap > 0 {
-			log.Warningf(
-				"both Plugins.%s.Capacity and Plugins.%s.System.Capacity "+
-					"configuration parameters are set, using System.Capacity: %d",
-				name,
-				name,
-				pluginSystemCap,
-			)
-		}
-		capacity = pluginSystemCap
-	} else if pluginCap > 0 {
-		log.Warningf(
-			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
-			name, name, name,
-		)
-		capacity = pluginCap
-	} else {
-		capacity = plugin.DefaultCapacity
+func getPluginOptions(optsRaw any, pluginName string) (int, int) {
+	var opt struct {
+		System systemOptions `conf:"optional"`
 	}
 
-	if nil != pluginForceActiveChecksOnStart {
-		if *pluginForceActiveChecksOnStart > 1 ||
-			*pluginForceActiveChecksOnStart < 0 {
-			log.Warningf(
-				"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
-				name,
-				*pluginForceActiveChecksOnStart,
-			)
-			forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
-		} else {
-			forceActiveChecksOnStart = *pluginForceActiveChecksOnStart
-		}
-	} else {
-		forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
-	}
-
-	return
-}
-
-func getPluginOpts(
-	optsRaw interface{},
-	name string,
-) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
-	var opt pluginOptions
+	capacity := plugin.DefaultCapacity
 
 	if optsRaw == nil {
-		return
+		return capacity, agent.Options.ForceActiveChecksOnStart
 	}
 
-	if err := conf.Unmarshal(optsRaw, &opt, false); err != nil {
-		log.Warningf("invalid plugin %s configuration: %s", name, err)
+	err := conf.Unmarshal(optsRaw, &opt, false)
+	if err != nil {
+		log.Warningf("invalid plugin %s configuration: %s", pluginName, err)
 
-		return
+		return capacity, agent.Options.ForceActiveChecksOnStart
 	}
 
-	pluginCap = opt.Capacity
-	pluginSystemCap = opt.System.Capacity
-	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
+	if opt.System.Capacity > 0 {
+		capacity = opt.System.Capacity
+	}
 
-	return
+	if opt.System.ForceActiveChecksOnStart == nil {
+		return capacity, agent.Options.ForceActiveChecksOnStart
+	}
+
+	if *opt.System.ForceActiveChecksOnStart > 1 || *opt.System.ForceActiveChecksOnStart < 0 {
+		log.Warningf(
+			"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
+			pluginName,
+			*opt.System.ForceActiveChecksOnStart,
+		)
+
+		return capacity, agent.Options.ForceActiveChecksOnStart
+	}
+
+	return capacity, *opt.System.ForceActiveChecksOnStart
+}
+
+func getPluginInterfaceNames(p plugin.Accessor) string {
+	interfaceNames := make([]string, 0, 5)
+
+	if _, ok := p.(plugin.Exporter); ok {
+		interfaceNames = append(interfaceNames, "exporter")
+	}
+
+	if _, ok := p.(plugin.Collector); ok {
+		interfaceNames = append(interfaceNames, "collector")
+	}
+
+	if _, ok := p.(plugin.Runner); ok {
+		interfaceNames = append(interfaceNames, "runner")
+	}
+
+	if _, ok := p.(plugin.Watcher); ok {
+		interfaceNames = append(interfaceNames, "watcher")
+	}
+
+	if _, ok := p.(plugin.Configurator); ok {
+		interfaceNames = append(interfaceNames, "configurator")
+	}
+
+	return strings.Join(interfaceNames, ", ")
 }
