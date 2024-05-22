@@ -665,6 +665,9 @@ static void	wd_perf_dump_entry(const char *name, zbx_wd_perf_entry_t *entry)
 	zbx_vector_wd_attr_ptr_t	attrs;
 	zbx_wd_attr_t			*attr;
 
+	if (NULL == entry)
+		return;
+
 	zbx_vector_wd_attr_ptr_create(&attrs);
 	zbx_hashset_iter_reset(&entry->attrs, &iter);
 	while (NULL != (attr = (zbx_wd_attr_t *)zbx_hashset_iter_next(&iter)))
