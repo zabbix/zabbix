@@ -90,6 +90,11 @@ msgstr "找到%1$d个可匹配%2$s"
 msgid "%1$d of %1$d+ hosts are shown"
 msgstr ""
 
+#: widgets/itemnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ items are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -1072,6 +1077,14 @@ msgstr "附加规则"
 msgid "Address"
 msgstr "地址"
 
+#: app/controllers/CControllerProxyCreate.php:72
+#: app/controllers/CControllerProxyCreate.php:80
+#: app/controllers/CControllerProxyUpdate.php:67
+#: app/controllers/CControllerProxyUpdate.php:75
+#: app/views/popup.proxy.edit.php:90
+msgid "Address for active agents"
+msgstr ""
+
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
 msgstr "管理员"
@@ -1441,6 +1454,14 @@ msgstr "当前表单中所做的任何更改都将丢失。"
 msgid "Any character string included"
 msgstr "包括任何字符串"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "应用错误."
@@ -1534,6 +1555,10 @@ msgstr "断言"
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "资产标签"
+
+#: app/partials/configuration.host.edit.html.php:331
+msgid "Assigned proxy"
+msgstr ""
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -2031,6 +2056,11 @@ msgstr "向上一层"
 msgid "Bring to front"
 msgstr "移到上一层"
 
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
+
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
 msgstr "保加利亚语 (bg_BG)"
@@ -2275,6 +2305,11 @@ msgstr "无法添加网络拓扑图"
 #: app/controllers/CControllerProxyCreate.php:235
 msgid "Cannot add proxy"
 msgstr "无法添加agent代理程序"
+
+#: app/controllers/CControllerProxyGroupCreate.php:42
+#: app/controllers/CControllerProxyGroupCreate.php:74
+msgid "Cannot add proxy group"
+msgstr ""
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2705,6 +2740,15 @@ msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "无法删除proxy"
 
+#: app/controllers/CControllerProxyGroupDelete.php:78
+msgid "Cannot delete proxy group"
+msgid_plural "Cannot delete proxy groups"
+msgstr[0] ""
+
+#: app/controllers/CControllerProxyGroupDelete.php:39
+msgid "Cannot delete proxy groups"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:362
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
@@ -2798,6 +2842,11 @@ msgstr "无法删除默认用户目录 %1$s"
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "无法删除用户组"
+
+#: include/classes/api/services/CUserGroup.php:1397
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -3922,6 +3971,11 @@ msgstr "无法更新proxy"
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "对于被自动发现的主机 \"%1$s\"无法更新其代理节点"
 
+#: app/controllers/CControllerProxyGroupUpdate.php:43
+#: app/controllers/CControllerProxyGroupUpdate.php:82
+msgid "Cannot update proxy group"
+msgstr ""
+
 #: include/classes/api/services/CRole.php:768
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
@@ -4654,6 +4708,10 @@ msgstr "配置网络拓扑图"
 msgid "Configuration of proxies"
 msgstr "配置Proxy"
 
+#: app/controllers/CControllerProxyGroupList.php:131
+msgid "Configuration of proxy groups"
+msgstr ""
+
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
 msgid "Configuration of regular expressions"
@@ -5256,6 +5314,10 @@ msgstr "创建新的"
 msgid "Create proxy"
 msgstr "创建Proxy"
 
+#: app/views/administration.proxygroup.list.php:168
+msgid "Create proxy group"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
 msgstr "创建报表"
@@ -5503,6 +5565,10 @@ msgstr "DUO 通用提示"
 #: include/classes/helpers/CSlaHelper.php:39 report4.php:90
 msgid "Daily"
 msgstr "每日"
+
+#: include/locales.inc.php:40
+msgid "Danish (da_DK)"
+msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -5919,6 +5985,11 @@ msgstr "默认主题"
 msgid "Default time zone"
 msgstr "默认时区"
 
+#: app/views/administration.proxygroup.list.php:55
+#: app/views/administration.proxygroup.list.php:111
+msgid "Degrading"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:160 app/views/popup.massupdate.item.php:276
 msgid "Delay"
 msgstr "延迟"
@@ -6237,6 +6308,15 @@ msgstr "删除所选的媒介类型?"
 #: app/views/js/administration.proxy.list.js.php:143
 msgid "Delete selected proxies?"
 msgstr "删除所选的proxy?"
+
+#: app/views/js/administration.proxygroup.list.js.php:88
+#: app/views/popup.proxygroup.edit.php:147
+msgid "Delete selected proxy group?"
+msgstr ""
+
+#: app/views/js/administration.proxygroup.list.js.php:87
+msgid "Delete selected proxy groups?"
+msgstr ""
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -6827,6 +6907,10 @@ msgstr "自动发现"
 msgid "Discovery actions"
 msgstr "发现动作"
 
+#: app/views/configuration.discovery.edit.php:52
+msgid "Discovery by"
+msgstr ""
+
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
 msgstr "由agent代理程序自动发现"
@@ -6977,6 +7061,10 @@ msgstr "显示OK触发器予"
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "显示图表"
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -8112,6 +8200,11 @@ msgstr "更新时间选择器失败。"
 msgid "Failed to update widget properties."
 msgstr "小组件属性更新失败。"
 
+#: app/views/administration.proxygroup.list.php:79
+#: app/views/popup.proxygroup.edit.php:51
+msgid "Failover period"
+msgstr ""
+
 #: include/items.inc.php:37
 msgid "Failure Audit"
 msgstr "审计失败"
@@ -8289,6 +8382,11 @@ msgstr "条件检索"
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
 msgstr "过滤器已删除"
+
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Filter is not set"
+msgstr ""
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -9056,6 +9154,10 @@ msgstr "高对比度亮色"
 msgid "Highlight whole row"
 msgstr "高亮整行"
 
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
 #: app/partials/configuration.filter.items.php:158
@@ -9199,6 +9301,11 @@ msgstr "主机 \"%1$s\" 没有设置主机组"
 #, c-format
 msgid "Host \"%1$s\" is monitored by proxy \"%2$s\"."
 msgstr "主机 \"%1$s\" 是由proxy  \"%2$s\" 监控的。"
+
+#: include/classes/api/services/CProxyGroup.php:456
+#, c-format
+msgid "Host \"%1$s\" is monitored by proxy group \"%2$s\"."
+msgstr ""
 
 #: include/actions.inc.php:57
 msgid "Host IP"
@@ -9427,6 +9534,10 @@ msgstr ""
 msgid "Host networks"
 msgstr "主机网络"
 
+#: widgets/hostnavigator/includes/WidgetForm.php:65
+msgid "Host patterns"
+msgstr ""
+
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
 msgstr "主机权限"
@@ -9504,6 +9615,14 @@ msgstr ""
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
 msgstr "主机子网掩码"
+
+#: widgets/itemnavigator/Widget.php:43
+msgid "Host tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
+msgid "Host tag value"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -11570,9 +11689,17 @@ msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "监控项已启用"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "监控项在“不支持”的状态"
+
+#: widgets/itemnavigator/includes/WidgetForm.php:107
+msgid "Item limit"
+msgstr ""
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11583,6 +11710,10 @@ msgstr "项目列表"
 msgid "Item name"
 msgstr ""
 
+#: widgets/itemnavigator/Widget.php:29
+msgid "Item navigator"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "项目未被选择"
@@ -11591,6 +11722,13 @@ msgstr "项目未被选择"
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
 msgstr "项目图案"
+
+#: widgets/honeycomb/includes/WidgetForm.php:90
+#: widgets/itemnavigator/includes/WidgetForm.php:78
+#: widgets/piechart/views/widget.edit.js.php:208
+#: widgets/svggraph/views/widget.edit.js.php:279
+msgid "Item patterns"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11632,6 +11770,14 @@ msgstr "ID为 \"%1$s\" 的项目原型不可用。"
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
 msgstr "监控项原型"
+
+#: widgets/itemnavigator/Widget.php:44
+msgid "Item tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
+msgid "Item tag value"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12050,6 +12196,10 @@ msgstr "上周图形"
 msgid "Latest data"
 msgstr "最新数据"
 
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
+
 #: jsLoader.php:376
 msgid "Latest values"
 msgstr "最新值"
@@ -12197,6 +12347,14 @@ msgstr "位于给定键的 Windows 注册表值或键的列表。返回 JSON。"
 #: include/classes/data/CItemData.php:2743
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
 msgstr "Zabbix proxy列表，包括名称、模式、加密、压缩、版本、上次看到、主机数、项目数、每秒所需值 (vps) 和兼容性（当前/过期/不支持）。返回 JSON。"
+
+#: include/classes/data/CItemData.php:2877
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2905
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -12981,6 +13139,10 @@ msgstr "媒介"
 msgid "Media types disabled by Administration."
 msgstr "媒介类型已被管理禁用。"
 
+#: app/views/popup.media.php:78
+msgid "Media types disabled in Alerts."
+msgstr ""
+
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
 msgid "Media types used by action \"%1$s\"."
@@ -13116,9 +13278,17 @@ msgstr "居中"
 msgid "Min"
 msgstr "最小"
 
+#: app/views/popup.proxygroup.edit.php:59
+msgid "Minimum number of proxies"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
 msgstr "最小密码长度"
+
+#: app/views/administration.proxygroup.list.php:81
+msgid "Minimum proxies"
+msgstr ""
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -13797,6 +13967,11 @@ msgstr "添加操作"
 msgid "New proxy"
 msgstr "添加proxy"
 
+#: app/views/popup.proxygroup.edit.php:127
+#: app/views/popup.proxygroup.edit.php:156
+msgid "New proxy group"
+msgstr ""
+
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "新的正则表达式"
@@ -13843,9 +14018,18 @@ msgstr "新建触发器原型"
 msgid "New triggers"
 msgstr "新触发器"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "新用户组映射"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -13923,6 +14107,12 @@ msgstr "无数据"
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
 msgstr "无数据收集"
+
+#: app/views/search.php:48 app/views/search.php:209 app/views/search.php:289
+#: app/views/search.php:394 include/classes/html/CTableInfo.php:72
+#: widgets/hostnavigator/Widget.php:40
+msgid "No data found"
+msgstr ""
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -14584,6 +14774,10 @@ msgstr "队列中在 Zabbix 服务器或proxy中延迟 \"from\" 到 \"to\" 秒�
 msgid "Number of monitored hosts"
 msgstr "已监控主机的数量"
 
+#: include/classes/data/CItemData.php:2891
+msgid "Number of online proxies. Returns integer."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1101
 msgid "Number of out-of-window collisions. Returns integer"
 msgstr "网络冲突数量。返回整型"
@@ -14764,6 +14958,12 @@ msgstr "十月"
 msgid "Off"
 msgstr "关"
 
+#: app/views/administration.proxygroup.list.php:56
+#: app/views/administration.proxygroup.list.php:99
+#: app/views/administration.proxy.list.php:166
+msgid "Offline"
+msgstr ""
+
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
 #: app/views/js/mediatype.test.edit.js.php:103
@@ -14818,6 +15018,16 @@ msgstr "壹"
 #: include/classes/helpers/CMaintenanceHelper.php:29
 msgid "One time only"
 msgstr "一次性"
+
+#: app/views/administration.proxygroup.list.php:54
+#: app/views/administration.proxygroup.list.php:107
+#: app/views/administration.proxy.list.php:170
+msgid "Online"
+msgstr ""
+
+#: app/views/administration.proxygroup.list.php:80
+msgid "Online proxies"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15601,6 +15811,10 @@ msgstr "百分比"
 msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "已消耗的主机物理内存百分比，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
+#: include/classes/data/CItemData.php:2898
+msgid "Percentage of online proxies. Returns float."
+msgstr ""
+
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr "虚拟机已就绪但无法安排在物理 CPU 上运行的时间百分比，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“instance”- CPU 实例"
@@ -15728,6 +15942,14 @@ msgstr "请扫描并填写您的身份验证器app中的验证码。"
 #: jsLoader.php:261
 msgid "Please select two elements"
 msgstr "请选择两个组件"
+
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
@@ -16222,6 +16444,55 @@ msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "proxy已删除"
 
+#: app/controllers/CControllerAuditLogList.php:239
+#: app/partials/configuration.host.edit.html.php:266
+#: app/views/configuration.host.list.php:153
+#: app/views/popup.massupdate.host.php:114 app/views/popup.proxy.edit.php:70
+#: app/views/popup.proxygroup.edit.php:112
+#: include/views/configuration.host.prototype.edit.php:303
+msgid "Proxy group"
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:369
+#, c-format
+msgid "Proxy group \"%1$s\" already exists."
+msgstr ""
+
+#: include/classes/import/importers/CHostImporter.php:348
+#, c-format
+msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:437
+#, c-format
+msgid "Proxy group \"%1$s\" is used by proxy \"%2$s\"."
+msgstr ""
+
+#: app/controllers/CControllerProxyGroupCreate.php:66
+msgid "Proxy group added"
+msgstr ""
+
+#: app/controllers/CControllerProxyGroupDelete.php:70
+msgid "Proxy group deleted"
+msgid_plural "Proxy groups deleted"
+msgstr[0] ""
+
+#: app/controllers/CControllerProxyGroupUpdate.php:74
+msgid "Proxy group updated"
+msgstr ""
+
+#: app/controllers/CControllerPopupGeneric.php:227
+#: app/views/administration.proxygroup.list.php:163
+#: app/views/configuration.host.list.php:177
+#: include/classes/helpers/CMenuHelper.php:378
+#: include/classes/helpers/CRoleHelper.php:512
+msgid "Proxy groups"
+msgstr ""
+
+#: app/partials/configuration.host.edit.html.php:334
+msgid "Proxy is not assigned yet."
+msgstr ""
+
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
 msgstr "系统代理程序模式"
@@ -16455,6 +16726,11 @@ msgstr "收件人"
 msgid "Recordset ID"
 msgstr "记录集 ID"
 
+#: app/views/administration.proxygroup.list.php:57
+#: app/views/administration.proxygroup.list.php:103
+msgid "Recovering"
+msgstr ""
+
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
 #: app/views/trigger.prototype.list.php:146
 #: include/classes/screens/CScreenProblem.php:1502
@@ -16494,6 +16770,10 @@ msgstr "引用属性"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
+msgstr ""
+
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
 msgstr ""
 
 #: app/views/administration.user.edit.php:309
@@ -16568,6 +16848,10 @@ msgstr "正则表达式"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "关联报表"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18324,6 +18608,10 @@ msgstr "显示聚合函数"
 msgid "Show arc"
 msgstr "显示圆弧"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18394,6 +18682,10 @@ msgstr "显示已选"
 msgid "Show sidebar"
 msgstr "显示侧边栏"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18425,11 +18717,19 @@ msgstr "显示技术错误"
 msgid "Show text as HTML"
 msgstr "查看HTML文字"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "显示时间线"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18465,6 +18765,10 @@ msgstr "已查看"
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the label to all MFA users in authenticator apps."
 msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
@@ -18525,6 +18829,14 @@ msgstr "简单触发器"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "单个"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -18632,6 +18944,10 @@ msgstr "软件应用程序E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "软件架构信息。返回字符串"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -18765,6 +19081,10 @@ msgstr "Zabbix服务器的启动时间，Unix时间截."
 #: include/views/configuration.host.discovery.list.php:161
 msgid "State"
 msgstr "状态"
+
+#: include/classes/data/CItemData.php:2912
+msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
+msgstr ""
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -19606,6 +19926,12 @@ msgstr "测试主题"
 msgid "Test user input"
 msgstr "测试用户输入"
 
+#: app/controllers/CControllerPopupItemTestGetValue.php:152
+#: app/controllers/CControllerPopupItemTestSend.php:256
+#: app/views/popup.itemtestedit.view.php:256
+msgid "Test with"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -19827,6 +20153,10 @@ msgstr "应启用此设置，因为历史表包含压缩块。"
 #: app/views/administration.housekeeping.edit.php:157
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "应启用此设置，因为趋势表包含压缩块。"
+
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -20802,6 +21132,10 @@ msgstr "仅未确认的"
 msgid "Unavailable"
 msgstr "不可用"
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "解锁"
@@ -21101,6 +21435,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "上"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21283,6 +21622,15 @@ msgstr "如果存在严重性则使用"
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
 msgstr "使用 iframe 沙盒"
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
+
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Use the filter to display results"
+msgstr ""
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -21510,6 +21858,10 @@ msgstr "用户姓氏属性"
 #: widgets/item/views/widget.edit.php:90
 msgid "User macros"
 msgstr "用户自定义宏"
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "User media"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -22269,6 +22621,13 @@ msgstr "保险库证书"
 #: include/classes/vaults/CVaultHashiCorp.php:85 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "保险库连接失败。"
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:640
+#: include/classes/setup/CSetupWizard.php:843
+#: include/classes/setup/CSetupWizard.php:863
+msgid "Vault prefix"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -23268,6 +23627,10 @@ msgstr "预设一个数组或一个字符串"
 msgid "an array or object is expected"
 msgstr "应为数组或对象"
 
+#: include/classes/api/services/CUser.php:990
+msgid "an email address is expected"
+msgstr ""
+
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
 msgid "an empty string is expected"
@@ -23665,6 +24028,15 @@ msgstr "无法更新已发现对象的只读参数“%1$s”"
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
 msgstr "无法更新继承对象的只读参数“%1$s”"
 
+#: include/classes/api/services/CUserGroup.php:501
+#: include/classes/api/services/CUser.php:451
+#: include/classes/api/services/CUser.php:614
+#: include/classes/api/services/CUser.php:794
+#: include/classes/api/services/CUser.php:1066
+#, c-format
+msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr "cbrt() - 立方根"
@@ -24032,6 +24404,13 @@ msgstr "具有相同 UUID 的主机组已存在"
 msgid "host pattern"
 msgstr "主机样式"
 
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:155
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:159
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
+#: widgets/svggraph/views/widget.edit.php:292
+msgid "host patterns"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr "具有相同 UUID 的主机原型已存在"
@@ -24269,6 +24648,15 @@ msgstr "主机“%2$s”上的监控项“%1$s”不受监控"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:329
 msgid "item pattern"
 msgstr "监控项模式"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:134
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:172
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:138
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:176
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
+msgid "item patterns"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -24787,6 +25175,11 @@ msgstr "输出"
 msgid "pattern"
 msgstr "模式表达式"
 
+#: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
+#: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
+msgid "patterns"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile() - 周期 T 内的百分位数 P"
@@ -24849,6 +25242,11 @@ msgstr "引用不存在的树状元素"
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
 msgstr "引用的对象不存在"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82

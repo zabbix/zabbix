@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -36,6 +31,16 @@ $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Proxy tab.
 
+$local_address = (new CTable())
+	->setHeader([_('Address'), _('Port')])
+	->addRow([
+		(new CTextBox('local_address', $data['form']['local_address'], false,
+			DB::getFieldLength('proxy', 'local_address')
+		))->setWidth(336),
+		(new CTextBox('local_port', $data['form']['local_port'], false, DB::getFieldLength('proxy', 'local_port')))
+			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			->setAriaRequired()
+	]);
 $interface = (new CTable())
 	->setHeader([_('Address'), _('Port')])
 	->addRow([
@@ -53,7 +58,36 @@ $proxy_tab = (new CFormGrid())
 			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('proxy', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
 		)
+	])
+	->addItem([
+		new CLabel(_('Proxy group'), 'proxy_groupid_ms'),
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'proxy_groupid',
+				'object_name' => 'proxy_groups',
+				'multiple' => false,
+				'data' => $data['ms_proxy_group'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxy_groups',
+						'srcfld1' => 'proxy_groupid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxy_groupid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Address for active agents')))
+			->addClass('js-local-address')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CDiv($local_address))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		))->addClass('js-local-address')
 	])
 	->addItem([
 		new CLabel(_('Proxy mode'), 'operating_mode'),
@@ -198,7 +232,9 @@ $timeouts_tab = (new CFormGrid())
 			$data['user']['can_edit_global_timeouts']
 				? (new CLink(_('Global timeouts'),
 					(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
-				))->setTarget('_blank')
+				))
+					->addClass(ZBX_STYLE_LINK)
+					->setTarget('_blank')
 				: null
 		])
 	])
@@ -295,6 +331,17 @@ $timeouts_tab = (new CFormGrid())
 		new CFormField(
 			(new CTextBox('timeout_script', $data['form']['timeout_script'], false,
 				DB::getFieldLength('proxy', 'timeout_script')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_disabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Browser'), 'timeout_browser'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_browser', $data['form']['timeout_browser'], false,
+				DB::getFieldLength('proxy', 'timeout_browser')
 			))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setReadonly($custom_timeouts_disabled)

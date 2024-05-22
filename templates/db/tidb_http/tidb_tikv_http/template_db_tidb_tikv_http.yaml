@@ -24,7 +24,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 449a7ba908884db3af4ec8ccc0d7ea43
-          name: 'TiKV: Scheduler: High priority commands total, rate'
+          name: 'Scheduler: High priority commands total, rate'
           type: DEPENDENT
           key: tikv.commands_pri.high.rate
           delay: '0'
@@ -44,7 +44,7 @@ zabbix_export:
             - tag: component
               value: scheduler
         - uuid: b5ce79ee79804e76bb7b91e17915159c
-          name: 'TiKV: Scheduler: Low priority commands total, rate'
+          name: 'Scheduler: Low priority commands total, rate'
           type: DEPENDENT
           key: tikv.commands_pri.low.rate
           delay: '0'
@@ -64,7 +64,7 @@ zabbix_export:
             - tag: component
               value: scheduler
         - uuid: df3fa02457ac47168fad251727b300ff
-          name: 'TiKV: Scheduler: Normal priority commands total, rate'
+          name: 'Scheduler: Normal priority commands total, rate'
           type: DEPENDENT
           key: tikv.commands_pri.normal.rate
           delay: '0'
@@ -84,7 +84,7 @@ zabbix_export:
             - tag: component
               value: scheduler
         - uuid: dbf8288b5cab4e8a95b5e7c4355676bd
-          name: 'TiKV: Coprocessor: Requests, rate'
+          name: 'Coprocessor: Requests, rate'
           type: DEPENDENT
           key: tikv.coprocessor_request.rate
           delay: '0'
@@ -105,7 +105,7 @@ zabbix_export:
             - tag: component
               value: coprocessor
         - uuid: a4166b4e9f454e0388ee813bcf9ed429
-          name: 'TiKV: Get coprocessor requests metrics'
+          name: 'Get coprocessor requests metrics'
           type: DEPENDENT
           key: tikv.coprocessor_requests.metrics
           delay: '0'
@@ -124,7 +124,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d6185382a1974b9194e68bea4f14eb75
-          name: 'TiKV: Coprocessor: Errors, rate'
+          name: 'Coprocessor: Errors, rate'
           type: DEPENDENT
           key: tikv.coprocessor_request_error.rate
           delay: '0'
@@ -148,14 +148,14 @@ zabbix_export:
           triggers:
             - uuid: 31eca27ff6ce4ed78ee428ed3b8d8806
               expression: 'min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPROCESSOR.ERRORS.MAX.WARN}'
-              name: 'TiKV: Too many coprocessor request error'
-              event_name: 'TiKV: Too many coprocessor request error (over {$TIKV.COPROCESSOR.ERRORS.MAX.WARN} in 5m)'
+              name: 'Too many coprocessor request error'
+              event_name: 'Too many coprocessor request error (over {$TIKV.COPROCESSOR.ERRORS.MAX.WARN} in 5m)'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 5567ebf02fb6441dbb6672e1bc77b3ab
-          name: 'TiKV: Coprocessor: Response size, rate'
+          name: 'Coprocessor: Response size, rate'
           type: DEPENDENT
           key: tikv.coprocessor_response_bytes.rate
           delay: '0'
@@ -176,7 +176,7 @@ zabbix_export:
             - tag: component
               value: coprocessor
         - uuid: 237f6ba2973e472d8c20de1d61b4695c
-          name: 'TiKV: Coprocessor: RocksDB ops, rate'
+          name: 'Coprocessor: RocksDB ops, rate'
           type: DEPENDENT
           key: tikv.coprocessor_rocksdb_perf.rate
           delay: '0'
@@ -198,7 +198,7 @@ zabbix_export:
             - tag: component
               value: coprocessor
         - uuid: bfcec759c0894cf89c5267fc6b3862d7
-          name: 'TiKV: Coprocessor: Scan keys, rate'
+          name: 'Coprocessor: Scan keys, rate'
           type: DEPENDENT
           key: tikv.coprocessor_scan_keys_sum.rate
           delay: '0'
@@ -220,7 +220,7 @@ zabbix_export:
             - tag: component
               value: coprocessor
         - uuid: a76665b7a9924f8cbd4a455bc248d790
-          name: 'TiKV: CPU util'
+          name: 'CPU util'
           type: DEPENDENT
           key: tikv.cpu.util
           delay: '0'
@@ -244,7 +244,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4558a5a11c304584bf24a7c3d2eace23
-          name: 'TiKV: Bytes read'
+          name: 'Bytes read'
           type: DEPENDENT
           key: tikv.engine_flow_bytes.read
           delay: '0'
@@ -262,7 +262,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 0d44c3c9a7f34905b0404ae39a3bc881
-          name: 'TiKV: Bytes write'
+          name: 'Bytes write'
           type: DEPENDENT
           key: tikv.engine_flow_bytes.write
           delay: '0'
@@ -280,7 +280,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: f79d5daea61842b18e39c7289657ddf5
-          name: 'TiKV: Store size'
+          name: 'Store size'
           type: DEPENDENT
           key: tikv.engine_size
           delay: '0'
@@ -298,7 +298,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 418bcc8c0bc440468efe833bef02929d
-          name: 'TiKV: Get instance metrics'
+          name: 'Get instance metrics'
           type: HTTP_AGENT
           key: tikv.get_metrics
           history: '0'
@@ -317,7 +317,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: fed3db7222fa41a8bf51d2ad860a22d4
-          name: 'TiKV: Total query, rate'
+          name: 'Total query, rate'
           type: DEPENDENT
           key: tikv.grpc_msg.rate
           delay: '0'
@@ -338,7 +338,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: bb14162b05c84458a66996c08deffb1e
-          name: 'TiKV: Get QPS metrics'
+          name: 'Get QPS metrics'
           type: DEPENDENT
           key: tikv.grpc_msgs.metrics
           delay: '0'
@@ -357,7 +357,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c68db41c184d44d98445cc66489ef39c
-          name: 'TiKV: Total query errors, rate'
+          name: 'Total query errors, rate'
           type: DEPENDENT
           key: tikv.grpc_msg_fail.rate
           delay: '0'
@@ -379,7 +379,7 @@ zabbix_export:
             - tag: component
               value: grpc
         - uuid: 3ef3b7bf8c2645e8a953e68fdf246274
-          name: 'TiKV: Get failure msg metrics'
+          name: 'Get failure msg metrics'
           type: DEPENDENT
           key: tikv.messages.failure.metrics
           delay: '0'
@@ -398,7 +398,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7afa5147a1e247a5b8914d8739d31f15
-          name: 'TiKV: Server: failure messages total, rate'
+          name: 'Server: failure messages total, rate'
           type: DEPENDENT
           key: tikv.messages.failure.rate
           delay: '0'
@@ -419,7 +419,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: e6137dd87faa496497b23cadaa37dca9
-          name: 'TiKV: Regions, count'
+          name: 'Regions, count'
           type: DEPENDENT
           key: tikv.region_count
           delay: '0'
@@ -435,7 +435,7 @@ zabbix_export:
             - tag: component
               value: regions
         - uuid: 2ab7643435794ec6b5a2c3eb1dd7e913
-          name: 'TiKV: Regions, leader'
+          name: 'Regions, leader'
           type: DEPENDENT
           key: tikv.region_leader
           delay: '0'
@@ -451,7 +451,7 @@ zabbix_export:
             - tag: component
               value: regions
         - uuid: 1c480fa23eaa42bcb367bb5afdcb65b9
-          name: 'TiKV: RSS memory usage'
+          name: 'RSS memory usage'
           type: DEPENDENT
           key: tikv.rss_bytes
           delay: '0'
@@ -469,7 +469,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: c99a6d9591674723a45de6a0ace68088
-          name: 'TiKV: Get scheduler metrics'
+          name: 'Get scheduler metrics'
           type: DEPENDENT
           key: tikv.scheduler.metrics
           delay: '0'
@@ -488,7 +488,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 62f856cf22804262aef64e9369049332
-          name: 'TiKV: Scheduler: Commands total, rate'
+          name: 'Scheduler: Commands total, rate'
           type: DEPENDENT
           key: tikv.scheduler_commands.rate
           delay: '0'
@@ -510,7 +510,7 @@ zabbix_export:
             - tag: component
               value: scheduler
         - uuid: 33a1b2f676134cf1b81771fbaf152f59
-          name: 'TiKV: Scheduler: Pending commands'
+          name: 'Scheduler: Pending commands'
           type: DEPENDENT
           key: tikv.scheduler_contex
           delay: '0'
@@ -528,14 +528,14 @@ zabbix_export:
           triggers:
             - uuid: 0f21c02b8e1c45d9bbe0c3313cea1a23
               expression: 'min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}'
-              name: 'TiKV: Too many pending commands'
-              event_name: 'TiKV: Too many pending commands (over {$TIKV.PENDING_COMMANDS.MAX.WARN} for 5m)'
+              name: 'Too many pending commands'
+              event_name: 'Too many pending commands (over {$TIKV.PENDING_COMMANDS.MAX.WARN} for 5m)'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: performance
         - uuid: 8f5c9d2b9eca4a489d764420ee06e4b6
-          name: 'TiKV: Scheduler: Busy, rate'
+          name: 'Scheduler: Busy, rate'
           type: DEPENDENT
           key: tikv.scheduler_too_busy.rate
           delay: '0'
@@ -556,7 +556,7 @@ zabbix_export:
             - tag: component
               value: scheduler
         - uuid: 0a2d0a119bcd406aadfc5c014186c5d3
-          name: 'TiKV: Snapshot: Applying'
+          name: 'Snapshot: Applying'
           type: DEPENDENT
           key: tikv.snapshot.applying
           delay: '0'
@@ -573,7 +573,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: 58559be859d64887a1b919e36aa1e336
-          name: 'TiKV: Snapshot: Receiving'
+          name: 'Snapshot: Receiving'
           type: DEPENDENT
           key: tikv.snapshot.receiving
           delay: '0'
@@ -589,7 +589,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: 0ae6a2024ed3488498e22bc542d27619
-          name: 'TiKV: Snapshot: Sending'
+          name: 'Snapshot: Sending'
           type: DEPENDENT
           key: tikv.snapshot.sending
           delay: '0'
@@ -605,7 +605,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: ce31318a420d40668e62a47fe19d3d40
-          name: 'TiKV: Storage: commands total, rate'
+          name: 'Storage: commands total, rate'
           type: DEPENDENT
           key: tikv.storage_command.rate
           delay: '0'
@@ -625,7 +625,7 @@ zabbix_export:
             - tag: component
               value: commands
         - uuid: fbfaa0d967c049c0a1bbcec5afea4bf2
-          name: 'TiKV: Available size'
+          name: 'Available size'
           type: DEPENDENT
           key: tikv.store_size.available
           delay: '0'
@@ -643,7 +643,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 1e0c1c071b604e77998797c2f9d41dfc
-          name: 'TiKV: Capacity size'
+          name: 'Capacity size'
           type: DEPENDENT
           key: tikv.store_size.capacity
           delay: '0'
@@ -661,7 +661,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: fd4b786239d9426d9a882af47a5abe01
-          name: 'TiKV: Get store size metrics'
+          name: 'Get store size metrics'
           type: DEPENDENT
           key: tikv.store_size.metrics
           delay: '0'
@@ -680,7 +680,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f2632dbd773140398a7d61608d85f392
-          name: 'TiKV: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: tikv.uptime
           delay: '0'
@@ -703,8 +703,8 @@ zabbix_export:
           triggers:
             - uuid: ca06602fa0b64a2ba0c51ed4835c52b2
               expression: 'last(/TiDB TiKV by HTTP/tikv.uptime)<10m'
-              name: 'TiKV: has been restarted'
-              event_name: 'TiKV: has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: 'has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -712,7 +712,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 8b7c2dc8c60e491db76cafd2d0e1234b
-          name: 'TiKV: Snapshot: Pending tasks'
+          name: 'Snapshot: Pending tasks'
           type: DEPENDENT
           key: tikv.worker_pending_task
           delay: '0'
@@ -730,8 +730,8 @@ zabbix_export:
           triggers:
             - uuid: f26874f910e34933983685ae43a90bee
               expression: 'min(/TiDB TiKV by HTTP/tikv.worker_pending_task,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}'
-              name: 'TiKV: Too many pending tasks'
-              event_name: 'TiKV: Too many pending tasks (over {$TIKV.PENDING_TASKS.MAX.WARN} for 5m)'
+              name: 'Too many pending tasks'
+              event_name: 'Too many pending tasks (over {$TIKV.PENDING_TASKS.MAX.WARN} for 5m)'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -745,7 +745,7 @@ zabbix_export:
           description: 'Discovery coprocessor metrics.'
           item_prototypes:
             - uuid: e5176f11fe694efba01c4a2b14f5929d
-              name: 'TiKV: Coprocessor: {#REQ_TYPE} metrics'
+              name: 'Coprocessor: {#REQ_TYPE} metrics'
               type: DEPENDENT
               key: 'tikv.coprocessor_request.metrics[{#REQ_TYPE}]'
               delay: '0'
@@ -766,7 +766,7 @@ zabbix_export:
                 - tag: request
                   value: '{#REQ_TYPE}'
             - uuid: ecbe08549fef42d5aad0369e861b4c20
-              name: 'TiKV: Coprocessor: {#REQ_TYPE} requests, rate'
+              name: 'Coprocessor: {#REQ_TYPE} requests, rate'
               type: DEPENDENT
               key: 'tikv.coprocessor_request.rate[{#REQ_TYPE}]'
               delay: '0'
@@ -789,7 +789,7 @@ zabbix_export:
                 - tag: request
                   value: '{#REQ_TYPE}'
             - uuid: 08060401409b4fff97430c595fec7b82
-              name: 'TiKV: Coprocessor: {#REQ_TYPE} errors, rate'
+              name: 'Coprocessor: {#REQ_TYPE} errors, rate'
               type: DEPENDENT
               key: 'tikv.coprocessor_request_error.rate[{#REQ_TYPE}]'
               delay: '0'
@@ -813,7 +813,7 @@ zabbix_export:
                 - tag: request
                   value: '{#REQ_TYPE}'
             - uuid: bff6ee970f7349edba6cac1cd0da70ed
-              name: 'TiKV: Coprocessor: {#REQ_TYPE} RocksDB ops, rate'
+              name: 'Coprocessor: {#REQ_TYPE} RocksDB ops, rate'
               type: DEPENDENT
               key: 'tikv.coprocessor_rocksdb_perf.rate[{#REQ_TYPE}]'
               delay: '0'
@@ -837,7 +837,7 @@ zabbix_export:
                 - tag: request
                   value: '{#REQ_TYPE}'
             - uuid: 8ef93de8a25b4f35b2e54f6ced4a5bd2
-              name: 'TiKV: Coprocessor: {#REQ_TYPE} scan keys, rate'
+              name: 'Coprocessor: {#REQ_TYPE} scan keys, rate'
               type: DEPENDENT
               key: 'tikv.coprocessor_scan_keys.rate[{#REQ_TYPE}]'
               delay: '0'
@@ -882,7 +882,7 @@ zabbix_export:
           description: 'Discovery QPS metrics.'
           item_prototypes:
             - uuid: 3b1d1b10cee6465c822152072189ebbe
-              name: 'TiKV: Query: {#TYPE}, rate'
+              name: 'Query: {#TYPE}, rate'
               type: DEPENDENT
               key: 'tikv.grpc_msg.rate[{#TYPE}]'
               delay: '0'
@@ -925,7 +925,7 @@ zabbix_export:
           description: 'Discovery scheduler metrics.'
           item_prototypes:
             - uuid: c4f902a0be5444b2babb1775b89a6827
-              name: 'TiKV: Scheduler: commands {#STAGE}, rate'
+              name: 'Scheduler: commands {#STAGE}, rate'
               type: DEPENDENT
               key: 'tikv.scheduler_stage.rate[{#STAGE}]'
               delay: '0'
@@ -977,7 +977,7 @@ zabbix_export:
           description: 'Discovery server errors metrics.'
           item_prototypes:
             - uuid: 064e74b5484e42e4acf3122c8ead4826
-              name: 'TiKV: Store_id {#STORE_ID}: failure messages "{#TYPE}", rate'
+              name: 'Store_id {#STORE_ID}: failure messages "{#TYPE}", rate'
               type: DEPENDENT
               key: 'tikv.messages.failure.rate[{#STORE_ID},{#TYPE}]'
               delay: '0'
@@ -1003,8 +1003,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 1f65b64824d64852aaa609df5f3e27fd
                   expression: 'min(/TiDB TiKV by HTTP/tikv.messages.failure.rate[{#STORE_ID},{#TYPE}],5m)>{$TIKV.STORE.ERRORS.MAX.WARN}'
-                  name: 'TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}"'
-                  event_name: 'TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" (over {$TIKV.STORE.ERRORS.MAX.WARN} in 5m)'
+                  name: 'Store_id {#STORE_ID}: Too many failure messages "{#TYPE}"'
+                  event_name: 'Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" (over {$TIKV.STORE.ERRORS.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'Indicates that the remote TiKV cannot be connected.'
@@ -1076,7 +1076,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: Uptime
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1091,7 +1091,7 @@ zabbix_export:
                       value: '4'
                 - type: graph
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1103,9 +1103,9 @@ zabbix_export:
                       name: reference
                       value: AAAAA
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

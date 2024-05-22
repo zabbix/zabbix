@@ -24,7 +24,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 5ddd6354810347e4b4995a65d8429daf
-          name: 'PD: Get cluster metrics'
+          name: 'Get cluster metrics'
           type: DEPENDENT
           key: pd.cluster_status.get_metrics
           delay: '0'
@@ -43,7 +43,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3a1fd879a08a445cbf438f3d68078111
-          name: 'PD: Get instance metrics'
+          name: 'Get instance metrics'
           type: HTTP_AGENT
           key: pd.get_metrics
           history: '0'
@@ -62,7 +62,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7eb740eed4eb43a0a449e1c1436e582b
-          name: 'PD: Get instance status'
+          name: 'Get instance status'
           type: HTTP_AGENT
           key: pd.get_status
           history: '0'
@@ -82,7 +82,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 101266930d0747748bf3cbd9259e2818
-          name: 'PD: gRPC Commands total, rate'
+          name: 'gRPC Commands total, rate'
           type: DEPENDENT
           key: pd.grpc_command.rate
           delay: '0'
@@ -103,7 +103,7 @@ zabbix_export:
             - tag: component
               value: grpc
         - uuid: d6b8c44bcea14a08b7f5ed85bd596542
-          name: 'PD: Get gRPC command metrics'
+          name: 'Get gRPC command metrics'
           type: DEPENDENT
           key: pd.grpc_commands.get_metrics
           delay: '0'
@@ -122,7 +122,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7d7581a14a4e4de197a000337d7b8c41
-          name: 'PD: Get region metrics'
+          name: 'Get region metrics'
           type: DEPENDENT
           key: pd.regions.get_metrics
           delay: '0'
@@ -141,7 +141,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 6e6cc3d28b884372a2380b4732af438f
-          name: 'PD: Get region label metrics'
+          name: 'Get region label metrics'
           type: DEPENDENT
           key: pd.region_labels.get_metrics
           delay: '0'
@@ -160,7 +160,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 6d97b65149ef4880ae547fb3e82a68c0
-          name: 'PD: Get region status metrics'
+          name: 'Get region status metrics'
           type: DEPENDENT
           key: pd.region_status.get_metrics
           delay: '0'
@@ -179,7 +179,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 78c65105fd4a4f24b67176331ee685b5
-          name: 'PD: Get scheduler metrics'
+          name: 'Get scheduler metrics'
           type: DEPENDENT
           key: pd.scheduler.get_metrics
           delay: '0'
@@ -198,7 +198,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c18f702f68bf4fed94a598daffdada8a
-          name: 'PD: Status'
+          name: Status
           type: DEPENDENT
           key: pd.status
           delay: '0'
@@ -225,13 +225,13 @@ zabbix_export:
           triggers:
             - uuid: ab1d0d23dad844099e42debb71512887
               expression: 'last(/TiDB PD by HTTP/pd.status)=0'
-              name: 'PD: Instance is not responding'
+              name: 'Instance is not responding'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: availability
         - uuid: 0b71c8a5104b46ebbeabe0d708b6676e
-          name: 'PD: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: pd.uptime
           delay: '0'
@@ -254,8 +254,8 @@ zabbix_export:
           triggers:
             - uuid: 9f47a19f6f424df598e74c5a653ebf27
               expression: 'last(/TiDB PD by HTTP/pd.uptime)<10m'
-              name: 'PD: has been restarted'
-              event_name: 'PD: has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: 'has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -263,7 +263,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: c7e8e9bf01d04e5db25bd8eaafff3b80
-          name: 'PD: Version'
+          name: Version
           type: DEPENDENT
           key: pd.version
           delay: '0'
@@ -286,8 +286,8 @@ zabbix_export:
           triggers:
             - uuid: 6fb6045405af4c89b09750f57ada472a
               expression: 'last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0'
-              name: 'PD: Version has changed'
-              event_name: 'PD: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'PD version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -303,7 +303,7 @@ zabbix_export:
           description: 'Discovery cluster specific metrics.'
           item_prototypes:
             - uuid: fe49e1de54214fb0ac882feb42fdee3b
-              name: 'TiDB cluster: Number of regions'
+              name: 'Number of regions'
               type: DEPENDENT
               key: 'pd.cluster_status.leader_count[{#SINGLETON}]'
               delay: '0'
@@ -321,7 +321,7 @@ zabbix_export:
                 - tag: component
                   value: regions
             - uuid: 0950ba514e05447c8cfe726ec2d76944
-              name: 'TiDB cluster: Current peer count'
+              name: 'Current peer count'
               type: DEPENDENT
               key: 'pd.cluster_status.region_count[{#SINGLETON}]'
               delay: '0'
@@ -339,7 +339,7 @@ zabbix_export:
                 - tag: component
                   value: peers
             - uuid: d39f58372e3f464c87b2ec42acdf2061
-              name: 'TiDB cluster: Storage capacity'
+              name: 'Storage capacity'
               type: DEPENDENT
               key: 'pd.cluster_status.storage_capacity[{#SINGLETON}]'
               delay: '0'
@@ -362,7 +362,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: c72e6a2f89d041c4bf764021b9bc182c
-              name: 'TiDB cluster: Storage size'
+              name: 'Storage size'
               type: DEPENDENT
               key: 'pd.cluster_status.storage_size[{#SINGLETON}]'
               delay: '0'
@@ -382,7 +382,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 517cea991add45319d30047ac96fd9e4
-              name: 'TiDB cluster: Disconnect stores'
+              name: 'Disconnect stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_disconnected[{#SINGLETON}]'
               delay: '0'
@@ -405,14 +405,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 077d39f8ea194081a9d0c5dfdec4d1b5
                   expression: 'last(/TiDB PD by HTTP/pd.cluster_status.store_disconnected[{#SINGLETON}])>0'
-                  name: 'TiDB cluster: There are disconnected TiKV nodes'
+                  name: 'There are disconnected TiKV nodes'
                   priority: WARNING
                   description: 'PD does not receive a TiKV heartbeat within 20 seconds. Normally a TiKV heartbeat comes in every 10 seconds.'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 7125a7c858264f339e879c1389c6c027
-              name: 'TiDB cluster: Down stores'
+              name: 'Down stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_down[{#SINGLETON}]'
               delay: '0'
@@ -435,14 +435,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 526b935d3fa04825b7544eb6efd50ab5
                   expression: 'last(/TiDB PD by HTTP/pd.cluster_status.store_down[{#SINGLETON}])>0'
-                  name: 'TiDB cluster: There are offline TiKV nodes'
+                  name: 'There are offline TiKV nodes'
                   priority: AVERAGE
                   description: 'PD has not received a TiKV heartbeat for a long time.'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: c3bd9d1e0f6c427ab5232e57769030d1
-              name: 'TiDB cluster: Lowspace stores'
+              name: 'Lowspace stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_low_space[{#SINGLETON}]'
               delay: '0'
@@ -465,14 +465,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 87ef0f211afd4d58adec05007ef1d263
                   expression: 'last(/TiDB PD by HTTP/pd.cluster_status.store_low_space[{#SINGLETON}])>0'
-                  name: 'TiDB cluster: There are low space TiKV nodes'
+                  name: 'There are low space TiKV nodes'
                   priority: AVERAGE
                   description: 'Indicates that there is no sufficient space on the TiKV node.'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: 3c24fb49463b45f199dbc3955e87d01b
-              name: 'TiDB cluster: Offline stores'
+              name: 'Offline stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_offline[{#SINGLETON}]'
               delay: '0'
@@ -492,7 +492,7 @@ zabbix_export:
                 - tag: component
                   value: stores
             - uuid: 476a1b6e3c9b4b41ae1637f0e12801c9
-              name: 'TiDB cluster: Tombstone stores'
+              name: 'Tombstone stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_tombstone[{#SINGLETON}]'
               delay: '0'
@@ -513,7 +513,7 @@ zabbix_export:
                 - tag: component
                   value: stores
             - uuid: 89db2b996fbe41bdb6b82ccf75139090
-              name: 'TiDB cluster: Unhealth stores'
+              name: 'Unhealth stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_unhealth[{#SINGLETON}]'
               delay: '0'
@@ -534,7 +534,7 @@ zabbix_export:
                 - tag: component
                   value: stores
             - uuid: ff80108e2a5e45779a428a6fd31ea089
-              name: 'TiDB cluster: Normal stores'
+              name: 'Normal stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_up[{#SINGLETON}]'
               delay: '0'
@@ -557,8 +557,8 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 843d566b33bc401390c2a633d08bb033
               expression: 'min(/TiDB PD by HTTP/pd.cluster_status.storage_size[{#SINGLETON}],5m)/last(/TiDB PD by HTTP/pd.cluster_status.storage_capacity[{#SINGLETON}])*100>{$PD.STORAGE_USAGE.MAX.WARN}'
-              name: 'TiDB cluster: Current storage usage is too high'
-              event_name: 'TiDB cluster: Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
+              name: 'Current storage usage is too high'
+              event_name: 'Current storage usage is too high (over {$PD.STORAGE_USAGE.MAX.WARN}% for 5m)'
               priority: WARNING
               description: 'Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.'
               tags:
@@ -631,7 +631,7 @@ zabbix_export:
           description: 'Discovery grpc commands specific metrics.'
           item_prototypes:
             - uuid: 7b96abc0e68a405ea5693f4f445936fe
-              name: 'PD: gRPC Commands: {#GRPC_METHOD}, rate'
+              name: 'gRPC Commands: {#GRPC_METHOD}, rate'
               type: DEPENDENT
               key: 'pd.grpc_command.rate[{#GRPC_METHOD}]'
               delay: '0'
@@ -681,7 +681,7 @@ zabbix_export:
           description: 'Discovery region specific metrics.'
           item_prototypes:
             - uuid: 024bf1d31bbd40a49d683d962887c6e0
-              name: 'PD: Region heartbeat: error, rate'
+              name: 'Region heartbeat: error, rate'
               type: DEPENDENT
               key: 'pd.region_heartbeat.error.rate[{#STORE_ADDRESS}]'
               delay: '0'
@@ -705,7 +705,7 @@ zabbix_export:
                 - tag: component
                   value: regions
             - uuid: 963c4d34d2664e6aba984f746b80b5c4
-              name: 'PD: Get metrics: {#STORE_ADDRESS}'
+              name: 'Get metrics: {#STORE_ADDRESS}'
               type: DEPENDENT
               key: 'pd.region_heartbeat.get_metrics[{#STORE_ADDRESS}]'
               delay: '0'
@@ -726,7 +726,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 1d1d686f5c544a89a691a9b75e5c3b11
-              name: 'PD: Region heartbeat: active, rate'
+              name: 'Region heartbeat: active, rate'
               type: DEPENDENT
               key: 'pd.region_heartbeat.ok.rate[{#STORE_ADDRESS}]'
               delay: '0'
@@ -750,7 +750,7 @@ zabbix_export:
                 - tag: component
                   value: regions
             - uuid: c44f934ce8a144afa95252041535ef44
-              name: 'PD: Region schedule push: total, rate'
+              name: 'Region schedule push: total, rate'
               type: DEPENDENT
               key: 'pd.region_heartbeat.push.err.rate[{#STORE_ADDRESS}]'
               delay: '0'
@@ -773,7 +773,7 @@ zabbix_export:
                 - tag: component
                   value: regions
             - uuid: ea76344669de4251a0e7bef35d70494a
-              name: 'PD: Region heartbeat: total, rate'
+              name: 'Region heartbeat: total, rate'
               type: DEPENDENT
               key: 'pd.region_heartbeat.rate[{#STORE_ADDRESS}]'
               delay: '0'
@@ -825,7 +825,7 @@ zabbix_export:
           description: 'Discovery region labels specific metrics.'
           item_prototypes:
             - uuid: 117efc3f2fe64c51a18cd3be162185ea
-              name: 'TiDB cluster: Regions label: {#TYPE}'
+              name: 'Regions label: {#TYPE}'
               type: DEPENDENT
               key: 'pd.region_labels[{#TYPE}]'
               delay: '0'
@@ -866,7 +866,7 @@ zabbix_export:
           description: 'Discovery region status specific metrics.'
           item_prototypes:
             - uuid: 45ef4940b0454492b70116d8958c9b11
-              name: 'TiDB cluster: Regions status: {#TYPE}'
+              name: 'Regions status: {#TYPE}'
               type: DEPENDENT
               key: 'pd.region_status[{#TYPE}]'
               delay: '0'
@@ -887,7 +887,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 2bc6b48bbfd8436e80903ea947571501
                   expression: 'min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>0'
-                  name: 'TiDB cluster: There are unresponsive peers'
+                  name: 'There are unresponsive peers'
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Regions with an unresponsive peer reported by the Raft leader.'
@@ -896,8 +896,8 @@ zabbix_export:
                       value: availability
                 - uuid: 1f80bd81d11345f59699617113a0cad5
                   expression: 'min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}'
-                  name: 'TiDB cluster: Too many missed regions'
-                  event_name: 'TiDB cluster: Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
+                  name: 'Too many missed regions'
+                  event_name: 'Too many missed regions (over {$PD.MISS_REGION.MAX.WARN} in 5m)'
                   discover: NO_DISCOVER
                   priority: WARNING
                   description: 'The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.'
@@ -954,7 +954,7 @@ zabbix_export:
           description: 'Discovery scheduler specific metrics.'
           item_prototypes:
             - uuid: c6748a20540f49b293795bc72480dda7
-              name: 'TiDB cluster: Scheduler status: {#KIND}'
+              name: 'Scheduler status: {#KIND}'
               type: DEPENDENT
               key: 'pd.scheduler[{#KIND}]'
               delay: '0'
@@ -1017,7 +1017,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: Status
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1032,7 +1032,7 @@ zabbix_export:
                       value: '4'
                 - type: graphprototype
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1048,8 +1048,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: Uptime
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1064,8 +1064,8 @@ zabbix_export:
                       value: '4'
                 - type: item
                   name: Version
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -1076,9 +1076,9 @@ zabbix_export:
                       name: show.0
                       value: '2'
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

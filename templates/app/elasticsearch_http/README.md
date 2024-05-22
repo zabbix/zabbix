@@ -6,8 +6,7 @@
 The template to monitor Elasticsearch by Zabbix that work without any external scripts.
 It works with both standalone and cluster instances.
 The metrics are collected in one pass remotely using an HTTP agent.
-They are getting values from REST API _cluster/health, _cluster/stats, _nodes/stats requests.
-
+They are getting values from REST API `_cluster/health`, `_cluster/stats`, `_nodes/stats` requests.
 
 ## Requirements
 
@@ -24,8 +23,11 @@ This template has been tested on:
 
 ## Setup
 
-You can set {$ELASTICSEARCH.USERNAME} and {$ELASTICSEARCH.PASSWORD} macros in the template for using on the host level.
-If you use an atypical location ES API, don't forget to change the macros {$ELASTICSEARCH.SCHEME},{$ELASTICSEARCH.PORT}.
+1. Set the hostname or IP address of the Elasticsearch host in the `{$ELASTICSEARCH.HOST}` macro.
+
+2. Set the login and password in the `{$ELASTICSEARCH.USERNAME}` and `{$ELASTICSEARCH.PASSWORD}` macros.
+
+3. If you use an atypical location of ES API, don't forget to change the macros `{$ELASTICSEARCH.SCHEME}`,`{$ELASTICSEARCH.PORT}`.
 
 ### Macros used
 
@@ -33,6 +35,7 @@ If you use an atypical location ES API, don't forget to change the macros {$ELAS
 |----|-----------|-------|
 |{$ELASTICSEARCH.USERNAME}|<p>The username of the Elasticsearch.</p>||
 |{$ELASTICSEARCH.PASSWORD}|<p>The password of the Elasticsearch.</p>||
+|{$ELASTICSEARCH.HOST}|<p>The hostname or IP address of the Elasticsearch host.</p>|`<SET ELASTICSEARCH HOST>`|
 |{$ELASTICSEARCH.PORT}|<p>The port of the Elasticsearch host.</p>|`9200`|
 |{$ELASTICSEARCH.SCHEME}|<p>The scheme of the Elasticsearch (http/https).</p>|`http`|
 |{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}|<p>The ES cluster maximum response time in seconds for trigger expression.</p>|`10s`|
@@ -47,46 +50,46 @@ If you use an atypical location ES API, don't forget to change the macros {$ELAS
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ES: Service status|<p>Checks if the service is running and accepting TCP connections.</p>|Simple check|net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|ES: Service response time|<p>Checks performance of the TCP service.</p>|Simple check|net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]|
-|ES: Get cluster health|<p>Returns the health status of a cluster.</p>|HTTP agent|es.cluster.get_health|
-|ES: Cluster health status|<p>Health status of the cluster, based on the state of its primary and replica shards. Statuses are:</p><p>green</p><p>All shards are assigned.</p><p>yellow</p><p>All primary shards are assigned, but one or more replica shards are unassigned. If a node in the cluster fails, some data could be unavailable until that node is repaired.</p><p>red</p><p>One or more primary shards are unassigned, so some data is unavailable. This can occur briefly during cluster startup as primary shards are assigned.</p>|Dependent item|es.cluster.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Number of nodes|<p>The number of nodes within the cluster.</p>|Dependent item|es.cluster.number_of_nodes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.number_of_nodes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Number of data nodes|<p>The number of nodes that are dedicated to data nodes.</p>|Dependent item|es.cluster.number_of_data_nodes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.number_of_data_nodes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Number of relocating shards|<p>The number of shards that are under relocation.</p>|Dependent item|es.cluster.relocating_shards<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.relocating_shards`</p></li></ul>|
-|ES: Number of initializing shards|<p>The number of shards that are under initialization.</p>|Dependent item|es.cluster.initializing_shards<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.initializing_shards`</p></li></ul>|
-|ES: Number of unassigned shards|<p>The number of shards that are not allocated.</p>|Dependent item|es.cluster.unassigned_shards<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.unassigned_shards`</p></li></ul>|
-|ES: Delayed unassigned shards|<p>The number of shards whose allocation has been delayed by the timeout settings.</p>|Dependent item|es.cluster.delayed_unassigned_shards<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.delayed_unassigned_shards`</p></li></ul>|
-|ES: Number of pending tasks|<p>The number of cluster-level changes that have not yet been executed.</p>|Dependent item|es.cluster.number_of_pending_tasks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.number_of_pending_tasks`</p></li></ul>|
-|ES: Task max waiting in queue|<p>The time expressed in seconds since the earliest initiated task is waiting for being performed.</p>|Dependent item|es.cluster.task_max_waiting_in_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.task_max_waiting_in_queue_millis`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
-|ES: Inactive shards percentage|<p>The ratio of inactive shards in the cluster expressed as a percentage.</p>|Dependent item|es.cluster.inactive_shards_percent_as_number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_shards_percent_as_number`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|ES: Get cluster stats|<p>Returns cluster statistics.</p>|HTTP agent|es.cluster.get_stats|
-|ES: Cluster uptime|<p>Uptime duration in seconds since JVM has last started.</p>|Dependent item|es.nodes.jvm.max_uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.jvm.max_uptime_in_millis`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
-|ES: Number of non-deleted documents|<p>The total number of non-deleted documents across all primary shards assigned to the selected nodes.</p><p>This number is based on the documents in Lucene segments and may include the documents from nested fields.</p>|Dependent item|es.indices.docs.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.indices.docs.count`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Indices with shards assigned to nodes|<p>The total number of indices with shards assigned to the selected nodes.</p>|Dependent item|es.indices.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.indices.count`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Total size of all file stores|<p>The total size in bytes of all file stores across all selected nodes.</p>|Dependent item|es.nodes.fs.total_in_bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.fs.total_in_bytes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Total available size to JVM in all file stores|<p>The total number of bytes available to JVM in the file stores across all selected nodes.</p><p>Depending on OS or process-level restrictions, this number may be less than nodes.fs.free_in_byes.</p><p>This is the actual amount of free disk space the selected Elasticsearch nodes can use.</p>|Dependent item|es.nodes.fs.available_in_bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.fs.available_in_bytes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Nodes with the data role|<p>The number of selected nodes with the data role.</p>|Dependent item|es.nodes.count.data<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.count.data`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Nodes with the ingest role|<p>The number of selected nodes with the ingest role.</p>|Dependent item|es.nodes.count.ingest<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.count.ingest`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Nodes with the master role|<p>The number of selected nodes with the master role.</p>|Dependent item|es.nodes.count.master<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.count.master`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|ES: Get nodes stats|<p>Returns cluster nodes statistics.</p>|HTTP agent|es.nodes.get_stats|
+|Service status|<p>Checks if the service is running and accepting TCP connections.</p>|Simple check|net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Service response time|<p>Checks performance of the TCP service.</p>|Simple check|net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]|
+|Get cluster health|<p>Returns the health status of a cluster.</p>|HTTP agent|es.cluster.get_health|
+|Cluster health status|<p>Health status of the cluster, based on the state of its primary and replica shards. Statuses are:</p><p>green</p><p>All shards are assigned.</p><p>yellow</p><p>All primary shards are assigned, but one or more replica shards are unassigned. If a node in the cluster fails, some data could be unavailable until that node is repaired.</p><p>red</p><p>One or more primary shards are unassigned, so some data is unavailable. This can occur briefly during cluster startup as primary shards are assigned.</p>|Dependent item|es.cluster.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Number of nodes|<p>The number of nodes within the cluster.</p>|Dependent item|es.cluster.number_of_nodes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.number_of_nodes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Number of data nodes|<p>The number of nodes that are dedicated to data nodes.</p>|Dependent item|es.cluster.number_of_data_nodes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.number_of_data_nodes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Number of relocating shards|<p>The number of shards that are under relocation.</p>|Dependent item|es.cluster.relocating_shards<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.relocating_shards`</p></li></ul>|
+|Number of initializing shards|<p>The number of shards that are under initialization.</p>|Dependent item|es.cluster.initializing_shards<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.initializing_shards`</p></li></ul>|
+|Number of unassigned shards|<p>The number of shards that are not allocated.</p>|Dependent item|es.cluster.unassigned_shards<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.unassigned_shards`</p></li></ul>|
+|Delayed unassigned shards|<p>The number of shards whose allocation has been delayed by the timeout settings.</p>|Dependent item|es.cluster.delayed_unassigned_shards<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.delayed_unassigned_shards`</p></li></ul>|
+|Number of pending tasks|<p>The number of cluster-level changes that have not yet been executed.</p>|Dependent item|es.cluster.number_of_pending_tasks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.number_of_pending_tasks`</p></li></ul>|
+|Task max waiting in queue|<p>The time expressed in seconds since the earliest initiated task is waiting for being performed.</p>|Dependent item|es.cluster.task_max_waiting_in_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.task_max_waiting_in_queue_millis`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Inactive shards percentage|<p>The ratio of inactive shards in the cluster expressed as a percentage.</p>|Dependent item|es.cluster.inactive_shards_percent_as_number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_shards_percent_as_number`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get cluster stats|<p>Returns cluster statistics.</p>|HTTP agent|es.cluster.get_stats|
+|Cluster uptime|<p>Uptime duration in seconds since JVM has last started.</p>|Dependent item|es.nodes.jvm.max_uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.jvm.max_uptime_in_millis`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Number of non-deleted documents|<p>The total number of non-deleted documents across all primary shards assigned to the selected nodes.</p><p>This number is based on the documents in Lucene segments and may include the documents from nested fields.</p>|Dependent item|es.indices.docs.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.indices.docs.count`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Indices with shards assigned to nodes|<p>The total number of indices with shards assigned to the selected nodes.</p>|Dependent item|es.indices.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.indices.count`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total size of all file stores|<p>The total size in bytes of all file stores across all selected nodes.</p>|Dependent item|es.nodes.fs.total_in_bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.fs.total_in_bytes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total available size to JVM in all file stores|<p>The total number of bytes available to JVM in the file stores across all selected nodes.</p><p>Depending on OS or process-level restrictions, this number may be less than nodes.fs.free_in_byes.</p><p>This is the actual amount of free disk space the selected Elasticsearch nodes can use.</p>|Dependent item|es.nodes.fs.available_in_bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.fs.available_in_bytes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nodes with the data role|<p>The number of selected nodes with the data role.</p>|Dependent item|es.nodes.count.data<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.count.data`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nodes with the ingest role|<p>The number of selected nodes with the ingest role.</p>|Dependent item|es.nodes.count.ingest<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.count.ingest`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nodes with the master role|<p>The number of selected nodes with the master role.</p>|Dependent item|es.nodes.count.master<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.count.master`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get nodes stats|<p>Returns cluster nodes statistics.</p>|HTTP agent|es.nodes.get_stats|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|ES: Service is down|<p>The service is unavailable or does not accept TCP connections.</p>|`last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0`|Average|**Manual close**: Yes|
-|ES: Service response time is too high|<p>The performance of the TCP service is very low.</p>|`min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>ES: Service is down</li></ul>|
-|ES: Health is YELLOW|<p>All primary shards are assigned, but one or more replica shards are unassigned.<br>If a node in the cluster fails, some data could be unavailable until that node is repaired.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=1`|Average||
-|ES: Health is RED|<p>One or more primary shards are unassigned, so some data is unavailable.<br>This can occur briefly during cluster startup as primary shards are assigned.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=2`|High||
-|ES: Health is UNKNOWN|<p>The health status of the cluster is unknown or cannot be obtained.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=255`|High||
-|ES: The number of nodes within the cluster has decreased||`change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)<0`|Info|**Manual close**: Yes|
-|ES: The number of nodes within the cluster has increased||`change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)>0`|Info|**Manual close**: Yes|
-|ES: Cluster has the initializing shards|<p>The cluster has the initializing shards longer than 10 minutes.</p>|`min(/Elasticsearch Cluster by HTTP/es.cluster.initializing_shards,10m)>0`|Average||
-|ES: Cluster has the unassigned shards|<p>The cluster has the unassigned shards longer than 10 minutes.</p>|`min(/Elasticsearch Cluster by HTTP/es.cluster.unassigned_shards,10m)>0`|Average||
-|ES: Cluster has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Elasticsearch Cluster by HTTP/es.nodes.jvm.max_uptime)<10m`|Info|**Manual close**: Yes|
-|ES: Cluster does not have enough space for resharding|<p>There is not enough disk space for index resharding.</p>|`(last(/Elasticsearch Cluster by HTTP/es.nodes.fs.total_in_bytes)-last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes))/(last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes)-1)>last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes)`|High||
-|ES: Cluster has only two master nodes|<p>The cluster has only two nodes with a master role and will be unavailable if one of them breaks.</p>|`last(/Elasticsearch Cluster by HTTP/es.nodes.count.master)=2`|Disaster||
+|Service is down|<p>The service is unavailable or does not accept TCP connections.</p>|`last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"])=0`|Average|**Manual close**: Yes|
+|Service response time is too high|<p>The performance of the TCP service is very low.</p>|`min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|Health is YELLOW|<p>All primary shards are assigned, but one or more replica shards are unassigned.<br>If a node in the cluster fails, some data could be unavailable until that node is repaired.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=1`|Average||
+|Health is RED|<p>One or more primary shards are unassigned, so some data is unavailable.<br>This can occur briefly during cluster startup as primary shards are assigned.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=2`|High||
+|Health is UNKNOWN|<p>The health status of the cluster is unknown or cannot be obtained.</p>|`last(/Elasticsearch Cluster by HTTP/es.cluster.status)=255`|High||
+|The number of nodes within the cluster has decreased||`change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)<0`|Info|**Manual close**: Yes|
+|The number of nodes within the cluster has increased||`change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)>0`|Info|**Manual close**: Yes|
+|Cluster has the initializing shards|<p>The cluster has the initializing shards longer than 10 minutes.</p>|`min(/Elasticsearch Cluster by HTTP/es.cluster.initializing_shards,10m)>0`|Average||
+|Cluster has the unassigned shards|<p>The cluster has the unassigned shards longer than 10 minutes.</p>|`min(/Elasticsearch Cluster by HTTP/es.cluster.unassigned_shards,10m)>0`|Average||
+|Cluster has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Elasticsearch Cluster by HTTP/es.nodes.jvm.max_uptime)<10m`|Info|**Manual close**: Yes|
+|Cluster does not have enough space for resharding|<p>There is not enough disk space for index resharding.</p>|`(last(/Elasticsearch Cluster by HTTP/es.nodes.fs.total_in_bytes)-last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes))/(last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes)-1)>last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes)`|High||
+|Cluster has only two master nodes|<p>The cluster has only two nodes with a master role and will be unavailable if one of them breaks.</p>|`last(/Elasticsearch Cluster by HTTP/es.nodes.count.master)=2`|Disaster||
 
 ### LLD rule Cluster nodes discovery
 

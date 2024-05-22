@@ -68,6 +68,8 @@ Specify the file name of the script to execute. If '-' is specified as file name
 Specify the input parameter.
 .IP "\fB\-i\fR, \fB\-\-input\fR \fIinput\-file\fR"
 Specify the file name of the input parameter. If '-' is specified as file name, the input will be read from stdin.
+.IP "\fB\-w\fR, \fB\-\-webdriver\fR \fIurl\fR"
+Specify the webdriver URL.
 .IP "\fB\-l\fR, \fB\-\-loglevel\fR \fIlog\-level\fR"
 Specify the log level.
 .IP "\fB\-t\fR, \fB\-\-timeout\fR \fItimeout\fR"

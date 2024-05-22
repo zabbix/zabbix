@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -368,6 +363,24 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($proxies, ['proxyid' => 'id']);
+				}
+				break;
+
+			case 'proxy_groups':
+				$db_proxy_groups = API::ProxyGroup()->get([
+					'output' => ['proxy_groupid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($db_proxy_groups) {
+					CArrayHelper::sort($db_proxy_groups, ['name']);
+
+					if (array_key_exists('limit', $data)) {
+						$db_proxy_groups = array_slice($db_proxy_groups, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($db_proxy_groups, ['proxy_groupid' => 'id']);
 				}
 				break;
 
@@ -858,7 +871,8 @@ switch ($data['method']) {
 		if (array_key_exists('itemid', $data) && is_scalar($data['itemid'])) {
 			$items = API::Item()->get([
 				'output' => ['value_type'],
-				'itemids' => $data['itemid']
+				'itemids' => $data['itemid'],
+				'webitems' => true
 			]);
 
 			if ($items) {

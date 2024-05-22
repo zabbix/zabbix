@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package zbxlib
@@ -38,7 +33,7 @@ typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 
-void metric_set_refresh(zbx_active_metric_t *metric, int refresh);
+void metric_set_nextcheck(zbx_active_metric_t *metric, int nextcheck);
 void metric_get_meta(zbx_active_metric_t *metric, zbx_uint64_t *lastlogsize, int *mtime);
 void metric_set_unsupported(zbx_active_metric_t *metric);
 int metric_set_supported(zbx_active_metric_t *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
@@ -134,13 +129,14 @@ static void free_eventlog_result(eventlog_result_t *result)
 	zbx_free(result);
 }
 
-int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
 		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
 		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
 		int config_timeout, const char *config_source_ip)
 {
 	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(itemid);
 	ZBX_UNUSED(host);
 	ZBX_UNUSED(key);
 	ZBX_UNUSED(mtime);
@@ -157,13 +153,14 @@ int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 
 	return SUCCEED;
 }
-int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
 		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
 		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
 		int config_timeout, const char *config_source_ip)
 {
 	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(itemid);
 	ZBX_UNUSED(host);
 	ZBX_UNUSED(key);
 	ZBX_UNUSED(mtime);
@@ -194,13 +191,13 @@ import (
 	"time"
 	"unsafe"
 
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/tls"
-
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/sdk/log"
 )
 
 type EventLogItem struct {
+	Itemid  uint64
 	LastTs  time.Time // the last log value timestamp + 1ns
 	Results []*EventLogResult
 	Output  ResultWriter
@@ -218,9 +215,9 @@ type EventLogResult struct {
 	Mtime          int
 }
 
-func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, cblob unsafe.Pointer, isCountItem bool) {
-	log.Tracef("Calling C function \"metric_set_refresh()\"")
-	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
+func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, nextcheck int, cblob unsafe.Pointer, isCountItem bool) {
+	log.Tracef("Calling C function \"metric_set_nextcheck()\"")
+	C.metric_set_nextcheck(C.ZBX_ACTIVE_METRIC_LP(data), C.int(nextcheck))
 
 	var clastLogsizeSent, clastLogsizeLast C.zbx_uint64_t
 	var cstate, cmtime C.int

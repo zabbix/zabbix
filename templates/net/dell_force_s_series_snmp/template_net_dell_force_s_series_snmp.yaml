@@ -25,7 +25,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 3853e6ef8cbf4e59a64422659f66bbb7
-          name: 'Dell Force S-Series: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -39,14 +39,14 @@ zabbix_export:
           triggers:
             - uuid: f186488b337f4b1b8971992e8118d9cc
               expression: 'max(/Dell Force S-Series by SNMP/icmpping,#3)=0'
-              name: 'Dell Force S-Series: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: ef0432ffcf0546bf82177193866861cf
-          name: 'Dell Force S-Series: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -60,11 +60,11 @@ zabbix_export:
           triggers:
             - uuid: 46798adec54c47a38cb599773767a2a7
               expression: 'min(/Dell Force S-Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell Force S-Series by SNMP/icmppingloss,5m)<100'
-              name: 'Dell Force S-Series: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Dell Force S-Series: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell Force S-Series by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -72,7 +72,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9b56a2a725bf4632bc28c6a5d0c3d64b
-          name: 'Dell Force S-Series: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -86,13 +86,14 @@ zabbix_export:
           triggers:
             - uuid: 04828676081147b4bfad0ad03385986e
               expression: 'avg(/Dell Force S-Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Dell Force S-Series: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Dell Force S-Series: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Dell Force S-Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell Force S-Series by SNMP/icmppingloss,5m)<100'
-                - name: 'Dell Force S-Series: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell Force S-Series by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -100,7 +101,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: ba8178338b0e41ac97b0265f98b90770
-          name: 'Dell Force S-Series: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -113,7 +114,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: d4df70f2c5f04ad2b7f1b4e8ab9a9993
-          name: 'Dell Force S-Series: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -133,7 +134,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 804476e771374e22b8767f90f271654a
-          name: 'Dell Force S-Series: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -154,7 +155,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5297253edb09463e8fdb6f1905e4f494
-          name: 'Dell Force S-Series: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -178,7 +179,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f3d1970fc4404b4fa50a855433681105
-          name: 'Dell Force S-Series: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -188,7 +189,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -198,7 +199,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a36cccdaf24c4e82801ebb44eaa5e25a
-          name: 'Dell Force S-Series: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -220,8 +221,8 @@ zabbix_export:
           triggers:
             - uuid: 2dc35c5813b042fd96f2ebc53f565799
               expression: 'last(/Dell Force S-Series by SNMP/system.name,#1)<>last(/Dell Force S-Series by SNMP/system.name,#2) and length(last(/Dell Force S-Series by SNMP/system.name))>0'
-              name: 'Dell Force S-Series: System name has changed'
-              event_name: 'Dell Force S-Series: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -231,7 +232,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 26a0a117545f4b17986f0b48996fec47
-          name: 'Dell Force S-Series: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -241,7 +242,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -250,7 +251,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 651059497914431f827ad82a982e139b
-          name: 'Dell Force S-Series: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -269,13 +270,13 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7ce4f98cdc6741bbb03f6e2ea03432c4
-          name: 'Dell Force S-Series: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -289,12 +290,12 @@ zabbix_export:
           triggers:
             - uuid: da99689aa1394d17af5008e5678915bc
               expression: 'max(/Dell Force S-Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Dell Force S-Series: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Dell Force S-Series: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell Force S-Series by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -683,8 +684,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -894,7 +895,7 @@ zabbix_export:
                   expression: 'last(/Dell Force S-Series by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
-                  description: 'Please check autonegotiation settings and cabling'
+                  description: 'Please check autonegotiation settings and cabling.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1127,7 +1128,7 @@ zabbix_export:
                   description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'Dell Force S-Series: System name has changed'
+                    - name: 'System name has changed'
                       expression: 'last(/Dell Force S-Series by SNMP/system.name,#1)<>last(/Dell Force S-Series by SNMP/system.name,#2) and length(last(/Dell Force S-Series by SNMP/system.name))>0'
                   tags:
                     - tag: scope
@@ -1148,10 +1149,13 @@ zabbix_export:
           value: '1'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
         - macro: '{$IFCONTROL}'
@@ -1191,6 +1195,7 @@ zabbix_export:
           value: '1'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '65'
         - macro: '{$TEMP_CRIT_LOW}'
@@ -1203,7 +1208,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1854,13 +1859,13 @@ zabbix_export:
   triggers:
     - uuid: 4246a064d33f428c8441491402ae8090
       expression: '(last(/Dell Force S-Series by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Dell Force S-Series by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Dell Force S-Series by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Dell Force S-Series by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Dell Force S-Series: Host has been restarted'
-      event_name: 'Dell Force S-Series: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Dell Force S-Series: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Dell Force S-Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

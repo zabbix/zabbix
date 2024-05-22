@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_ZBXDIAG_H
@@ -50,6 +45,8 @@ typedef struct
 }
 zbx_diag_map_t;
 
+ZBX_PTR_VECTOR_DECL(diag_map_ptr, zbx_diag_map_t *)
+
 /* diagnostic information section callback function prototype */
 typedef int (*zbx_diag_add_section_info_func_t)(const char *section, const struct zbx_json_parse *jp,
 		struct zbx_json *json, char **error);
@@ -65,7 +62,7 @@ typedef int (*zbx_diag_add_section_info_func_t)(const char *section, const struc
 
 void	zbx_diag_map_free(zbx_diag_map_t *map);
 int	zbx_diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map, zbx_uint64_t
-		*field_mask, zbx_vector_ptr_t *top_views, char **error);
+		*field_mask, zbx_vector_diag_map_ptr_t *top_views, char **error);
 void	zbx_diag_add_mem_stats(struct zbx_json *json, const char *name, const zbx_shmem_stats_t *stats);
 int	zbx_diag_add_historycache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 void	zbx_diag_add_locks_info(struct zbx_json *json);

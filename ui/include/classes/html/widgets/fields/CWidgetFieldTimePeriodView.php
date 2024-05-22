@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -96,14 +91,14 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 				'label' => (new CLabel(_('Widget'), $field_name.'_reference_ms'))
 					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_name.'-reference')
-					->setAsteriskMark($this->isRequired()),
+					->setAsteriskMark(),
 				'view' =>  (new CMultiSelect([
 					'name' => $field_name.'['.CWidgetField::FOREIGN_REFERENCE_KEY.']',
 					'add_post_js' => false
 				]))
 					->setId($field_name.'_reference')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired($this->isRequired()),
+					->setAriaRequired(),
 				'class' => $style_class.'js-'.$field_name.'-reference'
 			];
 		}
