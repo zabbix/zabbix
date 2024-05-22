@@ -58,6 +58,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	cachehistory/libzbxcachehistory_proxy.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
@@ -127,7 +128,8 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
-	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
+	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_builddir)/src/libs/zbxbincommon/libzbxbincommon.a
 
 if HAVE_IPMI
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a

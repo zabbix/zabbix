@@ -29,7 +29,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: d729b3a06df94b6890fe4c62f8d26f60
-          name: 'Cisco Catalyst 3750V2-48PS: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -43,14 +43,14 @@ zabbix_export:
           triggers:
             - uuid: 01901a212f7c4fd2976f8ab89ad7eb68
               expression: 'max(/Cisco Catalyst 3750V2-48PS by SNMP/icmpping,#3)=0'
-              name: 'Cisco Catalyst 3750V2-48PS: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 3a6fdbfbbf7c4944a24e22e93aabf0e3
-          name: 'Cisco Catalyst 3750V2-48PS: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -64,11 +64,11 @@ zabbix_export:
           triggers:
             - uuid: 20104e6a8abe4b0e9bdd32325d506d9c
               expression: 'min(/Cisco Catalyst 3750V2-48PS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-48PS by SNMP/icmppingloss,5m)<100'
-              name: 'Cisco Catalyst 3750V2-48PS: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Cisco Catalyst 3750V2-48PS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco Catalyst 3750V2-48PS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -76,7 +76,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 80efc7d77e314e97953cc75b5ae43e92
-          name: 'Cisco Catalyst 3750V2-48PS: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -90,13 +90,13 @@ zabbix_export:
           triggers:
             - uuid: 21b7cefe750048fba80e026afecebcfd
               expression: 'avg(/Cisco Catalyst 3750V2-48PS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Cisco Catalyst 3750V2-48PS: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Cisco Catalyst 3750V2-48PS: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Cisco Catalyst 3750V2-48PS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-48PS by SNMP/icmppingloss,5m)<100'
-                - name: 'Cisco Catalyst 3750V2-48PS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco Catalyst 3750V2-48PS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -104,7 +104,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 2c44173959284d7db1d2a745c68fa0a3
-          name: 'Cisco Catalyst 3750V2-48PS: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -117,7 +117,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b3ac05facd4349fc8e573525f3fdb239
-          name: 'Cisco Catalyst 3750V2-48PS: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: system.contact
@@ -137,7 +137,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f21c4e4de69342a68ca060a52fe071d6
-          name: 'Cisco Catalyst 3750V2-48PS: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.descr
@@ -158,7 +158,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2a0f9c29094f4a72ab66813c931d35ee
-          name: 'Cisco Catalyst 3750V2-48PS: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.1
           key: system.hw.model
@@ -176,7 +176,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 487fc626eb5e4629a0585210153ebbd1
-          name: 'Cisco Catalyst 3750V2-48PS: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
           key: system.hw.serialnumber
@@ -196,8 +196,8 @@ zabbix_export:
           triggers:
             - uuid: a11a364406534a838c99f89c4136eb5b
               expression: 'last(/Cisco Catalyst 3750V2-48PS by SNMP/system.hw.serialnumber,#1)<>last(/Cisco Catalyst 3750V2-48PS by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Catalyst 3750V2-48PS by SNMP/system.hw.serialnumber))>0'
-              name: 'Cisco Catalyst 3750V2-48PS: Device has been replaced'
-              event_name: 'Cisco Catalyst 3750V2-48PS: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'The device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -205,7 +205,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: b81c8fccadb94cd4bd7c798906d881ef
-          name: 'Cisco Catalyst 3750V2-48PS: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: system.hw.uptime
@@ -228,7 +228,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 679e63af2b3548c48b278da7356ae8ed
-          name: 'Cisco Catalyst 3750V2-48PS: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: system.location
@@ -248,7 +248,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5d51ca0ffadf4e4599390aa9a4644426
-          name: 'Cisco Catalyst 3750V2-48PS: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -270,8 +270,8 @@ zabbix_export:
           triggers:
             - uuid: b881ec6269d54e25810ed2ec2dfe3385
               expression: 'last(/Cisco Catalyst 3750V2-48PS by SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-48PS by SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-48PS by SNMP/system.name))>0'
-              name: 'Cisco Catalyst 3750V2-48PS: System name has changed'
-              event_name: 'Cisco Catalyst 3750V2-48PS: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -279,7 +279,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 54ff117dbac14916aee823e247bff23f
-          name: 'Cisco Catalyst 3750V2-48PS: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: system.net.uptime
@@ -297,7 +297,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2d49036582724a19b5cd5006360be8d2
-          name: 'Cisco Catalyst 3750V2-48PS: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: system.objectid
@@ -315,7 +315,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5852aecfbfbe429097c660d8a1ce47ee
-          name: 'Cisco Catalyst 3750V2-48PS: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.sw.os
@@ -340,18 +340,18 @@ zabbix_export:
             - uuid: cc0071c5d3074123a77ebddd7dd8583c
               expression: 'last(/Cisco Catalyst 3750V2-48PS by SNMP/system.sw.os,#1)<>last(/Cisco Catalyst 3750V2-48PS by SNMP/system.sw.os,#2) and length(last(/Cisco Catalyst 3750V2-48PS by SNMP/system.sw.os))>0'
               recovery_mode: NONE
-              name: 'Cisco Catalyst 3750V2-48PS: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Cisco Catalyst 3750V2-48PS: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Cisco Catalyst 3750V2-48PS by SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-48PS by SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-48PS by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 642cee0c23134982adc4dfc486a63843
-          name: 'Cisco Catalyst 3750V2-48PS: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -363,7 +363,7 @@ zabbix_export:
           triggers:
             - uuid: 90d5894323074dc8bcd57b212cdbf398
               expression: 'max(/Cisco Catalyst 3750V2-48PS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Cisco Catalyst 3750V2-48PS: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -1312,7 +1312,7 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1328,7 +1328,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1344,7 +1344,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -1994,8 +1994,8 @@ zabbix_export:
   triggers:
     - uuid: 904571e51fbc4cd0a3a25800e16ec495
       expression: '(last(/Cisco Catalyst 3750V2-48PS by SNMP/system.hw.uptime)>0 and last(/Cisco Catalyst 3750V2-48PS by SNMP/system.hw.uptime)<10m) or (last(/Cisco Catalyst 3750V2-48PS by SNMP/system.hw.uptime)=0 and last(/Cisco Catalyst 3750V2-48PS by SNMP/system.net.uptime)<10m)'
-      name: 'Cisco Catalyst 3750V2-48PS: Host has been restarted'
-      event_name: 'Cisco Catalyst 3750V2-48PS: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,6 +24,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'authtype'				=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'headers'				=> 'array',
 			'hostid'				=> 'db hosts.hostid',
+			'test_with'				=> 'in '.implode(',', [self::TEST_WITH_SERVER, self::TEST_WITH_PROXY]),
 			'proxyid'				=> 'id',
 			'http_authtype'			=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'http_password'			=> 'string',
@@ -47,6 +43,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
 			'script'				=> 'string',
+			'browser_script'		=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
@@ -143,6 +140,15 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 						));
 					}
 				}
+			}
+
+			if ($this->hasInput('test_with') && $this->getInput('test_with') == self::TEST_WITH_PROXY
+					&& $this->getInput('proxyid', 0) == 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.',
+					_s('%1$s: %2$s', _('Test with'), _('Proxy')), _('cannot be empty')
+				));
+
+				$ret = false;
 			}
 		}
 

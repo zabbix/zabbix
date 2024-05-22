@@ -15,7 +15,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 56f89fce2b1541b7898ad56362d4b28a
-          name: 'Aranet: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: aranet.get_data
           history: '0'
@@ -298,7 +298,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 92fb73948fa74de8a6a219397b77b570
-          name: 'Aranet: Sensors discovery'
+          name: 'Sensors discovery'
           type: DEPENDENT
           key: aranet.sensor.discovery
           delay: '0'

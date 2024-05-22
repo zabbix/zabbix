@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "lld_protocol.h"
@@ -125,7 +120,6 @@ zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, const zbx_
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, item_len = 0;
-	int		i;
 
 	if (0 != num)
 	{
@@ -140,7 +134,7 @@ zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, const zbx_
 	ptr = *data;
 	ptr += zbx_serialize_value(ptr, num);
 
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		ptr += zbx_serialize_value(ptr, rule_infos[i]->itemid);
 		ptr += zbx_serialize_value(ptr, rule_infos[i]->values_num);
@@ -151,7 +145,7 @@ zbx_uint32_t	zbx_lld_serialize_top_items_result(unsigned char **data, const zbx_
 
 static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_vector_uint64_pair_t *items)
 {
-	int	i, items_num;
+	int	items_num;
 
 	data += zbx_deserialize_value(data, &items_num);
 
@@ -159,7 +153,7 @@ static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_
 	{
 		zbx_vector_uint64_pair_reserve(items, items_num);
 
-		for (i = 0; i < items_num; i++)
+		for (int i = 0; i < items_num; i++)
 		{
 			zbx_uint64_pair_t	pair;
 			int			value;
@@ -174,7 +168,7 @@ static void	zbx_lld_deserialize_top_items_result(const unsigned char *data, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: enqueue low level discovery value/error                           *
+ * Purpose: enqueues LLD value/error                                          *
  *                                                                            *
  * Parameters: itemid      - [IN]                                             *
  *             hostid      - [IN]                                             *
@@ -214,8 +208,6 @@ void	zbx_lld_queue_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *v
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process low level discovery agent result                          *
- *                                                                            *
  * Parameters: itemid - [IN]                                                  *
  *             hostid - [IN]                                                  *
  *             result - [IN] agent result                                     *
@@ -250,12 +242,12 @@ void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGEN
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get queue size (enqueued value count) of LLD manager              *
+ * Purpose: gets queue size (enqueued value count) of LLD manager             *
  *                                                                            *
  * Parameters: size  - [OUT] queue size                                       *
  *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the queue size was returned successfully           *
+ * Return value: SUCCEED - queue size was returned successfully               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -293,7 +285,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get lld manager diagnostic statistics                             *
+ * Purpose: gets LLD manager diagnostic statistics                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, char **error)
@@ -314,13 +306,13 @@ int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the top N items by the number of queued values                *
+ * Purpose: gets top N items by number of queued values                       *
  *                                                                            *
  * Parameters limit - [IN] number of top records to retrieve                  *
  *            items - [OUT] vector of top itemid, values_num pairs            *
  *            error - [OUT] error message                                     *
  *                                                                            *
- * Return value: SUCCEED - the top n items were returned successfully         *
+ * Return value: SUCCEED - top n items were returned successfully             *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/

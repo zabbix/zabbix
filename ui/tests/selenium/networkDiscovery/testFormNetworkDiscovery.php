@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -72,10 +67,10 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form = $dialog->asForm();
 
 		// Check that all labels present and visible.
-		$this->assertEquals(['Name', 'Discovery by proxy', 'IP range', 'Update interval',
-			'Maximum concurrent checks per type', 'Checks', 'Device uniqueness criteria', 'Host name',
-			'Visible name', 'Enabled'
-		], $form->getLabels(CElementFilter::VISIBLE)->asText());
+		$this->assertEquals(['Name', 'Discovery by', 'IP range', 'Update interval', 'Maximum concurrent checks per type',
+			'Checks', 'Device uniqueness criteria', 'Host name', 'Visible name', 'Enabled'],
+			$form->getLabels(CElementFilter::VISIBLE)->asText()
+		);
 
 		// Check required fields.
 		$this->assertEquals(['Name', 'IP range', 'Update interval', 'Checks'], $form->getRequiredLabels());
@@ -83,7 +78,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		// Check the default values.
 		$form->checkValue([
 			'Name' => '',
-			'Discovery by proxy' => 'No proxy',
+			'Discovery by' => 'Server',
 			'IP range' => '192.168.0.1-254',
 			'Update interval' => '1h',
 			'id:concurrency_max_type' => 'Unlimited',
@@ -821,7 +816,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'All fields',
-						'Discovery by proxy' => 'Proxy for Actions',
+						'id:discovery_by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Test Proxy',
 						'IP range' => '192.168.251.253-254',
 						'id:concurrency_max_type' => 'One',
 						'Update interval' => 604800,
@@ -1579,7 +1575,8 @@ class testFormNetworkDiscovery extends CWebTest {
 					'simple' => true,
 					'expected_fields' => [
 						'Name' => 'New cloned name, no changes',
-						'Discovery by proxy' => 'Proxy for Network discovery',
+						'id:discovery_by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for Network discovery',
 						'IP range' => '192.168.2.3-255',
 						'Update interval' => '25h',
 						'id:concurrency_max_type' => 'Unlimited'
@@ -1629,7 +1626,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected_fields' => [
 						'Name' => 'New cloned name with changes',
-						'Discovery by proxy' => 'Proxy for Network discovery cloning',
+						'id:discovery_by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for Network discovery cloning',
 						'IP range' => '192.168.2.3-255',
 						'Update interval' => '25h',
 						'id:concurrency_max_type' => 'Unlimited',
@@ -1925,7 +1923,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				// Fill form's fields.
 				$form->fill([
 					'Name' => $new_name,
-					'Discovery by proxy' => 'Proxy for Actions',
+					'id:discovery_by' => 'Proxy',
+					'xpath:.//div[@id="proxyid"]/..' => 'Test Proxy',
 					'Update interval' => '15s',
 					'Enabled' => false
 				]);

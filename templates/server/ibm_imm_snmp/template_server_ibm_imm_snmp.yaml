@@ -41,7 +41,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 303807b2799f4f7cace3d781e9ed1715
-          name: 'IBM IMM: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -55,14 +55,14 @@ zabbix_export:
           triggers:
             - uuid: 937225d93eea44b3a8328eee03cf66f0
               expression: 'max(/IBM IMM by SNMP/icmpping,#3)=0'
-              name: 'IBM IMM: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 4af423253e1b4960825b49041d9c8feb
-          name: 'IBM IMM: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -76,11 +76,11 @@ zabbix_export:
           triggers:
             - uuid: ec37a141b33c46308b8d810069ce9142
               expression: 'min(/IBM IMM by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/IBM IMM by SNMP/icmppingloss,5m)<100'
-              name: 'IBM IMM: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'IBM IMM: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/IBM IMM by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -88,7 +88,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: b1659e3298fb447f8ee93e8bab98a22d
-          name: 'IBM IMM: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -102,13 +102,14 @@ zabbix_export:
           triggers:
             - uuid: 0541700de60549da8439f9b75cf83e7f
               expression: 'avg(/IBM IMM by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'IBM IMM: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'IBM IMM: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/IBM IMM by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/IBM IMM by SNMP/icmppingloss,5m)<100'
-                - name: 'IBM IMM: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/IBM IMM by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -116,7 +117,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: e0a1cdb1df4d408087a8ed3d473ce1fe
-          name: 'IBM IMM: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -129,7 +130,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 6686560b390540b593a2d3bb3289ea41
-          name: 'IBM IMM: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -149,7 +150,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 905c91ce799849dfb56b800c93849826
-          name: 'IBM IMM: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -170,7 +171,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7075609a2d2545828a93f701d7b02c17
-          name: 'IBM IMM: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2.3.51.3.1.5.2.1.5.0
           key: system.hw.model
@@ -188,7 +189,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: db393421a28b44148b0a1e1273186900
-          name: 'IBM IMM: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2.3.51.3.1.5.2.1.3.0
           key: system.hw.serialnumber
@@ -210,8 +211,8 @@ zabbix_export:
           triggers:
             - uuid: b2bf06198d5840c6905ea6cf6d9e443c
               expression: 'last(/IBM IMM by SNMP/system.hw.serialnumber,#1)<>last(/IBM IMM by SNMP/system.hw.serialnumber,#2) and length(last(/IBM IMM by SNMP/system.hw.serialnumber))>0'
-              name: 'IBM IMM: Device has been replaced'
-              event_name: 'IBM IMM: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -219,7 +220,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 81e5ed7d945d40f780eb9bd872ea1832
-          name: 'IBM IMM: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -243,7 +244,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 589def06a1b74a7f8ada7cc4576aa9eb
-          name: 'IBM IMM: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -253,7 +254,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -263,7 +264,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 596ce9f7e6b848e4869cd195996c7114
-          name: 'IBM IMM: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -285,8 +286,8 @@ zabbix_export:
           triggers:
             - uuid: 188852025e644d5ab583f9d7a9dea06c
               expression: 'last(/IBM IMM by SNMP/system.name,#1)<>last(/IBM IMM by SNMP/system.name,#2) and length(last(/IBM IMM by SNMP/system.name))>0'
-              name: 'IBM IMM: System name has changed'
-              event_name: 'IBM IMM: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -296,7 +297,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 97cd7cf6a9a545788a2f709bacb925ed
-          name: 'IBM IMM: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -306,7 +307,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -315,7 +316,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ad8eada79b464821a14759f32f6d7f2a
-          name: 'IBM IMM: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -334,7 +335,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 33572e0e11214d8b8454e6947e0d282d
-          name: 'IBM IMM: Overall system health status'
+          name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2.3.51.3.1.4.1.0
           key: 'system.status[systemHealthStat.0]'
@@ -352,7 +353,7 @@ zabbix_export:
           triggers:
             - uuid: ea8fbc9446d34033b60a8214b8199ea1
               expression: 'count(/IBM IMM by SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
-              name: 'IBM IMM: System is in unrecoverable state!'
+              name: 'System is in unrecoverable state!'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults'
@@ -363,12 +364,12 @@ zabbix_export:
                   value: performance
             - uuid: a76c198aeb7d452a8c710ddde21aa12e
               expression: 'count(/IBM IMM by SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
-              name: 'IBM IMM: System status is in critical state'
+              name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
               dependencies:
-                - name: 'IBM IMM: System is in unrecoverable state!'
+                - name: 'System is in unrecoverable state!'
                   expression: 'count(/IBM IMM by SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
               tags:
                 - tag: scope
@@ -377,14 +378,14 @@ zabbix_export:
                   value: performance
             - uuid: acd147a3d41b49478410f4d49562cde2
               expression: 'count(/IBM IMM by SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
-              name: 'IBM IMM: System status is in warning state'
+              name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings'
               dependencies:
-                - name: 'IBM IMM: System is in unrecoverable state!'
+                - name: 'System is in unrecoverable state!'
                   expression: 'count(/IBM IMM by SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
-                - name: 'IBM IMM: System status is in critical state'
+                - name: 'System status is in critical state'
                   expression: 'count(/IBM IMM by SNMP/system.status[systemHealthStat.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               tags:
                 - tag: scope
@@ -392,13 +393,13 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 59d2bec423a84ca186d5785ddea5270b
-          name: 'IBM IMM: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -412,12 +413,12 @@ zabbix_export:
           triggers:
             - uuid: fbec2f12ac244723bb31dec5efcc6f85
               expression: 'max(/IBM IMM by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'IBM IMM: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'IBM IMM: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/IBM IMM by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -802,12 +803,15 @@ zabbix_export:
           value: '4'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$PSU_OK_STATUS}'
           value: Normal
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
         - macro: '{$TEMP_CRIT:"Ambient"}'
@@ -825,7 +829,7 @@ zabbix_export:
             - name: Temperature
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -844,7 +848,7 @@ zabbix_export:
                       value: '3'
                 - type: graphprototype
                   'y': '4'
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -863,7 +867,7 @@ zabbix_export:
                       value: '3'
                 - type: graphprototype
                   'y': '8'
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -883,7 +887,7 @@ zabbix_export:
             - name: Fan
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '4'
                   fields:
                     - type: INTEGER
@@ -931,13 +935,13 @@ zabbix_export:
   triggers:
     - uuid: 7dd529ec3f1a4a59846a3a76536a7fa0
       expression: '(last(/IBM IMM by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/IBM IMM by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/IBM IMM by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/IBM IMM by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'IBM IMM: Host has been restarted'
-      event_name: 'IBM IMM: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'IBM IMM: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/IBM IMM by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

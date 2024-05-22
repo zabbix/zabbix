@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbwrap.h"
@@ -84,7 +79,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_
 		if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source ||
 				EVENT_SOURCE_SERVICE == event->source)
 		{
-			zbx_vector_tags_create(&event->tags);
+			zbx_vector_tags_ptr_create(&event->tags);
 			zbx_vector_uint64_append(&tagged_eventids, event->eventid);
 		}
 
@@ -156,7 +151,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[1]);
 			tag->value = zbx_strdup(NULL, row[2]);
-			zbx_vector_tags_append(&event->tags, tag);
+			zbx_vector_tags_ptr_append(&event->tags, tag);
 		}
 		zbx_db_free_result(result);
 	}
@@ -230,8 +225,8 @@ void	zbx_db_free_event(zbx_db_event *event)
 	if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source ||
 			EVENT_SOURCE_SERVICE == event->source)
 	{
-		zbx_vector_tags_clear_ext(&event->tags, zbx_free_tag);
-		zbx_vector_tags_destroy(&event->tags);
+		zbx_vector_tags_ptr_clear_ext(&event->tags, zbx_free_tag);
+		zbx_vector_tags_ptr_destroy(&event->tags);
 	}
 
 	if (0 != event->trigger.triggerid)
@@ -300,7 +295,7 @@ void	zbx_db_prepare_empty_event(zbx_uint64_t eventid, zbx_db_event **event)
 	evt = (zbx_db_event*)zbx_malloc(evt, sizeof(zbx_db_event));
 	evt->eventid = eventid;
 	evt->name = NULL;
-	zbx_vector_tags_create(&evt->tags);
+	zbx_vector_tags_ptr_create(&evt->tags);
 
 	evt->source = EVENT_SOURCE_TRIGGERS;
 	memset(&evt->trigger, 0, sizeof(zbx_db_trigger));
@@ -375,7 +370,7 @@ void	zbx_db_get_event_data_tags(zbx_db_event *event)
 		tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 		tag->tag = zbx_strdup(NULL, row[0]);
 		tag->value = zbx_strdup(NULL, row[1]);
-		zbx_vector_tags_append(&event->tags, tag);
+		zbx_vector_tags_ptr_append(&event->tags, tag);
 	}
 	zbx_db_free_result(result);
 

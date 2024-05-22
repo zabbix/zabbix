@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -752,9 +747,9 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 	public function testFormAdministrationMediaTypeWebhook_Clone() {
 		// SQL for collecting all webhook mediatype parameter values, both from media_type and media_type_param tables.
-		$mediatype_sql = 'SELECT type, status, maxsessions, maxattempts, attempt_interval, content_type, script, timeout, '.
-				'process_tags, show_event_menu, event_menu_name, event_menu_url, description, mtp.name, mtp.value '.
-				'FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid WHERE mt.name=';
+		$mediatype_sql = 'SELECT type,status,maxsessions,maxattempts,attempt_interval,message_format,script,timeout,'.
+				'process_tags,show_event_menu,event_menu_name,event_menu_url,description,mtp.name,mtp.value'.
+				' FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid WHERE mt.name=';
 		$old_hash = CDBHelper::getHash($mediatype_sql.'\'Reference webhook\' ORDER BY mtp.name');
 
 		// Clone the reference media type.

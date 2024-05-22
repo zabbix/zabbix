@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -150,17 +145,17 @@ $filter = (new CFilter())
 						->addValue(_('Any'), ZBX_MONITORED_BY_ANY)
 						->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
 						->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
-						->setModern(true)
+						->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
+						->setModern()
 				)
 			])
 			->addItem([
-				new CLabel(_('Proxy'), 'filter_proxyids__ms'),
-				new CFormField(
+				(new CLabel(_('Proxies'), 'filter_proxyids__ms'))->addClass('js-filter-proxyids'),
+				(new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_proxyids[]',
 						'object_name' => 'proxies',
 						'data' => $data['proxies_ms'],
-						'disabled' => ($data['filter']['monitored_by'] != ZBX_MONITORED_BY_PROXY),
 						'popup' => [
 							'parameters' => [
 								'srctbl' => 'proxies',
@@ -171,7 +166,26 @@ $filter = (new CFilter())
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				)
+				))->addClass('js-filter-proxyids')
+			])
+			->addItem([
+				(new CLabel(_('Proxy groups'), 'filter_proxy_groupids__ms'))->addClass('js-filter-proxy-groupids'),
+				(new CFormField(
+					(new CMultiSelect([
+						'name' => 'filter_proxy_groupids[]',
+						'object_name' => 'proxy_groups',
+						'data' => $data['proxy_groups_ms'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'proxy_groups',
+								'srcfld1' => 'proxy_groupid',
+								'srcfld2' => 'name',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_proxy_groupids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				))->addClass('js-filter-proxy-groupids')
 			])
 			->addItem([
 				new CLabel(_('Tags')),
@@ -189,8 +203,9 @@ $html_page->addItem($filter);
 // table hosts
 $form = (new CForm())->setName('hosts');
 $header_checkbox = (new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hostids');");
-$show_monitored_by = ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
-		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY);
+$show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
+	|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
+	|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP;
 $header_sortable_name = make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
 	$action_url->getUrl()
 );
@@ -215,7 +230,8 @@ $table = (new CTableInfo())
 		_('Agent encryption'),
 		_('Info'),
 		_('Tags')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $current_time = time();
 $csrf_token_massupdate = CCsrfTokenHelper::get('host');
@@ -333,7 +349,7 @@ foreach ($data['hosts'] as $host) {
 		}
 
 		if (array_key_exists($template['templateid'], $data['writable_templates'])
-				&& $data['allowed_ui_conf_templates']) {
+				&& $data['user']['can_edit_templates']) {
 			$caption = [
 				(new CLink($template['name']))
 					->addClass('js-edit-template')
@@ -357,7 +373,7 @@ foreach ($data['hosts'] as $host) {
 
 			foreach ($parent_templates as $parent_template) {
 				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
-						&& $data['allowed_ui_conf_templates']) {
+						&& $data['user']['can_edit_templates']) {
 					$caption[] = (new CLink($parent_template['name']))
 						->addClass('js-edit-template')
 						->setAttribute('data-templateid', $parent_template['templateid'])
@@ -446,9 +462,35 @@ foreach ($data['hosts'] as $host) {
 	$monitored_by = null;
 
 	if ($show_monitored_by) {
-		$monitored_by = ($host['proxyid'] != 0)
-			? $data['proxies'][$host['proxyid']]['name']
-			: '';
+		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+			$monitored_by = $data['user']['can_edit_proxies']
+				? (new CLink($data['proxies'][$host['proxyid']]['name']))
+					->addClass('js-edit-proxy')
+					->setAttribute('data-proxyid', $host['proxyid'])
+				: $data['proxies'][$host['proxyid']]['name'];
+		}
+		elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+			$monitored_by = $data['user']['can_edit_proxy_groups']
+				? (new CLink($data['proxy_groups'][$host['proxy_groupid']]['name']))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY)
+					->addClass('js-edit-proxy-group')
+					->setAttribute('data-proxy_groupid', $host['proxy_groupid'])
+				: $data['proxy_groups'][$host['proxy_groupid']]['name'];
+
+			if ($host['assigned_proxyid'] != 0) {
+				$monitored_by = [$monitored_by];
+				$monitored_by[] = NAME_DELIMITER;
+				$monitored_by[] = $data['user']['can_edit_proxies']
+					? (new CLink($data['proxies'][$host['assigned_proxyid']]['name']))
+						->addClass('js-edit-proxy')
+						->setAttribute('data-proxyid', $host['assigned_proxyid'])
+					: $data['proxies'][$host['assigned_proxyid']]['name'];
+			}
+		}
+		else {
+			$monitored_by = '';
+		}
 	}
 
 	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
@@ -531,7 +573,6 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 
 $form->addItem([
 	$table,
-	$data['paging'],
 	new CActionButtonList('action', 'hostids', [
 		'enable-hosts' => [
 			'name' => _('Enable'),

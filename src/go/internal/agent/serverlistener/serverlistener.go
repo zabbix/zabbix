@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package serverlistener
@@ -27,13 +22,13 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/zbxnet"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/zbxcomms"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/zbxnet"
 )
 
 type ServerListener struct {

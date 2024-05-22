@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -157,16 +152,19 @@ class CControllerPopupLdapCheck extends CController {
 	}
 
 	private function validateProvisionMedia(): bool {
-		if (!$this->hasInput('provision_media')) {
-			return true;
-		}
+		$validation_rules = [
+			'mediatypeid' =>	'db media_type.mediatypeid',
+			'name' =>			'required|string|not_empty',
+			'attribute' =>		'required|string|not_empty',
+			'period' =>			'time_periods',
+			'severity' =>		'int32|ge 0|le '.(pow(2, TRIGGER_SEVERITY_COUNT) - 1),
+			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])
+		];
 
-		foreach ($this->getInput('provision_media') as $media) {
-			if (!is_array($media)
-					|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
-					|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
-					|| $media['attribute'] === ''
-					|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
+		foreach ($this->getInput('provision_media', []) as $provision_media) {
+			$validator = new CNewValidator($provision_media, $validation_rules);
+
+			if ($validator->isError()) {
 				return false;
 			}
 		}

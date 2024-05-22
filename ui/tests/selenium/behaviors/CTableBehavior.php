@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -86,7 +81,7 @@ class CTableBehavior extends CBehavior {
 		$rows = $this->getTable($selector)->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
-			$this->test->assertEquals(['No data found.'], $rows->asText());
+			$this->test->assertEquals(['No data found'], $rows->asText());
 
 			return;
 		}
@@ -122,7 +117,7 @@ class CTableBehavior extends CBehavior {
 
 		if (!$data) {
 			// Check that table contains one row with text "No data found."
-			$this->test->assertEquals(['No data found.'], $table->getRows()->asText());
+			$this->test->assertEquals(['No data found'], $table->getRows()->asText());
 
 			return;
 		}
@@ -207,14 +202,22 @@ class CTableBehavior extends CBehavior {
 	/**
 	 * Assert text of displayed rows amount.
 	 *
-	 * @param integer $count	rows count per page
-	 * @param integer $total	total rows count
+	 * @param integer|string $count		rows count per page
+	 * @param integer $total			total rows count
 	 */
-	public function assertTableStats($count, $total = null) {
+	public function assertTableStats($count = null, $total = null) {
+		if ($count === null || $count === 0) {
+			$this->test->assertFalse($this->test->query('xpath://div[@class="table-stats"]')->one(false)->isValid(),
+					'Table rows amount is visible on page');
+
+			return;
+		}
+
 		if ($total === null) {
 			$total = $count;
 		}
-		$this->test->assertEquals('Displaying '.$count.' of '.$count.' found',
+
+		$this->test->assertEquals('Displaying '.$count.' of '.$total.' found',
 				$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
 	}

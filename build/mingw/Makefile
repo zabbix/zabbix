@@ -7,12 +7,13 @@ OUTPUTDIR := output
 
 MODULEDIR = $(TOPDIR)\src\go
 TARGETDIR = $(TOPDIR)\src\go\cmd\zabbix_agent2
-TARGETPKG=zabbix.com/cmd/zabbix_agent2
+TARGETPKG=golang.zabbix.com/agent2/cmd/zabbix_agent2
 
 CC = gcc
 WINDRES = windres.exe
 
 OBJS = \
+	$(OUTPUTDIR)\bincommon.o \
 	$(OUTPUTDIR)\threads.o \
 	$(OUTPUTDIR)\interval.o \
 	$(OUTPUTDIR)\num.o \
@@ -119,6 +120,9 @@ GOLDFLAGS += -X main.confDefault=zabbix_agent2.win.conf
 GOLDFLAGS += -X main.applicationName=zabbix_agent2
 
 all: $(TARGETBIN)
+
+$(OUTPUTDIR)\bincommon.o: $(TOPDIR)\src\libs\zbxbincommon\bincommon.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\misc.o: $(TOPDIR)\src\libs\zbxcommon\misc.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
@@ -255,13 +259,13 @@ $(OUTPUTDIR)\zbxregexp.o: $(TOPDIR)\src\libs\zbxregexp\zbxregexp.c
 $(OUTPUTDIR)\active_checks.o: $(TOPDIR)\src\zabbix_agent\active_checks\active_checks.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog\eventlog.c
+$(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\active_checks\eventlog_win32\eventlog.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\process_eventslog.o: $(TOPDIR)\src\zabbix_agent\eventlog\process_eventslog.c
+$(OUTPUTDIR)\process_eventslog.o: $(TOPDIR)\src\zabbix_agent\active_checks\eventlog_win32\process_eventslog.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\process_eventslog6.o: $(TOPDIR)\src\zabbix_agent\eventlog\process_eventslog6.c
+$(OUTPUTDIR)\process_eventslog6.o: $(TOPDIR)\src\zabbix_agent\active_checks\eventlog_win32\process_eventslog6.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\persistent_state.o: $(TOPDIR)\src\zabbix_agent\logfiles\persistent_state.c
@@ -288,7 +292,7 @@ $(TARGETBIN): $(OBJS) .FORCE
 	set GOLDFLAGS=%GOLDFLAGS% -X $(PKG).compileTime=%BUILD_TIME%
 	cd $(MODULEDIR)
 
-	go build -tags "$(TAGS)" -ldflags="%GOLDFLAGS%" -o $(TARGETBIN) zabbix.com/cmd/zabbix_agent2
+	go build -tags "$(TAGS)" -ldflags="%GOLDFLAGS%" -o $(TARGETBIN) golang.zabbix.com/agent2/cmd/zabbix_agent2
 
 clean:
 	go clean -cache

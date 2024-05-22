@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -77,7 +72,12 @@ class CWidgetHoneycomb extends CWidget {
 			this.#honeycomb.setSize(super._getContentsSize());
 
 			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_CLICK, e => {
-				this.broadcast({_hostid: e.detail.hostid, _itemid: e.detail.itemid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [e.detail.hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [e.detail.hostid],
+					[CWidgetsData.DATA_TYPE_ITEM_ID]: [e.detail.itemid],
+					[CWidgetsData.DATA_TYPE_ITEM_IDS]: [e.detail.itemid]
+				});
 			});
 
 			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_ENTER, e => {
@@ -97,12 +97,19 @@ class CWidgetHoneycomb extends CWidget {
 		});
 	}
 
+	onClearContents() {
+		if (this.#honeycomb !== null) {
+			this.#honeycomb.destroy();
+			this.#honeycomb = null;
+		}
+	}
+
 	onFeedback({type, value, descriptor}) {
-		if (type === '_itemid') {
+		if (type === CWidgetsData.DATA_TYPE_ITEM_ID) {
 			return this.#honeycomb.selectCell(value);
 		}
 
-		return super.onFeedback({type, value, descriptor});
+		return false;
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
