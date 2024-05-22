@@ -2620,5 +2620,5 @@ function getItemTypeCountByHostId(int $item_type, array $hostids): array {
 		'filter' => ['type' => $item_type]
 	]);
 
-	return !$items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
+	return $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
 }
