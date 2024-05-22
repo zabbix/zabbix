@@ -1447,7 +1447,7 @@ zabbix_export:
               key: 'jmx["{#JMXOBJ}",CorePoolSize]'
               history: 7d
               units: '!msg'
-              username: '{$IGNITE.USER}'
+              username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
               description: 'The core number of threads.'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
@@ -1460,7 +1460,7 @@ zabbix_export:
               key: 'jmx["{#JMXOBJ}",MaximumPoolSize]'
               history: 7d
               units: '!msg'
-              username: '{$IGNITE.USER}'
+              username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
               description: 'The maximum allowed number of threads.'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
@@ -1473,7 +1473,7 @@ zabbix_export:
               key: 'jmx["{#JMXOBJ}",PoolSize]'
               history: 7d
               units: '!msg'
-              username: '{$IGNITE.USER}'
+              username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
               description: 'Current number of threads in the pool.'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
@@ -1486,7 +1486,7 @@ zabbix_export:
               key: 'jmx["{#JMXOBJ}",QueueSize]'
               history: 7d
               units: '!msg'
-              username: '{$IGNITE.USER}'
+              username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
               description: 'Current size of the execution queue.'
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
@@ -1856,7 +1856,7 @@ zabbix_export:
             - name: General
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -1869,7 +1869,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -1882,7 +1882,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -1895,7 +1895,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH_PROTOTYPE

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"zabbix.com/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent"
 )
 
 type ParseServerActiveParams struct {

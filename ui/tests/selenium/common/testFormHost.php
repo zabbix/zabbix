@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -182,6 +177,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test update functionality in host form and interfaces',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
+				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'proxyid' => $proxyid,
 				'status' => HOST_STATUS_MONITORED
 			],
@@ -190,6 +186,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
+				'monitored_by' => ZBX_MONITORED_BY_PROXY,
 				'proxyid' => $proxyid,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
@@ -794,7 +791,8 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'Host with all interfaces visible name',
 						'Host groups' => 'Zabbix servers',
 						'Description' => 'Added description for host with all interfaces',
-						'Monitored by proxy' => 'Test Host Proxy',
+						'id:monitored_by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Test Host Proxy',
 						'Enabled' => false
 					],
 					'interfaces' => [
@@ -1368,7 +1366,8 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'Update host with all interfaces visible name',
 						'Host groups' => 'Linux servers',
 						'Description' => 'Update description',
-						'Monitored by proxy' => 'Active proxy 3',
+						'id:monitored_by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Active proxy 1',
 						'Enabled' => false
 					],
 					'interfaces' => [
@@ -1474,8 +1473,7 @@ class testFormHost extends CWebTest {
 						'Host name' => 'Mixed interface actions',
 						'Visible name' => '',
 						'Host groups' => 'Discovered hosts',
-						'Description' => '',
-						'Monitored by proxy' => '(no proxy)'
+						'Description' => ''
 					],
 					'interfaces' => [
 						[
@@ -1524,7 +1522,8 @@ class testFormHost extends CWebTest {
 				'Visible name' => 'testFormHost_Update Visible name',
 				'Host groups' => 'Zabbix servers',
 				'Description' => 'Created host via API to test update functionality in host form and interfaces',
-				'Monitored by proxy' => 'Test Host Proxy',
+				'id:monitored_by' => 'Proxy',
+				'xpath:.//div[@id="proxyid"]/..' => 'Test Host Proxy',
 				'Enabled' => true
 			],
 			'interfaces' => [
@@ -2035,7 +2034,7 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible(25)->one();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table').']')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
@@ -2087,7 +2086,7 @@ class testFormHost extends CWebTest {
 			switch ($tab) {
 				case 'Host':
 					foreach (['Discovered by', 'Host name', 'Templates', 'Host groups', 'Interfaces', 'Description',
-							'Monitored by proxy', 'Enabled'] as $label) {
+							'Monitored by', 'Enabled'] as $label) {
 						$this->assertEquals($label, $form->getLabel($label)->getText());
 					}
 
@@ -2110,7 +2109,7 @@ class testFormHost extends CWebTest {
 						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
 								'enabled' => false],
 						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
-						['name' => 'Monitored by proxy', 'value' => '(no proxy)', 'enabled' => false],
+						['name' => 'id:monitored_by', 'value' => 'Server', 'enabled' => false],
 						['name' => 'Enabled', 'value' => true, 'enabled' => true]
 					];
 
@@ -2162,8 +2161,8 @@ class testFormHost extends CWebTest {
 						$this->assertFalse($form->getField($label)->isEnabled());
 					}
 
-					foreach (['Username', 'Password'] as $fields) {
-						$this->assertEquals(255, $form->getField($label)->getAttribute('maxlength'));
+					foreach (['Username' => 16, 'Password' => 20] as $field => $maxlength) {
+						$this->assertEquals($maxlength, $form->getField($field)->getAttribute('maxlength'));
 					}
 
 					break;

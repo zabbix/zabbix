@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -41,11 +36,12 @@
 
 		checkbox_object: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, filter_set}) {
 			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
+			this.filter_set = filter_set;
 
 			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view.refresh');
@@ -56,7 +52,7 @@
 			this.initListActions();
 			this.initItemFormEvents(this.getCurrentForm().get(0));
 
-			if (this.refresh_interval != 0) {
+			if (this.refresh_interval != 0 && this.filter_set) {
 				this.running = true;
 				this.scheduleRefresh();
 			}
@@ -202,7 +198,19 @@
 		},
 
 		getCurrentSubfilter() {
-			return $('#latest-data-subfilter');
+			const latest_data_subfilter = document.getElementById('latest-data-subfilter');
+
+			if (latest_data_subfilter) {
+				return latest_data_subfilter;
+			}
+			else {
+				const table = document.createElement('table');
+
+				table.classList.add('list-table', 'tabfilter-subfilter');
+				table.id = 'latest-data-subfilter';
+
+				return document.querySelector('.tabfilter-content-container').appendChild(table);
+			}
 		},
 
 		_addRefreshMessage(messages) {
@@ -275,9 +283,26 @@
 			this.getCurrentForm().removeClass('is-loading is-loading-fadein delayed-15s');
 		},
 
-		doRefresh(body, subfilter) {
+		doRefresh(body, subfilter = null) {
 			this.getCurrentForm().replaceWith(body);
-			this.getCurrentSubfilter().replaceWith(subfilter);
+
+			const colapsed_tabfilter = document.querySelector('.tabfilter-collapsed');
+
+			if (subfilter !== null) {
+				this.getCurrentSubfilter().innerHTML = subfilter;
+
+				if (colapsed_tabfilter !== null) {
+					colapsed_tabfilter.classList.remove('display-none');
+				}
+			}
+			else {
+				this.getCurrentSubfilter().remove();
+
+				if (colapsed_tabfilter !== null) {
+					colapsed_tabfilter.classList.add('display-none');
+				}
+			}
+
 			chkbxRange.init();
 			this.initListActions();
 		},
@@ -300,7 +325,7 @@
 		onDataDone(response) {
 			this.clearLoading();
 			this._removeRefreshMessage();
-			this.doRefresh(response.body, response.subfilter);
+			this.doRefresh(response.body, response.subfilter ? response.subfilter : null);
 
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);

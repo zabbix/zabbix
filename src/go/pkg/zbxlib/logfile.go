@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package zbxlib
@@ -35,13 +30,12 @@ typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 typedef char * char_lp_t;
 typedef zbx_vector_pre_persistent_t * zbx_vector_pre_persistent_lp_t;
 
-zbx_active_metric_t *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, int flags)
+zbx_active_metric_t *new_metric(zbx_uint64_t itemid, char *key, zbx_uint64_t lastlogsize, int mtime, int flags)
 {
 	zbx_active_metric_t *metric = malloc(sizeof(zbx_active_metric_t));
 	memset(metric, 0, sizeof(zbx_active_metric_t));
+	metric->itemid = itemid;
 	metric->key = key;
-	// key_orig is used in error messages, consider using "itemid: <itemid>" instead of the key
-	metric->key_orig = zbx_strdup(NULL, key);
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
 	metric->flags = (unsigned char)flags;
@@ -51,9 +45,9 @@ zbx_active_metric_t *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, 
 	return metric;
 }
 
-void metric_set_refresh(zbx_active_metric_t *metric, int refresh)
+void metric_set_nextcheck(zbx_active_metric_t *metric, int nextcheck)
 {
-	metric->refresh = refresh;
+	metric->nextcheck = nextcheck;
 }
 
 void metric_get_meta(zbx_active_metric_t *metric, zbx_uint64_t *lastlogsize, int *mtime)
@@ -103,7 +97,7 @@ void	metric_free(zbx_active_metric_t *metric)
 		return;
 
 	zbx_free(metric->key);
-	zbx_free(metric->key_orig);
+	zbx_free(metric->delay);
 
 	for (i = 0; i < metric->logfiles_num; i++)
 		zbx_free(metric->logfiles[i].filename);
@@ -181,10 +175,10 @@ static void free_log_result(log_result_t *result)
 	zbx_free(result);
 }
 
-int	process_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
-		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
-		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
-		unsigned char flags)
+int	process_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_uint64_t itemid,
+		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
+		const int *mtime, unsigned long *timestamp, const char *source, unsigned short *severity,
+		unsigned long *logeventid, unsigned char flags)
 {
 	ZBX_UNUSED(addrs);
 
@@ -213,8 +207,8 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 static int	invoke_process_log_check(zbx_vector_ptr_t *agent2_result, zbx_vector_expression_t *regexps,
 		zbx_active_metric_t *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		int *mtime_sent, char **error, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, zbx_uint64_t itemid,
-		int config_buffer_send, int config_buffer_size, int config_max_lines_per_second)
+		const char *config_source_ip, const char *config_hostname, int config_buffer_send, int config_buffer_size,
+		 int config_max_lines_per_second)
 {
 	int	ret;
 	zbx_vector_pre_persistent_t	vect;
@@ -230,8 +224,8 @@ static int	invoke_process_log_check(zbx_vector_ptr_t *agent2_result, zbx_vector_
 	zbx_vector_pre_persistent_create(&vect);
 
 	ret = process_log_check(NULL, agent2_result, regexps, metric, process_value_cb, lastlogsize_sent, mtime_sent, error,
-		&vect, config_tls, config_timeout, config_source_ip, config_hostname, itemid, config_buffer_send,
-		config_buffer_size, config_max_lines_per_second);
+		&vect, config_tls, config_timeout, config_source_ip, config_hostname, config_buffer_send, config_buffer_size,
+		config_max_lines_per_second);
 
 #if !defined(__MINGW32__)
 	sigaction(SIGSEGV, &sa_old, NULL);
@@ -279,10 +273,10 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/tls"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (
@@ -313,7 +307,13 @@ type LogResult struct {
 	Mtime       int
 }
 
-func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int32) (data unsafe.Pointer, err error) {
+func NewActiveMetric(
+	itemid uint64,
+	key string,
+	params []string,
+	lastLogsize uint64,
+	mtime int32,
+) (data unsafe.Pointer, err error) {
 	flags := MetricFlagNew | MetricFlagPersistent
 	switch key {
 	case "log":
@@ -350,7 +350,8 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 	ckey := C.CString(itemutil.MakeKey(key, params))
 
 	log.Tracef("Calling C function \"new_metric()\"")
-	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
+	return unsafe.Pointer(C.new_metric(C.zbx_uint64_t(itemid), ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime),
+		C.int(flags))), nil
 }
 
 func FreeActiveMetric(data unsafe.Pointer) {
@@ -358,9 +359,9 @@ func FreeActiveMetric(data unsafe.Pointer) {
 	C.metric_free(C.ZBX_ACTIVE_METRIC_LP(data))
 }
 
-func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer, itemid uint64) {
-	log.Tracef("Calling C function \"metric_set_refresh()\"")
-	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
+func ProcessLogCheck(data unsafe.Pointer, item *LogItem, nextcheck int, cblob unsafe.Pointer, itemid uint64) {
+	log.Tracef("Calling C function \"metric_set_nextcheck()\"")
+	C.metric_set_nextcheck(C.ZBX_ACTIVE_METRIC_LP(data), C.int(nextcheck))
 
 	var clastLogsizeSent, clastLogsizeLast C.zbx_uint64_t
 	var cmtimeSent, cmtimeLast C.int
@@ -441,7 +442,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
 		C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
 		&cmtimeSent, &cerrmsg, ctlsConfig_p, (C.int)(agent.Options.Timeout),
-		cSourceIP, cHostname, C.zbx_uint64_t(itemid), (C.int)(agent.Options.BufferSend),
+		cSourceIP, cHostname, (C.int)(agent.Options.BufferSend),
 		(C.int)(agent.Options.BufferSize), (C.zbx_config_max_lines_per_second))
 
 	// add cached results

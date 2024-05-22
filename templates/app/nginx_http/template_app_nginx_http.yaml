@@ -8,8 +8,33 @@ zabbix_export:
       template: 'Nginx by HTTP'
       name: 'Nginx by HTTP'
       description: |
-        Get metrics from stub status module using HTTP agent
-        https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html.
+        This template is developed to monitor Nginx by Zabbix that works without any external scripts.
+        Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+        
+        The template collects metrics by polling the module 'ngx_http_stub_status_module' with HTTP agent remotely:
+        https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html
+        
+        Active connections: 291
+        server accepts handled requests
+        16630948 16630948 31070465
+        Reading: 6 Writing: 179 Waiting: 106
+        
+        Setup:
+        
+        1. See the setup instructions for 'ngx_http_stub_status_module':
+        https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html
+        
+        Test the availability of the 'http_stub_status_module' with 'nginx -V 2>&1 | grep -o with-http_stub_status_module'.
+        
+        Example configuration of Nginx:
+        
+        location = /basic_status {
+            stub_status;
+            allow <IP of your Zabbix server/proxy>;
+            deny all;
+        }
+        
+        2. Set the hostname or IP address of the Nginx host or Nginx container in the '{$NGINX.STUB_STATUS.HOST}' macro. You can also change the status page port in the '{$NGINX.STUB_STATUS.PORT}' macro, the status page scheme in the '{$NGINX.STUB_STATUS.SCHEME}' macro and the status page path in the '{$NGINX.STUB_STATUS.PATH}' macro if necessary.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384765-discussion-thread-for-official-zabbix-template-nginx
         
@@ -21,9 +46,9 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 18c6209295b347e2a96ef11b147139d8
-          name: 'Nginx: Service response time'
+          name: 'Service response time'
           type: SIMPLE
-          key: 'net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"]'
+          key: 'net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -34,21 +59,21 @@ zabbix_export:
               value: health
           triggers:
             - uuid: fc1f7927b8864996986c1da44df57279
-              expression: 'min(/Nginx by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN}'
-              name: 'Nginx: Service response time is too high'
-              event_name: 'Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              expression: 'min(/Nginx by HTTP/net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN}'
+              name: 'Service response time is too high'
+              event_name: 'Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
-                - name: 'Nginx: Service is down'
-                  expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"])=0'
+                - name: 'Service is down'
+                  expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: e4a09193bc8f42f2888ece83f89f84af
-          name: 'Nginx: Service status'
+          name: 'Service status'
           type: SIMPLE
-          key: 'net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"]'
+          key: 'net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"]'
           history: 7d
           valuemap:
             name: 'Service state'
@@ -63,15 +88,15 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 7b3de87ba0ea425280d42235bb626b8b
-              expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"])=0'
-              name: 'Nginx: Service is down'
+              expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
+              name: 'Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: availability
         - uuid: e054b58ebbbe4b45961ba697b468ab9e
-          name: 'Nginx: Connections accepted per second'
+          name: 'Connections accepted per second'
           type: DEPENDENT
           key: nginx.connections.accepted.rate
           delay: '0'
@@ -92,7 +117,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 2e4b049ab60947d9a05165f67388e531
-          name: 'Nginx: Connections active'
+          name: 'Connections active'
           type: DEPENDENT
           key: nginx.connections.active
           delay: '0'
@@ -109,7 +134,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: eecc0e887a744627be7f3b01cec6d46e
-          name: 'Nginx: Connections dropped per second'
+          name: 'Connections dropped per second'
           type: DEPENDENT
           key: nginx.connections.dropped.rate
           delay: '0'
@@ -135,19 +160,19 @@ zabbix_export:
           triggers:
             - uuid: 79767fbc18594069a1fc0cbec832f8ff
               expression: 'min(/Nginx by HTTP/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
-              name: 'Nginx: High connections drop rate'
-              event_name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
+              name: 'High connections drop rate'
+              event_name: 'High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               opdata: 'Current rate: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The rate of dropping connections has been greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
               dependencies:
-                - name: 'Nginx: Service is down'
-                  expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"])=0'
+                - name: 'Service is down'
+                  expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: a53cf4f2d2ad4a84a70ff57df6299adc
-          name: 'Nginx: Connections handled per second'
+          name: 'Connections handled per second'
           type: DEPENDENT
           key: nginx.connections.handled.rate
           delay: '0'
@@ -168,7 +193,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 73493cbf8508419a8fed3abff8cc5851
-          name: 'Nginx: Connections reading'
+          name: 'Connections reading'
           type: DEPENDENT
           key: nginx.connections.reading
           delay: '0'
@@ -185,7 +210,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: cf393814511a48b498da8aab94d7ca00
-          name: 'Nginx: Connections waiting'
+          name: 'Connections waiting'
           type: DEPENDENT
           key: nginx.connections.waiting
           delay: '0'
@@ -202,7 +227,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: b0d63efb16984042945fe42e192f7d4e
-          name: 'Nginx: Connections writing'
+          name: 'Connections writing'
           type: DEPENDENT
           key: nginx.connections.writing
           delay: '0'
@@ -219,7 +244,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 86f93d1941d147fe94d754eddd3e8ff2
-          name: 'Nginx: Get stub status page'
+          name: 'Get stub status page'
           type: HTTP_AGENT
           key: nginx.get_stub_status
           history: 1h
@@ -236,7 +261,7 @@ zabbix_export:
             `Waiting` - the current number of idle client connections waiting for a request.
             
             See also [Module ngx_http_stub_status_module](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html).
-          url: '{$NGINX.STUB_STATUS.SCHEME}://{HOST.CONN}:{$NGINX.STUB_STATUS.PORT}/{$NGINX.STUB_STATUS.PATH}'
+          url: '{$NGINX.STUB_STATUS.SCHEME}://{$NGINX.STUB_STATUS.HOST}:{$NGINX.STUB_STATUS.PORT}/{$NGINX.STUB_STATUS.PATH}'
           retrieve_mode: BOTH
           tags:
             - tag: component
@@ -248,19 +273,19 @@ zabbix_export:
               expression: |
                 find(/Nginx by HTTP/nginx.get_stub_status,,"iregexp","HTTP\\/[\\d.]+\\s+200")=0 or
                 nodata(/Nginx by HTTP/nginx.get_stub_status,30m)=1
-              name: 'Nginx: Failed to fetch stub status page'
-              event_name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
+              name: 'Failed to fetch stub status page'
+              event_name: 'Failed to fetch stub status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Nginx: Service is down'
-                  expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"])=0'
+                - name: 'Service is down'
+                  expression: 'last(/Nginx by HTTP/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 071b3d77324740a59045be19da231d76
-          name: 'Nginx: Requests total'
+          name: 'Requests total'
           type: DEPENDENT
           key: nginx.requests.total
           delay: '0'
@@ -277,7 +302,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 81b17056ec664f9f926a74ee390ab9c1
-          name: 'Nginx: Requests per second'
+          name: 'Requests per second'
           type: DEPENDENT
           key: nginx.requests.total.rate
           delay: '0'
@@ -298,7 +323,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 716b627d6d894ac2af3ae8c4aeaa8c0c
-          name: 'Nginx: Version'
+          name: Version
           type: DEPENDENT
           key: nginx.version
           delay: '0'
@@ -321,8 +346,8 @@ zabbix_export:
           triggers:
             - uuid: 0f2689d4967a446e98a107b933179817
               expression: 'last(/Nginx by HTTP/nginx.version,#1)<>last(/Nginx by HTTP/nginx.version,#2) and length(last(/Nginx by HTTP/nginx.version))>0'
-              name: 'Nginx: Version has changed'
-              event_name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'The Nginx version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -341,6 +366,9 @@ zabbix_export:
         - macro: '{$NGINX.RESPONSE_TIME.MAX.WARN}'
           value: '10'
           description: 'The maximum response time of Nginx expressed in seconds for a trigger expression.'
+        - macro: '{$NGINX.STUB_STATUS.HOST}'
+          value: '<SET STUB_STATUS HOST>'
+          description: 'The hostname or IP address of the Nginx host or Nginx container of a stub_status.'
         - macro: '{$NGINX.STUB_STATUS.PATH}'
           value: basic_status
           description: 'The path of the `Nginx stub_status` page.'
@@ -356,7 +384,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -369,7 +397,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -381,8 +409,8 @@ zabbix_export:
                       name: reference
                       value: AAAAC
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

@@ -33,8 +33,12 @@ Metrics are collected by JMX.
 |----|-----------|-------|
 |{$TOMCAT.USER}|<p>User for JMX</p>||
 |{$TOMCAT.PASSWORD}|<p>Password for JMX</p>||
-|{$TOMCAT.LLD.FILTER.MATCHES}|<p>Filter for discoverable objects. Can be used with following contexts: "GlobalRequestProcessor", "ThreadPool", "Manager"</p>|`.*`|
-|{$TOMCAT.LLD.FILTER.NOT_MATCHES}|<p>Filter to exclude discovered objects. Can be used with following contexts: "GlobalRequestProcessor", "ThreadPool", "Manager"</p>|`CHANGE IF NEEDED`|
+|{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.MATCHES}|<p>Filter for discoverable global request processors.</p>|`.*`|
+|{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.NOT_MATCHES}|<p>Filter to exclude global request processors.</p>|`CHANGE_IF_NEEDED`|
+|{$TOMCAT.LLD.FILTER.MANAGER.MATCHES}|<p>Filter for discoverable managers.</p>|`.*`|
+|{$TOMCAT.LLD.FILTER.MANAGER.NOT_MATCHES}|<p>Filter to exclude managers.</p>|`CHANGE_IF_NEEDED`|
+|{$TOMCAT.LLD.FILTER.THREAD_POOL.MATCHES}|<p>Filter for discoverable thread pools.</p>|`.*`|
+|{$TOMCAT.LLD.FILTER.THREAD_POOL.NOT_MATCHES}|<p>Filter to exclude thread pools.</p>|`CHANGE_IF_NEEDED`|
 |{$TOMCAT.THREADS.MAX.PCT}|<p>Threshold for busy worker threads trigger. Can be used with {#JMXNAME} as context.</p>|`75`|
 |{$TOMCAT.THREADS.MAX.TIME}|<p>The time during which the number of busy threads can exceed the threshold. Can be used with {#JMXNAME} as context.</p>|`5m`|
 
@@ -42,13 +46,13 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Tomcat: Version|<p>The version of the Tomcat.</p>|JMX agent|jmx["Catalina:type=Server",serverInfo]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Version|<p>The version of the Tomcat.</p>|JMX agent|jmx["Catalina:type=Server",serverInfo]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Tomcat: Version has been changed|<p>The Tomcat version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0`|Info|**Manual close**: Yes|
+|Version has been changed|<p>The Tomcat version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Global request processors discovery
 

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -126,34 +121,24 @@ class testPageMonitoringLatestData extends CWebTest {
 		);
 		$this->assertTrue($this->query('button:Apply')->one()->isClickable());
 
-		$subfilter = $this->query('id:latest-data-subfilter')->asTable()->one();
-		$this->assertTrue($subfilter->query('xpath:.//h4[text()="Subfilter "]/span[@class="grey" and '.
-				'text()="affects only filtered data"]')->one()->isValid()
+		// Subfilter is not visible if filter isn't set.
+		$this->assertFalse($this->query('id:latest-data-subfilter')->exists());
+		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+				explode("\n", $this->query('class:no-data-message')->one()->getText())
 		);
-
-		foreach (['Hosts', 'Tags', 'Tag values'] as $header) {
-			$this->assertTrue($subfilter->query("xpath:.//h3[text()=".CXPathHelper::escapeQuotes($header)."]")
-					->one()->isValid()
-			);
-		}
-
-		// With data/Without data subfilter is always present.
-		$subfilter_queries = ['xpath:.//h3[text()="Data"]', 'link:With data', 'link:Without data'];
-
-		foreach ($subfilter_queries as $query) {
-			$this->assertTrue($subfilter->query($query)->one()->isValid());
-		}
 
 		$form->fill(['Hosts' => self::HOSTNAME]);
 		$form->submit();
-		$subfilter->waitUntilReloaded();
 
-		foreach ($subfilter_queries as $query) {
+		$subfilter = $this->query('id:latest-data-subfilter')->waitUntilVisible()->asTable()->one();
+		$this->assertTrue($subfilter->query('xpath:.//h4[text()="Subfilter "]/span[@class="grey" and '.
+				'text()="affects only filtered data"]')->one()->isValid()
+		);
+		$this->assertEquals(['HOSTS', 'TAGS', 'TAG VALUES', 'DATA'], $subfilter->query('tag:h3')->all()->asText());
+
+		foreach (['link:With data', 'link:Without data'] as $query) {
 			$this->assertTrue($subfilter->query($query)->one()->isValid());
 		}
-
-		$this->query('button:Reset')->waitUntilClickable()->one()->click();
-		$subfilter->waitUntilReloaded();
 
 		// Check table headers.
 		$details_headers = [
@@ -162,17 +147,23 @@ class testPageMonitoringLatestData extends CWebTest {
 			false => ['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info']
 		];
 
+		$table = $this->getTable();
 		foreach ($details_headers as $status => $headers) {
 			$this->query('name:show_details')->one()->asCheckbox()->set($status);
 			$form->submit();
-			$subfilter->waitUntilReloaded();
-			$this->assertEquals($headers, $this->getTable()->getHeadersText());
+			$table->waitUntilReloaded();
+			$this->assertEquals($headers, $table->getHeadersText());
 		}
 
 		// Check that sortable headers are clickable.
-		foreach (['Host', 'Name'] as $header) {
-			$this->assertTrue($this->getTable()->query('xpath:.//th/a[text()="'.$header.'"]')->one()->isClickable());
-		}
+		$this->assertEquals(['Host', 'Name'], $table->getSortableHeaders()->asText());
+
+		// Subfilter is not visible again after Reset.
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->assertFalse($this->query('id:latest-data-subfilter')->waitUntilNotVisible()->exists());
+		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+				explode("\n", $this->query('class:no-data-message')->one()->getText())
+		);
 
 		// Check filter collapse/expand.
 		$filter_tab = $this->query('xpath://a[contains(@class, "tabfilter-item-link")]')->one();
@@ -571,7 +562,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		$link = (CTestArrayHelper::get($data['subfilter'], 'Data'))
 			? 'zabbix.php?action=latest.view&hostids%5B%5D='.$hostid
-			: 'zabbix.php?action=latest.view';
+			: 'zabbix.php?action=latest.view&name=item';
 
 		$this->page->login()->open($link)->waitUntilReady();
 
@@ -615,9 +606,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		);
 
 		$this->assertTableData([
-				['Name' => 'Linux: Free swap space'],
-				['Name' => 'Linux: Free swap space in %'],
-				['Name' => 'Linux: Total swap space']
+				['Name' => 'Free swap space'],
+				['Name' => 'Free swap space in %'],
+				['Name' => 'Total swap space']
 			], $this->getTableSelector()
 		);
 	}
@@ -649,24 +640,34 @@ class testPageMonitoringLatestData extends CWebTest {
 			)
 		];
 
-		$this->page->login()->open('zabbix.php?action=latest.view');
+		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['State' => 'Normal']);
+		$table = $this->getTable();
+		$this->query('button:Apply')->one()->click();
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		foreach ($result as $hosts) {
 			foreach ($hosts as $host) {
 				/*
 				 * Check if hostname is present on page, if not, go to next page.
-				 * Now there are 3 pages for unfiltered Latest data.
+				 * Now there are 2 pages for Latest data with state Normal.
 				 */
-				for ($i = 1; $i < 3; $i++) {
+				for ($i = 1; $i < 2; $i++) {
 					$this->assertFalse($this->query('link', $host['host'])->one(false)->isValid());
 					$this->query('class:arrow-right')->waitUntilClickable()->one()->click();
 					$this->page->waitUntilReady();
 				}
 
-				$this->query('button:Reset')->waitUntilClickable()->one()->click();
+				$this->query('class:table-paging')->query('link:1')->waitUntilClickable()->one()->click();
+				$this->page->waitUntilReady();
 			}
 		}
+
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 	}
 
 	public static function getItemDescription() {
@@ -774,7 +775,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());

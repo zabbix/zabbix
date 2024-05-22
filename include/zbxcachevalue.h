@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_CACHEVALUE_H
@@ -92,6 +87,10 @@ typedef struct
 }
 zbx_vc_item_stats_t;
 
+ZBX_PTR_VECTOR_DECL(vc_item_stats_ptr, zbx_vc_item_stats_t *)
+
+void	zbx_vc_item_stats_free(zbx_vc_item_stats_t *vc_item_stats);
+
 int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error);
 
 void	zbx_vc_destroy(void);
@@ -108,7 +107,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 int	zbx_vc_get_value(zbx_uint64_t itemid, unsigned char value_type, const zbx_timespec_t *ts,
 		zbx_history_record_t *value);
 
-int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines);
+int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int config_history_storage_pipelines);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
 
@@ -116,7 +115,7 @@ void	zbx_vc_remove_items_by_ids(zbx_vector_uint64_t *itemids);
 
 void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, int *mode);
 void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem);
-void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats);
+void	zbx_vc_get_item_stats(zbx_vector_vc_item_stats_ptr_t *stats);
 void	zbx_vc_flush_stats(void);
 
 void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items);

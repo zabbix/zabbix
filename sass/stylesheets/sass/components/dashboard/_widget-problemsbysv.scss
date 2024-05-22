@@ -1,3 +1,11 @@
+// Widget view.
+
+div.dashboard-widget-problemsbysv {
+	.list-table tr[data-hostgroupid] {
+		cursor: pointer;
+	}
+}
+
 // Modifications by themes.
 
 @if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {

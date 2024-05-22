@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "checks_simple_vmware.h"
@@ -1060,10 +1055,13 @@ out:
 	return ret;
 }
 
-static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t eventlog_last_key,
-		const zbx_dc_item_t *item, zbx_vector_agent_result_ptr_t *add_results)
+static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events,
+		const zbx_vmware_eventlog_state_t *evt_state, const zbx_dc_item_t *item,
+		zbx_vector_agent_result_ptr_t *add_results)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T " events:%d top event id:"
+			ZBX_FS_UI64 " top event ts:" ZBX_FS_TIME_T, __func__, evt_state->last_key, evt_state->last_ts,
+			events->values_num, events->values[0]->key, events->values[0]->timestamp);
 
 	/* events were retrieved in reverse chronological order */
 	for (int i = events->values_num - 1; i >= 0; i--)
@@ -1071,7 +1069,8 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_u
 		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
 		AGENT_RESULT			*add_result = NULL;
 
-		if (event->key <= eventlog_last_key)
+		/* Event id of ESXi will reset when ESXi is rebooted */
+		if (event->timestamp <= evt_state->last_ts && event->key <= evt_state->last_key)
 			continue;
 
 		add_result = (AGENT_RESULT *)zbx_malloc(add_result, sizeof(AGENT_RESULT));
@@ -1084,7 +1083,7 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_u
 			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
 				add_result->log->logeventid = event->key;
-				add_result->log->timestamp = event->timestamp;
+				add_result->log->timestamp = (int)event->timestamp;
 			}
 
 			zbx_vector_agent_result_ptr_append(add_results, add_result);
@@ -1220,6 +1219,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	{
 		/* this may happen if recreate item vmware.eventlog for same service URL */
 		service->eventlog.last_key = request->lastlogsize;
+		service->eventlog.last_ts = 0;
 		service->eventlog.skip_old = skip_old;
 	}
 	else if (0 != service->eventlog.oom)
@@ -1236,8 +1236,9 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	}
 	else if (0 < service->data->events.values_num)
 	{
-		vmware_get_events(&service->data->events, request->lastlogsize, item, add_results);
+		vmware_get_events(&service->data->events, &service->eventlog, item, add_results);
 		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
+		service->eventlog.last_ts = ((const zbx_vmware_event_t *)service->data->events.values[0])->timestamp;
 	}
 
 	ret = SYSINFO_RET_OK;

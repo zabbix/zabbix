@@ -39,7 +39,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 25196b29de6c45c18485f2aefe306818
-          name: 'YugabyteDB: Get cluster'
+          name: 'Get cluster'
           type: SCRIPT
           key: yugabytedb.clusters.get
           delay: 1h
@@ -127,7 +127,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f5a43644d4d341658b8818077e24ccb3
-          name: 'YugabyteDB: Get clusters item error'
+          name: 'Get clusters item error'
           type: DEPENDENT
           key: yugabytedb.clusters.get.errors
           delay: '0'
@@ -151,7 +151,7 @@ zabbix_export:
           triggers:
             - uuid: add4067f699f401887d259ee35b4d654
               expression: 'length(last(/YugabyteDB by HTTP/yugabytedb.clusters.get.errors)) > 0'
-              name: 'YugabyteDB: Failed to fetch data'
+              name: 'Failed to fetch data'
               priority: WARNING
               description: 'Failed to fetch data about cluster.'
               tags:
@@ -239,7 +239,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 4872cb50f8284ff6aa07c530156f324e
-          name: 'YugabyteDB Cluster: YSQL connections average used'
+          name: 'YSQL connections average used'
           type: DEPENDENT
           key: yugabytedb.cluster.connection.count
           delay: '0'
@@ -257,7 +257,7 @@ zabbix_export:
             - tag: component
               value: connection
         - uuid: 5bfd7adb38334116a5a54e2a0e2847f9
-          name: 'YugabyteDB Cluster: YSQL connections limit'
+          name: 'YSQL connections limit'
           type: DEPENDENT
           key: yugabytedb.cluster.connection.limit
           delay: '0'
@@ -278,7 +278,7 @@ zabbix_export:
             - tag: component
               value: connection
         - uuid: 187e373dd49a4214b1862393538ff209
-          name: 'YugabyteDB Cluster: YSQL connections maximum used'
+          name: 'YSQL connections maximum used'
           type: DEPENDENT
           key: yugabytedb.cluster.connection.max
           delay: '0'
@@ -296,7 +296,7 @@ zabbix_export:
             - tag: component
               value: connection
         - uuid: a7c388d2e66b48469e47a55cbb6ec614
-          name: 'YugabyteDB Cluster: YSQL connections utilization'
+          name: 'YSQL connections utilization'
           type: CALCULATED
           key: yugabytedb.cluster.connection.utilization
           history: 7d
@@ -312,21 +312,21 @@ zabbix_export:
           triggers:
             - uuid: 5caf42a5309a4f0f834b6058f4741a44
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.utilization,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}'
-              name: 'YugabyteDB Cluster: Average utilization of connections is high'
-              event_name: 'YugabyteDB Cluster: Average utilization of connections is high (over {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}% for 5m)'
+              name: 'Average utilization of connections is high'
+              event_name: 'Average utilization of connections is high (over {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}% for 5m)'
               opdata: 'Current connections utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}% of the connection limit.'
               dependencies:
-                - name: 'YugabyteDB Cluster: Average utilization of connections is too high'
+                - name: 'Average utilization of connections is too high'
                   expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.utilization,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
                   value: performance
             - uuid: 68d2710963394afe8218178c98e88c62
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.utilization,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}'
-              name: 'YugabyteDB Cluster: Average utilization of connections is too high'
-              event_name: 'YugabyteDB Cluster: Average utilization of connections is too high (over {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}% for 5m)'
+              name: 'Average utilization of connections is too high'
+              event_name: 'Average utilization of connections is too high (over {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}% for 5m)'
               opdata: 'Current connections utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}% of the connection limit.'
@@ -334,7 +334,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 8065a31bd61b494a9edf94692c4846ff
-          name: 'YugabyteDB Cluster: CPU utilization'
+          name: 'CPU utilization'
           type: DEPENDENT
           key: yugabytedb.cluster.cpu.utilization
           delay: '0'
@@ -356,21 +356,21 @@ zabbix_export:
           triggers:
             - uuid: 22340ce9ea2e457fa4270498bfc53666
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.utilization,5m) > {$YUGABYTEDB.CPU.UTILIZATION.WARN}'
-              name: 'YugabyteDB Cluster: CPU utilization is high'
-              event_name: 'YugabyteDB Cluster: CPU utilization is high (over {$YUGABYTEDB.CPU.UTILIZATION.WARN}% for 5m)'
+              name: 'CPU utilization is high'
+              event_name: 'CPU utilization is high (over {$YUGABYTEDB.CPU.UTILIZATION.WARN}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'YugabyteDB Cluster CPU utilization is more than {$YUGABYTEDB.CPU.UTILIZATION.WARN}%. The system might be slow to respond.'
               dependencies:
-                - name: 'YugabyteDB Cluster: CPU utilization is too high'
+                - name: 'CPU utilization is too high'
                   expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.utilization,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
                   value: performance
             - uuid: ed88478e0a784c8dbbe95c20b08c167e
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.utilization,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}'
-              name: 'YugabyteDB Cluster: CPU utilization is too high'
-              event_name: 'YugabyteDB Cluster: CPU utilization is too high (over {$YUGABYTEDB.CPU.UTILIZATION.CRIT}% for 5m)'
+              name: 'CPU utilization is too high'
+              event_name: 'CPU utilization is too high (over {$YUGABYTEDB.CPU.UTILIZATION.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'YugabyteDB Cluster CPU utilization is more than {$YUGABYTEDB.CPU.UTILIZATION.CRIT}%. The system might be slow to respond.'
@@ -378,7 +378,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 03b2e6e400334c0eb6e6b2c7efe8ddcf
-          name: 'YugabyteDB Cluster: Disk space provisioned'
+          name: 'Disk space provisioned'
           type: DEPENDENT
           key: yugabytedb.cluster.disk.provisioned
           delay: '0'
@@ -404,7 +404,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 2e59d947823e4e6b8a3eb9cd28cb8602
-          name: 'YugabyteDB Cluster: Disk read, Bps'
+          name: 'Disk read, Bps'
           type: DEPENDENT
           key: yugabytedb.cluster.disk.read.bps
           delay: '0'
@@ -427,7 +427,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7a7c47740d01462f82ccb8649de19a23
-          name: 'YugabyteDB Cluster: Disk read OPS'
+          name: 'Disk read OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.disk.read.ops
           delay: '0'
@@ -447,7 +447,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 03cd79b37aa543d4ba3ce9fb154513f2
-          name: 'YugabyteDB Cluster: Disk space usage'
+          name: 'Disk space usage'
           type: DEPENDENT
           key: yugabytedb.cluster.disk.usage
           delay: '0'
@@ -470,7 +470,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b2de999838914ca2bfc2c4fdfd22db74
-          name: 'YugabyteDB Cluster: Disk space utilization'
+          name: 'Disk space utilization'
           type: CALCULATED
           key: yugabytedb.cluster.disk.utilization
           history: 7d
@@ -486,7 +486,7 @@ zabbix_export:
           triggers:
             - uuid: 3571704c29e040b198a6e72d7526c98a
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.utilization,5m) > {$YUGABYTEDB.DISK.UTILIZATION.CRIT}'
-              name: 'YugabyteDB Cluster: Storage space is critically low'
+              name: 'Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.DISK.UTILIZATION.CRIT}% of disk space.'
@@ -495,18 +495,18 @@ zabbix_export:
                   value: capacity
             - uuid: 21623809368a43b0bdfb127f2fdea22c
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.utilization,5m) > {$YUGABYTEDB.DISK.UTILIZATION.WARN}'
-              name: 'YugabyteDB Cluster: Storage space is low'
+              name: 'Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.DISK.UTILIZATION.WARN}% of disk space.'
               dependencies:
-                - name: 'YugabyteDB Cluster: Storage space is critically low'
+                - name: 'Storage space is critically low'
                   expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.utilization,5m) > {$YUGABYTEDB.DISK.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: c528c1692fe84e7c85ec99f5802dea15
-          name: 'YugabyteDB Cluster: Disk write, Bps'
+          name: 'Disk write, Bps'
           type: DEPENDENT
           key: yugabytedb.cluster.disk.write.bps
           delay: '0'
@@ -529,7 +529,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 0badafcd38d34e4faa70f95ba501658a
-          name: 'YugabyteDB Cluster: Disk write OPS'
+          name: 'Disk write OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.disk.write.ops
           delay: '0'
@@ -549,7 +549,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: d8f71197e0e147fea4de2a17d4b1ad81
-          name: 'YugabyteDB Cluster: Get cluster'
+          name: 'Get cluster'
           type: SCRIPT
           key: yugabytedb.cluster.get
           delay: 10m
@@ -639,7 +639,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: fe9960991a4540e795a0a113cd251271
-          name: 'YugabyteDB Cluster: Get cluster item error'
+          name: 'Get cluster item error'
           type: DEPENDENT
           key: yugabytedb.cluster.get.errors
           delay: '0'
@@ -661,7 +661,7 @@ zabbix_export:
             - tag: component
               value: error
         - uuid: e5415e8c03ac4a61aa10a6b35a18b084
-          name: 'YugabyteDB Cluster: Health state'
+          name: 'Health state'
           type: DEPENDENT
           key: yugabytedb.cluster.health.state
           delay: '0'
@@ -698,7 +698,7 @@ zabbix_export:
           triggers:
             - uuid: e111a563fb9947eda48a56ad5ef59891
               expression: 'last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.health.state,#1) <> 0'
-              name: 'YugabyteDB Cluster: Cluster is not healthy'
+              name: 'Cluster is not healthy'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'YugabyteDB Cluster is not healthy.'
@@ -706,7 +706,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 955291127a4e483693c1db6690a1beab
-          name: 'YugabyteDB Cluster: Memory total'
+          name: 'Memory total'
           type: DEPENDENT
           key: yugabytedb.cluster.memory.total
           delay: '0'
@@ -732,7 +732,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 682d46a939cf4ec186d4081e7a8eee42
-          name: 'YugabyteDB Cluster: Memory usage'
+          name: 'Memory usage'
           type: DEPENDENT
           key: yugabytedb.cluster.memory.usage
           delay: '0'
@@ -755,7 +755,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 18e6de024a7a4ae48901f455dbd0a373
-          name: 'YugabyteDB Cluster: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: yugabytedb.cluster.memory.utilization
           history: 7d
@@ -771,21 +771,21 @@ zabbix_export:
           triggers:
             - uuid: 5614204dbeca4b799989a13717824f07
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.utilization,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}'
-              name: 'YugabyteDB Cluster: Memory utilization is high'
-              event_name: 'YugabyteDB Cluster: Memory utilization is high (>{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN} for 5m)'
+              name: 'Memory utilization is high'
+              event_name: 'Memory utilization is high (>{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN} for 5m)'
               opdata: 'Current memory utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}% of memory.'
               dependencies:
-                - name: 'YugabyteDB Cluster: Memory utilization is too high'
+                - name: 'Memory utilization is too high'
                   expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.utilization,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
                   value: performance
             - uuid: 27a8c6b07e474581be53f5d896387f45
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.utilization,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}'
-              name: 'YugabyteDB Cluster: Memory utilization is too high'
-              event_name: 'YugabyteDB Cluster: Memory utilization is too high (>{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT} for 5m)'
+              name: 'Memory utilization is too high'
+              event_name: 'Memory utilization is too high (>{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT} for 5m)'
               opdata: 'Current memory utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}% of memory.'
@@ -793,7 +793,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9c51b3d15ac448388e23c74d4e5bba3a
-          name: 'YugabyteDB Cluster: Get cluster metrics'
+          name: 'Get cluster metrics'
           type: SCRIPT
           key: yugabytedb.cluster.metric.get
           history: '0'
@@ -931,7 +931,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 58b766758f7644369d3a1d125e012c07
-          name: 'YugabyteDB Cluster: Get cluster metrics item error'
+          name: 'Get cluster metrics item error'
           type: DEPENDENT
           key: yugabytedb.cluster.metric.get.errors
           delay: '0'
@@ -953,7 +953,7 @@ zabbix_export:
             - tag: component
               value: error
         - uuid: 91ace5e3a9a3428eb209e539c25f43b4
-          name: 'YugabyteDB Cluster: Network receive, Bps'
+          name: 'Network receive, Bps'
           type: DEPENDENT
           key: yugabytedb.cluster.network.receive.bps
           delay: '0'
@@ -976,7 +976,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3503d33b5c35433093565aac0890c717
-          name: 'YugabyteDB Cluster: Network receive error, rate'
+          name: 'Network receive error, rate'
           type: DEPENDENT
           key: yugabytedb.cluster.network.receive.error.rate
           delay: '0'
@@ -995,7 +995,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 51e7acc58c824737af2b48475ede228d
-          name: 'YugabyteDB Cluster: Network transmit, Bps'
+          name: 'Network transmit, Bps'
           type: DEPENDENT
           key: yugabytedb.cluster.network.transmit.bps
           delay: '0'
@@ -1018,7 +1018,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 86c23bbe2d29444b85a6435508c53e28
-          name: 'YugabyteDB Cluster: Network transmit error, rate'
+          name: 'Network transmit error, rate'
           type: DEPENDENT
           key: yugabytedb.cluster.network.transmit.error.rate
           delay: '0'
@@ -1037,7 +1037,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: a64c4ba3b34045aba315dbb500aa86c4
-          name: 'YugabyteDB Cluster: Number of nodes'
+          name: 'Number of nodes'
           type: DEPENDENT
           key: yugabytedb.cluster.node.number
           delay: '0'
@@ -1056,7 +1056,7 @@ zabbix_export:
             - tag: component
               value: cluster
         - uuid: c04d594c1a39437f8e5f47b42ccf9fba
-          name: 'YugabyteDB Cluster: Clock skew'
+          name: 'Clock skew'
           type: DEPENDENT
           key: yugabytedb.cluster.node.skew
           delay: '0'
@@ -1079,7 +1079,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 5497290f85d44d2c95ca0be3d2b030a3
-          name: 'YugabyteDB Cluster: Get cluster query statistic'
+          name: 'Get cluster query statistic'
           type: SCRIPT
           key: yugabytedb.cluster.query.statistic.get
           history: '0'
@@ -1220,7 +1220,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0d9d39db84de4879b6c0fac044537e55
-          name: 'YugabyteDB Cluster: Get cluster query statistic item error'
+          name: 'Get cluster query statistic item error'
           type: DEPENDENT
           key: yugabytedb.cluster.query.statistic.get.errors
           delay: '0'
@@ -1242,7 +1242,7 @@ zabbix_export:
             - tag: component
               value: error
         - uuid: e116d1dfe5c94a64b47c66b0898e2c5a
-          name: 'YugabyteDB Cluster: Average read latency'
+          name: 'Average read latency'
           type: DEPENDENT
           key: yugabytedb.cluster.read.latency
           delay: '0'
@@ -1267,7 +1267,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 4fd495d88f824bd2b18a3c885dc45d28
-          name: 'YugabyteDB Cluster: Software version'
+          name: 'Software version'
           type: DEPENDENT
           key: yugabytedb.cluster.software.version
           delay: '0'
@@ -1290,8 +1290,8 @@ zabbix_export:
           triggers:
             - uuid: 27fdbe72229343029ede51c7705c28c4
               expression: 'last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version,#1) <> last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version,#2) and length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version)) > 0'
-              name: 'YugabyteDB Cluster: Cluster software version has changed'
-              event_name: 'YugabyteDB Cluster: Cluster software version has changed (new version: {ITEM.VALUE})'
+              name: 'Cluster software version has changed'
+              event_name: 'Cluster software version has changed (new version: {ITEM.VALUE})'
               opdata: 'Current version: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'YugabyteDB Cluster software version has changed. Acknowledge to close the problem manually.'
@@ -1300,7 +1300,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 70e1cee9adc149afb7f1765384b587e2
-          name: 'YugabyteDB Cluster: State'
+          name: State
           type: DEPENDENT
           key: yugabytedb.cluster.state
           delay: '0'
@@ -1431,7 +1431,7 @@ zabbix_export:
             - tag: component
               value: cluster
         - uuid: a9b902783af24e5f8d56139e803d85aa
-          name: 'YugabyteDB Cluster: Type'
+          name: Type
           type: DEPENDENT
           key: yugabytedb.cluster.type
           delay: '0'
@@ -1460,7 +1460,7 @@ zabbix_export:
             - tag: component
               value: cluster
         - uuid: fde822561b0c4a9196e52006c6ae459f
-          name: 'YugabyteDB Cluster: Average write latency'
+          name: 'Average write latency'
           type: DEPENDENT
           key: yugabytedb.cluster.write.latency
           delay: '0'
@@ -1485,7 +1485,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 6e303d8bbd3540dcba8e6336e395df01
-          name: 'YugabyteDB Cluster: YB controller version'
+          name: 'YB controller version'
           type: DEPENDENT
           key: yugabytedb.cluster.ybc.version
           delay: '0'
@@ -1508,8 +1508,8 @@ zabbix_export:
           triggers:
             - uuid: d927b0d668fc413db697a2360ac806a6
               expression: 'last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version,#1) <> last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version,#2) and length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version)) > 0'
-              name: 'YugabyteDB Cluster: YB controller version has changed'
-              event_name: 'YugabyteDB Cluster: YB controller version has changed (new version: {ITEM.VALUE})'
+              name: 'YB controller version has changed'
+              event_name: 'YB controller version has changed (new version: {ITEM.VALUE})'
               opdata: 'Current version: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'YugabyteDB Cluster YB controller version has changed. Acknowledge to close the problem manually.'
@@ -1518,7 +1518,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 9034de71bb9a4d5babb77f4433deb9a1
-          name: 'YugabyteDB Cluster: YCQL DELETE average latency'
+          name: 'YCQL DELETE average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.delete.latency
           delay: '0'
@@ -1543,7 +1543,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 31473b597b274acc894bde4415efc1df
-          name: 'YugabyteDB Cluster: YCQL DELETE OPS'
+          name: 'YCQL DELETE OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.delete.ops
           delay: '0'
@@ -1563,7 +1563,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 02b74ef8873a464786ff68b80fa2bc72
-          name: 'YugabyteDB Cluster: YCQL INSERT average latency'
+          name: 'YCQL INSERT average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.insert.latency
           delay: '0'
@@ -1588,7 +1588,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: bc9776051ac5494da1450837ce2541f0
-          name: 'YugabyteDB Cluster: YCQL INSERT OPS'
+          name: 'YCQL INSERT OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.insert.ops
           delay: '0'
@@ -1608,7 +1608,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 267399592fef42c58b5885d1fc4e821d
-          name: 'YugabyteDB Cluster: YCQL OTHER average latency'
+          name: 'YCQL OTHER average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.other.latency
           delay: '0'
@@ -1633,7 +1633,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 8e6f1197d23e4398a40c08232ecbaf88
-          name: 'YugabyteDB Cluster: YCQL OTHER OPS'
+          name: 'YCQL OTHER OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.other.ops
           delay: '0'
@@ -1653,7 +1653,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 438badfcc37c437f94988a211fc1ca1d
-          name: 'YugabyteDB Cluster: YCQL SELECT average latency'
+          name: 'YCQL SELECT average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.select.latency
           delay: '0'
@@ -1678,7 +1678,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: e663d79a6b404c9fb369c213f51a2f62
-          name: 'YugabyteDB Cluster: YCQL SELECT OPS'
+          name: 'YCQL SELECT OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.select.ops
           delay: '0'
@@ -1698,7 +1698,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: e0a86eaf9be4426c9ae8948980cf9855
-          name: 'YugabyteDB Cluster: YCQL transaction average latency'
+          name: 'YCQL transaction average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.transaction.latency
           delay: '0'
@@ -1723,7 +1723,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 4b81ff96ce054cd480073217281eedf7
-          name: 'YugabyteDB Cluster: YCQL transaction OPS'
+          name: 'YCQL transaction OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.transaction.ops
           delay: '0'
@@ -1743,7 +1743,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: c5af4d0a6cb44292882071bcfb39f689
-          name: 'YugabyteDB Cluster: YCQL UPDATE average latency'
+          name: 'YCQL UPDATE average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.update.latency
           delay: '0'
@@ -1768,7 +1768,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 6120fea6606f4a98ac417559e80aad13
-          name: 'YugabyteDB Cluster: YCQL UPDATE OPS'
+          name: 'YCQL UPDATE OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.update.ops
           delay: '0'
@@ -1788,7 +1788,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 662f390c33154db199f13a065f68eebf
-          name: 'YugabyteDB Cluster: YSQL DELETE average latency'
+          name: 'YSQL DELETE average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.delete.latency
           delay: '0'
@@ -1813,7 +1813,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 3a6e9b4837c44babb020fe1e579db573
-          name: 'YugabyteDB Cluster: YSQL DELETE OPS'
+          name: 'YSQL DELETE OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.delete.ops
           delay: '0'
@@ -1833,7 +1833,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: e0dda63d599041a8b9781da7c4b52433
-          name: 'YugabyteDB Cluster: YSQL INSERT average latency'
+          name: 'YSQL INSERT average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.insert.latency
           delay: '0'
@@ -1858,7 +1858,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 8074080c8e7244eaaf4353a92a80a82a
-          name: 'YugabyteDB Cluster: YSQL INSERT OPS'
+          name: 'YSQL INSERT OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.insert.ops
           delay: '0'
@@ -1878,7 +1878,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: e007bb3d98fd4442ab84a2227be63e8b
-          name: 'YugabyteDB Cluster: YSQL OTHER average latency'
+          name: 'YSQL OTHER average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.other.latency
           delay: '0'
@@ -1903,7 +1903,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 502162acb66941d19b567a5172a56600
-          name: 'YugabyteDB Cluster: YSQL OTHER OPS'
+          name: 'YSQL OTHER OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.other.ops
           delay: '0'
@@ -1923,7 +1923,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 9d6bea98b3a54bdbbe2b141417148927
-          name: 'YugabyteDB Cluster: YSQL SELECT average latency'
+          name: 'YSQL SELECT average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.select.latency
           delay: '0'
@@ -1948,7 +1948,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 03053740519b4756886897b45ed3f73c
-          name: 'YugabyteDB Cluster: YSQL SELECT OPS'
+          name: 'YSQL SELECT OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.select.ops
           delay: '0'
@@ -1968,7 +1968,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 57a5c002be714c8da7afc0d30d9a891d
-          name: 'YugabyteDB Cluster: YSQL transaction average latency'
+          name: 'YSQL transaction average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.transaction.latency
           delay: '0'
@@ -1993,7 +1993,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: bd63dbe655734d66bbf9409500cc4a3f
-          name: 'YugabyteDB Cluster: YSQL transaction OPS'
+          name: 'YSQL transaction OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.transaction.ops
           delay: '0'
@@ -2013,7 +2013,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 02b4d8b704754dab83188bced7f5d98e
-          name: 'YugabyteDB Cluster: YSQL UPDATE average latency'
+          name: 'YSQL UPDATE average latency'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.update.latency
           delay: '0'
@@ -2038,7 +2038,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 2557d7cf5f0d429886999d6eba2d9182
-          name: 'YugabyteDB Cluster: YSQL UPDATE OPS'
+          name: 'YSQL UPDATE OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.update.ops
           delay: '0'
@@ -2058,7 +2058,7 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 88c3b743cbe24ea9a0046dc0854a36be
-          name: 'YugabyteDB Cluster: Get keyspace'
+          name: 'Get keyspace'
           type: SCRIPT
           key: yugabytedb.keyspace.get
           delay: 10m
@@ -2172,7 +2172,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 59f34be153c049ecac1c4e08487a18c0
-          name: 'YugabyteDB Cluster: Get keyspace item error'
+          name: 'Get keyspace item error'
           type: DEPENDENT
           key: yugabytedb.keyspace.get.errors
           delay: '0'
@@ -2194,7 +2194,7 @@ zabbix_export:
             - tag: component
               value: error
         - uuid: 734486b27ba64138bae356c7b14c8dbc
-          name: 'YugabyteDB Cluster: Get node'
+          name: 'Get node'
           type: SCRIPT
           key: yugabytedb.node.get
           delay: 10m
@@ -2283,7 +2283,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 401d87f7dace497699df56f749bf821e
-          name: 'YugabyteDB Cluster: Get node item error'
+          name: 'Get node item error'
           type: DEPENDENT
           key: yugabytedb.node.get.errors
           delay: '0'
@@ -2971,7 +2971,7 @@ zabbix_export:
             - name: 'YugabyteDB Cluster: Overview'
               widgets:
                 - type: gauge
-                  width: '6'
+                  width: '18'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -3022,7 +3022,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Average latency'
                   'y': '4'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3060,8 +3060,8 @@ zabbix_export:
                       name: simple_triggers
                       value: '1'
                 - type: gauge
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -3110,8 +3110,8 @@ zabbix_export:
                       name: units
                       value: '%'
                 - type: gauge
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '4'
                   hide_header: 'YES'
                   fields:
@@ -3160,9 +3160,9 @@ zabbix_export:
                       name: units
                       value: '%'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '4'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3186,9 +3186,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3215,9 +3215,9 @@ zabbix_export:
                       name: show.2
                       value: '4'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '8'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3250,8 +3250,8 @@ zabbix_export:
                       name: units_size
                       value: '20'
                 - type: item
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3296,9 +3296,9 @@ zabbix_export:
                       name: thresholds.3.threshold
                       value: '2'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '2'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3319,9 +3319,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '4'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3342,9 +3342,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '6'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
@@ -3365,9 +3365,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '8'
-                  width: '6'
+                  width: '18'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3403,7 +3403,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Memory utilization'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3440,7 +3440,7 @@ zabbix_export:
                       value: '1'
                 - type: item
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3469,8 +3469,8 @@ zabbix_export:
                       value: B
                 - type: svggraph
                   name: 'YugabyteDB Cluster: CPU utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3506,9 +3506,9 @@ zabbix_export:
                       name: simple_triggers
                       value: '1'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3542,7 +3542,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Disk r\w usage, Bps'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
@@ -3582,7 +3582,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Disk space usage, bytes'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3613,8 +3613,8 @@ zabbix_export:
                       value: '1'
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Disk r\w OPS'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: STRING
@@ -3653,9 +3653,9 @@ zabbix_export:
                       value: '1'
                 - type: item
                   name: 'Disk space utilization'
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3690,9 +3690,9 @@ zabbix_export:
                       value: '40'
                 - type: item
                   name: 'Disk space provisioned'
-                  x: '12'
+                  x: '36'
                   'y': '8'
-                  width: '4'
+                  width: '12'
                   height: '3'
                   hide_header: 'YES'
                   fields:
@@ -3730,9 +3730,9 @@ zabbix_export:
                       value: '40'
                 - type: piechart
                   name: 'YugabyteDB Cluster: Disk space'
-                  x: '16'
+                  x: '48'
                   'y': '5'
-                  width: '8'
+                  width: '24'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3773,7 +3773,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Received/Transmit, Bps'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3810,7 +3810,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Connections utilization'
                   'y': '6'
-                  width: '16'
+                  width: '48'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3841,8 +3841,8 @@ zabbix_export:
                       value: '1'
                 - type: svggraph
                   name: 'YugabyteDB Cluster: Received/Transmit, error/sec'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -3877,9 +3877,9 @@ zabbix_export:
                       name: reference
                       value: AAAAM
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '6'
-                  width: '8'
+                  width: '24'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3903,9 +3903,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '8'
-                  width: '8'
+                  width: '24'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3932,9 +3932,9 @@ zabbix_export:
                       name: show.2
                       value: '4'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '10'
-                  width: '8'
+                  width: '24'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
@@ -3964,7 +3964,7 @@ zabbix_export:
               widgets:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: YCQL OPS'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -4033,7 +4033,7 @@ zabbix_export:
                 - type: svggraph
                   name: 'YugabyteDB Cluster: YSQL OPS'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -4101,8 +4101,8 @@ zabbix_export:
                       value: AAAAO
                 - type: svggraph
                   name: 'YugabyteDB Cluster: YCQL latency'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -4170,9 +4170,9 @@ zabbix_export:
                       value: AAAAP
                 - type: svggraph
                   name: 'YugabyteDB Cluster: YSQL latency'
-                  x: '12'
+                  x: '36'
                   'y': '6'
-                  width: '12'
+                  width: '36'
                   height: '6'
                   fields:
                     - type: STRING
@@ -4242,7 +4242,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'YugabyteDB Cluster: Node Disk IOPS'
-                  width: '12'
+                  width: '36'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -4261,8 +4261,8 @@ zabbix_export:
                       value: '2'
                 - type: graphprototype
                   name: 'YugabyteDB Cluster: Node SST size'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -4283,7 +4283,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'YugabyteDB Cluster: Keyspace size'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -4449,7 +4449,7 @@ zabbix_export:
   triggers:
     - uuid: 12afa59565304d648e7a0165ea367a2a
       expression: 'length(last(/YugabyteDB Cluster by HTTP/yugabytedb.node.get.errors)) > 0 or length(last(/YugabyteDB Cluster by HTTP/yugabytedb.keyspace.get.errors)) > 0 or length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.get.errors)) > 0'
-      name: 'YugabyteDB Cluster: Failed to fetch data'
+      name: 'Failed to fetch data'
       priority: WARNING
       description: 'Failed to fetch data from the YugabyteDB API.'
       tags:
@@ -4457,7 +4457,7 @@ zabbix_export:
           value: availability
     - uuid: 93ea4576b31f44ca8ceef6db0ff12e2d
       expression: 'length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.query.statistic.get.errors)) > 0 or length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.metric.get.errors)) > 0'
-      name: 'YugabyteDB Cluster: Failed to fetch metric data'
+      name: 'Failed to fetch metric data'
       priority: WARNING
       description: 'Failed to fetch cluster metrics or cluster statistics.'
       tags:

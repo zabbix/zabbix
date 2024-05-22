@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "trapper_history_push.h"
@@ -90,7 +85,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	struct zbx_json		json;
 	struct zbx_json_parse	jp_data, jp_params;
 	unsigned char		*data = NULL, smtp_security, smtp_verify_peer, smtp_verify_host,
-				smtp_authentication, content_type, *response = NULL;
+				smtp_authentication, message_format, *response = NULL;
 	zbx_uint32_t		size;
 	zbx_user_t		user;
 	unsigned short		smtp_port;
@@ -139,7 +134,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	result = zbx_db_select(
 			"select type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd,smtp_port"
 				",smtp_security,smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions"
-				",maxattempts,attempt_interval,content_type,script,timeout"
+				",maxattempts,attempt_interval,message_format,script,timeout"
 			" from media_type"
 			" where mediatypeid=" ZBX_FS_UI64, mediatypeid);
 
@@ -161,12 +156,12 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(smtp_verify_peer, row[10]);
 	ZBX_STR2UCHAR(smtp_verify_host, row[11]);
 	ZBX_STR2UCHAR(smtp_authentication, row[12]);
-	ZBX_STR2UCHAR(content_type, row[16]);
+	ZBX_STR2UCHAR(message_format, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
 
 	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[1], row[2], row[3], row[4], row[5],
 			row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,
-			smtp_authentication, atoi(row[13]), atoi(row[14]), row[15], content_type, row[17], row[18],
+			smtp_authentication, atoi(row[13]), atoi(row[14]), row[15], message_format, row[17], row[18],
 			sendto, subject, message, params);
 
 	zbx_db_free_result(result);
