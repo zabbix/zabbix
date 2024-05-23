@@ -85,6 +85,13 @@ class testBrowserMonitoring extends CIntegrationTest {
 	 * @required-components server
 	 */
 	public function testBrowserMonitoring_executeBrowserJs() {
+		$response = $this->call('task.create', [
+			'type' => ZBX_TM_TASK_CHECK_NOW,
+			'request' => [
+				'itemid' => self::$itemid
+			]
+		]);
+
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'output' => 'extend',
