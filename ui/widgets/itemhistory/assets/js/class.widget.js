@@ -215,7 +215,7 @@ class CWidgetItemHistory extends CWidget {
 		button.dataset.hintbox = '1';
 		button.dataset.hintboxStatic = '1';
 		button.dataset.hintboxClass = 'dashboard-widget-itemhistory-hintbox';
-		button.dataset.hintboxContents = content;
+		button.dataset.hintboxContents = content || t('Empty value');
 
 		if (curl !== null) {
 			button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});

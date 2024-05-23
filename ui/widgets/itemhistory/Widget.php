@@ -25,4 +25,12 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Item history');
 	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.widget.js' => [
+				'Empty value' => _('Empty value')
+			]
+		];
+	}
 }
