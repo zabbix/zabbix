@@ -92,7 +92,7 @@ try
 	el = browser.findElement("xpath", "//input[@id='name']");
 	el.sendKeys("A");
 	el.sendKeys("d");
-	Zabbix.sleep(3000);
+	Zabbix.sleep(500);
 	try
 	{
 		Zabbix.log(5, "foo:" + el.getAttribute("foo"));
