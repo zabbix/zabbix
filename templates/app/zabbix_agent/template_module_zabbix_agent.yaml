@@ -18,7 +18,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: f46c6142cf434df1b6abe9334bf6c84c
-          name: 'Zabbix agent: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -32,17 +32,17 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 37a952edc12f47d6ac6f3ca04eb41326
-          name: 'Zabbix agent: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
             - tag: component
               value: system
         - uuid: 3a6af03a083b4366bd1d4c6ccf06ca88
-          name: 'Zabbix agent: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -56,11 +56,11 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 49708b126e3844b898d2625f77c0030c
-          name: 'Zabbix agent: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
-          description: 'Monitoring the availability status of the agent.'
+          description: 'Used for monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
           tags:
@@ -69,10 +69,10 @@ zabbix_export:
           triggers:
             - uuid: 6767f9c764bb42dfa961baacf879f45c
               expression: 'max(/Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'Zabbix agent: Zabbix agent is not available'
-              event_name: 'Zabbix agent: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
-              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              description: 'For passive agents only, host availability is used with `{$AGENT.TIMEOUT}` as a time threshold.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -94,7 +94,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Agent availability'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -110,8 +110,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Version
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -126,8 +126,8 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM
@@ -170,7 +170,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: ca27c17d8ca34643a7db8b99d2cc3025
-          name: 'Zabbix agent active: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           type: ZABBIX_ACTIVE
           key: agent.hostname
           delay: 1h
@@ -185,11 +185,11 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 0f86ec6cde2249f7946c678f9fd2665a
-          name: 'Zabbix agent active: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           type: ZABBIX_ACTIVE
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -198,16 +198,16 @@ zabbix_export:
           triggers:
             - uuid: 6bbb74c522d44baea8c6ceb666423da2
               expression: 'nodata(/Zabbix agent active/agent.ping,{$AGENT.NODATA_TIMEOUT})=1'
-              name: 'Zabbix agent active: Zabbix agent is not available'
-              event_name: 'Zabbix agent active: Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT})'
               priority: AVERAGE
-              description: 'For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.'
+              description: 'For active agents, `nodata()` with `agent.ping` is used with `{$AGENT.NODATA_TIMEOUT}` as a time threshold.'
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 41fb0f76fa1d464f8ab67f744fc29e8b
-          name: 'Zabbix agent active: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           type: ZABBIX_ACTIVE
           key: agent.version
           delay: 1h
@@ -222,13 +222,13 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 0fd83c56dce244738607cd6585a6acb3
-          name: 'Zabbix agent active: Active agent availability'
+          name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
           history: 7d
           description: |
             Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - unknown
             1 - available
             2 - not available
@@ -242,10 +242,10 @@ zabbix_export:
           triggers:
             - uuid: e91c556b0ff64292b9b9b5709a5d74b3
               expression: 'min(/Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
-              name: 'Zabbix agent active: Active checks are not available'
+              name: 'Active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              description: 'Active checks are considered unavailable. Agent has not sent a heartbeat for a prolonged time.'
               tags:
                 - tag: scope
                   value: availability
@@ -269,7 +269,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Agent availability'
-                  width: '6'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -285,8 +285,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Version
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '3'
                   fields:
                     - type: ITEM
@@ -301,8 +301,8 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: ITEM

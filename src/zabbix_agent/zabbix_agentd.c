@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "agent_conf/agent_conf.h"
@@ -31,6 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxcfg.h"
 #include "zbxmutexs.h"
+#include "zbxbincommon.h"
 
 static char	*config_pid_file = NULL;
 
@@ -133,7 +129,14 @@ static const char	*usage_message[] = {
 	"[-c config-file]", "-t item-key", NULL,
 	"[-c config-file]", "-T", NULL,
 #ifdef _WINDOWS
-	"[-c config-file]", "-i", "[-m]", NULL,
+	"[-c config-file]", "[-m] [-S " ZBX_SERVICE_STARTUP_AUTOMATIC "]", NULL,
+	"[-c config-file]", "[-m] [-S " ZBX_SERVICE_STARTUP_DELAYED "]", NULL,
+	"[-c config-file]", "[-m] [-S " ZBX_SERVICE_STARTUP_MANUAL "]", NULL,
+	"[-c config-file]", "[-m] [-S " ZBX_SERVICE_STARTUP_DISABLED "]", NULL,
+	"[-c config-file]", "-i", "[-m] [-S " ZBX_SERVICE_STARTUP_AUTOMATIC "]", NULL,
+	"[-c config-file]", "-i", "[-m] [-S " ZBX_SERVICE_STARTUP_DELAYED "]", NULL,
+	"[-c config-file]", "-i", "[-m] [-S " ZBX_SERVICE_STARTUP_MANUAL "]", NULL,
+	"[-c config-file]", "-i", "[-m] [-S " ZBX_SERVICE_STARTUP_DISABLED "]", NULL,
 	"[-c config-file]", "-d", "[-m]", NULL,
 	"[-c config-file]", "-s", "[-m]", NULL,
 	"[-c config-file]", "-x", "[-m]", NULL,
@@ -165,6 +168,10 @@ static const char	*help_message[] = {
 	"  -m --multiple-agents           For -i -d -s -x functions service name will",
 	"                                 include Hostname parameter specified in",
 	"                                 configuration file",
+	"  -S --startup-type              Set startup type of the Zabbix Windows",
+	"                                 agent service to be installed. Allowed values:",
+	"                                 " ZBX_SERVICE_STARTUP_AUTOMATIC " (default), " ZBX_SERVICE_STARTUP_DELAYED
+	", " ZBX_SERVICE_STARTUP_MANUAL ", " ZBX_SERVICE_STARTUP_DISABLED,
 	"Functions:",
 	"",
 	"  -i --install                   Install Zabbix agent as service",
@@ -227,6 +234,7 @@ static struct zbx_option	longopts[] =
 	{"stop",		0,	NULL,	'x'},
 
 	{"multiple-agents",	0,	NULL,	'm'},
+	{"startup-type",	1,	NULL,	'S'},
 #endif
 	{0}
 };
@@ -236,7 +244,7 @@ static char	shortopts[] =
 #ifndef _WINDOWS
 	"R:"
 #else
-	"idsxm"
+	"idsxmS:"
 #endif
 	;
 /* end of COMMAND LINE OPTIONS */
@@ -292,7 +300,9 @@ static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
 	0, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	0, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
-	0 /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
+	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
+	0, /* ZBX_PROCESS_TYPE_PG_MANAGER */
+	0 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
 };
 
 static char	*config_file	= NULL;
@@ -354,6 +364,9 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	int		zbx_optind = 0;
 
 	t->task = ZBX_TASK_START;
+#ifdef _WINDOWS
+	t->flags |= ZBX_TASK_FLAG_SERVICE_ENABLED | ZBX_TASK_FLAG_SERVICE_AUTOSTART;
+#endif
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -418,6 +431,16 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			case 'm':
 				t->flags |= ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 				break;
+			case 'S':
+				if (SUCCEED != zbx_service_startup_flags_set(zbx_optarg, &t->flags))
+				{
+					ret = FAIL;
+					goto out;
+				}
+
+				if (ZBX_TASK_INSTALL_SERVICE != t->task)
+					t->task = ZBX_TASK_SET_SERVICE_STARTUP_TYPE;
+				break;
 #endif
 			default:
 				t->task = ZBX_TASK_SHOW_USAGE;
@@ -434,6 +457,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
 		case ZBX_TASK_STOP_SERVICE:
+		case ZBX_TASK_SET_SERVICE_STARTUP_TYPE:
 			if (0 != (t->flags & ZBX_TASK_FLAG_FOREGROUND))
 			{
 				zbx_error("foreground option cannot be used with Zabbix agent services");
@@ -477,22 +501,28 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* check for mutually exclusive options */
 	/* Allowed option combinations.		*/
 	/* Option 'c' is always optional.	*/
-	/* T  p  t  i  d  s  x  m    opt_mask	*/
-	/* ----------------------    --------	*/
-	/* -  -  -  -  -  -  -  -	0x00	*/
-	/* T  -  -  -  -  -  -  -	0x80	*/
-	/* -  p  -  -  -  -  -  -	0x40	*/
-	/* -  -  t  -  -  -  -  -	0x20	*/
-	/* -  -  -  i  -  -  -  -	0x10	*/
-	/* -  -  -  -  d  -  -  -	0x08	*/
-	/* -  -  -  -  -  s  -  -	0x04	*/
-	/* -  -  -  -  -  -  x  -	0x02	*/
-	/* -  -  -  i  -  -  -  m	0x11	*/
-	/* -  -  -  -  d  -  -  m	0x09	*/
-	/* -  -  -  -  -  s  -  m	0x05	*/
-	/* -  -  -  -  -  -  x  m	0x03	*/
-	/* -  -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
+	/* S  T  p  t  i  d  s  x  m   opt_mask */
+	/* -------------------------   -------- */
+	/* -  -  -  -  -  -  -  -  -	0x000	*/
+	/* S  -  -  -  -  -  -  -  -	0x100	*/
+	/* -  T  -  -  -  -  -  -  -	0x080	*/
+	/* -  -  p  -  -  -  -  -  -	0x040	*/
+	/* -  -  -  t  -  -  -  -  -	0x020	*/
+	/* S  -  -  -  i  -  -  -  -	0x110	*/
+	/* -  -  -  -  i  -  -  -  -	0x010	*/
+	/* -  -  -  -  -  d  -  -  -	0x008	*/
+	/* -  -  -  -  -  -  s  -  -	0x004	*/
+	/* -  -  -  -  -  -  -  x  -	0x002	*/
+	/* S  -  -  -  -  -  -  -  m	0x101	*/
+	/* S  -  -  -  i  -  -  -  m	0x111	*/
+	/* -  -  -  -  i  -  -  -  m	0x011	*/
+	/* -  -  -  -  -  d  -  -  m	0x009	*/
+	/* -  -  -  -  -  -  s  -  m	0x005	*/
+	/* -  -  -  -  -  -  -  x  m	0x003	*/
+	/* -  -  -  -  -  -  -  -  m	0x001 special case required for starting as a service with '-m' option */
 
+	if (0 < opt_count['S'])
+		opt_mask |= 0x100;
 	if (0 < opt_count['T'])
 		opt_mask |= 0x80;
 	if (0 < opt_count['p'])
@@ -525,10 +555,14 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case 0x20:
 		case 0x40:
 		case 0x80:
+		case 0x100:
+		case 0x101:
+		case 0x110:
+		case 0x111:
 			break;
 		default:
 			zbx_error("mutually exclusive options used");
-			zbx_print_usage(usage_message, zbx_progname);
+			zbx_print_usage(zbx_progname, usage_message);
 			ret = FAIL;
 			goto out;
 	}
@@ -1111,7 +1145,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 	switch (t->task)
 	{
 		case ZBX_TASK_INSTALL_SERVICE:
-			ret = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS, config_file);
+			ret = ZabbixCreateService(name, config_file, t->flags);
 			break;
 		case ZBX_TASK_UNINSTALL_SERVICE:
 			ret = ZabbixRemoveService();
@@ -1121,6 +1155,9 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 			break;
 		case ZBX_TASK_STOP_SERVICE:
 			ret = ZabbixStopService();
+			break;
+		case ZBX_TASK_SET_SERVICE_STARTUP_TYPE:
+			ret = zbx_service_startup_type_change(t->flags);
 			break;
 		default:
 			/* there can not be other choice */
@@ -1497,7 +1534,7 @@ int	main(int argc, char **argv)
 	argv = zbx_setproctitle_init(argc, argv);
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
@@ -1551,7 +1588,7 @@ int	main(int argc, char **argv)
 	switch (t.task)
 	{
 		case ZBX_TASK_SHOW_USAGE:
-			zbx_print_usage(usage_message, zbx_progname);
+			zbx_print_usage(zbx_progname, usage_message);
 			exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS
@@ -1564,6 +1601,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
 		case ZBX_TASK_STOP_SERVICE:
+		case ZBX_TASK_SET_SERVICE_STARTUP_TYPE:
 			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
 			{
 				char	*p, *first_hostname;
@@ -1584,6 +1622,7 @@ int	main(int argc, char **argv)
 
 			zbx_free_config();
 
+			zbx_service_init(get_zbx_service_name, get_zbx_event_source);
 			ret = zbx_exec_service_task(argv[0], &t);
 
 			while (0 == WSACleanup())
@@ -1678,7 +1717,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			zbx_print_help(config_file, help_message, usage_message, zbx_progname);
+			zbx_print_help(zbx_progname, help_message, usage_message, config_file);
 			exit(EXIT_SUCCESS);
 			break;
 		default:
@@ -1693,7 +1732,8 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(ZABBIX_SERVICE)
-	zbx_service_start(t.flags, get_zbx_service_name, get_zbx_event_source);
+	zbx_service_init(get_zbx_service_name, get_zbx_event_source);
+	zbx_service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,

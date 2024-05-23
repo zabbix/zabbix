@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -208,25 +203,27 @@ $triggers_form = (new CForm('post', $url))
 	->addVar('context', $data['context'], 'form_context');
 
 // create table
-$triggers_table = (new CTableInfo())->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_triggers'))
-			->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
-	$data['show_value_column'] ? _('Value') : null,
-	($data['single_selected_hostid'] == 0)
-		? ($data['context'] === 'host')
-			? _('Host')
-			: _('Template')
-		: null,
-	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
-	_('Operational data'),
-	_('Expression'),
-	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
-	$data['show_info_column'] ? _('Info') : null,
-	_('Tags')
-]);
+$triggers_table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_triggers'))
+				->onClick("checkAll('".$triggers_form->getName()."', 'all_triggers', 'g_triggerid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
+		$data['show_value_column'] ? _('Value') : null,
+		($data['single_selected_hostid'] == 0)
+			? ($data['context'] === 'host')
+				? _('Host')
+				: _('Template')
+			: null,
+		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
+		_('Operational data'),
+		_('Expression'),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		$data['show_info_column'] ? _('Info') : null,
+		_('Tags')
+	])
+	->setPageNavigation($data['paging']);
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['triggers'], [
 	'html' => true,
@@ -365,7 +362,6 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 // append table to form
 $triggers_form->addItem([
 	$triggers_table,
-	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.massenable' => [

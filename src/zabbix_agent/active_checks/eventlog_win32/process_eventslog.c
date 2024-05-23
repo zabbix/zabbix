@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "process_eventslog.h"
@@ -659,6 +654,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 		while (pELR < pEndOfRecords)
 		{
+			int	delay;
 			/* to prevent mismatch in comparing with RecordNumber in case of wrap-around, */
 			/* we look for using '=' */
 			if (0 != timestamp || (DWORD)FirstID == ((PEVENTLOGRECORD)pELR)->RecordNumber)
@@ -773,8 +769,8 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 				{
 					if (EVT_LOG_ITEM == evt_item_type)
 					{
-						send_err = process_value_cb(addrs, agent2_result, config_hostname,
-								metric->key_orig, value, ITEM_STATE_NORMAL,
+						send_err = process_value_cb(addrs, agent2_result, metric->itemid, config_hostname,
+								metric->key, value, ITEM_STATE_NORMAL,
 								&lastlogsize, NULL, &timestamp, source, &severity,
 								&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT,
 								config_tls, config_timeout, config_source_ip, config_buffer_send,
@@ -808,12 +804,15 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 					}
 				}
 
+				if (0 >= (delay = metric->nextcheck - (int)time(NULL)))
+					delay = 1;
+
 				/* do not flood Zabbix server if file grows too fast */
-				if (s_count >= (rate * metric->refresh))
+				if (s_count >= (rate * delay))
 					break;
 
 				/* do not flood local system if file grows too fast */
-				if (p_count >= (4 * rate * metric->refresh))
+				if (p_count >= (4 * rate * delay))
 					break;
 			}
 
@@ -831,7 +830,7 @@ finish:
 		char	buf[ZBX_MAX_UINT64_LEN];
 
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
-		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
+		send_err = process_value_cb(addrs, agent2_result, metric->itemid, config_hostname, metric->key, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
 				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip,
 				config_buffer_send, config_buffer_size);

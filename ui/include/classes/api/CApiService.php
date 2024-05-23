@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -433,7 +428,8 @@ class CApiService {
 				$r_table = DB::getSchema($left_join['table']);
 
 				// Increase count when table linked by non-unique column.
-				if ($left_join['using'] !== $r_table['key']) {
+				if ((array_key_exists('using', $left_join) && $left_join['using'] !== $r_table['key'])
+						|| (!array_key_exists('using', $left_join) && $left_join['use_distinct'])) {
 					$count++;
 					break;
 				}
@@ -456,9 +452,11 @@ class CApiService {
 			$l_table = DB::getSchema($sqlParts['left_table']['table']);
 
 			foreach ($sqlParts['left_join'] as $left_join) {
-				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].
-					' ON '.$sqlParts['left_table']['alias'].'.'.$l_table['key'].
-					'='.$left_join['alias'].'.'.$left_join['using'];
+				$sql_left_join .= ' LEFT JOIN '.$left_join['table'].' '.$left_join['alias'].' ON ';
+				$sql_left_join .= array_key_exists('condition', $left_join)
+					? $left_join['condition']
+					: $sqlParts['left_table']['alias'].'.'.$l_table['key'].'='.
+						$left_join['alias'].'.'.$left_join['using'];
 			}
 
 			// Moving a left table to the end.

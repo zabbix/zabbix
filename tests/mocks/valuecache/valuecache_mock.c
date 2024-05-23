@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxmockassert.h"
@@ -418,7 +413,7 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
  *             history - [OUT] the history records                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *history)
+void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_dc_history_ptr_t *history)
 {
 	zbx_mock_handle_t	hitem, hdata;
 	zbx_mock_error_t	err;
@@ -444,7 +439,7 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *histo
 		hdata = zbx_mock_get_object_member_handle(hitem, "data");
 		zbx_vcmock_read_history_value(hdata, data->value_type, &data->value, &data->ts);
 
-		zbx_vector_ptr_append(history, data);
+		zbx_vector_dc_history_ptr_append(history, data);
 	}
 }
 
@@ -453,10 +448,8 @@ void	zbx_vcmock_get_dc_history(zbx_mock_handle_t handle, zbx_vector_ptr_t *histo
  * Purpose: frees zbx_dc_history_t structure                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vcmock_free_dc_history(void *ptr)
+void	zbx_vcmock_free_dc_history(zbx_dc_history_t *h)
 {
-	zbx_dc_history_t	*h = (zbx_dc_history_t *)ptr;
-
 	switch (h->value_type)
 	{
 		case ITEM_VALUE_TYPE_STR:

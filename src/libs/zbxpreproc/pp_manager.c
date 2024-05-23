@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "pp_manager.h"
@@ -48,6 +43,7 @@
 #	include <libxml/parser.h>
 #endif
 
+static zbx_prepare_value_func_t	prepare_value_func_cb = NULL;
 static zbx_flush_value_func_t	flush_value_func_cb = NULL;
 static zbx_get_progname_f	get_progname_func_cb = NULL;
 
@@ -99,8 +95,10 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_progname_f get_progname_cb)
+void	zbx_init_library_preproc(zbx_prepare_value_func_t prepare_value_cb, zbx_flush_value_func_t flush_value_cb,
+		zbx_get_progname_f get_progname_cb)
 {
+	prepare_value_func_cb = prepare_value_cb;
 	flush_value_func_cb = flush_value_cb;
 	get_progname_func_cb = get_progname_cb;
 }
@@ -884,6 +882,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 
 		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
+			/* allow empty values */
 			preprocessing_flush_value(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
 
@@ -956,7 +955,9 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
 	zbx_pp_value_opt_t	*value_opt;
 
 	zbx_pp_value_task_get_data(task, &value_type, &flags, &value, &ts, &value_opt);
-	preprocessing_flush_value(manager, task->itemid, value_type, flags, value, ts, value_opt);
+
+	if (SUCCEED == prepare_value_func_cb(value, value_opt))
+		preprocessing_flush_value(manager, task->itemid, value_type, flags, value, ts, value_opt);
 }
 
 /******************************************************************************

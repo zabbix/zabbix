@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -30,96 +25,134 @@ class CVaultSecretParserTest extends TestCase {
 		return [
 			// HashiCorp
 			// PARSE_SUCCESS
-			['path/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['path/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['path/to/secret', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
+			['path/to/secret', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true, 'with_key' => false], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['mount%2Fpoint/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['mount%2Fpoint/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['mount%2Fpoint/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['mount%2Fpoint/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['mount%2Fpoint/secret', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
+			['mount%2Fpoint/secret', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true, 'with_key' => false], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
 			// Double slash in key is allowed.
-			['namespace/secret:key/'.'/key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['namespace/secret:key/'.'/key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
 			// Multibyte support.
-			['bā/āb:ā', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['bā/āb:ā', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['zabbix/secret%3A/path:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['zabbix/secret%3A/path:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
+			]],
+			// Without with_namespace option
+			['pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
+			]],
+			['pathtosecret:key/:/key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
+			]],
+			['pathtosecret:key/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
+			]],
+			['pathtosecret:/key/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
 			// PARSE_FAIL
-			['pathtosecret/:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['pathtosecret/:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near ":key"'
 			]],
-			['/mount%2Fpoint/pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['/mount%2Fpoint/pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/mount%2Fpoint/pathtosecret:key"'
 			]],
-			['/pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['/pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/pathtosecret:key"'
 			]],
-			['pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "pathtosecret:key"'
 			]],
-			[':key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			[':key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near ":key"'
 			]],
-			['/path/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['/path/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/path/to/secret:key"'
 			]],
 			// Path is empty.
-			['namespace/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
+			['namespace/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
-				'error' => 'incorrect syntax near "namespace/"'
+				'error' => 'unexpected end of string'
 			]],
 			// Path has trailing slash.
-			['namespace/path/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
+			['namespace/path/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "path/"'
 			]],
-			['namespace/path/:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['namespace/path/:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "path/:key"'
 			]],
 			// Path begins with slash.
-			['namespace/'.'/path', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
+			['namespace/'.'/path', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/path"'
 			]],
 			// Path has empty segment.
-			['namespace/path/'.'/to', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
+			['namespace/path/'.'/to', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "path//to"'
 			]],
-			['namespace/path/'.'/to:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['namespace/path/'.'/to:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "path//to:key"'
 			]],
-			['zabbix/secret/:path:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+			['zabbix/secret/:path:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "secret/:path:key"'
+			]],
+			// Key is empty
+			['path/to/secret:', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near ":"'
+			]],
+			['path/to/secret', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "to/secret"'
+			]],
+			['', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_namespace' => true], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'string is empty'
+			]],
+			['', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'string is empty'
+			]],
+			['', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'string is empty'
 			]],
 
 			// CyberArk

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "nodecommand.h"
@@ -30,6 +25,7 @@
 #include "zbxstr.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_scripts_constants.h"
+#include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
@@ -91,6 +87,13 @@ static int	execute_remote_script(const zbx_script_t *script, const zbx_dc_host_t
 	zbx_uint64_t	taskid;
 	zbx_db_result_t	result = NULL;
 	zbx_db_row_t	row;
+
+	if (0 == host->proxyid)
+	{
+		zbx_snprintf(error, max_error_len, "Host is monitored by proxy group, "
+				"but its proxy assignment is still pending.");
+		return FAIL;
+	}
 
 	if (0 == (taskid = zbx_script_create_task(script, host, 0, time(NULL))))
 	{
@@ -600,7 +603,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char	*poutput = NULL, *perror = NULL;
 		int		audit_res;
 
-		if (0 == host.proxyid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+		if (HOST_MONITORED_BY_SERVER == host.monitored_by ||
+				ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
 			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,

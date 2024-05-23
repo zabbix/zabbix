@@ -24,7 +24,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 286bb866060e47948c02408ebc841f1f
-          name: 'InfluxDB: Get instance metrics'
+          name: 'Get instance metrics'
           type: HTTP_AGENT
           key: influx.get_metrics
           history: '0'
@@ -42,7 +42,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f8f514943c9040d7b41f14db92ca6c91
-          name: 'InfluxDB: Instance status'
+          name: 'Instance status'
           type: HTTP_AGENT
           key: influx.healthcheck
           history: 7d
@@ -68,14 +68,14 @@ zabbix_export:
           triggers:
             - uuid: de130833b4514481aa56d3ba06e648fc
               expression: 'last(/InfluxDB by HTTP/influx.healthcheck)=0'
-              name: 'InfluxDB: Health check was failed'
+              name: 'Health check was failed'
               priority: HIGH
               description: 'The InfluxDB instance is not available or unhealthy.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 56b1a9f2eb454a9b96a0e0a73d5439cf
-          name: 'InfluxDB: Boltdb reads, rate'
+          name: 'Boltdb reads, rate'
           type: DEPENDENT
           key: influxdb.boltdb_reads.rate
           delay: '0'
@@ -96,7 +96,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 7bd505a8abb944c2bed17f8e4e5a8c84
-          name: 'InfluxDB: Boltdb writes, rate'
+          name: 'Boltdb writes, rate'
           type: DEPENDENT
           key: influxdb.boltdb_writes.rate
           delay: '0'
@@ -117,7 +117,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 5d5e26ee272a4af6ac979e69a83de74d
-          name: 'InfluxDB: Buckets, total'
+          name: 'Buckets, total'
           type: DEPENDENT
           key: influxdb.buckets.total
           delay: '0'
@@ -137,7 +137,7 @@ zabbix_export:
             - tag: component
               value: buckets
         - uuid: 1c5931f514804a95ac4bfba3ec4a7d82
-          name: 'InfluxDB: Dashboards, total'
+          name: 'Dashboards, total'
           type: DEPENDENT
           key: influxdb.dashboards.total
           delay: '0'
@@ -157,7 +157,7 @@ zabbix_export:
             - tag: component
               value: dashboards
         - uuid: 915f00d9dc9847bb8bc8007d034bb80d
-          name: 'InfluxDB: Organizations, total'
+          name: 'Organizations, total'
           type: DEPENDENT
           key: influxdb.organizations.total
           delay: '0'
@@ -177,7 +177,7 @@ zabbix_export:
             - tag: component
               value: organizations
         - uuid: e05aa2c424c140afa3794878ed2c3baa
-          name: 'InfluxDB: Scrapers, total'
+          name: 'Scrapers, total'
           type: DEPENDENT
           key: influxdb.scrapers.total
           delay: '0'
@@ -197,7 +197,7 @@ zabbix_export:
             - tag: component
               value: scrapers
         - uuid: f77894d5ede9481381a268670bc88766
-          name: 'InfluxDB: Task runs failed, rate'
+          name: 'Task runs failed, rate'
           type: DEPENDENT
           key: influxdb.task_executor_complete.failed.rate
           delay: '0'
@@ -219,15 +219,15 @@ zabbix_export:
           triggers:
             - uuid: f0d2137905bc477f979d035c06111844
               expression: 'min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}'
-              name: 'InfluxDB: Too many tasks failure runs'
-              event_name: 'InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
+              name: 'Too many tasks failure runs'
+              event_name: 'Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
               description: '"Number of failure runs completed across all tasks is too high."'
               tags:
                 - tag: scope
                   value: performance
         - uuid: a0183b6d934c4612b358c027c75eda6e
-          name: 'InfluxDB: Task runs successful, rate'
+          name: 'Task runs successful, rate'
           type: DEPENDENT
           key: influxdb.task_executor_complete.successful.rate
           delay: '0'
@@ -247,7 +247,7 @@ zabbix_export:
             - tag: component
               value: tasks
         - uuid: c3f147a2afb3438d8bacbb41fac6b1d0
-          name: 'InfluxDB: Workers currently running'
+          name: 'Workers currently running'
           type: DEPENDENT
           key: influxdb.task_executor_runs_active.total
           delay: '0'
@@ -264,7 +264,7 @@ zabbix_export:
             - tag: component
               value: tasks
         - uuid: 25595754557d49fca7c671df3f6a898c
-          name: 'InfluxDB: Workers busy, pct'
+          name: 'Workers busy, pct'
           type: DEPENDENT
           key: influxdb.task_executor_workers_busy.pct
           delay: '0'
@@ -282,7 +282,7 @@ zabbix_export:
             - tag: component
               value: tasks
         - uuid: 94d98714ecce4847be0bdb7b8802f1ec
-          name: 'InfluxDB: Telegrafs, total'
+          name: 'Telegrafs, total'
           type: DEPENDENT
           key: influxdb.telegrafs.total
           delay: '0'
@@ -302,7 +302,7 @@ zabbix_export:
             - tag: component
               value: telegraf
         - uuid: 23bad615af024a2e9f06d4541cf6f910
-          name: 'InfluxDB: Telegraf plugins, total'
+          name: 'Telegraf plugins, total'
           type: DEPENDENT
           key: influxdb.telegraf_plugins.total
           delay: '0'
@@ -322,7 +322,7 @@ zabbix_export:
             - tag: component
               value: telegraf
         - uuid: 079c1eee7d93484b9126598b23921e9d
-          name: 'InfluxDB: Tokens, total'
+          name: 'Tokens, total'
           type: DEPENDENT
           key: influxdb.tokens.total
           delay: '0'
@@ -342,7 +342,7 @@ zabbix_export:
             - tag: component
               value: tokens
         - uuid: 8699e951b7944659993422334a4cddc0
-          name: 'InfluxDB: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: influxdb.uptime
           delay: '0'
@@ -362,8 +362,8 @@ zabbix_export:
           triggers:
             - uuid: 335f27fb002544838f7150b11238d86b
               expression: 'last(/InfluxDB by HTTP/influxdb.uptime)<10m'
-              name: 'InfluxDB: has been restarted'
-              event_name: 'InfluxDB: has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: 'has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -371,7 +371,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 86357d43721f4e6aa6b1dd7e63dd2f47
-          name: 'InfluxDB: Users, total'
+          name: 'Users, total'
           type: DEPENDENT
           key: influxdb.users.total
           delay: '0'
@@ -391,7 +391,7 @@ zabbix_export:
             - tag: component
               value: tokens
         - uuid: d31e0d0823af4f6c999cae3d49b3815b
-          name: 'InfluxDB: Version'
+          name: Version
           type: DEPENDENT
           key: influxdb.version
           delay: '0'
@@ -414,8 +414,8 @@ zabbix_export:
           triggers:
             - uuid: d2b02cc426c748608968ae08c0823461
               expression: 'last(/InfluxDB by HTTP/influxdb.version,#1)<>last(/InfluxDB by HTTP/influxdb.version,#2) and length(last(/InfluxDB by HTTP/influxdb.version))>0'
-              name: 'InfluxDB: Version has changed'
-              event_name: 'InfluxDB: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'InfluxDB version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -441,7 +441,7 @@ zabbix_export:
           description: 'Discovery of organizations metrics.'
           item_prototypes:
             - uuid: c84ae278bd7c4387873bc8bbf6d8ba8f
-              name: 'InfluxDB: [{#ORG_NAME}] Query response bytes, failed'
+              name: '[{#ORG_NAME}] Query response bytes, failed'
               type: DEPENDENT
               key: 'influxdb.org.http_query_response_bytes.failed.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -465,7 +465,7 @@ zabbix_export:
                 - tag: organization
                   value: '{#ORG_NAME}'
             - uuid: fb13e133cf054e8783ba6bf5deaf1686
-              name: 'InfluxDB: [{#ORG_NAME}] Query response bytes, success'
+              name: '[{#ORG_NAME}] Query response bytes, success'
               type: DEPENDENT
               key: 'influxdb.org.http_query_response_bytes.success.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -489,7 +489,7 @@ zabbix_export:
                 - tag: organization
                   value: '{#ORG_NAME}'
             - uuid: 9688861c4268455193772389a957264f
-              name: 'InfluxDB: [{#ORG_NAME}] Query requests, failed'
+              name: '[{#ORG_NAME}] Query requests, failed'
               type: DEPENDENT
               key: 'influxdb.org.query_request.failed.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -515,15 +515,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 893fa5755b514c36aa177c4f4e25b254
                   expression: 'min(/InfluxDB by HTTP/influxdb.org.query_request.failed.rate["{#ORG_NAME}"],5m)>{$INFLUXDB.REQ.FAIL.MAX.WARN}'
-                  name: 'InfluxDB: [{#ORG_NAME}]: Too many requests failures'
-                  event_name: 'InfluxDB: [{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m)'
+                  name: '[{#ORG_NAME}]: Too many requests failures'
+                  event_name: '[{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m)'
                   priority: WARNING
                   description: 'Too many query requests failed.'
                   tags:
                     - tag: scope
                       value: performance
             - uuid: da53d3185ba744c38fc264993c72b1b9
-              name: 'InfluxDB: [{#ORG_NAME}] Query requests, success'
+              name: '[{#ORG_NAME}] Query requests, success'
               type: DEPENDENT
               key: 'influxdb.org.query_request.success.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -547,7 +547,7 @@ zabbix_export:
                 - tag: organization
                   value: '{#ORG_NAME}'
             - uuid: 4f8dbb16f7a842678e4fb4343c88b560
-              name: 'InfluxDB: [{#ORG_NAME}] Query requests bytes, failed'
+              name: '[{#ORG_NAME}] Query requests bytes, failed'
               type: DEPENDENT
               key: 'influxdb.org.query_request_bytes.failed.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -571,7 +571,7 @@ zabbix_export:
                 - tag: organization
                   value: '{#ORG_NAME}'
             - uuid: 6bbeb22e5c9b46a2bf480dcf41b4eb0e
-              name: 'InfluxDB: [{#ORG_NAME}] Query requests bytes, success'
+              name: '[{#ORG_NAME}] Query requests bytes, success'
               type: DEPENDENT
               key: 'influxdb.org.query_request_bytes.success.rate["{#ORG_NAME}"]'
               delay: '0'
@@ -684,7 +684,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Instance status'
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -700,7 +700,7 @@ zabbix_export:
                 - type: graph
                   name: 'InfluxDB: Tasks runs'
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -713,8 +713,8 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   name: Uptime
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -729,8 +729,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Version
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -742,8 +742,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Workers busy, pct'
-                  x: '12'
-                  width: '4'
+                  x: '36'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -758,8 +758,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Workers currently running'
-                  x: '16'
-                  width: '4'
+                  x: '48'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -774,8 +774,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: 'Users, total'
-                  x: '20'
-                  width: '4'
+                  x: '60'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -789,7 +789,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'InfluxDB: Query requests'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -805,8 +805,8 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: 'InfluxDB: Query traffic'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -9,7 +9,23 @@
 	"description": "Displays hosts as markers on a geographical map.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/geomap",
 	"widget": {
-		"js_class": "CWidgetGeoMap"
+		"js_class": "CWidgetGeoMap",
+        "in": {
+			"hostids": {
+				"type": "_hostids"
+			},
+			"groupids": {
+				"type": "_hostgroupids"
+			}
+		},
+		"out": [
+            {
+				"type": "_hostid"
+			},
+            {
+				"type": "_hostids"
+			}
+        ]
 	},
 	"actions": {
 		"widget.geomap.view": {

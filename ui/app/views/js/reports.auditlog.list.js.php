@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 ?>
 
@@ -64,11 +59,12 @@
 					CAudit::RESOURCE_ITEM, CAudit::RESOURCE_ITEM_PROTOTYPE, CAudit::RESOURCE_LLD_RULE,
 					CAudit::RESOURCE_MACRO, CAudit::RESOURCE_MAINTENANCE, CAudit::RESOURCE_MAP,
 					CAudit::RESOURCE_MEDIA_TYPE, CAudit::RESOURCE_MODULE, CAudit::RESOURCE_PROXY,
-					CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO, CAudit::RESOURCE_SCHEDULED_REPORT,
-					CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SLA, CAudit::RESOURCE_TEMPLATE,
-					CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TEMPLATE_GROUP, CAudit::RESOURCE_TRIGGER,
-					CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER, CAudit::RESOURCE_USERDIRECTORY,
-					CAudit::RESOURCE_USER_GROUP, CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
+					CAudit::RESOURCE_PROXY_GROUP, CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO,
+					CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SLA,
+					CAudit::RESOURCE_TEMPLATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TEMPLATE_GROUP,
+					CAudit::RESOURCE_TRIGGER, CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER,
+					CAudit::RESOURCE_USERDIRECTORY, CAudit::RESOURCE_USER_GROUP, CAudit::RESOURCE_USER_ROLE,
+					CAudit::RESOURCE_VALUE_MAP
 				],
 				CAudit::ACTION_UPDATE => [
 					CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTHENTICATION, CAudit::RESOURCE_AUTH_TOKEN,
@@ -80,11 +76,12 @@
 					CAudit::RESOURCE_ITEM, CAudit::RESOURCE_ITEM_PROTOTYPE, CAudit::RESOURCE_LLD_RULE,
 					CAudit::RESOURCE_MACRO, CAudit::RESOURCE_MAINTENANCE, CAudit::RESOURCE_MAP,
 					CAudit::RESOURCE_MEDIA_TYPE, CAudit::RESOURCE_MODULE, CAudit::RESOURCE_PROXY,
-					CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO, CAudit::RESOURCE_SCHEDULED_REPORT,
-					CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SETTINGS, CAudit::RESOURCE_SLA, CAudit::RESOURCE_TEMPLATE,
-					CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TEMPLATE_GROUP, CAudit::RESOURCE_TRIGGER,
-					CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER, CAudit::RESOURCE_USERDIRECTORY,
-					CAudit::RESOURCE_USER_GROUP, CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
+					CAudit::RESOURCE_PROXY_GROUP, CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO,
+					CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SETTINGS,
+					CAudit::RESOURCE_SLA, CAudit::RESOURCE_TEMPLATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD,
+					CAudit::RESOURCE_TEMPLATE_GROUP, CAudit::RESOURCE_TRIGGER, CAudit::RESOURCE_TRIGGER_PROTOTYPE,
+					CAudit::RESOURCE_USER, CAudit::RESOURCE_USERDIRECTORY, CAudit::RESOURCE_USER_GROUP,
+					CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
 				],
 				CAudit::ACTION_DELETE => [
 					CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTH_TOKEN, CAudit::RESOURCE_CONNECTOR,
@@ -95,11 +92,12 @@
 					CAudit::RESOURCE_ITEM, CAudit::RESOURCE_ITEM_PROTOTYPE, CAudit::RESOURCE_LLD_RULE,
 					CAudit::RESOURCE_MACRO, CAudit::RESOURCE_MAINTENANCE, CAudit::RESOURCE_MAP,
 					CAudit::RESOURCE_MEDIA_TYPE, CAudit::RESOURCE_MODULE, CAudit::RESOURCE_PROXY,
-					CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO, CAudit::RESOURCE_SCHEDULED_REPORT,
-					CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SLA, CAudit::RESOURCE_TEMPLATE,
-					CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TEMPLATE_GROUP, CAudit::RESOURCE_TRIGGER,
-					CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER, CAudit::RESOURCE_USERDIRECTORY,
-					CAudit::RESOURCE_USER_GROUP, CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
+					CAudit::RESOURCE_PROXY_GROUP, CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO,
+					CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SLA,
+					CAudit::RESOURCE_TEMPLATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TEMPLATE_GROUP,
+					CAudit::RESOURCE_TRIGGER, CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER,
+					CAudit::RESOURCE_USERDIRECTORY, CAudit::RESOURCE_USER_GROUP, CAudit::RESOURCE_USER_ROLE,
+					CAudit::RESOURCE_VALUE_MAP
 				],
 				CAudit::ACTION_LOGOUT => [CAudit::RESOURCE_USER],
 				CAudit::ACTION_EXECUTE => [CAudit::RESOURCE_SCRIPT],

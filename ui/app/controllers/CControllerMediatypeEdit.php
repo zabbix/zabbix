@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -60,7 +55,7 @@ class CControllerMediatypeEdit extends CController {
 				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
 					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
-					'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
+					'message_format', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 					'event_menu_name', 'parameters', 'description', 'provider'
 				],
 				'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
@@ -119,7 +114,7 @@ class CControllerMediatypeEdit extends CController {
 				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
 			],
 			'description' => '',
-			'content_type' => $email_defaults['content_type'],
+			'message_format' => $email_defaults['message_format'],
 			'message_templates' => [],
 			'providers' => CMediatypeHelper::getEmailProviders()
 		];

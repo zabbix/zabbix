@@ -33,7 +33,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: cba2e98b8ea14ff0a03dee515337ac7d
-          name: 'Mikrotik: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -47,14 +47,14 @@ zabbix_export:
           triggers:
             - uuid: dc51a869c302440ba48d352545782e6e
               expression: 'max(/Mikrotik by SNMP/icmpping,#3)=0'
-              name: 'Mikrotik: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 81b47dcd39864dd6812344bd0dc34963
-          name: 'Mikrotik: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -68,11 +68,11 @@ zabbix_export:
           triggers:
             - uuid: 83fa0a00b298491a967e052ec0c3bafe
               expression: 'min(/Mikrotik by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mikrotik by SNMP/icmppingloss,5m)<100'
-              name: 'Mikrotik: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Mikrotik: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mikrotik by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -80,7 +80,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 3bb0c6c8aad64f21a11dc58c6be2eeaf
-          name: 'Mikrotik: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -94,13 +94,14 @@ zabbix_export:
           triggers:
             - uuid: 7c027442ed3c44a0a26b4f35458a37f9
               expression: 'avg(/Mikrotik by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Mikrotik: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Mikrotik: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Mikrotik by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mikrotik by SNMP/icmppingloss,5m)<100'
-                - name: 'Mikrotik: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mikrotik by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -120,7 +121,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: a23fdffc346b4adb833924d9975542c2
-          name: 'Mikrotik: SNMP walk wireless interfaces'
+          name: 'SNMP walk wireless interfaces'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.14.1.1.2,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.2.2.1.7,1.3.6.1.4.1.14988.1.1.16.1.1.2,1.3.6.1.4.1.14988.1.1.16.1.1.4,1.3.6.1.4.1.14988.1.1.16.1.1.3,1.3.6.1.4.1.14988.1.1.16.1.1.7,1.3.6.1.4.1.14988.1.1.1.3.1.4,1.3.6.1.4.1.14988.1.1.1.3.1.8,1.3.6.1.4.1.14988.1.1.1.3.1.9,1.3.6.1.4.1.14988.1.1.1.3.1.6,1.3.6.1.4.1.14988.1.1.1.3.1.11,1.3.6.1.4.1.14988.1.1.1.7.1.5,1.3.6.1.4.1.14988.1.1.1.7.1.4,1.3.6.1.4.1.14988.1.1.1.7.1.2,1.3.6.1.4.1.14988.1.1.1.7.1.3]'
           key: net.if.wireless.walk
@@ -131,7 +132,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1fa6a6ee638946d086a69dacf166ebe2
-          name: 'Mikrotik: SNMP walk CPU temperature sensors'
+          name: 'SNMP walk CPU temperature sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.3.11]'
           key: sensor.cpu.temp.walk
@@ -145,7 +146,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f798e03cc75d48b2b6a8e7633e213601
-          name: 'Mikrotik: SNMP walk temperature sensors'
+          name: 'SNMP walk temperature sensors'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.3.10]'
           key: sensor.temp.walk
@@ -159,7 +160,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 540698a8c58d4a659e2c2ecdd5cb76e0
-          name: 'Mikrotik: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -172,7 +173,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 9d2b98385edb49979abcde5481560253
-          name: 'Mikrotik: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -192,7 +193,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2f9bb0334ae74e22b3ff917dec5fa924
-          name: 'Mikrotik: SNMP walk system CPUs'
+          name: 'SNMP walk system CPUs'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.25.3.3.1.1,1.3.6.1.2.1.25.3.3.1.2]'
           key: system.cpu.walk
@@ -206,7 +207,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 763d10f3cf344cd488db9c156c893d18
-          name: 'Mikrotik: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -227,7 +228,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 260eff3ec4034e33aea9c25962a782be
-          name: 'Mikrotik: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.7.4.0
           key: system.hw.firmware
@@ -248,7 +249,7 @@ zabbix_export:
           triggers:
             - uuid: 62a9cd04a4dc4f5a9b59a01e54fb983f
               expression: 'last(/Mikrotik by SNMP/system.hw.firmware,#1)<>last(/Mikrotik by SNMP/system.hw.firmware,#2) and length(last(/Mikrotik by SNMP/system.hw.firmware))>0'
-              name: 'Mikrotik: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -257,7 +258,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 8d2c5a405ffa42fc81a2c9b914e20874
-          name: 'Mikrotik: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.hw.model
@@ -274,7 +275,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2c5a89f75a8d4e38ad021b3539ce8273
-          name: 'Mikrotik: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.7.3.0
           key: system.hw.serialnumber
@@ -296,8 +297,8 @@ zabbix_export:
           triggers:
             - uuid: 6c1dcb2e8e76405887af69a6a08e53df
               expression: 'last(/Mikrotik by SNMP/system.hw.serialnumber,#1)<>last(/Mikrotik by SNMP/system.hw.serialnumber,#2) and length(last(/Mikrotik by SNMP/system.hw.serialnumber))>0'
-              name: 'Mikrotik: Device has been replaced'
-              event_name: 'Mikrotik: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -305,7 +306,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 94f4af679dba4d3e9047ebcf8c1bc419
-          name: 'Mikrotik: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -329,7 +330,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9766fcd2e7b64865a6ef60f3ab27002f
-          name: 'Mikrotik: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -339,7 +340,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -349,7 +350,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2d99a01f7c0d4ca38f3bc9a5f8db3ab7
-          name: 'Mikrotik: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -371,8 +372,8 @@ zabbix_export:
           triggers:
             - uuid: 0172b76bc48d4dcead140c4880499777
               expression: 'last(/Mikrotik by SNMP/system.name,#1)<>last(/Mikrotik by SNMP/system.name,#2) and length(last(/Mikrotik by SNMP/system.name))>0'
-              name: 'Mikrotik: System name has changed'
-              event_name: 'Mikrotik: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -382,7 +383,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: ff6fea946fb143e3b8b151eafb403952
-          name: 'Mikrotik: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -392,7 +393,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -401,7 +402,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9d8a27d216f146ae88479e8e6bcbd301
-          name: 'Mikrotik: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -420,7 +421,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7e3b3e78086742a7b9cda953367a2d83
-          name: 'Mikrotik: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.14988.1.1.4.4.0
           key: 'system.sw.os[mtxrLicVersion.0]'
@@ -442,18 +443,18 @@ zabbix_export:
           triggers:
             - uuid: 739f60e0862d4fe88cc2a5fe626211a8
               expression: 'last(/Mikrotik by SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/Mikrotik by SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/Mikrotik by SNMP/system.sw.os[mtxrLicVersion.0]))>0'
-              name: 'Mikrotik: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Mikrotik: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Mikrotik by SNMP/system.name,#1)<>last(/Mikrotik by SNMP/system.name,#2) and length(last(/Mikrotik by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 2af6a2f85926468ab8242e4f5c6fb096
-          name: 'Mikrotik: SNMP walk mounted filesystems'
+          name: 'SNMP walk mounted filesystems'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.25.2.3.1.3,1.3.6.1.2.1.25.2.3.1.4,1.3.6.1.2.1.25.2.3.1.2,1.3.6.1.2.1.25.2.3.1.6,1.3.6.1.2.1.25.2.3.1.5]'
           key: vfs.fs.walk
@@ -467,7 +468,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0636e173288d42e68faf62c381a65087
-          name: 'Mikrotik: Total memory'
+          name: 'Total memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.2.3.1.5.65536
           key: 'vm.memory.total[hrStorageSize.Memory]'
@@ -492,7 +493,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 7d4a1591887848028ea8bae81b7d01a7
-          name: 'Mikrotik: Used memory'
+          name: 'Used memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.2.3.1.6.65536
           key: 'vm.memory.used[hrStorageUsed.Memory]'
@@ -509,7 +510,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 56017f610bf74f0aaaa92e9183e68ea5
-          name: 'Mikrotik: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[memoryUsedPercentage.Memory]'
           history: 7d
@@ -523,8 +524,8 @@ zabbix_export:
           triggers:
             - uuid: e4b4ba5ec80c4d83adbb10739edf4574
               expression: 'min(/Mikrotik by SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Mikrotik: High memory utilization'
-              event_name: 'Mikrotik: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -533,13 +534,13 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 754f890d63c042f6976a1ad25c317574
-          name: 'Mikrotik: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -553,12 +554,12 @@ zabbix_export:
           triggers:
             - uuid: 2cc6310f1a824d40903f497f155a7834
               expression: 'max(/Mikrotik by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Mikrotik: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Mikrotik: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mikrotik by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1574,7 +1575,9 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n`, then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`.
+                For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.
+                For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1638,8 +1641,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `last(/TEMPLATE_NAME/METRIC,#1)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1996,14 +1999,19 @@ zabbix_export:
           value: '90'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
+          description: 'Used as a threshold in the interface utilization trigger.'
         - macro: '{$IFCONTROL}'
           value: '1'
+          description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
         - macro: '{$IFNAME.LTEMODEM.MATCHES}'
           value: ^lte
           description: 'This macro is used in LTE modem discovery. It can be overridden on the host.'
@@ -2026,33 +2034,43 @@ zabbix_export:
           value: '90'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
-          description: 'Ignore down(2) administrative status'
+          description: 'Ignore `down(2)` administrative status'
         - macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFNAME.MATCHES}'
           value: '^.*$'
+          description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
+          description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
+          description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
-          description: 'Ignore notPresent(6)'
+          description: 'Ignore `notPresent(6)`'
         - macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
+          description: 'Used in network interface discovery rule filters.'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
         - macro: '{$TEMP_CRIT:"CPU"}'
@@ -2073,7 +2091,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2697,13 +2715,13 @@ zabbix_export:
   triggers:
     - uuid: 53e737a095a840df9abfcfd9c26007bf
       expression: '(last(/Mikrotik by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Mikrotik by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Mikrotik by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Mikrotik by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Mikrotik: Host has been restarted'
-      event_name: 'Mikrotik: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Mikrotik: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Mikrotik by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

@@ -25,7 +25,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 50bf00cc5c9f41c887add07d0bba3cc1
-          name: 'HashiCorp Nomad: Client nodes API response'
+          name: 'Client nodes API response'
           type: DEPENDENT
           key: nomad.client.nodes.api.response
           delay: '0'
@@ -58,8 +58,8 @@ zabbix_export:
           triggers:
             - uuid: f2e1cbbf808946ca902c1f378747e936
               expression: 'find(/HashiCorp Nomad by HTTP/nomad.client.nodes.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
-              name: 'HashiCorp Nomad: Client nodes API connection has failed'
-              event_name: 'HashiCorp Nomad: Client nodes API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
+              name: 'Client nodes API connection has failed'
+              event_name: 'Client nodes API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
                 Client nodes API connection has failed.
@@ -69,7 +69,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 99d8cd0768094bef93995e4baa475186
-          name: 'HashiCorp Nomad: Nomad clients get'
+          name: 'Nomad clients get'
           type: HTTP_AGENT
           key: nomad.client.nodes.get
           delay: 1h
@@ -99,7 +99,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7a46e18358e641cc941b306de6eb5dc4
-          name: 'HashiCorp Nomad: Nomad clients count'
+          name: 'Nomad clients count'
           type: DEPENDENT
           key: nomad.clients.count
           delay: '0'
@@ -112,7 +112,7 @@ zabbix_export:
           master_item:
             key: nomad.client.nodes.get
         - uuid: e848e135a5574931accf114fcafb89d7
-          name: 'HashiCorp Nomad: Region'
+          name: Region
           type: DEPENDENT
           key: nomad.region
           delay: '0'
@@ -130,7 +130,7 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 53a0c689f27547ccbcb0a57c736a5027
-          name: 'HashiCorp Nomad: Server-related APIs response'
+          name: 'Server-related APIs response'
           type: DEPENDENT
           key: nomad.server.api.response
           delay: '0'
@@ -152,8 +152,8 @@ zabbix_export:
           triggers:
             - uuid: 1560c32cb7de4fc8a58cf537c7958205
               expression: 'find(/HashiCorp Nomad by HTTP/nomad.server.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
-              name: 'HashiCorp Nomad: Server-related API connection has failed'
-              event_name: 'HashiCorp Nomad: Server-related API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
+              name: 'Server-related API connection has failed'
+              event_name: 'Server-related API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
                 Server-related API connection has failed.
@@ -163,7 +163,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 254354aa21764751bf7e1961e37de7ae
-          name: 'HashiCorp Nomad: Nomad servers get'
+          name: 'Nomad servers get'
           type: SCRIPT
           key: nomad.server.nodes.get
           delay: 1h
@@ -286,7 +286,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 904e226008324cb8aa11f716e0420b51
-          name: 'HashiCorp Nomad: Nomad servers count'
+          name: 'Nomad servers count'
           type: DEPENDENT
           key: nomad.servers.count
           delay: '0'
@@ -514,7 +514,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: Region
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -533,8 +533,8 @@ zabbix_export:
                       value: '4'
                 - type: item
                   name: Servers
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -553,8 +553,8 @@ zabbix_export:
                       value: '4'
                 - type: item
                   name: Clients
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -589,7 +589,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: f98bd789c9f7409aac2e1902776ddc21
-          name: 'HashiCorp Nomad Client: Service [rpc] state'
+          name: 'Service [rpc] state'
           type: SIMPLE
           key: 'net.tcp.service[tcp,,{$NOMAD.CLIENT.RPC.PORT}]'
           history: 7d
@@ -607,7 +607,7 @@ zabbix_export:
           triggers:
             - uuid: f368ff4de45e4620963135836eb54092
               expression: 'last(/HashiCorp Nomad Client by HTTP/net.tcp.service[tcp,,{$NOMAD.CLIENT.RPC.PORT}]) = 0'
-              name: 'HashiCorp Nomad Client: Service [rpc] is down'
+              name: 'Service [rpc] is down'
               opdata: 'Service: rpc, Port: {$NOMAD.CLIENT.RPC.PORT}, State: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: |
@@ -618,7 +618,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 00b39edd70cc42daa565879494f15f38
-          name: 'HashiCorp Nomad Client: Service [serf] state'
+          name: 'Service [serf] state'
           type: SIMPLE
           key: 'net.tcp.service[tcp,,{$NOMAD.CLIENT.SERF.PORT}]'
           history: 7d
@@ -636,7 +636,7 @@ zabbix_export:
           triggers:
             - uuid: 0108c9f85b48433c8b9864e41458994f
               expression: 'last(/HashiCorp Nomad Client by HTTP/net.tcp.service[tcp,,{$NOMAD.CLIENT.SERF.PORT}]) = 0'
-              name: 'HashiCorp Nomad Client: Service [serf] is down'
+              name: 'Service [serf] is down'
               opdata: 'Service: serf, Port: {$NOMAD.CLIENT.SERF.PORT}, State: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: |
@@ -647,7 +647,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 13aa2136b7634c32a56fe00b29056d2d
-          name: 'HashiCorp Nomad Client: CPU allocated'
+          name: 'CPU allocated'
           type: DEPENDENT
           key: nomad.client.allocated.cpu
           delay: '0'
@@ -668,7 +668,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: fb7211ae27c845bba8dca7e75e0083b8
-          name: 'HashiCorp Nomad Client: Disk allocated'
+          name: 'Disk allocated'
           type: DEPENDENT
           key: nomad.client.allocated.disk
           delay: '0'
@@ -692,7 +692,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 27c71fbb37f14deba301c3b5c7daecb5
-          name: 'HashiCorp Nomad Client: Memory allocated'
+          name: 'Memory allocated'
           type: DEPENDENT
           key: nomad.client.allocated.memory
           delay: '0'
@@ -716,7 +716,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 945d348f2f2d4c02b3a1ec6f32f1290d
-          name: 'HashiCorp Nomad Client: Allocations blocked'
+          name: 'Allocations blocked'
           type: DEPENDENT
           key: nomad.client.allocations.blocked
           delay: '0'
@@ -737,7 +737,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: f556557bf5de438d9aaf941ab5c8d93b
-          name: 'HashiCorp Nomad Client: Allocations completed, rate'
+          name: 'Allocations completed, rate'
           type: DEPENDENT
           key: nomad.client.allocations.complete
           delay: '0'
@@ -764,7 +764,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: 586bc8f63e7f46cf99337c7f70809c43
-          name: 'HashiCorp Nomad Client: Allocations failed, rate'
+          name: 'Allocations failed, rate'
           type: DEPENDENT
           key: nomad.client.allocations.failed
           delay: '0'
@@ -791,7 +791,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: 88b2eb8e9e8041df83674d3800b1f8c1
-          name: 'HashiCorp Nomad Client: Allocations migrating'
+          name: 'Allocations migrating'
           type: DEPENDENT
           key: nomad.client.allocations.migrating
           delay: '0'
@@ -812,7 +812,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: 717172608fbb4d81bfb65e7f4aa4aaf3
-          name: 'HashiCorp Nomad Client: Allocations OOM killed'
+          name: 'Allocations OOM killed'
           type: DEPENDENT
           key: nomad.client.allocations.oom_killed
           delay: '0'
@@ -838,7 +838,7 @@ zabbix_export:
           triggers:
             - uuid: 747de32c46cb4d95851cee8a30c576b0
               expression: 'last(/HashiCorp Nomad Client by HTTP/nomad.client.allocations.oom_killed) > 0'
-              name: 'HashiCorp Nomad Client: OOM killed allocations found'
+              name: 'OOM killed allocations found'
               opdata: 'OOM killed: {ITEM.LASTVALUE}'
               priority: WARNING
               description: 'OOM killed allocations found.'
@@ -847,7 +847,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9fc77ab432c04cf4b1c0f1941da641d3
-          name: 'HashiCorp Nomad Client: Allocations pending'
+          name: 'Allocations pending'
           type: DEPENDENT
           key: nomad.client.allocations.pending
           delay: '0'
@@ -868,7 +868,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: eae33da538c642868cf9afe9e6495c95
-          name: 'HashiCorp Nomad Client: Allocations restarted, rate'
+          name: 'Allocations restarted, rate'
           type: DEPENDENT
           key: nomad.client.allocations.restart
           delay: '0'
@@ -895,7 +895,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: 6a4903e8bfa04f18a44813349ea6b33d
-          name: 'HashiCorp Nomad Client: Allocations running'
+          name: 'Allocations running'
           type: DEPENDENT
           key: nomad.client.allocations.running
           delay: '0'
@@ -916,7 +916,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: 3fcbebb8436d4dec8db6625e44520999
-          name: 'HashiCorp Nomad Client: Allocations starting'
+          name: 'Allocations starting'
           type: DEPENDENT
           key: nomad.client.allocations.start
           delay: '0'
@@ -937,7 +937,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: 166aad9bafeb478abcd8c61ea1d0cc98
-          name: 'HashiCorp Nomad Client: Allocations terminal'
+          name: 'Allocations terminal'
           type: DEPENDENT
           key: nomad.client.allocations.terminal
           delay: '0'
@@ -958,7 +958,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: 31faeb4af30f4f878050eca21e6f97df
-          name: 'HashiCorp Nomad Client: CPU idle utilization'
+          name: 'CPU idle utilization'
           type: DEPENDENT
           key: nomad.client.cpu.idle
           delay: '0'
@@ -980,7 +980,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ad75d4b5e69c4e11bc886582791951be
-          name: 'HashiCorp Nomad Client: CPU system utilization'
+          name: 'CPU system utilization'
           type: DEPENDENT
           key: nomad.client.cpu.system
           delay: '0'
@@ -1002,7 +1002,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 71eb3676049a4d60aa69ef3901005894
-          name: 'HashiCorp Nomad Client: CPU total utilization'
+          name: 'CPU total utilization'
           type: DEPENDENT
           key: nomad.client.cpu.total
           delay: '0'
@@ -1026,8 +1026,8 @@ zabbix_export:
           triggers:
             - uuid: 59db4f1d22cb48fab0ced8ad9ec39a25
               expression: 'min(/HashiCorp Nomad Client by HTTP/nomad.client.cpu.total, 10m) >= {$NOMAD.CPU.UTIL.MIN}'
-              name: 'HashiCorp Nomad Client: High CPU utilization'
-              event_name: 'HashiCorp Nomad Client: High CPU utilization: (over >= {$NOMAD.CPU.UTIL.MIN}% over last 10m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization: (over >= {$NOMAD.CPU.UTIL.MIN}% over last 10m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -1035,7 +1035,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: cc0671cc71fb4bdd8cdf7a959e1022fd
-          name: 'HashiCorp Nomad Client: CPU user utilization'
+          name: 'CPU user utilization'
           type: DEPENDENT
           key: nomad.client.cpu.user
           delay: '0'
@@ -1057,7 +1057,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 71be24cf848a448dbb993a577015bd9e
-          name: 'HashiCorp Nomad Client: Monitoring API response'
+          name: 'Monitoring API response'
           type: DEPENDENT
           key: nomad.client.data.api.response
           delay: '0'
@@ -1090,8 +1090,8 @@ zabbix_export:
           triggers:
             - uuid: 676e1535cde2424cbda78f18cd9084bf
               expression: 'find(/HashiCorp Nomad Client by HTTP/nomad.client.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
-              name: 'HashiCorp Nomad Client: Monitoring API connection has failed'
-              event_name: 'HashiCorp Nomad Client: Monitoring API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
+              name: 'Monitoring API connection has failed'
+              event_name: 'Monitoring API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
                 Monitoring API connection has failed.
@@ -1101,7 +1101,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: fe07fd88f3e14273b3f0b135aab26236
-          name: 'HashiCorp Nomad Client: Telemetry get'
+          name: 'Telemetry get'
           type: HTTP_AGENT
           key: nomad.client.data.get
           history: '0'
@@ -1130,7 +1130,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c9bfa74720ea4e228e5d200ab1f38074
-          name: 'HashiCorp Nomad Client: Allocations API response'
+          name: 'Allocations API response'
           type: DEPENDENT
           key: nomad.client.job.allocs.api.response
           delay: '0'
@@ -1163,21 +1163,21 @@ zabbix_export:
           triggers:
             - uuid: 300f5fba0f45465aa6868a3f1d16633d
               expression: 'find(/HashiCorp Nomad Client by HTTP/nomad.client.job.allocs.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
-              name: 'HashiCorp Nomad Client: Allocations API connection has failed'
-              event_name: 'HashiCorp Nomad Client: Allocations API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
+              name: 'Allocations API connection has failed'
+              event_name: 'Allocations API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
                 Allocations API connection has failed.
                 Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               dependencies:
-                - name: 'HashiCorp Nomad Client: Monitoring API connection has failed'
+                - name: 'Monitoring API connection has failed'
                   expression: 'find(/HashiCorp Nomad Client by HTTP/nomad.client.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 9948608c5b3a4dad9d1b433483296427
-          name: 'HashiCorp Nomad Client: Allocated jobs get'
+          name: 'Allocated jobs get'
           type: HTTP_AGENT
           key: nomad.client.job.allocs.get
           delay: 1h
@@ -1211,7 +1211,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f312a5ba5758426d83c5c3c414d765fd
-          name: 'HashiCorp Nomad Client: Memory available'
+          name: 'Memory available'
           type: DEPENDENT
           key: nomad.client.memory.available
           delay: '0'
@@ -1233,7 +1233,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: e379e923ed6b45a682f1da192b3a328d
-          name: 'HashiCorp Nomad Client: Memory free'
+          name: 'Memory free'
           type: DEPENDENT
           key: nomad.client.memory.free
           delay: '0'
@@ -1254,7 +1254,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 50d152cf3c654e818aa7303841d5444a
-          name: 'HashiCorp Nomad Client: Memory size'
+          name: 'Memory size'
           type: DEPENDENT
           key: nomad.client.memory.total
           delay: '0'
@@ -1275,7 +1275,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: b2638e0b928e46cd825304a3f1ca1682
-          name: 'HashiCorp Nomad Client: Memory used'
+          name: 'Memory used'
           type: DEPENDENT
           key: nomad.client.memory.used
           delay: '0'
@@ -1296,7 +1296,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 933621a61d2241d084b48ec6b3bd5b74
-          name: 'HashiCorp Nomad Client: Metrics'
+          name: Metrics
           type: DEPENDENT
           key: nomad.client.metrics.get
           delay: '0'
@@ -1315,7 +1315,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 39430d6dceaa42a68c72ef68f67b1a12
-          name: 'HashiCorp Nomad Client: Nodes API response'
+          name: 'Nodes API response'
           type: DEPENDENT
           key: nomad.client.node.info.api.response
           delay: '0'
@@ -1348,21 +1348,21 @@ zabbix_export:
           triggers:
             - uuid: 3ea14e12d6154492a4505c4b51003ed3
               expression: 'find(/HashiCorp Nomad Client by HTTP/nomad.client.node.info.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
-              name: 'HashiCorp Nomad Client: Nodes API connection has failed'
-              event_name: 'HashiCorp Nomad Client: Nodes API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
+              name: 'Nodes API connection has failed'
+              event_name: 'Nodes API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
                 Nodes API connection has failed.
                 Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               dependencies:
-                - name: 'HashiCorp Nomad Client: Monitoring API connection has failed'
+                - name: 'Monitoring API connection has failed'
                   expression: 'find(/HashiCorp Nomad Client by HTTP/nomad.client.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 36eb68c80b194a4591208cf210fb6d6e
-          name: 'HashiCorp Nomad Client: Node info get'
+          name: 'Node info get'
           type: HTTP_AGENT
           key: nomad.client.node.info.get
           delay: 1h
@@ -1392,7 +1392,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 18e57950b0c041e0a2abc0dbd0644b33
-          name: 'HashiCorp Nomad Client: CPU unallocated'
+          name: 'CPU unallocated'
           type: DEPENDENT
           key: nomad.client.unallocated.cpu
           delay: '0'
@@ -1413,7 +1413,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 44619e3740a9403581d54c6555ecd967
-          name: 'HashiCorp Nomad Client: Disk unallocated'
+          name: 'Disk unallocated'
           type: DEPENDENT
           key: nomad.client.unallocated.disk
           delay: '0'
@@ -1437,7 +1437,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: bc0928fcff2f458f83874d7442274e61
-          name: 'HashiCorp Nomad Client: Memory unallocated'
+          name: 'Memory unallocated'
           type: DEPENDENT
           key: nomad.client.unallocated.memory
           delay: '0'
@@ -1461,7 +1461,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 3561fb69284f4c88a7f5d8c7f04c3b14
-          name: 'HashiCorp Nomad Client: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: nomad.client.uptime
           delay: '0'
@@ -1483,8 +1483,8 @@ zabbix_export:
           triggers:
             - uuid: 74fe77871e8c4161b5944f30dd4d1c84
               expression: 'last(/HashiCorp Nomad Client by HTTP/nomad.client.uptime) < 10m'
-              name: 'HashiCorp Nomad Client: The host has been restarted'
-              event_name: 'HashiCorp Nomad Client: The host has been restarted: (uptime < 10m)'
+              name: 'The host has been restarted'
+              event_name: 'The host has been restarted: (uptime < 10m)'
               priority: WARNING
               description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1492,7 +1492,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 872961bd507c4f6380168d2284ead1ae
-          name: 'HashiCorp Nomad Client: Nomad client version'
+          name: 'Nomad client version'
           type: DEPENDENT
           key: nomad.client.version
           delay: '0'
@@ -1509,8 +1509,8 @@ zabbix_export:
           triggers:
             - uuid: afac97bced6f49bc994ae633b662722c
               expression: 'change(/HashiCorp Nomad Client by HTTP/nomad.client.version)<>0'
-              name: 'HashiCorp Nomad Client: Nomad client version has changed'
-              event_name: 'HashiCorp Nomad Client: Nomad client version has changed to {ITEM.LASTVALUE}'
+              name: 'Nomad client version has changed'
+              event_name: 'Nomad client version has changed to {ITEM.LASTVALUE}'
               priority: INFO
               description: 'Nomad client version has changed.'
               manual_close: 'YES'
@@ -1526,18 +1526,18 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#JOB.NAMESPACE}'
-                value: '{$NOMAD.JOB.NAMESPACE.MATCHES}'
-                formulaid: A
-              - macro: '{#JOB.NAMESPACE}'
-                value: '{$NOMAD.JOB.NAMESPACE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#JOB.NAME}'
                 value: '{$NOMAD.JOB.NAME.MATCHES}'
-                formulaid: C
+                formulaid: A
               - macro: '{#JOB.NAME}'
                 value: '{$NOMAD.JOB.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#JOB.NAMESPACE}'
+                value: '{$NOMAD.JOB.NAMESPACE.MATCHES}'
+                formulaid: C
+              - macro: '{#JOB.NAMESPACE}'
+                value: '{$NOMAD.JOB.NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               - macro: '{#JOB.TASK.GROUP}'
@@ -1558,7 +1558,7 @@ zabbix_export:
           description: 'Allocated jobs discovery.'
           item_prototypes:
             - uuid: ba9e5a022dbc4f7aa28a1db2ef6d73bb
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] CPU allocated'
+              name: 'Job ["{#JOB.NAME}"] CPU allocated'
               type: DEPENDENT
               key: 'nomad.client.allocs.cpu.allocated["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1587,7 +1587,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: 85daa0ce6d4f41ab83a3a65ceb8359a9
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] CPU system utilization'
+              name: 'Job ["{#JOB.NAME}"] CPU system utilization'
               type: DEPENDENT
               key: 'nomad.client.allocs.cpu.system["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1616,7 +1616,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: d5ec55f8d9a74c99924a01acb206295e
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] CPU throttled periods time'
+              name: 'Job ["{#JOB.NAME}"] CPU throttled periods time'
               type: DEPENDENT
               key: 'nomad.client.allocs.cpu.throttled_periods["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1648,7 +1648,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: 3122f6d0c1b24ea7bac7a3af4fc00fb2
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] CPU throttled time'
+              name: 'Job ["{#JOB.NAME}"] CPU throttled time'
               type: DEPENDENT
               key: 'nomad.client.allocs.cpu.throttled_time["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1681,7 +1681,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: 5ff1ea02768243f4971339bf70f89772
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] CPU total utilization'
+              name: 'Job ["{#JOB.NAME}"] CPU total utilization'
               type: DEPENDENT
               key: 'nomad.client.allocs.cpu.total_percent["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1710,7 +1710,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: 14179529be9d47bc898a5330ff37a9c5
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] CPU ticks'
+              name: 'Job ["{#JOB.NAME}"] CPU ticks'
               type: DEPENDENT
               key: 'nomad.client.allocs.cpu.total_ticks["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1738,7 +1738,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: 9fb3e3b461874e86aee9483d5af65535
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] CPU user utilization'
+              name: 'Job ["{#JOB.NAME}"] CPU user utilization'
               type: DEPENDENT
               key: 'nomad.client.allocs.cpu.user["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1767,7 +1767,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: c353af0be02b47faa27036dfdd173176
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] Memory allocated'
+              name: 'Job ["{#JOB.NAME}"] Memory allocated'
               type: DEPENDENT
               key: 'nomad.client.allocs.memory.allocated["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1796,7 +1796,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: 7bd7a486864b4d0f82242676da2370ed
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] Memory cached'
+              name: 'Job ["{#JOB.NAME}"] Memory cached'
               type: DEPENDENT
               key: 'nomad.client.allocs.memory.cache["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1825,7 +1825,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: b1419d5017cf4f8ba23e8c774c451772
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] Memory swapped'
+              name: 'Job ["{#JOB.NAME}"] Memory swapped'
               type: DEPENDENT
               key: 'nomad.client.allocs.memory.swap["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -1854,7 +1854,7 @@ zabbix_export:
                 - tag: task-group
                   value: '{#JOB.TASK.GROUP}'
             - uuid: 09ba4987f69c496ebeab3fb08f4b499b
-              name: 'HashiCorp Nomad Client: Job ["{#JOB.NAME}"] Memory used'
+              name: 'Job ["{#JOB.NAME}"] Memory used'
               type: DEPENDENT
               key: 'nomad.client.allocs.memory.usage["{#JOB.NAME}","{#JOB.TASK.GROUP}","{#JOB.NAMESPACE}"]'
               delay: '0'
@@ -2008,7 +2008,7 @@ zabbix_export:
           description: 'Physical disks discovery.'
           item_prototypes:
             - uuid: 4a79c99027494bb98b474e6f81db5e18
-              name: 'HashiCorp Nomad Client: Disk ["{#DEV.NAME}"] space available'
+              name: 'Disk ["{#DEV.NAME}"] space available'
               type: DEPENDENT
               key: 'nomad.client.disk.available["{#DEV.NAME}"]'
               delay: '0'
@@ -2031,7 +2031,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DEV.NAME}'
             - uuid: 21043b0ed4424e3086a00a567d134d45
-              name: 'HashiCorp Nomad Client: Disk ["{#DEV.NAME}"] inodes utilization'
+              name: 'Disk ["{#DEV.NAME}"] inodes utilization'
               type: DEPENDENT
               key: 'nomad.client.disk.inodes_percent["{#DEV.NAME}"]'
               delay: '0'
@@ -2058,7 +2058,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 433c2227305a4aeb82eb1d390621a81e
                   expression: 'min(/HashiCorp Nomad Client by HTTP/nomad.client.disk.inodes_percent["{#DEV.NAME}"],5m) >= {$NOMAD.INODES.FREE.MIN.CRIT:"{#DEV.NAME}"}'
-                  name: 'HashiCorp Nomad Client: Running out of free inodes on [{#DEV.NAME}] device'
+                  name: 'Running out of free inodes on [{#DEV.NAME}] device'
                   event_name: 'Running out of free inodes on [{#DEV.NAME}]  (free < {$NOMAD.INODES.FREE.MIN.CRIT:"{#DEV.NAME}"}%)'
                   opdata: 'Free inodes: {ITEM.VALUE}'
                   priority: AVERAGE
@@ -2073,7 +2073,7 @@ zabbix_export:
                       value: capacity
                 - uuid: d0f2aacaada545c4a81d35f0eb454532
                   expression: 'min(/HashiCorp Nomad Client by HTTP/nomad.client.disk.inodes_percent["{#DEV.NAME}"],5m) >= {$NOMAD.INODES.FREE.MIN.WARN:"{#DEV.NAME}"}'
-                  name: 'HashiCorp Nomad Client: Running out of free inodes on [{#DEV.NAME}] device'
+                  name: 'Running out of free inodes on [{#DEV.NAME}] device'
                   event_name: 'Running out of free inodes on [{#DEV.NAME}]  (free < {$NOMAD.INODES.FREE.MIN.WARN:"{#DEV.NAME}"}%)'
                   opdata: 'Free inodes: {ITEM.VALUE}'
                   priority: WARNING
@@ -2084,13 +2084,13 @@ zabbix_export:
                     - Disk is full.
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'HashiCorp Nomad Client: Running out of free inodes on [{#DEV.NAME}] device'
+                    - name: 'Running out of free inodes on [{#DEV.NAME}] device'
                       expression: 'min(/HashiCorp Nomad Client by HTTP/nomad.client.disk.inodes_percent["{#DEV.NAME}"],5m) >= {$NOMAD.INODES.FREE.MIN.CRIT:"{#DEV.NAME}"}'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: 4358e8accdd0400496b491cda7edc909
-              name: 'HashiCorp Nomad Client: Disk ["{#DEV.NAME}"] size'
+              name: 'Disk ["{#DEV.NAME}"] size'
               type: DEPENDENT
               key: 'nomad.client.disk.size["{#DEV.NAME}"]'
               delay: '0'
@@ -2113,7 +2113,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DEV.NAME}'
             - uuid: 778f4609e236434d8b216b62bfebf885
-              name: 'HashiCorp Nomad Client: Disk ["{#DEV.NAME}"] space used'
+              name: 'Disk ["{#DEV.NAME}"] space used'
               type: DEPENDENT
               key: 'nomad.client.disk.used["{#DEV.NAME}"]'
               delay: '0'
@@ -2136,7 +2136,7 @@ zabbix_export:
                 - tag: disk
                   value: '{#DEV.NAME}'
             - uuid: aec5d7147bd64f508e793d7539a8524b
-              name: 'HashiCorp Nomad Client: Disk ["{#DEV.NAME}"] space utilization'
+              name: 'Disk ["{#DEV.NAME}"] space utilization'
               type: DEPENDENT
               key: 'nomad.client.disk.used_percent["{#DEV.NAME}"]'
               delay: '0'
@@ -2161,7 +2161,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: b3e22e93d51a4a8d825b0bd2e45fc7a2
                   expression: 'min(/HashiCorp Nomad Client by HTTP/nomad.client.disk.used_percent["{#DEV.NAME}"],5m) >= {$NOMAD.DISK.UTIL.MIN.CRIT:"{#DEV.NAME}"}'
-                  name: 'HashiCorp Nomad Client: High disk [{#DEV.NAME}] utilization'
+                  name: 'High disk [{#DEV.NAME}] utilization'
                   event_name: 'Disk [{#DEV.NAME}] space low (utilization: >= {$NOMAD.DISK.UTIL.MIN.CRIT:"{#DEV.NAME}"}%)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE}'
                   priority: AVERAGE
@@ -2172,14 +2172,14 @@ zabbix_export:
                       value: capacity
                 - uuid: 05c3e6cd711f4a98a21c581a4437ffb5
                   expression: 'min(/HashiCorp Nomad Client by HTTP/nomad.client.disk.used_percent["{#DEV.NAME}"],5m) >= {$NOMAD.DISK.UTIL.MIN.WARN:"{#DEV.NAME}"}'
-                  name: 'HashiCorp Nomad Client: High disk [{#DEV.NAME}] utilization'
+                  name: 'High disk [{#DEV.NAME}] utilization'
                   event_name: 'Disk [{#DEV.NAME}] space low (utilization: >= {$NOMAD.DISK.UTIL.MIN.WARN:"{#DEV.NAME}"}%)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'High disk [{#DEV.NAME}] utilization.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'HashiCorp Nomad Client: Running out of free inodes on [{#DEV.NAME}] device'
+                    - name: 'Running out of free inodes on [{#DEV.NAME}] device'
                       expression: 'min(/HashiCorp Nomad Client by HTTP/nomad.client.disk.inodes_percent["{#DEV.NAME}"],5m) >= {$NOMAD.INODES.FREE.MIN.CRIT:"{#DEV.NAME}"}'
                   tags:
                     - tag: scope
@@ -2249,7 +2249,7 @@ zabbix_export:
           description: 'Client drivers discovery.'
           item_prototypes:
             - uuid: 6ffea3b88b29451ea6491cbd34a61148
-              name: 'HashiCorp Nomad Client: Driver [{#DRIVER.NAME}] detection state'
+              name: 'Driver [{#DRIVER.NAME}] detection state'
               type: DEPENDENT
               key: 'nomad.client.driver.detected["{#DRIVER.NAME}"]'
               delay: '0'
@@ -2277,7 +2277,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 576192afab06466f80c95c1b17c1e6fa
                   expression: 'change(/HashiCorp Nomad Client by HTTP/nomad.client.driver.detected["{#DRIVER.NAME}"]) <> 0'
-                  name: 'HashiCorp Nomad Client: Driver [{#DRIVER.NAME}] detection state has changed'
+                  name: 'Driver [{#DRIVER.NAME}] detection state has changed'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: INFO
                   description: 'The [{#DRIVER.NAME}] driver detection state has changed.'
@@ -2286,7 +2286,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: fdff50758360474dafffee8cb7ba6289
-              name: 'HashiCorp Nomad Client: Driver [{#DRIVER.NAME}] state'
+              name: 'Driver [{#DRIVER.NAME}] state'
               type: DEPENDENT
               key: 'nomad.client.driver.state["{#DRIVER.NAME}"]'
               delay: '0'
@@ -2317,7 +2317,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 5630f8b3585f4f5b8faf4a30d95755b8
               expression: 'last(/HashiCorp Nomad Client by HTTP/nomad.client.driver.state["{#DRIVER.NAME}"]) = 0 and last(/HashiCorp Nomad Client by HTTP/nomad.client.driver.detected["{#DRIVER.NAME}"]) = 1'
-              name: 'HashiCorp Nomad Client: Driver [{#DRIVER.NAME}] is in unhealthy state'
+              name: 'Driver [{#DRIVER.NAME}] is in unhealthy state'
               priority: WARNING
               description: 'The [{#DRIVER.NAME}] driver detected, but its state is unhealthy.'
               manual_close: 'YES'
@@ -2452,7 +2452,7 @@ zabbix_export:
             - name: Allocations
               widgets:
                 - type: item
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2471,7 +2471,7 @@ zabbix_export:
                       value: '4'
                 - type: item
                   'y': '5'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2490,7 +2490,7 @@ zabbix_export:
                       value: '4'
                 - type: item
                   'y': '10'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2508,8 +2508,8 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2527,9 +2527,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '8'
+                  x: '24'
                   'y': '5'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2547,9 +2547,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '8'
+                  x: '24'
                   'y': '10'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2567,8 +2567,8 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2586,9 +2586,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '5'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2606,9 +2606,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '10'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2631,7 +2631,7 @@ zabbix_export:
             - name: 'Job resources'
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2647,7 +2647,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2666,7 +2666,7 @@ zabbix_export:
                       value: '3'
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2681,8 +2681,8 @@ zabbix_export:
                       name: reference
                       value: AAAAJ
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2697,9 +2697,9 @@ zabbix_export:
                       name: reference
                       value: AAAAG
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2722,7 +2722,7 @@ zabbix_export:
             - name: 'Node resources'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2735,7 +2735,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2748,7 +2748,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2763,9 +2763,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2777,9 +2777,9 @@ zabbix_export:
                       name: reference
                       value: AAAAC
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2833,7 +2833,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: c5903e91262b4877be8c7e8f304b2862
-          name: 'HashiCorp Nomad Server: Service [rpc] state'
+          name: 'Service [rpc] state'
           type: SIMPLE
           key: 'net.tcp.service[tcp,,{$NOMAD.SERVER.RPC.PORT}]'
           history: 7d
@@ -2851,7 +2851,7 @@ zabbix_export:
           triggers:
             - uuid: 0b534fa4c6cd4e89bd0a44ca8e810fa2
               expression: 'last(/HashiCorp Nomad Server by HTTP/net.tcp.service[tcp,,{$NOMAD.SERVER.RPC.PORT}]) = 0'
-              name: 'HashiCorp Nomad Server: Service [rpc] is down'
+              name: 'Service [rpc] is down'
               opdata: 'Service: rpc, Port: {$NOMAD.SERVER.RPC.PORT}, State: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: |
@@ -2862,7 +2862,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 9eecc3ee79f04448991c83ac93459597
-          name: 'HashiCorp Nomad Server: Service [serf] state'
+          name: 'Service [serf] state'
           type: SIMPLE
           key: 'net.tcp.service[tcp,,{$NOMAD.SERVER.SERF.PORT}]'
           history: 7d
@@ -2880,7 +2880,7 @@ zabbix_export:
           triggers:
             - uuid: 00799e8927b547308fc9caab4ba2d24d
               expression: 'last(/HashiCorp Nomad Server by HTTP/net.tcp.service[tcp,,{$NOMAD.SERVER.SERF.PORT}]) = 0'
-              name: 'HashiCorp Nomad Server: Service [serf] is down'
+              name: 'Service [serf] is down'
               opdata: 'Service: serf, Port: {$NOMAD.SERVER.SERF.PORT}, State: {ITEM.LASTVALUE}'
               priority: AVERAGE
               description: |
@@ -2891,7 +2891,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 04821dab074f43e785dec52fbf69240e
-          name: 'HashiCorp Nomad Server: Nomad raft version'
+          name: 'Nomad raft version'
           type: DEPENDENT
           key: nomad.raft.version
           delay: '0'
@@ -2907,7 +2907,7 @@ zabbix_export:
           master_item:
             key: nomad.server.stats.get
         - uuid: 6ad163ebdefa4f5aa1e3712b7ddac7a7
-          name: 'HashiCorp Nomad Server: FSM allocation client update time'
+          name: 'FSM allocation client update time'
           type: DEPENDENT
           key: nomad.server.alloc_client_update
           delay: '0'
@@ -2932,7 +2932,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: 22947f9cc2734f95997a55d9e6392b77
-          name: 'HashiCorp Nomad Server: Autopilot failure tolerance'
+          name: 'Autopilot failure tolerance'
           type: DEPENDENT
           key: nomad.server.autopilot.failure_tolerance
           delay: '0'
@@ -2954,8 +2954,8 @@ zabbix_export:
           triggers:
             - uuid: fbb6d007481a4aab8d107a1d25a8c7ad
               expression: 'last(/HashiCorp Nomad Server by HTTP/nomad.server.autopilot.failure_tolerance) < {$NOMAD.REDUNDANCY.MIN} and nodata(/HashiCorp Nomad Server by HTTP/nomad.server.autopilot.failure_tolerance,5m) = 0'
-              name: 'HashiCorp Nomad Server: Autopilot redundancy is low'
-              event_name: 'HashiCorp Nomad Server: Autopilot redundancy is low (less than {$NOMAD.REDUNDANCY.MIN})'
+              name: 'Autopilot redundancy is low'
+              event_name: 'Autopilot redundancy is low (less than {$NOMAD.REDUNDANCY.MIN})'
               priority: WARNING
               description: |
                 The autopilot redundancy is low.
@@ -2965,7 +2965,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 05ce375320dd402ab6c75f8fffba74cb
-          name: 'HashiCorp Nomad Server: Autopilot state'
+          name: 'Autopilot state'
           type: DEPENDENT
           key: nomad.server.autopilot.state
           delay: '0'
@@ -2989,7 +2989,7 @@ zabbix_export:
           triggers:
             - uuid: 73c14eec055e47c6af6d8728ba0fb416
               expression: 'last(/HashiCorp Nomad Server by HTTP/nomad.server.autopilot.state) = 0 and nodata(/HashiCorp Nomad Server by HTTP/nomad.server.autopilot.state,5m) = 0'
-              name: 'HashiCorp Nomad Server: Autopilot is unhealthy'
+              name: 'Autopilot is unhealthy'
               priority: AVERAGE
               description: 'The autopilot is in unhealthy state. The successful failover probability is extremely low.'
               manual_close: 'YES'
@@ -2997,7 +2997,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: ace31f3772fe4ffe84741554e3fba8bc
-          name: 'HashiCorp Nomad Server: CPU shares for blocked evaluations'
+          name: 'CPU shares for blocked evaluations'
           type: DEPENDENT
           key: nomad.server.blocked_evals.cpu
           delay: '0'
@@ -3020,7 +3020,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: d7fe536b4d0445328dfbf3b1188bea70
-          name: 'HashiCorp Nomad Server: CPU shares for blocked job evaluations'
+          name: 'CPU shares for blocked job evaluations'
           type: DEPENDENT
           key: nomad.server.blocked_evals.job.cpu
           delay: '0'
@@ -3045,7 +3045,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 2f07cbd6ec11449cae787a6e84fa5fbf
-          name: 'HashiCorp Nomad Server: Memory shares for blocked job evaluations'
+          name: 'Memory shares for blocked job evaluations'
           type: DEPENDENT
           key: nomad.server.blocked_evals.job.memory
           delay: '0'
@@ -3070,7 +3070,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 5460a81df8174fb5a7596b4243162d05
-          name: 'HashiCorp Nomad Server: Memory shares by blocked evaluations'
+          name: 'Memory shares by blocked evaluations'
           type: DEPENDENT
           key: nomad.server.blocked_evals.memory
           delay: '0'
@@ -3093,7 +3093,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 474d05060b0d4a608f6a2d319235af91
-          name: 'HashiCorp Nomad Server: Evaluations blocked'
+          name: 'Evaluations blocked'
           type: DEPENDENT
           key: nomad.server.blocked_evals.total_blocked
           delay: '0'
@@ -3114,7 +3114,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: 80f5edf18daf407ba6b64374084a555b
-          name: 'HashiCorp Nomad Server: Evaluations escaped'
+          name: 'Evaluations escaped'
           type: DEPENDENT
           key: nomad.server.blocked_evals.total_escaped
           delay: '0'
@@ -3137,7 +3137,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: 356dec0f5d5b45d981db4b590ef7dd73
-          name: 'HashiCorp Nomad Server: Evaluations blocked due to quota limit'
+          name: 'Evaluations blocked due to quota limit'
           type: DEPENDENT
           key: nomad.server.blocked_evals.total_quota_limit
           delay: '0'
@@ -3158,7 +3158,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: 54ddea6f2fa04e6c8ceb456d4d67c530
-          name: 'HashiCorp Nomad Server: Evaluations enqueue time'
+          name: 'Evaluations enqueue time'
           type: DEPENDENT
           key: nomad.server.broker.eval_waiting
           delay: '0'
@@ -3183,7 +3183,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: 7df3a4b80f6b44c6a03b672182d3f73f
-          name: 'HashiCorp Nomad Server: Services ready to schedule'
+          name: 'Services ready to schedule'
           type: DEPENDENT
           key: nomad.server.broker.service_ready
           delay: '0'
@@ -3204,7 +3204,7 @@ zabbix_export:
             - tag: component
               value: services
         - uuid: 0da8881c8ddf4cd18e04b38201b83b7d
-          name: 'HashiCorp Nomad Server: Services unacknowledged'
+          name: 'Services unacknowledged'
           type: DEPENDENT
           key: nomad.server.broker.service_unacked
           delay: '0'
@@ -3225,7 +3225,7 @@ zabbix_export:
             - tag: component
               value: services
         - uuid: 2a38602920224c31a221696cf65c6abc
-          name: 'HashiCorp Nomad Server: System evaluations ready to schedule'
+          name: 'System evaluations ready to schedule'
           type: DEPENDENT
           key: nomad.server.broker.system_ready
           delay: '0'
@@ -3246,7 +3246,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: 3faaaa69672c4b999a12f054dbd8b980
-          name: 'HashiCorp Nomad Server: System evaluations unacknowledged'
+          name: 'System evaluations unacknowledged'
           type: DEPENDENT
           key: nomad.server.broker.system_unacked
           delay: '0'
@@ -3267,7 +3267,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: 2e556f5894c9492a80b34c84ceb69dba
-          name: 'HashiCorp Nomad Server: Evaluations pending'
+          name: 'Evaluations pending'
           type: DEPENDENT
           key: nomad.server.broker.total_pending
           delay: '0'
@@ -3288,7 +3288,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: 01e11850732a46709942c225d294a8ef
-          name: 'HashiCorp Nomad Server: Evaluations ready'
+          name: 'Evaluations ready'
           type: DEPENDENT
           key: nomad.server.broker.total_ready
           delay: '0'
@@ -3309,7 +3309,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: d57805e0d8a24117bb64992a9aeb3dc3
-          name: 'HashiCorp Nomad Server: Evaluations unacked'
+          name: 'Evaluations unacked'
           type: DEPENDENT
           key: nomad.server.broker.total_unacked
           delay: '0'
@@ -3330,7 +3330,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: ac1d1422adc248b48ba65268f9a43be8
-          name: 'HashiCorp Nomad Server: Evaluations waiting'
+          name: 'Evaluations waiting'
           type: DEPENDENT
           key: nomad.server.broker.total_waiting
           delay: '0'
@@ -3350,7 +3350,7 @@ zabbix_export:
             - tag: component
               value: evaluations
         - uuid: de3e13f7635e4058bd2ca12f6f454668
-          name: 'HashiCorp Nomad Server: RPC eval dequeue time'
+          name: 'RPC eval dequeue time'
           type: DEPENDENT
           key: nomad.server.client.dequeue
           delay: '0'
@@ -3377,7 +3377,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: ac2a5b69fef546d0924d631a9ed9cffd
-          name: 'HashiCorp Nomad Server: RPC get client allocs time'
+          name: 'RPC get client allocs time'
           type: DEPENDENT
           key: nomad.server.client.get_client_allocs
           delay: '0'
@@ -3404,7 +3404,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 758f3474636c42378fac78a2f5e3b63b
-          name: 'HashiCorp Nomad Server: RPC list time'
+          name: 'RPC list time'
           type: DEPENDENT
           key: nomad.server.client.list
           delay: '0'
@@ -3431,7 +3431,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 588bb9b304634852af149d7903d42798
-          name: 'HashiCorp Nomad Server: RPC update allocations time'
+          name: 'RPC update allocations time'
           type: DEPENDENT
           key: nomad.server.client.update_alloc
           delay: '0'
@@ -3458,7 +3458,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 1e1ce033c99b45a3892df8674deaf1f4
-          name: 'HashiCorp Nomad Server: RPC update status time'
+          name: 'RPC update status time'
           type: DEPENDENT
           key: nomad.server.client.update_status
           delay: '0'
@@ -3485,7 +3485,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: c5bd6a645e9f49ba83fe065b2af6248e
-          name: 'HashiCorp Nomad Server: CPU time, rate'
+          name: 'CPU time, rate'
           type: DEPENDENT
           key: nomad.server.cpu.time
           delay: '0'
@@ -3510,7 +3510,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: dbbee3bb99d347f9a9a5325b4f64a894
-          name: 'HashiCorp Nomad Server: Monitoring API response'
+          name: 'Monitoring API response'
           type: DEPENDENT
           key: nomad.server.data.api.response
           delay: '0'
@@ -3543,8 +3543,8 @@ zabbix_export:
           triggers:
             - uuid: 9dc8cd0bcbad4ee7a2afe45e33db53a7
               expression: 'find(/HashiCorp Nomad Server by HTTP/nomad.server.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
-              name: 'HashiCorp Nomad Server: Monitoring API connection has failed'
-              event_name: 'HashiCorp Nomad Server: Monitoring API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
+              name: 'Monitoring API connection has failed'
+              event_name: 'Monitoring API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
                 Monitoring API connection has failed.
@@ -3554,7 +3554,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: b7ba2f4a56b04de298fde77cbf5afb6a
-          name: 'HashiCorp Nomad Server: Telemetry get'
+          name: 'Telemetry get'
           type: HTTP_AGENT
           key: nomad.server.data.get
           history: '0'
@@ -3583,7 +3583,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7241c9923d714970ad950f9b7aa8ab52
-          name: 'HashiCorp Nomad Server: RPC evaluation acknowledgement time'
+          name: 'RPC evaluation acknowledgement time'
           type: DEPENDENT
           key: nomad.server.eval.ack
           delay: '0'
@@ -3610,7 +3610,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: b9085e173cec4ce2b2fa6fd68041695e
-          name: 'HashiCorp Nomad Server: FSM apply plan results time'
+          name: 'FSM apply plan results time'
           type: DEPENDENT
           key: nomad.server.fsm.apply_plan_results
           delay: '0'
@@ -3635,7 +3635,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: 62b19ce1b2bb4fdaacff02d70101a10f
-          name: 'HashiCorp Nomad Server: FSM job registration time'
+          name: 'FSM job registration time'
           type: DEPENDENT
           key: nomad.server.fsm.register_job
           delay: '0'
@@ -3660,7 +3660,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: 2d0b9f09bfb5480ebd6d6cf96c15278e
-          name: 'HashiCorp Nomad Server: FSM update evaluation time'
+          name: 'FSM update evaluation time'
           type: DEPENDENT
           key: nomad.server.fsm.update_eval
           delay: '0'
@@ -3685,7 +3685,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: 0abce7a087874e58a7da20acb3599535
-          name: 'HashiCorp Nomad Server: Heartbeats active'
+          name: 'Heartbeats active'
           type: DEPENDENT
           key: nomad.server.heartbeat.active
           delay: '0'
@@ -3707,7 +3707,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: dc95deb3590148a9bc50ea151a0d46b7
-          name: 'HashiCorp Nomad Server: RPC job allocations time'
+          name: 'RPC job allocations time'
           type: DEPENDENT
           key: nomad.server.job.allocations
           delay: '0'
@@ -3734,7 +3734,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 11e18e811fe7461181417ca1f5dad915
-          name: 'HashiCorp Nomad Server: RPC job evaluations time'
+          name: 'RPC job evaluations time'
           type: DEPENDENT
           key: nomad.server.job.evaluations
           delay: '0'
@@ -3761,7 +3761,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 0efaac3a59d44ce09d31435ddfa6aada
-          name: 'HashiCorp Nomad Server: RPC get job time'
+          name: 'RPC get job time'
           type: DEPENDENT
           key: nomad.server.job.get_job
           delay: '0'
@@ -3788,7 +3788,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 5ab3191f1f744682bab6d3142a1c39a4
-          name: 'HashiCorp Nomad Server: Jobs dead'
+          name: 'Jobs dead'
           type: DEPENDENT
           key: nomad.server.job_status.dead
           delay: '0'
@@ -3811,7 +3811,7 @@ zabbix_export:
           triggers:
             - uuid: 44dcd52ebf54404e871501a4c4825424
               expression: 'last(/HashiCorp Nomad Server by HTTP/nomad.server.job_status.dead) > 0 and nodata(/HashiCorp Nomad Server by HTTP/nomad.server.job_status.dead,5m) = 0'
-              name: 'HashiCorp Nomad Server: Dead jobs found'
+              name: 'Dead jobs found'
               opdata: 'Current amount: {ITEM.LASTVALUE}'
               priority: WARNING
               description: |
@@ -3822,7 +3822,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 39a27315e33549dc88c6cb426a5a05c9
-          name: 'HashiCorp Nomad Server: Jobs pending'
+          name: 'Jobs pending'
           type: DEPENDENT
           key: nomad.server.job_status.pending
           delay: '0'
@@ -3843,7 +3843,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 97907d8816b14fb69063a55bdea22701
-          name: 'HashiCorp Nomad Server: Jobs running'
+          name: 'Jobs running'
           type: DEPENDENT
           key: nomad.server.job_status.running
           delay: '0'
@@ -3864,7 +3864,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 4be8c941477046dd9dcc549020d687e7
-          name: 'HashiCorp Nomad Server: Job allocations completed'
+          name: 'Job allocations completed'
           type: DEPENDENT
           key: nomad.server.job_summary.complete
           delay: '0'
@@ -3885,7 +3885,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 6f6ad9a70b4e4759bc2e4cc213d697bb
-          name: 'HashiCorp Nomad Server: Job allocations failed'
+          name: 'Job allocations failed'
           type: DEPENDENT
           key: nomad.server.job_summary.failed
           delay: '0'
@@ -3906,7 +3906,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 7a267a1b82b24157a19b52e6f285f0ce
-          name: 'HashiCorp Nomad Server: RPC job summary time'
+          name: 'RPC job summary time'
           type: DEPENDENT
           key: nomad.server.job_summary.get_job_summary
           delay: '0'
@@ -3933,7 +3933,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 0c408dff86604486b0f23efed00f4348
-          name: 'HashiCorp Nomad Server: Job allocations lost'
+          name: 'Job allocations lost'
           type: DEPENDENT
           key: nomad.server.job_summary.lost
           delay: '0'
@@ -3954,7 +3954,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: d0de68553b484d2d9311b356a7b5a9e7
-          name: 'HashiCorp Nomad Server: Job allocations queued'
+          name: 'Job allocations queued'
           type: DEPENDENT
           key: nomad.server.job_summary.queued
           delay: '0'
@@ -3975,7 +3975,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 98ab06dce1f84ef5993e8cc793114008
-          name: 'HashiCorp Nomad Server: Job allocations running'
+          name: 'Job allocations running'
           type: DEPENDENT
           key: nomad.server.job_summary.running
           delay: '0'
@@ -3996,7 +3996,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: e3cc96bd72924bb5bd0334018a5a88be
-          name: 'HashiCorp Nomad Server: Job allocations starting'
+          name: 'Job allocations starting'
           type: DEPENDENT
           key: nomad.server.job_summary.starting
           delay: '0'
@@ -4017,7 +4017,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 244a84e136c94a47b1b64b92d08ac20f
-          name: 'HashiCorp Nomad Server: Job allocations unknown'
+          name: 'Job allocations unknown'
           type: DEPENDENT
           key: nomad.server.job_summary.unknown
           delay: '0'
@@ -4038,7 +4038,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 478f45d1095646bca5ffd3a6d923dddf
-          name: 'HashiCorp Nomad Server: Leader barrier time'
+          name: 'Leader barrier time'
           type: DEPENDENT
           key: nomad.server.leader.barrier
           delay: '0'
@@ -4065,7 +4065,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 8425336f75704a259bc066c795df1516
-          name: 'HashiCorp Nomad Server: Total reconcile time'
+          name: 'Total reconcile time'
           type: DEPENDENT
           key: nomad.server.leader.reconcile
           delay: '0'
@@ -4092,7 +4092,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: a5b6d36142174dd683e2aec5dd4ee1e9
-          name: 'HashiCorp Nomad Server: Reconcile peer time'
+          name: 'Reconcile peer time'
           type: DEPENDENT
           key: nomad.server.leader.reconcile_member
           delay: '0'
@@ -4119,7 +4119,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: af6eda309cc545b2aa65efc0af103a02
-          name: 'HashiCorp Nomad Server: Gossip time'
+          name: 'Gossip time'
           type: DEPENDENT
           key: nomad.server.memberlist.gossip
           delay: '0'
@@ -4144,7 +4144,7 @@ zabbix_export:
             - tag: component
               value: gossip
         - uuid: 25372c89439641d09521348033b1e324
-          name: 'HashiCorp Nomad Server: Metrics'
+          name: Metrics
           type: DEPENDENT
           key: nomad.server.metrics.get
           delay: '0'
@@ -4163,7 +4163,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8a003df55bae4bf0a14fefc6f02f28bf
-          name: 'HashiCorp Nomad Server: Namespace list time'
+          name: 'Namespace list time'
           type: DEPENDENT
           key: nomad.server.namespace.list_namespace
           delay: '0'
@@ -4188,7 +4188,7 @@ zabbix_export:
             - tag: component
               value: namespaces
         - uuid: dd8d8b5cdf914002ac58183b667ceb06
-          name: 'HashiCorp Nomad Server: Plan apply time'
+          name: 'Plan apply time'
           type: DEPENDENT
           key: nomad.server.plan.apply
           delay: '0'
@@ -4213,7 +4213,7 @@ zabbix_export:
             - tag: component
               value: plan
         - uuid: d8d69f231d23457e82c6d3941f09cf5d
-          name: 'HashiCorp Nomad Server: Plan evaluate time'
+          name: 'Plan evaluate time'
           type: DEPENDENT
           key: nomad.server.plan.evaluate
           delay: '0'
@@ -4238,7 +4238,7 @@ zabbix_export:
             - tag: component
               value: plan
         - uuid: ee7b59fd19644bc4813696f8d806955f
-          name: 'HashiCorp Nomad Server: Plan queue'
+          name: 'Plan queue'
           type: DEPENDENT
           key: nomad.server.plan.queue_depth
           delay: '0'
@@ -4259,7 +4259,7 @@ zabbix_export:
             - tag: component
               value: plan
         - uuid: 9df85708b74d40509d9c9412a15e5ce5
-          name: 'HashiCorp Nomad Server: RPC plan submit time'
+          name: 'RPC plan submit time'
           type: DEPENDENT
           key: nomad.server.plan.submit
           delay: '0'
@@ -4288,7 +4288,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 851eea2a548644ba884ca852c2759d90
-          name: 'HashiCorp Nomad Server: Plan raft index processing time'
+          name: 'Plan raft index processing time'
           type: DEPENDENT
           key: nomad.server.plan.wait_for_index
           delay: '0'
@@ -4313,7 +4313,7 @@ zabbix_export:
             - tag: component
               value: plan
         - uuid: 505ee2804b4e451892103b36cc38abde
-          name: 'HashiCorp Nomad Server: Open file descriptors, max'
+          name: 'Open file descriptors, max'
           type: DEPENDENT
           key: nomad.server.process_max_fds
           delay: '0'
@@ -4333,7 +4333,7 @@ zabbix_export:
             - tag: component
               value: fds
         - uuid: cba898eca0c84a84a1ea0309e04b9f84
-          name: 'HashiCorp Nomad Server: Open file descriptors'
+          name: 'Open file descriptors'
           type: DEPENDENT
           key: nomad.server.process_open_fds
           delay: '0'
@@ -4353,7 +4353,7 @@ zabbix_export:
             - tag: component
               value: fds
         - uuid: 1dd455d2776f4378a39980cfa8eba33c
-          name: 'HashiCorp Nomad Server: FSM index'
+          name: 'FSM index'
           type: DEPENDENT
           key: nomad.server.raft.applied_index
           delay: '0'
@@ -4373,7 +4373,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: bad74d0dc4b2431fbb5a442bc2fc1236
-          name: 'HashiCorp Nomad Server: Raft transactions, rate'
+          name: 'Raft transactions, rate'
           type: DEPENDENT
           key: nomad.server.raft.apply
           delay: '0'
@@ -4397,7 +4397,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 804693ed989b44e3903bcd81159dd51d
-          name: 'HashiCorp Nomad Server: Raft calls blocked, rate'
+          name: 'Raft calls blocked, rate'
           type: DEPENDENT
           key: nomad.server.raft.barrier
           delay: '0'
@@ -4420,7 +4420,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: f7d1bc6c6a82475dabcdaaec7472fe02
-          name: 'HashiCorp Nomad Server: BoltDB freelist bytes'
+          name: 'BoltDB freelist bytes'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.freelist_bytes
           delay: '0'
@@ -4441,7 +4441,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: b3f246d0991746589f4d0d68653eb4e9
-          name: 'HashiCorp Nomad Server: BoltDB free page bytes'
+          name: 'BoltDB free page bytes'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.free_page_bytes
           delay: '0'
@@ -4463,7 +4463,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: e3d0d6f656f5484f8e8a8ca1195aad59
-          name: 'HashiCorp Nomad Server: BoltDB free pages'
+          name: 'BoltDB free pages'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.num_free_pages
           delay: '0'
@@ -4483,7 +4483,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 73f359bcb02d46a0adb6fdd51284afcf
-          name: 'HashiCorp Nomad Server: BoltDB pending pages'
+          name: 'BoltDB pending pages'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.num_pending_pages
           delay: '0'
@@ -4503,7 +4503,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 08afe7430e3c49e388f0a87c8bbf2ff4
-          name: 'HashiCorp Nomad Server: BoltDB open read transactions'
+          name: 'BoltDB open read transactions'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.open_read_txn
           delay: '0'
@@ -4523,7 +4523,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 36e89e86c9124e868670e9cb7b247899
-          name: 'HashiCorp Nomad Server: BoltDB read transactions, rate'
+          name: 'BoltDB read transactions, rate'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.total_read_txn
           delay: '0'
@@ -4546,7 +4546,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 2733afd943b346e38c8605259bea038c
-          name: 'HashiCorp Nomad Server: BoltDB cursors'
+          name: 'BoltDB cursors'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.cursor_count
           delay: '0'
@@ -4569,7 +4569,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 1641576e376c4c82a8b1882b4810db4c
-          name: 'HashiCorp Nomad Server: BoltDB nodes, rate'
+          name: 'BoltDB nodes, rate'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.node_count
           delay: '0'
@@ -4592,7 +4592,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: f0151f3431254030a3bcd538e8d2068b
-          name: 'HashiCorp Nomad Server: BoltDB node dereferences, rate'
+          name: 'BoltDB node dereferences, rate'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.node_deref
           delay: '0'
@@ -4616,7 +4616,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 27a8a38acfc34e14b3fbb13aa58ad5d4
-          name: 'HashiCorp Nomad Server: BoltDB page allocations, rate'
+          name: 'BoltDB page allocations, rate'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.page_alloc
           delay: '0'
@@ -4640,7 +4640,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 14a5fc715dad4eacaddb2f277e1f85f6
-          name: 'HashiCorp Nomad Server: BoltDB pages in use'
+          name: 'BoltDB pages in use'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.page_count
           delay: '0'
@@ -4660,7 +4660,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: dd9729e812614ab59c595b7183a883b0
-          name: 'HashiCorp Nomad Server: BoltDB rebalance operations, rate'
+          name: 'BoltDB rebalance operations, rate'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.rebalance
           delay: '0'
@@ -4684,7 +4684,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: d270aa05d1ca4f3d9ee606937f1703cc
-          name: 'HashiCorp Nomad Server: BoltDB rebalance time'
+          name: 'BoltDB rebalance time'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.rebalance_time
           delay: '0'
@@ -4709,7 +4709,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 621478ee2bea482abffd6b8c80df5ee1
-          name: 'HashiCorp Nomad Server: BoltDB spill operations, rate'
+          name: 'BoltDB spill operations, rate'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.spill
           delay: '0'
@@ -4732,7 +4732,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: 2ca3e7572bf04b04961107e7d9304887
-          name: 'HashiCorp Nomad Server: BoltDB spill time'
+          name: 'BoltDB spill time'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.spill_time
           delay: '0'
@@ -4757,7 +4757,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: bd14547f789540618db85057eceb70db
-          name: 'HashiCorp Nomad Server: BoltDB split operations, rate'
+          name: 'BoltDB split operations, rate'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.split
           delay: '0'
@@ -4780,7 +4780,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: b13b7b9eb66940c9bf4d14e711ee0279
-          name: 'HashiCorp Nomad Server: BoltDB write operations, rate'
+          name: 'BoltDB write operations, rate'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.write
           delay: '0'
@@ -4803,7 +4803,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: e9b31f3434aa4df0908a79ff5352a29e
-          name: 'HashiCorp Nomad Server: BoltDB write time'
+          name: 'BoltDB write time'
           type: DEPENDENT
           key: nomad.server.raft.boltdb.txstats.write_time
           delay: '0'
@@ -4828,7 +4828,7 @@ zabbix_export:
             - tag: component
               value: boltdb
         - uuid: dce75575b01e4cf8bd84d6a40c74f22b
-          name: 'HashiCorp Nomad Server: Cluster role'
+          name: 'Cluster role'
           type: DEPENDENT
           key: nomad.server.raft.cluster_role
           delay: '0'
@@ -4859,8 +4859,8 @@ zabbix_export:
           triggers:
             - uuid: 1bc6ee807acd4532a58b4527f8865c1c
               expression: 'change(/HashiCorp Nomad Server by HTTP/nomad.server.raft.cluster_role) <> 0'
-              name: 'HashiCorp Nomad Server: Cluster role has changed'
-              event_name: 'HashiCorp Nomad Server: Cluster role has changed to {ITEM.LASTVALUE}'
+              name: 'Cluster role has changed'
+              event_name: 'Cluster role has changed to {ITEM.LASTVALUE}'
               priority: INFO
               description: 'Cluster role has changed.'
               manual_close: 'YES'
@@ -4868,7 +4868,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: a994ee525886407486adace82ea5ef90
-          name: 'HashiCorp Nomad Server: Raft commit logs enqueued'
+          name: 'Raft commit logs enqueued'
           type: DEPENDENT
           key: nomad.server.raft.commit_num_logs
           delay: '0'
@@ -4888,7 +4888,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 3160d5b81e1540aab3244f1cf6bce95d
-          name: 'HashiCorp Nomad Server: Raft commit time'
+          name: 'Raft commit time'
           type: DEPENDENT
           key: nomad.server.raft.commit_time
           delay: '0'
@@ -4913,7 +4913,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 09f1baf6fc2443f48e01814b939c0749
-          name: 'HashiCorp Nomad Server: FSM apply time'
+          name: 'FSM apply time'
           type: DEPENDENT
           key: nomad.server.raft.fsm.apply
           delay: '0'
@@ -4938,7 +4938,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: 18689de9474f4812ba9ed34d311ad3a1
-          name: 'HashiCorp Nomad Server: FSM autopilot time'
+          name: 'FSM autopilot time'
           type: DEPENDENT
           key: nomad.server.raft.fsm.autopilot
           delay: '0'
@@ -4964,7 +4964,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: 6846f262148e49288ecb7aa0ad18f7d2
-          name: 'HashiCorp Nomad Server: FSM enqueue time'
+          name: 'FSM enqueue time'
           type: DEPENDENT
           key: nomad.server.raft.fsm.enqueue
           delay: '0'
@@ -4989,7 +4989,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: 4e2d0557fc984ed9858316c8409edd0e
-          name: 'HashiCorp Nomad Server: FSM register node time'
+          name: 'FSM register node time'
           type: DEPENDENT
           key: nomad.server.raft.fsm.register_node
           delay: '0'
@@ -5014,7 +5014,7 @@ zabbix_export:
             - tag: component
               value: fsm
         - uuid: bb65ca263f3244fc883d9102bbf9bef7
-          name: 'HashiCorp Nomad Server: Raft last index'
+          name: 'Raft last index'
           type: DEPENDENT
           key: nomad.server.raft.last_index
           delay: '0'
@@ -5034,7 +5034,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: bda052f13e3c4dacaafc4ddefbc98036
-          name: 'HashiCorp Nomad Server: Dispatch log time'
+          name: 'Dispatch log time'
           type: DEPENDENT
           key: nomad.server.raft.leader.dispatch_log
           delay: '0'
@@ -5061,7 +5061,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: f915e5e162814786943cd4cc85bb7aff
-          name: 'HashiCorp Nomad Server: Logs dispatched'
+          name: 'Logs dispatched'
           type: DEPENDENT
           key: nomad.server.raft.leader.dispatch_num_logs
           delay: '0'
@@ -5084,7 +5084,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 7f9db272307c43e7b87b8a4a4a6eae16
-          name: 'HashiCorp Nomad Server: Leader last contact'
+          name: 'Leader last contact'
           type: DEPENDENT
           key: nomad.server.raft.leader.lastContact
           delay: '0'
@@ -5119,7 +5119,7 @@ zabbix_export:
           triggers:
             - uuid: 65c69469e9354e81a632485a74bc711d
               expression: 'min(/HashiCorp Nomad Server by HTTP/nomad.server.raft.leader.lastContact,5m) >= {$NOMAD.SERVER.LEADER.LATENCY} and nodata(/HashiCorp Nomad Server by HTTP/nomad.server.raft.leader.lastContact,5m) = 0'
-              name: 'HashiCorp Nomad Server: Leader last contact timeout exceeded'
+              name: 'Leader last contact timeout exceeded'
               event_name: 'Leader last contact timeout exceeded: over {$NOMAD.SERVER.LEADER.LATENCY} for the last 5 minutes'
               priority: WARNING
               description: |
@@ -5129,7 +5129,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: bca59612c439447ebe78ae68e68fd6cb
-          name: 'HashiCorp Nomad Server: Raft peers'
+          name: 'Raft peers'
           type: DEPENDENT
           key: nomad.server.raft.peers
           delay: '0'
@@ -5147,7 +5147,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 36ff560da62740a0b4657b4afabcf902
-          name: 'HashiCorp Nomad Server: Raft transaction commit time'
+          name: 'Raft transaction commit time'
           type: DEPENDENT
           key: nomad.server.raft.replication.appendEntries
           delay: '0'
@@ -5171,7 +5171,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 662cd8712bbe4a4080a540f878b4ec44
-          name: 'HashiCorp Nomad Server: Heartbeat fails'
+          name: 'Heartbeat fails'
           type: DEPENDENT
           key: nomad.server.raft.transition.heartbeat_timeout
           delay: '0'
@@ -5195,7 +5195,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 3dae4fd461fa4a5abdba717e538b8405
-          name: 'HashiCorp Nomad Server: Resident memory size'
+          name: 'Resident memory size'
           type: DEPENDENT
           key: nomad.server.resident_memory_bytes
           delay: '0'
@@ -5217,7 +5217,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: ec2d018e121442be9d3fb350f6572ca6
-          name: 'HashiCorp Nomad Server: RPC queries, rate'
+          name: 'RPC queries, rate'
           type: DEPENDENT
           key: nomad.server.rpc.query
           delay: '0'
@@ -5242,7 +5242,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 406d9bc9db1e44509a77acd11963f406
-          name: 'HashiCorp Nomad Server: RPC requests, rate'
+          name: 'RPC requests, rate'
           type: DEPENDENT
           key: nomad.server.rpc.request
           delay: '0'
@@ -5267,7 +5267,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 0ef3cfaf0e694625bbc3f3a117ff9f06
-          name: 'HashiCorp Nomad Server: RPC error requests, rate'
+          name: 'RPC error requests, rate'
           type: DEPENDENT
           key: nomad.server.rpc.request_error
           delay: '0'
@@ -5292,7 +5292,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: a0e7b48174de4e569762dc1654d63267
-          name: 'HashiCorp Nomad Server: Memory used'
+          name: 'Memory used'
           type: DEPENDENT
           key: nomad.server.runtime.alloc_bytes
           delay: '0'
@@ -5314,7 +5314,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 7d8883065c2c494f9c4853afe50d157c
-          name: 'HashiCorp Nomad Server: Objects freed, rate'
+          name: 'Objects freed, rate'
           type: DEPENDENT
           key: nomad.server.runtime.free_count
           delay: '0'
@@ -5338,7 +5338,7 @@ zabbix_export:
             - tag: component
               value: runtime
         - uuid: 02b0699a706742d1bb557e32ed1b52ea
-          name: 'HashiCorp Nomad Server: GC pause time'
+          name: 'GC pause time'
           type: DEPENDENT
           key: nomad.server.runtime.gc_pause_ns
           delay: '0'
@@ -5363,7 +5363,7 @@ zabbix_export:
             - tag: component
               value: runtime
         - uuid: c3fc612a6bec45ee9ffd51d168801974
-          name: 'HashiCorp Nomad Server: Heap objects'
+          name: 'Heap objects'
           type: DEPENDENT
           key: nomad.server.runtime.heap_objects
           delay: '0'
@@ -5385,7 +5385,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 9b1bcd0020b5413e920ce12af6124687
-          name: 'HashiCorp Nomad Server: Goroutines'
+          name: Goroutines
           type: DEPENDENT
           key: nomad.server.runtime.num_goroutines
           delay: '0'
@@ -5405,7 +5405,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 71256d39cf844c22be8d25a9170e61f2
-          name: 'HashiCorp Nomad Server: GC metadata size'
+          name: 'GC metadata size'
           type: DEPENDENT
           key: nomad.server.runtime.sys_bytes
           delay: '0'
@@ -5427,7 +5427,7 @@ zabbix_export:
             - tag: component
               value: runtime
         - uuid: 733b18dd02d7404bb8cf4c7447a374ae
-          name: 'HashiCorp Nomad Server: GC runs'
+          name: 'GC runs'
           type: DEPENDENT
           key: nomad.server.runtime.total_gc_runs
           delay: '0'
@@ -5447,7 +5447,7 @@ zabbix_export:
             - tag: component
               value: runtime
         - uuid: c7f327a390884c928ebf228d8ebb3a4c
-          name: 'HashiCorp Nomad Server: Allocation reschedule attempts'
+          name: 'Allocation reschedule attempts'
           type: DEPENDENT
           key: nomad.server.scheduler.allocs.rescheduled.attempted
           delay: '0'
@@ -5468,7 +5468,7 @@ zabbix_export:
             - tag: component
               value: allocations
         - uuid: 8293b40a695b4b24ab9b6576a0f9a4d8
-          name: 'HashiCorp Nomad Server: Memberlist events'
+          name: 'Memberlist events'
           type: DEPENDENT
           key: nomad.server.serf.queue.event
           delay: '0'
@@ -5489,7 +5489,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: 8aacc54e455b49b0ab0cfed4559829f7
-          name: 'HashiCorp Nomad Server: Memberlist changes'
+          name: 'Memberlist changes'
           type: DEPENDENT
           key: nomad.server.serf.queue.intent
           delay: '0'
@@ -5510,7 +5510,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: 1c5f383a89f74934a6cb211bfd586856
-          name: 'HashiCorp Nomad Server: Memberlist queries'
+          name: 'Memberlist queries'
           type: DEPENDENT
           key: nomad.server.serf.queue.queries
           delay: '0'
@@ -5531,7 +5531,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: e645f371b4ae48e2b2b782f4b0d0fae4
-          name: 'HashiCorp Nomad Server: Snapshot index'
+          name: 'Snapshot index'
           type: DEPENDENT
           key: nomad.server.state.snapshot.index
           delay: '0'
@@ -5551,7 +5551,7 @@ zabbix_export:
             - tag: component
               value: state
         - uuid: 02ba826868414a16909f13b98cc4c445
-          name: 'HashiCorp Nomad Server: Internal stats API response'
+          name: 'Internal stats API response'
           type: DEPENDENT
           key: nomad.server.stats.api.response
           delay: '0'
@@ -5584,21 +5584,21 @@ zabbix_export:
           triggers:
             - uuid: b60dd78bd2d24c22afec63a8b420bcd6
               expression: 'find(/HashiCorp Nomad Server by HTTP/nomad.server.stats.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
-              name: 'HashiCorp Nomad Server: Internal stats API connection has failed'
-              event_name: 'HashiCorp Nomad Server: Internal stats API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
+              name: 'Internal stats API connection has failed'
+              event_name: 'Internal stats API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
                 Internal stats API connection has failed.
                 Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               dependencies:
-                - name: 'HashiCorp Nomad Server: Monitoring API connection has failed'
+                - name: 'Monitoring API connection has failed'
                   expression: 'find(/HashiCorp Nomad Server by HTTP/nomad.server.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: f8d3a680e6f94250ab0a1ef8169889e3
-          name: 'HashiCorp Nomad Server: Internal stats get'
+          name: 'Internal stats get'
           type: HTTP_AGENT
           key: nomad.server.stats.get
           delay: 1h
@@ -5628,7 +5628,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9593fe46e0d941f2b4ddef96baa39b0e
-          name: 'HashiCorp Nomad Server: Vault tokens revoked'
+          name: 'Vault tokens revoked'
           type: DEPENDENT
           key: nomad.server.vault.distributed_tokens_revoked
           delay: '0'
@@ -5649,7 +5649,7 @@ zabbix_export:
             - tag: component
               value: vault
         - uuid: 40c41426ab96476c84647a18511af6e8
-          name: 'HashiCorp Nomad Server: Vault token last renewal'
+          name: 'Vault token last renewal'
           type: DEPENDENT
           key: nomad.server.vault.token_last_renewal
           delay: '0'
@@ -5674,7 +5674,7 @@ zabbix_export:
             - tag: component
               value: vault
         - uuid: f62d8cf1e4b94c9b8796bd30fa799f7a
-          name: 'HashiCorp Nomad Server: Vault token next renewal'
+          name: 'Vault token next renewal'
           type: DEPENDENT
           key: nomad.server.vault.token_next_renewal
           delay: '0'
@@ -5699,7 +5699,7 @@ zabbix_export:
             - tag: component
               value: vault
         - uuid: c619c340887b43e1a4db750e74f1d4aa
-          name: 'HashiCorp Nomad Server: Vault token TTL'
+          name: 'Vault token TTL'
           type: DEPENDENT
           key: nomad.server.vault.token_ttl
           delay: '0'
@@ -5724,7 +5724,7 @@ zabbix_export:
             - tag: component
               value: vault
         - uuid: 921fc50044f94aceaa9d0789be854496
-          name: 'HashiCorp Nomad Server: Nomad server version'
+          name: 'Nomad server version'
           type: DEPENDENT
           key: nomad.server.version
           delay: '0'
@@ -5741,8 +5741,8 @@ zabbix_export:
           triggers:
             - uuid: 3c7dfd5ec21144b6b58c603d60142200
               expression: 'change(/HashiCorp Nomad Server by HTTP/nomad.server.version)<>0'
-              name: 'HashiCorp Nomad Server: Nomad server version has changed'
-              event_name: 'HashiCorp Nomad Server: Nomad server version has changed to {ITEM.LASTVALUE}'
+              name: 'Nomad server version has changed'
+              event_name: 'Nomad server version has changed to {ITEM.LASTVALUE}'
               priority: INFO
               description: 'Nomad server version has changed.'
               manual_close: 'YES'
@@ -5750,7 +5750,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: d769576e16df4aed86004498055d5a94
-          name: 'HashiCorp Nomad Server: Virtual memory size'
+          name: 'Virtual memory size'
           type: DEPENDENT
           key: nomad.server.virtual_memory_bytes
           delay: '0'
@@ -5772,7 +5772,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d1addab9628140b09adb60c2820c1829
-          name: 'HashiCorp Nomad Server: Worker evaluation create time'
+          name: 'Worker evaluation create time'
           type: DEPENDENT
           key: nomad.server.worker.create_eval
           delay: '0'
@@ -5797,7 +5797,7 @@ zabbix_export:
             - tag: component
               value: workers
         - uuid: 0875726948384b9696158d4db2b64691
-          name: 'HashiCorp Nomad Server: Worker evaluation dequeue time'
+          name: 'Worker evaluation dequeue time'
           type: DEPENDENT
           key: nomad.server.worker.dequeue_eval
           delay: '0'
@@ -5822,7 +5822,7 @@ zabbix_export:
             - tag: component
               value: workers
         - uuid: 5bc2cf7713274e1ca8997415f26f7087
-          name: 'HashiCorp Nomad Server: Worker invoke scheduler time'
+          name: 'Worker invoke scheduler time'
           type: DEPENDENT
           key: nomad.server.worker.invoke_scheduler_service
           delay: '0'
@@ -5847,7 +5847,7 @@ zabbix_export:
             - tag: component
               value: workers
         - uuid: c21aca97ba274913860b28a1fd06abec
-          name: 'HashiCorp Nomad Server: Worker acknowledgement send time'
+          name: 'Worker acknowledgement send time'
           type: DEPENDENT
           key: nomad.server.worker.send_ack
           delay: '0'
@@ -5872,7 +5872,7 @@ zabbix_export:
             - tag: component
               value: workers
         - uuid: 3c7b49c3f60e4d69981f6dd3569e49e6
-          name: 'HashiCorp Nomad Server: Worker submit plan time'
+          name: 'Worker submit plan time'
           type: DEPENDENT
           key: nomad.server.worker.submit_plan
           delay: '0'
@@ -5897,7 +5897,7 @@ zabbix_export:
             - tag: component
               value: workers
         - uuid: f5cd72ca250f402f9ddd112fb858d1f7
-          name: 'HashiCorp Nomad Server: Worker update evaluation time'
+          name: 'Worker update evaluation time'
           type: DEPENDENT
           key: nomad.server.worker.update_eval
           delay: '0'
@@ -5922,7 +5922,7 @@ zabbix_export:
             - tag: component
               value: workers
         - uuid: ae2e69196ef7416481e9904d9ee8862b
-          name: 'HashiCorp Nomad Server: Worker log replication time'
+          name: 'Worker log replication time'
           type: DEPENDENT
           key: nomad.server.worker.wait_for_index
           delay: '0'
@@ -5994,7 +5994,7 @@ zabbix_export:
             - name: BoltDB
               widgets:
                 - type: item
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6013,7 +6013,7 @@ zabbix_export:
                       value: '4'
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -6026,7 +6026,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graph
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -6039,7 +6039,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -6051,8 +6051,8 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: item
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6070,8 +6070,8 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6094,7 +6094,7 @@ zabbix_export:
             - name: Cluster
               widgets:
                 - type: item
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6113,7 +6113,7 @@ zabbix_export:
                       value: '30'
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -6126,7 +6126,7 @@ zabbix_export:
                       value: AAAAA
                 - type: item
                   'y': '10'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6144,8 +6144,8 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '6'
-                  width: '6'
+                  x: '18'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6166,9 +6166,9 @@ zabbix_export:
                       name: value_size
                       value: '30'
                 - type: item
-                  x: '8'
+                  x: '24'
                   'y': '10'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6186,8 +6186,8 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '12'
-                  width: '6'
+                  x: '36'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6205,9 +6205,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '10'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6225,8 +6225,8 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '18'
-                  width: '6'
+                  x: '54'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6249,7 +6249,7 @@ zabbix_export:
             - name: Jobs
               widgets:
                 - type: item
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6268,7 +6268,7 @@ zabbix_export:
                       value: '4'
                 - type: item
                   'y': '5'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6287,7 +6287,7 @@ zabbix_export:
                       value: '4'
                 - type: item
                   'y': '10'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6306,7 +6306,7 @@ zabbix_export:
                       value: '4'
                 - type: item
                   'y': '15'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6325,7 +6325,7 @@ zabbix_export:
                       value: '4'
                 - type: item
                   'y': '20'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6343,9 +6343,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '6'
+                  x: '18'
                   'y': '10'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6363,9 +6363,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '6'
+                  x: '18'
                   'y': '20'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6383,8 +6383,8 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6402,9 +6402,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '8'
+                  x: '24'
                   'y': '5'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6422,9 +6422,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '8'
+                  x: '24'
                   'y': '15'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6442,9 +6442,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6462,9 +6462,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '12'
+                  x: '36'
                   'y': '20'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6482,8 +6482,8 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6501,9 +6501,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '5'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6521,9 +6521,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '16'
+                  x: '48'
                   'y': '15'
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6541,9 +6541,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '10'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6561,9 +6561,9 @@ zabbix_export:
                       name: show.1
                       value: '4'
                 - type: item
-                  x: '18'
+                  x: '54'
                   'y': '20'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -6605,25 +6605,25 @@ zabbix_export:
             - value: '1'
               newvalue: Up
   triggers:
+    - uuid: 9b6d779864144e4e9e5e9924658d763e
+      expression: 'min(/HashiCorp Nomad Server by HTTP/nomad.server.process_open_fds,5m)/last(/HashiCorp Nomad Server by HTTP/nomad.server.process_max_fds)*100>{$NOMAD.OPEN.FDS.MAX}'
+      name: 'Current number of open files is too high'
+      event_name: 'Current number of open files is too high (over {$NOMAD.OPEN.FDS.MAX}% for 5m)'
+      priority: WARNING
+      description: 'Heavy file descriptor usage (i.e., near the process file descriptor limit) indicates a potential file descriptor exhaustion issue.'
+      tags:
+        - tag: scope
+          value: capacity
     - uuid: d41ae1c102d84eab9629565bcc9b51df
       expression: '(min(/HashiCorp Nomad Client by HTTP/nomad.client.memory.available, 10m) / last(/HashiCorp Nomad Client by HTTP/nomad.client.memory.total))*100 <= {$NOMAD.RAM.AVAIL.MIN}'
-      name: 'HashiCorp Nomad Client: High memory utilization'
-      event_name: 'HashiCorp Nomad Client: High memory utilization: (available < {$NOMAD.RAM.AVAIL.MIN}% over last 10m)'
+      name: 'High memory utilization'
+      event_name: 'High memory utilization: (available < {$NOMAD.RAM.AVAIL.MIN}% over last 10m)'
       opdata: 'RAM available: {ITEM.LASTVALUE1}, RAM total: {ITEM.LASTVALUE2}'
       priority: AVERAGE
       description: 'RAM utilization is too high. The system might be slow to respond.'
       tags:
         - tag: scope
           value: performance
-    - uuid: 9b6d779864144e4e9e5e9924658d763e
-      expression: 'min(/HashiCorp Nomad Server by HTTP/nomad.server.process_open_fds,5m)/last(/HashiCorp Nomad Server by HTTP/nomad.server.process_max_fds)*100>{$NOMAD.OPEN.FDS.MAX}'
-      name: 'HashiCorp Nomad Server: Current number of open files is too high'
-      event_name: 'HashiCorp Nomad Server: Current number of open files is too high (over {$NOMAD.OPEN.FDS.MAX}% for 5m)'
-      priority: WARNING
-      description: 'Heavy file descriptor usage (i.e., near the process file descriptor limit) indicates a potential file descriptor exhaustion issue.'
-      tags:
-        - tag: scope
-          value: capacity
   graphs:
     - uuid: a221474b1f494f8e85edfefd3a86b2ad
       name: 'HashiCorp Nomad Client: CPU utilization'
