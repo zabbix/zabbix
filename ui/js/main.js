@@ -467,10 +467,10 @@ var hintBox = {
 			}
 
 			setTimeout(() => {
-				if (target.scrollObserver !== undefined) {
+				if (target.scroll_observer !== undefined) {
 					const element_rect = element.getBoundingClientRect();
 
-					if ((element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y)
+					if ((element_rect.x !== target.scroll_observer.x || element_rect.y !== target.scroll_observer.y)
 							&& element.dataset.hintboxIgnorePositionChange !== '1') {
 						const do_focus_target = document.activeElement === document.body
 							|| element.hintBoxItem[0].contains(document.activeElement);
@@ -517,13 +517,13 @@ var hintBox = {
 			const element = target instanceof jQuery ? target[0] : target;
 			const element_rect_initial = element.getBoundingClientRect();
 
-			target.scrollObserver = {
+			target.scroll_observer = {
 				x: element_rect_initial.x,
 				y: element_rect_initial.y,
 				callback: (e) => hintBox.onScroll(target, e)
 			};
 
-			addEventListener('scroll', target.scrollObserver.callback, {capture: true});
+			addEventListener('scroll', target.scroll_observer.callback, {capture: true});
 		}
 
 		addEventListener('resize', target.resizeHandler = e => hintBox.onResize(e, target));
@@ -534,13 +534,13 @@ var hintBox = {
 		const element_rect = element.getBoundingClientRect();
 
 		if (e.target.classList.contains('wrapper')) {
-			target.scrollObserver.x = element_rect.x;
-			target.scrollObserver.y = element_rect.y;
+			target.scroll_observer.x = element_rect.x;
+			target.scroll_observer.y = element_rect.y;
 
 			return;
 		}
 
-		if (element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y) {
+		if (element_rect.x !== target.scroll_observer.x || element_rect.y !== target.scroll_observer.y) {
 			const do_focus_target = document.activeElement === document.body
 				|| element.hintBoxItem[0].contains(document.activeElement);
 
@@ -668,10 +668,10 @@ var hintBox = {
 			delete target.observer;
 		}
 
-		if (target.scrollObserver !== undefined) {
-			removeEventListener('scroll', target.scrollObserver.callback, {capture: true});
+		if (target.scroll_observer !== undefined) {
+			removeEventListener('scroll', target.scroll_observer.callback, {capture: true});
 
-			delete target.scrollObserver;
+			delete target.scroll_observer;
 		}
 
 		if (target.resize_observer !== undefined) {
