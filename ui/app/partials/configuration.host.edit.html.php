@@ -65,10 +65,7 @@ if ($host_is_discovered) {
 		$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 	}
 
-	$discovered_by = [
-		new CLabel(_('Discovered by')),
-		(new CFormField($discovery_rule))->addClass(ZBX_STYLE_WORDBREAK)
-	];
+	$discovered_by = [new CLabel(_('Discovered by')), new CFormField($discovery_rule)];
 }
 
 $agent_interfaces = (new CDiv())
