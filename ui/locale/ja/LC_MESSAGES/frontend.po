@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-17 02:52+0000\n"
-"Last-Translator: Akira <g42getd@gmail.com>\n"
+"PO-Revision-Date: 2024-05-20 10:10+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -2056,7 +2056,7 @@ msgstr "最前面へ"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "ブラウザ"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -4344,19 +4344,19 @@ msgstr "ヒストリとトレンドを削除"
 
 #: include/views/configuration.item.list.php:315
 msgid "Clear history and trends of selected item?"
-msgstr ""
+msgstr "選択したアイテムのヒストリとトレンドを削除しますか？"
 
 #: include/views/configuration.item.list.php:316
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "選択したアイテムのヒストリとトレンドを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Clear history and trends of selected web scenario?"
-msgstr ""
+msgstr "選択したWebシナリオのヒストリとトレンドを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:239
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "選択したWebシナリオのヒストリとトレンドを削除しますか？"
 
 #: app/views/popup.massupdate.host.php:66 app/views/template.massupdate.php:70
 msgid "Clear when unlinking"
@@ -5203,7 +5203,7 @@ msgstr "自動生成時のステータス有効"
 
 #: app/views/correlation.list.php:35
 msgid "Create event correlation"
-msgstr ""
+msgstr "イベント相関関係の作成"
 
 #: include/views/configuration.graph.list.php:63
 msgid "Create graph"
@@ -5237,11 +5237,11 @@ msgstr "ホストのプロトタイプの作成"
 
 #: include/views/configuration.host.prototype.list.php:201
 msgid "Create hosts from selected prototype as disabled?"
-msgstr ""
+msgstr "選択したプロトタイプからホストを無効にして作成しますか？"
 
 #: include/views/configuration.host.prototype.list.php:195
 msgid "Create hosts from selected prototype as enabled?"
-msgstr ""
+msgstr "選択したプロトタイプからホストを有効にして作成しますか？"
 
 #: include/views/configuration.host.prototype.list.php:202
 msgid "Create hosts from selected prototypes as disabled?"
@@ -5277,11 +5277,11 @@ msgstr "アイテムのプロトタイプの作成"
 
 #: include/views/configuration.item.prototype.list.php:212
 msgid "Create items from selected prototype as disabled?"
-msgstr ""
+msgstr "選択したプロトタイプからアイテムを無効にして作成しますか？"
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototype as enabled?"
-msgstr ""
+msgstr "選択したプロトタイプからアイテムを有効にして作成しますか？"
 
 #: include/views/configuration.item.prototype.list.php:213
 msgid "Create items from selected prototypes as disabled?"
@@ -5354,11 +5354,11 @@ msgstr "トリガーのプロトタイプの作成"
 
 #: app/views/js/trigger.prototype.list.js.php:127
 msgid "Create triggers from selected prototype as disabled?"
-msgstr ""
+msgstr "選択したプロトタイプからトリガーを無効にして作成しますか？"
 
 #: app/views/js/trigger.prototype.list.js.php:110
 msgid "Create triggers from selected prototype as enabled?"
-msgstr ""
+msgstr "選択したプロトタイプからトリガーを有効にして作成しますか？"
 
 #: app/views/js/trigger.prototype.list.js.php:126
 msgid "Create triggers from selected prototypes as disabled?"
@@ -5565,7 +5565,7 @@ msgstr "毎日"
 
 #: include/locales.inc.php:40
 msgid "Danish (da_DK)"
-msgstr ""
+msgstr "デンマーク語 (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -6175,7 +6175,7 @@ msgstr "選択したコネクタを削除しますか？"
 #: app/views/configuration.dashboard.list.php:71
 #: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboard?"
-msgstr ""
+msgstr "選択したダッシュボードを削除しますか？"
 
 #: app/views/configuration.dashboard.list.php:72
 #: app/views/monitoring.dashboard.list.php:126
@@ -6185,7 +6185,7 @@ msgstr "選択したダッシュボードを削除しますか？"
 #: app/views/js/configuration.discovery.list.js.php:113
 #: include/views/configuration.host.discovery.list.php:370
 msgid "Delete selected discovery rule?"
-msgstr ""
+msgstr "選択したディスカバリルールを削除しますか？"
 
 #: app/views/js/configuration.discovery.list.js.php:112
 #: include/views/configuration.host.discovery.list.php:371
@@ -6206,7 +6206,7 @@ msgstr "選択したイベント相関関係を削除しますか？"
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
-msgstr ""
+msgstr "選択したグラフのプロトタイプを削除しますか？"
 
 #: include/views/configuration.graph.list.php:272
 msgid "Delete selected graph prototypes?"
@@ -6214,7 +6214,7 @@ msgstr "選択したグラフのプロトタイプを削除しますか？"
 
 #: include/views/configuration.graph.list.php:270
 msgid "Delete selected graph?"
-msgstr ""
+msgstr "選択したグラフを削除しますか？"
 
 #: include/views/configuration.graph.list.php:273
 msgid "Delete selected graphs?"
@@ -6263,7 +6263,7 @@ msgstr "選択したイメージを削除しますか？"
 
 #: include/views/configuration.item.prototype.list.php:230
 msgid "Delete selected item prototype?"
-msgstr ""
+msgstr "選択したアイテムのプロトタイプを削除しますか？"
 
 #: include/views/configuration.item.prototype.list.php:231
 msgid "Delete selected item prototypes?"
@@ -6271,7 +6271,7 @@ msgstr "選択したアイテムのプロトタイプを削除しますか？"
 
 #: include/views/configuration.item.list.php:356
 msgid "Delete selected item?"
-msgstr ""
+msgstr "選択したアイテムを削除しますか？"
 
 #: include/views/configuration.item.list.php:357
 msgid "Delete selected items?"
@@ -6296,7 +6296,7 @@ msgstr "選択したマップを削除しますか？"
 
 #: app/views/js/mediatype.list.js.php:158
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "選択したメディアタイプを削除しますか？"
 
 #: app/views/js/mediatype.list.js.php:157
 msgid "Delete selected media types?"
@@ -6322,7 +6322,7 @@ msgstr "選択したプロキシを削除しますか？"
 
 #: app/views/administration.regex.list.php:83
 msgid "Delete selected regular expression?"
-msgstr ""
+msgstr "選択した正規表現を削除しますか？"
 
 #: app/views/administration.regex.list.php:84
 msgid "Delete selected regular expressions?"
@@ -6348,7 +6348,7 @@ msgstr "選択した定期レポートを削除しますか？"
 
 #: app/views/js/administration.script.list.js.php:93
 msgid "Delete selected script?"
-msgstr ""
+msgstr "選択したスクリプトを削除しますか？"
 
 #: app/views/js/administration.script.list.js.php:92
 msgid "Delete selected scripts?"
@@ -6378,7 +6378,7 @@ msgstr "選択したテンプレートグループを削除しますか？"
 
 #: app/views/js/template.list.js.php:139
 msgid "Delete selected template?"
-msgstr ""
+msgstr "選択したテンプレートを削除しますか？"
 
 #: app/views/js/template.list.js.php:138
 msgid "Delete selected templates?"
@@ -6396,7 +6396,7 @@ msgstr "選択したトークンを削除しますか？"
 
 #: app/views/js/trigger.prototype.list.js.php:152
 msgid "Delete selected trigger prototype?"
-msgstr ""
+msgstr "選択したトリガーのプロトタイプを削除しますか？"
 
 #: app/views/js/trigger.prototype.list.js.php:151
 msgid "Delete selected trigger prototypes?"
@@ -6404,7 +6404,7 @@ msgstr "選択したトリガーのプロトタイプを削除しますか？"
 
 #: app/views/js/trigger.list.js.php:191
 msgid "Delete selected trigger?"
-msgstr ""
+msgstr "選択したトリガーを削除しますか？"
 
 #: app/views/js/trigger.list.js.php:190
 msgid "Delete selected triggers?"
@@ -6421,7 +6421,7 @@ msgstr "選択したユーザーを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:248
 msgid "Delete selected web scenario?"
-msgstr ""
+msgstr "選択したWebシナリオを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:249
 msgid "Delete selected web scenarios?"
@@ -6630,7 +6630,7 @@ msgstr "デバッグモードを無効"
 
 #: app/views/usergroup.list.php:251
 msgid "Disable debug mode in selected group?"
-msgstr ""
+msgstr "選択したグループのデバッグモードを無効にしますか？"
 
 #: app/views/usergroup.list.php:252
 msgid "Disable debug mode in selected groups?"
@@ -6669,7 +6669,7 @@ msgstr ""
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
-msgstr ""
+msgstr "選択したAPIトークンを無効にしますか？"
 
 #: app/views/administration.token.list.php:212
 #: app/views/administration.user.token.list.php:165
@@ -6703,7 +6703,7 @@ msgstr "選択したコネクタを無効にしますか？"
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
 msgid "Disable selected discovery rule?"
-msgstr ""
+msgstr "選択したディスカバリルールを無効にしますか？"
 
 #: app/views/js/configuration.discovery.list.js.php:96
 #: include/views/configuration.host.discovery.list.php:350
@@ -6720,7 +6720,7 @@ msgstr "選択したイベント相関関係を無効にしますか？"
 
 #: app/views/usergroup.list.php:231
 msgid "Disable selected group?"
-msgstr ""
+msgstr "選択したグループを無効にしますか？"
 
 #: app/views/usergroup.list.php:232
 msgid "Disable selected groups?"
@@ -6728,7 +6728,7 @@ msgstr "選択したグループを無効にしますか？"
 
 #: app/views/configuration.host.list.php:531
 msgid "Disable selected host?"
-msgstr ""
+msgstr "選択したホストを無効にしますか？"
 
 #: app/views/configuration.host.list.php:532
 msgid "Disable selected hosts?"
@@ -6736,7 +6736,7 @@ msgstr "選択したホストを無効にしますか？"
 
 #: include/views/configuration.item.list.php:306
 msgid "Disable selected item?"
-msgstr ""
+msgstr "選択したアイテムを無効にしますか？"
 
 #: include/views/configuration.item.list.php:307
 msgid "Disable selected items?"
@@ -6744,7 +6744,7 @@ msgstr "選択したアイテムを無効にしますか？"
 
 #: app/views/js/mediatype.list.js.php:134
 msgid "Disable selected media type?"
-msgstr ""
+msgstr "選択したメディアタイプを無効にしますか？"
 
 #: app/views/js/mediatype.list.js.php:133
 msgid "Disable selected media types?"
@@ -6760,7 +6760,7 @@ msgstr "選択したモジュールを無効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Disable selected scheduled report?"
-msgstr ""
+msgstr "選択した定期レポートを無効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:97
 msgid "Disable selected scheduled reports?"
@@ -6768,7 +6768,7 @@ msgstr "選択した定期レポートを無効にしますか？"
 
 #: app/views/js/trigger.list.js.php:175
 msgid "Disable selected trigger?"
-msgstr ""
+msgstr "選択したトリガーを無効にしますか？"
 
 #: app/views/js/trigger.list.js.php:174
 msgid "Disable selected triggers?"
@@ -6776,7 +6776,7 @@ msgstr "選択したトリガーを無効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Disable selected web scenario?"
-msgstr ""
+msgstr "選択したWebシナリオを無効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:229
 msgid "Disable selected web scenarios?"
@@ -6906,7 +6906,7 @@ msgstr "ディスカバリアクション"
 
 #: app/views/configuration.discovery.edit.php:52
 msgid "Discovery by"
-msgstr ""
+msgstr "ディスカバリの実行"
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -7216,7 +7216,7 @@ msgstr "グラフの形式"
 
 #: app/views/administration.script.edit.php:353
 msgid "Dropdown"
-msgstr ""
+msgstr "ドロップダウン"
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
@@ -7470,7 +7470,7 @@ msgstr "デバッグモードを有効"
 
 #: app/views/usergroup.list.php:241
 msgid "Enable debug mode in selected group?"
-msgstr ""
+msgstr "選択したグループのデバッグモードを有効にしますか？"
 
 #: app/views/usergroup.list.php:242
 msgid "Enable debug mode in selected groups?"
@@ -7513,7 +7513,7 @@ msgstr "多要素認証の有効化"
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
-msgstr ""
+msgstr "選択したAPIトークンを有効にしますか？"
 
 #: app/views/administration.token.list.php:206
 #: app/views/administration.user.token.list.php:159
@@ -7547,7 +7547,7 @@ msgstr "選択したコネクタを有効にしますか？"
 #: app/views/js/configuration.discovery.list.js.php:81
 #: include/views/configuration.host.discovery.list.php:343
 msgid "Enable selected discovery rule?"
-msgstr ""
+msgstr "選択したディスカバリルールを有効にしますか？"
 
 #: app/views/js/configuration.discovery.list.js.php:80
 #: include/views/configuration.host.discovery.list.php:344
@@ -7564,7 +7564,7 @@ msgstr "選択したイベント相関関係を有効にしますか？"
 
 #: app/views/usergroup.list.php:221
 msgid "Enable selected group?"
-msgstr ""
+msgstr "選択したグループを有効にしますか？"
 
 #: app/views/usergroup.list.php:222
 msgid "Enable selected groups?"
@@ -7572,7 +7572,7 @@ msgstr "選択したグループを有効にしますか？"
 
 #: app/views/configuration.host.list.php:523
 msgid "Enable selected host?"
-msgstr ""
+msgstr "選択したホストを有効にしますか？"
 
 #: app/views/configuration.host.list.php:524
 #: app/views/js/configuration.hostgroup.list.js.php:77
@@ -7581,7 +7581,7 @@ msgstr "選択したホストを有効にしますか？"
 
 #: include/views/configuration.item.list.php:300
 msgid "Enable selected item?"
-msgstr ""
+msgstr "選択したアイテムを有効にしますか？"
 
 #: include/views/configuration.item.list.php:301
 msgid "Enable selected items?"
@@ -7589,7 +7589,7 @@ msgstr "選択したアイテムを有効にしますか？"
 
 #: app/views/js/mediatype.list.js.php:107
 msgid "Enable selected media type?"
-msgstr ""
+msgstr "選択したメディアタイプを有効にしますか？"
 
 #: app/views/js/mediatype.list.js.php:106
 msgid "Enable selected media types?"
@@ -7605,7 +7605,7 @@ msgstr "選択したモジュールを有効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:89
 msgid "Enable selected scheduled report?"
-msgstr ""
+msgstr "選択した定期レポートを有効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:90
 msgid "Enable selected scheduled reports?"
@@ -7613,7 +7613,7 @@ msgstr "選択した定期レポートを有効にしますか？"
 
 #: app/views/js/trigger.list.js.php:158
 msgid "Enable selected trigger?"
-msgstr ""
+msgstr "選択したトリガーを有効にしますか？"
 
 #: app/views/js/trigger.list.js.php:157
 msgid "Enable selected triggers?"
@@ -7621,7 +7621,7 @@ msgstr "選択したトリガーを有効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Enable selected web scenario?"
-msgstr ""
+msgstr "選択したWebシナリオを有効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:223
 msgid "Enable selected web scenarios?"
@@ -7807,7 +7807,7 @@ msgstr ""
 
 #: app/controllers/CControllerCorrelationCreate.php:107
 msgid "Event correlation created"
-msgstr ""
+msgstr "イベント相関関係を作成しました"
 
 #: app/controllers/CControllerCorrelationDelete.php:60
 msgid "Event correlation deleted"
@@ -7826,7 +7826,7 @@ msgstr[0] ""
 
 #: include/events.inc.php:143
 msgid "Event correlation rule"
-msgstr ""
+msgstr "イベント相関関係ルール"
 
 #: app/controllers/CControllerCorrelationEdit.php:130
 #: app/controllers/CControllerCorrelationList.php:128
@@ -7835,7 +7835,7 @@ msgstr "イベント相関関係ルール"
 
 #: app/controllers/CControllerCorrelationUpdate.php:109
 msgid "Event correlation updated"
-msgstr ""
+msgstr "イベント相関関係を更新しました"
 
 #: tr_events.php:29 tr_events.php:172 tr_events.php:191
 msgid "Event details"
@@ -8383,7 +8383,7 @@ msgstr "フィルターを削除しました"
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Filter is not set"
-msgstr ""
+msgstr "フィルターが設定されていません"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -12195,7 +12195,7 @@ msgstr "最新データ"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"
-msgstr ""
+msgstr "最新リリース"
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -12981,11 +12981,11 @@ msgstr "最大ズームレベル"
 
 #: app/views/configuration.discovery.edit.php:84
 msgid "Maximum concurrent checks"
-msgstr ""
+msgstr "最大同時チェック数"
 
 #: app/views/configuration.discovery.edit.php:85
 msgid "Maximum concurrent checks per type"
-msgstr ""
+msgstr "タイプごとの最大同時チェック数"
 
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -13896,7 +13896,7 @@ msgstr "新規ダッシュボード"
 #: app/views/configuration.discovery.edit.php:244
 #: app/views/configuration.discovery.edit.php:285
 msgid "New discovery rule"
-msgstr ""
+msgstr "新規ディスカバリルール"
 
 #: jsLoader.php:270
 msgid "New element"
@@ -13904,7 +13904,7 @@ msgstr "新規要素"
 
 #: app/views/correlation.edit.php:309 app/views/correlation.edit.php:339
 msgid "New event correlation"
-msgstr ""
+msgstr "新規イベント相関関係"
 
 #: app/views/js/correlation.edit.js.php:255
 #: include/classes/helpers/CCorrelationHelper.php:54
@@ -13937,11 +13937,11 @@ msgstr "新しいホストグループの作成"
 
 #: app/views/item.edit.php:218
 msgid "New item"
-msgstr ""
+msgstr "新規アイテム"
 
 #: app/views/item.prototype.edit.php:191
 msgid "New item prototype"
-msgstr ""
+msgstr "新規アイテムのプロトタイプ"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
@@ -13950,7 +13950,7 @@ msgstr "新しいメンテナンス期間の作成"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
-msgstr ""
+msgstr "新規メディアタイプ"
 
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
@@ -13976,7 +13976,7 @@ msgstr "正規表現の作成"
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
 msgid "New script"
-msgstr ""
+msgstr "新規スクリプト"
 
 #: app/views/popup.service.edit.php:336 app/views/popup.service.edit.php:365
 msgid "New service"
@@ -13984,11 +13984,11 @@ msgstr "新規サービス"
 
 #: app/views/webscenario.step.edit.php:295
 msgid "New step of web scenario"
-msgstr ""
+msgstr "新規Webシナリオのステップ"
 
 #: app/controllers/CControllerUsergroupTagFilterEdit.php:65
 msgid "New tag filter"
-msgstr ""
+msgstr "新規タグフィルター"
 
 #: app/views/correlation.condition.edit.php:136
 msgid "New tag name"
@@ -13996,7 +13996,7 @@ msgstr "新しいタグ名"
 
 #: app/views/template.edit.php:347
 msgid "New template"
-msgstr ""
+msgstr "新規テンプレート"
 
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
@@ -14005,11 +14005,11 @@ msgstr "新しいテンプレートグループの作成"
 
 #: app/views/trigger.edit.php:144
 msgid "New trigger"
-msgstr ""
+msgstr "新規トリガー"
 
 #: app/views/trigger.prototype.edit.php:144
 msgid "New trigger prototype"
-msgstr ""
+msgstr "新規トリガーのプロトタイプ"
 
 #: include/views/js/monitoring.sysmaps.js.php:191
 msgid "New triggers"
@@ -14093,7 +14093,7 @@ msgstr "変更はありません。"
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
-msgstr ""
+msgstr "互換性のあるウィジェットはありません。"
 
 #: jsLoader.php:412 tests/selenium/modules/clock32/views/widget.view.php:83
 #: widgets/clock/views/widget.view.php:83
@@ -14109,7 +14109,7 @@ msgstr "データ収集なし"
 #: app/views/search.php:394 include/classes/html/CTableInfo.php:72
 #: widgets/hostnavigator/Widget.php:40
 msgid "No data found"
-msgstr ""
+msgstr "データがありません"
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -18944,7 +18944,7 @@ msgstr "ソフトウェアのアーキテクチャ情報。文字列値を返す
 
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
-msgstr ""
+msgstr "ソフトウェア更新最終チェック日"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20414,7 +20414,7 @@ msgstr "上"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr ""
+msgstr "上位の100トリガー"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
@@ -21627,7 +21627,7 @@ msgstr ""
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Use the filter to display results"
-msgstr ""
+msgstr "フィルターを使用して結果を表示する"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -23318,7 +23318,7 @@ msgstr "Zabbixエージェント"
 
 #: widgets/hostavail/includes/WidgetForm.php:47
 msgid "Zabbix agent (active checks)"
-msgstr ""
+msgstr "Zabbixエージェント(アクティブチェック)"
 
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
@@ -23326,7 +23326,7 @@ msgstr "Zabbixエージェント(アクティブ)"
 
 #: widgets/hostavail/includes/WidgetForm.php:48
 msgid "Zabbix agent (passive checks)"
-msgstr ""
+msgstr "Zabbixエージェント(パッシブチェック)"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -24339,7 +24339,7 @@ msgstr ""
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
-msgstr ""
+msgstr "グラフ"
 
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
@@ -24653,7 +24653,7 @@ msgstr "アイテムパターン"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
 msgid "item patterns"
-msgstr ""
+msgstr "アイテムパターン"
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -25175,7 +25175,7 @@ msgstr "パターン"
 #: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
-msgstr ""
+msgstr "パターン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
