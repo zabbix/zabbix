@@ -339,6 +339,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
 			'History data' => ['value' => 'Auto', 'lables' => ['Auto', 'History', 'Trends']],
+			'id:max_length' => ['value' => 100, 'maxlength' => 3],
 			'Use monospace font' => ['value' => false],
 			'Display local time' => ['value' => false],
 			'Show thumbnail' => ['value' => false]
@@ -396,6 +397,18 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->checkHint($column_form, 'Display',
 					'Single line - result will be displayed in a single line and truncated to specified length.'
 			);
+
+			$display = [
+				'As is' => false,
+				'HTML' => false,
+				'Single line' => true
+			];
+			foreach ($display as $label => $status) {
+				$column_form->fill(['Display' => $label]);
+				$max_length = $column_form->getField('id:max_length');
+				$this->assertTrue($max_length->isEnabled($status));
+				$this->assertTrue($max_length->isVisible($status));
+			}
 
 			if ($item === 'Log item') {
 				$this->checkHint($column_form, 'Display local time', 'This setting will display local time '.
@@ -479,10 +492,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					],
@@ -498,10 +513,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					],
@@ -517,10 +534,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					],
@@ -536,10 +555,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					],
@@ -569,17 +590,21 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						],
 						[
-							'Name' => 'Column2',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column2',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -594,17 +619,21 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						],
 						[
-							'Name' => 'Column2',
-							'Item' => [
-								'values' => 'Test Item history',
-								'context' => ['values' => 'Simple host with item for Item history widget']
+							'fields' => [
+								'Name' => 'Column2',
+								'Item' => [
+									'values' => 'Test Item history',
+									'context' => ['values' => 'Simple host with item for Item history widget']
+								]
 							]
 						]
 					]
@@ -619,17 +648,21 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						],
 						[
-							'Name' => 'Column2',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column2',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -644,17 +677,21 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						],
 						[
-							'Name' => 'Column2',
-							'Item' => [
-								'values' => 'Test Item history',
-								'context' => ['values' => 'Simple host with item for Item history widget']
+							'fields' => [
+								'Name' => 'Column2',
+								'Item' => [
+									'values' => 'Test Item history',
+									'context' => ['values' => 'Simple host with item for Item history widget']
+								]
 							]
 						]
 					]
@@ -670,10 +707,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' => 'Test Item history',
-								'context' => ['values' => 'Simple host with item for Item history widget']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Test Item history',
+									'context' => ['values' => 'Simple host with item for Item history widget']
+								]
 							]
 						]
 					]
@@ -695,10 +734,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -717,10 +758,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -735,10 +778,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -753,10 +798,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -772,10 +819,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -791,10 +840,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -809,10 +860,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -827,10 +880,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -846,10 +901,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -865,10 +922,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -885,10 +944,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' => 'Test Item history',
-								'context' => ['values' => 'Simple host with item for Item history widget']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Test Item history',
+									'context' => ['values' => 'Simple host with item for Item history widget']
+								]
 							]
 						]
 					],
@@ -908,10 +969,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -926,16 +989,196 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'Columns' => [
 						[
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
-							],
-							'Name' => ''
+							'fields' => [
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								],
+								'Name' => ''
+							]
 						]
 					],
 					'column_error' => 'Invalid parameter "/1/name": cannot be empty.'
 				]
-			]
+			],
+			// #24.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Binary column with color'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Binary item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							],
+							'xpath://input[@id="base_color"]/..' => '90CAF9',
+							'Show thumbnail' => true
+						]
+					]
+				]
+			],
+//			// #25.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Name' => 'Binary column with error in color'
+//					],
+//					'Columns' => [
+//						[
+//							'fields' => [
+//								'Item' => [
+//									'values' => 'Binary item',
+//									'context' => ['values' => 'Host for all item value types']
+//								]
+//							],
+//							'xpath://input[@id="base_color"]/..' => 'FHTRHR',
+//						]
+//					],
+//					'column_error' => 'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
+//				]
+//			],
+			// #26.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Character column with color'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'xpath://input[@id="base_color"]/..' => 'AFB42B',
+								'Display' => 'HTML',
+								'Use monospace font' => true
+							],
+							'Highlights' => [
+								[
+									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1',
+									'id:highlights_0_pattern' => 'pattern_1'
+								],
+								[
+									'xpath://input[@id="highlights_1_color"]/..' => '00ACC1',
+									'id:highlights_1_pattern' => 'pattern_2'
+								]
+							]
+						]
+					]
+				]
+			],
+			// #27.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Duplicated highlights'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'HTML'
+							],
+							'Highlights' => [
+								[
+									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1',
+									'id:highlights_0_pattern' => 'pattern_1'
+								],
+								[
+									'xpath://input[@id="highlights_1_color"]/..' => '0288D1',
+									'id:highlights_1_pattern' => 'pattern_1'
+								]
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/highlights/2": value (pattern)=(pattern_1) already exists.'
+				]
+			],
+			// #28.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Character column with empty Highlight'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'HTML',
+								'Use monospace font' => true
+							],
+							'Highlights' => [
+								[
+									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1'
+								]
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/highlights/1/pattern": cannot be empty.'
+				]
+			],
+			// #29.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Character column with 0 max length'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Single line',
+								'Use monospace font' => true,
+								'id:max_length' => 0
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/max_length": value must be one of 1-500.'
+				]
+			],
+			// #30.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Character column with too large max length'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Single line',
+								'id:max_length' => 599
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/max_length": value must be one of 1-500.'
+				]
+			],
+			// Float, bar, indicators, min, max.
 		];
 	}
 
@@ -1004,7 +1247,17 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			foreach ($data['Columns'] as $column) {
 				$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
 				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$column_overlay->asForm()->fill($column);
+				$column_overlay_form = $column_overlay->asForm();
+				$column_overlay_form->fill($column['fields']);
+
+				if (array_key_exists('Highlights', $column)) {
+					foreach ($column['Highlights'] as $highlight) {
+						$column_overlay_form->getFieldContainer('Highlights')->query('button:Add')->one()
+								->waitUntilClickable()->click();
+						$column_overlay_form->fill($highlight);
+					}
+				}
+
 				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 
 				if (array_key_exists('column_error', $data)) {
@@ -1090,8 +1343,13 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 			foreach ($data['Columns'] as $i => $column) {
 				$row = $table->getRow($i);
-				$this->assertEquals($column['Name'], $row->getColumn('Name')->getText());
-				$this->assertEquals($column['Item']['context']['values'].': '.$column['Item']['values'],
+
+				$column_name = (array_key_exists('Name', $column['fields']))
+					? $column['fields']['Name']
+					: $column['fields']['Item']['values'];
+
+				$this->assertEquals($column_name, $row->getColumn('Name')->getText());
+				$this->assertEquals($column['fields']['Item']['context']['values'].': '.$column['fields']['Item']['values'],
 						$row->getColumn('Data')->getText()
 				);
 			}
