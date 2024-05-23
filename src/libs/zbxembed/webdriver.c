@@ -1042,7 +1042,14 @@ int	webdriver_get_raw_perf_data(zbx_webdriver_t *wd, const char *type, struct zb
 	int	ret;
 
 	if (NULL != type)
+	{
+		if (NULL != strchr(type, '\'') || NULL != strchr(type, '\\'))
+		{
+			*error = zbx_strdup(NULL, "invalid performance entry type");
+			return FAIL;
+		}
 		script = zbx_dsprintf(NULL, "return window.performance.getEntriesByType('%s')", type);
+	}
 	else
 		script = zbx_strdup(NULL, "return window.performance.getEntries();");
 
