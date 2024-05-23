@@ -392,18 +392,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				: ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font'];
 
 			$this->assertEquals($labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
-
-			$highlights_container =  $column_form->getFieldContainer('Highlights');
-			$highlights_container->query('button:Add')->one()->click();
-
-			$regex_input = $column_form->query('id', 'highlights_'.$i.'_pattern')->one();
-			$this->assertTrue($regex_input->isVisible());
-			$this->assertEquals('FF465C', $highlights_container->query('xpath:.//div[@class="color-picker"]')
-					->asColorPicker()->one()->getValue()
-			);
-			$column_form->query('id', 'highlights_'.$i.'_remove')->one()->click();
-			$this->assertFalse($regex_input->isVisible());
-
+			$this->checkThresholdsHighlights($column_form, 'Highlights', $i, '_pattern');
 			$this->checkHint($column_form, 'Display',
 					'Single line - result will be displayed in a single line and truncated to specified length.'
 			);
@@ -437,16 +426,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				}
 			}
 
-			$thresholds_container =  $column_form->getFieldContainer('Thresholds');
-			$thresholds_container->query('button:Add')->one()->click();
-
-			$threshold_input = $column_form->query('id', 'thresholds_'.$j.'_threshold')->one();
-			$this->assertTrue($threshold_input->isVisible());
-			$this->assertEquals('FF465C', $thresholds_container->query('xpath:.//div[@class="color-picker"]')
-					->asColorPicker()->one()->getValue()
-			);
-			$column_form->query('id', 'thresholds_'.$j.'_remove')->one()->click();
-			$this->assertFalse($threshold_input->isVisible());
+			$this->checkThresholdsHighlights($column_form, 'Thresholds', $j, '_threshold');
 		}
 
 		$column_overlay->close();
@@ -1495,5 +1475,26 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->assertEquals($hint_text, $hint->one()->getText());
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
+	}
+
+	/**
+	 * Check Thresholds or Highlights field inputs and color-pickers.
+	 *
+	 * @param CFormElement $form        given form
+	 * @param string       $label       checked field's label
+	 * @param int          $i           input counter
+	 * @param string       $selector    selector of tested input
+	 */
+	protected function checkThresholdsHighlights($form, $label, $i, $selector) {
+		$container =  $form->getFieldContainer($label);
+		$container->query('button:Add')->one()->click();
+		$input = $form->query('xpath:.//input[contains(@id, '.CXPathHelper::escapeQuotes($i.$selector).')]')->one();
+		$this->assertTrue($input->isVisible());
+		$this->assertEquals('FF465C', $container->query('xpath:.//div[@class="color-picker"]')
+				->asColorPicker()->one()->getValue()
+		);
+		$container->query('xpath:.//button[contains(@id, '.CXPathHelper::escapeQuotes($i.'_remove').')]')
+				->one()->click();
+		$this->assertFalse($input->isVisible());
 	}
 }
