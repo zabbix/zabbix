@@ -474,10 +474,7 @@ var hintBox = {
 			childList: true
 		});
 
-		target.resize_observer = new ResizeObserver(() => {
-			requestAnimationFrame(() => hintBox.onResize(e, target));
-		});
-
+		target.resize_observer = new ResizeObserver(() => hintBox.onResize(e, target));
 		target.resize_observer.observe(box[0]);
 
 		return box;
