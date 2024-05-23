@@ -1138,10 +1138,10 @@ class testDashboardPieChartWidget extends testWidgets {
 						'item-4' => 4.4
 					],
 					'expected_sectors' => [
-						'item-1' => ['value' => '1', 'color' => '212, 124, 0'],
-						'item-2' => ['value' => '2', 'color' => '255, 209, 80'],
-						'item-3' => ['value' => '3', 'color' => '255, 252, 123'],
-						'item-4' => ['value' => '4.4', 'color' => '255, 255, 165']
+						'item-1' => ['value' => '1', 'color' => '127, 39, 0'],
+						'item-2' => ['value' => '2', 'color' => '200, 112, 0'],
+						'item-3' => ['value' => '3', 'color' => '255, 185, 56'],
+						'item-4' => ['value' => '4.4', 'color' => '255, 221, 92']
 					]
 				]
 			],
