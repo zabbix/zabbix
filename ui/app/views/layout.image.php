@@ -20,6 +20,7 @@
  */
 
 header('Content-type: image/png');
+header('Cache-Control: max-age=86400');
 
 if (!$data['image']) {
 	http_response_code(404);
