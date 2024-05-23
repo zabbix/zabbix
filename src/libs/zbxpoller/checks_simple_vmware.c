@@ -1215,6 +1215,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	if (0 == (service->jobs_type & ZBX_VMWARE_UPDATE_EVENTLOG))
 	{
 		service->jobs_type |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
+		ret = SYSINFO_RET_OK;
 		goto unlock;
 	}
 
