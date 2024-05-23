@@ -123,8 +123,6 @@ class CModule extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $modules
 	 *
 	 * @throws APIException|JsonException
@@ -186,8 +184,6 @@ class CModule extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $modules
 	 * @param array|null $db_modules
 	 *

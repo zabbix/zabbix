@@ -23,8 +23,6 @@ class CImportReaderFactory {
 	/**
 	 * Get reader class for required format.
 	 *
-	 * @static
-	 *
 	 * @throws Exception
 	 *
 	 * @param string $format
@@ -49,8 +47,6 @@ class CImportReaderFactory {
 
 	/**
 	 * Converts file extension to associated import format.
-	 *
-	 * @static
 	 *
 	 * @throws Exception
 	 *

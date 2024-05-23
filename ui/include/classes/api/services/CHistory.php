@@ -316,8 +316,6 @@ class CHistory extends CApiService {
 	/**
 	 * Validates the input parameters for the clear() method.
 	 *
-	 * @static
-	 *
 	 * @param array      $itemids
 	 * @param array|null $db_items
 	 *

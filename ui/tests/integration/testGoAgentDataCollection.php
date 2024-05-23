@@ -641,8 +641,6 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	/**
 	 * Sort array by multiple fields.
 	 *
-	 * @static
-	 *
 	 * @param array $array  array to sort passed by reference
 	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
 	 */

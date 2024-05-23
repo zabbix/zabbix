@@ -43,8 +43,6 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert hosts.
 	 *
-	 * @static
-	 *
 	 * @param array $hosts
 	 *
 	 * @return array
@@ -66,8 +64,6 @@ class C50ImportConverter extends CConverter {
 
 	/**
 	 * Convert templates.
-	 *
-	 * @static
 	 *
 	 * @param array $templates
 	 *
@@ -96,8 +92,6 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert items.
 	 *
-	 * @static
-	 *
 	 * @param array $items
 	 *
 	 * @return array
@@ -115,8 +109,6 @@ class C50ImportConverter extends CConverter {
 
 	/**
 	 * Convert discovery rules.
-	 *
-	 * @static
 	 *
 	 * @param array $items
 	 *
@@ -140,8 +132,6 @@ class C50ImportConverter extends CConverter {
 	/**
 	 * Convert item prototypes.
 	 *
-	 * @static
-	 *
 	 * @param array $item_prototypes
 	 *
 	 * @return array
@@ -159,8 +149,6 @@ class C50ImportConverter extends CConverter {
 
 	/**
 	 * Convert preprocessing steps.
-	 *
-	 * @static
 	 *
 	 * @param array $preprocessing_steps
 	 *
@@ -180,8 +168,6 @@ class C50ImportConverter extends CConverter {
 
 	/**
 	 * Convert template screens to template dashboards.
-	 *
-	 * @static
 	 *
 	 * @param array $screens
 	 *

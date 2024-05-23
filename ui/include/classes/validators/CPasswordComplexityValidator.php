@@ -120,8 +120,6 @@ class CPasswordComplexityValidator extends CValidator {
 	/**
 	 * Check if string contains special character.
 	 *
-	 * @static
-	 *
 	 * @param string $password  Password to check.
 	 *
 	 * @return bool
@@ -144,8 +142,6 @@ class CPasswordComplexityValidator extends CValidator {
 	/**
 	 * Check if string contains upper and lower case characters.
 	 *
-	 * @static
-	 *
 	 * @param string $password  Password to check.
 	 *
 	 * @return bool
@@ -156,8 +152,6 @@ class CPasswordComplexityValidator extends CValidator {
 
 	/**
 	 * Check if string contains digit.
-	 *
-	 * @static
 	 *
 	 * @param string $password  Password to check.
 	 *
@@ -186,8 +180,6 @@ class CPasswordComplexityValidator extends CValidator {
 
 	/**
 	 * Check if string doesn't contain context specific substring.
-	 *
-	 * @static
 	 *
 	 * @param string $password  Password to check.
 	 *

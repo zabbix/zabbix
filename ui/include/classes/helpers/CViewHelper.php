@@ -22,8 +22,6 @@ class CViewHelper {
 	/**
 	 * Generate </a>&nbsp;<sup>num</sup>" to be used in tables. Null is returned if equal to zero.
 	 *
-	 * @static
-	 *
 	 * @param int $num
 	 *
 	 * @return mixed
@@ -39,8 +37,6 @@ class CViewHelper {
 	/**
 	 * Save web layout mode into user's profile.
 	 *
-	 * @static
-	 *
 	 * @param int $layout_mode  ZBX_LAYOUT_NORMAL | ZBX_LAYOUT_KIOSKMODE
 	 */
 	public static function saveLayoutMode($layout_mode) {
@@ -49,8 +45,6 @@ class CViewHelper {
 
 	/**
 	 * Load web layout mode from user's profile.
-	 *
-	 * @static
 	 *
 	 * @return int  Stored web layout mode (ZBX_LAYOUT_NORMAL by default).
 	 */
@@ -61,8 +55,6 @@ class CViewHelper {
 	/**
 	 * Save sidebar mode into user's profile.
 	 *
-	 * @static
-	 *
 	 * @param int $sidebar_mode  ZBX_SIDEBAR_VIEW_MODE_FULL | ZBX_SIDEBAR_VIEW_MODE_COMPACT
 	 *                           | ZBX_SIDEBAR_VIEW_MODE_HIDDEN
 	 */
@@ -72,8 +64,6 @@ class CViewHelper {
 
 	/**
 	 * Return sidebar mode setting.
-	 *
-	 * @static
 	 *
 	 * @return int  Stored sidebar mode (ZBX_SIDEBAR_VIEW_MODE_FULL by default).
 	 */

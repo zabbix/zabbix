@@ -70,8 +70,6 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert hosts.
 	 *
-	 * @static
-	 *
 	 * @param array $hosts
 	 *
 	 * @return array
@@ -109,8 +107,6 @@ class C52ImportConverter extends CConverter {
 
 	/**
 	 * Convert templates.
-	 *
-	 * @static
 	 *
 	 * @param array $templates
 	 *
@@ -158,8 +154,6 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert template dashboards.
 	 *
-	 * @static
-	 *
 	 * @param array  $dashboards
 	 * @param string $short_template_name
 	 *
@@ -189,8 +183,6 @@ class C52ImportConverter extends CConverter {
 
 	/**
 	 * Convert interfaces.
-	 *
-	 * @static
 	 *
 	 * @param array $interfaces
 	 *
@@ -274,8 +266,6 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert item prototypes.
 	 *
-	 * @static
-	 *
 	 * @param array       $item_prototypes
 	 * @param string      $hostname
 	 * @param string|null $discovery_rule_key
@@ -338,8 +328,6 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert items.
 	 *
-	 * @static
-	 *
 	 * @param array       $items
 	 * @param string      $hostname
 	 * @param string|null $short_template_name
@@ -389,8 +377,6 @@ class C52ImportConverter extends CConverter {
 
 	/**
 	 * Convert host prototypes.
-	 *
-	 * @static
 	 *
 	 * @param array       $host_prototypes
 	 * @param string|null $discovery_rule_key
@@ -473,8 +459,6 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert applications to item tags.
 	 *
-	 * @static
-	 *
 	 * @param array $applications
 	 *
 	 * @return array
@@ -494,8 +478,6 @@ class C52ImportConverter extends CConverter {
 
 	/**
 	 * Convert maps.
-	 *
-	 * @static
 	 *
 	 * @param array $maps
 	 *
@@ -534,8 +516,6 @@ class C52ImportConverter extends CConverter {
 
 	/**
 	 * Convert http tests.
-	 *
-	 * @static
 	 *
 	 * @param array       $httptests
 	 * @param string|null $short_template_name
@@ -643,8 +623,6 @@ class C52ImportConverter extends CConverter {
 	/**
 	 * Convert graphs.
 	 *
-	 * @static
-	 *
 	 * @param array $graphs
 	 *
 	 * @return array
@@ -674,8 +652,6 @@ class C52ImportConverter extends CConverter {
 
 	/**
 	 * Rename template name to be used for UUID generation.
-	 *
-	 * @static
 	 *
 	 * @param string $template_name
 	 *

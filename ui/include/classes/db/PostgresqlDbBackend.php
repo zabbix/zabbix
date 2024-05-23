@@ -231,8 +231,6 @@ class PostgresqlDbBackend extends DbBackend {
 	/**
 	 * Check if tables have compressed data.
 	 *
-	 * @static
-	 *
 	 * @param array $tables  Tables list.
 	 *
 	 * @return bool

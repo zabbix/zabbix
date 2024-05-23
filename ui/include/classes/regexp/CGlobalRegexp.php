@@ -112,8 +112,6 @@ class CGlobalRegexp {
 	/**
 	 * Matches expression against test string, respecting expression type.
 	 *
-	 * @static
-	 *
 	 * @param array $expression
 	 * @param $string
 	 *
@@ -133,8 +131,6 @@ class CGlobalRegexp {
 	/**
 	 * Matches expression as regular expression.
 	 *
-	 * @static
-	 *
 	 * @param array $expression
 	 * @param string $string
 	 *
@@ -150,8 +146,6 @@ class CGlobalRegexp {
 
 	/**
 	 * Combines regular expression provided as definition array into a string.
-	 *
-	 * @static
 	 *
 	 * @param array $expression
 	 *
@@ -170,8 +164,6 @@ class CGlobalRegexp {
 
 	/**
 	 * Matches expression as string.
-	 *
-	 * @static
 	 *
 	 * @param array $expression
 	 * @param string $string

@@ -883,8 +883,6 @@ abstract class CTriggerGeneral extends CApiService {
 	/**
 	 * Validate integrity of trigger recovery properties.
 	 *
-	 * @static
-	 *
 	 * @param array  $trigger
 	 * @param int    $trigger['recovery_mode']
 	 * @param string $trigger['recovery_expression']
@@ -908,8 +906,6 @@ abstract class CTriggerGeneral extends CApiService {
 
 	/**
 	 * Validate trigger correlation mode and related properties.
-	 *
-	 * @static
 	 *
 	 * @param array  $trigger
 	 * @param int    $trigger['correlation_mode']

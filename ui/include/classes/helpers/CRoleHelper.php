@@ -100,8 +100,6 @@ class CRoleHelper {
 	 * Array for storing roles data (including rules) loaded from Role API object and converted to one format. The data
 	 * of specific role can be accessed in following way: self::roles[{role ID}].
 	 *
-	 * @static
-	 *
 	 * @var array
 	 */
 	private static $roles = [];
@@ -122,8 +120,6 @@ class CRoleHelper {
 
 	/**
 	 * Checks the access of specific role to specific rule.
-	 *
-	 * @static
 	 *
 	 * @param string $rule_name  Name of the rule to check access for.
 	 * @param string $roleid     ID of the role where check of access is necessary to perform.
@@ -146,8 +142,6 @@ class CRoleHelper {
 	 * Gets list of API methods (with wildcards if that exists) that are considered allowed or denied (depending on
 	 * API access mode) for specific role.
 	 *
-	 * @static
-	 *
 	 * @param string $roleid  Role ID.
 	 *
 	 * @return array  Returns the array of API methods.
@@ -162,8 +156,6 @@ class CRoleHelper {
 
 	/**
 	 * Loads once all rules of specified Role API objects by ID and converts rule data to one format.
-	 *
-	 * @static
 	 *
 	 * @param string $roleid  Role ID.
 	 *
@@ -226,8 +218,6 @@ class CRoleHelper {
 
 	/**
 	 * Gets all available UI elements rules for specific user type.
-	 *
-	 * @static
 	 *
 	 * @param integer $user_type  User type.
 	 *
@@ -297,8 +287,6 @@ class CRoleHelper {
 	/**
 	 * Gets all available actions rules for specific user type.
 	 *
-	 * @static
-	 *
 	 * @param integer $user_type  User type.
 	 *
 	 * @return array  Returns the array of rule names for specified user type.
@@ -323,8 +311,6 @@ class CRoleHelper {
 
 	/**
 	 * Gets labels of all available UI sections for specific user type in order as it need to display in UI.
-	 *
-	 * @static
 	 *
 	 * @param integer $user_type  User type.
 	 *
@@ -358,8 +344,6 @@ class CRoleHelper {
 
 	/**
 	 * Gets labels of all available rules for specific UI section and user type in order as it need to display in UI.
-	 *
-	 * @static
 	 *
 	 * @param string  $ui_section_name  UI section name.
 	 * @param integer $user_type        User type.
@@ -521,8 +505,6 @@ class CRoleHelper {
 	 * Gets labels of all available actions rules for specific user type in order as it need to display on user roles
 	 * page.
 	 *
-	 * @static
-	 *
 	 * @param integer $user_type  User type.
 	 *
 	 * @return array  Returns the array where key of each element is rule name and value is rule label.
@@ -565,8 +547,6 @@ class CRoleHelper {
 	/**
 	 * Returns a list of all API methods by user type or API methods available only for the given user type.
 	 *
-	 * @static
-	 *
 	 * @param int|null $user_type
 	 *
 	 * @return array
@@ -582,8 +562,6 @@ class CRoleHelper {
 	/**
 	 * Returns a list of API methods with masks for the given user type.
 	 *
-	 * @static
-	 *
 	 * @param int|null $user_type
 	 *
 	 * @return array
@@ -598,8 +576,6 @@ class CRoleHelper {
 
 	/**
 	 * Returns a list of API methods for each method mask for the given user type.
-	 *
-	 * @static
 	 *
 	 * @param int $user_type
 	 *
@@ -620,8 +596,6 @@ class CRoleHelper {
 
 	/**
 	 * Collects all API methods for all user types.
-	 *
-	 * @static
 	 */
 	private static function loadApiMethods(): void {
 		$api_methods = [

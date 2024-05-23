@@ -46,7 +46,6 @@ class CArrayHelper {
 	 * Get from array only values with given keys.
 	 * If requested key is not in given array exception is thrown.
 	 *
-	 * @static
 	 * @throws InvalidArgumentException
 	 *
 	 * @param array $array
@@ -70,8 +69,6 @@ class CArrayHelper {
 	 * Get values with the $keys from $array.
 	 * If the requested key is not in the given array it is skipped.
 	 *
-	 * @static
-	 *
 	 * @param array $array
 	 * @param array $keys
 	 *
@@ -90,8 +87,6 @@ class CArrayHelper {
 
 	/**
 	 * Select sub-array of array items with keys in given numeric range.
-	 *
-	 * @static
 	 *
 	 * @param array $array    Array with numeric keys to test for given range.
 	 * @param int   $start    Range start value.
@@ -152,8 +147,6 @@ class CArrayHelper {
 	/**
 	 * Sort array by multiple fields.
 	 *
-	 * @static
-	 *
 	 * @param array $array  array to sort passed by reference
 	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
 	 */
@@ -171,7 +164,6 @@ class CArrayHelper {
 	 * Method to be used as callback for uasort function in sort method.
 	 *
 	 * @TODO: with PHP 5.3+ this should be changed to closure
-	 * @static
 	 *
 	 * @param $a
 	 * @param $b

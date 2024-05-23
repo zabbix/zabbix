@@ -1005,8 +1005,6 @@ abstract class CDashboardGeneral extends CApiService {
 	 *   - web.dashboard.widget.navtree.item.selected
 	 *   - web.dashboard.widget.navtree.item-*.toggle
 	 *
-	 * @static
-	 *
 	 * @param array $widgetids
 	 */
 	protected static function deleteWidgets(array $widgetids): void {

@@ -102,8 +102,6 @@ class CWebUser {
 	/**
 	 * Checks access of authenticated user to specific access rule.
 	 *
-	 * @static
-	 *
 	 * @param string $rule_name  Rule name.
 	 *
 	 * @return bool  Returns true if user has access to specified rule, false - otherwise.
@@ -120,8 +118,6 @@ class CWebUser {
 
 	/**
 	 * Sets user data defaults.
-	 *
-	 * @static
 	 */
 	public static function setDefault(): void {
 		self::$data = [
@@ -140,8 +136,6 @@ class CWebUser {
 
 	/**
 	 * Returns the type of the current user.
-	 *
-	 * @static
 	 *
 	 * @return int
 	 */

@@ -978,8 +978,6 @@ class testAgentItems extends CIntegrationTest {
 	/**
 	 * Compare arrays fields.
 	 *
-	 * @static
-	 *
 	 * @param array $array  array with mandatory fields
 	 * @param array $cmpr	array to compare with
 	 * @param string $key	item key
@@ -1009,8 +1007,6 @@ class testAgentItems extends CIntegrationTest {
 
 	/**
 	 * Find arrays fields.
-	 *
-	 * @static
 	 *
 	 * @param array $array  array with mandatory fields
 	 * @param array $cmpr_array	array to find object in
@@ -1043,8 +1039,6 @@ class testAgentItems extends CIntegrationTest {
 
 	/**
 	 * Update results.
-	 *
-	 * @static
 	 *
 	 * @param array $result	reference to array with the expected results
 	 * @param string $dyn	result field key

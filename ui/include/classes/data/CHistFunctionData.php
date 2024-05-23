@@ -553,8 +553,6 @@ final class CHistFunctionData {
 	/**
 	 * Check if function is aggregating wildcarded host/item queries and is exclusive to calculated item formulas.
 	 *
-	 * @static
-	 *
 	 * @param string $function
 	 *
 	 * @return bool

@@ -55,8 +55,6 @@ class C54ImportConverter extends CConverter {
 	/**
 	 * Convert function macros "{host:key.func(<param>)}" to expression macros "{?func(/host/key<, param>)}".
 	 *
-	 * @static
-	 *
 	 * @param string $text
 	 *
 	 * @return string
@@ -67,8 +65,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert hosts.
-	 *
-	 * @static
 	 *
 	 * @param array $hosts
 	 *
@@ -92,8 +88,6 @@ class C54ImportConverter extends CConverter {
 	/**
 	 * Convert templates.
 	 *
-	 * @static
-	 *
 	 * @param array $templates
 	 *
 	 * @return array
@@ -115,8 +109,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert items.
-	 *
-	 * @static
 	 *
 	 * @param array       $items
 	 *
@@ -141,8 +133,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert preprocessing steps.
-	 *
-	 * @static
 	 *
 	 * @param array $preprocessing_steps
 	 *
@@ -267,8 +257,6 @@ class C54ImportConverter extends CConverter {
 	/**
 	 * Convert graphs.
 	 *
-	 * @static
-	 *
 	 * @param array $graphs
 	 *
 	 * @return array
@@ -284,8 +272,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert maps.
-	 *
-	 * @static
 	 *
 	 * @param array $maps
 	 *
@@ -321,8 +307,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert media types.
-	 *
-	 * @static
 	 *
 	 * @param array $media_types
 	 *

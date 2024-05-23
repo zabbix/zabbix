@@ -127,8 +127,6 @@ class CApiTagHelper {
 	/**
 	 * Return SQL query conditions to filter host tags including inherited template tags.
 	 *
-	 * @static
-	 *
 	 * @param array  $tags
 	 * @param string $tags[]['tag']
 	 * @param int    $tags[]['operator']

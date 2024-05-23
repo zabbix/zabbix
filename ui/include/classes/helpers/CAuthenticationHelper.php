@@ -44,8 +44,6 @@ class CAuthenticationHelper {
 	/**
 	 * Userdirectory API object parameters array.
 	 *
-	 * @static
-	 *
 	 * @var array
 	 */
 	protected static array $userdirectory_params = [];

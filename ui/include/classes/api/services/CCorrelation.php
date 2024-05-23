@@ -130,8 +130,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $db_conditions
 	 * @param array $condition
 	 *
@@ -180,8 +178,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $correlations
 	 * @param string     $method
 	 * @param array|null $db_correlations
@@ -313,8 +309,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $correlations
 	 * @param string     $method
 	 * @param array|null $db_correlations
@@ -443,8 +437,6 @@ class CCorrelation extends CApiService {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @static
-	 *
 	 * @param array      $correlationids
 	 * @param array|null $db_correlations
 	 *
@@ -470,8 +462,6 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Check for unique event correlation names.
-	 *
-	 * @static
 	 *
 	 * @param array      $correlations
 	 * @param array|null $db_correlations
@@ -511,8 +501,6 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Returns validation rules for the filter object.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -564,8 +552,6 @@ class CCorrelation extends CApiService {
 	/**
 	 * Validates the input parameters for the create() method.
 	 *
-	 * @static
-	 *
 	 * @param array $correlations
 	 *
 	 * @throws APIException if the input is invalid.
@@ -592,8 +578,6 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Check host group permissions.
-	 *
-	 * @static
 	 *
 	 * @param array $correlations
 	 */
@@ -627,8 +611,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $correlations
 	 * @param array|null $db_correlations
 	 *
@@ -669,8 +651,6 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Validate correlation condition formula IDs. Check the "formulaid" field and that formula matches the conditions.
-	 *
-	 * @static
 	 *
 	 * @param array $correlations
 	 *
@@ -875,8 +855,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $correlations
 	 * @param array $db_correlations
 	 */

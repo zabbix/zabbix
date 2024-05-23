@@ -74,8 +74,6 @@ class ZBase {
 	/**
 	 * Returns the current instance of APP.
 	 *
-	 * @static
-	 *
 	 * @return APP
 	 */
 	public static function getInstance(): APP {

@@ -237,8 +237,6 @@ class CSelect extends CTag {
 	 * 	2 => 'Max'
 	 * ])
 	 *
-	 * @static
-	 *
 	 * @param array $values
 	 *
 	 * @return CSelectOption[]

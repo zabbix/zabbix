@@ -57,8 +57,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array       $options['tags']            (optional)
 	 * @param int         $options['limit']
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	private static function getDataEvents(array $options) {
@@ -87,8 +85,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param int         $options['time_from']       (optional)
 	 * @param array       $options['tags']            (optional)
 	 * @param int         $options['limit']
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -139,8 +135,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $filter['cause_eventid']         (optional)
 	 * @param int    $limit
 	 * @param bool   $resolve_comments
-	 *
-	 * @static
 	 *
 	 * @return mixed
 	 */
@@ -370,8 +364,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array $problems[]['suppression_data']
 	 * @param int   $problems[]['suppression_data'][]['maintenanceid']
 	 * @param int   $problems[]['suppression_data'][]['userid']
-	 *
-	 * @static
 	 */
 	public static function addSuppressionNames(array &$problems) {
 		$maintenanceids = [];
@@ -493,8 +485,6 @@ class CScreenProblem extends CScreenBase {
 	/**
 	 * @param array $eventids
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	private static function getExDataEvents(array $eventids) {
@@ -550,8 +540,6 @@ class CScreenProblem extends CScreenBase {
 	/**
 	 * @param array $eventids
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	private static function getExDataProblems(array $eventids) {
@@ -579,8 +567,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['show']
 	 * @param int   $filter['show_opdata']
 	 * @param bool  $resolve_comments
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */

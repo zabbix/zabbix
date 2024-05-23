@@ -22,8 +22,6 @@ class CSessionHelper {
 	/**
 	 * Clear session data.
 	 *
-	 * @static
-	 *
 	 * @return boolean
 	 */
 	public static function clear(): bool {
@@ -32,8 +30,6 @@ class CSessionHelper {
 
 	/**
 	 * Check has this key in session.
-	 *
-	 * @static
 	 *
 	 * @param string $key
 	 *
@@ -46,8 +42,6 @@ class CSessionHelper {
 	/**
 	 * Get session data.
 	 *
-	 * @static
-	 *
 	 * @param string $key
 	 *
 	 * @return mixed
@@ -59,8 +53,6 @@ class CSessionHelper {
 	/**
 	 * Add to session.
 	 *
-	 * @static
-	 *
 	 * @param string $key
 	 * @param mixed $value
 	 */
@@ -70,8 +62,6 @@ class CSessionHelper {
 
 	/**
 	 * Delete from session.
-	 *
-	 * @static
 	 *
 	 * @param array $keys
 	 */
@@ -84,8 +74,6 @@ class CSessionHelper {
 	/**
 	 * Get session id.
 	 *
-	 * @static
-	 *
 	 * @return string
 	 */
 	public static function getId(): string {
@@ -94,8 +82,6 @@ class CSessionHelper {
 
 	/**
 	 * Get all session data.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */

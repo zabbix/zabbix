@@ -558,8 +558,6 @@ class CHostGroup extends CApiService {
 	/**
 	 * @param array $groups
 	 *
-	 * @static
-	 *
 	 * @throws APIException if the input is invalid.
 	 */
 	private static function validateCreate(array &$groups): void {
@@ -707,8 +705,6 @@ class CHostGroup extends CApiService {
 	/**
 	 * Check for unique host group names.
 	 *
-	 * @static
-	 *
 	 * @param array      $groups
 	 * @param array|null $db_groups
 	 *
@@ -801,8 +797,6 @@ class CHostGroup extends CApiService {
 
 	/**
 	 * Check whether no one of passed groups are discovered host.
-	 *
-	 * @static
 	 *
 	 * @param array  $db_groups
 	 * @param string $db_groups[][name]
@@ -942,8 +936,6 @@ class CHostGroup extends CApiService {
 	/**
 	 * Prepare rights to inherit from parent host groups.
 	 *
-	 * @static
-	 *
 	 * @param array  $group_links
 	 * @param array  $usrgrps
 	 * @param array  $db_usrgrps
@@ -980,8 +972,6 @@ class CHostGroup extends CApiService {
 
 	/**
 	 * Prepare tag filters to inherit from parent host groups.
-	 *
-	 * @static
 	 *
 	 * @param array  $group_links
 	 * @param array  $usrgrps

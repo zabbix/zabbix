@@ -147,8 +147,6 @@ class CHistFunctionValidator extends CValidator {
 	 * @param string $value
 	 * @param array  $options
 	 *
-	 * @static
-	 *
 	 * @return bool
 	 */
 	private static function hasMacros(string $value, array $options): bool {
@@ -181,8 +179,6 @@ class CHistFunctionValidator extends CValidator {
 	 * @param array $param    Function parameter token.
 	 * @param array $rules
 	 * @param array $options
-	 *
-	 * @static
 	 *
 	 * @return bool
 	 */
@@ -318,8 +314,6 @@ class CHistFunctionValidator extends CValidator {
 	 * @param array  $filter   Filter token.
 	 * @param array  $options
 	 *
-	 * @static
-	 *
 	 * @return bool
 	 */
 	private static function validateQuery(string $host, string $item, array $filter, array $options): bool {
@@ -350,8 +344,6 @@ class CHistFunctionValidator extends CValidator {
 	 * @param string $time_shift
 	 * @param int    $mode
 	 * @param array  $options
-	 *
-	 * @static
 	 *
 	 * @return bool
 	 */

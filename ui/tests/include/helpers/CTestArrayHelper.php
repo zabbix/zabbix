@@ -58,8 +58,6 @@ class CTestArrayHelper {
 	/**
 	 * Sort array by multiple fields. This function assigns new keys to the elements in $array.
 	 *
-	 * @static
-	 *
 	 * @param array $array   The input array.
 	 * @param array $fields  Fields to sort, can be either string with field name or array with 'field' and 'order' keys.
 	 */

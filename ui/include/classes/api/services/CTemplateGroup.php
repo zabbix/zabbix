@@ -383,8 +383,6 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @param array $groups  [IN/OUT]
 	 *
-	 * @static
-	 *
 	 * @throws APIException if the input is invalid.
 	 */
 	private static function validateCreate(array &$groups): void {
@@ -479,8 +477,6 @@ class CTemplateGroup extends CApiService {
 
 	/**
 	 * Check for unique template group names.
-	 *
-	 * @static
 	 *
 	 * @param array      $groups
 	 * @param array|null $db_groups
@@ -653,8 +649,6 @@ class CTemplateGroup extends CApiService {
 
 	/**
 	 * Prepare rights to inherit from parent template groups.
-	 *
-	 * @static
 	 *
 	 * @param array  $group_links
 	 * @param array  $usrgrps

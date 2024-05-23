@@ -177,8 +177,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -242,8 +240,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -284,8 +280,6 @@ class CIconMap extends CApiService {
 	/**
 	 * Check for duplicated icon maps.
 	 *
-	 * @static
-	 *
 	 * @param array      $iconmaps
 	 * @param array|null $db_iconmaps
 	 *
@@ -321,8 +315,6 @@ class CIconMap extends CApiService {
 
 	/**
 	 * Check icon mappings.
-	 *
-	 * @static
 	 *
 	 * @param array $iconmaps
 	 *
@@ -368,8 +360,6 @@ class CIconMap extends CApiService {
 	/**
 	 * Check icons.
 	 *
-	 * @static
-	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException
@@ -409,8 +399,6 @@ class CIconMap extends CApiService {
 
 	/**
 	 * Update table "icon_mapping".
-	 *
-	 * @static
 	 *
 	 * @param array      $iconmaps
 	 * @param string     $method
@@ -512,8 +500,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $iconmapids
 	 * @param array|null $db_iconmaps
 	 *
@@ -540,8 +526,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $iconmapids
 	 * @param array|null $db_iconmaps
 	 *
@@ -583,8 +567,6 @@ class CIconMap extends CApiService {
 
 	/**
 	 * Add the existing mappings to $db_iconmaps whether these are affected by the update.
-	 *
-	 * @static
 	 *
 	 * @param array $iconmaps
 	 * @param array $db_iconmaps
