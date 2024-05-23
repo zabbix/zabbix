@@ -214,7 +214,7 @@ class CWidgetItemHistory extends CWidget {
 	#addHintbox(button, content = '', curl = null) {
 		button.dataset.hintbox = '1';
 		button.dataset.hintboxStatic = '1';
-		button.dataset.hintboxClass = 'dashboard-widget-itemhistory-hintbox';
+		button.dataset.hintboxClass = 'dashboard-widget-itemhistory-hintbox' + (content === '' ? ' nowrap' : '');
 		button.dataset.hintboxContents = content || t('Empty value');
 
 		if (curl !== null) {
