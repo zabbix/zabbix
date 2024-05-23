@@ -2090,7 +2090,8 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
  * Purpose: update configuration                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **error)
+int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, zbx_proxyconfig_write_status_t *status,
+		char **error)
 {
 	zbx_vector_table_data_ptr_t	config_tables;
 	int			ret = SUCCEED, full_sync = 0, delete_globalmacros = 0, loglevel;
@@ -2120,6 +2121,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 
 	if (1 == jp->end - jp->start)
 	{
+		*status = ZBX_PROXYCONFIG_WRITE_STATUS_EMPTY;
 		/* no configuration updates */
 		goto out;
 	}
@@ -2233,11 +2235,12 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const char *server)
 {
-	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
-	int			ret;
-	struct zbx_json		j;
-	char			*error = NULL;
-	zbx_uint64_t		config_revision, hostmap_revision;
+	struct zbx_json_parse		jp_config, jp_kvs_paths = {0};
+	int				ret;
+	struct zbx_json			j;
+	char				*error = NULL;
+	zbx_uint64_t			config_revision, hostmap_revision;
+	zbx_proxyconfig_write_status_t	status = ZBX_PROXYCONFIG_WRITE_STATUS_DATA;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2288,7 +2291,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		goto out;
 	}
 
-	if (SUCCEED == (ret = zbx_proxyconfig_process(sock->peer, &jp_config, &error)))
+	if (SUCCEED == (ret = zbx_proxyconfig_process(sock->peer, &jp_config, &status, &error)))
 	{
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
@@ -2316,8 +2319,10 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);
 out:
-#ifdef HAVE_MALLOC_TRIM
-	malloc_trim(ZBX_MALLOC_TRIM);
+#ifdef	HAVE_MALLOC_TRIM
+	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
+	if (ZBX_PROXYCONFIG_WRITE_STATUS_DATA == status)
+		malloc_trim(ZBX_MALLOC_TRIM);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

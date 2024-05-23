@@ -259,7 +259,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	struct zbx_json			j;
 	struct zbx_json_parse		jp;
 	size_t				buffer_size, reserved = 0;
-	zbx_proxyconfig_status_t	status;
+	zbx_proxyconfig_status_t	status = ZBX_PROXYCONFIG_STATUS_DATA;
 
 
 	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
@@ -347,8 +347,10 @@ out:
 	zbx_free(buffer);
 	zbx_free(error);
 	zbx_json_free(&j);
-#ifdef HAVE_MALLOC_TRIM
-	malloc_trim(ZBX_MALLOC_TRIM);
+#ifdef	HAVE_MALLOC_TRIM
+	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
+	if (ZBX_PROXYCONFIG_STATUS_DATA == status)
+		malloc_trim(ZBX_MALLOC_TRIM);
 #endif
 	return ret;
 }

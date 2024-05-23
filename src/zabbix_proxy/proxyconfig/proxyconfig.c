@@ -33,13 +33,14 @@
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
 		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args)
 {
-	zbx_socket_t		sock;
-	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
-	char			value[16], *error = NULL, *buffer = NULL;
-	size_t			buffer_size, reserved;
-	struct zbx_json		j;
-	int			ret = FAIL;
-	zbx_uint64_t		config_revision, hostmap_revision;
+	zbx_socket_t			sock;
+	struct	zbx_json_parse		jp, jp_kvs_paths = {0};
+	char				value[16], *error = NULL, *buffer = NULL;
+	size_t				buffer_size, reserved;
+	struct zbx_json			j;
+	int				ret = FAIL;
+	zbx_uint64_t			config_revision, hostmap_revision;
+	zbx_proxyconfig_write_status_t	status = ZBX_PROXYCONFIG_WRITE_STATUS_DATA;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -119,7 +120,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		goto error;
 	}
 
-	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &error)))
+	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &status, &error)))
 	{
 		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, args->config_vault,
 				args->config_proxyconfig_frequency);
@@ -154,7 +155,11 @@ out:
 	zbx_free(error);
 	zbx_free(buffer);
 	zbx_json_free(&j);
-
+#ifdef	HAVE_MALLOC_TRIM
+	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
+	if (ZBX_PROXYCONFIG_WRITE_STATUS_DATA == status)
+		malloc_trim(ZBX_MALLOC_TRIM);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

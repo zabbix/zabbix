@@ -1659,7 +1659,8 @@ out:
 	zbx_free(buffer);
 	zbx_free(version_str);
 #ifdef	HAVE_MALLOC_TRIM
-	if (ZBX_PROXYCONFIG_STATUS_EMPTY != status)
+	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
+	if (ZBX_PROXYCONFIG_STATUS_DATA == status)
 		malloc_trim(ZBX_MALLOC_TRIM);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
