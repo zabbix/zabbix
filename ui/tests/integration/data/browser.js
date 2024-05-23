@@ -137,7 +137,7 @@ try
 	el.click();
 
 	el = browser.findElement("link text", "Data collection"); // animation
-	Zabbix.sleep(500); // animation
+	Zabbix.sleep(250); // animation
 
 	if (el === null)
 	{
@@ -181,7 +181,7 @@ try
 	Zabbix.log(5, "Web length: " + el.length)
 
 	el = browser.findElement("link text", "Alerts");
-	Zabbix.sleep(500); // animation
+	Zabbix.sleep(250); // animation
 	if (el === null)
 	{
 		throw Error("cannot find Alerts");
