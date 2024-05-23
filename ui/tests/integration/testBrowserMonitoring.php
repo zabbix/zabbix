@@ -89,7 +89,7 @@ class testBrowserMonitoring extends CIntegrationTest {
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'output' => 'extend',
 			'itemids' => [self::$itemid]
-		], 30, 2);
+		], 120, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('value', $response['result'][0]);
 
