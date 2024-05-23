@@ -106,6 +106,8 @@ else {
 	}
 
 	if ($is_layout_vertical) {
+		$column_indexes = array_keys($data['columns']);
+
 		foreach ($rows as $row) {
 			$table_row = [];
 
@@ -115,7 +117,7 @@ else {
 				))->addClass(ZBX_STYLE_NOWRAP);
 			}
 
-			for ($index = 0, $count = count($data['columns']); $index < $count; $index ++) {
+			foreach ($column_indexes as $index) {
 				if (array_key_exists($index, $row)) {
 					$table_row = array_merge($table_row,
 						makeValueCell($data['columns'][$index], $row[$index], 'has-broadcast-data')
