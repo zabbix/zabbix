@@ -223,11 +223,11 @@ foreach ($data['users'] as $user) {
 	// Append user to table.
 	$table->addRow([
 		new CCheckBox('userids['.$userid.']', $userid),
-		(new CCol($username))->addClass(ZBX_STYLE_NOWRAP),
-		$user['name'],
-		$user['surname'],
-		$user['role']['name'],
-		$users_groups,
+		(new CCol($username))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($user['name']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($user['surname']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($user['role']['name']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($users_groups))->addClass(ZBX_STYLE_WORDBREAK),
 		$online,
 		$blocked,
 		(new CSpan(user_auth_type2str($user['gui_access'])))->addClass($gui_access_style),

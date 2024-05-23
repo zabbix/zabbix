@@ -183,7 +183,8 @@ foreach ($data['scripts'] as $script) {
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))
+			->addClass(ZBX_STYLE_WORDBREAK),
 		$scope,
 		$actions,
 		$type,

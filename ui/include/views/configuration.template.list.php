@@ -193,7 +193,7 @@ foreach ($data['templates'] as $template) {
 
 	$table->addRow([
 		new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		[
 			$data['allowed_ui_conf_hosts']
 				? new CLink(_('Hosts'),

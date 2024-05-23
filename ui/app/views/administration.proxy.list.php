@@ -159,7 +159,7 @@ foreach ($data['proxies'] as $proxy) {
 
 	$proxyTable->addRow([
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', $proxy['proxyid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? $out_encryption : $in_encryption,
 		($proxy['auto_compress'] == HOST_COMPRESSION_ON)

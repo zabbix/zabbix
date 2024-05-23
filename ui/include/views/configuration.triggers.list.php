@@ -330,7 +330,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
 		$description,
-		$trigger['opdata'],
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 		$status,
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
