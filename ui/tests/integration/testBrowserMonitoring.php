@@ -53,7 +53,7 @@ class testBrowserMonitoring extends CIntegrationTest {
 			'parameters' => [
 				[
 					'name' => 'url',
-					'value' => 'http://172.17.0.1/zabbix'
+					'value' => PHPUNIT_URL
 				]
 			]
 		]);
@@ -72,7 +72,7 @@ class testBrowserMonitoring extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 0,
-				'WebDriverURL' => 'localhost:4444'
+				'WebDriverURL' => PHPUNIT_DRIVER_ADDRESS
 			]
 		];
 	}
