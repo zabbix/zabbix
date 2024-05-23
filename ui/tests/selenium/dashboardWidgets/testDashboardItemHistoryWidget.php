@@ -285,10 +285,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			'Refresh interval' => 'Default (1 minute)',
 			'Columns' => [],
 			'Show lines' => '25',
+			'Override host' => '',
 			'New values' => 'Top',
 			'Show timestamp' => false,
-			'Show column header' => 'Vertical',
-			'Override host' => ''
+			'Show column header' => 'Vertical'
 		];
 		$form->checkValue($default_state);
 
@@ -435,6 +435,19 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		$visible_labels = ['Type', 'Show header', 'Name', 'Refresh interval', 'Layout', 'Columns', 'Show lines',
+				'Override host', 'Advanced configuration'
+		];
+		$hidden_labels = ['New values', 'Show timestamp', 'Show column header'];
+		$this->assertEquals($visible_labels, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
+		$this->assertEquals($hidden_labels, array_values($form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
+
+		$form->fill(['Advanced configuration' => true]);
+		$this->assertEquals(array_merge($visible_labels, $hidden_labels),
+				array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
+		);
+
 		$dialog->close();
 		$dashboard->save();
 
