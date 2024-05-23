@@ -960,7 +960,7 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 	zbx_webdriver_t		*wd;
 	char			*error = NULL, *entry_type = NULL;
 	struct zbx_json_parse	jp;
-	int			err_index;
+	int			err_index = -1;
 
 	wd = es_webdriver(ctx);
 
