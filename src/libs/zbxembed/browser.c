@@ -960,6 +960,7 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 	zbx_webdriver_t		*wd;
 	char			*error = NULL, *entry_type = NULL;
 	struct zbx_json_parse	jp;
+	int			err_index;
 
 	wd = es_webdriver(ctx);
 
@@ -977,19 +978,22 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 
 	if (SUCCEED != webdriver_get_raw_perf_data(wd, entry_type, &jp, &error))
 	{
-		(void)browser_push_error(ctx, wd, "cannot get performance data: %s", error);
+		err_index = browser_push_error(ctx, wd, "cannot get performance data: %s", error);
 		zbx_free(error);
-
-		return duk_throw(ctx);
+	}
+	else
+	{
+		duk_get_global_string(ctx, "JSON");
+		duk_push_string(ctx, "parse");
+		duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
+		duk_pcall_prop(ctx, -3, 1);
+		duk_remove(ctx, -2);	/* remove global JSON object from stack */
 	}
 
-	duk_get_global_string(ctx, "JSON");
-	duk_push_string(ctx, "parse");
-	duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
-	duk_pcall_prop(ctx, -3, 1);
-	duk_remove(ctx, -2);	/* remove global JSON object from stack */
-
 	zbx_free(entry_type);
+
+	if (-1 != err_index)
+		return duk_throw(ctx);
 
 	return 1;
 }
