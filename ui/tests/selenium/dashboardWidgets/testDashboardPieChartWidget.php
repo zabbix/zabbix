@@ -164,6 +164,12 @@ class testDashboardPieChartWidget extends testWidgets {
 						'key_' => 'item-4',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'item-5',
+						'key_' => 'item-5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
 					]
 				]
 			]
@@ -1148,16 +1154,19 @@ class testDashboardPieChartWidget extends testWidgets {
 						['name' => 'ds.0.dataset_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
 						['name' => 'ds.0.itemids.0', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-1'],
 						['name' => 'ds.0.type.0', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-						['name' => 'ds.0.color.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFEBEE'],
+						['name' => 'ds.0.color.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF002F'],
 						['name' => 'ds.0.itemids.1', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-2'],
 						['name' => 'ds.0.type.1', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-						['name' => 'ds.0.color.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'E53935'],
+						['name' => 'ds.0.color.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF4265'],
 						['name' => 'ds.0.itemids.2', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-3'],
 						['name' => 'ds.0.type.2', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-						['name' => 'ds.0.color.2', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546E7A'],
+						['name' => 'ds.0.color.2', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FA6984'],
 						['name' => 'ds.0.itemids.3', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-4'],
 						['name' => 'ds.0.type.3', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-						['name' => 'ds.0.color.3', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546EAA'],
+						['name' => 'ds.0.color.3', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '525252'],
+						['name' => 'ds.0.itemids.4', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-5'],
+						['name' => 'ds.0.type.4', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.color.4', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '525252'],
 						// Drawing and total value options.
 						['name' => 'draw_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'width', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 50],
@@ -1172,7 +1181,7 @@ class testDashboardPieChartWidget extends testWidgets {
 						['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
 						['name' => 'merge', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'merge_percent', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 10],
-						['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'B71C1C'],
+						['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '69B4FA'],
 						// Legend with values.
 						['name' => 'legend_value', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'legend_lines_mode', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
@@ -1180,15 +1189,17 @@ class testDashboardPieChartWidget extends testWidgets {
 					],
 					'item_data' => [
 						'item-1' => 100,
-						'item-2' => 41,
-						'item-3' => 4,
-						'item-4' => 5
+						'item-2' => 25,
+						'item-3' => 41,
+						'item-4' => 4,
+						'item-5' => 5
 					],
 					'expected_total' => '100 ♥',
 					'expected_sectors' => [
-						'item-1' => ['value' => '100 ♥', 'color' => '255, 235, 238'],
-						'item-2' => ['value' => '41 ♥', 'color' => '229, 57, 53'],
-						'Other' => ['value' => '9 ♥', 'color' => '183, 28, 28']
+						'item-1' => ['value' => '100 ♥', 'color' => '255, 0, 47'],
+						'item-2' => ['value' => '25 ♥', 'color' => '255, 66, 101'],
+						'item-3' => ['value' => '41 ♥', 'color' => '250, 105, 132'],
+						'Other' => ['value' => '9 ♥', 'color' => '105, 180, 250']
 					]
 				]
 			]
