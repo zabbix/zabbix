@@ -20,7 +20,10 @@ use API,
 	CController,
 	CControllerResponseData;
 
-class ImageValueGet extends CController {
+class ValueCheck extends CController {
+
+	private const VALUE_TYPE_IMAGE = 'image';
+	private const VALUE_TYPE_RAW = 'raw';
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -32,16 +35,29 @@ class ImageValueGet extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemid' =>	'int32|required',
-			'clock' =>	'int32|required',
-			'ns' =>		'int32|required'
+			'itemid' =>			'int32|required',
+			'clock' =>			'int32|required',
+			'ns' =>				'int32|required',
+			'show_thumbnail' =>	'in 1'
 		];
 
-		return $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)]))->disableView()
+			);
+		}
+
+		return $ret;
 	}
 
 	protected function doAction(): void {
-		$result = [];
+		$result = [2];
 
 		$db_item = API::Item()->get([
 			'output' => ['itemid', 'value_type'],
@@ -61,12 +77,30 @@ class ImageValueGet extends CController {
 			]);
 
 			if ($history_value) {
-				$result['image'] = @imagecreatefromstring(base64_decode($history_value[0]['value']));
+				$show_thumbnail = $this->getInput('show_thumbnail', 0);
+				$value = $history_value[0]['value'];
+
+				$image = @imagecreatefromstring(base64_decode($value));
+
+				if ($image) {
+					$result['type'] = self::VALUE_TYPE_IMAGE;
+
+					if ($show_thumbnail == 1) {
+						ob_start();
+
+						imagepng(imageThumb($image, 0, 112));
+
+						$result['thumbnail'] = base64_encode(ob_get_clean());
+					}
+				}
+				else {
+					$result['type'] = self::VALUE_TYPE_RAW;
+				}
 			}
 		}
 
 		$this->setResponse(
-			(new CControllerResponseData($result))->disableView()
+			(new CControllerResponseData(['main_block' => json_encode($result, JSON_THROW_ON_ERROR)]))->disableView()
 		);
 	}
 }

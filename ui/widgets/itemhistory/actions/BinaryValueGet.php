@@ -22,22 +22,19 @@ use API,
 
 class BinaryValueGet extends CController {
 
-	private const BASE64_STRING_LENGTH = 1024;
-
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return true;
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'itemid' =>		'int32|required',
 			'clock' =>		'int32|required',
-			'ns' =>			'int32|required',
-			'preview' =>	'in 1'
+			'ns' =>			'int32|required'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,52 +52,28 @@ class BinaryValueGet extends CController {
 		return $ret;
 	}
 
-	protected function doAction() {
-		$itemid = $this->getInput('itemid', '');
-		$clock = $this->getInput('clock', 0);
-		$ns = $this->getInput('ns', 0);
-		$preview = $this->getInput('preview', 0);
-
+	protected function doAction(): void {
 		$result = [];
 
-		if ($itemid !== '') {
-			$db_item = API::Item()->get([
-				'output' => ['itemid', 'value_type'],
-				'itemids' => [$itemid],
-				'webitems' => true
+		$db_item = API::Item()->get([
+			'output' => ['itemid', 'value_type'],
+			'itemids' => $this->getInput('itemid'),
+			'webitems' => true
+		]);
+
+		if ($db_item && $db_item[0]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			$history_value = API::History()->get([
+				'history' => ITEM_VALUE_TYPE_BINARY,
+				'output' => ['value'],
+				'itemids' => $db_item[0]['itemid'],
+				'filter' => [
+					'clock' => $this->getInput('clock'),
+					'ns' => $this->getInput('ns')
+				]
 			]);
 
-			if ($db_item && $db_item[0]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				$history_value = API::History()->get([
-					'history' => ITEM_VALUE_TYPE_BINARY,
-					'output' => ['value'],
-					'filter' => [
-						'clock' => $clock,
-						'ns' => $ns
-					],
-					'itemids' => [$db_item[0]['itemid']]
-				]);
-
-				if ($preview == 1) {
-					if ($history_value) {
-						$image = @imagecreatefromstring(base64_decode($history_value[0]['value']));
-
-						if ($image) {
-							ob_start();
-
-							imagepng(imageThumb($image, 0, 112));
-
-							$result['thumbnail'] = base64_encode(ob_get_clean());
-						}
-						else {
-							$result['value'] = substr($history_value[0]['value'], 0, self::BASE64_STRING_LENGTH);
-							$result['has_more'] = strlen($history_value[0]['value']) >= self::BASE64_STRING_LENGTH;
-						}
-					}
-				}
-				else {
-					$result['value'] = $history_value[0]['value'];
-				}
+			if ($history_value) {
+				$result['value'] = $history_value[0]['value'];
 			}
 		}
 

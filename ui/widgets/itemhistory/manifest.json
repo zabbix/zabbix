@@ -32,6 +32,10 @@
 			"view": "column.edit",
 			"layout": "layout.json"
 		},
+		"widget.itemhistory.value.check": {
+			"class": "ValueCheck",
+			"layout": "layout.json"
+		},
 		"widget.itemhistory.binary_value.get": {
 			"class": "BinaryValueGet",
 			"layout": "layout.json"

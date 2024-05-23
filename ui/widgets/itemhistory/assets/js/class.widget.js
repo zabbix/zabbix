@@ -15,13 +15,14 @@
 
 class CWidgetItemHistory extends CWidget {
 
+	static VALUE_TYPE_IMAGE = 'image';
+	static VALUE_TYPE_RAW = 'raw';
+
 	#binary_data_cache = new Map();
 
 	#abort_controller = null;
 
 	#thumbnail_loader = null;
-
-	#show_thumbnail = false;
 
 	#selected_itemid = null;
 	#selected_clock = null;
@@ -37,8 +38,6 @@ class CWidgetItemHistory extends CWidget {
 		const table = this._body.querySelector(`.${ZBX_STYLE_LIST_TABLE}`);
 
 		if (table !== null) {
-			this.#show_thumbnail = table.classList.contains('show-thumbnail');
-
 			this.#loadThumbnails(this.#makeUrls());
 
 			table.querySelectorAll('.has-broadcast-data').forEach(element => {
@@ -81,9 +80,12 @@ class CWidgetItemHistory extends CWidget {
 			const cell = button.closest('td');
 			const curl = new Curl('zabbix.php');
 
-			curl.setArgument('action', 'widget.itemhistory.binary_value.get');
-			curl.setArgument('preview', 1);
+			curl.setArgument('action', 'widget.itemhistory.value.check');
 			curl.setArgument('itemid', cell.dataset.itemid);
+
+			if (button.classList.contains('btn-thumbnail')) {
+				curl.setArgument('show_thumbnail', 1);
+			}
 
 			const [clock, ns] = cell.dataset.clock.split('.');
 			curl.setArgument('clock', clock);
@@ -130,11 +132,22 @@ class CWidgetItemHistory extends CWidget {
 				.then(binary_data => {
 					this.#binary_data_cache.set(url, binary_data);
 
-					if ('thumbnail' in binary_data && this.#show_thumbnail) {
-						this.#makeThumbnailButton(binary_data);
-					}
-					else {
-						this.#makeBinaryButton(binary_data);
+					switch (binary_data.type) {
+						case CWidgetItemHistory.VALUE_TYPE_IMAGE:
+							if ('thumbnail' in binary_data) {
+								this.#makeThumbnailButton(binary_data);
+							}
+							else {
+								this.#makeBinaryButton(binary_data);
+							}
+							break;
+
+						case CWidgetItemHistory.VALUE_TYPE_RAW:
+							this.#makeBinaryButton(binary_data);
+							break;
+
+						default:
+							binary_data.button.disabled = true;
 					}
 				})
 				.catch(exception => {
@@ -162,18 +175,19 @@ class CWidgetItemHistory extends CWidget {
 
 		const curl = this.#getHintboxContentCUrl(binary_data);
 
-		if ('thumbnail' in binary_data) {
-			curl.setArgument('action', 'widget.itemhistory.image_value.get');
-			this.#addHintbox(button, `<img src="${curl.getUrl()}">`);
-		}
-		else {
-			if (!binary_data.has_more) {
-				this.#addHintbox(button, binary_data.value);
-			}
-			else {
+		switch (binary_data.type) {
+			case CWidgetItemHistory.VALUE_TYPE_IMAGE:
+				curl.setArgument('action', 'widget.itemhistory.image_value.get');
+				this.#addHintbox(button, `<img src="${curl.getUrl()}">`);
+				break;
+
+			case CWidgetItemHistory.VALUE_TYPE_RAW:
 				curl.setArgument('action', 'widget.itemhistory.binary_value.get');
 				this.#addHintbox(button, '', curl);
-			}
+				break;
+
+			default:
+				binary_data.button.disabled = true;
 		}
 	}
 
