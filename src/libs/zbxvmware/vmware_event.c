@@ -647,7 +647,7 @@ static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events
 		time_t last_ts, const int is_prop, xmlDoc *xdoc, const zbx_vmware_eventlog_state_t *eventlog,
 		zbx_uint64_t *alloc_sz, int *node_count, unsigned char *skip_old)
 {
-#	define LAST_KEY(evs)	(((const zbx_vmware_event_t *)evs->values[evs->values_num - 1])->key)
+#	define LAST_KEY(evs)	(evs->values[evs->values_num - 1]->key)
 
 	zbx_vector_id_xmlnode_t	ids;
 	int			parsed_num = 0;
@@ -806,7 +806,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 #	define ATTEMPTS_NUM	4
 #	define EVENT_TAG	1
 #	define RETURNVAL_TAG	0
-#	define LAST_KEY(evs)	(((const zbx_vmware_event_t *)evs->values[evs->values_num - 1])->key)
+#	define LAST_KEY(evs)	(evs->values[evs->values_num - 1]->key)
 
 	char		*event_session = NULL, *err = NULL;
 	int		ret = FAIL, node_count = 1, soap_retry = ATTEMPTS_NUM,
@@ -824,10 +824,10 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		goto end_session;
 
 	if (NULL != service->data && 0 != service->eventlog.data->events.values_num &&
-			((const zbx_vmware_event_t *)service->eventlog.data->events.values[0])->key > last_key)
+			service->eventlog.data->events.values[0]->key > last_key)
 	{
-		eventlog_last_key = ((const zbx_vmware_event_t *)service->eventlog.data->events.values[0])->key;
-		eventlog_last_ts = ((const zbx_vmware_event_t *)service->eventlog.data->events.values[0])->timestamp;
+		eventlog_last_key = service->eventlog.data->events.values[0]->key;
+		eventlog_last_ts = service->eventlog.data->events.values[0]->timestamp;
 	}
 	else
 	{
@@ -1083,7 +1083,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	}
 
 	if (NULL != service->eventlog.data && 0 != service->eventlog.data->events.values_num && 0 == evt_skip_old &&
-			((const zbx_vmware_event_t *)service->eventlog.data->events.values[0])->key > evt_last_key)
+			service->eventlog.data->events.values[0]->key > evt_last_key)
 	{
 		evt_pause = 1;
 	}

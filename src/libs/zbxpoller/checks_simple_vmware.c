@@ -1066,7 +1066,7 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events,
 	/* events were retrieved in reverse chronological order */
 	for (int i = events->values_num - 1; i >= 0; i--)
 	{
-		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
+		const zbx_vmware_event_t	*event = events->values[i];
 		AGENT_RESULT			*add_result = NULL;
 
 		/* Event id of ESXi will reset when ESXi is rebooted */
@@ -1256,10 +1256,8 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	else if (0 < service->eventlog.data->events.values_num)
 	{
 		vmware_get_events(&service->eventlog.data->events, &service->eventlog, item, add_results);
-		service->eventlog.last_key =
-				((const zbx_vmware_event_t *)service->eventlog.data->events.values[0])->key;
-		service->eventlog.last_ts =
-				((const zbx_vmware_event_t *)service->eventlog.data->events.values[0])->timestamp;
+		service->eventlog.last_key = service->eventlog.data->events.values[0]->key;
+		service->eventlog.last_ts = service->eventlog.data->events.values[0]->timestamp;
 	}
 
 	ret = SYSINFO_RET_OK;
