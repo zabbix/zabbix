@@ -1,7 +1,15 @@
+Changes for 7.0.0rc3
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0rc2
 
 New features:
 .........T [ZBXNEXT-9167] added Website by Browser template (egordymov)
+...G...... [ZBXNEXT-9056] removed deprecated Plugins.<Name>.Capacity parameter (mprihodko)
 
 Bug fixes:
 .........T [ZBX-24518] updated global dashboards (abakaldin)
