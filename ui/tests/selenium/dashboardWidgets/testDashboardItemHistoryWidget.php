@@ -562,7 +562,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #6.
 			[
 				[
-					'flag' => true,
 					'expected' => TEST_GOOD,
 					'same_host' => 'ЗАББИКС Сервер',
 					'fields' => [
@@ -589,7 +588,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #7 Test case with items from two different hosts.
 			[
 				[
-					'flag' => true,
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => ''
@@ -688,7 +686,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'fields' => [
 						'Name' => 'Header is hidden',
 						'Show header' => false,
-						'Refresh interval' => 'No refresh'
+						'Refresh interval' => 'No refresh',
+						'Layout' => 'Vertical',
+						'Advanced configuration' => true,
+						'New values' => 'Bottom',
+						'Show timestamp' => true,
+						'Show column header' => 'Horizontal'
 					],
 					'Columns' => [
 						[
@@ -708,7 +711,9 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'fields' => [
 						'Name' => 'Header appears',
 						'Show header' => true,
-						'Refresh interval' => '10 seconds'
+						'Refresh interval' => '10 seconds',
+						'Advanced configuration' => true,
+						'Show column header' => 'Off'
 					],
 					'Columns' => [
 						[
@@ -911,6 +916,25 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						]
 					]
 				]
+			],
+			// #23.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty name in column'
+					],
+					'Columns' => [
+						[
+							'Item' => [
+								'values' =>  'Available memory',
+								'context' => ['values' => 'ЗАББИКС Сервер']
+							],
+							'Name' => ''
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/name": cannot be empty.'
+				]
 			]
 		];
 	}
@@ -964,32 +988,37 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
 
 		if ($update) {
-			$table = $form->query('id:list_columns')->asTable()->one();
-			$button_remove = $table->query('button:Remove');
-			$remove_count = $button_remove->count();
+			$buttons = $form->query('id:list_columns')->asTable()->one()->query('button:Remove')->all();
 
-			for ($i = 0; $i < $remove_count; $i++) {
-				$button_remove->waitUntilClickable()->one()->click();
-				$form->waitUntilReloaded();
-			}
-		}
-
-		// Fill Columns field.
-		if (array_key_exists('Columns', $data)) {
-			foreach ($data['Columns'] as $column) {
-				$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
-				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$column_form = $column_overlay->asForm();
-				$column_form->fill($column);
-				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
-				$column_overlay->waitUntilNotVisible();
+			foreach ($buttons as $remove_button) {
+				$remove_button->waitUntilClickable()->click();
 				$form->waitUntilReloaded();
 			}
 		}
 
 		$form->fill($data['fields']);
 		$values = $form->getValues();
-		$form->submit();
+
+		// Fill Columns field.
+		if (array_key_exists('Columns', $data)) {
+			foreach ($data['Columns'] as $column) {
+				$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_overlay->asForm()->fill($column);
+				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+				if (array_key_exists('column_error', $data)) {
+					break;
+				}
+
+				$column_overlay->waitUntilNotVisible();
+				$form->waitUntilReloaded();
+			}
+		}
+
+		if (!array_key_exists('column_error', $data)) {
+			$form->submit();
+		}
 
 		// Trim leading and trailing spaces from expected results if necessary.
 		if (array_key_exists('trim', $data)) {
@@ -1000,11 +1029,21 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			if (array_key_exists('column_error', $data)) {
+				$data['error'] = $data['column_error'];
+			}
+
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 
 			// Check that after error and cancellation of the widget, the widget is not available on dashboard.
-			COverlayDialogElement::find()->one()->close();
+			$dialogs = COverlayDialogElement::find()->all();
+			$dialog_count = $dialogs->count();
+
+			for ($i = $dialog_count - 1; $i >= 0; $i--) {
+				$dialogs->get($i)->close(true);
+			}
+
 			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertFalse($dashboard->getWidget($data['fields']['Name'], false)->isValid());
@@ -1037,6 +1076,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
+
+			// 'Advanced configuration' is always collapsed after save.
+			$values['Advanced configuration'] = false;
+			$data['fields']['Advanced configuration'] = false;
+
 			$this->assertEquals($values, $saved_form->getValues());
 			$table = $saved_form->query('id:list_columns')->asTable()->one();
 
@@ -1045,9 +1089,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->assertEquals(count($data['Columns']), $columns_count);
 
 			foreach ($data['Columns'] as $i => $column) {
-				$this->assertEquals($column['Name'], $table->getRow($i)->getColumn('Name')->getText());
+				$row = $table->getRow($i);
+				$this->assertEquals($column['Name'], $row->getColumn('Name')->getText());
 				$this->assertEquals($column['Item']['context']['values'].': '.$column['Item']['values'],
-						$table->getRow($i)->getColumn('Data')->getText()
+						$row->getColumn('Data')->getText()
 				);
 			}
 
@@ -1123,8 +1168,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 		$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$column_form = $column_overlay->asForm();
-		$column_form->fill([
+		$column_overlay->asForm()->fill([
 			'Item' => [
 				'values' => 'Test Item history',
 				'context' => ['values' => 'Simple host with item for Item history widget']
@@ -1269,8 +1313,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-							'Show lines' => '1'
-						],
+						'Show lines' => '1'
+					],
 					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
