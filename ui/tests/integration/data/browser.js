@@ -1,4 +1,4 @@
-var	parameters = JSON.parse(value);
+parameters = JSON.parse(value);
 
 var	opts = Browser.chromeOptions();
 var	optsFirefox = Browser.firefoxOptions();
@@ -315,7 +315,7 @@ catch (err)
 	}
 
 	result = browser.getResult();
-	result["screenshot"] = browser.getScreenshot();
+	var screenshot = browser.getScreenshot();
 	return JSON.stringify(result);
 
 }
