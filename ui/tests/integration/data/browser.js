@@ -267,9 +267,9 @@ try
 		el = browser2.findElement("link text", "Sign out");
 
 		browser2.collectPerfEntries();
-		raw = browser2.getRawPerfEntries();
+		var raw = browser2.getRawPerfEntriesByType('navigation');
 		browserDashboardResult = browser2.getResult();
-		browserDashboardResult.raw = raw
+		browserDashboardResult.raw = raw.concat(browser2.getRawPerfEntriesByType('resource'));
 
 		summary = browserDashboardResult.performance_data.summary;
 

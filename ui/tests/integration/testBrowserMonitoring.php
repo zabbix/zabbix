@@ -72,7 +72,8 @@ class testBrowserMonitoring extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 0,
-				'WebDriverURL' => 'localhost:4444'
+				'WebDriverURL' => 'localhost:4444',
+				'DebugLevel' => 4,
 			]
 		];
 	}
@@ -96,7 +97,7 @@ class testBrowserMonitoring extends CIntegrationTest {
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'output' => 'extend',
 			'itemids' => [self::$itemid]
-		], 120, 2);
+		], 30, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('value', $response['result'][0]);
 
