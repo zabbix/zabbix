@@ -467,16 +467,18 @@ var hintBox = {
 			}
 		});
 
-		target.resize_observer = new ResizeObserver(() => {
-			hintBox.onResize(e, target);
-		}).observe(box[0]);
-
 		target.observer.observe(document.body, {
 			attributes: true,
 			attributeFilter: ['style', 'class'],
 			subtree: true,
 			childList: true
 		});
+
+		target.resize_observer = new ResizeObserver(() => {
+			requestAnimationFrame(() => hintBox.onResize(e, target));
+		});
+
+		target.resize_observer.observe(box[0]);
 
 		return box;
 	},

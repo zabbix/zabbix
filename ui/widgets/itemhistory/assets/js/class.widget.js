@@ -198,7 +198,7 @@ class CWidgetItemHistory extends CWidget {
 		const curl = this.#getHintboxContentCUrl(binary_data);
 		curl.setArgument('action', 'widget.itemhistory.image_value.get');
 
-		this.#addHintbox(button, `<img src="${curl.getUrl()}">`)
+		this.#addHintbox(button, `<img src="${curl.getUrl()}">`);
 	}
 
 	#getHintboxContentCUrl(binary_data) {

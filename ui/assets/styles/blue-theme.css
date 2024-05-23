@@ -4522,8 +4522,8 @@ div.dashboard-widget-itemhistory z-bar-gauge {
   overflow: auto; }
   .dashboard-widget-itemhistory-hintbox img {
     display: block;
-    max-width: 80vw;
-    max-height: 80vh; }
+    max-width: 60vw;
+    max-height: 60vh; }
 
 form.dashboard-widget-itemnavigator .item-grouping {
   line-height: 1.4em; }
