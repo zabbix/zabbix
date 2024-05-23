@@ -266,6 +266,29 @@ try
 		el = browser2.findElement("link text", "Sign out");
 
 		browser2.collectPerfEntries();
+
+		try
+		{
+			raw = browser2.getRawPerfEntries()
+		}
+		catch (error) {
+			Zabbix.log(5, "cannot get getRawPerfEntries: " + error);
+		}
+
+		try
+		{
+			raw = browser2.getRawPerfEntriesByType('\'\+\'navigation');
+		}
+		catch (error)
+		{
+			Zabbix.log(5, "cannot get getRawPerfEntriesByType: " + error);
+		}
+
+		if (null === browser2.getError())
+		{
+			throw Error("injection not handled");
+		}
+
 		var raw = browser2.getRawPerfEntriesByType('navigation');
 		browserDashboardResult = browser2.getResult();
 		browserDashboardResult.raw = raw.concat(browser2.getRawPerfEntriesByType('resource'));
