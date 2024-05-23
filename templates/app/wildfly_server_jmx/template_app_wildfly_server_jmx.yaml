@@ -22,7 +22,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 9b9fce7f4b4945fea45feaa5b213c186
-          name: 'WildFly: Uptime'
+          name: Uptime
           type: JMX
           key: 'jmx["java.lang:type=Runtime","Uptime"]'
           history: 7d
@@ -41,8 +41,8 @@ zabbix_export:
           triggers:
             - uuid: 8a4fab49eb1e4ebbb1459d9b0f848771
               expression: 'nodata(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"],15m)=1'
-              name: 'WildFly: Failed to fetch info data'
-              event_name: 'WildFly: Failed to fetch info data (or no data for 15m)'
+              name: 'Failed to fetch info data'
+              event_name: 'Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
               tags:
@@ -50,8 +50,8 @@ zabbix_export:
                   value: availability
             - uuid: 71db189440ec4355aa06262e3200d47e
               expression: 'last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m'
-              name: 'WildFly: Host has been restarted'
-              event_name: 'WildFly: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -59,7 +59,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: daf104c5cafe4879b79fb30fca99c838
-          name: 'WildFly: Launch type'
+          name: 'Launch type'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","launchType"]'
           history: 7d
@@ -77,7 +77,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: b3c30ba00ac54677a944cda7ec8536af
-          name: 'WildFly: Name'
+          name: Name
           type: JMX
           key: 'jmx["jboss.as:management-root=server","name"]'
           history: 7d
@@ -97,7 +97,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 98dd8a8de5f240998bebaf28c8d1bbe2
-          name: 'WildFly: Process type'
+          name: 'Process type'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","processType"]'
           history: 7d
@@ -115,7 +115,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 0238c33ca0f045a7b1376cd5b3048bf0
-          name: 'WildFly: Version'
+          name: Version
           type: JMX
           key: 'jmx["jboss.as:management-root=server","productVersion"]'
           history: 7d
@@ -135,8 +135,8 @@ zabbix_export:
           triggers:
             - uuid: 2923ab6f81d64579b6ba778bc0467042
               expression: 'last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
-              name: 'WildFly: Version has changed'
-              event_name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'WildFly version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -144,7 +144,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 855c96cf1b3d4ef691f7693ba5f8357f
-          name: 'WildFly: Runtime configuration state'
+          name: 'Runtime configuration state'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","runtimeConfigurationState"]'
           history: 7d
@@ -164,13 +164,13 @@ zabbix_export:
           triggers:
             - uuid: c5702304641748e4bb04be89f3a38326
               expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0'
-              name: 'WildFly: Server needs to restart for configuration change.'
+              name: 'Server needs to restart for configuration change.'
               priority: WARNING
               tags:
                 - tag: scope
                   value: notice
         - uuid: cd57068c6e18440a8e14c0b4fc5c6c78
-          name: 'WildFly: Server controller state'
+          name: 'Server controller state'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","serverState"]'
           history: 7d
@@ -190,16 +190,16 @@ zabbix_export:
           triggers:
             - uuid: 81de7058e3b64f73a14e03728dcf1c9b
               expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","serverState"],,"like","running")=0'
-              name: 'WildFly: Server controller is not in RUNNING state'
+              name: 'Server controller is not in RUNNING state'
               priority: WARNING
               dependencies:
-                - name: 'WildFly: Server needs to restart for configuration change.'
+                - name: 'Server needs to restart for configuration change.'
                   expression: 'find(/WildFly Server by JMX/jmx["jboss.as:management-root=server","runtimeConfigurationState"],,"like","ok")=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 2986d57975334b0bbf6bd687df457c26
-          name: 'WildFly: Transactions: Aborted, rate'
+          name: 'Transactions: Aborted, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfAbortedTransactions"]'
           history: 7d
@@ -216,7 +216,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 035752468405481a9e0c4c60e662eadc
-          name: 'WildFly: Transactions: Application rollbacks, rate'
+          name: 'Transactions: Application rollbacks, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfApplicationRollbacks"]'
           history: 7d
@@ -233,7 +233,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 2c157932072e416baed45a2350a3bd66
-          name: 'WildFly: Transactions: Committed, rate'
+          name: 'Transactions: Committed, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfCommittedTransactions"]'
           history: 7d
@@ -250,7 +250,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 82958fc3169c42d2bb0c9dc29e341b8f
-          name: 'WildFly: Transactions: Heuristics, rate'
+          name: 'Transactions: Heuristics, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfHeuristics"]'
           history: 7d
@@ -267,7 +267,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 50ba79375dbf48c8b86c3d8654576186
-          name: 'WildFly: Transactions: Current'
+          name: 'Transactions: Current'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfInflightTransactions"]'
           history: 7d
@@ -280,7 +280,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 6ca1501ec2904b7b875d2f9bfa127e10
-          name: 'WildFly: Transactions: Nested, rate'
+          name: 'Transactions: Nested, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfNestedTransactions"]'
           history: 7d
@@ -297,7 +297,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: b1f782b6d71b4cc698a3f0d3b9d03a8d
-          name: 'WildFly: Transactions: ResourceRollbacks, rate'
+          name: 'Transactions: ResourceRollbacks, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfResourceRollbacks"]'
           history: 7d
@@ -314,7 +314,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 6ca6b59da5da4d7cb6fbacd2bdd37996
-          name: 'WildFly: Transactions: System rollbacks, rate'
+          name: 'Transactions: System rollbacks, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfSystemRollbacks"]'
           history: 7d
@@ -331,7 +331,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 90f1a21c335b42928455d31635bfd11d
-          name: 'WildFly: Transactions: Timed out, rate'
+          name: 'Transactions: Timed out, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfTimedOutTransactions"]'
           history: 7d
@@ -348,7 +348,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: a0c40292c62e4d51a96db3e07967b17c
-          name: 'WildFly: Transactions: Total, rate'
+          name: 'Transactions: Total, rate'
           type: JMX
           key: 'jmx["jboss.as:subsystem=transactions","numberOfTransactions"]'
           history: 7d

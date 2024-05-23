@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -144,13 +139,20 @@ window.widget_item_form = new class {
 	/**
 	 * Fetch type of currently selected item.
 	 *
-	 * @return {Promise<any>}  Resolved promise will contain item type, or null in case of error or if no item is
-	 *                         currently selected.
+	 * Will return null if outer data source (widget) is selected instead of item.
+	 *
+	 * @return {Promise<any>}  Resolved promise will contain item type, or null if item type can't be established.
 	 */
 	#promiseGetItemType() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
 
-		if (ms_item_data.length == 0) {
+		if (ms_item_data.length === 0) {
+			return Promise.resolve(null);
+		}
+
+		const {reference} = CWidgetBase.parseTypedReference(ms_item_data[0].id);
+
+		if (reference !== '') {
 			return Promise.resolve(null);
 		}
 

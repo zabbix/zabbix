@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -266,7 +261,7 @@ window.mediatype_edit_popup = new class {
 			const btn = event.target;
 			const parameters = {
 				type: this.form.querySelector('#type').value,
-				content_type: this.form.querySelector('input[name="content_type"]:checked').value,
+				message_format: this.form.querySelector('input[name="message_format"]:checked').value,
 				message_types: [...this.form.querySelectorAll('tr[data-message-type]')].map((tr) =>
 					tr.dataset.messageType
 				)
@@ -557,7 +552,7 @@ window.mediatype_edit_popup = new class {
 			this.form.querySelector('#smtp_server').value = providers[provider]['smtp_server'];
 			this.form.querySelector(`input[name=smtp_security][value='${providers[provider]['smtp_security']}']`)
 				.checked = true;
-			this.form.querySelector(`input[name=content_type][value='${providers[provider]['content_type']}']`)
+			this.form.querySelector(`input[name=message_format][value='${providers[provider]['message_format']}']`)
 				.checked = true;
 			this.form.querySelector(
 				`input[name=smtp_authentication][value='${providers[provider]['smtp_authentication']}']`
@@ -576,7 +571,7 @@ window.mediatype_edit_popup = new class {
 					'#smtp-server-field', '#smtp-port-label', '#smtp-port-field', '#smtp-email-label',
 					'#smtp-email-field', '#smtp-helo-label', '#smtp-helo-field', '#smtp-security-label',
 					'#smtp-security-field', '#smtp-authentication-label', '#smtp-authentication-field',
-					'#content_type_label', '#content_type_field'
+					'#message_format_label', '#message_format_field'
 				];
 
 				const smtp_security = this.form.querySelector('#smtp_security');
@@ -588,14 +583,14 @@ window.mediatype_edit_popup = new class {
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL ?>:
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 ?>:
 				show_fields = ['#smtp-email-label', '#smtp-email-field', '#passwd_label', '#passwd_field',
-					'#content_type_label', '#content_type_field'
+					'#message_format_label', '#message_format_field'
 				];
 				break;
 
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>:
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>:
 				show_fields = ['#smtp-email-label', '#smtp-email-field', '#smtp-authentication-label',
-					'#smtp-authentication-field', '#content_type_label', '#content_type_field'
+					'#smtp-authentication-field', '#message_format_label', '#message_format_field'
 				];
 				break;
 		}
@@ -725,7 +720,7 @@ window.mediatype_edit_popup = new class {
 				'#verify-peer-field', '#verify-host-label', '#verify-host-field', '#smtp-authentication-label',
 				'#smtp-authentication-field', '#smtp-username-label', '#smtp-username-field', '#exec-path-label',
 				'#exec-path-field', '#row_exec_params_label', '#row_exec_params_field', '#gsm_modem_label',
-				'#gsm_modem_field', '#passwd_label', '#passwd_field', '#content_type_label', '#content_type_field',
+				'#gsm_modem_field', '#passwd_label', '#passwd_field', '#message_format_label', '#message_format_field',
 				'#webhook_parameters_label', '#webhook_parameters_field', '#webhook_script_label',
 				'#webhook_script_field', '#webhook_timeout_label', '#webhook_timeout_field', '#webhook_tags_label',
 				'#webhook_tags_field', '#webhook_event_menu_label', '#webhook_event_menu_field',

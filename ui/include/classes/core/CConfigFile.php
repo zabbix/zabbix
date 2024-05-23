@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -146,6 +141,10 @@ class CConfigFile {
 			$this->config['DB']['VAULT_URL'] = $DB['VAULT_URL'];
 		}
 
+		if (isset($DB['VAULT_PREFIX'])) {
+			$this->config['DB']['VAULT_PREFIX'] = $DB['VAULT_PREFIX'];
+		}
+
 		if (isset($DB['VAULT_DB_PATH'])) {
 			$this->config['DB']['VAULT_DB_PATH'] = $DB['VAULT_DB_PATH'];
 		}
@@ -190,13 +189,18 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
+		if (isset($ALLOW_HTTP_AUTH)) {
+			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
+			$ALLOW_HTTP_AUTH;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -205,6 +209,7 @@ class CConfigFile {
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
+		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
 	}
 
 	public function save() {
@@ -271,6 +276,7 @@ $DB[\'CIPHER_LIST\']		= \''.addcslashes($this->config['DB']['CIPHER_LIST'], "'\\
 // Vault configuration. Used if database credentials are stored in Vault secrets manager.
 $DB[\'VAULT\']			= \''.addcslashes($this->config['DB']['VAULT'], "'\\").'\';
 $DB[\'VAULT_URL\']		= \''.addcslashes($this->config['DB']['VAULT_URL'], "'\\").'\';
+$DB[\'VAULT_PREFIX\']		= \''.addcslashes($this->config['DB']['VAULT_PREFIX'], "'\\").'\';
 $DB[\'VAULT_DB_PATH\']		= \''.addcslashes($this->config['DB']['VAULT_DB_PATH'], "'\\").'\';
 $DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\").'\';
 $DB[\'VAULT_CERT_FILE\']		= \''.addcslashes($this->config['DB']['VAULT_CERT_FILE'], "'\\").'\';
@@ -301,6 +307,9 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 //$SSO[\'SP_CERT\']			= \'conf/certs/sp.crt\';
 //$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 //$SSO[\'SETTINGS\']		= [];
+
+// If set to false, support for HTTP authentication will be disabled.
+// $ALLOW_HTTP_AUTH = true;
 ';
 	}
 
@@ -321,6 +330,7 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 			'CIPHER_LIST' => '',
 			'VAULT' => '',
 			'VAULT_URL' => '',
+			'VAULT_PREFIX' => '',
 			'VAULT_DB_PATH' => '',
 			'VAULT_TOKEN' => '',
 			'VAULT_CERT_FILE' => '',
@@ -333,6 +343,7 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
+		$this->config['ALLOW_HTTP_AUTH'] = true;
 	}
 
 	protected function check() {

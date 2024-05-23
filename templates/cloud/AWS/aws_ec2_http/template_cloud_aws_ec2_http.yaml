@@ -21,7 +21,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 22b61bf7ebba43e8aef544385448d18c
-          name: 'AWS EC2: Get alarms check'
+          name: 'Get alarms check'
           type: DEPENDENT
           key: aws.ec2.alarms.check
           delay: '0'
@@ -45,13 +45,13 @@ zabbix_export:
           triggers:
             - uuid: 1d017a1213fb4bc9896add10a2b97dd6
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0'
-              name: 'AWS EC2: Failed to get alarms data'
+              name: 'Failed to get alarms data'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 0384bacca1e14994a5c38dc55b73e8bb
-          name: 'AWS EC2: Credit CPU: Balance'
+          name: 'Credit CPU: Balance'
           type: DEPENDENT
           key: aws.ec2.cpu.credit_balance
           delay: '0'
@@ -77,8 +77,8 @@ zabbix_export:
           triggers:
             - uuid: 4e67cac1f58a478fb0e47c52b402fd92
               expression: 'max(/AWS EC2 by HTTP/aws.ec2.cpu.credit_balance,5m)<{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}'
-              name: 'AWS EC2: Instance CPU Credit balance is too low'
-              event_name: 'AWS EC2: Instance CPU Credit balance is too low (less {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} for 5m)'
+              name: 'Instance CPU Credit balance is too low'
+              event_name: 'Instance CPU Credit balance is too low (less {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The number of earned CPU credits has been less than {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.'
@@ -86,7 +86,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: b445a56de3194f6f9b4bf9dd85fcbe52
-          name: 'AWS EC2: Credit CPU: Usage'
+          name: 'Credit CPU: Usage'
           type: DEPENDENT
           key: aws.ec2.cpu.credit_usage
           delay: '0'
@@ -108,7 +108,7 @@ zabbix_export:
             - tag: component
               value: credit
         - uuid: 285ec6451412450c963e3a24d2aa74e1
-          name: 'AWS EC2: Credit CPU: Surplus balance'
+          name: 'Credit CPU: Surplus balance'
           type: DEPENDENT
           key: aws.ec2.cpu.surplus_credit_balance
           delay: '0'
@@ -130,7 +130,7 @@ zabbix_export:
             - tag: component
               value: credit
         - uuid: 77a32118a77e4836a945c7b0954ef64a
-          name: 'AWS EC2: Credit CPU: Surplus charged'
+          name: 'Credit CPU: Surplus charged'
           type: DEPENDENT
           key: aws.ec2.cpu.surplus_credit_charged
           delay: '0'
@@ -158,8 +158,8 @@ zabbix_export:
           triggers:
             - uuid: 644ace5510164f329d9af65bd0ed4f34
               expression: 'last(/AWS EC2 by HTTP/aws.ec2.cpu.surplus_credit_charged)>{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}'
-              name: 'AWS EC2: Instance has spent too many CPU surplus credits'
-              event_name: 'AWS EC2: Instance has spent too many CPU surplus credits (over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN} for 15m)'''
+              name: 'Instance has spent too many CPU surplus credits'
+              event_name: 'Instance has spent too many CPU surplus credits (over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN} for 15m)'''
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The number of spent surplus credits that are not paid down and which thus incur an additional charge is over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}.'
@@ -167,7 +167,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 7fd871e7eed54845ad069c3e7d3cad56
-          name: 'AWS EC2: CPU: Utilization'
+          name: 'CPU: Utilization'
           type: DEPENDENT
           key: aws.ec2.cpu_utilization
           delay: '0'
@@ -190,8 +190,8 @@ zabbix_export:
           triggers:
             - uuid: ea74d00067874b609e4846847033058f
               expression: 'min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}'
-              name: 'AWS EC2: High CPU utilization'
-              event_name: 'AWS EC2: High CPU utilization (over {$AWS.EC2.CPU.UTIL.WARN.MAX}% for 15m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$AWS.EC2.CPU.UTIL.WARN.MAX}% for 15m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -201,7 +201,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 49aecab5c7df407b9cbfe80ad8790492
-          name: 'AWS EC2: Disk: Read bytes, rate'
+          name: 'Disk: Read bytes, rate'
           type: DEPENDENT
           key: aws.ec2.disk.read_bytes.rate
           delay: '0'
@@ -227,7 +227,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: d6bb726f9f1b4d5b889ede0ae2c73613
-          name: 'AWS EC2: Disk: Read, rate'
+          name: 'Disk: Read, rate'
           type: DEPENDENT
           key: aws.ec2.disk.read_ops.rate
           delay: '0'
@@ -251,7 +251,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 95bcfd522147498688555e2cab5c00e2
-          name: 'AWS EC2: Disk: Write bytes, rate'
+          name: 'Disk: Write bytes, rate'
           type: DEPENDENT
           key: aws.ec2.disk_write_bytes.rate
           delay: '0'
@@ -277,7 +277,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 28496d5aa03742feb85ae000deb616d1
-          name: 'AWS EC2: Disk: Write ops, rate'
+          name: 'Disk: Write ops, rate'
           type: DEPENDENT
           key: aws.ec2.disk_write_ops.rate
           delay: '0'
@@ -301,7 +301,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 64180ec5dae84f588006bb1dd0ce6980
-          name: 'AWS EC2: EBS: Byte balance'
+          name: 'EBS: Byte balance'
           type: DEPENDENT
           key: aws.ec2.ebs.byte_balance
           delay: '0'
@@ -322,15 +322,15 @@ zabbix_export:
           triggers:
             - uuid: 27f3b00e295d4aeb9a2d0519e95da4e0
               expression: 'max(/AWS EC2 by HTTP/aws.ec2.ebs.byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}'
-              name: 'AWS EC2: Byte Credit balance is too low'
-              event_name: 'AWS EC2: Byte Credit balance is too low (less {$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+              name: 'Byte Credit balance is too low'
+              event_name: 'Byte Credit balance is too low (less {$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}% for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 7b8a2b6941d04cde8edc511752755c8f
-          name: 'AWS EC2: EBS: IO balance'
+          name: 'EBS: IO balance'
           type: DEPENDENT
           key: aws.ec2.ebs.io_balance
           delay: '0'
@@ -351,15 +351,15 @@ zabbix_export:
           triggers:
             - uuid: f4b9c2238b5443eab31255422bc22d7d
               expression: 'max(/AWS EC2 by HTTP/aws.ec2.ebs.io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}'
-              name: 'AWS EC2: I/O Credit balance is too low'
-              event_name: 'AWS EC2: I/O Credit balance is too low (less {$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+              name: 'I/O Credit balance is too low'
+              event_name: 'I/O Credit balance is too low (less {$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}% for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 251c9a3b0afd4930b822f7310f3fda43
-          name: 'AWS EC2: EBS: Read bytes, rate'
+          name: 'EBS: Read bytes, rate'
           type: DEPENDENT
           key: aws.ec2.ebs.read_bytes.rate
           delay: '0'
@@ -381,7 +381,7 @@ zabbix_export:
             - tag: component
               value: ebs
         - uuid: 29eff02b7c464605bc6d69a963d232b5
-          name: 'AWS EC2: EBS: Read, rate'
+          name: 'EBS: Read, rate'
           type: DEPENDENT
           key: aws.ec2.ebs.read_ops.rate
           delay: '0'
@@ -403,7 +403,7 @@ zabbix_export:
             - tag: component
               value: ebs
         - uuid: 9dafe0bcfb214d46975f570e2836e9cd
-          name: 'AWS EC2: EBS: Write bytes, rate'
+          name: 'EBS: Write bytes, rate'
           type: DEPENDENT
           key: aws.ec2.ebs.write_bytes.rate
           delay: '0'
@@ -425,7 +425,7 @@ zabbix_export:
             - tag: component
               value: ebs
         - uuid: 2da28e61261746d6b94b244b8f0cf2a8
-          name: 'AWS EC2: EBS: Write, rate'
+          name: 'EBS: Write, rate'
           type: DEPENDENT
           key: aws.ec2.ebs.write_ops.rate
           delay: '0'
@@ -446,7 +446,7 @@ zabbix_export:
             - tag: component
               value: ebs
         - uuid: 4e0b2ed29500487092148b14245839d4
-          name: 'AWS CloudWatch: Get instance alarms data'
+          name: 'Get instance alarms data'
           type: SCRIPT
           key: aws.ec2.get_alarms
           delay: 0s;m/1
@@ -727,7 +727,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 63ab011505f24885b843a9ac48b36a84
-          name: 'AWS EC2: Get metrics data'
+          name: 'Get metrics data'
           type: SCRIPT
           key: aws.ec2.get_metrics
           delay: 0s;m/5
@@ -1036,7 +1036,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9ec4650b564c41bca9893eca279a8cc7
-          name: 'AWS EBS: Get volumes data'
+          name: 'Get volumes data'
           type: SCRIPT
           key: aws.ec2.get_volumes
           delay: 5m
@@ -1266,7 +1266,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: adbe9cd98ffa41dda981c7f4e27a0d3b
-          name: 'AWS EC2: Metadata: No token'
+          name: 'Metadata: No token'
           type: DEPENDENT
           key: aws.ec2.metadata.no_token
           delay: '0'
@@ -1287,7 +1287,7 @@ zabbix_export:
             - tag: component
               value: metadata
         - uuid: 7c264d8d5d934f898f7c745acd429d25
-          name: 'AWS EC2: Get metrics check'
+          name: 'Get metrics check'
           type: DEPENDENT
           key: aws.ec2.metrics.check
           delay: '0'
@@ -1311,13 +1311,13 @@ zabbix_export:
           triggers:
             - uuid: c2cf3f875aa14416a108dd05df7b053a
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0'
-              name: 'AWS EC2: Failed to get metrics data'
+              name: 'Failed to get metrics data'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 2b16d3c6457842d892d06249a5fcd670
-          name: 'AWS EC2: Network: Bytes in, rate'
+          name: 'Network: Bytes in, rate'
           type: DEPENDENT
           key: aws.ec2.network_in.rate
           delay: '0'
@@ -1341,7 +1341,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 87fb8b61f115487696f02e50d98996ac
-          name: 'AWS EC2: Network: Bytes out, rate'
+          name: 'Network: Bytes out, rate'
           type: DEPENDENT
           key: aws.ec2.network_out.rate
           delay: '0'
@@ -1364,7 +1364,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: a6b74493528b486782c4b73e080019e1
-          name: 'AWS EC2: Network: Packets in, rate'
+          name: 'Network: Packets in, rate'
           type: DEPENDENT
           key: aws.ec2.packets_in.rate
           delay: '0'
@@ -1388,7 +1388,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 5d998e1680af4410b34fa9071bb7db78
-          name: 'AWS EC2: Network: Packets out, rate'
+          name: 'Network: Packets out, rate'
           type: DEPENDENT
           key: aws.ec2.packets_out.rate
           delay: '0'
@@ -1412,7 +1412,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 30156f76599147eaa5bcd4ca39816bbb
-          name: 'AWS EC2: Status: Check failed'
+          name: 'Status: Check failed'
           type: DEPENDENT
           key: aws.ec2.status_check_failed
           delay: '0'
@@ -1433,7 +1433,7 @@ zabbix_export:
             - tag: component
               value: instance
         - uuid: b373f0994e784caf8f5f39da20d2f5c8
-          name: 'AWS EC2: Status: Check failed, instance'
+          name: 'Status: Check failed, instance'
           type: DEPENDENT
           key: aws.ec2.status_check_failed_instance
           delay: '0'
@@ -1456,7 +1456,7 @@ zabbix_export:
           triggers:
             - uuid: 0fdd6b02eea948d3a6c958af7f195dc3
               expression: 'last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1'
-              name: 'AWS EC2: Instance status check failed'
+              name: 'Instance status check failed'
               priority: AVERAGE
               description: |
                 These checks detect problems that require your involvement to repair.
@@ -1471,7 +1471,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: c7063824e3a74e6fa55ba21ecba35ca1
-          name: 'AWS EC2: Status: Check failed, system'
+          name: 'Status: Check failed, system'
           type: DEPENDENT
           key: aws.ec2.status_check_failed_system
           delay: '0'
@@ -1494,7 +1494,7 @@ zabbix_export:
           triggers:
             - uuid: 723a254ffd72404ea0cc2366ff186c1c
               expression: 'last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_system)=1'
-              name: 'AWS EC2: System status check failed'
+              name: 'System status check failed'
               priority: AVERAGE
               description: |
                 These checks detect underlying problems with your instance that require AWS involvement to repair.
@@ -1508,7 +1508,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 3c819ed899c044ae8455266292f65632
-          name: 'AWS EC2: Get volumes info check'
+          name: 'Get volumes info check'
           type: DEPENDENT
           key: aws.ec2.volumes.check
           delay: '0'
@@ -1532,7 +1532,7 @@ zabbix_export:
           triggers:
             - uuid: 844fb22685804fe7894af7c64b420824
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0'
-              name: 'AWS EC2: Failed to get volumes info'
+              name: 'Failed to get volumes info'
               priority: WARNING
               tags:
                 - tag: scope
@@ -1563,7 +1563,7 @@ zabbix_export:
           description: 'Discovery instance and attached EBS volumes alarms.'
           item_prototypes:
             - uuid: 6294e05dc170431bb3af2caf1ccf6d40
-              name: 'AWS EC2 Alarms: [{#ALARM_NAME}]: Get metrics'
+              name: '[{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.ec2.alarm.get_metrics["{#ALARM_NAME}"]'
               delay: '0'
@@ -1582,7 +1582,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 87a163166aed40b786785b64122ab365
-              name: 'AWS EC2 Alarms: [{#ALARM_NAME}]: State'
+              name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.ec2.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -1613,13 +1613,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: be1301d97b5a47cc81dd6c2b76349f5d
                   expression: 'last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS EC2 Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
+                  name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 92a33b49f010464db7e6c7ef586240e9
-              name: 'AWS EC2 Alarms: [{#ALARM_NAME}]: State reason'
+              name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.ec2.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -1646,7 +1646,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 93813bd6aaf14fcb84068cb2c2e5d47e
               expression: 'last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS EC2 Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
+              name: '[{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -1696,7 +1696,7 @@ zabbix_export:
           description: 'Discovery attached EBS volumes.'
           item_prototypes:
             - uuid: cc0ece769d954bb590fb1a1a3d20e559
-              name: 'AWS EBS: [{#VOLUME_ID}]: Attachment state'
+              name: '[{#VOLUME_ID}]: Attachment state'
               type: DEPENDENT
               key: 'aws.ec2.ebs.attachment_status["{#VOLUME_ID}"]'
               delay: '0'
@@ -1728,7 +1728,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 639e7ddcac6345239fa27549ad35e799
-              name: 'AWS EBS: [{#VOLUME_ID}]: Attachment time'
+              name: '[{#VOLUME_ID}]: Attachment time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.attachment_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -1756,7 +1756,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 2df96e6c726e40c6a257c00ae26e8902
-              name: 'AWS EBS: [{#VOLUME_ID}]: Create time'
+              name: '[{#VOLUME_ID}]: Create time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.create_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -1782,7 +1782,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 141205eac3e4437d824794f8e6c76e90
-              name: 'AWS EBS: [{#VOLUME_ID}]: Device'
+              name: '[{#VOLUME_ID}]: Device'
               type: DEPENDENT
               key: 'aws.ec2.ebs.device["{#VOLUME_ID}"]'
               delay: '0'
@@ -1808,7 +1808,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 6145bf692ea0469eb5583485b6622a59
-              name: 'AWS EBS: [{#VOLUME_ID}]: Get volume data'
+              name: '[{#VOLUME_ID}]: Get volume data'
               type: DEPENDENT
               key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
               delay: '0'
@@ -1831,7 +1831,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 95add92252e24ab8b596c539d8090f3d
-              name: 'AWS EBS: [{#VOLUME_ID}]: Status'
+              name: '[{#VOLUME_ID}]: Status'
               type: DEPENDENT
               key: 'aws.ec2.ebs.status["{#VOLUME_ID}"]'
               delay: '0'
@@ -1867,13 +1867,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 2d4de438bdaa49b2930496ce6ddbe52d
                   expression: 'last(/AWS EC2 by HTTP/aws.ec2.ebs.status["{#VOLUME_ID}"])=5'
-                  name: 'AWS EBS: Volume [{#VOLUME_ID}] has ''error'' state'
+                  name: 'Volume [{#VOLUME_ID}] has ''error'' state'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: availability
             - uuid: fd10966f674e430a9dd70b148dcfa002
-              name: 'AWS EBS: [{#VOLUME_ID}]: Burst balance'
+              name: '[{#VOLUME_ID}]: Burst balance'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"]'
               delay: '0'
@@ -1901,15 +1901,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 9b2f5687020c4a5987c1b1b35a57d8b9
                   expression: 'max(/AWS EC2 by HTTP/aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"],5m)<{$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}'
-                  name: 'AWS EBS: Burst balance is too low'
-                  event_name: 'AWS EBS: Burst balance is too low (less {$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+                  name: 'Burst balance is too low'
+                  event_name: 'Burst balance is too low (less {$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}% for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: 8b936cef38294799a6826764eae68850
-              name: 'AWS EBS: [{#VOLUME_ID}]: Consumed Read/Write, ops'
+              name: '[{#VOLUME_ID}]: Consumed Read/Write, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.consumed_read_write_ops["{#VOLUME_ID}"]'
               delay: '0'
@@ -1935,7 +1935,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 5476d32c036d49588238cb2d2a4d652f
-              name: 'AWS EBS: [{#VOLUME_ID}]: Idle time'
+              name: '[{#VOLUME_ID}]: Idle time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.idle_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -1960,7 +1960,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 4dbb00e53cd84b9f88c44c765e73bd85
-              name: 'AWS EBS: [{#VOLUME_ID}]: Queue length'
+              name: '[{#VOLUME_ID}]: Queue length'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.queue_length["{#VOLUME_ID}"]'
               delay: '0'
@@ -1982,7 +1982,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 7313a503be27469ea82733ed965b57e4
-              name: 'AWS EBS: [{#VOLUME_ID}]: Read, bytes'
+              name: '[{#VOLUME_ID}]: Read, bytes'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.read_bytes["{#VOLUME_ID}"]'
               delay: '0'
@@ -2008,7 +2008,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 13d3dce70956402c945421c87e8eb784
-              name: 'AWS EBS: [{#VOLUME_ID}]: Read, ops'
+              name: '[{#VOLUME_ID}]: Read, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.read_ops["{#VOLUME_ID}"]'
               delay: '0'
@@ -2031,7 +2031,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 8d0b610ac0e3479a921720ef623ef896
-              name: 'AWS EBS: [{#VOLUME_ID}]: Throughput, pct'
+              name: '[{#VOLUME_ID}]: Throughput, pct'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.throughput_percentage["{#VOLUME_ID}"]'
               delay: '0'
@@ -2059,7 +2059,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 58163c98e1b943ceae5fcb52ff85dcfd
-              name: 'AWS EBS: [{#VOLUME_ID}]: Read time, total'
+              name: '[{#VOLUME_ID}]: Read time, total'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.total_read_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -2087,7 +2087,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 264a8f7df9e64d219082d5239b90cdf3
-              name: 'AWS EBS: [{#VOLUME_ID}]: Write time, total'
+              name: '[{#VOLUME_ID}]: Write time, total'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.total_write_time["{#VOLUME_ID}"]'
               delay: '0'
@@ -2115,7 +2115,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 459900740e784ca9ba7a8baf5b95734e
-              name: 'AWS EBS: [{#VOLUME_ID}]: Write, bytes'
+              name: '[{#VOLUME_ID}]: Write, bytes'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.write_bytes["{#VOLUME_ID}"]'
               delay: '0'
@@ -2141,7 +2141,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 7216494987dc45f59fc3a4b9100e4159
-              name: 'AWS EBS: [{#VOLUME_ID}]: Write, ops'
+              name: '[{#VOLUME_ID}]: Write, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.write_ops["{#VOLUME_ID}"]'
               delay: '0'
@@ -2164,7 +2164,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 8b3b008f7f65408fbd49e46186b01cfb
-              name: 'AWS EBS: [{#VOLUME_ID}]: Get metrics'
+              name: '[{#VOLUME_ID}]: Get metrics'
               type: SCRIPT
               key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
               delay: 0s;m/5

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdiag.h"
@@ -108,20 +103,20 @@ static void	diag_valuecache_add_items(struct zbx_json *json, const char *field, 
  ******************************************************************************/
 static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
-	zbx_vector_ptr_t	tops;
-	int			ret;
-	double			time1, time2, time_total = 0;
-	zbx_uint64_t		fields;
-	zbx_diag_map_t		field_map[] = {
-					{"", ZBX_DIAG_VALUECACHE_SIMPLE | ZBX_DIAG_VALUECACHE_MEMORY},
-					{"items", ZBX_DIAG_VALUECACHE_ITEMS},
-					{"values", ZBX_DIAG_VALUECACHE_VALUES},
-					{"mode", ZBX_DIAG_VALUECACHE_MODE},
-					{"memory", ZBX_DIAG_VALUECACHE_MEMORY},
-					{NULL, 0}
-					};
+	zbx_vector_diag_map_ptr_t	tops;
+	int				ret;
+	double				time1, time2, time_total = 0;
+	zbx_uint64_t			fields;
+	zbx_diag_map_t			field_map[] = {
+							{"", ZBX_DIAG_VALUECACHE_SIMPLE | ZBX_DIAG_VALUECACHE_MEMORY},
+							{"items", ZBX_DIAG_VALUECACHE_ITEMS},
+							{"values", ZBX_DIAG_VALUECACHE_VALUES},
+							{"mode", ZBX_DIAG_VALUECACHE_MODE},
+							{"memory", ZBX_DIAG_VALUECACHE_MEMORY},
+							{NULL, 0}
+						};
 
-	zbx_vector_ptr_create(&tops);
+	zbx_vector_diag_map_ptr_create(&tops);
 
 	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
@@ -159,10 +154,9 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 		if (0 != tops.values_num)
 		{
-			zbx_vector_ptr_t	items;
-			int			i;
+			zbx_vector_vc_item_stats_ptr_t	items;
 
-			zbx_vector_ptr_create(&items);
+			zbx_vector_vc_item_stats_ptr_create(&items);
 
 			time1 = zbx_time();
 			zbx_vc_get_item_stats(&items);
@@ -171,18 +165,18 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 
 			zbx_json_addobject(json, "top");
 
-			for (i = 0; i < tops.values_num; i++)
+			for (int i = 0; i < tops.values_num; i++)
 			{
-				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
+				zbx_diag_map_t	*map = tops.values[i];
 				int		limit;
 
 				if (0 == strcmp(map->name, "values"))
 				{
-					zbx_vector_ptr_sort(&items, diag_valuecache_item_compare_values);
+					zbx_vector_vc_item_stats_ptr_sort(&items, diag_valuecache_item_compare_values);
 				}
 				else if (0 == strcmp(map->name, "request.values"))
 				{
-					zbx_vector_ptr_sort(&items, diag_valuecache_item_compare_hourly);
+					zbx_vector_vc_item_stats_ptr_sort(&items, diag_valuecache_item_compare_hourly);
 				}
 				else
 				{
@@ -192,12 +186,12 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 				}
 
 				limit = MIN((int)map->value, items.values_num);
-				diag_valuecache_add_items(json, map->name, (zbx_vc_item_stats_t **)items.values, limit);
+				diag_valuecache_add_items(json, map->name, items.values, limit);
 			}
 			zbx_json_close(json);
 
-			zbx_vector_ptr_clear_ext(&items, zbx_ptr_free);
-			zbx_vector_ptr_destroy(&items);
+			zbx_vector_vc_item_stats_ptr_clear_ext(&items, zbx_vc_item_stats_free);
+			zbx_vector_vc_item_stats_ptr_destroy(&items);
 		}
 
 		zbx_json_addfloat(json, "time", time_total);
@@ -205,8 +199,8 @@ static int	diag_add_valuecache_info(const struct zbx_json_parse *jp, struct zbx_
 		zbx_json_close(json);
 	}
 out:
-	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
-	zbx_vector_ptr_destroy(&tops);
+	zbx_vector_diag_map_ptr_clear_ext(&tops, zbx_diag_map_free);
+	zbx_vector_diag_map_ptr_destroy(&tops);
 
 	return ret;
 }
@@ -254,18 +248,18 @@ static void	diag_add_lld_items(struct zbx_json *json, const char *field, const z
  ******************************************************************************/
 static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
-	zbx_vector_ptr_t	tops;
-	int			ret;
-	double			time1, time2, time_total = 0;
-	zbx_uint64_t		fields;
-	zbx_diag_map_t		field_map[] = {
-					{"", ZBX_DIAG_LLD_SIMPLE},
-					{"rules", ZBX_DIAG_LLD_RULES},
-					{"values", ZBX_DIAG_LLD_VALUES},
-					{NULL, 0}
-					};
+	zbx_vector_diag_map_ptr_t	tops;
+	int				ret;
+	double				time1, time2, time_total = 0;
+	zbx_uint64_t			fields;
+	zbx_diag_map_t			field_map[] = {
+							{"", ZBX_DIAG_LLD_SIMPLE},
+							{"rules", ZBX_DIAG_LLD_RULES},
+							{"values", ZBX_DIAG_LLD_VALUES},
+							{NULL, 0}
+						};
 
-	zbx_vector_ptr_create(&tops);
+	zbx_vector_diag_map_ptr_create(&tops);
 
 	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
@@ -289,13 +283,11 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 
 		if (0 != tops.values_num)
 		{
-			int	i;
-
 			zbx_json_addobject(json, "top");
 
-			for (i = 0; i < tops.values_num; i++)
+			for (int i = 0; i < tops.values_num; i++)
 			{
-				zbx_diag_map_t	*map = (zbx_diag_map_t *)tops.values[i];
+				zbx_diag_map_t	*map = tops.values[i];
 
 				if (0 == strcmp(map->name, "values"))
 				{
@@ -330,8 +322,8 @@ static int	diag_add_lld_info(const struct zbx_json_parse *jp, struct zbx_json *j
 		zbx_json_close(json);
 	}
 out:
-	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
-	zbx_vector_ptr_destroy(&tops);
+	zbx_vector_diag_map_ptr_clear_ext(&tops, zbx_diag_map_free);
+	zbx_vector_diag_map_ptr_destroy(&tops);
 
 	return ret;
 }
@@ -410,17 +402,17 @@ static void	diag_add_alerting_sources(struct zbx_json *json, const char *field,
  ******************************************************************************/
 static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
-	zbx_vector_ptr_t	tops;
-	int			ret;
-	double			time1, time2, time_total = 0;
-	zbx_uint64_t		fields;
-	zbx_diag_map_t		field_map[] = {
-					{"", ZBX_DIAG_ALERTING_SIMPLE},
-					{"alerts", ZBX_DIAG_ALERTING_ALERTS},
-					{NULL, 0}
-					};
+	zbx_vector_diag_map_ptr_t	tops;
+	int				ret;
+	double				time1, time2, time_total = 0;
+	zbx_uint64_t			fields;
+	zbx_diag_map_t			field_map[] = {
+							{"", ZBX_DIAG_ALERTING_SIMPLE},
+							{"alerts", ZBX_DIAG_ALERTING_ALERTS},
+							{NULL, 0}
+						};
 
-	zbx_vector_ptr_create(&tops);
+	zbx_vector_diag_map_ptr_create(&tops);
 
 	if (SUCCEED == (ret = zbx_diag_parse_request(jp, field_map, &fields, &tops, error)))
 	{
@@ -506,8 +498,8 @@ static int	diag_add_alerting_info(const struct zbx_json_parse *jp, struct zbx_js
 		zbx_json_close(json);
 	}
 out:
-	zbx_vector_ptr_clear_ext(&tops, (zbx_ptr_free_func_t)zbx_diag_map_free);
-	zbx_vector_ptr_destroy(&tops);
+	zbx_vector_diag_map_ptr_clear_ext(&tops, zbx_diag_map_free);
+	zbx_vector_diag_map_ptr_destroy(&tops);
 
 	return ret;
 }

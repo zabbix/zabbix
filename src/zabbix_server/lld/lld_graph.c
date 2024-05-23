@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "lld.h"
@@ -193,7 +188,7 @@ static void	lld_graphs_free(zbx_vector_lld_graph_ptr_t *graphs)
  *                                                                            *
  * Purpose: retrieves graphs which were created by specified graph prototype  *
  *                                                                            *
- * Parameters: parent_graphid - [IN] graph prototype identifier               *
+ * Parameters: parent_graphid - [IN] graph prototype id                       *
  *             graphs         - [OUT] sorted list of graphs                   *
  *             ...            - [IN] new values which should be updated if    *
  *                                   different from original                  *
@@ -304,8 +299,8 @@ static void	lld_graphs_get(zbx_uint64_t parent_graphid, zbx_vector_lld_graph_ptr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve graphs_items which are used by the graph prototype and   *
- *          by selected graphs                                                *
+ * Purpose: Retrieves graphs_items which are used by graph prototype and by   *
+ *          selected graphs.                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr_t *gitems_proto,
@@ -407,8 +402,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns the list of items which are related to the graph          *
- *          prototype                                                         *
+ * Purpose: Returns list of items which are related to graph prototype.       *
  *                                                                            *
  * Parameters: gitems_proto      - [IN] graph prototype's graphs_items        *
  *             ymin_itemid_proto - [IN] graph prototype's ymin_itemid         *
@@ -422,13 +416,12 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_uint64_t	itemids;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&itemids);
 
-	for (i = 0; i < gitems_proto->values_num; i++)
+	for (int i = 0; i < gitems_proto->values_num; i++)
 	{
 		const zbx_lld_gitem_t	*gitem = gitems_proto->values[i];
 
@@ -481,27 +474,23 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds already existing graph, using an item                       *
+ * Purpose: Finds already existing graph, using item.                         *
  *                                                                            *
- * Return value: upon successful completion return pointer to the graph       *
+ * Return value: upon successful completion returns pointer to graph          *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_lld_graph_ptr_t *graphs, zbx_uint64_t itemid)
+static zbx_lld_graph_t	*lld_graph_by_item(const zbx_vector_lld_graph_ptr_t *graphs, zbx_uint64_t itemid)
 {
-	int		i, j;
-	zbx_lld_graph_t	*graph;
-	zbx_lld_gitem_t	*gitem;
-
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
-		graph = graphs->values[i];
+		zbx_lld_graph_t	*graph = graphs->values[i];
 
 		if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 			continue;
 
-		for (j = 0; j < graph->gitems.values_num; j++)
+		for (int j = 0; j < graph->gitems.values_num; j++)
 		{
-			gitem = graph->gitems.values[j];
+			zbx_lld_gitem_t	*gitem = graph->gitems.values[j];
 
 			if (gitem->itemid == itemid)
 				return graph;
@@ -513,19 +502,18 @@ static zbx_lld_graph_t	*lld_graph_by_item(zbx_vector_lld_graph_ptr_t *graphs, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds already existing graph, using an item prototype and items   *
- *          already created by it                                             *
+ * Purpose: Finds already existing graph, using an item prototype and items   *
+ *          already created by it.                                            *
  *                                                                            *
- * Return value: upon successful completion return pointer to the graph       *
+ * Return value: upon successful completion returns pointer to graph          *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_get(zbx_vector_lld_graph_ptr_t *graphs,
+static zbx_lld_graph_t	*lld_graph_get(const zbx_vector_lld_graph_ptr_t *graphs,
 		const zbx_vector_lld_item_link_ptr_t *item_links)
 {
-	int		i;
 	zbx_lld_graph_t	*graph;
 
-	for (i = 0; i < item_links->values_num; i++)
+	for (int i = 0; i < item_links->values_num; i++)
 	{
 		const zbx_lld_item_link_t	*item_link = item_links->values[i];
 
@@ -538,8 +526,8 @@ static zbx_lld_graph_t	*lld_graph_get(zbx_vector_lld_graph_ptr_t *graphs,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds already created item when itemid_proto is an item prototype *
- *          or return itemid_proto as itemid if it's a normal item            *
+ * Purpose: Finds already created item when itemid_proto is an item prototype *
+ *          or return itemid_proto as itemid if it's a normal item.           *
  *                                                                            *
  * Return value: SUCCEED if item successfully processed, FAIL - otherwise     *
  *                                                                            *
@@ -552,9 +540,7 @@ static int	lld_item_get(zbx_uint64_t itemid_proto, const zbx_vector_lld_item_ptr
 	zbx_lld_item_link_t	*item_link;
 
 	if (FAIL == (index = zbx_vector_lld_item_ptr_bsearch(items, &lld_item_cmp, lld_item_compare_func)))
-	{
 		return FAIL;
-	}
 
 	item_proto = items->values[index];
 
@@ -693,7 +679,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a graph based on lld rule and add it to the list           *
+ * Purpose: creates graph based on LLD rule and adds it to list               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
@@ -799,9 +785,7 @@ static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_
 		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, const zbx_vector_lld_row_ptr_t *lld_rows,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
-	int	i;
-
-	for (i = 0; i < lld_rows->values_num; i++)
+	for (int i = 0; i < lld_rows->values_num; i++)
 	{
 		zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
@@ -858,7 +842,6 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
  ******************************************************************************/
 static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t *graphs, char **error)
 {
-	int			i, j;
 	zbx_lld_graph_t		*graph, *graph_b;
 	zbx_vector_uint64_t	graphids;
 	zbx_vector_str_t	names;
@@ -870,7 +853,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 
 	/* checking a validity of the fields */
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
@@ -879,7 +862,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 	}
 
 	/* checking duplicated graph names */
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
@@ -890,7 +873,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 		if (0 != graph->graphid && 0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
 			continue;
 
-		for (j = 0; j < graphs->values_num; j++)
+		for (int j = 0; j < graphs->values_num; j++)
 		{
 			graph_b = graphs->values[j];
 
@@ -918,7 +901,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 
 	/* checking duplicated graphs in DB */
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		graph = graphs->values[i];
 
@@ -968,7 +951,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			for (i = 0; i < graphs->values_num; i++)
+			for (int i = 0; i < graphs->values_num; i++)
 			{
 				graph = graphs->values[i];
 
@@ -1006,7 +989,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update graphs in database based on discovery rule          *
+ * Purpose: adds or updates graphs in database based on discovery rule        *
  *                                                                            *
  * Return value: SUCCEED - if graphs were successfully saved or saving        *
  *                         was not necessary                                  *
@@ -1018,7 +1001,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		unsigned char show_triggers, unsigned char graphtype, unsigned char show_legend, unsigned char show_3d,
 		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
-	int				ret = SUCCEED, i, j, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
+	int				ret = SUCCEED, new_graphs = 0, upd_graphs = 0, new_gitems = 0;
 	zbx_vector_lld_gitem_ptr_t	upd_gitems;	/* the ordered list of graphs_items which will be updated */
 	zbx_vector_uint64_t		del_gitemids;
 
@@ -1032,7 +1015,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	zbx_vector_lld_gitem_ptr_create(&upd_gitems);
 	zbx_vector_uint64_create(&del_gitemids);
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		const zbx_lld_graph_t	*graph = graphs->values[i];
 
@@ -1051,7 +1034,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
-		for (j = 0; j < graph->gitems.values_num; j++)
+		for (int j = 0; j < graph->gitems.values_num; j++)
 		{
 			zbx_lld_gitem_t	*gitem = graph->gitems.values[j];
 
@@ -1119,7 +1102,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
-	for (i = 0; i < graphs->values_num; i++)
+	for (int i = 0; i < graphs->values_num; i++)
 	{
 		zbx_lld_graph_t	*graph = graphs->values[i];
 
@@ -1325,9 +1308,9 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					graph->graphid);
 		}
 
-		for (j = 0; j < graph->gitems.values_num; j++)
+		for (int j = 0; j < graph->gitems.values_num; j++)
 		{
-			zbx_lld_gitem_t	*gitem = (zbx_lld_gitem_t *)graph->gitems.values[j];
+			zbx_lld_gitem_t	*gitem = graph->gitems.values[j];
 
 			if (0 != (gitem->flags & ZBX_FLAG_LLD_GITEM_DELETE))
 				continue;
@@ -1351,7 +1334,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		}
 	}
 
-	for (i = 0; i < upd_gitems.values_num; i++)
+	for (int i = 0; i < upd_gitems.values_num; i++)
 	{
 		const char		*d = "";
 		const zbx_lld_gitem_t	*gitem = (const zbx_lld_gitem_t *)upd_gitems.values[i];
@@ -1499,7 +1482,7 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update graphs for discovery item                           *
+ * Purpose: adds or updates graphs for discovery item                         *
  *                                                                            *
  * Return value: SUCCEED - if graphs were successfully added/updated or       *
  *                         adding/updating was not necessary                  *
@@ -1507,8 +1490,8 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
-		int lastcheck)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error,
+		const zbx_lld_lifetime_t *lifetime, int lastcheck)
 {
 	int				ret = SUCCEED;
 	zbx_db_result_t			result;

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxmocktest.h"
@@ -83,7 +78,7 @@ void	zbx_mock_test_entry(void **state)
 	int				i, param_num = 0;
 	zbx_mock_error_t 		error;
 	zbx_mock_handle_t		vector, element;
-	zbx_vector_ptr_t		hosts;
+	zbx_vector_lld_host_ptr_t	hosts;
 	zbx_vector_lld_hgset_ptr_t	hgsets;
 	zbx_vector_uint64_t		del_hgsetids_act, del_hgsetids_exp;
 	zbx_lld_host_t			*host;
@@ -95,7 +90,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_uint64_create(&del_hgsetids_act);
 	zbx_vector_uint64_create(&del_hgsetids_exp);
 	zbx_vector_lld_hgset_ptr_create(&hgsets);
-	zbx_vector_ptr_create(&hosts);
+	zbx_vector_lld_host_ptr_create(&hosts);
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("hosts", &vector)))
 		fail_msg("Cannot get description of in.hosts from test case data: %s", zbx_mock_error_string(error));
@@ -105,6 +100,7 @@ void	zbx_mock_test_entry(void **state)
 		host = (zbx_lld_host_t *)zbx_malloc(NULL, sizeof(zbx_lld_host_t));
 
 		host->flags = ZBX_FLAG_LLD_HOST_DISCOVERED;
+		host->hgset_action = ZBX_LLD_HOST_HGSET_ACTION_IDLE;
 		zbx_vector_uint64_create(&host->old_groupids);
 		zbx_vector_uint64_create(&host->new_groupids);
 		zbx_vector_uint64_create(&host->groupids);
@@ -125,7 +121,7 @@ void	zbx_mock_test_entry(void **state)
 			}
 		}
 
-		zbx_vector_ptr_append(&hosts, host);
+		zbx_vector_lld_host_ptr_append(&hosts, host);
 	}
 
 	if (ZBX_MOCK_END_OF_VECTOR != error)
@@ -249,8 +245,8 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_vector_uint64_eq("del_hgsetids", &del_hgsetids_exp, &del_hgsetids_act);
 
-	zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)host_free);
-	zbx_vector_ptr_destroy(&hosts);
+	zbx_vector_lld_host_ptr_clear_ext(&hosts, host_free);
+	zbx_vector_lld_host_ptr_destroy(&hosts);
 
 	zbx_vector_lld_hgset_ptr_clear_ext(&hgsets, lld_hgset_free);
 	zbx_vector_lld_hgset_ptr_destroy(&hgsets);

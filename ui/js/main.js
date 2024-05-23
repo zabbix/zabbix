@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -355,7 +350,7 @@ var hintBox = {
 		const url = new Curl('zabbix.php');
 		const data = jQuery(target).data('hintbox-preload');
 
-		url.setArgument('action', hintBox.getHintboxAction(data.type));
+		url.setArgument('action', data.action || hintBox.getHintboxAction(data.type));
 
 		const xhr = jQuery.ajax({
 			url: url.getUrl(),
@@ -385,6 +380,10 @@ var hintBox = {
 				if (resp.data) {
 					hintbox_contents += resp.data;
 				}
+
+				if (resp.value) {
+					hintbox_contents += resp.value;
+				}
 			}
 
 			target.dataset.hintboxContents = hintbox_contents;
@@ -410,7 +409,7 @@ var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
+			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak'),
 			appendTo = appendTo || '.wrapper';
 
 		if (styles) {
@@ -482,6 +481,10 @@ var hintBox = {
 			});
 		});
 
+		target.resize_observer = new ResizeObserver(() => {
+			hintBox.onResize(e, target);
+		}).observe(box[0]);
+
 		target.observer.observe(document.body, {
 			attributes: true,
 			attributeFilter: ['style', 'class'],
@@ -522,6 +525,8 @@ var hintBox = {
 
 			addEventListener('scroll', target.scrollObserver.callback, {capture: true});
 		}
+
+		addEventListener('resize', target.resizeHandler = e => hintBox.onResize(e, target));
 	},
 
 	onScroll: function(target, e) {
@@ -587,15 +592,23 @@ var hintBox = {
 				than the width of window when horizontal scrolling is active.
 			*/
 			css = {
-				width: $elem.width(),
-				height: $elem.height()
+				width: null,
+				height: null,
+				top: null,
+				right: null,
+				left: null
 			};
+
+		if ($host[0].clientWidth > hint_width) {
+			css.width = $elem.width();
+			css.height = $elem.height();
+		}
 
 		if (event_x + event_offset + hint_width <= host_x_max) {
 			css.left = event_x + event_offset;
 		}
 		else {
-			css.right = -$host.scrollLeft();
+			css.right = -$host.scrollLeft() || 0;
 		}
 
 		if (event_y + event_offset + hint_height <= host_y_max) {
@@ -607,8 +620,8 @@ var hintBox = {
 		else {
 			css.top = Math.max(host_y_min, Math.min(host_y_max - hint_height, event_y + event_offset));
 
-			if (css.right !== undefined) {
-				delete css.right;
+			if (css.right !== null) {
+				css.right = null;
 
 				css.left = ((event_x - event_offset - hint_width >= host_x_min)
 					? event_x - event_offset - hint_width
@@ -617,7 +630,9 @@ var hintBox = {
 			}
 		}
 
-		$elem.css(css);
+		for (const [key, value] of Object.entries(css)) {
+			$elem[0].style[key] = value !== null ? `${value}px` : null;
+		}
 	},
 
 	hideHint: function(target, hideStatic) {
@@ -658,6 +673,14 @@ var hintBox = {
 
 			delete target.scrollObserver;
 		}
+
+		if (target.resize_observer !== undefined) {
+			target.resize_observer.disconnect();
+
+			delete target.resize_observer;
+		}
+
+		removeEventListener('resize', target.resizeHandler);
 	},
 
 	deleteAll: () => {
@@ -677,6 +700,12 @@ var hintBox = {
 		}
 
 		return hintboxid;
+	},
+
+	onResize: function(e, target) {
+		if (target && target.hintBoxItem) {
+			hintBox.positionElement(e, target, target.hintBoxItem);
+		}
 	}
 };
 
@@ -1114,6 +1143,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Event hub initialization.
 
 	ZABBIX.EventHub = new CEventHub();
+
+	// Software version check initialization.
+
+	if (typeof CSoftwareVersionCheck !== 'undefined') {
+		ZABBIX.SoftwareVersionCheck = new CSoftwareVersionCheck();
+	}
 });
 
 window.addEventListener('load', () => {

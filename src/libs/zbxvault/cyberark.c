@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "cyberark.h"
@@ -22,13 +17,14 @@
 #include "zbxjson.h"
 #include "zbxhttp.h"
 
-int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+int	zbx_cyberark_kvs_get(const char *vault_url, const char *prefix, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
 		long timeout, zbx_kvs_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);
+	ZBX_UNUSED(prefix);
 	ZBX_UNUSED(token);
 	ZBX_UNUSED(ssl_cert_file);
 	ZBX_UNUSED(ssl_key_file);
@@ -50,7 +46,10 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *s
 
 	ZBX_UNUSED(token);
 
-	url = zbx_dsprintf(NULL, "%s/AIMWebService/api/Accounts?%s", vault_url, path);
+	if (NULL == prefix || '\0' == *prefix)
+		prefix = "/AIMWebService/api/Accounts?";
+
+	url = zbx_dsprintf(NULL, "%s%s%s", vault_url, prefix, path);
 
 	if (SUCCEED != zbx_http_get(url, "Content-Type: application/json", timeout, ssl_cert_file, ssl_key_file,
 			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,

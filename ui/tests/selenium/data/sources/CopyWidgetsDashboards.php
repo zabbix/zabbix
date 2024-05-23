@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 class CopyWidgetsDashboards {
@@ -31,6 +26,71 @@ class CopyWidgetsDashboards {
 	 * @return array
 	 */
 	public static function load() {
+		$hosts = CDataHelper::createHosts([
+			[
+				'host' => 'Host with widgets items',
+				'groups' => ['groupid' => 4], // Zabbix servers.
+				'items' => [
+					[
+						'name' => 'Widget item',
+						'key_' => 'key[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			]
+		]);
+		$itemid = $hosts['itemids']['Host with widgets items:key[1]'];
+
+		$templates = CDataHelper::createTemplates([
+			[
+				'host' => 'Template for copy widgets',
+				'groups' => ['groupid' => 1], // Templates.
+				'items' => [
+					[
+						'name' => 'Templates widget item',
+						'key_' => 'templ_key[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'LLD rule for graph prototype widget',
+						'key_' => 'drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
+			]
+		]);
+		$templateid = $templates['templateids']['Template for copy widgets'];
+		$template_itemid = $templates['itemids']['Template for copy widgets:templ_key[1]'];
+		$discoveryruleid =  $templates['discoveryruleids']['Template for copy widgets:drule'];
+
+		$item_protototypes = CDataHelper::call('itemprototype.create', [
+			[
+				'hostid' => $templateid,
+				'ruleid' => $discoveryruleid,
+				'name' => 'Template item prototype {#KEY}',
+				'key_' => 'trap[{#KEY}]',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'delay' => 0
+			]
+		]);
+		$item_prototypeid = $item_protototypes['itemids'][0];
+
+		$item_protototypes = CDataHelper::call('graphprototype.create', [
+			[
+				'name' => 'Template graph prototype {#KEY}',
+				'width' => 600,
+				'height' => 300,
+				'gitems' => [['itemid' => $item_prototypeid, 'color' => '3333FF']]
+			]
+		]);
+		$graph_prototypeid = $item_protototypes['graphids'][0];
+
 		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for Copying widgets _1',
@@ -45,7 +105,7 @@ class CopyWidgetsDashboards {
 								'type' => 'actionlog',
 								'x' => 0,
 								'y' => 0,
-								'width' => 7,
+								'width' => 17,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -69,9 +129,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Clock',
 								'type' => 'clock',
-								'x' => 18,
-								'y' => 7,
-								'width' => 2,
+								'x' => 0,
+								'y' => 8,
+								'width' => 17,
 								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
@@ -95,10 +155,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Data overview',
 								'type' => 'dataover',
-								'x' => 18,
-								'y' => 10,
-								'width' => 6,
-								'height' => 2,
+								'x' => 54,
+								'y' => 4,
+								'width' => 18,
+								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -136,9 +196,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy classic Graph',
 								'type' => 'graph',
-								'x' => 7,
+								'x' => 17,
 								'y' => 0,
-								'width' => 11,
+								'width' => 24,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -177,10 +237,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Favorite graphs',
 								'type' => 'favgraphs',
-								'x' => 20,
+								'x' => 24,
 								'y' => 7,
-								'width' => 4,
-								'height' => 3,
+								'width' => 17,
+								'height' => 1,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -193,10 +253,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Favorite maps',
 								'type' => 'favmaps',
-								'x' => 14,
-								'y' => 10,
-								'width' => 4,
-								'height' => 2,
+								'x' => 24,
+								'y' => 6,
+								'width' => 17,
+								'height' => 1,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -209,10 +269,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Discovery status',
 								'type' => 'discovery',
-								'x' => 8,
-								'y' => 10,
-								'width' => 6,
-								'height' => 2,
+								'x' => 41,
+								'y' => 4,
+								'width' => 13,
+								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -225,9 +285,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Graph prototype',
 								'type' => 'graphprototype',
-								'x' => 0,
-								'y' => 4,
-								'width' => 13,
+								'x' => 41,
+								'y' => 0,
+								'width' => 17,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -271,9 +331,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Host availability',
 								'type' => 'hostavail',
-								'x' => 13,
+								'x' => 0,
 								'y' => 4,
-								'width' => 5,
+								'width' => 24,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -317,9 +377,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Map',
 								'type' => 'map',
-								'x' => 18,
-								'y' => 3,
-								'width' => 6,
+								'x' => 58,
+								'y' => 0,
+								'width' => 14,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -333,10 +393,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Map from tree',
 								'type' => 'map',
-								'x' => 14,
+								'x' => 17,
 								'y' => 8,
-								'width' => 4,
-								'height' => 2,
+								'width' => 9,
+								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -354,9 +414,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Map navigation tree',
 								'type' => 'navtree',
-								'x' => 8,
-								'y' => 8,
-								'width' => 6,
+								'x' => 24,
+								'y' => 4,
+								'width' => 17,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
@@ -405,10 +465,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Problems',
 								'type' => 'problems',
-								'x' => 0,
-								'y' => 12,
-								'width' => 8,
-								'height' => 6,
+								'x' => 56,
+								'y' => 8,
+								'width' => 16,
+								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -541,10 +601,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Problems by severity',
 								'type' => 'problemsbysv',
-								'x' => 8,
-								'y' => 14,
-								'width' => 16,
-								'height' => 4,
+								'x' => 26,
+								'y' => 8,
+								'width' => 30,
+								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -647,10 +707,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy System information',
 								'type' => 'systeminfo',
-								'x' => 16,
+								'x' => 13,
 								'y' => 0,
-								'width' => 8,
-								'height' => 3,
+								'width' => 14,
+								'height' => 6,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -665,7 +725,7 @@ class CopyWidgetsDashboards {
 								'type' => 'trigover',
 								'x' => 0,
 								'y' => 0,
-								'width' => 16,
+								'width' => 13,
 								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
@@ -710,8 +770,8 @@ class CopyWidgetsDashboards {
 								'name' => 'Test copy Problems 2',
 								'type' => 'problems',
 								'x' => 0,
-								'y' => 5,
-								'width' => 9,
+								'y' => 6,
+								'width' => 16,
 								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
@@ -825,10 +885,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy URL',
 								'type' => 'url',
-								'x' => 16,
+								'x' => 0,
 								'y' => 3,
-								'width' => 8,
-								'height' => 2,
+								'width' => 13,
+								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -849,53 +909,73 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
-								'name' => 'Test copy plain text',
-								'type' => 'plaintext',
-								'x' => 5,
-								'y' => 3,
-								'width' => 5,
-								'height' => 2,
+								'name' => 'Test copy item history',
+								'type' => 'itemhistory',
+								'x' => 38,
+								'y' => 0,
+								'width' => 18,
+								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
-										'name' => 'override_hostid._reference',
-										'value' => 'DASHBOARD._hostid'
-									],
-									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => '0'
 									],
 									[
-										'type' => 0,
-										'name' => 'show_as_html',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'show_lines',
-										'value' => 12
-									],
-									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'style',
 										'value' => 1
 									],
 									[
-										'type' => 4,
-										'name' => 'itemids',
-										'value' => 42230
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Item 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => $itemid
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.0.history',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 12
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sortorder',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_timestamp',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_column_header',
+										'value' => 1
 									]
 								]
 							],
 							[
 								'name' => 'Test copy Problem hosts',
 								'type' => 'problemhosts',
-								'x' => 10,
+								'x' => 27,
 								'y' => 3,
-								'width' => 6,
-								'height' => 2,
+								'width' => 17,
+								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -978,10 +1058,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Web monitoring',
 								'type' => 'web',
-								'x' => 0,
-								'y' => 3,
-								'width' => 5,
-								'height' => 2,
+								'x' => 27,
+								'y' => 0,
+								'width' => 11,
+								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -1014,10 +1094,10 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Problems 3',
 								'type' => 'problems',
-								'x' => 9,
-								'y' => 5,
-								'width' => 7,
-								'height' => 3,
+								'x' => 56,
+								'y' => 0,
+								'width' => 16,
+								'height' => 6,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -1145,8 +1225,8 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Graph prototype 2',
 								'type' => 'graphprototype',
-								'x' => 10,
-								'y' => 8,
+								'x' => 16,
+								'y' => 6,
 								'width' => 14,
 								'height' => 4,
 								'view_mode' => 0,
@@ -1191,9 +1271,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy item value',
 								'type' => 'item',
-								'x' => 0,
-								'y' => 12,
-								'width' => 6,
+								'x' => 16,
+								'y' => 10,
+								'width' => 14,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1298,8 +1378,8 @@ class CopyWidgetsDashboards {
 								'name' => 'Geomap widget for copying',
 								'type' => 'geomap',
 								'x' => 0,
-								'y' => 8,
-								'width' => 10,
+								'y' => 9,
+								'width' => 16,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1353,9 +1433,9 @@ class CopyWidgetsDashboards {
 							[
 								'name' => 'Test copy Top hosts',
 								'type' => 'tophosts',
-								'x' => 16,
-								'y' => 5,
-								'width' => 8,
+								'x' => 44,
+								'y' => 3,
+								'width' => 12,
 								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
@@ -1504,9 +1584,9 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'gauge',
 								'name' => 'Gauge for copying',
-								'x' => 6,
-								'y' => 12,
-								'width' => 10,
+								'x' => 30,
+								'y' => 10,
+								'width' => 20,
 								'height' => 4,
 								'fields' => [
 									[
@@ -1669,9 +1749,9 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers for copying',
-								'x' => 16,
-								'y' => 12,
-								'width' => 8,
+								'x' => 30,
+								'y' => 6,
+								'width' => 20,
 								'height' => 4,
 								'fields' => [
 									[
@@ -1744,9 +1824,9 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'piechart',
 								'name' => 'Pie chart for copying',
-								'x' => 0,
-								'y' => 16,
-								'width' => 8,
+								'x' => 50,
+								'y' => 10,
+								'width' => 13,
 								'height' => 4,
 								'fields' => [
 									[
@@ -1895,6 +1975,221 @@ class CopyWidgetsDashboards {
 										'value' => 0
 									]
 								]
+							],
+							[
+								'type' => 'hostnavigator',
+								'name' => 'Host navigator for copying',
+								'x' => 63,
+								'y' => 10,
+								'width' => 9,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 60
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.0',
+										'value' => 4 // Zabbix servers.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hosts.0',
+										'value' => 'test'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'status',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags_evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.0.tag',
+										'value' => 'host tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.0.value',
+										'value' => 'host tag value1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.1.tag',
+										'value' => 'host tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags.1.operator',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.1.value',
+										'value' => 'host tag value2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities.0',
+										'value' => 5
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'maintenance',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_problems',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'group_by.0.tag_name',
+										'value' => 'host tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 50
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'AZIBQ'
+									]
+								]
+							],
+							[
+								'type' => 'itemnavigator',
+								'name' => 'Item navigator for copying',
+								'x' => 50,
+								'y' => 6,
+								'width' => 22,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 60
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids.0',
+										'value' => 4 // Zabbix servers.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hosts.0',
+										'value' => 10084 // ЗАББИКС Сервер.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags_evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.0.tag',
+										'value' => 'host tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.0.value',
+										'value' => 'host tag value1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.1.tag',
+										'value' => 'host tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'host_tags.1.operator',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'host_tags.1.value',
+										'value' => 'host tag value2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'trap item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'item_tags_evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'item_tags.0.tag',
+										'value' => 'item tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'item_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'item_tags.0.value',
+										'value' => 'item tag1 value'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'state',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_problems',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'group_by.0.tag_name',
+										'value' => 'item tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 77
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'AZIBO'
+									]
+								]
 							]
 						]
 					],
@@ -1912,20 +2207,11 @@ class CopyWidgetsDashboards {
 						'name' => '',
 						'widgets' => [
 							[
-								'name' => 'Test widget for replace',
-								'type' => 'clock',
-								'x' => 6,
-								'y' => 0,
-								'width' => 13,
-								'height' => 8,
-								'view_mode' => 0
-							],
-							[
 								'name' => 'Test copy Map navigation tree',
 								'type' => 'navtree',
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 10,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1935,6 +2221,15 @@ class CopyWidgetsDashboards {
 										'value' => 'FYKXG'
 									]
 								]
+							],
+							[
+								'name' => 'Test widget for replace',
+								'type' => 'clock',
+								'x' => 10,
+								'y' => 0,
+								'width' => 21,
+								'height' => 3,
+								'view_mode' => 0
 							]
 						]
 					]
@@ -1944,7 +2239,7 @@ class CopyWidgetsDashboards {
 
 		CDataHelper::call('templatedashboard.create', [
 			[
-				'templateid' => 50000,
+				'templateid' => $templateid,
 				'name' => 'Templated dashboard with all widgets',
 				'pages' => [
 					[
@@ -1953,15 +2248,15 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'clock',
 								'name' => 'Clock widget',
-								'width' => 4,
+								'width' => 19,
 								'height' => 4
 							],
 							[
 								'type' => 'graph',
 								'name' => 'Graph (classic) widget',
-								'x' => 4,
+								'x' => 19,
 								'y' => 0,
-								'width' => 8,
+								'width' => 31,
 								'height' => 4,
 								'fields' => [
 									[
@@ -1972,7 +2267,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => 400410
+										'value' => $template_itemid
 									],
 									[
 										'type' => 1,
@@ -1982,26 +2277,31 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
-								'type' => 'plaintext',
-								'name' => 'Plain text widget',
-								'x' => 12,
+								'type' => 'itemhistory',
+								'name' => 'Item history widget',
+								'x' => 50,
 								'y' => 0,
-								'width' => 6,
+								'width' => 13,
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 4,
-										'name' => 'itemids',
-										'value' => 400410
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Item 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => $template_itemid
 									]
 								]
 							],
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 18,
+								'x' => 63,
 								'y' => 0,
-								'width' => 6,
+								'width' => 9,
 								'height' => 4,
 								'fields' => [
 									[
@@ -2014,15 +2314,15 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'graphprototype',
 								'name' => 'Graph prototype widget',
-								'x' => 0,
-								'y' => 4,
-								'width' => 12,
-								'height' => 6,
+								'x' => 46,
+								'y' => 6,
+								'width' => 26,
+								'height' => 2,
 								'fields' => [
 									[
 										'type' => 7,
 										'name' => 'graphid',
-										'value' => 700016
+										'value' => $graph_prototypeid
 									],
 									[
 										'type' => 1,
@@ -2034,30 +2334,30 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'item',
 								'name' => 'Item value widget',
-								'x' => 13,
+								'x' => 19,
 								'y' => 4,
-								'width' => 4,
+								'width' => 14,
 								'height' => 4,
 								'fields' => [
 									[
 										'type' => 0,
 										'name' => 'itemid',
-										'value' => 400410
+										'value' => $template_itemid
 									]
 								]
 							],
 							[
 								'type' => 'gauge',
 								'name' => 'Gauge widget',
-								'x' => 17,
+								'x' => 33,
 								'y' => 4,
-								'width' => 7,
-								'height' => 5,
+								'width' => 13,
+								'height' => 4,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
-										'value' => '400410'
+										'value' => $template_itemid
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2214,10 +2514,10 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 0,
-								'y' => 10,
-								'width' => 7,
-								'height' => 5,
+								'x' => 46,
+								'y' => 4,
+								'width' => 26,
+								'height' => 2,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -2279,10 +2579,10 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'piechart',
 								'name' => 'Pie chart widget',
-								'x' => 7,
-								'y' => 10,
-								'width' => 7,
-								'height' => 5,
+								'x' => 0,
+								'y' => 4,
+								'width' => 19,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2405,6 +2705,121 @@ class CopyWidgetsDashboards {
 										'value' => 3
 									]
 								]
+							],
+							[
+								'type' => 'hostnavigator',
+								'name' => 'Host navigator widget',
+								'x' => 0,
+								'y' => 7,
+								'width' => 9,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 60
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities.0',
+										'value' => 5
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'maintenance',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_problems',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'group_by.0.tag_name',
+										'value' => 'host tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'AZIBQ'
+									]
+								]
+							],
+							[
+								'type' => 'itemnavigator',
+								'name' => 'Item navigator widget',
+								'x' => 9,
+								'y' => 7,
+								'width' => 10,
+								'height' => 3,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 60
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'trap item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'item_tags_evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'item_tags.0.tag',
+										'value' => 'item tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'item_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'item_tags.0.value',
+										'value' => 'item tag1 value'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'state',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_problems',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'group_by.0.attribute',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'group_by.0.tag_name',
+										'value' => 'item tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 77
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'AZIBO'
+									]
+								]
 							]
 						]
 					],
@@ -2415,7 +2830,7 @@ class CopyWidgetsDashboards {
 				]
 			],
 			[
-				'templateid' => 50000,
+				'templateid' => $templateid,
 				'name' => 'Dashboard without widgets',
 				'pages' => [[]]
 			]

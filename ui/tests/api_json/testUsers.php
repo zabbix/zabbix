@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,6 +24,13 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testUsers extends CAPITest {
 
 	private static $data = [
+		'userdirectoryid' => [
+			'Provision userdirectory' => null
+		],
+		'userdirectory_mediaid' => [
+			'Provision media mapping email' => null,
+			'Provision media mapping sms' => null
+		],
 		'userids' => [
 			'user_with_not_authorized_session' => null,
 			'user_with_expired_session' => null,
@@ -39,6 +41,40 @@ class testUsers extends CAPITest {
 			'user_for_extend_parameter_tests' => null,
 			'user_with_mfa_default' => null,
 			'user_with_mfa_duo' => null
+		],
+		'userid' => [
+			'Provisioned user' => null
+		],
+		'mediaid' => [
+			'Provision media mapping email' => null,
+			'Provision media mapping sms' => null
+		],
+		'mediatypeid' => [
+			'Email media type' => 1,
+			'SMS media type' => 3
+		],
+		'roleid' => [
+			'Provision user role' => null
+		],
+		'usrgrpid' => [
+			'Provision user group' => null
+		],
+		'userid' => [
+			'Provisioned user' => null
+		],
+		'mediaid' => [
+			'Provision media mapping email' => null,
+			'Provision media mapping sms' => null
+		],
+		'mediatypeid' => [
+			'Email media type' => 1,
+			'SMS media type' => 3
+		],
+		'roleid' => [
+			'Provision user role' => null
+		],
+		'usrgrpid' => [
+			'Provision user group' => null
 		],
 		'sessionids' => [
 			'not_authorized_session' => null,
@@ -60,6 +96,27 @@ class testUsers extends CAPITest {
 			'mfa_duo_1' => null
 		]
 	];
+
+	/**
+	 * Replace name by value for property names in self::$data.
+	 *
+	 * @param array $rows
+	 */
+	public static function resolveIds(array $rows): array {
+		$result = [];
+
+		foreach ($rows as $row) {
+			foreach (array_intersect_key(self::$data, $row) as $key => $ids) {
+				if (array_key_exists($row[$key], $ids)) {
+					$row[$key] = $ids[$row[$key]];
+				}
+			}
+
+			$result[] = $row;
+		}
+
+		return $result;
+	}
 
 	/**
 	 * Prepare data for user.checkAuthentication tests.
@@ -335,6 +392,280 @@ class testUsers extends CAPITest {
 
 		self::$data['userids']['user_with_mfa_default'] = $userids_mfa['userids'][0];
 		self::$data['userids']['user_with_mfa_duo'] = $userids_mfa['userids'][1];
+
+		self::prepareProvisionUsers();
+	}
+
+	public static function prepareProvisionUsers() {
+		// Role 'Provision user role'.
+		self::$data['roleid']['Provision user role'] = CDataHelper::call('role.create', [
+			'type' => USER_TYPE_ZABBIX_ADMIN, 'name' => 'Provision user role'
+		])['roleids'][0];
+
+		// Group 'Provision user group'.
+		self::$data['usrgrpid']['Provision user group'] = CDataHelper::call('usergroup.create', [
+			'name' => 'Provision user group'
+		])['usrgrpids'][0];
+
+		// Userdirectories 'Provision userdirectory'.
+		$data = [
+			[
+				'idp_type' => IDP_TYPE_LDAP,
+				'name' => 'Provision userdirectory',
+				'host' => 'ldap://local.ldap',
+				'port' => '389',
+				'base_dn' => 'test',
+				'search_attribute' => 'test',
+				'provision_status' => JIT_PROVISIONING_ENABLED,
+				'provision_media' => self::resolveIds([
+					['name' => 'Provision media mapping email', 'mediatypeid' => 'Email media type', 'attribute' => 'attr1'],
+					['name' => 'Provision media mapping sms', 'mediatypeid' => 'SMS media type', 'attribute' => 'attr2']
+				]),
+				'provision_groups' => self::resolveIds([
+					[
+						'name' => '#1',
+						'roleid' => 'Provision user role',
+						'user_groups' => self::resolveIds([['usrgrpid' => 'Provision user group']])
+					]
+				])
+			]
+		];
+		$result = CDataHelper::call('userdirectory.create', $data);
+		self::$data['userdirectoryid'] = array_merge(
+			self::$data['userdirectoryid'],
+			array_combine(array_column($data, 'name'), $result['userdirectoryids'])
+		);
+		$userdirectories = CDataHelper::call('userdirectory.get', [
+			'output' => [],
+			'selectProvisionMedia' => ['userdirectory_mediaid', 'name'],
+			'userdirectoryids' => [self::$data['userdirectoryid']['Provision userdirectory']]
+		]);
+
+		foreach ($userdirectories as $userdirectory) {
+			self::$data['userdirectory_mediaid'] = array_merge(
+				self::$data['userdirectory_mediaid'],
+				array_column($userdirectory['provision_media'], 'userdirectory_mediaid', 'name')
+			);
+		}
+
+		// Create provisioned user.
+		$provisioned_user = self::resolveIds([[
+			'username' => 'Provisioned user',
+			'passwd' => 'Z@bbIxPa$$',
+			'roleid' => 'Provision user role',
+			'usrgrps' => self::resolveIds([['usrgrpid' => 'Provision user group']]),
+			'medias' => self::resolveIds([
+				['mediatypeid' => 'Email media type', 'sendto' => 'provision@user.local'],
+				['mediatypeid' => 'SMS media type', 'sendto' => 'provision-user']
+			])
+		]])[0];
+		$email_userdirectory_mediaid = self::$data['userdirectory_mediaid']['Provision media mapping email'];
+		$sms_userdirectory_mediaid = self::$data['userdirectory_mediaid']['Provision media mapping sms'];
+		$result = CDataHelper::call('user.create', $provisioned_user);
+		self::$data['userid'][$provisioned_user['username']] = $result['userids'][0];
+		DB::update('users', [
+			'values' => [
+				'userdirectoryid' => self::$data['userdirectoryid']['Provision userdirectory']
+			],
+			'where' => ['userid' => self::$data['userid'][$provisioned_user['username']]]
+		]);
+		DB::update('media', [
+			'values' => ['userdirectory_mediaid' => $email_userdirectory_mediaid],
+			'where' => [
+				'userid' => self::$data['userid'][$provisioned_user['username']],
+				'mediatypeid' => self::$data['mediatypeid']['Email media type']
+			]
+		]);
+		DB::update('media', [
+			'values' => ['userdirectory_mediaid' => $sms_userdirectory_mediaid],
+			'where' => [
+				'userid' => self::$data['userid'][$provisioned_user['username']],
+				'mediatypeid' => self::$data['mediatypeid']['SMS media type']
+			]
+		]);
+		$db_user = CDataHelper::call('user.get', [
+			'output' => [],
+			'selectMedias' => ['mediaid', 'userdirectory_mediaid'],
+			'userids' => [self::$data['userid'][$provisioned_user['username']]]
+		])[0];
+		$user_medias = array_column($db_user['medias'], null, 'userdirectory_mediaid');
+		self::$data['mediaid']['Provision media mapping email'] = $user_medias[$email_userdirectory_mediaid]['mediaid'];
+		self::$data['mediaid']['Provision media mapping sms'] = $user_medias[$sms_userdirectory_mediaid]['mediaid'];
+	}
+
+	public static function dataProviderUserMediaUpdate() {
+		return [
+			'Property userdirectory_mediaid is not supported in medias for user.update.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'userdirectory_mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local']
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'userdirectory_mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						]
+					]
+				]],
+				'expected_error' => 'Invalid parameter "/1/medias/1": unexpected parameter "userdirectory_mediaid".'
+			],
+			'Duplicate value of mediaid is not allowed.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local']
+						],
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						]
+					]
+				]],
+				'expected_error' => 'Invalid parameter "/1/medias/2": value (mediaid)=(%d) already exists.'
+			],
+			'Property mediatypeid cannot be changed for existing provisioned medias.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user2'
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user2'
+						]
+					]
+				]],
+				'expected_error' => 'Invalid parameter "/1/medias/1": cannot update readonly parameter "mediatypeid" of provisioned user.'
+			],
+			'Provisioned media cannot be deleted, but without error.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => []
+				]],
+				'expected_error' => null
+			],
+			'Successfully update provisioned media.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local'],
+							'active' => MEDIA_STATUS_DISABLED
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						]
+					]
+				]],
+				'expected_error' => null
+			],
+			'Successfully add custom media to provisioned media list.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local'],
+							'active' => MEDIA_STATUS_DISABLED
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						],
+						[
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'custom-sendto',
+							'active' => MEDIA_STATUS_ACTIVE,
+							'severity' => 1,
+							'period' => '1-5,9:00-20:00'
+						]
+					]
+				]],
+				'expected_error' => null
+			],
+			'Successfully replace custom media without specifying provisioned media.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local'],
+							'active' => MEDIA_STATUS_DISABLED
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						],
+						[
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'custom-sendto2',
+							'active' => MEDIA_STATUS_ACTIVE,
+							'severity' => 1,
+							'period' => '1-5,9:00-20:00'
+						]
+					]
+				]],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * Test provisioned media for user update action.
+	 *
+	 * @dataProvider dataProviderUserMediaUpdate
+	 */
+	public function testUserMediaUpdate(array $users, ?string $expected_error) {
+		$users = self::resolveIds($users);
+
+		foreach($users as &$user) {
+			if (array_key_exists('medias', $user)) {
+				$user['medias'] = self::resolveIds($user['medias']);
+			}
+		}
+		unset($user);
+
+		if ($expected_error === null || strpos($expected_error, '%') === false) {
+			$this->call('user.update', $users, $expected_error);
+		}
+		else {
+			if (CAPIHelper::getSessionId() === null) {
+				$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+			}
+
+			$response = CAPIHelper::call('user.update', $users);
+			$this->assertArrayNotHasKey('result', $response);
+			$this->assertArrayHasKey('error', $response);
+			$replaceable = sscanf($response['error']['data'], $expected_error);
+
+			if ($replaceable) {
+				$expected_error = vsprintf($expected_error, $replaceable);
+			}
+
+			$this->assertSame($expected_error, $response['error']['data']);
+		}
 	}
 
 	public static function user_create() {
@@ -561,68 +892,11 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'username' => 'API user with non-existing userdirectory',
+						'username' => 'API user create provisioned user',
 						'userdirectoryid' => 1234
 					]
 				],
-				'expected_error' => 'User directory with ID "1234" is not available.'
-			],
-			[
-				'user' => [
-					[
-						'username' => 'API user create with MFA TOTP method',
-						'roleid' => 1,
-						'passwd' => 'Z@bb1x1234',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'mfa_totp_secrets' => [
-							[
-								'mfaid' => 'mfa_totp_1',
-								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-							]
-						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'user' => [
-					[
-						'username' => 'API user create with non-existing MFA TOTP method',
-						'roleid' => 1,
-						'passwd' => 'Z@bb1x1234',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'mfa_totp_secrets' => [
-							[
-								'mfaid' => 999,
-								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/mfa_totp_secrets/1/mfaid": object does not exist.'
-			],
-			[
-				'user' => [
-					[
-						'username' => 'API user create with MFA DUO method',
-						'roleid' => 1,
-						'passwd' => 'Z@bb1x1234',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'mfa_totp_secrets' => [
-							[
-								'mfaid' => 'mfa_duo_1',
-								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-							]
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/mfa_totp_secrets/1/mfaid": object of TOTP type is expected.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
 			]
 		];
 	}
@@ -631,8 +905,6 @@ class testUsers extends CAPITest {
 	 * @dataProvider user_create
 	 */
 	public function testUsers_Create($user, $expected_error) {
-		$this->resolveMfaids($user);
-
 		$result = $this->call('user.create', $user, $expected_error);
 
 		if ($expected_error === null) {
@@ -970,23 +1242,35 @@ class testUsers extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			[
+			'Cannot update provisioned user readonly field username.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'username' => 'other-username-value'
+				]],
+				'expected_error' => 'Invalid parameter "/1": cannot update readonly parameter "username" of provisioned user.'
+			],
+			'Cannot update provisioned user readonly field password.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'passwd' => 'Z@BB1X@dmln'
+				]],
+				'expected_error' => 'Invalid parameter "/1": cannot update readonly parameter "passwd" of provisioned user.'
+			],
+			'Cannot update user userdirectoryid to make provisioned user not provisioned.' => [
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'userdirectoryid' => 0
+				]],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
+			],
+			'Cannot update user userdirectoryid to make user provisioned.' => [
 				'user' => [
 					[
-						'userid' => '16',
-						'username' => 'api-user-for-password-super-admin',
-						'usrgrps' => [
-							['usrgrpid' => 7]
-						],
-						'mfa_totp_secrets' => [
-							[
-								'mfaid' => 'mfa_totp_1',
-								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-							]
-						]
+						'userid' => 'API test user with disabled group',
+						'userdirectoryid' => 'Provision userdirectory'
 					]
 				],
-				'expected_error' => null
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
 			]
 		];
 	}
@@ -995,6 +1279,8 @@ class testUsers extends CAPITest {
 	 * @dataProvider user_update
 	 */
 	public function testUsers_Update($users, $expected_error) {
+		$users = self::resolveIds($users);
+
 		foreach ($users as $user) {
 			if (array_key_exists('userid', $user) && filter_var($user['userid'], FILTER_VALIDATE_INT)
 					&& $expected_error !== null) {
@@ -1002,8 +1288,6 @@ class testUsers extends CAPITest {
 				$oldHashUser = CDBHelper::getHash($sqlUser);
 			}
 		}
-
-		$this->resolveMfaids($users);
 
 		$result = $this->call('user.update', $users, $expected_error);
 
@@ -1026,9 +1310,12 @@ class testUsers extends CAPITest {
 					$this->assertEquals(1, password_verify('GreatNewP', $dbRowUser['passwd']));
 				}
 
-				$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($id).
-						' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
-				);
+				if (array_key_exists('usrgrps', $users[$key])) {
+					$this->assertEquals(1, CDBHelper::getCount(
+						'select * from users_groups where userid='.zbx_dbstr($id).
+							' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
+					);
+				}
 
 				if (array_key_exists('medias', $users[$key])) {
 					$dbResultMedia = DBSelect('select * from media where userid='.zbx_dbstr($id));
@@ -1052,7 +1339,7 @@ class testUsers extends CAPITest {
 		}
 	}
 
-		public static function user_password() {
+	public static function user_password() {
 		return [
 			[
 				'method' => 'user.update',
@@ -1270,7 +1557,7 @@ class testUsers extends CAPITest {
 					],
 					'lang' => '123456'
 				],
-				'expected_error' => 'Invalid parameter "/1/lang": value must be one of "default", "en_GB", "en_US", "bg_BG", "ca_ES", "zh_CN", "zh_TW", "cs_CZ", "nl_NL", "fi_FI", "fr_FR", "ka_GE", "de_DE", "el_GR", "he_IL", "hu_HU", "id_ID", "it_IT", "ko_KR", "ja_JP", "lv_LV", "lt_LT", "nb_NO", "fa_IR", "pl_PL", "pt_BR", "pt_PT", "ro_RO", "ru_RU", "sk_SK", "es_ES", "sv_SE", "tr_TR", "uk_UA", "vi_VN".'
+				'expected_error' => 'Invalid parameter "/1/lang": value must be one of "default", "en_GB", "en_US", "bg_BG", "ca_ES", "zh_CN", "zh_TW", "cs_CZ", "da_DK", "nl_NL", "fi_FI", "fr_FR", "ka_GE", "de_DE", "el_GR", "he_IL", "hu_HU", "id_ID", "it_IT", "ko_KR", "ja_JP", "lv_LV", "lt_LT", "nb_NO", "fa_IR", "pl_PL", "pt_BR", "pt_PT", "ro_RO", "ru_RU", "sk_SK", "es_ES", "sv_SE", "tr_TR", "uk_UA", "vi_VN".'
 			],
 			// Check user properties, theme.
 			[
@@ -1402,7 +1689,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User without medias properties',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1414,7 +1701,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty mediatypeid',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1430,7 +1717,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid mediatypeid',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1457,14 +1744,14 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Media type with ID "1234" is not available.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/mediatypeid": object does not exist.'
 			],
 			// Check user media, sendto.
 			[
 				'user' => [
 					'username' => 'User without sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1491,13 +1778,13 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": cannot be empty.'
 			],
 			[
 				'user' => [
 					'username' => 'User with empty sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1514,7 +1801,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty sendto',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1542,7 +1829,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": cannot be empty.'
 			],
 			[
 				'user' => [
@@ -1559,7 +1846,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "sendto": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/2": cannot be empty.'
 			],
 			[
 				'user' => [
@@ -1576,7 +1863,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1593,7 +1880,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1610,7 +1897,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1627,7 +1914,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1644,7 +1931,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1661,7 +1948,7 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			[
 				'user' => [
@@ -1678,14 +1965,14 @@ class testUsers extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid email address for media type with ID "1".'
+				'expected_error' => 'Invalid parameter "/1/medias/1/sendto/1": an email address is expected.'
 			],
 			// Check user media, active.
 			[
 				'user' => [
 					'username' => 'User with empty active',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1703,7 +1990,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid active',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1721,7 +2008,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid active',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1740,7 +2027,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty severity',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1758,7 +2045,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid severity',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1777,7 +2064,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with empty period',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1795,7 +2082,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with string period',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1813,7 +2100,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid period, without comma',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1831,7 +2118,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid period, with two comma',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1849,7 +2136,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid period, 8 week days',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1867,7 +2154,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid period, zero week day',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1885,7 +2172,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid time',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1903,7 +2190,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid time',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1921,7 +2208,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid time',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -1939,7 +2226,7 @@ class testUsers extends CAPITest {
 				'user' => [
 					'username' => 'User with invalid time',
 					'roleid' => 1,
-					'passwd' => 'zabbix',
+					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => '7']
 					],
@@ -2874,19 +3161,5 @@ class testUsers extends CAPITest {
 
 	public function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
-	}
-
-	public function resolveMfaids(array &$users): void {
-		foreach ($users as &$user) {
-			if (is_array($user) && array_key_exists('mfa_totp_secrets', $user)) {
-				foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
-					if (array_key_exists($mfa_totp_secret['mfaid'], self::$data['mfaids'])) {
-						$mfa_totp_secret['mfaid'] = self::$data['mfaids'][$mfa_totp_secret['mfaid']];
-					}
-				}
-				unset($mfa_totp_secret);
-			}
-		}
-		unset($user);
 	}
 }

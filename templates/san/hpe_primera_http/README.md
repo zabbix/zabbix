@@ -21,13 +21,14 @@ This template has been tested on:
 
 ## Setup
 
-1. Create user zabbix on the storage with browse role and enable it for all domains.
+1. Create a user on the storage with a browse role and enable it for all domains, for example "zabbix".
 2. The WSAPI server does not start automatically.
    Log in to the CLI as Super, Service, or any role granted the wsapi_set right.
    Start the WSAPI server by command: `startwsapi`.
    To check WSAPI state use command: `showwsapi`.
 3. Link template to the host.
-4. Configure macros {$HPE.PRIMERA.API.USERNAME} and {$HPE.PRIMERA.API.PASSWORD}.
+4. Set the hostname or IP address of the host in the {$HPE.PRIMERA.API.HOST} macro and configure the username and password in the {$HPE.PRIMERA.API.USERNAME} and {$HPE.PRIMERA.API.PASSWORD} macros.
+5. Change the {$HPE.PRIMERA.API.SCHEME} and {$HPE.PRIMERA.API.PORT} macros if needed.
 
 ### Macros used
 
@@ -41,6 +42,7 @@ This template has been tested on:
 |{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered tasks by type.</p>|`CHANGE_IF_NEEDED`|
 |{$HPE.PRIMERA.DATA.TIMEOUT}|<p>Response timeout for WSAPI.</p>|`15s`|
 |{$HPE.PRIMERA.API.SCHEME}|<p>The WSAPI scheme (http/https).</p>|`https`|
+|{$HPE.PRIMERA.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
 |{$HPE.PRIMERA.API.PORT}|<p>The WSAPI port.</p>|`443`|
 |{$HPE.PRIMERA.VOLUME.NAME.MATCHES}|<p>This macro is used in filters of volume discovery rule.</p>|`.*`|
 |{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES}|<p>This macro is used in filters of volume discovery rule.</p>|`^(admin\|.srdata\|.mgmtdata)$`|
@@ -51,37 +53,37 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|HPE Primera: Get data|<p>The JSON with result of WSAPI requests.</p>|Script|hpe.primera.get.data|
-|HPE Primera: Get errors|<p>A list of errors from WSAPI requests.</p>|Dependent item|hpe.primera.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HPE Primera: Get disks data|<p>Disks data.</p>|Dependent item|hpe.primera.get.disks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disks`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Primera: Get CPGs data|<p>Common provisioning groups data.</p>|Dependent item|hpe.primera.get.cpgs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpgs`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Primera: Get hosts data|<p>Hosts data.</p>|Dependent item|hpe.primera.get.hosts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hosts`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Primera: Get ports data|<p>Ports data.</p>|Dependent item|hpe.primera.get.ports<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ports`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Primera: Get system data|<p>System data.</p>|Dependent item|hpe.primera.get.system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Primera: Get tasks data|<p>Tasks data.</p>|Dependent item|hpe.primera.get.tasks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tasks`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Primera: Get volumes data|<p>Volumes data.</p>|Dependent item|hpe.primera.get.volumes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.volumes`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Primera: Capacity allocated|<p>Allocated capacity in the system.</p>|Dependent item|hpe.primera.system.capacity.allocated<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.allocatedCapacityMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|HPE Primera: Chunklet size|<p>Chunklet size.</p>|Dependent item|hpe.primera.system.chunklet.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chunkletSizeMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|HPE Primera: System contact|<p>Contact of the system.</p>|Dependent item|hpe.primera.system.contact<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.contact`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|HPE Primera: Capacity failed|<p>Failed capacity in the system.</p>|Dependent item|hpe.primera.system.capacity.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.failedCapacityMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|HPE Primera: Capacity free|<p>Free capacity in the system.</p>|Dependent item|hpe.primera.system.capacity.free<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.freeCapacityMiB`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|HPE Primera: System location|<p>Location of the system.</p>|Dependent item|hpe.primera.system.location<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.location`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|HPE Primera: Model|<p>System model.</p>|Dependent item|hpe.primera.system.model<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.model`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|HPE Primera: System name|<p>System name.</p>|Dependent item|hpe.primera.system.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.name`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|HPE Primera: Serial number|<p>System serial number.</p>|Dependent item|hpe.primera.system.serial_number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serialNumber`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|HPE Primera: Software version number|<p>Storage system software version number.</p>|Dependent item|hpe.primera.system.sw_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemVersion`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|HPE Primera: Capacity total|<p>Total capacity in the system.</p>|Dependent item|hpe.primera.system.capacity.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalCapacityMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|HPE Primera: Nodes total|<p>Total number of nodes in the system.</p>|Dependent item|hpe.primera.system.nodes.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalNodes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HPE Primera: Nodes online|<p>Number of online nodes in the system.</p>|Dependent item|hpe.primera.system.nodes.online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.onlineNodes.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HPE Primera: Disks total|<p>Number of physical disks.</p>|Dependent item|hpe.primera.disks.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HPE Primera: Service ping|<p>Checks if the service is running and accepting TCP connections.</p>|Simple check|net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Get data|<p>The JSON with result of WSAPI requests.</p>|Script|hpe.primera.get.data|
+|Get errors|<p>A list of errors from WSAPI requests.</p>|Dependent item|hpe.primera.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get disks data|<p>Disks data.</p>|Dependent item|hpe.primera.get.disks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disks`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get CPGs data|<p>Common provisioning groups data.</p>|Dependent item|hpe.primera.get.cpgs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpgs`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get hosts data|<p>Hosts data.</p>|Dependent item|hpe.primera.get.hosts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hosts`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get ports data|<p>Ports data.</p>|Dependent item|hpe.primera.get.ports<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ports`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get system data|<p>System data.</p>|Dependent item|hpe.primera.get.system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get tasks data|<p>Tasks data.</p>|Dependent item|hpe.primera.get.tasks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tasks`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get volumes data|<p>Volumes data.</p>|Dependent item|hpe.primera.get.volumes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.volumes`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Capacity allocated|<p>Allocated capacity in the system.</p>|Dependent item|hpe.primera.system.capacity.allocated<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.allocatedCapacityMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Chunklet size|<p>Chunklet size.</p>|Dependent item|hpe.primera.system.chunklet.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.chunkletSizeMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|System contact|<p>Contact of the system.</p>|Dependent item|hpe.primera.system.contact<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.contact`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Capacity failed|<p>Failed capacity in the system.</p>|Dependent item|hpe.primera.system.capacity.failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.failedCapacityMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Capacity free|<p>Free capacity in the system.</p>|Dependent item|hpe.primera.system.capacity.free<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.freeCapacityMiB`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|System location|<p>Location of the system.</p>|Dependent item|hpe.primera.system.location<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.location`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Model|<p>System model.</p>|Dependent item|hpe.primera.system.model<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.model`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|System name|<p>System name.</p>|Dependent item|hpe.primera.system.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.name`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Serial number|<p>System serial number.</p>|Dependent item|hpe.primera.system.serial_number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.serialNumber`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Software version number|<p>Storage system software version number.</p>|Dependent item|hpe.primera.system.sw_version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.systemVersion`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Capacity total|<p>Total capacity in the system.</p>|Dependent item|hpe.primera.system.capacity.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalCapacityMiB`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Nodes total|<p>Total number of nodes in the system.</p>|Dependent item|hpe.primera.system.nodes.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalNodes`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nodes online|<p>Number of online nodes in the system.</p>|Dependent item|hpe.primera.system.nodes.online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.onlineNodes.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Disks total|<p>Number of physical disks.</p>|Dependent item|hpe.primera.disks.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service ping|<p>Checks if the service is running and accepting TCP connections.</p>|Simple check|net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|HPE Primera: There are errors in requests to WSAPI|<p>Zabbix has received errors in requests to WSAPI.</p>|`length(last(/HPE Primera by HTTP/hpe.primera.get.errors))>0`|Average|**Depends on**:<br><ul><li>HPE Primera: Service is unavailable</li></ul>|
-|HPE Primera: Service is unavailable||`max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
+|There are errors in requests to WSAPI|<p>Zabbix has received errors in requests to WSAPI.</p>|`length(last(/HPE Primera by HTTP/hpe.primera.get.errors))>0`|Average|**Depends on**:<br><ul><li>Service is unavailable</li></ul>|
+|Service is unavailable||`max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
 
 ### LLD rule Common provisioning groups discovery
 

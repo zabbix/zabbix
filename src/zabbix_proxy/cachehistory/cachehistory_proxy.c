@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "cachehistory_proxy.h"
@@ -41,13 +36,13 @@ static size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
  * Parameters: item_diff - diff of items to be updated                        *
  *                                                                            *
  ******************************************************************************/
-static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
+static void	DBmass_proxy_update_items(zbx_vector_item_diff_ptr_t *item_diff)
 {
 	size_t	sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_item_diff_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
@@ -275,13 +270,13 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
  *             item_diff   - vector to store prepared diff                    *
  *                                                                            *
  ******************************************************************************/
-static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zbx_vector_ptr_t *item_diff)
+static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zbx_vector_item_diff_ptr_t *item_diff)
 {
 	int			i, *errcodes;
 	zbx_history_sync_item_t	*items;
 	zbx_vector_uint64_t	itemids;
 
-	zbx_vector_ptr_reserve(item_diff, history_num);
+	zbx_vector_item_diff_ptr_reserve(item_diff, history_num);
 
 	zbx_vector_uint64_create(&itemids);
 	zbx_vector_uint64_reserve(&itemids, (size_t)history_num);
@@ -326,7 +321,7 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME;
 		}
 
-		zbx_vector_ptr_append(item_diff, diff);
+		zbx_vector_item_diff_ptr_append(item_diff, diff);
 
 		/* store numeric items to handle data conversion errors on server and trends */
 		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
@@ -359,21 +354,22 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 }
 
 void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
-		int config_history_storage_pipelines, int *more)
+		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more)
 {
 	ZBX_UNUSED(triggers_num);
 	ZBX_UNUSED(events_cbs);
+	ZBX_UNUSED(rtc);
 
-	int			history_num, txn_rc;
-	time_t			sync_start;
-	zbx_vector_ptr_t	history_items;
-	zbx_vector_ptr_t	item_diff;
-	zbx_dc_history_t	history[ZBX_HC_SYNC_MAX];
+	int				history_num, txn_rc = ZBX_DB_OK;
+	time_t				sync_start;
+	zbx_vector_hc_item_ptr_t	history_items;
+	zbx_vector_item_diff_ptr_t	item_diff;
+	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
 
 	ZBX_UNUSED(config_history_storage_pipelines);
-	zbx_vector_ptr_create(&history_items);
-	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
-	zbx_vector_ptr_create(&item_diff);
+	zbx_vector_hc_item_ptr_create(&history_items);
+	zbx_vector_hc_item_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
+	zbx_vector_item_diff_ptr_create(&item_diff);
 
 	sync_start = time(NULL);
 
@@ -432,8 +428,8 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 			zbx_dbcache_unlock();
 		}
 
-		zbx_vector_ptr_clear(&history_items);
-		zbx_vector_ptr_clear_ext(&item_diff, zbx_default_mem_free_func);
+		zbx_vector_hc_item_ptr_clear(&history_items);
+		zbx_vector_item_diff_ptr_clear_ext(&item_diff, zbx_item_diff_free);
 
 		/* Exit from sync loop if we have spent too much time here */
 		/* unless we are doing full sync. This is done to allow    */
@@ -441,6 +437,6 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 	}
 	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
 
-	zbx_vector_ptr_destroy(&item_diff);
-	zbx_vector_ptr_destroy(&history_items);
+	zbx_vector_item_diff_ptr_destroy(&item_diff);
+	zbx_vector_hc_item_ptr_destroy(&history_items);
 }

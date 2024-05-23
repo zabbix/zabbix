@@ -1,25 +1,21 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "lld.h"
 
 #include "../db_lengths_constants.h"
+#include "../server_constants.h"
 
 #include "zbxexpression.h"
 #include "audit/zbxaudit.h"
@@ -35,7 +31,6 @@
 #include "zbxeval.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
-#include "../server_constants.h"
 
 typedef struct
 {
@@ -360,10 +355,10 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve trigger prototypes which are inherited from the          *
- *          discovery rule                                                    *
+ * Purpose: Retrieves trigger prototypes which are inherited from the         *
+ *          discovery rule.                                                   *
  *                                                                            *
- * Parameters: lld_ruleid         - [IN] discovery rule id                    *
+ * Parameters: lld_ruleid         - [IN]                                      *
  *             trigger_prototypes - [OUT] sorted list of trigger prototypes   *
  *             error              - [OUT] error message                       *
  *                                                                            *
@@ -450,8 +445,8 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve triggers which were created by the specified trigger     *
- *          prototypes                                                        *
+ * Purpose: Retrieves triggers which were created by the specified trigger    *
+ *          prototypes.                                                       *
  *                                                                            *
  * Parameters: trigger_prototypes - [IN] sorted list of trigger prototypes    *
  *             triggers           - [OUT] sorted list of triggers             *
@@ -465,14 +460,13 @@ static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigg
 	zbx_vector_uint64_t	parent_triggerids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&parent_triggerids);
 	zbx_vector_uint64_reserve(&parent_triggerids, (size_t)trigger_prototypes->values_num);
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		const zbx_lld_trigger_prototype_t	*trigger_prototype = trigger_prototypes->values[i];
 
@@ -599,14 +593,13 @@ static void	lld_triggers_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigg
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve functions which are used by all triggers in the host of  *
- *          the trigger prototype                                             *
+ * Purpose: Retrieves functions which are used by all triggers in the host of *
+ *          the trigger prototype.                                            *
  *                                                                            *
  ******************************************************************************/
 static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
 		zbx_vector_lld_trigger_ptr_t *triggers)
 {
-	int				i;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_lld_trigger_t		*trigger;
 	zbx_vector_uint64_t		triggerids;
@@ -617,7 +610,7 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 
 	if (NULL != trigger_prototypes)
 	{
-		for (i = 0; i < trigger_prototypes->values_num; i++)
+		for (int i = 0; i < trigger_prototypes->values_num; i++)
 		{
 			trigger_prototype = trigger_prototypes->values[i];
 
@@ -625,7 +618,7 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 		}
 	}
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
@@ -700,7 +693,7 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 
 		if (NULL != trigger_prototypes)
 		{
-			for (i = 0; i < trigger_prototypes->values_num; i++)
+			for (int i = 0; i < trigger_prototypes->values_num; i++)
 			{
 				trigger_prototype = trigger_prototypes->values[i];
 
@@ -709,7 +702,7 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 			}
 		}
 
-		for (i = 0; i < triggers->values_num; i++)
+		for (int i = 0; i < triggers->values_num; i++)
 		{
 			trigger = triggers->values[i];
 
@@ -724,7 +717,7 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve trigger dependencies                                     *
+ * Purpose: retrieves trigger dependencies                                    *
  *                                                                            *
  ******************************************************************************/
 static void	lld_dependencies_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
@@ -739,20 +732,20 @@ static void	lld_dependencies_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger
 	zbx_uint64_t			triggerid_down;
 	char				*sql = NULL;
 	size_t				sql_alloc = 256, sql_offset = 0;
-	int				i, index;
+	int				index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&triggerids);
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		trigger_prototype = trigger_prototypes->values[i];
 
 		zbx_vector_uint64_append(&triggerids, trigger_prototype->triggerid);
 	}
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
@@ -811,14 +804,14 @@ static void	lld_dependencies_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger
 	}
 	zbx_db_free_result(result);
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		trigger_prototype = trigger_prototypes->values[i];
 
 		zbx_vector_lld_dependency_ptr_sort(&trigger_prototype->dependencies, lld_dependency_compare_func);
 	}
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
@@ -830,7 +823,7 @@ static void	lld_dependencies_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve trigger tags                                             *
+ * Purpose: retrieves trigger tags                                            *
  *                                                                            *
  ******************************************************************************/
 static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
@@ -839,7 +832,6 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
 	zbx_vector_uint64_t		triggerids;
-	int				i;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_lld_trigger_t		*trigger;
 	char				*sql = NULL;
@@ -847,14 +839,14 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 
 	zbx_vector_uint64_create(&triggerids);
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		trigger_prototype = trigger_prototypes->values[i];
 
 		zbx_vector_uint64_append(&triggerids, trigger_prototype->triggerid);
 	}
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
@@ -919,10 +911,10 @@ static void	lld_tags_get(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_p
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns the list of items which are related to the trigger        *
- *          prototypes                                                        *
+ * Purpose: Returns the list of items which are related to the trigger        *
+ *          prototypes.                                                       *
  *                                                                            *
- * Parameters: trigger_prototypes - [IN] vector of trigger prototypes         *
+ * Parameters: trigger_prototypes - [IN]                                      *
  *             items              - [OUT] sorted list of items                *
  *                                                                            *
  ******************************************************************************/
@@ -935,14 +927,13 @@ static void	lld_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_protot
 	zbx_vector_uint64_t	parent_triggerids;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&parent_triggerids);
 	zbx_vector_uint64_reserve(&parent_triggerids, (size_t)trigger_prototypes->values_num);
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		zbx_lld_trigger_prototype_t	*trigger_prototype;
 
@@ -950,6 +941,7 @@ static void	lld_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_protot
 
 		zbx_vector_uint64_append(&parent_triggerids, trigger_prototype->triggerid);
 	}
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -975,6 +967,7 @@ static void	lld_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_protot
 
 		zbx_vector_lld_item_ptr_append(items, item);
 	}
+
 	zbx_db_free_result(result);
 
 	zbx_vector_lld_item_ptr_sort(items, lld_item_compare_func);
@@ -984,18 +977,16 @@ static void	lld_items_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_protot
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds already existing trigger, using an item prototype and items *
- *          already created by it                                             *
+ * Purpose: Finds already existing trigger, using an item prototype and items *
+ *          already created by it.                                            *
  *                                                                            *
- * Return value: upon successful completion return pointer to the trigger     *
+ * Return value: upon successful completion returns pointer to trigger        *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_trigger_t	*lld_trigger_get(zbx_uint64_t parent_triggerid, zbx_hashset_t *items_triggers,
 		const zbx_vector_lld_item_link_ptr_t *item_links)
 {
-	int	i;
-
-	for (i = 0; i < item_links->values_num; i++)
+	for (int i = 0; i < item_links->values_num; i++)
 	{
 		zbx_lld_item_trigger_t		*item_trigger, item_trigger_local;
 		const zbx_lld_item_link_t	*item_link = item_links->values[i];
@@ -1013,17 +1004,17 @@ static zbx_lld_trigger_t	*lld_trigger_get(zbx_uint64_t parent_triggerid, zbx_has
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set indexes for functionid tokens {<functionid>} from the         *
- *          specified function vector                                         *
+ * Purpose: Sets indexes for functionid tokens {<functionid>} from the        *
+ *          specified function vector.                                        *
  *                                                                            *
  ******************************************************************************/
 static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vector_lld_function_ptr_t *functions)
 {
-	int			i, index;
+	int			index;
 	zbx_uint64_t		functionid;
 	zbx_lld_function_t	*function;
 
-	for (i = 0; i < ctx->stack.values_num; i++)
+	for (int i = 0; i < ctx->stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
 
@@ -1051,8 +1042,8 @@ static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Purpose: simplify parsed expression by replacing {<functionid>} with       *
- *          {<function index>}                                                *
+ * Purpose: Simplifies parsed expression by replacing {<functionid>} with     *
+ *          {<function index>}.                                               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **expression,
@@ -1079,8 +1070,8 @@ static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **express
 
 /******************************************************************************
  *                                                                            *
- * Purpose: simplify trigger expression by replacing {<functionid>} with      *
- *          {<function index>}                                                *
+ * Purpose: Simplifies trigger expression by replacing {<functionid>} with    *
+ *          {<function index>}.                                               *
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_expression_simplify(const zbx_lld_trigger_t *trigger, char **expression,
@@ -1112,19 +1103,18 @@ static void	lld_trigger_expression_simplify(const zbx_lld_trigger_t *trigger, ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand parsed expression function indexes with function strings   *
- *          in format itemid:func(params)                                     *
+ * Purpose: Expands parsed expression function indexes with function strings  *
+ *          in format itemid:func(params).                                    *
  *                                                                            *
  ******************************************************************************/
 static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vector_lld_function_ptr_t *functions)
 {
-	int		i, j;
 	char		*expression = NULL;
 	zbx_uint64_t	index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __func__, ctx->expression);
 
-	for (i = 0; i < ctx->stack.values_num; i++)
+	for (int i = 0; i < ctx->stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
 
@@ -1143,7 +1133,7 @@ static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vecto
 		else
 			index = token->value.data.ui64;
 
-		for (j = 0; j < functions->values_num; j++)
+		for (int j = 0; j < functions->values_num; j++)
 		{
 			const zbx_lld_function_t	*function = functions->values[j];
 
@@ -1172,8 +1162,8 @@ static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vecto
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand trigger expression function indexes with function strings  *
- *          in format itemid:func(params)                                     *
+ * Purpose: Expands trigger expression function indexes with function strings *
+ *          in format itemid:func(params).                                    *
  *                                                                            *
  ******************************************************************************/
 static char	*lld_trigger_expression_expand(const zbx_lld_trigger_t *trigger, const char *expression,
@@ -1206,8 +1196,8 @@ static char	*lld_trigger_expression_expand(const zbx_lld_trigger_t *trigger, con
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set function indexes and expand them to function strings in       *
- *          format itemid:func(params)                                        *
+ * Purpose: Sets function indexes and expands them to function strings in     *
+ *          format itemid:func(params).                                       *
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_expression_simplify_and_expand(const zbx_lld_trigger_t *trigger, char **expression,
@@ -1245,8 +1235,7 @@ static int	lld_parameter_make(const char *e, char **exp, const struct zbx_json_p
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
 	int	ret;
-	size_t	exp_alloc = 0, exp_offset = 0;
-	size_t	length;
+	size_t	length, exp_alloc = 0, exp_offset = 0;
 	char	err[64];
 
 	if (FAIL == zbx_function_validate_parameters(e, &length))
@@ -1268,11 +1257,11 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
-	int			i, ret, function_found = 0;
+	int			ret, function_found = 0;
 	zbx_lld_function_t	*function = NULL;
 	char			*proto_parameter = NULL;
 
-	for (i = 0; i < functions->values_num; i++)
+	for (int i = 0; i < functions->values_num; i++)
 	{
 		function = functions->values[i];
 
@@ -1318,9 +1307,7 @@ clean:
 
 static void	lld_functions_delete(zbx_vector_lld_function_ptr_t *functions)
 {
-	int	i;
-
-	for (i = 0; i < functions->values_num; i++)
+	for (int i = 0; i < functions->values_num; i++)
 	{
 		zbx_lld_function_t	*function = functions->values[i];
 
@@ -1336,7 +1323,7 @@ static int	lld_functions_make(const zbx_vector_lld_function_ptr_t *functions_pro
 		const zbx_vector_lld_item_link_ptr_t *item_links, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
 {
-	int				i, index, ret = FAIL;
+	int				index, ret = FAIL;
 	const zbx_lld_function_t	*function_proto;
 	const zbx_lld_item_t		*item_proto;
 	const zbx_lld_item_link_t	*item_link;
@@ -1344,7 +1331,7 @@ static int	lld_functions_make(const zbx_vector_lld_function_ptr_t *functions_pro
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < functions_proto->values_num; i++)
+	for (int i = 0; i < functions_proto->values_num; i++)
 	{
 		function_proto = functions_proto->values[i];
 
@@ -1389,14 +1376,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return copy of the expression with expanded LLD macros            *
+ * Purpose: returns copy of expression with expanded LLD macros               *
  *                                                                            *
  ******************************************************************************/
 static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char *err, size_t err_len)
 {
 	zbx_eval_context_t	ctx;
-	int			i;
 	char			*expression = NULL;
 
 	/* empty expression will not be parsed */
@@ -1405,7 +1391,7 @@ static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, con
 
 	zbx_eval_copy(&ctx, src, src->expression);
 
-	for (i = 0; i < ctx.stack.values_num; i++)
+	for (int i = 0; i < ctx.stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx.stack.values[i];
 		char			*value;
@@ -1441,7 +1427,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a trigger based on lld rule and add it to the list         *
+ * Purpose: creates trigger based on LLD rule and adds it to list             *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
@@ -1667,6 +1653,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	}
 
 	func_num = trigger->functions.values_num;
+
 	if (SUCCEED != lld_functions_make(&trigger_prototype->functions, &trigger->functions, items,
 			&lld_row->item_links, jp_row, lld_macros, &err_msg))
 	{
@@ -1735,7 +1722,6 @@ static void	lld_triggers_make(const zbx_vector_lld_trigger_prototype_ptr_t *trig
 		char **error)
 {
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
-	int					i, j;
 	zbx_hashset_t				items_triggers;
 	zbx_lld_trigger_t			*trigger;
 	const zbx_lld_function_t		*function;
@@ -1744,11 +1730,11 @@ static void	lld_triggers_make(const zbx_vector_lld_trigger_prototype_ptr_t *trig
 	/* used for fast search of trigger by item prototype */
 	zbx_hashset_create(&items_triggers, 512, items_triggers_hash_func, items_triggers_compare_func);
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
-		for (j = 0; j < trigger->functions.values_num; j++)
+		for (int j = 0; j < trigger->functions.values_num; j++)
 		{
 			function = trigger->functions.values[j];
 
@@ -1759,11 +1745,11 @@ static void	lld_triggers_make(const zbx_vector_lld_trigger_prototype_ptr_t *trig
 		}
 	}
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		trigger_prototype = trigger_prototypes->values[i];
 
-		for (j = 0; j < lld_rows->values_num; j++)
+		for (int j = 0; j < lld_rows->values_num; j++)
 		{
 			zbx_lld_row_t	*lld_row = lld_rows->values[j];
 
@@ -1779,7 +1765,7 @@ static void	lld_triggers_make(const zbx_vector_lld_trigger_prototype_ptr_t *trig
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create trigger dependencies                                       *
+ * Purpose: creates trigger dependencies                                      *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
@@ -1790,14 +1776,14 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 	const zbx_lld_trigger_prototype_t	*dep_trigger_prototype;
 	zbx_lld_dependency_t			*dependency = NULL;
 	zbx_uint64_t				triggerid_up;
-	int					i, j, index;
+	int					index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == (trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links)))
 		goto out;
 
-	for (i = 0; i < trigger_prototype->dependencies.values_num; i++)
+	for (int i = 0; i < trigger_prototype->dependencies.values_num; i++)
 	{
 		triggerid_up = (trigger_prototype->dependencies.values[i])->triggerid_up;
 
@@ -1831,7 +1817,7 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 				{
 					int	dependency_found = 0;
 
-					for (j = 0; j < trigger->dependencies.values_num; j++)
+					for (int j = 0; j < trigger->dependencies.values_num; j++)
 					{
 						dependency = trigger->dependencies.values[j];
 
@@ -1872,6 +1858,7 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 		else
 		{
 			/* creating trigger dependency based on generic trigger */
+			int	j;
 
 			for (j = 0; j < trigger->dependencies.values_num; j++)
 			{
@@ -1906,46 +1893,46 @@ static void	lld_trigger_dependencies_make(const zbx_vector_lld_trigger_prototype
 		zbx_vector_lld_trigger_ptr_t *triggers, const zbx_vector_lld_row_ptr_t *lld_rows, char **error)
 {
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
-	int					i, j;
 	zbx_hashset_t				items_triggers;
 	zbx_lld_trigger_t			*trigger;
 	zbx_lld_function_t			*function;
 	zbx_lld_item_trigger_t			item_trigger;
 	zbx_lld_dependency_t			*dependency;
+	int					ii, jj;
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (ii = 0; ii < trigger_prototypes->values_num; ii++)
 	{
-		trigger_prototype = trigger_prototypes->values[i];
+		trigger_prototype = trigger_prototypes->values[ii];
 
 		if (0 != trigger_prototype->dependencies.values_num)
 			break;
 	}
 
-	for (j = 0; j < triggers->values_num; j++)
+	for (jj = 0; jj < triggers->values_num; jj++)
 	{
-		trigger = triggers->values[j];
+		trigger = triggers->values[jj];
 
 		if (0 != trigger->dependencies.values_num)
 			break;
 	}
 
 	/* all trigger prototypes and triggers have no dependencies */
-	if (i == trigger_prototypes->values_num && j == triggers->values_num)
+	if (ii == trigger_prototypes->values_num && jj == triggers->values_num)
 		return;
 
 	/* used for fast search of trigger by item prototype */
 	zbx_hashset_create(&items_triggers, 512, items_triggers_hash_func, items_triggers_compare_func);
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int k = 0; k < triggers->values_num; k++)
 	{
-		trigger = triggers->values[i];
+		trigger = triggers->values[k];
 
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		for (j = 0; j < trigger->functions.values_num; j++)
+		for (int m = 0; m < trigger->functions.values_num; m++)
 		{
-			function = trigger->functions.values[j];
+			function = trigger->functions.values[m];
 
 			item_trigger.parent_triggerid = trigger->parent_triggerid;
 			item_trigger.itemid = function->itemid;
@@ -1954,13 +1941,13 @@ static void	lld_trigger_dependencies_make(const zbx_vector_lld_trigger_prototype
 		}
 	}
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int k = 0; k < trigger_prototypes->values_num; k++)
 	{
-		trigger_prototype = trigger_prototypes->values[i];
+		trigger_prototype = trigger_prototypes->values[k];
 
-		for (j = 0; j < lld_rows->values_num; j++)
+		for (int m = 0; m < lld_rows->values_num; m++)
 		{
-			zbx_lld_row_t	*lld_row = lld_rows->values[j];
+			zbx_lld_row_t	*lld_row = lld_rows->values[m];
 
 			lld_trigger_dependency_make(trigger_prototype, trigger_prototypes,
 					&items_triggers, lld_row, error);
@@ -1968,16 +1955,16 @@ static void	lld_trigger_dependencies_make(const zbx_vector_lld_trigger_prototype
 	}
 
 	/* marking dependencies which will be deleted */
-	for (i = 0; i < triggers->values_num; i++)
+	for (int k = 0; k < triggers->values_num; k++)
 	{
-		trigger = triggers->values[i];
+		trigger = triggers->values[k];
 
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		for (j = 0; j < trigger->dependencies.values_num; j++)
+		for (int m = 0; m < trigger->dependencies.values_num; m++)
 		{
-			dependency = trigger->dependencies.values[j];
+			dependency = trigger->dependencies.values[m];
 
 			if (0 == (dependency->flags & ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED))
 				dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DELETE;
@@ -1991,15 +1978,14 @@ static void	lld_trigger_dependencies_make(const zbx_vector_lld_trigger_prototype
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a trigger tag                                              *
+ * Purpose: creates trigger tag                                               *
  *                                                                            *
  ******************************************************************************/
-static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
+static void	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
 		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	zbx_lld_trigger_t	*trigger;
-	int			i;
 	zbx_vector_db_tag_ptr_t	new_tags;
 	zbx_db_tag_t		*tag;
 
@@ -2010,21 +1996,21 @@ static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_pro
 
 	zbx_vector_db_tag_ptr_create(&new_tags);
 
-	for (i = 0; i < trigger_prototype->tags.values_num; i++)
+	for (int i = 0; i < trigger_prototype->tags.values_num; i++)
 	{
 		tag = zbx_db_tag_create(trigger_prototype->tags.values[i]->tag,
 				trigger_prototype->tags.values[i]->value);
 		zbx_vector_db_tag_ptr_append(&new_tags, tag);
 	}
 
-	for (i = 0; i < trigger->override_tags.values_num; i++)
+	for (int i = 0; i < trigger->override_tags.values_num; i++)
 	{
 		tag = zbx_db_tag_create(trigger->override_tags.values[i]->tag,
 				trigger->override_tags.values[i]->value);
 		zbx_vector_db_tag_ptr_append(&new_tags, tag);
 	}
 
-	for (i = 0; i < new_tags.values_num; i++)
+	for (int i = 0; i < new_tags.values_num; i++)
 	{
 		zbx_substitute_lld_macros(&new_tags.values[i]->tag, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC,
 				NULL, 0);
@@ -2045,7 +2031,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a trigger tags                                             *
+ * Purpose: creates trigger tags                                              *
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_tags_make(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
@@ -2053,7 +2039,6 @@ static void	lld_trigger_tags_make(const zbx_vector_lld_trigger_prototype_ptr_t *
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
-	int				i, j;
 	zbx_hashset_t			items_triggers;
 	zbx_lld_trigger_t		*trigger;
 	zbx_lld_function_t		*function;
@@ -2062,14 +2047,14 @@ static void	lld_trigger_tags_make(const zbx_vector_lld_trigger_prototype_ptr_t *
 	/* used for fast search of trigger by item prototype */
 	zbx_hashset_create(&items_triggers, 512, items_triggers_hash_func, items_triggers_compare_func);
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		for (j = 0; j < trigger->functions.values_num; j++)
+		for (int j = 0; j < trigger->functions.values_num; j++)
 		{
 			function = trigger->functions.values[j];
 
@@ -2080,11 +2065,11 @@ static void	lld_trigger_tags_make(const zbx_vector_lld_trigger_prototype_ptr_t *
 		}
 	}
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		trigger_prototype = trigger_prototypes->values[i];
 
-		for (j = 0; j < lld_rows->values_num; j++)
+		for (int j = 0; j < lld_rows->values_num; j++)
 		{
 			zbx_lld_row_t	*lld_row = lld_rows->values[j];
 
@@ -2134,13 +2119,13 @@ static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field,
 
 /******************************************************************************
  *                                                                            *
- * Return value: returns SUCCEED if a trigger description or expression has   *
- *               been changed; FAIL - otherwise                               *
+ * Return value: SUCCEED - if trigger description or expression has been      *
+ *                         changed                                            *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
 {
-	int			i;
 	zbx_lld_function_t	*function;
 
 	if (0 == trigger->triggerid)
@@ -2152,7 +2137,7 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
 		return SUCCEED;
 	}
 
-	for (i = 0; i < trigger->functions.values_num; i++)
+	for (int i = 0; i < trigger->functions.values_num; i++)
 	{
 		function = trigger->functions.values[i];
 
@@ -2165,8 +2150,9 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Return value: returns SUCCEED if descriptions and expressions of           *
- *               the triggers are identical; FAIL - otherwise                 *
+ * Return value: SUCCEED - if descriptions and expressions of triggers are    *
+ *                         identical                                          *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_trigger_t *db_trigger)
@@ -2199,12 +2185,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Parameters: triggers - [IN] sorted list of triggers                        *
+ * Parameters:                                                                *
+ *   hostid   - [IN]                                                          *
+ *   triggers - [IN] sorted list of triggers                                  *
+ *   error    - [OUT]                                                         *
  *                                                                            *
  ******************************************************************************/
 static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_ptr_t *triggers, char **error)
 {
-	int			i, j, k;
 	zbx_lld_trigger_t	*trigger;
 	zbx_lld_function_t	*function;
 	zbx_vector_uint64_t	triggerids;
@@ -2217,7 +2205,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 
 	/* checking a validity of the fields */
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
@@ -2239,7 +2227,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 
 	/* checking duplicated triggers in DB */
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
@@ -2337,7 +2325,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 
 		lld_functions_get(NULL, &db_triggers);
 
-		for (i = 0; i < db_triggers.values_num; i++)
+		for (int i = 0; i < db_triggers.values_num; i++)
 		{
 			db_trigger = db_triggers.values[i];
 
@@ -2346,7 +2334,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 			lld_trigger_expression_simplify_and_expand(db_trigger, &db_trigger->recovery_expression,
 					&db_trigger->functions);
 
-			for (j = 0; j < triggers->values_num; j++)
+			for (int j = 0; j < triggers->values_num; j++)
 			{
 				trigger = triggers->values[j];
 
@@ -2371,7 +2359,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 							&trigger->recovery_expression_orig, &trigger->flags,
 							ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION);
 
-					for (k = 0; k < trigger->functions.values_num; k++)
+					for (int k = 0; k < trigger->functions.values_num; k++)
 					{
 						function = trigger->functions.values[k];
 
@@ -2402,7 +2390,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 
 /******************************************************************************
  *                                                                            *
- * Purpose: transforms the simple trigger expression to the DB format         *
+ * Purpose: transforms simple trigger expression to DB format                 *
  *                                                                            *
  * Example:                                                                   *
  *                                                                            *
@@ -2415,7 +2403,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_lld_trigger_pt
 static int	lld_expression_create(const zbx_lld_trigger_t *trigger, char **expression,
 		const zbx_vector_lld_function_ptr_t *functions)
 {
-	int			i, j, ret = FAIL;
+	int			ret = FAIL;
 	zbx_uint64_t		function_index;
 	zbx_eval_context_t	ctx;
 	char			*errmsg = NULL, *new_expression = NULL;
@@ -2442,7 +2430,7 @@ static int	lld_expression_create(const zbx_lld_trigger_t *trigger, char **expres
 		goto out;
 	}
 
-	for (i = 0; i < ctx.stack.values_num; i++)
+	for (int i = 0; i < ctx.stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx.stack.values[i];
 
@@ -2456,7 +2444,7 @@ static int	lld_expression_create(const zbx_lld_trigger_t *trigger, char **expres
 			continue;
 		}
 
-		for (j = 0; j < functions->values_num; j++)
+		for (int j = 0; j < functions->values_num; j++)
 		{
 			const zbx_lld_function_t	*function = functions->values[j];
 
@@ -2486,7 +2474,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update triggers in database based on discovery rule        *
+ * Purpose: adds or updates triggers in database based on discovery rule      *
  *                                                                            *
  * Parameters: hostid             - [IN] parent host id                       *
  *             trigger_prototypes - [IN]                                      *
@@ -2500,7 +2488,7 @@ out:
 static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
 		const zbx_vector_lld_trigger_ptr_t *triggers)
 {
-	int					ret = SUCCEED, i, j, new_triggers = 0, upd_triggers = 0,
+	int					ret = SUCCEED, new_triggers = 0, upd_triggers = 0,
 						new_functions = 0, new_dependencies = 0, new_tags = 0, upd_tags = 0;
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_lld_trigger_t			*trigger;
@@ -2522,7 +2510,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 	zbx_vector_uint64_create(&del_triggertagids);
 	zbx_vector_uint64_create(&trigger_protoids);
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
@@ -2541,7 +2529,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 					trigger->description_orig, ZBX_FLAG_DISCOVERY_CREATED);
 		}
 
-		for (j = 0; j < trigger->functions.values_num; j++)
+		for (int j = 0; j < trigger->functions.values_num; j++)
 		{
 			function = trigger->functions.values[j];
 
@@ -2558,7 +2546,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 				new_functions++;
 		}
 
-		for (j = 0; j < trigger->dependencies.values_num; j++)
+		for (int j = 0; j < trigger->dependencies.values_num; j++)
 		{
 			dependency = trigger->dependencies.values[j];
 
@@ -2579,7 +2567,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 				new_dependencies++;
 		}
 
-		for (j = 0; j < trigger->tags.values_num; j++)
+		for (int j = 0; j < trigger->tags.values_num; j++)
 		{
 			tag = trigger->tags.values[j];
 
@@ -2608,7 +2596,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 
 	zbx_db_begin();
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
 		trigger_prototype = trigger_prototypes->values[i];
 		zbx_vector_uint64_append(&trigger_protoids, trigger_prototype->triggerid);
@@ -2666,7 +2654,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		int	index;
 
@@ -2682,7 +2670,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 
 		trigger_prototype = trigger_prototypes->values[index];
 
-		for (j = 0; j < trigger->functions.values_num; j++)
+		for (int j = 0; j < trigger->functions.values_num; j++)
 		{
 			function = trigger->functions.values[j];
 
@@ -2937,14 +2925,14 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 		}
 	}
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		for (j = 0; j < trigger->dependencies.values_num; j++)
+		for (int j = 0; j < trigger->dependencies.values_num; j++)
 		{
 			dependency = trigger->dependencies.values[j];
 
@@ -2972,14 +2960,14 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 	}
 
 	/* create/update trigger tags */
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
 		trigger = triggers->values[i];
 
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		for (j = 0; j < trigger->tags.values_num; j++)
+		for (int j = 0; j < trigger->tags.values_num; j++)
 		{
 			char	*value_esc;
 
@@ -3119,7 +3107,12 @@ out:
 	return ret;
 }
 
-/* hash/comparison functions to support cache/vector lookups by trigger reference */
+
+/*******************************************************************************************
+ *                                                                                         *
+ * Purpose: hash/comparison functions to support cache/vector lookups by trigger reference *
+ *                                                                                         *
+ *******************************************************************************************/
 static zbx_hash_t	zbx_lld_trigger_ref_hash_func(const void *data)
 {
 	zbx_hash_t			hash;
@@ -3151,7 +3144,11 @@ static int	zbx_lld_trigger_ref_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-/* comparison function to determine trigger dependency validation order */
+/*******************************************************************************************
+ *                                                                                         *
+ * comparison function to determine trigger dependency validation order                    *
+ *                                                                                         *
+ *******************************************************************************************/
 static int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
 {
 	const zbx_lld_trigger_node_t	*n1 = *(const zbx_lld_trigger_node_t **)d1;
@@ -3178,13 +3175,13 @@ static int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds a node to trigger cache                                      *
+ * Purpose: adds node to trigger cache                                        *
  *                                                                            *
  * Parameters: cache     - [IN] trigger cache                                 *
  *             triggerid - [IN]                                               *
  *             trigger   - [IN] trigger data for new triggers                 *
  *                                                                            *
- * Return value: the added node                                               *
+ * Return value: added node                                                   *
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zbx_uint64_t triggerid,
@@ -3205,7 +3202,7 @@ static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add trigger and all triggers related to it to trigger dependency  *
+ * Purpose: Adds trigger and all triggers related to it to trigger dependency *
  *          validation cache.                                                 *
  *                                                                            *
  * Parameters: cache           - [IN] trigger cache                           *
@@ -3222,7 +3219,6 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 	zbx_lld_trigger_ref_t	*trigger_ref;
 	zbx_lld_trigger_node_t	*trigger_node, trigger_node_local;
 	zbx_lld_dependency_t	*dependency;
-	int			i;
 
 	trigger_node_local.trigger_ref.triggerid = trigger->triggerid;
 	trigger_node_local.trigger_ref.trigger = trigger;
@@ -3232,7 +3228,7 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 
 	trigger_node = lld_trigger_cache_append(cache, trigger->triggerid, trigger);
 
-	for (i = 0; i < trigger->dependencies.values_num; i++)
+	for (int i = 0; i < trigger->dependencies.values_num; i++)
 	{
 		dependency = trigger->dependencies.values[i];
 
@@ -3266,13 +3262,13 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 	if (0 != trigger->triggerid)
 		zbx_vector_uint64_append(triggerids_up, trigger->triggerid);
 
-	for (i = 0; i < trigger->dependents.values_num; i++)
+	for (int i = 0; i < trigger->dependents.values_num; i++)
 	{
-		lld_trigger_cache_add_trigger_node(cache, (zbx_lld_trigger_t *)trigger->dependents.values[i],
-				triggerids_up, triggerids_down);
+		lld_trigger_cache_add_trigger_node(cache, trigger->dependents.values[i], triggerids_up,
+				triggerids_down);
 	}
 
-	for (i = 0; i < trigger->dependencies.values_num; i++)
+	for (int i = 0; i < trigger->dependencies.values_num; i++)
 	{
 		dependency = trigger->dependencies.values[i];
 
@@ -3286,8 +3282,8 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initializes trigger cache used to perform trigger dependency      *
- *          validation                                                        *
+ * Purpose: Initializes trigger cache used to perform trigger dependency      *
+ *          validation.                                                       *
  *                                                                            *
  * Parameters: cache    - [IN] trigger cache                                  *
  *             triggers - [IN] discovered triggers                            *
@@ -3454,7 +3450,6 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_lld_trigger_
 
 			zbx_db_free_result(result);
 		}
-
 	}
 
 	zbx_free(sql);
@@ -3467,8 +3462,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_lld_trigger_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: releases resources allocated by trigger cache                     *
- *          validation                                                        *
+ * Purpose: releases resources allocated by trigger cache validation          *
  *                                                                            *
  * Parameters: cache - [IN] trigger cache                                     *
  *                                                                            *
@@ -3560,8 +3554,8 @@ static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_t
  *             level         - [IN] dependency level                          *
  *             error         - [OUT] error message                            *
  *                                                                            *
- * Return value: SUCCEED - the trigger's dependency chain in valid            *
- *               FAIL    - a dependency loop was detected                     *
+ * Return value: SUCCEED - trigger's dependency chain is valid                *
+ *               FAIL    - dependency loop was detected                       *
  *                                                                            *
  * Comments: If the validation fails the offending dependency is removed.     *
  *                                                                            *
@@ -3569,7 +3563,6 @@ static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_t
 static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_lld_trigger_node_t *trigger_node,
 		zbx_lld_trigger_node_iter_t *iter, int level, char **error)
 {
-	int				i;
 	zbx_lld_trigger_ref_t		*trigger_ref;
 	zbx_lld_trigger_node_t		*trigger_node_up;
 	zbx_lld_trigger_node_iter_t	child_iter, *piter;
@@ -3587,7 +3580,7 @@ static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_lld_trigger_n
 
 	trigger_node->iter_num = iter->iter_num;
 
-	for (i = 0; i < trigger_node->dependencies.values_num; i++)
+	for (int i = 0; i < trigger_node->dependencies.values_num; i++)
 	{
 		trigger_ref = trigger_node->dependencies.values[i];
 
@@ -3627,7 +3620,7 @@ static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_lld_trigger_n
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate discovered trigger dependencies                          *
+ * Purpose: validates discovered trigger dependencies                         *
  *                                                                            *
  * Parameters: triggers - [IN] discovered triggers                            *
  *             error    - [OUT] error message                                 *
@@ -3728,7 +3721,7 @@ static	int	get_trigger_status_value(int status)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add or update triggers for discovered items                       *
+ * Purpose: adds or updates triggers for discovered items                     *
  *                                                                            *
  * Return value: SUCCEED - if triggers were successfully added/updated or     *
  *                         adding/updating was not necessary                  *

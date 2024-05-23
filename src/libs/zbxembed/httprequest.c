@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the envied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "httprequest.h"
@@ -99,7 +94,7 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 	duk_push_this(ctx);
 	duk_get_prop_string(ctx, -1, "\xff""\xff""d");
 	request = (zbx_es_httprequest_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
+	duk_pop_2(ctx);
 
 	return request;
 }
@@ -131,9 +126,6 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 		zbx_free(request->data);
 		zbx_free(request->headers_in);
 		zbx_free(request);
-
-		duk_push_pointer(ctx, NULL);
-		duk_put_prop_string(ctx, 0, "\xff""\xff""d");
 	}
 
 	return 0;

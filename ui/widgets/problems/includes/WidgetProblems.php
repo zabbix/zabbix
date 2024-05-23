@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -472,29 +467,31 @@ class WidgetProblems extends CTableInfo {
 					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 				: new CSpan(_('Update'));
 
-			$row->addItem([
-				$data['show_recovery_data'] ? $cell_r_clock : null,
-				$data['show_recovery_data'] ? $cell_status : null,
-				makeInformationList($info_icons),
-				$data['triggers_hosts'][$trigger['triggerid']],
-				$description,
-				($data['fields']['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY)
-					? $opdata->addClass(ZBX_STYLE_WORDBREAK)
-					: null,
-				(new CCol(
-					(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0)
-						? $problem['r_clock']
-						: 0
-					)))
-						->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $problem['eventid'],
-							$data['show_timeline'], $data['fields']['show_tags'], $data['fields']['tags'],
-							$data['fields']['tag_name_format'], $data['fields']['tag_priority']
-						))
-				))->addClass(ZBX_STYLE_NOWRAP),
-				$problem_update_link,
-				makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
-				$data['fields']['show_tags'] ? $data['tags'][$problem['eventid']] : null
-			]);
+			$row
+				->addItem([
+					$data['show_recovery_data'] ? $cell_r_clock : null,
+					$data['show_recovery_data'] ? $cell_status : null,
+					makeInformationList($info_icons),
+					$data['triggers_hosts'][$trigger['triggerid']],
+					$description,
+					($data['fields']['show_opdata'] == OPERATIONAL_DATA_SHOW_SEPARATELY)
+						? $opdata->addClass(ZBX_STYLE_WORDBREAK)
+						: null,
+					(new CCol(
+						(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0)
+							? $problem['r_clock']
+							: 0
+						)))
+							->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $problem['eventid'],
+								$data['show_timeline'], $data['fields']['show_tags'], $data['fields']['tags'],
+								$data['fields']['tag_name_format'], $data['fields']['tag_priority']
+							))
+					))->addClass(ZBX_STYLE_NOWRAP),
+					$problem_update_link,
+					makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'], $is_acknowledged),
+					$data['fields']['show_tags'] ? $data['tags'][$problem['eventid']] : null
+				])
+				->setAttribute('data-eventid', $problem['eventid']);
 
 			$this->addRow($row);
 

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -495,9 +490,16 @@ class testPageSearch extends CWebTest {
 			$expected_count = CTestArrayHelper::get($data, 'count_from_db')
 				? $db_count[$widget_params['key']]
 				: (array_key_exists($widget_params['key'], $data) ? count($data[$widget_params['key']]) : 0);
-			$footer_text = $widget->query('xpath:.//div[@class="section-foot"]')->one()->getText();
-			// Only a maximum of 100 records are displayed at once.
-			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
+
+			if ($expected_count === 0) {
+				$this->assertFalse($widget->query('xpath:.//div[@class="section-foot"]')->exists());
+				$this->assertEquals('No data found', $widget->query('class:no-data-message')->one()->getText());
+			}
+			else {
+				$footer_text = $widget->query('xpath:.//div[@class="section-foot"]')->one()->getText();
+				// Only a maximum of 100 records are displayed at once.
+				$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
+			}
 		}
 	}
 
@@ -651,7 +653,6 @@ class testPageSearch extends CWebTest {
 					'expected_suggestions' => [
 						'Simple form test host',
 						'Template inheritance test host',
-						'Visible host for template linkage',
 						'ЗАББИКС Сервер'
 					]
 				]

@@ -1,13 +1,13 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libservice.a
+noinst_LIBRARIES = libservice_server.a
 
-libservice_a_SOURCES = \
-	service_manager.c \
-	service_manager.h \
+libservice_server_a_SOURCES = \
 	service_manager_impl.h \
 	service_actions.c \
-	service_actions.h
+	service_actions.h \
+	service_manager.c \
+	service_server.h
 
-libservice_a_CFLAGS = \
+libservice_server_a_CFLAGS = \
 	$(TLS_CFLAGS)

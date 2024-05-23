@@ -16,6 +16,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
@@ -24,6 +25,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
+	$(top_srcdir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -79,6 +81,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/tests/libzbxmockdummy.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)

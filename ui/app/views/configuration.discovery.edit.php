@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -47,23 +42,35 @@ $form_grid = (new CFormGrid())
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
-	]);
-
-// Append proxy to form list.
-$proxy_select = (new CSelect('proxyid'))
-	->setValue($this->data['drule']['proxyid'])
-	->setFocusableElementId('label-proxy')
-	->addOption(new CSelectOption(0, _('No proxy')));
-
-foreach ($this->data['proxies'] as $proxy) {
-	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['name']));
-}
-
-$form_grid
-	->addItem([
-		new CLabel(_('Discovery by proxy'), $proxy_select->getFocusableElementId()),
-		new CFormField($proxy_select)
 	])
+	->addItem([
+		new CLabel(_('Discovery by'), 'discovery_by'),
+		new CFormField(
+			(new CRadioButtonList('discovery_by', $data['discovery_by']))
+				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER)
+				->addValue(_('Proxy'), ZBX_DISCOVERY_BY_PROXY)
+				->setModern()
+		)
+	])
+	->addItem(
+		(new CFormField(
+			(new CMultiSelect([
+				'name' => 'proxyid',
+				'object_name' => 'proxies',
+				'multiple' => false,
+				'data' => $data['ms_proxy'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxies',
+						'srcfld1' => 'proxyid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxyid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass('js-field-proxy')
+	)
 	->addItem([
 		(new CLabel(_('IP range'), 'iprange'))->setAsteriskMark(),
 		new CFormField(

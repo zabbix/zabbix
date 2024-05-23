@@ -1,36 +1,25 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 class CWidgetGraph extends CWidget {
-
-	#override_hostid = null;
 
 	onInitialize() {
 		this._is_graph_mode = false;
 	}
 
 	onStart() {
-		if (this.getFieldsReferredData().has('override_hostid')) {
-			this.#override_hostid = this.getFieldsReferredData().get('override_hostid').value;
-		}
-
 		this.events_handlers = {
 			rangeUpdate: (e) => {
 				if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
@@ -40,7 +29,9 @@ class CWidgetGraph extends CWidget {
 					timeControl.refreshObject(`graph_${this._unique_id}`);
 
 					this.feedback({time_period});
-					this.broadcast({_timeperiod: time_period});
+					this.broadcast({
+						[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+					});
 				}
 			}
 		};
@@ -94,7 +85,7 @@ class CWidgetGraph extends CWidget {
 	}
 
 	onFeedback({type, value}) {
-		if (type === '_timeperiod') {
+		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD && this.getFieldsReferredData().has('time_period')) {
 			this._startUpdating();
 
 			this.feedback({time_period: value});
@@ -102,35 +93,29 @@ class CWidgetGraph extends CWidget {
 			return true;
 		}
 
-		return super.onFeedback({type, value});
+		return false;
 	}
 
 	promiseUpdate() {
 		const time_period = this.getFieldsData().time_period;
 
-		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: time_period});
+		if (!this.hasBroadcast(CWidgetsData.DATA_TYPE_TIME_PERIOD) || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+			});
+		}
+
+		if (this.isFieldsReferredDataUpdated()) {
+			this.clearContents();
+
+			return super.promiseUpdate();
 		}
 
 		if (this._is_graph_mode) {
-			if (time_period === null) {
-				this._is_graph_mode = false;
-				this._deactivateGraph();
+			if (this.isFieldsReferredDataUpdated()) {
+				this.clearContents();
 
 				return super.promiseUpdate();
-			}
-
-			if (this.getFieldsReferredData().has('override_hostid')) {
-				const override_hostid = this.getFieldsReferredData().get('override_hostid').value;
-
-				if (this.#override_hostid !== override_hostid) {
-					this.#override_hostid = override_hostid;
-
-					this._is_graph_mode = false;
-					this._deactivateGraph();
-
-					return super.promiseUpdate();
-				}
 			}
 
 			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`], time_period);
@@ -175,10 +160,6 @@ class CWidgetGraph extends CWidget {
 
 	setContents(response) {
 		super.setContents(response);
-
-		if (this.getFieldsData().time_period === null) {
-			return;
-		}
 
 		if (!this._is_graph_mode && 'async_data' in response) {
 			this._is_graph_mode = true;
@@ -251,6 +232,13 @@ class CWidgetGraph extends CWidget {
 		flickerfreeScreen.remove(this._flickerfreescreen_data);
 
 		this._flickerfreescreen_container.removeEventListener('rangeupdate', this.events_handlers.rangeUpdate);
+	}
+
+	onClearContents() {
+		if (this._is_graph_mode) {
+			this._is_graph_mode = false;
+			this._deactivateGraph();
+		}
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {

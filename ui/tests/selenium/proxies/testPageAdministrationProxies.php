@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -76,7 +71,7 @@ class testPageAdministrationProxies extends CWebTest {
 		}
 
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
-		$this->assertEquals(['', 'Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)', 'Host count', 'Item count',
+		$this->assertEquals(['', 'Name', 'Mode', 'Encryption', 'State', 'Version', 'Last seen (age)', 'Item count',
 				'Required vps', 'Hosts'], $table->getHeadersText()
 		);
 
@@ -109,7 +104,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 				// Check version hint.
 				$column->query('xpath:.//button[@data-hintbox="1"]')->one()->waitUntilClickable()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
 				$this->assertEquals($parameters['hint_text'], $hint->getText());
 
 				if (array_key_exists('hint_color', $parameters)) {
@@ -154,27 +149,36 @@ class testPageAdministrationProxies extends CWebTest {
 				'Mode' => 'Active',
 				'Encryption' => 'None',
 				'Version' => '',
+				'State' => 'Unknown',
 				'Last seen (age)' => 'Never',
-				'Host count' => '',
 				'Item count' => '',
 				'Required vps' => '',
-				'Hosts' => 'enabled_host1'
+				'Hosts' => '1'
 			],
 			[
 				'Name' => 'passive_proxy1',
 				'Mode' => 'Passive',
 				'Encryption' => 'None',
 				'Version' => '',
+				'State' => 'Unknown',
 				'Last seen (age)' => 'Never',
-				'Host count' => '',
 				'Item count' => '',
 				'Required vps' => '',
-				'Hosts' => 'disabled_host1'
+				'Hosts' => '1'
 			]
+		];
+
+		$hosts = [
+			'active_proxy1' => 'enabled_host1',
+			'passive_proxy1' => 'disabled_host1'
 		];
 
 		// Check filtered result.
 		$this->assertTableData($filter_result);
+
+		foreach ($hosts as $proxy_name => $host_name) {
+			$this->assertEquals($host_name, $table->findRow('Name', $proxy_name)->getColumn(10)->getText());
+		}
 
 		// Reset filter and assert row count.
 		$form->query('button:Reset')->one()->click();

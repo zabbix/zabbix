@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -28,7 +23,7 @@
 	const view = new class {
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
-				saml_provision_media, templates, mfa_methods, mfa_default_row_index
+				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -38,6 +33,7 @@
 			this.ldap_jit_status = document.getElementById('ldap_jit_status');
 			this.ldap_servers_table = document.getElementById('ldap-servers');
 			this.templates = templates;
+			this.is_http_auth_allowed = is_http_auth_allowed;
 			this.ldap_provisioning_fields = this.form.querySelectorAll(
 				'[name="ldap_jit_status"],[name="ldap_case_sensitive"],[name="jit_provision_interval"]'
 			);
@@ -66,48 +62,50 @@
 		_addEventListeners() {
 			this.#addLdapSettingsEventListeners();
 
-			document.getElementById('http_auth_enabled').addEventListener('change', (e) => {
-				this.form.querySelectorAll('[name^=http_]').forEach(field => {
-					if (!field.isSameNode(e.target)) {
-						field.disabled = !e.target.checked;
+			if (this.is_http_auth_allowed) {
+				document.getElementById('http_auth_enabled').addEventListener('change', (e) => {
+					this.form.querySelectorAll('[name^=http_]').forEach(field => {
+						if (!field.isSameNode(e.target)) {
+							field.disabled = !e.target.checked;
+						}
+					});
+
+					if (e.target.checked) {
+						let form_fields = this.form.querySelectorAll('[name^=http_]');
+
+						const http_auth_enabled = document.getElementById('http_auth_enabled');
+						overlayDialogue({
+							'title': <?= json_encode(_('Confirm changes')) ?>,
+							'class': 'position-middle',
+							'content': document.createElement('span').innerText = <?= json_encode(
+								_('Enable HTTP authentication for all users.')
+							) ?>,
+							'buttons': [
+								{
+									'title': <?= json_encode(_('Cancel')) ?>,
+									'cancel': true,
+									'class': '<?= ZBX_STYLE_BTN_ALT ?>',
+									'action': function () {
+										for (const form_field of form_fields) {
+											if (form_field !== http_auth_enabled) {
+												form_field.disabled = true;
+											}
+										}
+
+										http_auth_enabled.checked = false;
+										document.getElementById('tab_http').setAttribute('data-indicator-value', '0');
+									}
+								},
+								{
+									'title': <?= json_encode(_('Ok')) ?>,
+									'focused': true,
+									'action': function () {}
+								}
+							]
+						}, e.target);
 					}
 				});
-
-				if (e.target.checked) {
-					let form_fields = this.form.querySelectorAll('[name^=http_]');
-
-					const http_auth_enabled = document.getElementById('http_auth_enabled');
-					overlayDialogue({
-						'title': <?= json_encode(_('Confirm changes')) ?>,
-						'class': 'position-middle',
-						'content': document.createElement('span').innerText = <?= json_encode(
-							_('Enable HTTP authentication for all users.')
-						) ?>,
-						'buttons': [
-							{
-								'title': <?= json_encode(_('Cancel')) ?>,
-								'cancel': true,
-								'class': '<?= ZBX_STYLE_BTN_ALT ?>',
-								'action': function () {
-									for (const form_field of form_fields) {
-										if (form_field !== http_auth_enabled) {
-											form_field.disabled = true;
-										}
-									}
-
-									http_auth_enabled.checked = false;
-									document.getElementById('tab_http').setAttribute('data-indicator-value', '0');
-								}
-							},
-							{
-								'title': <?= json_encode(_('Ok')) ?>,
-								'focused': true,
-								'action': function () {}
-							}
-						]
-					}, e.target);
-				}
-			});
+			}
 
 			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
@@ -384,11 +382,10 @@
 			if (row !== null) {
 				row_index = row.dataset.row_index;
 
-				popup_params = {
-					name: row.querySelector(`[name="saml_provision_media[${row_index}][name]"`).value,
-					attribute: row.querySelector(`[name="saml_provision_media[${row_index}][attribute]"`).value,
-					mediatypeid: row.querySelector(`[name="saml_provision_media[${row_index}][mediatypeid]"`).value
-				};
+				popup_params = Object.fromEntries(
+					[...row.querySelectorAll(`[name^="saml_provision_media[${row_index}]"]`)].map(
+						i => [i.name.match(/\[([^\]]+)\]$/)[1], i.value]
+				));
 			}
 			else {
 				while (this.saml_media_type_mapping_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
@@ -463,17 +460,10 @@
 					return element.name.substring(start, end);
 				});
 				const provision_media = provision_media_indexes.map((i) => {
-					return {
-						name: row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_media][${i}][name]"`
-						).value,
-						mediatypeid: row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_media][${i}][mediatypeid]"`
-						).value,
-						attribute: row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_media][${i}][attribute]"`
-						).value
-					};
+					return Object.fromEntries(
+						[...row.querySelectorAll(`[name^="ldap_servers[${row_index}][provision_media][${i}]"]`)].map(
+							i => [i.name.match(/\[([^\]]+)\]$/)[1], i.value]
+					));
 				});
 
 				popup_params = {
@@ -649,6 +639,10 @@
 			const template = document.createElement('template');
 
 			template.innerHTML = template_saml_media_mapping_row.evaluate(saml_media).trim();
+
+			if (saml_media.userdirectory_mediaid === undefined) {
+				template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"]').remove();
+			}
 
 			return template.content.firstChild;
 		}
