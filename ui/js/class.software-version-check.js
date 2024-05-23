@@ -50,7 +50,7 @@ class CSoftwareVersionCheck {
 				}
 				else {
 					this.#data.versions = [];
-					this.#data.major_version = response.major_version;
+					this.#data.version = response.version;
 					this.#data.check_hash = response.check_hash;
 					this.#data._csrf_token = response._csrf_token;
 
@@ -68,7 +68,7 @@ class CSoftwareVersionCheck {
 		const curl = new Curl(CSoftwareVersionCheck.URL);
 
 		curl.setArgument('type', CSoftwareVersionCheck.TYPE);
-		curl.setArgument('version', this.#data.major_version);
+		curl.setArgument('version', this.#data.version);
 		curl.setArgument('software_update_check_hash', this.#data.check_hash);
 
 		fetch(curl.getUrl(), {cache: 'no-store'})
