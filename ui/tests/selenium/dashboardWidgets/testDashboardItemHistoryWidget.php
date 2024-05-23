@@ -17,13 +17,16 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
  * @backup dashboard
  *
  * @onBefore prepareData
+ *
+ * @dataSource AllItemValueTypes
  */
-class testDashboardItemHistoryWidget extends CWebTest {
+class testDashboardItemHistoryWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -316,6 +319,137 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		$refresh_interval = ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
 				'2 minutes', '10 minutes', '15 minutes'];
 		$this->assertEquals($refresh_interval, $form->getField('Refresh interval')->getOptions()->asText());
+
+		// Check Column popup.
+		$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
+		$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$this->assertEquals('New column', $column_overlay->getTitle());
+		$column_form = $column_overlay->asForm();
+		$this->assertEquals(['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Min', 'Max', 'Thresholds',
+				'History data', 'Use monospace font', 'Display local time', 'Show thumbnail'],
+				$column_form->getLabels()->asText()
+		);
+		$this->assertEquals(['Name', 'Item'], $column_form->getRequiredLabels());
+
+		$defaults = [
+			'Name' => ['value' => '', 'maxlength' => 255],
+			'Item' => ['value' => ''],
+			'xpath://input[@id="base_color"]/..' => ['value' => ''],
+			'Display' => ['value' => 'As is', 'lables' => ['As is', 'HTML', 'Single line']],
+			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
+			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
+			'History data' => ['value' => 'Auto', 'lables' => ['Auto', 'History', 'Trends']],
+			'Use monospace font' => ['value' => false],
+			'Display local time' => ['value' => false],
+			'Show thumbnail' => ['value' => false]
+		];
+
+		foreach ($defaults as $label => $attributes) {
+			$field = $column_form->getField($label);
+			$this->assertEquals($attributes['value'], $field->getValue());
+
+			if (array_key_exists('maxlength', $attributes)) {
+				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
+			}
+
+			if (array_key_exists('placeholder', $attributes)) {
+				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
+			}
+
+			if (array_key_exists('labels', $attributes)) {
+				$this->assertEquals($attributes['labels'], $field->asSegmentedRadio()->getLabels()->asText());
+			}
+		}
+
+		// Check buttons in column dialog.
+		$this->assertEquals(['Add', 'Cancel'], $column_overlay->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+		);
+
+		// Check initial visible fields.
+		foreach (['Name', 'Item', 'Base colour'] as $label) {
+			$field = $column_form->getField($label);
+			$this->assertTrue($field->isEnabled());
+			$this->assertTrue($field->isVisible());
+		}
+
+		// Check fields for binary item.
+		$column_form->fill(['Item' => 'Binary item']);
+
+		// Check that name is filled automatically.
+		$this->assertEquals('Binary item', $column_form->getField('Name')->getValue());
+		$this->assertEquals(['Name', 'Item', 'Base colour', 'Show thumbnail'],
+				array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
+		);
+
+		// Check fields for character, text and log items.
+		foreach (['Character item', 'Text item', 'Log item'] as $i => $item) {
+			$column_form->fill(['Item' => $item]);
+			$this->assertEquals($item, $column_form->getField('Name')->getValue());
+
+			$labels = ($item === 'Log item')
+				? ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font', 'Display local time']
+				: ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font'];
+
+			$this->assertEquals($labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
+
+			$highlights_container =  $column_form->getFieldContainer('Highlights');
+			$highlights_container->query('button:Add')->one()->click();
+
+			$regex_input = $column_form->query('id', 'highlights_'.$i.'_pattern')->one();
+			$this->assertTrue($regex_input->isVisible());
+			$this->assertEquals('FF465C', $highlights_container->query('xpath:.//div[@class="color-picker"]')
+					->asColorPicker()->one()->getValue()
+			);
+			$column_form->query('id', 'highlights_'.$i.'_remove')->one()->click();
+			$this->assertFalse($regex_input->isVisible());
+
+			$this->checkHint($column_form, 'Display',
+					'Single line - result will be displayed in a single line and truncated to specified length.'
+			);
+
+			if ($item === 'Log item') {
+				$this->checkHint($column_form, 'Display local time', 'This setting will display local time '.
+						'instead of the timestamp. "Show timestamp" must also be checked in the advanced configuration.'
+				);
+			}
+		}
+
+		// Check fields for float and unsigned item.
+		foreach (['Float item', 'Unsigned item'] as $j => $item) {
+			$column_form->fill(['Item' => $item]);
+			$this->assertEquals(['Name', 'Item', 'Base colour', 'Display', 'Thresholds', 'History data'],
+					array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
+			);
+
+			$display_fields = [
+				'Bar' => true,
+				'Indicators' => true,
+				'As is' => false
+			];
+			foreach ($display_fields as $label => $status) {
+				$column_form->fill(['Display' => $label]);
+
+				foreach (['Min', 'Max'] as $display_input) {
+					$input = $column_form->getField($display_input);
+					$this->assertTrue($input->isEnabled($status));
+					$this->assertTrue($input->isVisible($status));
+				}
+			}
+
+			$thresholds_container =  $column_form->getFieldContainer('Thresholds');
+			$thresholds_container->query('button:Add')->one()->click();
+
+			$threshold_input = $column_form->query('id', 'thresholds_'.$j.'_threshold')->one();
+			$this->assertTrue($threshold_input->isVisible());
+			$this->assertEquals('FF465C', $thresholds_container->query('xpath:.//div[@class="color-picker"]')
+					->asColorPicker()->one()->getValue()
+			);
+			$column_form->query('id', 'thresholds_'.$j.'_remove')->one()->click();
+			$this->assertFalse($threshold_input->isVisible());
+		}
+
+		$column_overlay->close();
 
 		// Check if buttons present and clickable.
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
@@ -1326,6 +1460,15 @@ class testDashboardItemHistoryWidget extends CWebTest {
 	}
 
 	/**
+	 * Test function for assuring that all items are available in Item History widget.
+	 */
+	public function testDashboardItemHistoryWidget_CheckAvailableItems() {
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid,
+				'Item history'
+		);
+	}
+
+	/**
 	 * Change Item history widget configuration.
 	 *
 	 * @param CDashboardElement		$dashboard			dashboard element
@@ -1337,5 +1480,20 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		$form->submit();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
+	}
+
+	/**
+	 * Check field's hint text.
+	 *
+	 * @param CFormElement $form         given form
+	 * @param string       $label        checked field's label
+	 * @param string       $hint_text    text of the hint
+	 */
+	protected function checkHint($form, $label, $hint_text) {
+		$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click();
+		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
+		$this->assertEquals($hint_text, $hint->one()->getText());
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+		$hint->waitUntilNotPresent();
 	}
 }

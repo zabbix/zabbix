@@ -47,17 +47,13 @@ class testWidgets extends CWebTest {
 		$select_dialog = $widget_dialog;
 
 		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
-		$item_types = [
-			'Character item',
-			'Float item',
-			'Log item',
-			'Text item',
-			'Unsigned item',
-			'Unsigned_dependent item'
-		];
+		$item_types = ($widget === 'Item history')
+			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
+			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
 
 		switch ($widget) {
 			case 'Top hosts':
+			case 'Item history':
 				$widget_dialog->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
 				$column_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
