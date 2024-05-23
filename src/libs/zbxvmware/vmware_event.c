@@ -823,7 +823,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (SUCCEED != vmware_service_reset_event_history_collector(easyhandle, event_session, error))
 		goto end_session;
 
-	if (NULL != service->data && 0 != service->eventlog.data->events.values_num &&
+	if (NULL != service->eventlog.data && 0 != service->eventlog.data->events.values_num &&
 			service->eventlog.data->events.values[0]->key > last_key)
 	{
 		eventlog_last_key = service->eventlog.data->events.values[0]->key;
@@ -1221,7 +1221,7 @@ out:
 
 	zbx_snprintf(msg, sizeof(msg), "Events:%d VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
 			ZBX_FS_UI64 " / " ZBX_FS_UI64,
-			NULL != service->data ? service->eventlog.data->events.values_num : 0,
+			NULL != service->eventlog.data ? service->eventlog.data->events.values_num : 0,
 			vmware_shmem_get_vmware_mem()->free_size, zbx_vmware_get_vmware()->strpool_sz,
 			vmware_shmem_get_vmware_mem()->total_size);
 
