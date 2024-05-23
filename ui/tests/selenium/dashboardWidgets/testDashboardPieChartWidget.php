@@ -514,6 +514,7 @@ class testDashboardPieChartWidget extends testWidgets {
 							'History data selection' => 'History',
 							'Draw' => 'Doughnut',
 							'Width' => '40',
+							'Stroke width' => '5',
 							'Space between sectors' => '2',
 							'id:merge' => true,
 							'id:merge_percent' => '10',
@@ -1120,10 +1121,10 @@ class testDashboardPieChartWidget extends testWidgets {
 					]
 				]
 			],
-			// Four items, host and item pattern, custom colors, hide legend and header.
+			// Five items, host and item pattern, custom colors, hide legend and header.
 			[
 				[
-					'widget_name' => 'four-items',
+					'widget_name' => 'five-items',
 					'view_mode' => 1,
 					'widget_fields' => [
 						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'pie-chart*'],
@@ -1180,7 +1181,8 @@ class testDashboardPieChartWidget extends testWidgets {
 						['name' => 'units', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '♥'],
 						['name' => 'value_bold', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'value_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '7CB342'],
-						['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
+						['name' => 'stroke', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 8],
+						['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 6],
 						['name' => 'merge', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'merge_percent', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 10],
 						['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '69B4FA'],
@@ -1192,7 +1194,7 @@ class testDashboardPieChartWidget extends testWidgets {
 					'item_data' => [
 						'item-1' => 100,
 						'item-2' => 25,
-						'item-3' => 41,
+						'item-3' => 35,
 						'item-4' => 4,
 						'item-5' => 5
 					],
@@ -1200,7 +1202,7 @@ class testDashboardPieChartWidget extends testWidgets {
 					'expected_sectors' => [
 						'item-1' => ['value' => '100 ♥', 'color' => '255, 0, 47'],
 						'item-2' => ['value' => '25 ♥', 'color' => '255, 66, 101'],
-						'item-3' => ['value' => '41 ♥', 'color' => '250, 105, 132'],
+						'item-3' => ['value' => '35 ♥', 'color' => '250, 105, 132'],
 						'Other' => ['value' => '9 ♥', 'color' => '105, 180, 250']
 					]
 				]
