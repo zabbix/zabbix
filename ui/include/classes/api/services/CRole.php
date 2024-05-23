@@ -422,7 +422,7 @@ class CRole extends CApiService {
 				continue;
 			}
 
-			$name = $db_roles !== null ? $db_roles[$role['roleid']]['name'] : $role['name'];
+			$name = array_key_exists('name', $role) ? $role['name'] : $db_roles[$role['roleid']]['name'];
 			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
 
 			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
@@ -430,7 +430,7 @@ class CRole extends CApiService {
 			$this->checkUiRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkServicesRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkModulesRules($name, $role['rules']);
-			$this->checkApiRules($name, $role);
+			self::checkApiRules($name, (int) $type, $role['rules']);
 			$this->checkActionsRules($name, (int) $type, $role['rules']);
 		}
 	}
@@ -711,22 +711,23 @@ class CRole extends CApiService {
 
 	/**
 	 * @param string $name
-	 * @param array  $role
+	 * @param int    $type
+	 * @param array  $rules
 	 *
 	 * @throws APIException
 	 */
-	private function checkApiRules(string $name, array $role): void {
-		if (!array_key_exists('api', $role['rules'])) {
+	private static function checkApiRules(string $name, int $type, array $rules): void {
+		if (!array_key_exists('api', $rules)) {
 			return;
 		}
 
-		foreach ($role['rules']['api'] as $rule) {
+		foreach ($rules['api'] as $rule) {
 			if ($rule === ZBX_ROLE_RULE_API_WILDCARD || $rule === ZBX_ROLE_RULE_API_WILDCARD_ALIAS) {
 				continue;
 			}
 
-			if (!in_array($rule, CRoleHelper::getApiMethodMasks($role['type']), true)
-					&& !in_array($rule, CRoleHelper::getApiMethods($role['type']), true)) {
+			if (!in_array($rule, CRoleHelper::getApiMethodMasks($type), true)
+					&& !in_array($rule, CRoleHelper::getApiMethods($type), true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid API method "%2$s" for user role "%1$s".', $name, $rule)
 				);
