@@ -88,7 +88,11 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 	while (*sbuf < *ebuf && FAIL == ret);
 
 	if (FAIL == ret && NULL != error)
-		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]", expect, rcv);
+	{
+		zbx_snprintf(error, (size_t)max_error_len, "modem communication error");
+		zabbix_log(LOG_LEVEL_WARNING, "modem communication error: expected [%s] received [%s]",
+				expect, rcv);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -252,13 +256,29 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 
 		if (NULL != error)
 		{
-			zbx_snprintf(error, max_error_len, "error in setting the status flag to 0 (for %s): %s", device,
-					zbx_strerror(errno));
+			zbx_snprintf(error, (size_t)max_error_len,
+					"error in setting the status flag to 0 (for %s): %s",
+					device, zbx_strerror(errno));
 		}
+		ret = FAIL;
+		goto out;
 	}
 
-	/* set ta parameters */
-	tcgetattr(f, &old_options);
+	/* get ta parameters */
+	if (0 != tcgetattr(f, &old_options))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "error in getting modem attributes (for %s): %s", device,
+					zbx_strerror(errno));
+
+		if (NULL != error)
+		{
+			zbx_snprintf(error, (size_t)max_error_len,
+					"error in getting modem attributes (for %s): %s",
+					device, zbx_strerror(errno));
+		}
+		ret = FAIL;
+		goto out;
+	}
 
 	memset(&options, 0, sizeof(options));
 
@@ -309,6 +329,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	}
 
 	tcsetattr(f, TCSANOW, &old_options);
+out:
 	close(f);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
