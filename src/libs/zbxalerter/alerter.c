@@ -217,14 +217,14 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
  *                                                                            *
  * Purpose: processes SMS alert                                               *
  *                                                                            *
- * Parameters: socket      - [IN] connection socket                           *
+ * Parameters: socket             - [IN] connection socket                    *
  *             ipc_message        - [IN] ipc message with media type and      *
  *                                       alert data                           *
  *             config_sms_devices - [IN] allowed list of modem devices        *
  *                                                                            *
  ******************************************************************************/
 static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
-					const char* config_sms_devices)
+		const char *config_sms_devices)
 {
 	zbx_uint64_t	alertid;
 	char		*sendto, *message, *gsm_modem, error[MAX_STRING_LEN];
