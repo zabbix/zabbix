@@ -91,7 +91,6 @@ typedef struct
 {
 	const char		*name;
 	zbx_entry_type_t	entry_type;
-	zbx_user_type_t		access_level;
 	int			*res;
 	zbx_section_entry_t	entries[ZBX_MAX_SECTION_ENTRIES];
 }
@@ -545,7 +544,7 @@ static void	zbx_status_counters_free(void)
 }
 
 const zbx_status_section_t	status_sections[] = {
-/*	{SECTION NAME,			NUMBER OF SECTION ENTRIES	SECTION ACCESS LEVEL	SECTION READINESS, */
+/*	{SECTION NAME,			NUMBER OF SECTION ENTRIES	SECTION READINESS,                         */
 /*		{                                                                                                  */
 /*			{ENTRY INFORMATION,		COUNTER TYPE,                                              */
 /*				{                                                                                  */
@@ -557,7 +556,7 @@ const zbx_status_section_t	status_sections[] = {
 /*		}                                                                                                  */
 /*	},                                                                                                         */
 /*	...                                                                                                        */
-	{"template stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&templates_res,
+	{"template stats",		ZBX_SECTION_ENTRY_THE_ONLY,	&templates_res,
 		{
 			{&templates,			ZBX_COUNTER_TYPE_UI64,
 				{
@@ -567,7 +566,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"host stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
+	{"host stats",			ZBX_SECTION_ENTRY_PER_PROXY,	NULL,
 		{
 			{&hosts_monitored,		ZBX_COUNTER_TYPE_UI64,
 				{
@@ -584,7 +583,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"item stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
+	{"item stats",			ZBX_SECTION_ENTRY_PER_PROXY,	NULL,
 		{
 			{&items_active_normal,		ZBX_COUNTER_TYPE_UI64,
 				{
@@ -609,7 +608,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"trigger stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	NULL,
+	{"trigger stats",		ZBX_SECTION_ENTRY_THE_ONLY,	NULL,
 		{
 			{&triggers_enabled_ok,		ZBX_COUNTER_TYPE_UI64,
 				{
@@ -634,7 +633,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"user stats",			ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&users_res,
+	{"user stats",			ZBX_SECTION_ENTRY_THE_ONLY,	&users_res,
 		{
 			{&users_online,			ZBX_COUNTER_TYPE_UI64,
 				{
@@ -651,7 +650,7 @@ const zbx_status_section_t	status_sections[] = {
 			{NULL}
 		}
 	},
-	{"required performance",	ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_SUPER_ADMIN,	NULL,
+	{"required performance",	ZBX_SECTION_ENTRY_PER_PROXY,	NULL,
 		{
 			{&required_performance,		ZBX_COUNTER_TYPE_DBL,
 				{
