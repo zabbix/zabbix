@@ -154,16 +154,6 @@ window.widget_itemhistory_form = new class {
 			delete data.highlights;
 		}
 
-		if (data.time_period) {
-			for (const [key, value] of Object.entries(data.time_period)) {
-				input.setAttribute('name', `columns[${this.#column_index}][time_period][${key}]`);
-				input.setAttribute('value', value);
-				this.#form.appendChild(input.cloneNode());
-			}
-
-			delete data.time_period;
-		}
-
 		for (const [key, value] of Object.entries(data)) {
 			input.setAttribute('name', `columns[${this.#column_index}][${key}]`);
 			input.setAttribute('value', value);

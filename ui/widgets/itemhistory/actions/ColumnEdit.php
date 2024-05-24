@@ -20,13 +20,7 @@ use API,
 	CController,
 	CControllerResponseData,
 	CNumberParser,
-	CParser,
-	CWidgetsData;
-
-use Zabbix\Widgets\{
-	CWidgetField,
-	Fields\CWidgetFieldTimePeriod
-};
+	CParser;
 
 use Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 
@@ -48,7 +42,6 @@ class ColumnEdit extends CController {
 			'min' =>				'string',
 			'max' =>				'string',
 			'thresholds' =>			'array',
-			'time_period' =>		'array',
 			'history' =>			'int32',
 			'monospace_font' =>		'int32',
 			'local_time' =>			'int32',
@@ -150,15 +143,6 @@ class ColumnEdit extends CController {
 				]
 			] + $input + self::getColumnDefaults();
 
-			$data['time_period_field'] = (new CWidgetFieldTimePeriod('time_period', 'Time period'))
-				->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
-				->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
-				->acceptDashboard()
-				->acceptWidget()
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
-
-			$data['time_period_field']->setValue($data['time_period']);
-
 			$this->setResponse(new CControllerResponseData($data));
 
 			return;
@@ -220,11 +204,6 @@ class ColumnEdit extends CController {
 				'max_length' => CWidgetFieldColumnsList::SINGLE_LINE_LENGTH_DEFAULT,
 				'thresholds' => [],
 				'highlights' => [],
-				'time_period' => [
-					CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
-						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
-					)
-				],
 				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
 				'monospace_font' => 0,
 				'local_time' => 0,

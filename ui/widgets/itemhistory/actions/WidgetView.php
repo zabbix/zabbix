@@ -29,6 +29,14 @@ use	Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'has_custom_time_period' => 'in 1'
+		]);
+	}
+
 	protected function doAction(): void {
 		$name = $this->widget->getDefaultName();
 
@@ -235,7 +243,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getItemValuesByDataSource(array &$columns_config, array $items): array {
-		$items_by_source = $this->addDataSourceAndPrepareColumns($columns_config, $items);
+		$time_from = $this->fields_values['time_period']['from_ts'];
+		$time_to = $this->fields_values['time_period']['to_ts'];
+		$history_period = $time_to - $time_from;
+
+		$items_by_source = $this->addDataSourceAndPrepareColumns($columns_config, $items, $time_from);
 
 		$result = [
 			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
@@ -245,8 +257,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]) {
 			foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] as $item) {
-				$history_period = $item['to_ts'] - $item['from_ts'];
-
 				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] += Manager::History()->getLastValues(
 					[$item], $this->fields_values['show_lines'], $history_period
 				);
@@ -254,42 +264,36 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]) {
-			foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS] as $item) {
-				$db_trend = Manager::History()->getAggregatedValues(
-					[$item], AGGREGATE_LAST, $item['from_ts'], $item['to_ts']
-				);
+			$db_trends = Manager::History()->getAggregatedValues(
+				$items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS], AGGREGATE_LAST, $time_from, $time_to
+			);
 
-				if ($db_trend) {
-					$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]
-						[$item['itemid']][] = $db_trend[$item['itemid']] + ['ns' => 0];
-				}
+			foreach ($db_trends as $db_trend) {
+				$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS][$db_trend['itemid']][] = $db_trend + ['ns' => 0];
 			}
-
 		}
 
 		if ($items_by_source['binary_items']) {
-			foreach ($items_by_source['binary_items'] as $item) {
-				$db_binary_item_values = API::History()->get([
-					'history' => ITEM_VALUE_TYPE_BINARY,
-					'itemids' => [$item['itemid']],
-					'time_from' => $item['from_ts'],
-					'time_till' => $item['to_ts'],
-					'output' => ['itemid', 'clock', 'ns'],
-					'limit' => $this->fields_values['show_lines'],
-					'sortfield' => 'clock',
-					'sortorder' => ZBX_SORT_DOWN
-				]);
+			$db_binary_items_values = API::History()->get([
+				'history' => ITEM_VALUE_TYPE_BINARY,
+				'itemids' => array_keys($items_by_source['binary_items']),
+				'time_from' => $time_from,
+				'time_till' => $time_to,
+				'output' => ['itemid', 'clock', 'ns'],
+				'limit' => $this->fields_values['show_lines'],
+				'sortfield' => 'clock',
+				'sortorder' => ZBX_SORT_DOWN
+			]) ?: [];
 
-				foreach ($db_binary_item_values as $binary_item_value) {
-					$result['binary_items'][$item['itemid']][] = $binary_item_value;
-				}
+			foreach ($db_binary_items_values as $binary_items_value) {
+				$result['binary_items'][$binary_items_value['itemid']][] = $binary_items_value;
 			}
 		}
 
 		return $result;
 	}
 
-	private function addDataSourceAndPrepareColumns(array &$columns, array $items): array {
+	private function addDataSourceAndPrepareColumns(array &$columns, array $items, int $time): array {
 		$items_with_source = [
 			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
 			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
@@ -300,12 +304,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$itemid = $column['itemid'];
 			$item = $items[$itemid];
 			$column['item_value_type'] = $item['value_type'];
-			$item['from_ts'] = $column['time_period']['from_ts'];
-			$item['to_ts'] = $column['time_period']['to_ts'];
 
 			if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 				if ($column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_AUTO) {
-					[$item] = CItemHelper::addDataSource([$item], $item['from_ts']);
+					[$item] = CItemHelper::addDataSource([$item], $time);
 
 					$column['history'] = $item['source'] === 'history'
 						? CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
@@ -316,18 +318,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 						? 'history'
 						: 'trends';
 				}
+
+				$items_with_source[$column['history']][$itemid] = $item;
 			}
 			else {
 				if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 					$column['history'] = 'binary_items';
+					$items_with_source['binary_items'][$itemid] = true;
 				}
 				else {
 					$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
 					$item['source'] = 'history';
+					$items_with_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$itemid] = $item;
 				}
 			}
-
-			$items_with_source[$column['history']][$itemid] = $item;
 		}
 		unset($column);
 

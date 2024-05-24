@@ -48,6 +48,13 @@ use Widgets\ItemHistory\Includes\CWidgetFieldColumnsListView;
 			->addField(
 				new CWidgetFieldRadioButtonListView($data['fields']['show_column_header'])
 			)
+			->addField(
+				(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+					->setDateFormat(ZBX_FULL_DATE_TIME)
+					->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->addRowClass('js-row-time-period')
+			)
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_itemhistory_form.init('.json_encode([
