@@ -83,6 +83,7 @@ else {
 
 		if ($item_value['clock'] != $clock || array_key_exists($column_index, $row)) {
 			if (count($rows) == $data['show_lines']) {
+				$row = [];
 				break;
 			}
 
