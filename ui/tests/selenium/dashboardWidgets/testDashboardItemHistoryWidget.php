@@ -194,7 +194,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 								'name' => self::DATA_WIDET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 60,
 								'height' => 6,
 								'fields' => [
 									[
@@ -1871,7 +1871,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				[
 					'initial_data' => [
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Host name',
 							'Value'=> 'Zabbix Item history'
 						],
@@ -1898,22 +1898,22 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				[
 					'initial_data' => [
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Available memory',
 							'Value' => '9.37 GB' // value rounding is expected.
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-30 seconds')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-30 seconds')),
 							'Name' => 'Available memory in %',
 							'Value'=> '82.0618 %' // value rounding is expected.
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 minute')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 minute')),
 							'Name' => 'Available memory in %',
 							'Value' => '72.0618 %' // value rounding is expected.
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 hour')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 hour')),
 							'Name' => 'Available memory',
 							'Value' => '8.44 GB' // value rounding is expected.
 						],
@@ -1942,19 +1942,19 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'Available memory',
-							'Value'=> '9.37 GB' // value rounding is expected.
+							'Value'=> '9.37 GB' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
+							'Name' => 'Available memory',
+							'Value'=> '8.44 GB' // Value rounding is expected.
 						]
-						// TODO: ZBX-24488 Sub-issue (6).
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
-//							'Available memory' => '8.44 GB' // value rounding is expected.
-//						]
 					],
 					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'Available memory',
-							'Value' => '9.37 GB' // value rounding is expected.
+							'Value' => '9.37 GB' // Value rounding is expected.
 						]
 					],
 					'item_data' => [
@@ -1962,117 +1962,179 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						['itemid' => '42243', 'values' => '9061078528', 'time' => strtotime('yesterday')]
 					]
 				]
-			]
+			],
 			// #4 Test case for 'Items location' and 'Show text as HTML' options check.
-//			[
-//				[
-//					'fields' => ['Layout' => 'Vertical'],
-//					'edit_columns' => ['Host name' => ['Display' => 'HTML']],
-//					'initial_data' => [
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Master item' => '1' // value rounding is expected.
-//						],
-//						[
-//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
-//							'Host name' => '<b>'.STRING_128.'</b>'
-//						],
-//						[
-//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
-//							'Host name' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
-//						],
-//                          TODO: ZBX-24488 Sub-issue (6).
-////						[
-////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
-////							'Host name' => STRING_255
-////						]
-//					],
-//					'result' => [
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Name' => 'Master item',
-//							'Value' => '1'
-//						],
-//						[
-//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
-//							'Name' => 'Host name',
-//							'Value' => STRING_128
-//						],
-//						[
-//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
-//							'Name' => 'Host name',
-//							'Value' => 'TEST'
-//						],
-//                          TODO: ZBX-24488 Sub-issue (6).
-////						[
-////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
-////							'Name' => 'Host name',
-////							'Value' => 'STRING_255'
-////						]
-//					],
-//					'item_data' => [
-//						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
-//						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-//						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
-//								'time' => strtotime('-16 hours')],
-//						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
-//					]
-//				]
-//			],
-//			// #5 Test case for host selection check.
-//			[
-//				[
-//					'host_select' => [
-//						'without_data' => 'Simple host with item for Item history widget',
-//						'with_data' =>'ЗАББИКС Сервер'
-//						],
-//					'initial_data' => [
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-//							'Value' => 'Zabbix Item history'
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
-//							'Name' => 'Test item host: Master item',
-//							'Value' => '7.7778' // value rounding is expected.
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
-//							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-//							'Value' => STRING_255
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-//							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
-//							'Value' => '82.0618 %' // value rounding is expected.
-//						]
-//					],
-//					'result' => [
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Name' =>  'Host name of Zabbix agent running',
-//							'Value' => 'Zabbix Item history'
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
-//							'Name' =>  'Host name of Zabbix agent running',
-//							'Value' => STRING_255
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-//							'Name' =>  'Available memory in %',
-//							'Value' => '82.0618 %' // value rounding is expected.
-//						]
-//					],
-//					'item_data' => [
-//						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
-//						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
-//						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
-//						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
-//					]
-//				]
-//			]
+			[
+				[
+					'fields' => ['Layout' => 'Vertical'],
+					'edit_columns' => [
+						'Host name' => ['Display' => 'HTML']
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Master item',
+							'Value' => '1' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Master item' => '1' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Host name' => STRING_128
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Host name' => 'TEST'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Host name' => STRING_255
+						]
+					],
+					'item_data' => [
+						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+								'time' => strtotime('-16 hours')
+						],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
+					]
+				]
+			],
+			// #5 Test case for 'Items location' and 'Show text as Single line' options check.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'New values' => 'Bottom',
+						'Show timestamp' => false
+					],
+					'edit_columns' => [
+						'Host name' => ['Display' => 'Single line', 'id:max_length' => 3]
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Master item',
+							'Value' => '1' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						]
+					],
+					'result' => [
+						[
+							'Name' => 'Host name',
+							'Value' => 'lon'
+						],
+						[
+							'Name' => 'Host name',
+							'Value' => '<sp'
+						],
+						[
+							'Name' => 'Host name',
+							'Value' => '<b>'
+						],
+						[
+							'Name' => 'Master item',
+							'Value' => '1' // Value rounding is expected.
+						],
+					],
+					'item_data' => [
+						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+								'time' => strtotime('-16 hours')
+						],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
+					]
+				]
+			],
+			// #6 Test case for host selection check.
+			[
+				[
+					'host_select' => [
+						'without_data' => 'Simple host with item for Item history widget',
+						'with_data' =>'ЗАББИКС Сервер'
+						],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Host name',
+							'Value' => 'Zabbix Item history'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
+							'Name' => 'Master item',
+							'Value' => '7.7778' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 days')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-6 days')),
+							'Name' => 'Available memory in %',
+							'Value' => '82.0618 %' // Value rounding is expected.
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' =>  'Host name',
+							'Value' => 'Zabbix Item history'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 days')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-6 days')),
+							'Name' =>  'Available memory in %',
+							'Value' => '82.0618 %' // Value rounding is expected.
+						]
+					],
+					'item_data' => [
+						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
+						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-2 days')],
+						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-6 days')]
+					]
+				]
+			]
 		];
 	}
 
@@ -2080,6 +2142,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
+	 *
+	 * @onBeforeOnce extendHistoryPeriod
+	 *
+	 * @onAfterOnce returnHistoryPeriodToDefault
 	 */
 	public function testDashboardItemHistoryWidget_TableData($data) {
 		foreach ($data['item_data'] as $params) {
@@ -2092,14 +2158,24 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->assertTableData($data['initial_data']);
 
 		$default_values = [
-			'Layout' => 'Horizontal',
-			'Show lines' => '25'
+			'fields' => [
+				'Layout' => 'Horizontal',
+				'Show lines' => '25',
+				'Advanced configuration' => true,
+				'New values' => 'Top',
+				'Show timestamp' => true
+			],
+			'columns' => [
+				'Host name' => ['id:display' => 'As is']
+			]
 		];
 
 		if (array_key_exists('fields', $data)) {
-			$this->widgetConfigurationChange($data['fields'], $dashboard);
+			$this->widgetConfigurationChange($data['fields'], $dashboard,
+					CTestArrayHelper::get($data, 'edit_columns', [])
+			);
 			$this->assertTableData($data['result']);
-			$this->widgetConfigurationChange($default_values, $dashboard);
+			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['columns']);
 		}
 
 		if (array_key_exists('host_select', $data)) {
@@ -2131,12 +2207,27 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	/**
 	 * Change Item history widget configuration.
 	 *
-	 * @param CDashboardElement		$dashboard			dashboard element
-	 * @param array 				$configuration    	widget parameter(s)
+	 * @param CDashboardElement $dashboard        dashboard element
+	 * @param array             $configuration    widget parameter(s)
+	 * @param array             $edit_columns     array of columns to be changed in test
 	 */
-	protected function widgetConfigurationChange($configuration, $dashboard) {
+	protected function widgetConfigurationChange($configuration, $dashboard, $edit_columns = []) {
 		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
 		$form->fill($configuration);
+
+		if ($edit_columns !== []) {
+			$table = $form->getFieldContainer('Columns')->asTable();
+
+			foreach ($edit_columns as $name => $settings) {
+				$table->findRow('Name', $name)->query('button:Edit')->one()->click();
+				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_overlay->asForm()->fill($settings);
+				$column_overlay->getFooter()->query('button:Update')->waitUntilClickable()->one()->click();
+				$column_overlay->waitUntilNotVisible();
+				$form->waitUntilReloaded();
+			}
+		}
+
 		$form->submit();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
@@ -2176,5 +2267,16 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$container->query('xpath:.//button[contains(@id, '.CXPathHelper::escapeQuotes($i.'_remove').')]')
 				->one()->click();
 		$this->assertFalse($input->isVisible());
+	}
+
+	/**
+	 * GUI "Max history display period" setting should be extended so widget shows all item values.
+	 */
+	public function extendHistoryPeriod() {
+		DBexecute('UPDATE config SET history_period='.zbx_dbstr('1w'));
+	}
+
+	public function returnHistoryPeriodToDefault() {
+		DBexecute('UPDATE config SET history_period='.zbx_dbstr('24h'));
 	}
 }
