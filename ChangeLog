@@ -3,6 +3,8 @@ Changes for 7.0.0rc3
 New features:
 
 Bug fixes:
+...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
+.........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0rc2
