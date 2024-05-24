@@ -27,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: 27949a6910304d39b3d2a68c90525581
-          name: 'HP-UX: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 98507eac4f70420698dc234c2a6e3198
-          name: 'HP-UX: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
@@ -51,7 +51,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3f456ce86b284b089f545d8c72c64405
-          name: 'HP-UX: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -65,7 +65,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: bcba4702a58d48339c6e7e49dea574c4
-          name: 'HP-UX: Processor load (1 min average per core)'
+          name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
@@ -76,7 +76,7 @@ zabbix_export:
           triggers:
             - uuid: 6721e8fbe5ee45aa9d06b698210a268a
               expression: 'avg(/HP-UX by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
-              name: 'HP-UX: Processor load is too high'
+              name: 'Processor load is too high'
               priority: WARNING
               tags:
                 - tag: scope
@@ -84,7 +84,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 60057d54b81342f4aaa0103a278bf7b6
-          name: 'HP-UX: Processor load (5 min average per core)'
+          name: 'Processor load (5 min average per core)'
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
@@ -93,7 +93,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 296dbd5148184004b26ac50ae5e6893b
-          name: 'HP-UX: Processor load (15 min average per core)'
+          name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
@@ -102,7 +102,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2b82ccaf9eb1424593e2738a5512e182
-          name: 'HP-UX: CPU idle time'
+          name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
           history: 7d
           value_type: FLOAT
@@ -112,7 +112,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 8665bd2dc84e46daa081a379548b0603
-          name: 'HP-UX: CPU nice time'
+          name: 'CPU nice time'
           key: 'system.cpu.util[,nice]'
           history: 7d
           value_type: FLOAT
@@ -122,7 +122,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 8419321f4744476ea27b7d1acddcd365
-          name: 'HP-UX: CPU system time'
+          name: 'CPU system time'
           key: 'system.cpu.util[,system]'
           history: 7d
           value_type: FLOAT
@@ -132,7 +132,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 611c9a3c70aa4455b6ec7bebe64b5316
-          name: 'HP-UX: CPU user time'
+          name: 'CPU user time'
           key: 'system.cpu.util[,user]'
           history: 7d
           value_type: FLOAT
@@ -142,7 +142,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 6e3b32f3f92543759ef2f30834899ba0
-          name: 'HP-UX: Host name'
+          name: 'Host name'
           key: system.hostname
           delay: 1h
           history: 7d
@@ -160,13 +160,13 @@ zabbix_export:
           triggers:
             - uuid: 07215ae05345423d8625962b85d9d4ec
               expression: 'last(/HP-UX by Zabbix agent/system.hostname,#1)<>last(/HP-UX by Zabbix agent/system.hostname,#2)'
-              name: 'HP-UX: Hostname was changed'
+              name: 'Hostname was changed'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 16c6c420c710498083355361b104f7a2
-          name: 'HP-UX: Host local time'
+          name: 'Host local time'
           key: system.localtime
           history: 7d
           units: unixtime
@@ -174,7 +174,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: b66598337e0e4990a2776d2a42020e72
-          name: 'HP-UX: System information'
+          name: 'System information'
           key: system.uname
           delay: 1h
           history: 7d
@@ -192,13 +192,13 @@ zabbix_export:
           triggers:
             - uuid: 34f76014b2d3434a8d1f1f0657b5605f
               expression: 'last(/HP-UX by Zabbix agent/system.uname,#1)<>last(/HP-UX by Zabbix agent/system.uname,#2)'
-              name: 'HP-UX: Host information was changed'
+              name: 'Host information was changed'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: bb698e97aa1b45ebadcb48da729b8e64
-          name: 'HP-UX: Number of logged in users'
+          name: 'Number of logged in users'
           key: system.users.num
           history: 7d
           description: 'The number of users who are currently logged in.'
@@ -206,7 +206,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 4e11e7c5d43a4566989b39dbc0c23266
-          name: 'HP-UX: Checksum of /etc/passwd'
+          name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
           history: 7d
@@ -222,13 +222,13 @@ zabbix_export:
           triggers:
             - uuid: f65c254d50e2454d9840784ff979f5d3
               expression: 'last(/HP-UX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/HP-UX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
-              name: 'HP-UX: /etc/passwd has been changed'
+              name: '/etc/passwd has been changed'
               priority: WARNING
               tags:
                 - tag: scope
                   value: security
         - uuid: 05adecd1fb3e4c85b826dfdd601fa444
-          name: 'HP-UX: Get filesystems'
+          name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
           trends: '0'
@@ -238,7 +238,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 767abadfa8be4bccb2c4c5a1d532ba87
-          name: 'HP-UX: Available memory'
+          name: 'Available memory'
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
@@ -249,7 +249,7 @@ zabbix_export:
           triggers:
             - uuid: 005730efb6a94c4a83c4265f42aa8dff
               expression: 'last(/HP-UX by Zabbix agent/vm.memory.size[available])<20M'
-              name: 'HP-UX: Lack of available memory on server'
+              name: 'Lack of available memory on server'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -257,7 +257,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 6da082e7f822465592f66e2bd0a46947
-          name: 'HP-UX: Total memory'
+          name: 'Total memory'
           key: 'vm.memory.size[total]'
           delay: 1h
           history: 7d
@@ -267,7 +267,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 5b0a1ce4ca4a441484eea38724eaf24d
-          name: 'HP-UX: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
@@ -280,7 +280,7 @@ zabbix_export:
           triggers:
             - uuid: ce008290ad6341b98386adf9ea5c315b
               expression: 'max(/HP-UX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'HP-UX: Zabbix agent is not available'
+              name: 'Zabbix agent is not available'
               event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive checks only; the availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.'

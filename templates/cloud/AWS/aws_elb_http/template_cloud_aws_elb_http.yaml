@@ -21,7 +21,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: cf1a45ea7ad74602b675d1fbe137c53d
-          name: 'AWS ELB ALB: Active Connection Count'
+          name: 'Active Connection Count'
           type: DEPENDENT
           key: aws.elb.alb.active_connection_count
           delay: '0'
@@ -38,7 +38,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 4bd5c4e139374a60a42eb86a343f315e
-          name: 'AWS ELB ALB: Get alarms check'
+          name: 'Get alarms check'
           type: DEPENDENT
           key: aws.elb.alb.alarms.check
           delay: '0'
@@ -62,8 +62,8 @@ zabbix_export:
           triggers:
             - uuid: 3fd832d1a2cc4cff955554cbd8c4b3c7
               expression: 'length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarms.check))>0'
-              name: 'AWS ELB ALB: Failed to get alarms data'
-              event_name: 'AWS ELB ALB: Failed to get CloudWatch alarms for Application Load Balancer'
+              name: 'Failed to get alarms data'
+              event_name: 'Failed to get CloudWatch alarms for Application Load Balancer'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Failed to get CloudWatch alarms for Application Load Balancer.'
@@ -71,7 +71,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 0f966c0ff2f344f58a5c049ea2bc503a
-          name: 'AWS ELB ALB: ELB Auth Error'
+          name: 'ELB Auth Error'
           type: DEPENDENT
           key: aws.elb.alb.auth_error
           delay: '0'
@@ -90,7 +90,7 @@ zabbix_export:
             - tag: component
               value: errors
         - uuid: 5f516687f9364f2f87b7fd1d2cbc8054
-          name: 'AWS ELB ALB: ELB Auth Failure'
+          name: 'ELB Auth Failure'
           type: DEPENDENT
           key: aws.elb.alb.auth_failure
           delay: '0'
@@ -109,7 +109,7 @@ zabbix_export:
             - tag: component
               value: errors
         - uuid: bfae078db4a14fd6a31b94e87552e430
-          name: 'AWS ELB ALB: ELB Auth Latency'
+          name: 'ELB Auth Latency'
           type: DEPENDENT
           key: aws.elb.alb.auth_latency
           delay: '0'
@@ -130,7 +130,7 @@ zabbix_export:
             - tag: component
               value: authorization
         - uuid: 3eed720ae5f948b287cf6ee0bdda41f1
-          name: 'AWS ELB ALB: ELB Auth Success'
+          name: 'ELB Auth Success'
           type: DEPENDENT
           key: aws.elb.alb.auth_success
           delay: '0'
@@ -149,7 +149,7 @@ zabbix_export:
             - tag: component
               value: authorization
         - uuid: 8562bd314951443faed4039c2c36b127
-          name: 'AWS ELB ALB: ELB Auth User Claims Size Exceeded'
+          name: 'ELB Auth User Claims Size Exceeded'
           type: DEPENDENT
           key: aws.elb.alb.auth_user_claims_size_exceeded
           delay: '0'
@@ -168,7 +168,7 @@ zabbix_export:
             - tag: component
               value: errors
         - uuid: 4f06db3a2da446c28228a20ed04847e1
-          name: 'AWS ELB ALB: Consumed LCUs'
+          name: 'Consumed LCUs'
           type: DEPENDENT
           key: aws.elb.alb.capacity_units
           delay: '0'
@@ -189,7 +189,7 @@ zabbix_export:
             - tag: component
               value: capacity
         - uuid: c7e81227b5a648de9413ffcb6b9746ee
-          name: 'AWS ELB ALB: Client TLS Negotiation Error Count'
+          name: 'Client TLS Negotiation Error Count'
           type: DEPENDENT
           key: aws.elb.alb.client_tls_negotiation_error_count
           delay: '0'
@@ -208,7 +208,7 @@ zabbix_export:
             - tag: component
               value: errors
         - uuid: 059b7697baba46b2a7f138a1011a0e0c
-          name: 'AWS CloudWatch: Get ELB ALB alarms data'
+          name: 'Get ELB ALB alarms data'
           type: SCRIPT
           key: aws.elb.alb.get_alarms
           delay: 0s;m/1
@@ -458,7 +458,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: c7b4e867ff8246058d931ca76d18d4e7
-          name: 'AWS ELB ALB: Get metrics data'
+          name: 'Get metrics data'
           type: SCRIPT
           key: aws.elb.alb.get_metrics
           delay: 0s;m/1
@@ -715,7 +715,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9b118d348b934146bab54e2df582e2b0
-          name: 'AWS ELB ALB: Get target groups'
+          name: 'Get target groups'
           type: SCRIPT
           key: aws.elb.alb.get_target_groups
           delay: 0s;m/30
@@ -937,7 +937,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: eabcf1ef1514451087d08d739cf55d94
-          name: 'AWS ELB ALB: ELB HTTP 3XX Count'
+          name: 'ELB HTTP 3XX Count'
           type: DEPENDENT
           key: aws.elb.alb.http_3xx_count
           delay: '0'
@@ -958,7 +958,7 @@ zabbix_export:
             - tag: http-code
               value: 3xx
         - uuid: c714c1f2185b4b0b8b86e3ad336d7888
-          name: 'AWS ELB ALB: ELB HTTP 4XX Count'
+          name: 'ELB HTTP 4XX Count'
           type: DEPENDENT
           key: aws.elb.alb.http_4xx_count
           delay: '0'
@@ -982,8 +982,8 @@ zabbix_export:
           triggers:
             - uuid: 922bd3ab505b420984c93dfdfc417a56
               expression: 'min(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.http_4xx_count,5m)>{$AWS.HTTP.4XX.FAIL.MAX.WARN}'
-              name: 'AWS ELB ALB: Too many HTTP 4XX error codes'
-              event_name: 'AWS ELB ALB: Too many HTTP 4XX error codes (over {$AWS.HTTP.4XX.FAIL.MAX.WARN} for 5m)'
+              name: 'Too many HTTP 4XX error codes'
+              event_name: 'Too many HTTP 4XX error codes (over {$AWS.HTTP.4XX.FAIL.MAX.WARN} for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Too many requests failed with HTTP 4XX code.'
@@ -991,7 +991,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 6395ef49a60546ec8d3ce117867cbb43
-          name: 'AWS ELB ALB: ELB HTTP 5XX Count'
+          name: 'ELB HTTP 5XX Count'
           type: DEPENDENT
           key: aws.elb.alb.http_5xx_count
           delay: '0'
@@ -1014,8 +1014,8 @@ zabbix_export:
           triggers:
             - uuid: 883fc396e7da4806943cd70688c057a3
               expression: 'min(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.http_5xx_count,5m)>{$AWS.HTTP.5XX.FAIL.MAX.WARN}'
-              name: 'AWS ELB ALB: Too many HTTP 5XX error codes'
-              event_name: 'AWS ELB ALB: Too many HTTP 5XX error codes (over {$AWS.HTTP.5XX.FAIL.MAX.WARN} for 5m)'
+              name: 'Too many HTTP 5XX error codes'
+              event_name: 'Too many HTTP 5XX error codes (over {$AWS.HTTP.5XX.FAIL.MAX.WARN} for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Too many requests failed with HTTP 5XX code.'
@@ -1023,7 +1023,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 7bf9230aa56b4196b386d23358da75ed
-          name: 'AWS ELB ALB: ELB HTTP 500 Count'
+          name: 'ELB HTTP 500 Count'
           type: DEPENDENT
           key: aws.elb.alb.http_500_count
           delay: '0'
@@ -1044,7 +1044,7 @@ zabbix_export:
             - tag: http-code
               value: '500'
         - uuid: f89bee8030774615a132d25a6d1b7a2a
-          name: 'AWS ELB ALB: ELB HTTP 502 Count'
+          name: 'ELB HTTP 502 Count'
           type: DEPENDENT
           key: aws.elb.alb.http_502_count
           delay: '0'
@@ -1065,7 +1065,7 @@ zabbix_export:
             - tag: http-code
               value: '502'
         - uuid: bca5eaf0b96c496395ed98e8d4705153
-          name: 'AWS ELB ALB: ELB HTTP 503 Count'
+          name: 'ELB HTTP 503 Count'
           type: DEPENDENT
           key: aws.elb.alb.http_503_count
           delay: '0'
@@ -1086,7 +1086,7 @@ zabbix_export:
             - tag: http-code
               value: '503'
         - uuid: 5d1c57a6483c4b84b992f9677f6216c1
-          name: 'AWS ELB ALB: ELB HTTP 504 Count'
+          name: 'ELB HTTP 504 Count'
           type: DEPENDENT
           key: aws.elb.alb.http_504_count
           delay: '0'
@@ -1107,7 +1107,7 @@ zabbix_export:
             - tag: http-code
               value: '504'
         - uuid: 115bdaf06c554f9a8b3a486c28d218cd
-          name: 'AWS ELB ALB: HTTP Fixed Response Count'
+          name: 'HTTP Fixed Response Count'
           type: DEPENDENT
           key: aws.elb.alb.http_fixed_response_count
           delay: '0'
@@ -1124,7 +1124,7 @@ zabbix_export:
             - tag: component
               value: responses
         - uuid: 4edc1d8d4eb84832996943ac571afb5f
-          name: 'AWS ELB ALB: HTTP Redirect Count'
+          name: 'HTTP Redirect Count'
           type: DEPENDENT
           key: aws.elb.alb.http_redirect_count
           delay: '0'
@@ -1141,7 +1141,7 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: fbf24a4f2110416d973a8f11c8770d98
-          name: 'AWS ELB ALB: HTTP Redirect Url Limit Exceeded Count'
+          name: 'HTTP Redirect Url Limit Exceeded Count'
           type: DEPENDENT
           key: aws.elb.alb.http_redirect_url_limit_exceeded_count
           delay: '0'
@@ -1158,7 +1158,7 @@ zabbix_export:
             - tag: component
               value: http
         - uuid: 7fdd931458ba4fa5b3baff1d67e4a32f
-          name: 'AWS ELB ALB: Get metrics check'
+          name: 'Get metrics check'
           type: DEPENDENT
           key: aws.elb.alb.metrics.check
           delay: '0'
@@ -1182,8 +1182,8 @@ zabbix_export:
           triggers:
             - uuid: 70282eb6c0c442f9a4f4c49b10f54a4d
               expression: 'length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.metrics.check))>0'
-              name: 'AWS ELB ALB: Failed to get metrics data'
-              event_name: 'AWS ELB ALB: Failed to get CloudWatch metrics for Application Load Balancer'
+              name: 'Failed to get metrics data'
+              event_name: 'Failed to get CloudWatch metrics for Application Load Balancer'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Failed to get CloudWatch metrics for Application Load Balancer.'
@@ -1191,7 +1191,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 740872a3328e4c12827d8fcd16eb43ea
-          name: 'AWS ELB ALB: New Connection Count'
+          name: 'New Connection Count'
           type: DEPENDENT
           key: aws.elb.alb.new_connection_count
           delay: '0'
@@ -1208,7 +1208,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 4e3cf684607741e39248929e6b917be7
-          name: 'AWS ELB ALB: Desync Mitigation Mode Non Compliant Request Count'
+          name: 'Desync Mitigation Mode Non Compliant Request Count'
           type: DEPENDENT
           key: aws.elb.alb.non_compliant_request_count
           delay: '0'
@@ -1225,7 +1225,7 @@ zabbix_export:
             - tag: component
               value: errors
         - uuid: 32b5fbc67cec4d739bbd95ba1cd77ab9
-          name: 'AWS ELB ALB: Processed Bytes'
+          name: 'Processed Bytes'
           type: DEPENDENT
           key: aws.elb.alb.processed_bytes
           delay: '0'
@@ -1246,7 +1246,7 @@ zabbix_export:
             - tag: component
               value: capacity
         - uuid: ed3c4ebc1faf43ff9be134ae98aac0e9
-          name: 'AWS ELB ALB: Rejected Connection Count'
+          name: 'Rejected Connection Count'
           type: DEPENDENT
           key: aws.elb.alb.rejected_connection_count
           delay: '0'
@@ -1263,7 +1263,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 4b5b059c30ef4f8bb4d11a273d071db1
-          name: 'AWS ELB ALB: Requests Count'
+          name: 'Requests Count'
           type: DEPENDENT
           key: aws.elb.alb.requests_count
           delay: '0'
@@ -1283,7 +1283,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: b5105b9e48f4482db42ff948f906be6f
-          name: 'AWS ELB ALB: Rule Evaluations'
+          name: 'Rule Evaluations'
           type: DEPENDENT
           key: aws.elb.alb.rule_evaluations
           delay: '0'
@@ -1300,7 +1300,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 09cd066b48544eb7ac818bc6171e3e87
-          name: 'AWS ELB ALB: Target Connection Error Count'
+          name: 'Target Connection Error Count'
           type: DEPENDENT
           key: aws.elb.alb.target_connection_error_count
           delay: '0'
@@ -1319,7 +1319,7 @@ zabbix_export:
             - tag: component
               value: errors
         - uuid: 560c74f7011b4b9c821dfdf7f8d8e93a
-          name: 'AWS ELB ALB: Target Response Time'
+          name: 'Target Response Time'
           type: DEPENDENT
           key: aws.elb.alb.target_response_time
           delay: '0'
@@ -1340,7 +1340,7 @@ zabbix_export:
             - tag: component
               value: responses
         - uuid: 66d56d14553d4de69a63745ab02f2611
-          name: 'AWS ELB ALB: Target TLS Negotiation Error Count'
+          name: 'Target TLS Negotiation Error Count'
           type: DEPENDENT
           key: aws.elb.alb.target_tls_negotiation_error_count
           delay: '0'
@@ -1384,7 +1384,7 @@ zabbix_export:
           description: 'Used for the discovery of alarm balancers.'
           item_prototypes:
             - uuid: fca522690827426bb63f93e90d98aa54
-              name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}]: Get metrics'
+              name: '[{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.elb.alb.alarm.get_metrics["{#ALARM_NAME}"]'
               delay: '0'
@@ -1403,7 +1403,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 3ef62eb9b0824f8ea3c2c1e8e15ce1fd
-              name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}]: State'
+              name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.elb.alb.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -1437,8 +1437,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: b8bbc96a20bc4ab393d1fa76a3cf5254
                   expression: 'last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
-                  event_name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
+                  name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
+                  event_name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
@@ -1446,7 +1446,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 8839a61a10f7453ebfdcae0ef16eb37c
-              name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}]: State reason'
+              name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -1473,8 +1473,8 @@ zabbix_export:
           trigger_prototypes:
             - uuid: a1b8587c80dd41ef8b185cf62e563bcb
               expression: 'last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
-              event_name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
+              name: '[{#ALARM_NAME}] has ''Alarm'' state'
+              event_name: '[{#ALARM_NAME}] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
               opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               description: |
@@ -1525,7 +1525,7 @@ zabbix_export:
           description: 'Used for the discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.'
           item_prototypes:
             - uuid: 21d1830526e14fb99b2288d79747d472
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Anomalous Host Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Anomalous Host Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.anomalous_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1548,7 +1548,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 306971d2e8fb441d8ae4a658b26304c3
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Get metrics'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Get metrics'
               type: SCRIPT
               key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: 0s;m/5
@@ -1806,7 +1806,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: e4cd95136bb04981b15a508aa73f5723
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1831,7 +1831,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: b96ad1d2f5064cc99c49eeec3801418e
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State DNS'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State DNS'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.healthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1856,7 +1856,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 030c4fe8b7f44bf3a290b1b5da9319d8
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State Routing'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State Routing'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1881,7 +1881,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: fa9da54b4feb4fc79fbf74c491eb23ba
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 2XX Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 2XX Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.http_2xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1910,7 +1910,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 50e78304f9e74019b7e06310d6dd2e6f
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 3XX Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 3XX Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.http_3xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1939,7 +1939,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: ec7b92c79c6f441cadb8994b906753f4
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 4XX Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 4XX Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.http_4xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1968,7 +1968,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: c9e61f9d2f12496d90693a83cb829b66
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 5XX Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 5XX Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.http_5xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1997,7 +1997,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 0ad4d9a933944c7d979da411d24b165e
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Mitigated Host Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Mitigated Host Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.mitigated_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2020,7 +2020,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 31a579ac8de9402bae3a3668779ec6c5
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Request Count Per Target'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Request Count Per Target'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.request["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2047,7 +2047,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: c158172738084d38aec424505a7a86a5
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2072,7 +2072,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 9fea4b63067445d98d29de566d50b0a4
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Routing Request Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Routing Request Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.unhealthy_routing_request_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2097,7 +2097,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: f050e9610eb64251b55e843fc5eb5876
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2122,7 +2122,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 2a446451893e4f70a0d4ac4b1bb969fb
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2674,7 +2674,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 170a4e084c3748dfa1cfcbb1b168ff4c
-          name: 'AWS ELB NLB: Active Flow Count'
+          name: 'Active Flow Count'
           type: DEPENDENT
           key: aws.elb.nlb.active_flow_count
           delay: '0'
@@ -2694,7 +2694,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: fd00c2998ae145ab821acde0a1515fbb
-          name: 'AWS ELB NLB: Active Flow Count TCP'
+          name: 'Active Flow Count TCP'
           type: DEPENDENT
           key: aws.elb.nlb.active_flow_count_tcp
           delay: '0'
@@ -2716,7 +2716,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: 31ae92c16e5643d3a67f392661518723
-          name: 'AWS ELB NLB: Active Flow Count TLS'
+          name: 'Active Flow Count TLS'
           type: DEPENDENT
           key: aws.elb.nlb.active_flow_count_tls
           delay: '0'
@@ -2737,7 +2737,7 @@ zabbix_export:
             - tag: component
               value: tls
         - uuid: 7ba1f232eacc41cfa6e38939128b9ee1
-          name: 'AWS ELB NLB: Active Flow Count UDP'
+          name: 'Active Flow Count UDP'
           type: DEPENDENT
           key: aws.elb.nlb.active_flow_count_udp
           delay: '0'
@@ -2756,7 +2756,7 @@ zabbix_export:
             - tag: component
               value: udp
         - uuid: 397ce9711a404da48ebdfde65c24ff3b
-          name: 'AWS ELB NLB: Get alarms check'
+          name: 'Get alarms check'
           type: DEPENDENT
           key: aws.elb.nlb.alarms.check
           delay: '0'
@@ -2780,8 +2780,8 @@ zabbix_export:
           triggers:
             - uuid: 4319dc0d484b456a9343535db3c079f4
               expression: 'length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarms.check))>0'
-              name: 'AWS ELB NLB: Failed to get alarms data'
-              event_name: 'AWS ELB NLB: Failed to get CloudWatch alarms for Network Load Balancer'
+              name: 'Failed to get alarms data'
+              event_name: 'Failed to get CloudWatch alarms for Network Load Balancer'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Failed to get CloudWatch alarms for Network Load Balancer.'
@@ -2789,7 +2789,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: b2ef5e512e674a969853b389f308664e
-          name: 'AWS ELB NLB: Consumed LCUs'
+          name: 'Consumed LCUs'
           type: DEPENDENT
           key: aws.elb.nlb.capacity_units
           delay: '0'
@@ -2809,7 +2809,7 @@ zabbix_export:
             - tag: component
               value: capacity
         - uuid: 33c9d9d275c04811b7dcb6806e8a9d9a
-          name: 'AWS ELB NLB: Consumed LCUs TCP'
+          name: 'Consumed LCUs TCP'
           type: DEPENDENT
           key: aws.elb.nlb.capacity_units_tcp
           delay: '0'
@@ -2831,7 +2831,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: bbcd303cbf654dc68fb40216994eef84
-          name: 'AWS ELB NLB: Consumed LCUs TLS'
+          name: 'Consumed LCUs TLS'
           type: DEPENDENT
           key: aws.elb.nlb.capacity_units_tls
           delay: '0'
@@ -2853,7 +2853,7 @@ zabbix_export:
             - tag: component
               value: tls
         - uuid: 90742c0ffb4844668f59a75f26132b18
-          name: 'AWS ELB NLB: Consumed LCUs UDP'
+          name: 'Consumed LCUs UDP'
           type: DEPENDENT
           key: aws.elb.nlb.capacity_units_udp
           delay: '0'
@@ -2875,7 +2875,7 @@ zabbix_export:
             - tag: component
               value: udp
         - uuid: 6bbe06db758f40da9c2e0cb825b2aac3
-          name: 'AWS ELB NLB: Client TLS Negotiation Error Count'
+          name: 'Client TLS Negotiation Error Count'
           type: DEPENDENT
           key: aws.elb.nlb.client_tls_negotiation_error_count
           delay: '0'
@@ -2894,7 +2894,7 @@ zabbix_export:
             - tag: component
               value: tls
         - uuid: 6d74c1a68ea9476dadc39b785f333d5d
-          name: 'AWS CloudWatch: Get ELB NLB alarms data'
+          name: 'Get ELB NLB alarms data'
           type: SCRIPT
           key: aws.elb.nlb.get_alarms
           delay: 0s;m/1
@@ -3144,7 +3144,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 76d374302b29430c8fe5813656ffd928
-          name: 'AWS ELB NLB: Get metrics data'
+          name: 'Get metrics data'
           type: SCRIPT
           key: aws.elb.nlb.get_metrics
           delay: 0s;m/1
@@ -3405,7 +3405,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d80c238267744bc9b46de217acd93842
-          name: 'AWS ELB NLB: Get target groups'
+          name: 'Get target groups'
           type: SCRIPT
           key: aws.elb.nlb.get_target_groups
           delay: 0s;m/30
@@ -3627,7 +3627,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 13516270f6124bf09a308bc20565528c
-          name: 'AWS ELB NLB: Get metrics check'
+          name: 'Get metrics check'
           type: DEPENDENT
           key: aws.elb.nlb.metrics.check
           delay: '0'
@@ -3651,8 +3651,8 @@ zabbix_export:
           triggers:
             - uuid: c2ba26fed3324a2bb9b90493a99db088
               expression: 'length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.metrics.check))>0'
-              name: 'AWS ELB NLB: Failed to get metrics data'
-              event_name: 'AWS ELB NLB: Failed to get CloudWatch metrics for Network Load Balancer'
+              name: 'Failed to get metrics data'
+              event_name: 'Failed to get CloudWatch metrics for Network Load Balancer'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Failed to get CloudWatch metrics for Network Load Balancer.'
@@ -3660,7 +3660,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 38a2dca1cca34a1988dd8713552c952b
-          name: 'AWS ELB NLB: New Flow Count'
+          name: 'New Flow Count'
           type: DEPENDENT
           key: aws.elb.nlb.new_flow_count
           delay: '0'
@@ -3677,7 +3677,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: a34d5ded1ec445b89a681a39b854b6cd
-          name: 'AWS ELB NLB: New Flow Count TCP'
+          name: 'New Flow Count TCP'
           type: DEPENDENT
           key: aws.elb.nlb.new_flow_count_tcp
           delay: '0'
@@ -3696,7 +3696,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: 25ec5461aa3f477c8698d3b31ed3263c
-          name: 'AWS ELB NLB: New Flow Count TLS'
+          name: 'New Flow Count TLS'
           type: DEPENDENT
           key: aws.elb.nlb.new_flow_count_tls
           delay: '0'
@@ -3715,7 +3715,7 @@ zabbix_export:
             - tag: component
               value: tls
         - uuid: 3f8fb9c0de524d0b9f157a9291fd7f27
-          name: 'AWS ELB NLB: New Flow Count UDP'
+          name: 'New Flow Count UDP'
           type: DEPENDENT
           key: aws.elb.nlb.new_flow_count_udp
           delay: '0'
@@ -3734,7 +3734,7 @@ zabbix_export:
             - tag: component
               value: udp
         - uuid: ffda7926a52c438c8195f70d772a4f7e
-          name: 'AWS ELB NLB: Peak Packets per second'
+          name: 'Peak Packets per second'
           type: DEPENDENT
           key: aws.elb.nlb.peak_packets.rate
           delay: '0'
@@ -3755,7 +3755,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: e83d4c875f414628987989a8e5e27c9e
-          name: 'AWS ELB NLB: Port Allocation Error Count'
+          name: 'Port Allocation Error Count'
           type: DEPENDENT
           key: aws.elb.nlb.port_allocation_error_count
           delay: '0'
@@ -3777,7 +3777,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 38cca57bd12048558d8569e6a9d18492
-          name: 'AWS ELB NLB: Processed Bytes'
+          name: 'Processed Bytes'
           type: DEPENDENT
           key: aws.elb.nlb.processed_bytes
           delay: '0'
@@ -3795,7 +3795,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: a6b272d40c3d4b72adcced4aadaa607c
-          name: 'AWS ELB NLB: Processed Bytes TCP'
+          name: 'Processed Bytes TCP'
           type: DEPENDENT
           key: aws.elb.nlb.processed_bytes_tcp
           delay: '0'
@@ -3815,7 +3815,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: c1e6456cd23446808299396f6368d6a9
-          name: 'AWS ELB NLB: Processed Bytes TLS'
+          name: 'Processed Bytes TLS'
           type: DEPENDENT
           key: aws.elb.nlb.processed_bytes_tls
           delay: '0'
@@ -3835,7 +3835,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 5c5e1be4725d4908adc0c506c98a6cab
-          name: 'AWS ELB NLB: Processed Bytes UDP'
+          name: 'Processed Bytes UDP'
           type: DEPENDENT
           key: aws.elb.nlb.processed_bytes_udp
           delay: '0'
@@ -3855,7 +3855,7 @@ zabbix_export:
             - tag: component
               value: udp
         - uuid: c41394db6dba4693b4c19aebdc2e8f69
-          name: 'AWS ELB NLB: Processed Packets'
+          name: 'Processed Packets'
           type: DEPENDENT
           key: aws.elb.nlb.processed_packets
           delay: '0'
@@ -3872,7 +3872,7 @@ zabbix_export:
             - tag: component
               value: traffic
         - uuid: 28bb42c1af9d4ee782a4ac1e75194293
-          name: 'AWS ELB NLB: Security Group Blocked Flow Count Inbound ICMP'
+          name: 'Security Group Blocked Flow Count Inbound ICMP'
           type: DEPENDENT
           key: aws.elb.nlb.sg_blocked_inbound_icmp
           delay: '0'
@@ -3891,7 +3891,7 @@ zabbix_export:
             - tag: component
               value: security-group
         - uuid: 95db8688978d4fc0b3a54c01c34cd0c7
-          name: 'AWS ELB NLB: Security Group Blocked Flow Count Inbound TCP'
+          name: 'Security Group Blocked Flow Count Inbound TCP'
           type: DEPENDENT
           key: aws.elb.nlb.sg_blocked_inbound_tcp
           delay: '0'
@@ -3910,7 +3910,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: 287e26627214470bba9589af506ca832
-          name: 'AWS ELB NLB: Security Group Blocked Flow Count Inbound UDP'
+          name: 'Security Group Blocked Flow Count Inbound UDP'
           type: DEPENDENT
           key: aws.elb.nlb.sg_blocked_inbound_udp
           delay: '0'
@@ -3929,7 +3929,7 @@ zabbix_export:
             - tag: component
               value: udp
         - uuid: 65a6fb4771114377bcdf93dc09665b2b
-          name: 'AWS ELB NLB: Security Group Blocked Flow Count Outbound ICMP'
+          name: 'Security Group Blocked Flow Count Outbound ICMP'
           type: DEPENDENT
           key: aws.elb.nlb.sg_blocked_outbound_icmp
           delay: '0'
@@ -3948,7 +3948,7 @@ zabbix_export:
             - tag: component
               value: security-group
         - uuid: 343b254cfc1a48cc8e401cd3514c76b3
-          name: 'AWS ELB NLB: Security Group Blocked Flow Count Outbound TCP'
+          name: 'Security Group Blocked Flow Count Outbound TCP'
           type: DEPENDENT
           key: aws.elb.nlb.sg_blocked_outbound_tcp
           delay: '0'
@@ -3967,7 +3967,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: 5a9126687a964f969270bc1855081a7a
-          name: 'AWS ELB NLB: Security Group Blocked Flow Count Outbound UDP'
+          name: 'Security Group Blocked Flow Count Outbound UDP'
           type: DEPENDENT
           key: aws.elb.nlb.sg_blocked_outbound_udp
           delay: '0'
@@ -3986,7 +3986,7 @@ zabbix_export:
             - tag: component
               value: udp
         - uuid: 583872d175174881a8cdcede4fe641e7
-          name: 'AWS ELB NLB: Target TLS Negotiation Error Count'
+          name: 'Target TLS Negotiation Error Count'
           type: DEPENDENT
           key: aws.elb.nlb.target_tls_negotiation_error_count
           delay: '0'
@@ -4005,7 +4005,7 @@ zabbix_export:
             - tag: component
               value: tls
         - uuid: 035021358b9f4ae2b0478d5168fc1501
-          name: 'AWS ELB NLB: TCP Client Reset Count'
+          name: 'TCP Client Reset Count'
           type: DEPENDENT
           key: aws.elb.nlb.tcp_client_reset_count
           delay: '0'
@@ -4026,7 +4026,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: 84f23b89fb414731979941a9a4701025
-          name: 'AWS ELB NLB: TCP ELB Reset Count'
+          name: 'TCP ELB Reset Count'
           type: DEPENDENT
           key: aws.elb.nlb.tcp_elb_reset_count
           delay: '0'
@@ -4047,7 +4047,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: 3318c330736e406c9eec5f581f3fc59b
-          name: 'AWS ELB NLB: TCP Target Reset Count'
+          name: 'TCP Target Reset Count'
           type: DEPENDENT
           key: aws.elb.nlb.tcp_target_reset_count
           delay: '0'
@@ -4068,7 +4068,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: 706019d7a11e48a9aaa1b5484c93fd8e
-          name: 'AWS ELB NLB: Unhealthy Routing Flow Count'
+          name: 'Unhealthy Routing Flow Count'
           type: DEPENDENT
           key: aws.elb.nlb.unhealthy_routing_flow_count
           delay: '0'
@@ -4110,7 +4110,7 @@ zabbix_export:
           description: 'Used for the discovery of alarm balancers.'
           item_prototypes:
             - uuid: c9f5791fe83743739ab74289126c7843
-              name: 'AWS ELB NLB Alarms: [{#ALARM_NAME}]: Get metrics'
+              name: '[{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.elb.nlb.alarm.get_metrics["{#ALARM_NAME}"]'
               delay: '0'
@@ -4129,7 +4129,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 3e039e2d86654095b0c9fa93f7273cab
-              name: 'AWS ELB NLB Alarms: [{#ALARM_NAME}]: State'
+              name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.elb.nlb.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -4163,8 +4163,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 0df06bb3cad742368204984c83f3c161
                   expression: 'last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS ELB NLB Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
-                  event_name: 'AWS ELB NLB Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
+                  name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
+                  event_name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
@@ -4172,7 +4172,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 8be7e86d50be4324ac6b7b8f20350eb0
-              name: 'AWS ELB NLB Alarms: [{#ALARM_NAME}]: State reason'
+              name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.elb.nlb.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -4199,8 +4199,8 @@ zabbix_export:
           trigger_prototypes:
             - uuid: a4558b07342b4e758cde7866e9027acf
               expression: 'last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS ELB NLB Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
-              event_name: 'AWS ELB NLB Alarms: [{#ALARM_NAME}] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
+              name: '[{#ALARM_NAME}] has ''Alarm'' state'
+              event_name: '[{#ALARM_NAME}] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
               opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               description: |
@@ -4251,7 +4251,7 @@ zabbix_export:
           description: 'Used for the discovery of `{$AWS.ELB.TARGET.GROUP.NAME}` target groups.'
           item_prototypes:
             - uuid: 9438a03b48bd4617a2363f83f758f107
-              name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Get metrics'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Get metrics'
               type: SCRIPT
               key: 'aws.elb.nlb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: 0s;m/5
@@ -4497,7 +4497,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 8a42548bf31843acb0b021dfa0cf7f38
-              name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host Count'
               type: DEPENDENT
               key: 'aws.elb.nlb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -4524,8 +4524,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: dd527fbba0a84a1b8abe77dc34f7474c
                   expression: 'last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) = 0'
-                  name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy'
-                  event_name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host Count = 0'
+                  name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy'
+                  event_name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host Count = 0'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'This trigger helps in identifying when your targets have become unhealthy.'
@@ -4533,7 +4533,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: b5e01700b1a14cd1bcfb676c69490f86
-              name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host Count'
+              name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host Count'
               type: DEPENDENT
               key: 'aws.elb.nlb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -4560,13 +4560,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 8de0720e39eb4759bec17431a596c3d4
                   expression: 'last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) > {$AWS.ELB.UNHEALTHY.HOST.MAX}'
-                  name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have unhealthy host'
-                  event_name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host Count > {$AWS.ELB.UNHEALTHY.HOST.MAX}'
+                  name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Target have unhealthy host'
+                  event_name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host Count > {$AWS.ELB.UNHEALTHY.HOST.MAX}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger allows you to become aware when there are no more registered targets.'
                   dependencies:
-                    - name: 'AWS ELB NLB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy'
+                    - name: '[{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy'
                       expression: 'last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) = 0'
                   tags:
                     - tag: scope

@@ -600,7 +600,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				'JMX agent',
 				'Calculated',
 				'Dependent item',
-				'Script'
+				'Script',
+				'Browser'
 			]);
 			if (isset($data['type'])) {
 				$type_field->select($data['type']);

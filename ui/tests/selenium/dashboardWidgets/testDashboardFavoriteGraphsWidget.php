@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 class testDashboardFavoriteGraphsWidget extends CWebTest {
 
 	protected static $dashboardid;
-	public $graph_cpu = 'Linux: CPU utilization';
+	public $graph_cpu = 'CPU utilization';
 	public $host_name = 'ЗАББИКС Сервер';
-	public $graph_memory = 'Linux: Available memory in %';
+	public $graph_memory = 'Available memory in %';
 
 	public static function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [

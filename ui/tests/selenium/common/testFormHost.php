@@ -2161,8 +2161,8 @@ class testFormHost extends CWebTest {
 						$this->assertFalse($form->getField($label)->isEnabled());
 					}
 
-					foreach (['Username', 'Password'] as $fields) {
-						$this->assertEquals(255, $form->getField($label)->getAttribute('maxlength'));
+					foreach (['Username' => 16, 'Password' => 20] as $field => $maxlength) {
+						$this->assertEquals($maxlength, $form->getField($field)->getAttribute('maxlength'));
 					}
 
 					break;

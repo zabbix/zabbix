@@ -55,14 +55,14 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Openweathermap: Get data|<p>JSON array with result of OpenWeatherMap API requests.</p>|Script|openweathermap.get.data|
-|Openweathermap: Get data collection errors|<p>Errors from get data requests by script item.</p>|Dependent item|openweathermap.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get data|<p>JSON array with result of OpenWeatherMap API requests.</p>|Script|openweathermap.get.data|
+|Get data collection errors|<p>Errors from get data requests by script item.</p>|Dependent item|openweathermap.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Openweathermap: There are errors in requests to OpenWeatherMap API|<p>Zabbix has received errors in requests to OpenWeatherMap API.</p>|`length(last(/OpenWeatherMap by HTTP/openweathermap.get.errors))>0`|Average|**Manual close**: Yes|
+|There are errors in requests to OpenWeatherMap API|<p>Zabbix has received errors in requests to OpenWeatherMap API.</p>|`length(last(/OpenWeatherMap by HTTP/openweathermap.get.errors))>0`|Average|**Manual close**: Yes|
 
 ### LLD rule Locations discovery
 

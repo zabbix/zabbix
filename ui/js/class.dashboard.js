@@ -2154,7 +2154,7 @@ class CDashboard {
 					for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
 						const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
 
-						if (circular_references.has(reference)) {
+						if (reference !== '' && circular_references.has(reference)) {
 							circular_references_next.add(fields.reference);
 
 							referable_widgets.delete(widget);
@@ -2187,12 +2187,12 @@ class CDashboard {
 			},
 
 			dashboardPageRequireDataSource: e => {
-				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD) {
+				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD && this.#broadcast_cache.has(e.detail.type)) {
 					return;
 				}
 
 				ZABBIX.EventHub.publish({
-					data: null,
+					data: CWidgetsData.getDefault(e.detail.type),
 					descriptor: {
 						context: 'dashboard',
 						sender_unique_id: 'dashboard',
@@ -2204,7 +2204,7 @@ class CDashboard {
 					}
 				});
 
-				console.log('Could not find required data source', e.detail.reference);
+				console.log('Could not require referred data source', `${e.detail.reference}.${e.detail.type}`);
 			},
 
 			dashboardPageEdit: () => {

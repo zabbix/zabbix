@@ -32,7 +32,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: fbefc108101b48e298a01037d5b3db50
-          name: 'HP Comware HH3C: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -46,14 +46,14 @@ zabbix_export:
           triggers:
             - uuid: 1bd6a4748e29498e99ccd3b23d83cdf7
               expression: 'max(/HP Comware HH3C by SNMP/icmpping,#3)=0'
-              name: 'HP Comware HH3C: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 49b86b6d17394b859b02ea79c6d28b30
-          name: 'HP Comware HH3C: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -67,11 +67,11 @@ zabbix_export:
           triggers:
             - uuid: d41edaea369d40d2944af72a3ee76850
               expression: 'min(/HP Comware HH3C by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Comware HH3C by SNMP/icmppingloss,5m)<100'
-              name: 'HP Comware HH3C: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'HP Comware HH3C: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Comware HH3C by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -79,7 +79,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 1560f8f1509040a783e4149845ce38a3
-          name: 'HP Comware HH3C: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -93,14 +93,14 @@ zabbix_export:
           triggers:
             - uuid: 2698115b6f014e8cbdb11c2d5eeb8f08
               expression: 'avg(/HP Comware HH3C by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'HP Comware HH3C: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'HP Comware HH3C: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/HP Comware HH3C by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Comware HH3C by SNMP/icmppingloss,5m)<100'
-                - name: 'HP Comware HH3C: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Comware HH3C by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -108,7 +108,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: fa164b01a218494dab454126b4f561a9
-          name: 'HP Comware HH3C: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -121,7 +121,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 6f340c49d4364b8096a49c3fa52e2745
-          name: 'HP Comware HH3C: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -141,7 +141,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 85e404c0181143f28b1187acb08cfa04
-          name: 'HP Comware HH3C: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -162,7 +162,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b476c099f8f64aa89cd5f61fc8b47dfa
-          name: 'HP Comware HH3C: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -186,7 +186,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3e4feed03de941c98e88e17b3e81b5e4
-          name: 'HP Comware HH3C: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -206,7 +206,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b57179ad3e5f41f5805e93ff9e68d631
-          name: 'HP Comware HH3C: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -228,8 +228,8 @@ zabbix_export:
           triggers:
             - uuid: cf1d0aa58a194904902899dbba814514
               expression: 'last(/HP Comware HH3C by SNMP/system.name,#1)<>last(/HP Comware HH3C by SNMP/system.name,#2) and length(last(/HP Comware HH3C by SNMP/system.name))>0'
-              name: 'HP Comware HH3C: System name has changed'
-              event_name: 'HP Comware HH3C: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -239,7 +239,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: ac039d3041cc439eb1c3184ed78554d0
-          name: 'HP Comware HH3C: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -258,7 +258,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 72139a34e0cf4357b86a52cf8430ee8c
-          name: 'HP Comware HH3C: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -277,7 +277,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c407deea6e0f41b18d84ccbe7fcbca63
-          name: 'HP Comware HH3C: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -297,12 +297,12 @@ zabbix_export:
           triggers:
             - uuid: bc6e9c399c3d4d43aaeb5a1b03deb7d4
               expression: 'max(/HP Comware HH3C by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'HP Comware HH3C: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'HP Comware HH3C: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Comware HH3C by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -435,7 +435,7 @@ zabbix_export:
                   description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'HP Comware HH3C: System name has changed'
+                    - name: 'System name has changed'
                       expression: 'last(/HP Comware HH3C by SNMP/system.name,#1)<>last(/HP Comware HH3C by SNMP/system.name,#2) and length(last(/HP Comware HH3C by SNMP/system.name))>0'
                   tags:
                     - tag: scope
@@ -1970,13 +1970,13 @@ zabbix_export:
   triggers:
     - uuid: c1372deba2b148f4ac8be6493f0b9868
       expression: '(last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'HP Comware HH3C: Host has been restarted'
-      event_name: 'HP Comware HH3C: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'HP Comware HH3C: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/HP Comware HH3C by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

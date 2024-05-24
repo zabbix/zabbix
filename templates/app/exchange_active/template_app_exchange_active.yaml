@@ -22,7 +22,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 5af1c3257c264abda20023eae10b3b86
-          name: 'MS Exchange: Databases total mounted'
+          name: 'Databases total mounted'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchange Active Manager(_total)\Database Mounted"]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -36,7 +36,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: bb9de29f56124a77a6ac1d3f8cbd72e9
-          name: 'MS Exchange [Client Access Server]: ActiveSync: ping command pending'
+          name: 'ActiveSync: ping command pending'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchange ActiveSync\Ping Commands Pending", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -47,7 +47,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 038e740be37c40339520b4c4b1b0d18b
-          name: 'MS Exchange [Client Access Server]: ActiveSync: requests per second'
+          name: 'ActiveSync: requests per second'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchange ActiveSync\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -58,7 +58,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 953665dbe8f948ff821333a4d50eada6
-          name: 'MS Exchange [Client Access Server]: ActiveSync: sync commands per second'
+          name: 'ActiveSync: sync commands per second'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchange ActiveSync\Sync Commands/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -69,7 +69,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: c8ed8a7e36c6453183aee1a778a4749a
-          name: 'MS Exchange [Client Access Server]: Autodiscover: requests per second'
+          name: 'Autodiscover: requests per second'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchangeAutodiscover\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -80,7 +80,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 2260d98130814d369ac1c90324caaa26
-          name: 'MS Exchange [Client Access Server]: Availability Service: availability requests per second'
+          name: 'Availability Service: availability requests per second'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchange Availability Service\Availability Requests (sec)", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -91,7 +91,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: b4336fce2d27450b95de4f1bbbf947f3
-          name: 'MS Exchange [Client Access Server]: Outlook Web App: current unique users'
+          name: 'Outlook Web App: current unique users'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchange OWA\Current Unique Users", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -102,7 +102,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 14344546f3a748fbb8f78e503e92255f
-          name: 'MS Exchange [Client Access Server]: Outlook Web App: requests per second'
+          name: 'Outlook Web App: requests per second'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchange OWA\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -113,7 +113,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: e8c8e348c01e48ad92ee02060717e097
-          name: 'MS Exchange [Client Access Server]: MSExchangeWS: requests per second'
+          name: 'MSExchangeWS: requests per second'
           type: ZABBIX_ACTIVE
           key: 'perf_counter_en["\MSExchangeWS\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
@@ -124,7 +124,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: b20b5df8198e4cdc8b584061f6815d5d
-          name: 'MS Exchange: Active agent availability'
+          name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
           history: 7d
@@ -144,7 +144,7 @@ zabbix_export:
           triggers:
             - uuid: 8f04c3d6b3224382abf7472e8a4e38ba
               expression: 'min(/Microsoft Exchange Server 2016 by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
-              name: 'MS Exchange: Active checks are not available'
+              name: 'Active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'

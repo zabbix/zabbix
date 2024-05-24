@@ -20,7 +20,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: af550a1bfe74428eb24492d8af3b405e
-          name: 'Windows: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -34,7 +34,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f81e2ce0d1104f9aaf1fc49284ed0ed4
-          name: 'Windows: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
@@ -44,7 +44,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5707443d739d4689bde192e75ff4bd0f
-          name: 'Windows: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -58,7 +58,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 5219a246de0641a89685a961cdd08c0b
-          name: 'Windows: Cache bytes'
+          name: 'Cache bytes'
           key: 'perf_counter_en["\Memory\Cache Bytes"]'
           history: 7d
           units: B
@@ -67,7 +67,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 2ea74fafb9334de095adcb47cced578d
-          name: 'Windows: Free system page table entries'
+          name: 'Free system page table entries'
           key: 'perf_counter_en["\Memory\Free System Page Table Entries"]'
           history: 7d
           description: 'This indicates the number of page table entries not currently in use by the system. If the number is less than 5,000, there may be a memory leak or you running out of memory.'
@@ -77,18 +77,18 @@ zabbix_export:
           triggers:
             - uuid: e3118e2e6109460f80cc2d56795ed42f
               expression: 'max(/Windows by Zabbix agent/perf_counter_en["\Memory\Free System Page Table Entries"],5m)<{$MEM.PAGE_TABLE_CRIT.MIN}'
-              name: 'Windows: Number of free system page table entries is too low'
-              event_name: 'Windows: Number of free system page table entries is too low (less {$MEM.PAGE_TABLE_CRIT.MIN} for 5m)'
+              name: 'Number of free system page table entries is too low'
+              event_name: 'Number of free system page table entries is too low (less {$MEM.PAGE_TABLE_CRIT.MIN} for 5m)'
               priority: WARNING
               description: '`Memory\Free System Page Table Entries` has been less than `{$MEM.PAGE_TABLE_CRIT.MIN}` for 5 minutes. If the number is less than 5,000, there may be a memory leak.'
               dependencies:
-                - name: 'Windows: High memory utilization'
+                - name: 'High memory utilization'
                   expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 6c41d254585a4d7b81a0c5766a8913c1
-          name: 'Windows: Memory page faults per second'
+          name: 'Memory page faults per second'
           key: 'perf_counter_en["\Memory\Page Faults/sec"]'
           history: 7d
           value_type: FLOAT
@@ -97,7 +97,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 287163bc5b0441c4bf51489432a278eb
-          name: 'Windows: Memory pages per second'
+          name: 'Memory pages per second'
           key: 'perf_counter_en["\Memory\Pages/sec"]'
           history: 7d
           value_type: FLOAT
@@ -110,18 +110,18 @@ zabbix_export:
           triggers:
             - uuid: ab4c9a66d16f42e6a32f6144f4d2a3ca
               expression: 'min(/Windows by Zabbix agent/perf_counter_en["\Memory\Pages/sec"],5m)>{$MEM.PAGE_SEC.CRIT.MAX}'
-              name: 'Windows: The Memory Pages/sec is too high'
-              event_name: 'Windows: The Memory Pages/sec is too high (over {$MEM.PAGE_SEC.CRIT.MAX} for 5m)'
+              name: 'The Memory Pages/sec is too high'
+              event_name: 'The Memory Pages/sec is too high (over {$MEM.PAGE_SEC.CRIT.MAX} for 5m)'
               priority: WARNING
               description: 'The Memory Pages/sec in the last 5 minutes exceeds `{$MEM.PAGE_SEC.CRIT.MAX}`. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.'
               dependencies:
-                - name: 'Windows: High memory utilization'
+                - name: 'High memory utilization'
                   expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: fb822cb2a17948208a61bd6661c496df
-          name: 'Windows: Memory pool non-paged'
+          name: 'Memory pool non-paged'
           key: 'perf_counter_en["\Memory\Pool Nonpaged Bytes"]'
           history: 7d
           units: B
@@ -132,7 +132,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: b99a722d267d455fad3c07c53302b20f
-          name: 'Windows: Used swap space in %'
+          name: 'Used swap space in %'
           key: 'perf_counter_en["\Paging file(_Total)\% Usage"]'
           history: 7d
           value_type: FLOAT
@@ -144,7 +144,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: ee1f116fdab34969a6e6f5e1c25fc3d2
-          name: 'Windows: CPU DPC time'
+          name: 'CPU DPC time'
           key: 'perf_counter_en["\Processor Information(_total)\% DPC Time"]'
           history: 7d
           value_type: FLOAT
@@ -154,7 +154,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e403552481b04ebdba2e8a019f114f20
-          name: 'Windows: CPU interrupt time'
+          name: 'CPU interrupt time'
           key: 'perf_counter_en["\Processor Information(_total)\% Interrupt Time"]'
           history: 7d
           value_type: FLOAT
@@ -166,18 +166,18 @@ zabbix_export:
           triggers:
             - uuid: f67bedcb282349b2aac052baf4963480
               expression: 'min(/Windows by Zabbix agent/perf_counter_en["\Processor Information(_total)\% Interrupt Time"],5m)>{$CPU.INTERRUPT.CRIT.MAX}'
-              name: 'Windows: CPU interrupt time is too high'
-              event_name: 'Windows: CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)'
+              name: 'CPU interrupt time is too high'
+              event_name: 'CPU interrupt time is too high (over {$CPU.INTERRUPT.CRIT.MAX}% for 5m)'
               priority: WARNING
               description: 'The CPU Interrupt Time in the last 5 minutes exceeds `{$CPU.INTERRUPT.CRIT.MAX}`%.'
               dependencies:
-                - name: 'Windows: High CPU utilization'
+                - name: 'High CPU utilization'
                   expression: 'min(/Windows by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 37448f05afe340a3891d05528c9d1adc
-          name: 'Windows: CPU privileged time'
+          name: 'CPU privileged time'
           key: 'perf_counter_en["\Processor Information(_total)\% Privileged Time"]'
           history: 7d
           value_type: FLOAT
@@ -189,20 +189,20 @@ zabbix_export:
           triggers:
             - uuid: 4d099256b3ba42f1b90143e2014900dd
               expression: 'min(/Windows by Zabbix agent/perf_counter_en["\Processor Information(_total)\% Privileged Time"],5m)>{$CPU.PRIV.CRIT.MAX}'
-              name: 'Windows: CPU privileged time is too high'
-              event_name: 'Windows: CPU privileged time is too high (over {$CPU.PRIV.CRIT.MAX}% for 5m)'
+              name: 'CPU privileged time is too high'
+              event_name: 'CPU privileged time is too high (over {$CPU.PRIV.CRIT.MAX}% for 5m)'
               priority: WARNING
               description: 'The CPU privileged time in the last 5 minutes exceeds {$CPU.PRIV.CRIT.MAX}%.'
               dependencies:
-                - name: 'Windows: CPU interrupt time is too high'
+                - name: 'CPU interrupt time is too high'
                   expression: 'min(/Windows by Zabbix agent/perf_counter_en["\Processor Information(_total)\% Interrupt Time"],5m)>{$CPU.INTERRUPT.CRIT.MAX}'
-                - name: 'Windows: High CPU utilization'
+                - name: 'High CPU utilization'
                   expression: 'min(/Windows by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 575912d512624143b564ca0fbfd0bb8f
-          name: 'Windows: CPU user time'
+          name: 'CPU user time'
           key: 'perf_counter_en["\Processor Information(_total)\% User Time"]'
           history: 7d
           value_type: FLOAT
@@ -212,7 +212,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2322a85bfc1049a3b5c892d83b5d5054
-          name: 'Windows: Context switches per second'
+          name: 'Context switches per second'
           key: 'perf_counter_en["\System\Context Switches/sec"]'
           history: 7d
           value_type: FLOAT
@@ -225,7 +225,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 002af28df72f4a788c88bc022d88c6dd
-          name: 'Windows: CPU queue length'
+          name: 'CPU queue length'
           key: 'perf_counter_en["\System\Processor Queue Length"]'
           history: 7d
           value_type: FLOAT
@@ -234,7 +234,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 630b7b2af6274936ab80b1dd774113e5
-          name: 'Windows: Number of threads'
+          name: 'Number of threads'
           key: 'perf_counter_en["\System\Threads"]'
           history: 7d
           description: 'The number of threads used by all running processes.'
@@ -242,7 +242,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: b305029532f84daf93c8da2d181ac3a1
-          name: 'Windows: Number of processes'
+          name: 'Number of processes'
           key: 'proc.num[]'
           history: 7d
           description: 'The number of processes.'
@@ -250,7 +250,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: c2ed8e2efab04564b6c70ee8ad14730f
-          name: 'Windows: CPU utilization'
+          name: 'CPU utilization'
           key: system.cpu.util
           history: 7d
           value_type: FLOAT
@@ -262,8 +262,8 @@ zabbix_export:
           triggers:
             - uuid: 806aa232f56640ab98aacc79491fc4d7
               expression: 'min(/Windows by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'Windows: High CPU utilization'
-              event_name: 'Windows: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -271,7 +271,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: cb056886ce72426e833a0445f9263906
-          name: 'Windows: System name'
+          name: 'System name'
           key: system.hostname
           delay: 1h
           history: 7d
@@ -289,8 +289,8 @@ zabbix_export:
           triggers:
             - uuid: 6b50d36a4e29468a9546e880f3004399
               expression: 'change(/Windows by Zabbix agent/system.hostname) and length(last(/Windows by Zabbix agent/system.hostname))>0'
-              name: 'Windows: System name has changed'
-              event_name: 'Windows: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -298,7 +298,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 94c4dfe23e2e4c6e995a3a715941a8eb
-          name: 'Windows: System local time'
+          name: 'System local time'
           key: system.localtime
           history: 7d
           units: unixtime
@@ -309,8 +309,8 @@ zabbix_export:
           triggers:
             - uuid: 37ca2366c8474cc8a49a605e93377601
               expression: 'fuzzytime(/Windows by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'Windows: System time is out of sync'
-              event_name: 'Windows: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              name: 'System time is out of sync'
+              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
@@ -318,7 +318,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 7e8b3476db6d4322a10cd1a28cbdb7ea
-          name: 'Windows: Operating system architecture'
+          name: 'Operating system architecture'
           key: system.sw.arch
           delay: 1h
           history: 7d
@@ -333,7 +333,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: c86dd0a8dbba468696cc09a9f9575769
-          name: 'Windows: Operating system'
+          name: 'Operating system'
           key: system.sw.os
           delay: 1h
           history: 7d
@@ -350,18 +350,18 @@ zabbix_export:
           triggers:
             - uuid: 9d5648eb580b41fca95d750113287567
               expression: 'change(/Windows by Zabbix agent/system.sw.os) and length(last(/Windows by Zabbix agent/system.sw.os))>0'
-              name: 'Windows: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Windows: System name has changed'
+                - name: 'System name has changed'
                   expression: 'change(/Windows by Zabbix agent/system.hostname) and length(last(/Windows by Zabbix agent/system.hostname))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 11cac38334544e5cbb028cfd473cb39e
-          name: 'Windows: Free swap space'
+          name: 'Free swap space'
           type: CALCULATED
           key: system.swap.free
           history: 7d
@@ -374,7 +374,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 9c7e3c843a3045df81dddc5d18de267c
-          name: 'Windows: Free swap space in %'
+          name: 'Free swap space in %'
           type: DEPENDENT
           key: system.swap.pfree
           delay: '0'
@@ -394,7 +394,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: f981835baf04494eaff2f33f159e0ab5
-          name: 'Windows: Total swap space'
+          name: 'Total swap space'
           key: 'system.swap.size[,total]'
           history: 7d
           units: B
@@ -405,7 +405,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b103a2c22fe344f886e9dc9f4e4a65ec
-          name: 'Windows: System description'
+          name: 'System description'
           key: system.uname
           delay: 15m
           history: 7d
@@ -420,7 +420,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 12503fbf4400488e9b5ff0488f164cb6
-          name: 'Windows: Uptime'
+          name: Uptime
           key: system.uptime
           delay: 30s
           history: 7d
@@ -433,8 +433,8 @@ zabbix_export:
           triggers:
             - uuid: d27b9eab4034439f91dff41fe6f043ab
               expression: 'last(/Windows by Zabbix agent/system.uptime)<10m'
-              name: 'Windows: Host has been restarted'
-              event_name: 'Windows: Host has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: 'Host has been restarted (uptime < 10m)'
               priority: WARNING
               description: 'The device uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -442,7 +442,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: f59d6794a6b94e93aced78a688507677
-          name: 'Windows: Get filesystems'
+          name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
           trends: '0'
@@ -452,7 +452,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 09e9a345a0f445b1a65685911f5eb9b0
-          name: 'Windows: Total memory'
+          name: 'Total memory'
           key: 'vm.memory.size[total]'
           history: 7d
           units: B
@@ -461,7 +461,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 1cbf45e11dab453797fe291639aa0c01
-          name: 'Windows: Used memory'
+          name: 'Used memory'
           key: 'vm.memory.size[used]'
           history: 7d
           units: B
@@ -470,7 +470,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 3b1e4ecaa04a46e9b0aee956918f0713
-          name: 'Windows: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: vm.memory.util
           history: 7d
@@ -484,8 +484,8 @@ zabbix_export:
           triggers:
             - uuid: b442993bb2a6404a8ebcb7be39d16ce6
               expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Windows: High memory utilization'
-              event_name: 'Windows: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -508,7 +508,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 83c8c6f15b524a2fb04fc90d04d3e8a2
-          name: 'Windows: Number of cores'
+          name: 'Number of cores'
           key: 'wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]'
           history: 7d
           description: 'The number of logical processors available on the computer.'
@@ -516,7 +516,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 3dcb0f79342b4ded97cdec0794472266
-          name: 'Windows: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
@@ -529,8 +529,8 @@ zabbix_export:
           triggers:
             - uuid: 05beb4500cae480892fad0739f99807d
               expression: 'max(/Windows by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'Windows: Zabbix agent is not available'
-              event_name: 'Windows: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive agents only, host availability is used with `{$AGENT.TIMEOUT}` as a time threshold.'
               manual_close: 'YES'
@@ -1791,25 +1791,25 @@ zabbix_export:
   triggers:
     - uuid: 8b1baeb26e154f99aefeaba3ea4fa63b
       expression: 'min(/Windows by Zabbix agent/perf_counter_en["\System\Processor Queue Length"],5m) - last(/Windows by Zabbix agent/wmi.get[root/cimv2,"Select NumberOfLogicalProcessors from Win32_ComputerSystem"]) * 2 > {$CPU.QUEUE.CRIT.MAX}'
-      name: 'Windows: CPU queue length is too high'
-      event_name: 'Windows: CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)'
+      name: 'CPU queue length is too high'
+      event_name: 'CPU queue length is too high (over {$CPU.QUEUE.CRIT.MAX} for 5m)'
       priority: WARNING
       description: 'The CPU Queue Length in the last 5 minutes exceeds `{$CPU.QUEUE.CRIT.MAX}`. According to actual observations, PQL should not exceed the number of cores * 2. To fine-tune the conditions, use the macro `{$CPU.QUEUE.CRIT.MAX }`.'
       dependencies:
-        - name: 'Windows: High CPU utilization'
+        - name: 'High CPU utilization'
           expression: 'min(/Windows by Zabbix agent/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
       tags:
         - tag: scope
           value: performance
     - uuid: 7c23e03060ce42b094aac2f8aea1a9ad
       expression: 'max(/Windows by Zabbix agent/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows by Zabbix agent/system.swap.size[,total])>0'
-      name: 'Windows: High swap space usage'
-      event_name: 'Windows: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      name: 'High swap space usage'
+      event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
       priority: WARNING
       description: 'This trigger is ignored, if there is no swap configured'
       dependencies:
-        - name: 'Windows: High memory utilization'
+        - name: 'High memory utilization'
           expression: 'min(/Windows by Zabbix agent/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
       tags:
         - tag: scope

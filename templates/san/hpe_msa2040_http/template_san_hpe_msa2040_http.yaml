@@ -84,7 +84,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e07e09dbcdd44f509a06343c9a53a455
-          name: 'HPE MSA: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: hpe.msa.get.data
           history: '0'
@@ -648,7 +648,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d1242f5aede14008ae6896123bb944a5
-          name: 'HPE MSA: Service ping'
+          name: 'Service ping'
           type: SIMPLE
           key: 'net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"]'
           history: 7d

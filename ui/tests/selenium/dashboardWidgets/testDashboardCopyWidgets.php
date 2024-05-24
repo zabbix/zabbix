@@ -40,7 +40,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	// Values for replacing widgets.
 	private static $replaced_widget_name = "Test widget for replace";
-	const REPLACED_WIDGET_SIZE = [ 'width' => '13', 'height' => '8'];
+	const REPLACED_WIDGET_SIZE = [ 'width' => '21', 'height' => '3'];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -294,7 +294,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
+					'name' => 'Item history widget',
 					'copy to' => 'same page'
 				]
 			],
@@ -330,7 +330,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
+					'name' => 'Item history widget',
 					'copy to' => 'another page'
 				]
 			],
@@ -396,7 +396,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
+					'name' => 'Item history widget',
 					'copy to' => 'another dashboard'
 				]
 			],
@@ -576,8 +576,8 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'module_name' => 'Plain text',
-					'widget_name' => 'Plain text widget',
+					'module_name' => 'Item history',
+					'widget_name' => 'Item history widget',
 					'action' => 'copy widget',
 					'template' => true
 				]

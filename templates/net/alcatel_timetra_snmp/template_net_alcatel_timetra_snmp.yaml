@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 832b1a2e21904591bc42d5cda9f3df14
-          name: 'Alcatel Timetra TiMOS: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -40,14 +40,14 @@ zabbix_export:
           triggers:
             - uuid: 72f8bcb4dfde4d338c31c83b72a36129
               expression: 'max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0'
-              name: 'Alcatel Timetra TiMOS: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 959946f1885c4e7fbde7ab7200c60858
-          name: 'Alcatel Timetra TiMOS: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -61,11 +61,11 @@ zabbix_export:
           triggers:
             - uuid: 0c0a32b98df84c07acbe51caabc8c012
               expression: 'min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)<100'
-              name: 'Alcatel Timetra TiMOS: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Alcatel Timetra TiMOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -73,7 +73,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 7f858a8bc36746be89b2e36608cbb643
-          name: 'Alcatel Timetra TiMOS: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -87,14 +87,14 @@ zabbix_export:
           triggers:
             - uuid: 06fd317938784236b3e17b2b4080925d
               expression: 'avg(/Alcatel Timetra TiMOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Alcatel Timetra TiMOS: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Alcatel Timetra TiMOS: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)<100'
-                - name: 'Alcatel Timetra TiMOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -102,7 +102,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 8f5bdb3fde9142a9892db396c040f8dd
-          name: 'Alcatel Timetra TiMOS: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -115,7 +115,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 0471357a58ff437e835e02175d6e6ca1
-          name: 'Alcatel Timetra TiMOS: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -135,7 +135,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e28cb751b37e42d29be9f0295bd030b6
-          name: 'Alcatel Timetra TiMOS: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.6527.3.1.2.1.1.1.0
           key: 'system.cpu.util[sgiCpuUsage.0]'
@@ -151,8 +151,8 @@ zabbix_export:
           triggers:
             - uuid: 4167b064eb19478da13531f629082ef1
               expression: 'min(/Alcatel Timetra TiMOS by SNMP/system.cpu.util[sgiCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'Alcatel Timetra TiMOS: High CPU utilization'
-              event_name: 'Alcatel Timetra TiMOS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -160,7 +160,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 757c85110dc34eb88265832aba8e7fbf
-          name: 'Alcatel Timetra TiMOS: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -181,7 +181,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2183a57a2c904632bf813c15610765f7
-          name: 'Alcatel Timetra TiMOS: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.hw.model
@@ -203,7 +203,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3ea3106277c64428950b4a5b6c4aedd0
-          name: 'Alcatel Timetra TiMOS: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -227,7 +227,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 597b68e7ddb8482280122de489424041
-          name: 'Alcatel Timetra TiMOS: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -247,7 +247,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 0b1d37d4950d40c79433f47dea9677d4
-          name: 'Alcatel Timetra TiMOS: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -269,8 +269,8 @@ zabbix_export:
           triggers:
             - uuid: 5f11cacfd4a94cf696897b3f3fa80601
               expression: 'last(/Alcatel Timetra TiMOS by SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.name))>0'
-              name: 'Alcatel Timetra TiMOS: System name has changed'
-              event_name: 'Alcatel Timetra TiMOS: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -280,7 +280,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: e80e3dfbf1a447be87f1b6853c66555b
-          name: 'Alcatel Timetra TiMOS: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -299,7 +299,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f0df5a577f5c46689578302df065a3d6
-          name: 'Alcatel Timetra TiMOS: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -318,7 +318,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9f1c8827a9ef4948808bac9d76add9a8
-          name: 'Alcatel Timetra TiMOS: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.sw.os[sysDescr.0]'
@@ -342,18 +342,18 @@ zabbix_export:
           triggers:
             - uuid: dd5dc3541a3d402c98a60b25d9e48dd6
               expression: 'last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0]))>0'
-              name: 'Alcatel Timetra TiMOS: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Alcatel Timetra TiMOS: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Alcatel Timetra TiMOS by SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 3f2769066a184d29afd26047039b633c
-          name: 'Alcatel Timetra TiMOS: Available memory'
+          name: 'Available memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.6527.3.1.2.1.1.10.0
           key: 'vm.memory.available[sgiKbMemoryAvailable.0]'
@@ -370,7 +370,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 9005685cea194d7c9702f19040df7b80
-          name: 'Alcatel Timetra TiMOS: Total memory'
+          name: 'Total memory'
           type: CALCULATED
           key: 'vm.memory.total[snmp]'
           history: 7d
@@ -381,7 +381,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: f5cd1ed0f61f464f86a97485f833d832
-          name: 'Alcatel Timetra TiMOS: Used memory'
+          name: 'Used memory'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.6527.3.1.2.1.1.9.0
           key: 'vm.memory.used[sgiKbMemoryUsed.0]'
@@ -398,7 +398,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: f223ac289a99469e8861219f4254dea6
-          name: 'Alcatel Timetra TiMOS: Memory utilization'
+          name: 'Memory utilization'
           type: CALCULATED
           key: 'vm.memory.util[vm.memory.util.0]'
           history: 7d
@@ -412,8 +412,8 @@ zabbix_export:
           triggers:
             - uuid: a22f13e245b944e991c2c9850a731a3c
               expression: 'min(/Alcatel Timetra TiMOS by SNMP/vm.memory.util[vm.memory.util.0],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Alcatel Timetra TiMOS: High memory utilization'
-              event_name: 'Alcatel Timetra TiMOS: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -422,7 +422,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: cbcc156906774a109dd3d0cf09c512e9
-          name: 'Alcatel Timetra TiMOS: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -442,12 +442,12 @@ zabbix_export:
           triggers:
             - uuid: 60187191b268499784a70ef1dfe058ae
               expression: 'max(/Alcatel Timetra TiMOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Alcatel Timetra TiMOS: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Alcatel Timetra TiMOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1912,13 +1912,13 @@ zabbix_export:
   triggers:
     - uuid: 3b6324116e5940b5aaea72adca4dbbf6
       expression: '(last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Alcatel Timetra TiMOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Alcatel Timetra TiMOS: Host has been restarted'
-      event_name: 'Alcatel Timetra TiMOS: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Alcatel Timetra TiMOS: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Alcatel Timetra TiMOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

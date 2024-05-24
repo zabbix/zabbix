@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-08 06:57+0000\n"
-"Last-Translator: Akira <g42getd@gmail.com>\n"
+"PO-Revision-Date: 2024-05-20 10:10+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -1116,7 +1116,7 @@ msgstr ""
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
-msgstr ""
+msgstr "この変更後TOTPのsecretがリセットされるため、すでにこの多要素認証(MFA)方式に登録しているユーザーは、登録プロセスを再度完了する必要があります。"
 
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
@@ -1451,6 +1451,14 @@ msgstr "現在のフォームで行われた変更はすべて失われます。
 msgid "Any character string included"
 msgstr "いずれかの文字列が含まれる"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "アプリケーションエラー。"
@@ -1581,7 +1589,7 @@ msgstr "少なくとも1台のLDAPサーバーを設定してください。"
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "少なくとも1つ以上の多要素認証(MFA)方式が設定されている必要があります。"
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -2044,6 +2052,11 @@ msgstr "前面へ"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "最前面へ"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr "ブラウザ"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2568,7 +2581,7 @@ msgstr[0] "APIトークンを削除できません"
 #: include/classes/api/services/CMfa.php:459
 #, c-format
 msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
-msgstr ""
+msgstr "多要素認証(MFA)方式の\"%1$s\"はユーザーグループ\"%2$s\"によって使用されているため、削除できません。"
 
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
@@ -2603,7 +2616,7 @@ msgstr[0] "ダッシュボードを削除できません"
 
 #: include/classes/api/services/CMfa.php:446
 msgid "Cannot delete default MFA method."
-msgstr ""
+msgstr "デフォルトの多要素認証(MFA)方式を削除できません。"
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
@@ -3271,12 +3284,12 @@ msgstr "同じキーの検出されたアイテムがすでにあるので、テ
 #: include/classes/api/services/CItemGeneral.php:1234
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "タイプが\"%4$s\"のホストインターフェースが必要なため、テンプレート\"%2$s\"のキー\"%1$s\"のアイテムプロトタイプをホスト\"%3$s\"に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "同じキーを持つLLDルールが既に存在するため、テンプレート \"%2$s\" のキー \"%1$s\" を持つアイテムプロトタイプをホスト \"%3$s\" に継承できません。"
 
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
@@ -4331,19 +4344,19 @@ msgstr "ヒストリとトレンドを削除"
 
 #: include/views/configuration.item.list.php:315
 msgid "Clear history and trends of selected item?"
-msgstr ""
+msgstr "選択したアイテムのヒストリとトレンドを削除しますか？"
 
 #: include/views/configuration.item.list.php:316
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "選択したアイテムのヒストリとトレンドを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Clear history and trends of selected web scenario?"
-msgstr ""
+msgstr "選択したWebシナリオのヒストリとトレンドを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:239
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "選択したWebシナリオのヒストリとトレンドを削除しますか？"
 
 #: app/views/popup.massupdate.host.php:66 app/views/template.massupdate.php:70
 msgid "Clear when unlinking"
@@ -5190,7 +5203,7 @@ msgstr "自動生成時のステータス有効"
 
 #: app/views/correlation.list.php:35
 msgid "Create event correlation"
-msgstr ""
+msgstr "イベント相関関係の作成"
 
 #: include/views/configuration.graph.list.php:63
 msgid "Create graph"
@@ -5224,11 +5237,11 @@ msgstr "ホストのプロトタイプの作成"
 
 #: include/views/configuration.host.prototype.list.php:201
 msgid "Create hosts from selected prototype as disabled?"
-msgstr ""
+msgstr "選択したプロトタイプからホストを無効にして作成しますか？"
 
 #: include/views/configuration.host.prototype.list.php:195
 msgid "Create hosts from selected prototype as enabled?"
-msgstr ""
+msgstr "選択したプロトタイプからホストを有効にして作成しますか？"
 
 #: include/views/configuration.host.prototype.list.php:202
 msgid "Create hosts from selected prototypes as disabled?"
@@ -5264,11 +5277,11 @@ msgstr "アイテムのプロトタイプの作成"
 
 #: include/views/configuration.item.prototype.list.php:212
 msgid "Create items from selected prototype as disabled?"
-msgstr ""
+msgstr "選択したプロトタイプからアイテムを無効にして作成しますか？"
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototype as enabled?"
-msgstr ""
+msgstr "選択したプロトタイプからアイテムを有効にして作成しますか？"
 
 #: include/views/configuration.item.prototype.list.php:213
 msgid "Create items from selected prototypes as disabled?"
@@ -5341,11 +5354,11 @@ msgstr "トリガーのプロトタイプの作成"
 
 #: app/views/js/trigger.prototype.list.js.php:127
 msgid "Create triggers from selected prototype as disabled?"
-msgstr ""
+msgstr "選択したプロトタイプからトリガーを無効にして作成しますか？"
 
 #: app/views/js/trigger.prototype.list.js.php:110
 msgid "Create triggers from selected prototype as enabled?"
-msgstr ""
+msgstr "選択したプロトタイプからトリガーを有効にして作成しますか？"
 
 #: app/views/js/trigger.prototype.list.js.php:126
 msgid "Create triggers from selected prototypes as disabled?"
@@ -5552,7 +5565,7 @@ msgstr "毎日"
 
 #: include/locales.inc.php:40
 msgid "Danish (da_DK)"
-msgstr ""
+msgstr "デンマーク語 (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -5912,7 +5925,7 @@ msgstr "デフォルトのLDAPサーバーを指定してください。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:241
 msgid "Default MFA method must be specified."
-msgstr ""
+msgstr "デフォルトの多要素認証(MFA)方式を指定してください。"
 
 #: app/views/administration.userrole.edit.php:143
 msgid "Default access to new UI elements"
@@ -6162,7 +6175,7 @@ msgstr "選択したコネクタを削除しますか？"
 #: app/views/configuration.dashboard.list.php:71
 #: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboard?"
-msgstr ""
+msgstr "選択したダッシュボードを削除しますか？"
 
 #: app/views/configuration.dashboard.list.php:72
 #: app/views/monitoring.dashboard.list.php:126
@@ -6172,7 +6185,7 @@ msgstr "選択したダッシュボードを削除しますか？"
 #: app/views/js/configuration.discovery.list.js.php:113
 #: include/views/configuration.host.discovery.list.php:370
 msgid "Delete selected discovery rule?"
-msgstr ""
+msgstr "選択したディスカバリルールを削除しますか？"
 
 #: app/views/js/configuration.discovery.list.js.php:112
 #: include/views/configuration.host.discovery.list.php:371
@@ -6193,7 +6206,7 @@ msgstr "選択したイベント相関関係を削除しますか？"
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
-msgstr ""
+msgstr "選択したグラフのプロトタイプを削除しますか？"
 
 #: include/views/configuration.graph.list.php:272
 msgid "Delete selected graph prototypes?"
@@ -6201,7 +6214,7 @@ msgstr "選択したグラフのプロトタイプを削除しますか？"
 
 #: include/views/configuration.graph.list.php:270
 msgid "Delete selected graph?"
-msgstr ""
+msgstr "選択したグラフを削除しますか？"
 
 #: include/views/configuration.graph.list.php:273
 msgid "Delete selected graphs?"
@@ -6250,7 +6263,7 @@ msgstr "選択したイメージを削除しますか？"
 
 #: include/views/configuration.item.prototype.list.php:230
 msgid "Delete selected item prototype?"
-msgstr ""
+msgstr "選択したアイテムのプロトタイプを削除しますか？"
 
 #: include/views/configuration.item.prototype.list.php:231
 msgid "Delete selected item prototypes?"
@@ -6258,7 +6271,7 @@ msgstr "選択したアイテムのプロトタイプを削除しますか？"
 
 #: include/views/configuration.item.list.php:356
 msgid "Delete selected item?"
-msgstr ""
+msgstr "選択したアイテムを削除しますか？"
 
 #: include/views/configuration.item.list.php:357
 msgid "Delete selected items?"
@@ -6283,7 +6296,7 @@ msgstr "選択したマップを削除しますか？"
 
 #: app/views/js/mediatype.list.js.php:158
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "選択したメディアタイプを削除しますか？"
 
 #: app/views/js/mediatype.list.js.php:157
 msgid "Delete selected media types?"
@@ -6309,7 +6322,7 @@ msgstr "選択したプロキシを削除しますか？"
 
 #: app/views/administration.regex.list.php:83
 msgid "Delete selected regular expression?"
-msgstr ""
+msgstr "選択した正規表現を削除しますか？"
 
 #: app/views/administration.regex.list.php:84
 msgid "Delete selected regular expressions?"
@@ -6335,7 +6348,7 @@ msgstr "選択した定期レポートを削除しますか？"
 
 #: app/views/js/administration.script.list.js.php:93
 msgid "Delete selected script?"
-msgstr ""
+msgstr "選択したスクリプトを削除しますか？"
 
 #: app/views/js/administration.script.list.js.php:92
 msgid "Delete selected scripts?"
@@ -6365,7 +6378,7 @@ msgstr "選択したテンプレートグループを削除しますか？"
 
 #: app/views/js/template.list.js.php:139
 msgid "Delete selected template?"
-msgstr ""
+msgstr "選択したテンプレートを削除しますか？"
 
 #: app/views/js/template.list.js.php:138
 msgid "Delete selected templates?"
@@ -6383,7 +6396,7 @@ msgstr "選択したトークンを削除しますか？"
 
 #: app/views/js/trigger.prototype.list.js.php:152
 msgid "Delete selected trigger prototype?"
-msgstr ""
+msgstr "選択したトリガーのプロトタイプを削除しますか？"
 
 #: app/views/js/trigger.prototype.list.js.php:151
 msgid "Delete selected trigger prototypes?"
@@ -6391,7 +6404,7 @@ msgstr "選択したトリガーのプロトタイプを削除しますか？"
 
 #: app/views/js/trigger.list.js.php:191
 msgid "Delete selected trigger?"
-msgstr ""
+msgstr "選択したトリガーを削除しますか？"
 
 #: app/views/js/trigger.list.js.php:190
 msgid "Delete selected triggers?"
@@ -6408,7 +6421,7 @@ msgstr "選択したユーザーを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:248
 msgid "Delete selected web scenario?"
-msgstr ""
+msgstr "選択したWebシナリオを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:249
 msgid "Delete selected web scenarios?"
@@ -6617,7 +6630,7 @@ msgstr "デバッグモードを無効"
 
 #: app/views/usergroup.list.php:251
 msgid "Disable debug mode in selected group?"
-msgstr ""
+msgstr "選択したグループのデバッグモードを無効にしますか？"
 
 #: app/views/usergroup.list.php:252
 msgid "Disable debug mode in selected groups?"
@@ -6656,7 +6669,7 @@ msgstr ""
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
-msgstr ""
+msgstr "選択したAPIトークンを無効にしますか？"
 
 #: app/views/administration.token.list.php:212
 #: app/views/administration.user.token.list.php:165
@@ -6690,7 +6703,7 @@ msgstr "選択したコネクタを無効にしますか？"
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
 msgid "Disable selected discovery rule?"
-msgstr ""
+msgstr "選択したディスカバリルールを無効にしますか？"
 
 #: app/views/js/configuration.discovery.list.js.php:96
 #: include/views/configuration.host.discovery.list.php:350
@@ -6707,7 +6720,7 @@ msgstr "選択したイベント相関関係を無効にしますか？"
 
 #: app/views/usergroup.list.php:231
 msgid "Disable selected group?"
-msgstr ""
+msgstr "選択したグループを無効にしますか？"
 
 #: app/views/usergroup.list.php:232
 msgid "Disable selected groups?"
@@ -6715,7 +6728,7 @@ msgstr "選択したグループを無効にしますか？"
 
 #: app/views/configuration.host.list.php:531
 msgid "Disable selected host?"
-msgstr ""
+msgstr "選択したホストを無効にしますか？"
 
 #: app/views/configuration.host.list.php:532
 msgid "Disable selected hosts?"
@@ -6723,7 +6736,7 @@ msgstr "選択したホストを無効にしますか？"
 
 #: include/views/configuration.item.list.php:306
 msgid "Disable selected item?"
-msgstr ""
+msgstr "選択したアイテムを無効にしますか？"
 
 #: include/views/configuration.item.list.php:307
 msgid "Disable selected items?"
@@ -6731,7 +6744,7 @@ msgstr "選択したアイテムを無効にしますか？"
 
 #: app/views/js/mediatype.list.js.php:134
 msgid "Disable selected media type?"
-msgstr ""
+msgstr "選択したメディアタイプを無効にしますか？"
 
 #: app/views/js/mediatype.list.js.php:133
 msgid "Disable selected media types?"
@@ -6739,7 +6752,7 @@ msgstr "選択したメディアタイプを無効にしますか？"
 
 #: app/views/js/module.list.js.php:91
 msgid "Disable selected module?"
-msgstr ""
+msgstr "選択したモジュールを無効にしますか？"
 
 #: app/views/js/module.list.js.php:90
 msgid "Disable selected modules?"
@@ -6747,7 +6760,7 @@ msgstr "選択したモジュールを無効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Disable selected scheduled report?"
-msgstr ""
+msgstr "選択した定期レポートを無効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:97
 msgid "Disable selected scheduled reports?"
@@ -6755,7 +6768,7 @@ msgstr "選択した定期レポートを無効にしますか？"
 
 #: app/views/js/trigger.list.js.php:175
 msgid "Disable selected trigger?"
-msgstr ""
+msgstr "選択したトリガーを無効にしますか？"
 
 #: app/views/js/trigger.list.js.php:174
 msgid "Disable selected triggers?"
@@ -6763,7 +6776,7 @@ msgstr "選択したトリガーを無効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Disable selected web scenario?"
-msgstr ""
+msgstr "選択したWebシナリオを無効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:229
 msgid "Disable selected web scenarios?"
@@ -6893,7 +6906,7 @@ msgstr "ディスカバリアクション"
 
 #: app/views/configuration.discovery.edit.php:52
 msgid "Discovery by"
-msgstr ""
+msgstr "ディスカバリの実行"
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -7045,6 +7058,10 @@ msgstr "正常イベントの表示期間"
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "グラフ表示"
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7199,7 +7216,7 @@ msgstr "グラフの形式"
 
 #: app/views/administration.script.edit.php:353
 msgid "Dropdown"
-msgstr ""
+msgstr "ドロップダウン"
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
@@ -7453,7 +7470,7 @@ msgstr "デバッグモードを有効"
 
 #: app/views/usergroup.list.php:241
 msgid "Enable debug mode in selected group?"
-msgstr ""
+msgstr "選択したグループのデバッグモードを有効にしますか？"
 
 #: app/views/usergroup.list.php:242
 msgid "Enable debug mode in selected groups?"
@@ -7491,12 +7508,12 @@ msgstr "削除処理を有効"
 
 #: app/views/administration.authentication.edit.php:564
 msgid "Enable multi-factor authentication"
-msgstr ""
+msgstr "多要素認証の有効化"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
-msgstr ""
+msgstr "選択したAPIトークンを有効にしますか？"
 
 #: app/views/administration.token.list.php:206
 #: app/views/administration.user.token.list.php:159
@@ -7530,7 +7547,7 @@ msgstr "選択したコネクタを有効にしますか？"
 #: app/views/js/configuration.discovery.list.js.php:81
 #: include/views/configuration.host.discovery.list.php:343
 msgid "Enable selected discovery rule?"
-msgstr ""
+msgstr "選択したディスカバリルールを有効にしますか？"
 
 #: app/views/js/configuration.discovery.list.js.php:80
 #: include/views/configuration.host.discovery.list.php:344
@@ -7547,7 +7564,7 @@ msgstr "選択したイベント相関関係を有効にしますか？"
 
 #: app/views/usergroup.list.php:221
 msgid "Enable selected group?"
-msgstr ""
+msgstr "選択したグループを有効にしますか？"
 
 #: app/views/usergroup.list.php:222
 msgid "Enable selected groups?"
@@ -7555,7 +7572,7 @@ msgstr "選択したグループを有効にしますか？"
 
 #: app/views/configuration.host.list.php:523
 msgid "Enable selected host?"
-msgstr ""
+msgstr "選択したホストを有効にしますか？"
 
 #: app/views/configuration.host.list.php:524
 #: app/views/js/configuration.hostgroup.list.js.php:77
@@ -7564,7 +7581,7 @@ msgstr "選択したホストを有効にしますか？"
 
 #: include/views/configuration.item.list.php:300
 msgid "Enable selected item?"
-msgstr ""
+msgstr "選択したアイテムを有効にしますか？"
 
 #: include/views/configuration.item.list.php:301
 msgid "Enable selected items?"
@@ -7572,7 +7589,7 @@ msgstr "選択したアイテムを有効にしますか？"
 
 #: app/views/js/mediatype.list.js.php:107
 msgid "Enable selected media type?"
-msgstr ""
+msgstr "選択したメディアタイプを有効にしますか？"
 
 #: app/views/js/mediatype.list.js.php:106
 msgid "Enable selected media types?"
@@ -7580,7 +7597,7 @@ msgstr "選択したメディアタイプを有効にしますか？"
 
 #: app/views/js/module.list.js.php:74
 msgid "Enable selected module?"
-msgstr ""
+msgstr "選択したモジュールを有効にしますか？"
 
 #: app/views/js/module.list.js.php:73
 msgid "Enable selected modules?"
@@ -7588,7 +7605,7 @@ msgstr "選択したモジュールを有効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:89
 msgid "Enable selected scheduled report?"
-msgstr ""
+msgstr "選択した定期レポートを有効にしますか？"
 
 #: app/views/reports.scheduledreport.list.php:90
 msgid "Enable selected scheduled reports?"
@@ -7596,7 +7613,7 @@ msgstr "選択した定期レポートを有効にしますか？"
 
 #: app/views/js/trigger.list.js.php:158
 msgid "Enable selected trigger?"
-msgstr ""
+msgstr "選択したトリガーを有効にしますか？"
 
 #: app/views/js/trigger.list.js.php:157
 msgid "Enable selected triggers?"
@@ -7604,7 +7621,7 @@ msgstr "選択したトリガーを有効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Enable selected web scenario?"
-msgstr ""
+msgstr "選択したWebシナリオを有効にしますか？"
 
 #: include/views/configuration.httpconf.list.php:223
 msgid "Enable selected web scenarios?"
@@ -7790,7 +7807,7 @@ msgstr ""
 
 #: app/controllers/CControllerCorrelationCreate.php:107
 msgid "Event correlation created"
-msgstr ""
+msgstr "イベント相関関係を作成しました"
 
 #: app/controllers/CControllerCorrelationDelete.php:60
 msgid "Event correlation deleted"
@@ -7809,7 +7826,7 @@ msgstr[0] ""
 
 #: include/events.inc.php:143
 msgid "Event correlation rule"
-msgstr ""
+msgstr "イベント相関関係ルール"
 
 #: app/controllers/CControllerCorrelationEdit.php:130
 #: app/controllers/CControllerCorrelationList.php:128
@@ -7818,7 +7835,7 @@ msgstr "イベント相関関係ルール"
 
 #: app/controllers/CControllerCorrelationUpdate.php:109
 msgid "Event correlation updated"
-msgstr ""
+msgstr "イベント相関関係を更新しました"
 
 #: tr_events.php:29 tr_events.php:172 tr_events.php:191
 msgid "Event details"
@@ -8366,7 +8383,7 @@ msgstr "フィルターを削除しました"
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Filter is not set"
-msgstr ""
+msgstr "フィルターが設定されていません"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -9133,6 +9150,10 @@ msgstr "High-contrast light"
 #: app/partials/monitoring.problem.filter.php:312
 msgid "Highlight whole row"
 msgstr "行を強調表示"
+
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -11166,7 +11187,7 @@ msgstr "LDAPの設定が正しくありません"
 #: app/controllers/CControllerMfaCheck.php:53
 #: app/controllers/CControllerMfaEdit.php:48
 msgid "Invalid MFA configuration"
-msgstr ""
+msgstr "多要素認証(MFA)の設定が正しくありません"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -11665,6 +11686,10 @@ msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "アイテムを有効にしました"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "アイテムが\"取得不可\"の状態"
@@ -11976,7 +12001,7 @@ msgstr "LDAP認証"
 
 #: app/views/usergroup.edit.php:109
 msgid "LDAP authentication is disabled system-wide."
-msgstr ""
+msgstr "LDAP認証はシステム全体で無効になっています。"
 
 #: include/classes/api/services/CUser.php:1526
 msgid "LDAP authentication is disabled."
@@ -12167,6 +12192,10 @@ msgstr "最新1週間のグラフ"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "最新データ"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr "最新リリース"
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -12543,16 +12572,16 @@ msgstr "ファイルのMD5チェックサム。ファイルのMD5ハッシュ値
 
 #: app/views/mfa.edit.php:161
 msgid "MFA method"
-msgstr ""
+msgstr "多要素認証(MFA)方式"
 
 #: include/classes/api/services/CMfa.php:243
 #, c-format
 msgid "MFA method \"%1$s\" already exists."
-msgstr ""
+msgstr "多要素認証(MFA)方式の\"%1$s\"はすでに存在しています。"
 
 #: app/views/administration.authentication.edit.php:606
 msgid "MFA settings"
-msgstr ""
+msgstr "多要素認証(MFA)の設定"
 
 #: app/controllers/CControllerAuditLogList.php:243
 #: app/partials/hostmacros.inherited.list.html.php:49
@@ -12952,11 +12981,11 @@ msgstr "最大ズームレベル"
 
 #: app/views/configuration.discovery.edit.php:84
 msgid "Maximum concurrent checks"
-msgstr ""
+msgstr "最大同時チェック数"
 
 #: app/views/configuration.discovery.edit.php:85
 msgid "Maximum concurrent checks per type"
-msgstr ""
+msgstr "タイプごとの最大同時チェック数"
 
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -13401,7 +13430,7 @@ msgstr[0] ""
 
 #: app/controllers/CControllerModuleUpdate.php:94
 msgid "Module updated"
-msgstr ""
+msgstr "モジュールを更新しました"
 
 #: include/classes/api/services/CRole.php:707
 #, c-format
@@ -13498,20 +13527,20 @@ msgstr "Mozilla Firefox"
 
 #: app/views/administration.user.list.php:320
 msgid "Multi-factor TOTP secret will be deleted."
-msgstr ""
+msgstr "多要素認証のTOTPのsecretが削除されます。"
 
 #: app/views/administration.user.list.php:321
 msgid "Multi-factor TOTP secrets will be deleted."
-msgstr ""
+msgstr "多要素認証のTOTPのsecretが削除されます。"
 
 #: app/controllers/CControllerAuditLogList.php:236
 #: app/views/usergroup.edit.php:139 app/views/usergroup.edit.php:169
 msgid "Multi-factor authentication"
-msgstr ""
+msgstr "多要素認証"
 
 #: app/views/usergroup.edit.php:111
 msgid "Multi-factor authentication is disabled system-wide."
-msgstr ""
+msgstr "多要素認証はシステム全体で無効になっています。"
 
 #: app/partials/trigger.edit.trigger.tab.php:240
 msgid "Multiple"
@@ -13829,7 +13858,7 @@ msgstr "新規LDAPサーバー"
 
 #: app/views/mfa.edit.php:149
 msgid "New MFA method"
-msgstr ""
+msgstr "新しい多要素認証(MFA)方式"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
@@ -13867,7 +13896,7 @@ msgstr "新規ダッシュボード"
 #: app/views/configuration.discovery.edit.php:244
 #: app/views/configuration.discovery.edit.php:285
 msgid "New discovery rule"
-msgstr ""
+msgstr "新規ディスカバリルール"
 
 #: jsLoader.php:270
 msgid "New element"
@@ -13875,7 +13904,7 @@ msgstr "新規要素"
 
 #: app/views/correlation.edit.php:309 app/views/correlation.edit.php:339
 msgid "New event correlation"
-msgstr ""
+msgstr "新規イベント相関関係"
 
 #: app/views/js/correlation.edit.js.php:255
 #: include/classes/helpers/CCorrelationHelper.php:54
@@ -13908,11 +13937,11 @@ msgstr "新しいホストグループの作成"
 
 #: app/views/item.edit.php:218
 msgid "New item"
-msgstr ""
+msgstr "新規アイテム"
 
 #: app/views/item.prototype.edit.php:191
 msgid "New item prototype"
-msgstr ""
+msgstr "新規アイテムのプロトタイプ"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
@@ -13921,7 +13950,7 @@ msgstr "新しいメンテナンス期間の作成"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
-msgstr ""
+msgstr "新規メディアタイプ"
 
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
@@ -13947,7 +13976,7 @@ msgstr "正規表現の作成"
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
 msgid "New script"
-msgstr ""
+msgstr "新規スクリプト"
 
 #: app/views/popup.service.edit.php:336 app/views/popup.service.edit.php:365
 msgid "New service"
@@ -13955,11 +13984,11 @@ msgstr "新規サービス"
 
 #: app/views/webscenario.step.edit.php:295
 msgid "New step of web scenario"
-msgstr ""
+msgstr "新規Webシナリオのステップ"
 
 #: app/controllers/CControllerUsergroupTagFilterEdit.php:65
 msgid "New tag filter"
-msgstr ""
+msgstr "新規タグフィルター"
 
 #: app/views/correlation.condition.edit.php:136
 msgid "New tag name"
@@ -13967,7 +13996,7 @@ msgstr "新しいタグ名"
 
 #: app/views/template.edit.php:347
 msgid "New template"
-msgstr ""
+msgstr "新規テンプレート"
 
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
@@ -13976,19 +14005,28 @@ msgstr "新しいテンプレートグループの作成"
 
 #: app/views/trigger.edit.php:144
 msgid "New trigger"
-msgstr ""
+msgstr "新規トリガー"
 
 #: app/views/trigger.prototype.edit.php:144
 msgid "New trigger prototype"
-msgstr ""
+msgstr "新規トリガーのプロトタイプ"
 
 #: include/views/js/monitoring.sysmaps.js.php:191
 msgid "New triggers"
 msgstr "新規トリガー"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "新しいユーザーグループのマッピングの作成"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -14055,7 +14093,7 @@ msgstr "変更はありません。"
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
-msgstr ""
+msgstr "互換性のあるウィジェットはありません。"
 
 #: jsLoader.php:412 tests/selenium/modules/clock32/views/widget.view.php:83
 #: widgets/clock/views/widget.view.php:83
@@ -14071,7 +14109,7 @@ msgstr "データ収集なし"
 #: app/views/search.php:394 include/classes/html/CTableInfo.php:72
 #: widgets/hostnavigator/Widget.php:40
 msgid "No data found"
-msgstr ""
+msgstr "データがありません"
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -15906,6 +15944,10 @@ msgstr "2つの要素を選択してください"
 msgid "Please update configuration"
 msgstr ""
 
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16328,7 +16370,7 @@ msgstr "プロビジョニングの実行"
 
 #: app/views/administration.user.list.php:304
 msgid "Provision selected LDAP user?"
-msgstr ""
+msgstr "選択したLDAPユーザーのプロビジョニングをしますか？"
 
 #: app/views/administration.user.list.php:305
 msgid "Provision selected LDAP users?"
@@ -16804,6 +16846,10 @@ msgstr "正規表現"
 msgid "Related reports"
 msgstr "関連するレポート"
 
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
+
 #: jsLoader.php:158
 msgid "Release to create a widget."
 msgstr "作成したウィジェットを離す。"
@@ -17163,7 +17209,7 @@ msgstr "リセット"
 
 #: app/views/administration.user.list.php:318
 msgid "Reset TOTP secret"
-msgstr ""
+msgstr "TOTPのsecretをリセットします"
 
 #: app/views/js/administration.audit.settings.edit.js.php:43
 #: app/views/js/administration.gui.edit.js.php:33
@@ -18559,6 +18605,10 @@ msgstr ""
 msgid "Show arc"
 msgstr "円弧を表示"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18629,6 +18679,10 @@ msgstr "選択を表示"
 msgid "Show sidebar"
 msgstr "サイドバーを表示"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18660,11 +18714,19 @@ msgstr "技術的エラーを表示"
 msgid "Show text as HTML"
 msgstr "HTMLとしてテキストを表示"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "タイムラインを表示"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18700,11 +18762,11 @@ msgstr "表示"
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the account name to all MFA users in authenticator apps."
-msgstr ""
+msgstr "認証アプリ内のすべての MFA ユーザーにアカウント名として表示されます。"
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the label to all MFA users in authenticator apps."
-msgstr ""
+msgstr "認証アプリ内のすべての MFA ユーザーにラベルとして表示されます。"
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -18764,6 +18826,14 @@ msgstr "シンプルトリガー"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "単一"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -18871,6 +18941,10 @@ msgstr "ソフトウェアアプリケーションE"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "ソフトウェアのアーキテクチャ情報。文字列値を返す。"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr "ソフトウェア更新最終チェック日"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -19446,16 +19520,16 @@ msgstr "合計"
 #: app/controllers/CControllerAuthenticationEdit.php:457
 #: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:58
 msgid "TOTP"
-msgstr ""
+msgstr "TOTP"
 
 #: app/controllers/CControllerUserResetTotp.php:77
 #, c-format
 msgid "TOTP secret for user \"%1$s\" has been reset."
-msgstr ""
+msgstr "ユーザー\"%1$s\"のTOTPのsecretがリセットされました。"
 
 #: app/controllers/CControllerUserResetTotp.php:81
 msgid "TOTP secret reset successful."
-msgstr ""
+msgstr "TOTPのsecretのリセットに成功しました。"
 
 #: app/views/js/administration.regex.edit.js.php:155
 #: app/views/js/administration.regex.edit.js.php:200
@@ -20077,6 +20151,10 @@ msgstr "ヒストリテーブルには圧縮されたチャンクが含まれて
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "トレンド テーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -20336,7 +20414,7 @@ msgstr "上"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr ""
+msgstr "上位の100トリガー"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
@@ -21354,6 +21432,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Up"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21537,10 +21620,14 @@ msgstr "指定した深刻度のときに使用"
 msgid "Use iframe sandboxing"
 msgstr "iframeサンドボックスを使用する"
 
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Use the filter to display results"
-msgstr ""
+msgstr "フィルターを使用して結果を表示する"
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
 msgid "Used in actions"
@@ -23157,7 +23244,7 @@ msgstr "\"%1$s\"としてログインしています。"
 
 #: app/views/mfa.edit.php:46
 msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
-msgstr ""
+msgstr "WebサーバーにPHP CURL拡張機能がインストールされていないため、いくつかの多要素認証(MFA)方式は利用できません。"
 
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
@@ -23231,7 +23318,7 @@ msgstr "Zabbixエージェント"
 
 #: widgets/hostavail/includes/WidgetForm.php:47
 msgid "Zabbix agent (active checks)"
-msgstr ""
+msgstr "Zabbixエージェント(アクティブチェック)"
 
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
@@ -23239,7 +23326,7 @@ msgstr "Zabbixエージェント(アクティブ)"
 
 #: widgets/hostavail/includes/WidgetForm.php:48
 msgid "Zabbix agent (passive checks)"
-msgstr ""
+msgstr "Zabbixエージェント(パッシブチェック)"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -23760,15 +23847,15 @@ msgstr "別のホストまたはテンプレートの値マップIDは使用で�
 
 #: include/classes/api/services/CItemGeneral.php:2179
 msgid "cannot be an item ID from another host or template"
-msgstr ""
+msgstr "別のホストまたはテンプレートの値アイテムIDは使用できません"
 
 #: include/classes/api/services/CItemGeneral.php:2193
 msgid "cannot be an item prototype ID from another LLD rule"
-msgstr ""
+msgstr "別のLLDルールのアイテムプロトタイプIDは使用できません"
 
 #: include/classes/api/services/CItemGeneral.php:2178
 msgid "cannot be an item/item prototype ID from another host or template"
-msgstr ""
+msgstr "別のホストまたはテンプレートの値アイテム/アイテムプロトタイプIDは使用できません"
 
 #: include/classes/api/services/CUserDirectory.php:629
 msgid "cannot be changed"
@@ -23873,17 +23960,17 @@ msgstr "空白は指定できません"
 
 #: include/classes/validators/CApiInputValidator.php:3660
 msgid "cannot be equal to zero without custom intervals"
-msgstr ""
+msgstr "カスタム間隔なしではゼロに等しくなることはできません"
 
 #: host_discovery.php:563
 #, c-format
 msgid "cannot be greater than or equal to the value of field \"%1$s\""
-msgstr ""
+msgstr "フィールド\"%1$s\"の値以上にすることはできません"
 
 #: include/classes/api/services/CDiscoveryRule.php:1678
 #, c-format
 msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
-msgstr ""
+msgstr "パラメーター\"%1$s\"の値以上にすることはできません"
 
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
@@ -23898,7 +23985,7 @@ msgstr "パラメーター\"%1$s\"の値を指定できません"
 
 #: include/classes/api/services/CItemGeneral.php:1895
 msgid "cannot be the host interface ID from another host"
-msgstr ""
+msgstr "別のホストのホストインターフェースIDにはできません"
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
@@ -24252,7 +24339,7 @@ msgstr ""
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
-msgstr ""
+msgstr "グラフ"
 
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
@@ -24566,7 +24653,7 @@ msgstr "アイテムパターン"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
 msgid "item patterns"
-msgstr ""
+msgstr "アイテムパターン"
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -24745,7 +24832,7 @@ msgstr "依存レベルの数が最大数に達しました\""
 
 #: app/views/popup.ldap.edit.php:127
 msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
-msgstr ""
+msgstr "memberOfは、より高速なため、グループを構成するのに適した方法です。LDAPサーバーがmemberOfをサポートしていない、またはグループフィルタリングが必要な場合は、groupOfNamesを使用してください。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:813
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
@@ -25007,7 +25094,7 @@ msgstr ""
 
 #: include/classes/api/services/CUser.php:823
 msgid "object of TOTP type is expected"
-msgstr ""
+msgstr "TOTP型のオブジェクトで指定してください"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
@@ -25088,7 +25175,7 @@ msgstr "パターン"
 #: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
-msgstr ""
+msgstr "パターン"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"

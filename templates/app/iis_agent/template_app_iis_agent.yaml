@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 96f2dd86997d4e259875b2fa9b1a3169
-          name: 'IIS: {$IIS.PORT} port ping'
+          name: '{$IIS.PORT} port ping'
           type: SIMPLE
           key: 'net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}]'
           history: 7d
@@ -38,17 +38,17 @@ zabbix_export:
           triggers:
             - uuid: da7d9c749f884c179a105b0c9475e6bd
               expression: 'last(/IIS by Zabbix agent/net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}])=0'
-              name: 'IIS: Port {$IIS.PORT} is down'
+              name: 'Port {$IIS.PORT} is down'
               priority: AVERAGE
               manual_close: 'YES'
               dependencies:
-                - name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
+                - name: 'The World Wide Web Publishing Service (W3SVC) is not running'
                   expression: 'last(/IIS by Zabbix agent/service.info[W3SVC])<>0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 50d8f5a08bbc494b8525f26eedbee781
-          name: 'IIS: Anonymous users per second'
+          name: 'Anonymous users per second'
           key: 'perf_counter_en["\Web Service(_Total)\Anonymous Users/sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -57,7 +57,7 @@ zabbix_export:
             - tag: component
               value: users
         - uuid: ac80660edbb74c1fb4739368806900d5
-          name: 'IIS: Bytes Received per second'
+          name: 'Bytes Received per second'
           key: 'perf_counter_en["\Web Service(_Total)\Bytes Received/sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -67,7 +67,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 5a0648316a164446bbf605930469d4c4
-          name: 'IIS: Bytes Sent per second'
+          name: 'Bytes Sent per second'
           key: 'perf_counter_en["\Web Service(_Total)\Bytes Sent/sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -77,7 +77,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: f086d17b51254e16bd43b57b39dc000e
-          name: 'IIS: Bytes Total per second'
+          name: 'Bytes Total per second'
           key: 'perf_counter_en["\Web Service(_Total)\Bytes Total/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -87,7 +87,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: b94dc0df81234c7d97197fe30875d5e9
-          name: 'IIS: Method CGI requests per second'
+          name: 'Method CGI requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\CGI Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -100,7 +100,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 1e8244ebb5524c72af1d506df7bb2982
-          name: 'IIS: Connection attempts per second'
+          name: 'Connection attempts per second'
           key: 'perf_counter_en["\Web Service(_Total)\Connection Attempts/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -113,7 +113,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 2b4cb17b486643eda9a560b43af70d74
-          name: 'IIS: Method COPY requests per second'
+          name: 'Method COPY requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Copy Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -126,7 +126,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 1baed2823f1a4d2ca618cac5ab8bbcbb
-          name: 'IIS: Current connections'
+          name: 'Current connections'
           key: 'perf_counter_en["\Web Service(_Total)\Current Connections"]'
           history: 7d
           value_type: FLOAT
@@ -135,7 +135,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 350a6c7fac354570bbba04aa2fd6c98a
-          name: 'IIS: Method DELETE requests per second'
+          name: 'Method DELETE requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 6ae641f632ae4422a6f71898078dc2ee
-          name: 'IIS: Method GET requests per second'
+          name: 'Method GET requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -161,7 +161,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 5e37ff2d4d1b4bf6bad855a3d09ec6c7
-          name: 'IIS: Method HEAD requests per second'
+          name: 'Method HEAD requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -174,7 +174,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 18217a40ddbc421fb2db1b19d1fb7d59
-          name: 'IIS: Method ISAPI requests per second'
+          name: 'Method ISAPI requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\ISAPI Extension Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -187,7 +187,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: b7634ae2a9d5454bbac631b55e896277
-          name: 'IIS: Locked errors per second'
+          name: 'Locked errors per second'
           key: 'perf_counter_en["\Web Service(_Total)\Locked Errors/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -200,7 +200,7 @@ zabbix_export:
             - tag: component
               value: errors
         - uuid: 069548a7c9e840bb8975f9b02b582c51
-          name: 'IIS: Method LOCK requests per second'
+          name: 'Method LOCK requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Lock Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -213,7 +213,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 02c1fe0d15d94744959e4b53b21309fe
-          name: 'IIS: Method MKCOL requests per second'
+          name: 'Method MKCOL requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Mkcol Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -226,7 +226,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 6395e8edb1394396bd7602f621cf4b00
-          name: 'IIS: Method MOVE requests per second'
+          name: 'Method MOVE requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Move Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -239,7 +239,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: d67523ef47464f8c9735d0a0359b5c77
-          name: 'IIS: NonAnonymous users per second'
+          name: 'NonAnonymous users per second'
           key: 'perf_counter_en["\Web Service(_Total)\NonAnonymous Users/sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -248,7 +248,7 @@ zabbix_export:
             - tag: component
               value: users
         - uuid: 11d9995d25114e4fad666a1b75734c01
-          name: 'IIS: Not Found errors per second'
+          name: 'Not Found errors per second'
           key: 'perf_counter_en["\Web Service(_Total)\Not Found Errors/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -261,7 +261,7 @@ zabbix_export:
             - tag: component
               value: errors
         - uuid: 22ececa2db2d488587b1194883723ea6
-          name: 'IIS: Method OPTIONS requests per second'
+          name: 'Method OPTIONS requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Options Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -274,7 +274,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 1653ca4c0c6743f39d9b1e764022da7c
-          name: 'IIS: Method Total Other requests per second'
+          name: 'Method Total Other requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -287,7 +287,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 5f1210173665453e84f8f330a8c15eea
-          name: 'IIS: Method POST requests per second'
+          name: 'Method POST requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -300,7 +300,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: f197e93e03d04025bc855d4d77c35010
-          name: 'IIS: Method PROPFIND requests per second'
+          name: 'Method PROPFIND requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Propfind Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -313,7 +313,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 55c71bab45b04a2ca2afb526bf7c3e7f
-          name: 'IIS: Method PROPPATCH requests per second'
+          name: 'Method PROPPATCH requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Proppatch Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -326,7 +326,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: d1d19cf6c920465184aa2b2a8b4439c9
-          name: 'IIS: Method PUT requests per second'
+          name: 'Method PUT requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -339,7 +339,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 20ae8a67912045dc9b69c83d68e5e8ea
-          name: 'IIS: Method MS-SEARCH requests per second'
+          name: 'Method MS-SEARCH requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Search Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -352,7 +352,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 4aa9419482eb484a8fc1773bee8b2993
-          name: 'IIS: Uptime'
+          name: Uptime
           key: 'perf_counter_en["\Web Service(_Total)\Service Uptime"]'
           history: 7d
           value_type: FLOAT
@@ -364,8 +364,8 @@ zabbix_export:
           triggers:
             - uuid: 7bbf8a836c66422abd4469d28afbcc00
               expression: 'last(/IIS by Zabbix agent/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m'
-              name: 'IIS: has been restarted'
-              event_name: 'IIS: has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: 'has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -373,7 +373,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 805f7dca2ac74f5bbfb81c5e7bfa6e09
-          name: 'IIS: Total connection attempts'
+          name: 'Total connection attempts'
           key: 'perf_counter_en["\Web Service(_Total)\Total Connection Attempts (all instances)"]'
           history: 7d
           value_type: FLOAT
@@ -386,7 +386,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 90eb19d7d37f439da2c78c44d85784ef
-          name: 'IIS: Method Total requests per second'
+          name: 'Method Total requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -399,7 +399,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: c2ddd72243ba4a499a7a1e9ba6e4046c
-          name: 'IIS: Method TRACE requests per second'
+          name: 'Method TRACE requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -412,7 +412,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 05a19416695b436daf701d9750b015a8
-          name: 'IIS: Method TRACE requests per second'
+          name: 'Method TRACE requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Unlock Requests/Sec", 60]'
           history: 7d
           value_type: FLOAT
@@ -425,7 +425,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 1e4b39ec2cca49fb9fb5a306c2724568
-          name: 'IIS: Files cache hits percentage'
+          name: 'Files cache hits percentage'
           key: 'perf_counter_en["\Web Service Cache\File Cache Hits %"]'
           history: 7d
           value_type: FLOAT
@@ -438,7 +438,7 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: d9c46d370afc496ba0a0ad0c141b4490
-          name: 'IIS: File cache misses'
+          name: 'File cache misses'
           key: 'perf_counter_en["\Web Service Cache\File Cache Misses"]'
           history: 7d
           value_type: FLOAT
@@ -451,7 +451,7 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: 566f0bea097e4b0bb7042e4f0302ff26
-          name: 'IIS: URIs cache hits percentage'
+          name: 'URIs cache hits percentage'
           key: 'perf_counter_en["\Web Service Cache\URI Cache Hits %"]'
           history: 7d
           value_type: FLOAT
@@ -464,7 +464,7 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: ab1884be28b54ea7bb187bbe843bb6a7
-          name: 'IIS: URI cache misses'
+          name: 'URI cache misses'
           key: 'perf_counter_en["\Web Service Cache\URI Cache Misses"]'
           history: 7d
           value_type: FLOAT
@@ -477,7 +477,7 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: 7d76ec3d35f6446c842595c4831fabf4
-          name: 'IIS: World Wide Web Publishing Service (W3SVC) state'
+          name: 'World Wide Web Publishing Service (W3SVC) state'
           key: 'service.info[W3SVC]'
           history: 7d
           description: 'The World Wide Web Publishing Service (W3SVC) provides web connectivity and administration of websites through the IIS snap-in. If the World Wide Web Publishing Service stops, the operating system cannot serve any form of web request. This service was dependent on "Windows Process Activation Service".'
@@ -495,17 +495,17 @@ zabbix_export:
           triggers:
             - uuid: cac6bbb13ce84772a976275da0805179
               expression: 'last(/IIS by Zabbix agent/service.info[W3SVC])<>0'
-              name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
+              name: 'The World Wide Web Publishing Service (W3SVC) is not running'
               priority: HIGH
               description: 'The World Wide Web Publishing Service (W3SVC) is not in the running state. IIS cannot start.'
               dependencies:
-                - name: 'IIS: Windows process Activation Service (WAS) is not running'
+                - name: 'Windows process Activation Service (WAS) is not running'
                   expression: 'last(/IIS by Zabbix agent/service.info[WAS])<>0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 38858eb3cc2f4580a0a3c56c11fdeba5
-          name: 'IIS: Windows Process Activation Service (WAS) state'
+          name: 'Windows Process Activation Service (WAS) state'
           key: 'service.info[WAS]'
           history: 7d
           description: 'Windows Process Activation Service (WAS) is a tool for managing worker processes that contain applications that host Windows Communication Foundation (WCF) services. Worker processes handle requests that are sent to a Web Server for specific application pools. Each application pool sets boundaries for the applications it contains.'
@@ -523,7 +523,7 @@ zabbix_export:
           triggers:
             - uuid: 98fc8e403ac0405e84bf533336c4102c
               expression: 'last(/IIS by Zabbix agent/service.info[WAS])<>0'
-              name: 'IIS: Windows process Activation Service (WAS) is not running'
+              name: 'Windows process Activation Service (WAS) is not running'
               priority: HIGH
               description: 'Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.'
               tags:
@@ -546,7 +546,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             - uuid: 270068fe6e6844ae9bbf993509eda7e0
-              name: 'IIS: AppPool {#APPPOOL} state'
+              name: 'AppPool {#APPPOOL} state'
               key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"]'
               history: 7d
               description: 'The state of the application pool.'
@@ -564,16 +564,16 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 56c6df39f3d1419ca4ce67c70f464ab7
                   expression: 'last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
-                  name: 'IIS: Application pool {#APPPOOL} is not in Running state'
+                  name: 'Application pool {#APPPOOL} is not in Running state'
                   priority: HIGH
                   dependencies:
-                    - name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
+                    - name: 'The World Wide Web Publishing Service (W3SVC) is not running'
                       expression: 'last(/IIS by Zabbix agent/service.info[W3SVC])<>0'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: f039a53351d54132ab9ad046282389d8
-              name: 'IIS: {#APPPOOL} Uptime'
+              name: '{#APPPOOL} Uptime'
               key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"]'
               history: 7d
               value_type: FLOAT
@@ -587,8 +587,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 53afe8614ac542feaed1d656152bafd2
                   expression: 'last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"])<10m'
-                  name: 'IIS: {#APPPOOL} has been restarted'
-                  event_name: 'IIS: {#APPPOOL} has been restarted (uptime < 10m)'
+                  name: '{#APPPOOL} has been restarted'
+                  event_name: '{#APPPOOL} has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
@@ -596,7 +596,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 4700b5729ca440869de976ae347598cf
-              name: 'IIS: AppPool {#APPPOOL} recycles'
+              name: 'AppPool {#APPPOOL} recycles'
               key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"]'
               history: 7d
               description: 'The number of times the application pool has been recycled since Windows Process Activation Service (WAS) started.'
@@ -612,13 +612,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 665d5fbd0b9247e890a9cfa1b39fa415
                   expression: 'last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2) and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
-                  name: 'IIS: Application pool {#APPPOOL} has been recycled'
+                  name: 'Application pool {#APPPOOL} has been recycled'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 193642cad7214206a00db4f710bfbef8
-              name: 'IIS: AppPool {#APPPOOL} current queue size'
+              name: 'AppPool {#APPPOOL} current queue size'
               key: 'perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"]'
               delay: 30s
               history: 7d
@@ -635,11 +635,11 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 8cebd49164154999903dab2c03fd4be9
                   expression: 'min(/IIS by Zabbix agent/perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"],{$IIS.QUEUE.MAX.TIME})>{$IIS.QUEUE.MAX.WARN}'
-                  name: 'IIS: Request queue of {#APPPOOL} is too large'
-                  event_name: 'IIS: Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN})'
+                  name: 'Request queue of {#APPPOOL} is too large'
+                  event_name: 'Request queue of {#APPPOOL} is too large (over {$IIS.QUEUE.MAX.WARN})'
                   priority: WARNING
                   dependencies:
-                    - name: 'IIS: Application pool {#APPPOOL} is not in Running state'
+                    - name: 'Application pool {#APPPOOL} is not in Running state'
                       expression: 'last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1'
                   tags:
                     - tag: scope

@@ -25,7 +25,7 @@ zabbix_export:
         - name: Templates/Telephony
       items:
         - uuid: 72d074f6bb214ef9884d8cc4b1530ad3
-          name: 'Asterisk: Active calls'
+          name: 'Active calls'
           type: DEPENDENT
           key: asterisk.active_calls
           delay: '0'
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: calls
         - uuid: bb9ac1ac188b43239456477e13ae555f
-          name: 'Asterisk: Active channels'
+          name: 'Active channels'
           type: DEPENDENT
           key: asterisk.active_channels
           delay: '0'
@@ -57,7 +57,7 @@ zabbix_export:
             - tag: component
               value: channels
         - uuid: ccfc2a8a5880430196e2c874b66370ca
-          name: 'Asterisk: Calls processed'
+          name: 'Calls processed'
           type: DEPENDENT
           key: asterisk.calls_processed
           delay: '0'
@@ -73,7 +73,7 @@ zabbix_export:
             - tag: component
               value: calls
         - uuid: 196af875a190438abd8de5a6803a550f
-          name: 'Asterisk: Calls processed per second'
+          name: 'Calls processed per second'
           type: DEPENDENT
           key: asterisk.calls_processed.rate
           delay: '0'
@@ -93,7 +93,7 @@ zabbix_export:
             - tag: component
               value: calls
         - uuid: 7db3e9cdae3d4bffa7429617e351fce1
-          name: 'Asterisk: Get stats'
+          name: 'Get stats'
           type: HTTP_AGENT
           key: asterisk.get_stats
           history: '0'
@@ -426,7 +426,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d9900a1f096a4b89a2aa4af89f30b2cc
-          name: 'Asterisk: IAX trunks active channels'
+          name: 'IAX trunks active channels'
           type: DEPENDENT
           key: asterisk.iax.active_channels
           delay: '0'
@@ -444,15 +444,15 @@ zabbix_export:
           triggers:
             - uuid: 0ae0a5b6123a42dd9722219e5e5839df
               expression: 'min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}'
-              name: 'Asterisk: Total number of active channels of IAX trunks is too high'
-              event_name: 'Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)'
+              name: 'Total number of active channels of IAX trunks is too high'
+              event_name: 'Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)'
               priority: WARNING
               description: 'The IAX trunks may not be able to process new calls.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 0798cf46d82041e6a7091698c7693ec5
-          name: 'Asterisk: IAX offline peers'
+          name: 'IAX offline peers'
           type: DEPENDENT
           key: asterisk.iax.offline
           delay: '0'
@@ -468,7 +468,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: bf741f5560734530be352341071c5984
-          name: 'Asterisk: IAX online peers'
+          name: 'IAX online peers'
           type: DEPENDENT
           key: asterisk.iax.online
           delay: '0'
@@ -484,7 +484,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: ccb62e9b41da4f20b4ab19e4eecd598b
-          name: 'Asterisk: IAX peers'
+          name: 'IAX peers'
           type: DEPENDENT
           key: asterisk.iax.total
           delay: '0'
@@ -500,7 +500,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: cf5c07c1a09b4a10af21292b876fcb20
-          name: 'Asterisk: IAX unmonitored peers'
+          name: 'IAX unmonitored peers'
           type: DEPENDENT
           key: asterisk.iax.unmonitored
           delay: '0'
@@ -516,7 +516,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: 5ae6135a49764db7b496f5d2378ddd77
-          name: 'Asterisk: PJSIP trunks active channels'
+          name: 'PJSIP trunks active channels'
           type: DEPENDENT
           key: asterisk.pjsip.active_channels
           delay: '0'
@@ -534,15 +534,15 @@ zabbix_export:
           triggers:
             - uuid: 9b158fe0efb4416cb6ad5d53b38c3e38
               expression: 'min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}'
-              name: 'Asterisk: Total number of active channels of PJSIP trunks is too high'
-              event_name: 'Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)'
+              name: 'Total number of active channels of PJSIP trunks is too high'
+              event_name: 'Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)'
               priority: WARNING
               description: 'The PJSIP trunks may not be able to process new calls.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: cc07f186104842aabec3d26dcd4322d2
-          name: 'Asterisk: PJSIP available endpoints'
+          name: 'PJSIP available endpoints'
           type: DEPENDENT
           key: asterisk.pjsip.available
           delay: '0'
@@ -558,7 +558,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: fdc888cb355a4b738be8a77354a7ce76
-          name: 'Asterisk: PJSIP endpoints'
+          name: 'PJSIP endpoints'
           type: DEPENDENT
           key: asterisk.pjsip.total
           delay: '0'
@@ -574,7 +574,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: 5c10fe1a4bfb4628be20137d0f1ec725
-          name: 'Asterisk: PJSIP unavailable endpoints'
+          name: 'PJSIP unavailable endpoints'
           type: DEPENDENT
           key: asterisk.pjsip.unavailable
           delay: '0'
@@ -590,7 +590,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: 2df0dca89a744e86b4f5a2cec673d427
-          name: 'Asterisk: SIP trunks active channels'
+          name: 'SIP trunks active channels'
           type: DEPENDENT
           key: asterisk.sip.active_channels
           delay: '0'
@@ -608,15 +608,15 @@ zabbix_export:
           triggers:
             - uuid: d2fde5d26d284a129346a12ba0949b60
               expression: 'min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}'
-              name: 'Asterisk: Total number of active channels of SIP trunks is too high'
-              event_name: 'Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)'
+              name: 'Total number of active channels of SIP trunks is too high'
+              event_name: 'Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)'
               priority: WARNING
               description: 'The SIP trunks may not be able to process new calls.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: fb08ec8d143a41a097f8652c8261bad8
-          name: 'Asterisk: SIP monitored offline'
+          name: 'SIP monitored offline'
           type: DEPENDENT
           key: asterisk.sip.monitored_offline
           delay: '0'
@@ -632,7 +632,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: 23744b0a04b54637a7dbe1c7f8f5200f
-          name: 'Asterisk: SIP monitored online'
+          name: 'SIP monitored online'
           type: DEPENDENT
           key: asterisk.sip.monitored_online
           delay: '0'
@@ -648,7 +648,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: fb78998a342942ac942a7e1632b98208
-          name: 'Asterisk: SIP peers'
+          name: 'SIP peers'
           type: DEPENDENT
           key: asterisk.sip.total
           delay: '0'
@@ -664,7 +664,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: ae21f8c13063402d9eece400a18c6167
-          name: 'Asterisk: SIP unmonitored offline'
+          name: 'SIP unmonitored offline'
           type: DEPENDENT
           key: asterisk.sip.unmonitored_offline
           delay: '0'
@@ -680,7 +680,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: 1cd5fb5232ca4f4398f85d959ac11b2c
-          name: 'Asterisk: SIP unmonitored online'
+          name: 'SIP unmonitored online'
           type: DEPENDENT
           key: asterisk.sip.unmonitored_online
           delay: '0'
@@ -696,7 +696,7 @@ zabbix_export:
             - tag: component
               value: peers
         - uuid: 9c64cb54c2c541c1862558dcf8c6e3a3
-          name: 'Asterisk: Total queues'
+          name: 'Total queues'
           type: DEPENDENT
           key: asterisk.total_queues
           delay: '0'
@@ -712,7 +712,7 @@ zabbix_export:
             - tag: component
               value: queues
         - uuid: 8395ab5b70a7433eb508c513995988bb
-          name: 'Asterisk: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: asterisk.uptime
           delay: '0'
@@ -732,21 +732,21 @@ zabbix_export:
           triggers:
             - uuid: 35ca01e504a548db9d4db8be1390d6b9
               expression: 'nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1'
-              name: 'Asterisk: Failed to fetch AMI page'
-              event_name: 'Asterisk: Failed to fetch AMI page (or no data for 30m)'
+              name: 'Failed to fetch AMI page'
+              event_name: 'Failed to fetch AMI page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Asterisk: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0'
               tags:
                 - tag: scope
                   value: availability
             - uuid: 100d38b62c1d4ce298a9fadfbab19e4c
               expression: 'last(/Asterisk by HTTP/asterisk.uptime)<10m'
-              name: 'Asterisk: Host has been restarted'
-              event_name: 'Asterisk: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -754,7 +754,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 86e23b5b9fd64e6e840588d25921fcbf
-          name: 'Asterisk: Uptime after reload'
+          name: 'Uptime after reload'
           type: DEPENDENT
           key: asterisk.uptime_reload
           delay: '0'
@@ -774,8 +774,8 @@ zabbix_export:
           triggers:
             - uuid: 4e99b65188264ba1aa80e24662f9b3cd
               expression: 'last(/Asterisk by HTTP/asterisk.uptime_reload)<10m'
-              name: 'Asterisk: has been reloaded'
-              event_name: 'Asterisk: has been reloaded (uptime < 10m)'
+              name: 'has been reloaded'
+              event_name: 'has been reloaded (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -783,7 +783,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 8ed124c5d61541c0ab1dcc3491fb05c6
-          name: 'Asterisk: Version'
+          name: Version
           type: DEPENDENT
           key: asterisk.version
           delay: '0'
@@ -803,8 +803,8 @@ zabbix_export:
           triggers:
             - uuid: f1a260626ae6446d89e1e725e14c1098
               expression: 'last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0'
-              name: 'Asterisk: Version has changed'
-              event_name: 'Asterisk: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'The Asterisk version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -812,7 +812,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 09102393dc6a4ac598f02d95801c6ca0
-          name: 'Asterisk: Service response time'
+          name: 'Service response time'
           type: SIMPLE
           key: 'net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"]'
           history: 7d
@@ -825,18 +825,18 @@ zabbix_export:
           triggers:
             - uuid: dbc74502be01498194003dc1a3d90014
               expression: 'min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}'
-              name: 'Asterisk: Service response time is too high'
-              event_name: 'Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m)'
+              name: 'Service response time is too high'
+              event_name: 'Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
-                - name: 'Asterisk: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 58e18df6a5534395bf74d3babdb73170
-          name: 'Asterisk: Service status'
+          name: 'Service status'
           type: SIMPLE
           key: 'net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"]'
           history: 7d
@@ -855,7 +855,7 @@ zabbix_export:
           triggers:
             - uuid: 1fa3370fa93f4d07a2c470f993096554
               expression: 'last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0'
-              name: 'Asterisk: Service is down'
+              name: 'Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               tags:

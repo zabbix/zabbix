@@ -11,7 +11,6 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -79,7 +78,15 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	}
 
 	public function setValue($value): self {
-		$this->value = (array) $value;
+		$columns = (array) $value;
+
+		$columns = $columns
+			? array_filter($columns, static function ($column) {
+				return array_key_exists('itemid', $column) && $column['itemid'] !== '';
+			})
+			: [];
+
+		$this->value = $columns;
 
 		return $this;
 	}

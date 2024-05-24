@@ -1472,6 +1472,14 @@ msgstr "Eventuelle ændringer i den nuværende formular vil gå tabt."
 msgid "Any character string included"
 msgstr "Enhver tegnstreng inkluderet"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "Applikationsfejl"
@@ -2067,6 +2075,11 @@ msgstr "Bring frem"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "Bring forrest"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -7172,6 +7185,10 @@ msgstr "Vis OK udløsere for"
 msgid "Display graph"
 msgstr "Vis graf"
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Vis min/gennemsnit/maks"
@@ -9266,6 +9283,10 @@ msgstr "Lys med høj kontrast"
 #: app/partials/monitoring.problem.filter.php:312
 msgid "Highlight whole row"
 msgstr "Fremhæv hele rækken"
+
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -11812,6 +11833,10 @@ msgid_plural "Items enabled"
 msgstr[0] "Datapunkt deaktiveret"
 msgstr[1] "Datapunkter aktiveret"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "Datapunkt i tilstanden \"ikke understøttet\""
@@ -12323,6 +12348,10 @@ msgstr "Sidste uges graf"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "Seneste data"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -14153,9 +14182,18 @@ msgstr "Ny udløser prototype"
 msgid "New triggers"
 msgstr "Ny udløser"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
 msgstr "Ny brugergruppekortlægning"
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
+msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -16074,6 +16112,10 @@ msgstr "Vælg venligst to elementer"
 msgid "Please update configuration"
 msgstr ""
 
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16974,6 +17016,10 @@ msgstr "Regulære udtryk"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "Relaterede rapporter"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18738,6 +18784,10 @@ msgstr "Vis aggregeringsfunktion"
 msgid "Show arc"
 msgstr "Vis bue"
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18808,6 +18858,10 @@ msgstr "Vis valgte"
 msgid "Show sidebar"
 msgstr "Vis sidebjælke"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18839,11 +18893,19 @@ msgstr "Vis tekniske fejl"
 msgid "Show text as HTML"
 msgstr "Vis tekst som HTML"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "Vis tidslinje"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18943,6 +19005,14 @@ msgstr "Simple udløsere"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "Enkelt"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19050,6 +19120,10 @@ msgstr "Softwareapplikation E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "Software arkitektur information. Returnerer streng"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20260,6 +20334,10 @@ msgstr "Denne indstilling bør være aktiveret, fordi historietabeller indeholde
 #: app/views/administration.housekeeping.edit.php:157
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "Denne indstilling bør være aktiveret, fordi trendtabeller indeholder komprimerede bidder."
+
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -21546,6 +21624,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr ""
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21727,6 +21810,10 @@ msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
 msgstr ""
 
 #: app/partials/monitoring.latest.view.html.php:36

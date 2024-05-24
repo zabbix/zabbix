@@ -48,8 +48,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Aranet: Sensors discovery|<p>Discovery for Aranet Cloud sensors</p>|Dependent item|aranet.sensor.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
-|Aranet: Get data||Script|aranet.get_data|
+|Sensors discovery|<p>Discovery for Aranet Cloud sensors</p>|Dependent item|aranet.sensor.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
+|Get data||Script|aranet.get_data|
 
 ### LLD rule Temperature discovery
 

@@ -22,7 +22,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 7ae6f7fae8d4485fb850c84ac00b7ff1
-          name: 'Jenkins: Get computer info'
+          name: 'Get computer info'
           type: HTTP_AGENT
           key: jenkins.computer_info
           history: '0'
@@ -42,7 +42,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 790aedce97be4e7dae6f4de8238340a7
-          name: 'Jenkins: File descriptor ratio'
+          name: 'File descriptor ratio'
           type: DEPENDENT
           key: jenkins.descriptor.ratio
           delay: '0'
@@ -65,14 +65,14 @@ zabbix_export:
           triggers:
             - uuid: 5ec22ac264d445769039bd4c13e41bf7
               expression: 'min(/Jenkins by HTTP/jenkins.descriptor.ratio,5m)>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
-              name: 'Jenkins: Current number of used files is too high'
-              event_name: 'Jenkins: Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)'
+              name: 'Current number of used files is too high'
+              event_name: 'Current number of used files is too high (over {$JENKINS.FILE_DESCRIPTORS.MAX.WARN}% for 5m)'
               priority: WARNING
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 0b3cf1992122407795eef5ab9474101d
-          name: 'Jenkins: Disk space check'
+          name: 'Disk space check'
           type: DEPENDENT
           key: jenkins.disk_space
           delay: '0'
@@ -96,7 +96,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 8095797fe6ef478db4a8acb60e1dcc54
-          name: 'Jenkins: Disk space check message'
+          name: 'Disk space check message'
           type: DEPENDENT
           key: jenkins.disk_space.message
           delay: '0'
@@ -118,7 +118,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 26902068daf94cf3a5aec360be9abc18
-          name: 'Jenkins: Executors count'
+          name: 'Executors count'
           type: DEPENDENT
           key: jenkins.executor.count
           delay: '0'
@@ -137,7 +137,7 @@ zabbix_export:
             - tag: component
               value: executors
         - uuid: 7b672586e5194370a0c141570174d21a
-          name: 'Jenkins: Executors free'
+          name: 'Executors free'
           type: DEPENDENT
           key: jenkins.executor.free
           delay: '0'
@@ -153,7 +153,7 @@ zabbix_export:
             - tag: component
               value: executors
         - uuid: 197470fead89470f94a910e9405498fe
-          name: 'Jenkins: Executors in use'
+          name: 'Executors in use'
           type: DEPENDENT
           key: jenkins.executor.in_use
           delay: '0'
@@ -169,7 +169,7 @@ zabbix_export:
             - tag: component
               value: executors
         - uuid: 035f0609b9ba4231a31f3310ca8151b8
-          name: 'Jenkins: Get gauges'
+          name: 'Get gauges'
           type: DEPENDENT
           key: jenkins.gauges.raw
           delay: '0'
@@ -187,7 +187,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: db4c0de52dca4c8a853edf918b35bbe4
-          name: 'Jenkins: Get service metrics'
+          name: 'Get service metrics'
           type: HTTP_AGENT
           key: jenkins.get_metrics
           history: '0'
@@ -202,7 +202,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 4be0216b409d46a2a12e2929a9a03295
-          name: 'Jenkins: Get healthcheck'
+          name: 'Get healthcheck'
           type: HTTP_AGENT
           key: jenkins.healthcheck
           history: '0'
@@ -217,7 +217,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: d9677f596dae43e4984838061fe19d45
-          name: 'Jenkins: HTTP active requests, rate'
+          name: 'HTTP active requests, rate'
           type: DEPENDENT
           key: jenkins.http.active_requests.rate
           delay: '0'
@@ -238,7 +238,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: d95c9a1b19ed4da38bec3217eee2e590
-          name: 'Jenkins: HTTP response 400, rate'
+          name: 'HTTP response 400, rate'
           type: DEPENDENT
           key: jenkins.http.bad_request.rate
           delay: '0'
@@ -261,7 +261,7 @@ zabbix_export:
             - tag: http-code
               value: '400'
         - uuid: b3d77a909487431bab2b0b7f7c89bf90
-          name: 'Jenkins: HTTP response 201, rate'
+          name: 'HTTP response 201, rate'
           type: DEPENDENT
           key: jenkins.http.created.rate
           delay: '0'
@@ -284,7 +284,7 @@ zabbix_export:
             - tag: http-code
               value: '201'
         - uuid: 3265515d32f840e9ade25c0d2892b372
-          name: 'Jenkins: HTTP response 403, rate'
+          name: 'HTTP response 403, rate'
           type: DEPENDENT
           key: jenkins.http.forbidden.rate
           delay: '0'
@@ -307,7 +307,7 @@ zabbix_export:
             - tag: http-code
               value: '403'
         - uuid: 22b8fc85f441484cad8b2641748d75a1
-          name: 'Jenkins: HTTP response 404, rate'
+          name: 'HTTP response 404, rate'
           type: DEPENDENT
           key: jenkins.http.not_found.rate
           delay: '0'
@@ -330,7 +330,7 @@ zabbix_export:
             - tag: http-code
               value: '404'
         - uuid: 1a9a6b663aaa48bbacfc56c1569521c0
-          name: 'Jenkins: HTTP response 304, rate'
+          name: 'HTTP response 304, rate'
           type: DEPENDENT
           key: jenkins.http.not_modified.rate
           delay: '0'
@@ -353,7 +353,7 @@ zabbix_export:
             - tag: http-code
               value: '304'
         - uuid: 2a79c1139b44402fa8f31d6b61a0d739
-          name: 'Jenkins: HTTP response 204, rate'
+          name: 'HTTP response 204, rate'
           type: DEPENDENT
           key: jenkins.http.no_content.rate
           delay: '0'
@@ -376,7 +376,7 @@ zabbix_export:
             - tag: http-code
               value: '204'
         - uuid: c4c1dfcf2d904985a0ca6956724adf41
-          name: 'Jenkins: HTTP response 200, rate'
+          name: 'HTTP response 200, rate'
           type: DEPENDENT
           key: jenkins.http.ok.rate
           delay: '0'
@@ -399,7 +399,7 @@ zabbix_export:
             - tag: http-code
               value: '200'
         - uuid: afdab05416084124887bcec705f2603d
-          name: 'Jenkins: HTTP response other, rate'
+          name: 'HTTP response other, rate'
           type: DEPENDENT
           key: jenkins.http.other.rate
           delay: '0'
@@ -422,7 +422,7 @@ zabbix_export:
             - tag: http-code
               value: other
         - uuid: 5169a969034b4da29eaab59c7c3aa719
-          name: 'Jenkins: HTTP requests, rate'
+          name: 'HTTP requests, rate'
           type: DEPENDENT
           key: jenkins.http.requests.rate
           delay: '0'
@@ -443,7 +443,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 9a4ad856db02403b8b523179bf4b3699
-          name: 'Jenkins: HTTP requests, median'
+          name: 'HTTP requests, median'
           type: DEPENDENT
           key: jenkins.http.requests_p50.rate
           delay: '0'
@@ -461,7 +461,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 6766b45e349e4a4d88593207df6b35ba
-          name: 'Jenkins: HTTP requests, p95'
+          name: 'HTTP requests, p95'
           type: DEPENDENT
           key: jenkins.http.requests_p95.rate
           delay: '0'
@@ -479,7 +479,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 320cc4d7fafc4c87ab8d92bd76901982
-          name: 'Jenkins: HTTP response 500, rate'
+          name: 'HTTP response 500, rate'
           type: DEPENDENT
           key: jenkins.http.server_error.rate
           delay: '0'
@@ -502,7 +502,7 @@ zabbix_export:
             - tag: http-code
               value: '500'
         - uuid: d4ad6574138443a18e721f3d518d5e61
-          name: 'Jenkins: HTTP response 503, rate'
+          name: 'HTTP response 503, rate'
           type: DEPENDENT
           key: jenkins.http.service_unavailable.rate
           delay: '0'
@@ -525,7 +525,7 @@ zabbix_export:
             - tag: http-code
               value: '503'
         - uuid: ecca8e2341c14ede9e397ddc39df5592
-          name: 'Jenkins: Job blocked duration, median'
+          name: 'Job blocked duration, median'
           type: DEPENDENT
           key: jenkins.job.blocked.duration.p50
           delay: '0'
@@ -543,7 +543,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 859a7845f3d8483ba3378f7077509784
-          name: 'Jenkins: Job blocked duration, p95'
+          name: 'Job blocked duration, p95'
           type: DEPENDENT
           key: jenkins.job.blocked.duration.p95
           delay: '0'
@@ -561,7 +561,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: ca4e141c83344aeeb32d9ea2d9017cbf
-          name: 'Jenkins: Job blocked, m1 rate'
+          name: 'Job blocked, m1 rate'
           type: DEPENDENT
           key: jenkins.job.blocked.m1.rate
           delay: '0'
@@ -578,7 +578,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: d0a242007b424a0e80dbfb90577eaab2
-          name: 'Jenkins: Job blocked, m5 rate'
+          name: 'Job blocked, m5 rate'
           type: DEPENDENT
           key: jenkins.job.blocked.m5.rate
           delay: '0'
@@ -595,7 +595,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 3c2ba170a89040089b226871512e237b
-          name: 'Jenkins: Job buildable duration, median'
+          name: 'Job buildable duration, median'
           type: DEPENDENT
           key: jenkins.job.buildable.duration.p50
           delay: '0'
@@ -613,7 +613,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 9047881efcb84822b7da852f4c66dbff
-          name: 'Jenkins: Job buildable duration, p95'
+          name: 'Job buildable duration, p95'
           type: DEPENDENT
           key: jenkins.job.buildable.duration.p95
           delay: '0'
@@ -631,7 +631,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 1d8e643a0ddc44aa951ee516372e587b
-          name: 'Jenkins: Job buildable, m1 rate'
+          name: 'Job buildable, m1 rate'
           type: DEPENDENT
           key: jenkins.job.buildable.m1.rate
           delay: '0'
@@ -648,7 +648,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 0e1d712b9a854922b28e3ddf871bf7b1
-          name: 'Jenkins: Job buildable, m5 rate'
+          name: 'Job buildable, m5 rate'
           type: DEPENDENT
           key: jenkins.job.buildable.m5.rate
           delay: '0'
@@ -665,7 +665,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: c0c0335fd8654cfaa9534c816fbee967
-          name: 'Jenkins: Job building duration, median'
+          name: 'Job building duration, median'
           type: DEPENDENT
           key: jenkins.job.building.duration.p50
           delay: '0'
@@ -683,7 +683,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 61fb13ee0d0f4e1bb5fdab1ea35371ef
-          name: 'Jenkins: Job building duration, p95'
+          name: 'Job building duration, p95'
           type: DEPENDENT
           key: jenkins.job.building.duration.p95
           delay: '0'
@@ -701,7 +701,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 08ebe2359c4f4134aaf610b50bcba8fe
-          name: 'Jenkins: Job building, m1 rate'
+          name: 'Job building, m1 rate'
           type: DEPENDENT
           key: jenkins.job.building.m1.rate
           delay: '0'
@@ -718,7 +718,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 36f551fd55814000b76b5b63c05051d7
-          name: 'Jenkins: Job building, m5 rate'
+          name: 'Job building, m5 rate'
           type: DEPENDENT
           key: jenkins.job.building.m5.rate
           delay: '0'
@@ -735,7 +735,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 39bc5fdfbe884c72816d34045438ea7d
-          name: 'Jenkins: Jobs count'
+          name: 'Jobs count'
           type: DEPENDENT
           key: jenkins.job.count.value
           delay: '0'
@@ -754,7 +754,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: af40fcdb50c545bd9b49a6f4b7a26fea
-          name: 'Jenkins: Job queuing duration, median'
+          name: 'Job queuing duration, median'
           type: DEPENDENT
           key: jenkins.job.queuing.duration.p50
           delay: '0'
@@ -772,7 +772,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: f797a4698f1b41f885a8cdd3d98924e2
-          name: 'Jenkins: Job queuing duration, p95'
+          name: 'Job queuing duration, p95'
           type: DEPENDENT
           key: jenkins.job.queuing.duration.p95
           delay: '0'
@@ -790,7 +790,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: d9f785e6f2e148ee98d922524f014037
-          name: 'Jenkins: Job queuing, m1 rate'
+          name: 'Job queuing, m1 rate'
           type: DEPENDENT
           key: jenkins.job.queuing.m1.rate
           delay: '0'
@@ -807,7 +807,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 10c80e91b2214ab2b43458a1d65c3a18
-          name: 'Jenkins: Job queuing, m5 rate'
+          name: 'Job queuing, m5 rate'
           type: DEPENDENT
           key: jenkins.job.queuing.m5.rate
           delay: '0'
@@ -824,7 +824,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: ff842a648bcc4aaa89f2200e0d4bb661
-          name: 'Jenkins: Job scheduled, m1 rate'
+          name: 'Job scheduled, m1 rate'
           type: DEPENDENT
           key: jenkins.job.scheduled.m1.rate
           delay: '0'
@@ -841,7 +841,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: bc2de2ce8e9d474d8e2591d76adecabe
-          name: 'Jenkins: Jobs scheduled, m5 rate'
+          name: 'Jobs scheduled, m5 rate'
           type: DEPENDENT
           key: jenkins.job.scheduled.m5.rate
           delay: '0'
@@ -858,7 +858,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 975124750e3e4c969711185ea58bcb49
-          name: 'Jenkins: Job total duration, median'
+          name: 'Job total duration, median'
           type: DEPENDENT
           key: jenkins.job.total.duration.p50
           delay: '0'
@@ -876,7 +876,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: dbc0aeedccb740b4a7c1b5f84eb2513b
-          name: 'Jenkins: Job total duration, p95'
+          name: 'Job total duration, p95'
           type: DEPENDENT
           key: jenkins.job.total.duration.p95
           delay: '0'
@@ -894,7 +894,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 19c5a45a673c4af2be5808faf35a3892
-          name: 'Jenkins: Job total, m1 rate'
+          name: 'Job total, m1 rate'
           type: DEPENDENT
           key: jenkins.job.total.m1.rate
           delay: '0'
@@ -911,7 +911,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 58067833af494a66b4a44bc25ac17a0e
-          name: 'Jenkins: Job total, m5 rate'
+          name: 'Job total, m5 rate'
           type: DEPENDENT
           key: jenkins.job.total.m5.rate
           delay: '0'
@@ -928,7 +928,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: dd7a1e8142f94ef099f6aa0ed1facce3
-          name: 'Jenkins: Job waiting duration, median'
+          name: 'Job waiting duration, median'
           type: DEPENDENT
           key: jenkins.job.waiting.duration.p50
           delay: '0'
@@ -946,7 +946,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: bb339169024b4461a39261f3fe36de4f
-          name: 'Jenkins: Job waiting duration, p95'
+          name: 'Job waiting duration, p95'
           type: DEPENDENT
           key: jenkins.job.waiting.duration.p95
           delay: '0'
@@ -964,7 +964,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 2d21f74757374b769ae8e76d4d7afa79
-          name: 'Jenkins: Job waiting, m1 rate'
+          name: 'Job waiting, m1 rate'
           type: DEPENDENT
           key: jenkins.job.waiting.m1.rate
           delay: '0'
@@ -981,7 +981,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: 9e16580148964e9aae3a660b18721bee
-          name: 'Jenkins: Job waiting, m5 rate'
+          name: 'Job waiting, m5 rate'
           type: DEPENDENT
           key: jenkins.job.waiting.m5.rate
           delay: '0'
@@ -998,7 +998,7 @@ zabbix_export:
             - tag: component
               value: jobs
         - uuid: dc47555812a0485e9d77da3e5a1c1227
-          name: 'Jenkins: Get jobs info'
+          name: 'Get jobs info'
           type: HTTP_AGENT
           key: jenkins.job_info
           delay: 5m
@@ -1022,7 +1022,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: dd8237e43a0d494394da664bc58a5fec
-          name: 'Jenkins: Get meters'
+          name: 'Get meters'
           type: DEPENDENT
           key: jenkins.meters.raw
           delay: '0'
@@ -1040,7 +1040,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 930fa76b32484155ae3ec8964e3952a1
-          name: 'Jenkins: Nodes count'
+          name: 'Nodes count'
           type: DEPENDENT
           key: jenkins.node.count
           delay: '0'
@@ -1059,7 +1059,7 @@ zabbix_export:
             - tag: component
               value: nodes
         - uuid: 440bdc39d2444b9e83cc863e34f3b416
-          name: 'Jenkins: Nodes offline'
+          name: 'Nodes offline'
           type: DEPENDENT
           key: jenkins.node.offline
           delay: '0'
@@ -1078,7 +1078,7 @@ zabbix_export:
             - tag: component
               value: nodes
         - uuid: 758ead9ea71646be882b9bff280ce4d6
-          name: 'Jenkins: Nodes online'
+          name: 'Nodes online'
           type: DEPENDENT
           key: jenkins.node.online
           delay: '0'
@@ -1099,13 +1099,13 @@ zabbix_export:
           triggers:
             - uuid: 4cee7d0f5faf4595a67c6c0e33153f4d
               expression: 'last(/Jenkins by HTTP/jenkins.node.online)=0'
-              name: 'Jenkins: Service has no online nodes'
+              name: 'Service has no online nodes'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: availability
         - uuid: 21cad39b9c914516827b09d04716a71f
-          name: 'Jenkins: Service ping'
+          name: 'Service ping'
           type: HTTP_AGENT
           key: jenkins.ping
           history: 7d
@@ -1133,14 +1133,14 @@ zabbix_export:
           triggers:
             - uuid: ae12ac7aa5c54858a794eb8fc888f90c
               expression: 'last(/Jenkins by HTTP/jenkins.ping)=0'
-              name: 'Jenkins: Service is down'
+              name: 'Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 81609d18d2004fe28f9cb096cdb03995
-          name: 'Jenkins: Plugins check'
+          name: 'Plugins check'
           type: DEPENDENT
           key: jenkins.plugins
           delay: '0'
@@ -1164,7 +1164,7 @@ zabbix_export:
             - tag: component
               value: plugins
         - uuid: e3fae3ddf1fa47db9925106098bc31eb
-          name: 'Jenkins: Plugins active'
+          name: 'Plugins active'
           type: DEPENDENT
           key: jenkins.plugins.active
           delay: '0'
@@ -1183,7 +1183,7 @@ zabbix_export:
             - tag: component
               value: plugins
         - uuid: e8a9f7bd98004939b75749c29227859c
-          name: 'Jenkins: Plugins failed'
+          name: 'Plugins failed'
           type: DEPENDENT
           key: jenkins.plugins.failed
           delay: '0'
@@ -1202,7 +1202,7 @@ zabbix_export:
             - tag: component
               value: plugins
         - uuid: 0b2ad285bc2b4ef5a01633d57099434c
-          name: 'Jenkins: Plugins inactive'
+          name: 'Plugins inactive'
           type: DEPENDENT
           key: jenkins.plugins.inactive
           delay: '0'
@@ -1221,7 +1221,7 @@ zabbix_export:
             - tag: component
               value: plugins
         - uuid: d678faf0377a4024a930adcdb1c2db2f
-          name: 'Jenkins: Plugins check message'
+          name: 'Plugins check message'
           type: DEPENDENT
           key: jenkins.plugins.message
           delay: '0'
@@ -1243,7 +1243,7 @@ zabbix_export:
             - tag: component
               value: plugins
         - uuid: f1bf69d134a848178b21a050c830aa8a
-          name: 'Jenkins: Plugins with update'
+          name: 'Plugins with update'
           type: DEPENDENT
           key: jenkins.plugins.with_update
           delay: '0'
@@ -1262,7 +1262,7 @@ zabbix_export:
             - tag: component
               value: plugins
         - uuid: a5b58789e54b43f896d4d7e64f8415d3
-          name: 'Jenkins: Projects count'
+          name: 'Projects count'
           type: DEPENDENT
           key: jenkins.project.count
           delay: '0'
@@ -1281,7 +1281,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: db758cf660c14d69b37f724545de7662
-          name: 'Jenkins: Build queue, blocked'
+          name: 'Build queue, blocked'
           type: DEPENDENT
           key: jenkins.queue.blocked
           delay: '0'
@@ -1297,7 +1297,7 @@ zabbix_export:
             - tag: component
               value: queue
         - uuid: 1160d4150fa840b5a4628eeb6e8cdaab
-          name: 'Jenkins: Build queue, buildable'
+          name: 'Build queue, buildable'
           type: DEPENDENT
           key: jenkins.queue.buildable
           delay: '0'
@@ -1313,7 +1313,7 @@ zabbix_export:
             - tag: component
               value: queue
         - uuid: 456ddd17c4044d578a11d8cac80d229b
-          name: 'Jenkins: Build queue, pending'
+          name: 'Build queue, pending'
           type: DEPENDENT
           key: jenkins.queue.pending
           delay: '0'
@@ -1329,7 +1329,7 @@ zabbix_export:
             - tag: component
               value: queue
         - uuid: f99d731f466445dcb3aeda3f306a5de6
-          name: 'Jenkins: Build queue, size'
+          name: 'Build queue, size'
           type: DEPENDENT
           key: jenkins.queue.size
           delay: '0'
@@ -1345,7 +1345,7 @@ zabbix_export:
             - tag: component
               value: queue
         - uuid: 90387bb3b3384adcafa66b4c9543d1ab
-          name: 'Jenkins: Build queue, stuck'
+          name: 'Build queue, stuck'
           type: DEPENDENT
           key: jenkins.queue.stuck
           delay: '0'
@@ -1361,7 +1361,7 @@ zabbix_export:
             - tag: component
               value: queue
         - uuid: 9c97e12efa624176b95aef3413aec1a8
-          name: 'Jenkins: CPU Load'
+          name: 'CPU Load'
           type: DEPENDENT
           key: jenkins.system.cpu.load
           delay: '0'
@@ -1378,7 +1378,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ca81bc28fbc14dbc9eb7b0fa6a46a65d
-          name: 'Jenkins: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: jenkins.system.uptime
           delay: '0'
@@ -1400,8 +1400,8 @@ zabbix_export:
           triggers:
             - uuid: 7d20942598a648ebb2e03f9acdb3e5e3
               expression: 'last(/Jenkins by HTTP/jenkins.system.uptime)<10m'
-              name: 'Jenkins: Host has been restarted'
-              event_name: 'Jenkins: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1409,7 +1409,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: ea80ab8045a44f96a5cb2736c009258f
-          name: 'Jenkins: Temporary space check'
+          name: 'Temporary space check'
           type: DEPENDENT
           key: jenkins.temporary_space
           delay: '0'
@@ -1433,7 +1433,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: d884c3a9662e48eeaf6c9ba50641a2cb
-          name: 'Jenkins: Temporary space check message'
+          name: 'Temporary space check message'
           type: DEPENDENT
           key: jenkins.temporary_space.message
           delay: '0'
@@ -1455,7 +1455,7 @@ zabbix_export:
             - tag: component
               value: disk
         - uuid: 39f474c3c6f841af9b14113df04bf078
-          name: 'Jenkins: Thread deadlock check'
+          name: 'Thread deadlock check'
           type: DEPENDENT
           key: jenkins.thread_deadlock
           delay: '0'
@@ -1479,7 +1479,7 @@ zabbix_export:
             - tag: component
               value: threads
         - uuid: 64f62df61b6b4f4c9963e09b827850e1
-          name: 'Jenkins: Thread deadlock check message'
+          name: 'Thread deadlock check message'
           type: DEPENDENT
           key: jenkins.thread_deadlock.message
           delay: '0'
@@ -1501,7 +1501,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b988986e794d44c79629f865cc6f77e7
-          name: 'Jenkins: Get timers'
+          name: 'Get timers'
           type: DEPENDENT
           key: jenkins.timers.raw
           delay: '0'
@@ -1519,7 +1519,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: ae836e5439cf494a9ed0681836da854e
-          name: 'Jenkins: Version'
+          name: Version
           type: DEPENDENT
           key: jenkins.version
           delay: '0'
@@ -1542,8 +1542,8 @@ zabbix_export:
           triggers:
             - uuid: 3dd66b51ed1b4fc2a250daf3e9999e4f
               expression: 'last(/Jenkins by HTTP/jenkins.version,#1)<>last(/Jenkins by HTTP/jenkins.version,#2) and length(last(/Jenkins by HTTP/jenkins.version))>0'
-              name: 'Jenkins: Version has changed'
-              event_name: 'Jenkins: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'The Jenkins version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1561,7 +1561,7 @@ zabbix_export:
           password: '{$JENKINS.API.TOKEN}'
           item_prototypes:
             - uuid: fe0191db274944699107010f7f7c8091
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available physical memory'
+              name: 'Computer [{#DISPLAY_NAME}]: Available physical memory'
               type: DEPENDENT
               key: 'jenkins.computer.available_physical_memory[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1583,7 +1583,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: 4d00cdff0ed0442ab419754264d78ec9
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available swap space'
+              name: 'Computer [{#DISPLAY_NAME}]: Available swap space'
               type: DEPENDENT
               key: 'jenkins.computer.available_swap_space[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1605,7 +1605,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: ff5a78519c834902ae607832b67f2558
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Clock difference'
+              name: 'Computer [{#DISPLAY_NAME}]: Clock difference'
               type: DEPENDENT
               key: 'jenkins.computer.clock_difference[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1629,7 +1629,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: 4dcf897c9c2c4ce58483ef6de6786000
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available disk space'
+              name: 'Computer [{#DISPLAY_NAME}]: Available disk space'
               type: DEPENDENT
               key: 'jenkins.computer.disk_space[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1651,7 +1651,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: fad90db95f69491da5f9af0967995021
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Get computer'
+              name: 'Computer [{#DISPLAY_NAME}]: Get computer'
               type: DEPENDENT
               key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1677,7 +1677,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: 1bca0941b2d24de5980eeb5cb3516b2c
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Idle'
+              name: 'Computer [{#DISPLAY_NAME}]: Idle'
               type: DEPENDENT
               key: 'jenkins.computer.idle[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1703,7 +1703,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: 38a5eb0b4fb44b93b9f764edcd3f6c49
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Executors'
+              name: 'Computer [{#DISPLAY_NAME}]: Executors'
               type: DEPENDENT
               key: 'jenkins.computer.numExecutors[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1722,7 +1722,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: 8ddcfbf9b9d84fb290e9f30db7406ea1
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Offline cause reason'
+              name: 'Computer [{#DISPLAY_NAME}]: Offline cause reason'
               type: DEPENDENT
               key: 'jenkins.computer.offline.reason[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1745,7 +1745,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: a2068445af644089be8501da5b02144a
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Response time average'
+              name: 'Computer [{#DISPLAY_NAME}]: Response time average'
               type: DEPENDENT
               key: 'jenkins.computer.response_time[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1768,7 +1768,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: b8af2fb1f6d646978739b9c44ea85a27
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: State'
+              name: 'Computer [{#DISPLAY_NAME}]: State'
               type: DEPENDENT
               key: 'jenkins.computer.state[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1796,7 +1796,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: f1318d38fa5a469a999265896e4546dd
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Temporarily offline'
+              name: 'Computer [{#DISPLAY_NAME}]: Temporarily offline'
               type: DEPENDENT
               key: 'jenkins.computer.temp_offline[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1822,7 +1822,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: 5704446ab4f34eb2bc33b8ed6d8da691
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Available temp space'
+              name: 'Computer [{#DISPLAY_NAME}]: Available temp space'
               type: DEPENDENT
               key: 'jenkins.computer.temp_space[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1844,7 +1844,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: 5c3dc14eb6264153a0cd7ddd8effb869
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Total physical memory'
+              name: 'Computer [{#DISPLAY_NAME}]: Total physical memory'
               type: DEPENDENT
               key: 'jenkins.computer.total_physical_memory[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1866,7 +1866,7 @@ zabbix_export:
                 - tag: computer
                   value: '{#DISPLAY_NAME}'
             - uuid: c18b82a205d345fa9c1b92e59521735a
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Total swap space'
+              name: 'Computer [{#DISPLAY_NAME}]: Total swap space'
               type: DEPENDENT
               key: 'jenkins.computer.total_swap_space[{#DISPLAY_NAME}]'
               delay: '0'
@@ -1890,20 +1890,20 @@ zabbix_export:
           trigger_prototypes:
             - uuid: a2347420d1f14fd2b55cbb0865282268
               expression: 'last(/Jenkins by HTTP/jenkins.computer.state[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0'
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is down'
+              name: 'Computer [{#DISPLAY_NAME}]: Node is down'
               priority: AVERAGE
               description: 'Node down with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}'
               dependencies:
-                - name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is temporarily offline'
+                - name: 'Computer [{#DISPLAY_NAME}]: Node is temporarily offline'
                   expression: 'last(/Jenkins by HTTP/jenkins.computer.temp_offline[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0'
-                - name: 'Jenkins: Service has no online nodes'
+                - name: 'Service has no online nodes'
                   expression: 'last(/Jenkins by HTTP/jenkins.node.online)=0'
               tags:
                 - tag: scope
                   value: availability
             - uuid: bf04115784bc48ffa27d5d2d65176853
               expression: 'last(/Jenkins by HTTP/jenkins.computer.temp_offline[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0'
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Node is temporarily offline'
+              name: 'Computer [{#DISPLAY_NAME}]: Node is temporarily offline'
               priority: INFO
               description: 'Node is temporarily Offline with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}'
               manual_close: 'YES'
@@ -1912,7 +1912,7 @@ zabbix_export:
                   value: availability
           graph_prototypes:
             - uuid: 6296f12b13934006bd462eb4937ca248
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Physical memory'
+              name: 'Computer [{#DISPLAY_NAME}]: Physical memory'
               graph_items:
                 - color: 199C0D
                   item:
@@ -1924,7 +1924,7 @@ zabbix_export:
                     host: 'Jenkins by HTTP'
                     key: 'jenkins.computer.available_physical_memory[{#DISPLAY_NAME}]'
             - uuid: b8dcbbaf33d54a0fab3780a5fdd541e0
-              name: 'Jenkins: Computer [{#DISPLAY_NAME}]: Swap space'
+              name: 'Computer [{#DISPLAY_NAME}]: Swap space'
               graph_items:
                 - color: 199C0D
                   item:
@@ -1958,7 +1958,7 @@ zabbix_export:
           password: '{$JENKINS.API.TOKEN}'
           item_prototypes:
             - uuid: b2a99bad873046cda1d5b839aa43ba91
-              name: 'Jenkins job [{#NAME}]: Health score'
+              name: 'Job [{#NAME}]: Health score'
               type: DEPENDENT
               key: 'jenkins.build.health[{#NAME}]'
               delay: '0'
@@ -1987,14 +1987,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: c440cd7d92884c9594c8616f1ac99d74
                   expression: 'last(/Jenkins by HTTP/jenkins.build.health[{#NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
-                  name: 'Jenkins job [{#NAME}]: Job is unhealthy'
+                  name: 'Job [{#NAME}]: Job is unhealthy'
                   priority: WARNING
                   manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: performance
             - uuid: c82a3a59d2974e24bfa2489bd02fb10a
-              name: 'Jenkins job [{#NAME}]: Get job'
+              name: 'Job [{#NAME}]: Get job'
               type: DEPENDENT
               key: 'jenkins.job.get[{#NAME}]'
               delay: '0'
@@ -2022,7 +2022,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: a0fa8864c536408895f13758eacb486f
-              name: 'Jenkins job [{#NAME}]: Last Build duration'
+              name: 'Job [{#NAME}]: Last Build duration'
               type: DEPENDENT
               key: 'jenkins.last_build.duration[{#NAME}]'
               delay: '0'
@@ -2048,7 +2048,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: 338020d76f8e4b28b1e1c02f97b889f4
-              name: 'Jenkins job [{#NAME}]: Last Build number'
+              name: 'Job [{#NAME}]: Last Build number'
               type: DEPENDENT
               key: 'jenkins.last_build.number[{#NAME}]'
               delay: '0'
@@ -2070,7 +2070,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: a3a70807138548a29e9212f48f07946d
-              name: 'Jenkins job [{#NAME}]: Last Build result'
+              name: 'Job [{#NAME}]: Last Build result'
               type: DEPENDENT
               key: 'jenkins.last_build.result[{#NAME}]'
               delay: '0'
@@ -2093,7 +2093,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: d53a3f165052440098d087d4f2b868b6
-              name: 'Jenkins job [{#NAME}]: Last Build timestamp'
+              name: 'Job [{#NAME}]: Last Build timestamp'
               type: DEPENDENT
               key: 'jenkins.last_build.timestamp[{#NAME}]'
               delay: '0'
@@ -2118,7 +2118,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: 907e48fadc6e4a04a076ca9368f73395
-              name: 'Jenkins job [{#NAME}]: Last Failed Build duration'
+              name: 'Job [{#NAME}]: Last Failed Build duration'
               type: DEPENDENT
               key: 'jenkins.last_failed_build.duration[{#NAME}]'
               delay: '0'
@@ -2144,7 +2144,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: 2e4afc599bf54ea29b1b8734f5aea121
-              name: 'Jenkins job [{#NAME}]: Last Failed Build number'
+              name: 'Job [{#NAME}]: Last Failed Build number'
               type: DEPENDENT
               key: 'jenkins.last_failed_build.number[{#NAME}]'
               delay: '0'
@@ -2166,7 +2166,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: e1885df4d7a440c0805207f0afb28cb5
-              name: 'Jenkins job [{#NAME}]: Last Failed Build timestamp'
+              name: 'Job [{#NAME}]: Last Failed Build timestamp'
               type: DEPENDENT
               key: 'jenkins.last_failed_build.timestamp[{#NAME}]'
               delay: '0'
@@ -2191,7 +2191,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: d750d312fa424215931375963100217d
-              name: 'Jenkins job [{#NAME}]: Last Successful Build duration'
+              name: 'Job [{#NAME}]: Last Successful Build duration'
               type: DEPENDENT
               key: 'jenkins.last_successful_build.duration[{#NAME}]'
               delay: '0'
@@ -2217,7 +2217,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: 701c272b59c046e4948a7dc814374d59
-              name: 'Jenkins job [{#NAME}]: Last Successful Build number'
+              name: 'Job [{#NAME}]: Last Successful Build number'
               type: DEPENDENT
               key: 'jenkins.last_successful_build.number[{#NAME}]'
               delay: '0'
@@ -2239,7 +2239,7 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: 1adbf52ee3f946118f8a37cf2487262d
-              name: 'Jenkins job [{#NAME}]: Last Successful Build timestamp'
+              name: 'Job [{#NAME}]: Last Successful Build timestamp'
               type: DEPENDENT
               key: 'jenkins.last_successful_build.timestamp[{#NAME}]'
               delay: '0'
@@ -2334,7 +2334,7 @@ zabbix_export:
   triggers:
     - uuid: d79dc9c1dab142d18791172e6df0a4e9
       expression: 'last(/Jenkins by HTTP/jenkins.disk_space)=0 and length(last(/Jenkins by HTTP/jenkins.disk_space.message))>0'
-      name: 'Jenkins: Disk space is too low'
+      name: 'Disk space is too low'
       priority: WARNING
       description: |
         Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.
@@ -2344,7 +2344,7 @@ zabbix_export:
           value: capacity
     - uuid: 121e23bd172d447cb975595685495a93
       expression: 'last(/Jenkins by HTTP/jenkins.plugins)=0 and length(last(/Jenkins by HTTP/jenkins.plugins.message))>0'
-      name: 'Jenkins: One or more Jenkins plugins failed to start'
+      name: 'One or more Jenkins plugins failed to start'
       priority: INFO
       description: |
         A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues.
@@ -2355,7 +2355,7 @@ zabbix_export:
           value: notice
     - uuid: 34de8503a2c84fffb1beb701a4a991ab
       expression: 'last(/Jenkins by HTTP/jenkins.temporary_space)=0 and length(last(/Jenkins by HTTP/jenkins.temporary_space.message))>0'
-      name: 'Jenkins: Temporary space is too low'
+      name: 'Temporary space is too low'
       priority: WARNING
       description: |
         Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.
@@ -2365,7 +2365,7 @@ zabbix_export:
           value: capacity
     - uuid: f0a09eb0743948bb8f52a4c28aa728c5
       expression: 'last(/Jenkins by HTTP/jenkins.thread_deadlock)=0 and length(last(/Jenkins by HTTP/jenkins.thread_deadlock.message))>0'
-      name: 'Jenkins: There are deadlocked threads in Jenkins master JVM'
+      name: 'There are deadlocked threads in Jenkins master JVM'
       priority: WARNING
       description: |
         There are any deadlocked threads in the Jenkins master JVM.

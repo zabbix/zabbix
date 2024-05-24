@@ -24,7 +24,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 45c9681958504f3b8b161a2c7c728dbb
-          name: 'Intel_Qlogic Infiniband: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -38,14 +38,14 @@ zabbix_export:
           triggers:
             - uuid: a3a6c95c0a32405d81b1bc7690f1bd1f
               expression: 'max(/Intel_Qlogic Infiniband by SNMP/icmpping,#3)=0'
-              name: 'Intel_Qlogic Infiniband: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 81af3843a1e44469affca02640f22b77
-          name: 'Intel_Qlogic Infiniband: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -59,11 +59,11 @@ zabbix_export:
           triggers:
             - uuid: 9c78f78339724840b7ab6db4c62f5aa0
               expression: 'min(/Intel_Qlogic Infiniband by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Intel_Qlogic Infiniband by SNMP/icmppingloss,5m)<100'
-              name: 'Intel_Qlogic Infiniband: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Intel_Qlogic Infiniband: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Intel_Qlogic Infiniband by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -71,7 +71,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 771d21b9c40b426d97eff54c6ac5227e
-          name: 'Intel_Qlogic Infiniband: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -85,14 +85,14 @@ zabbix_export:
           triggers:
             - uuid: 3c5e0b2660764386ac162ed5d2778a56
               expression: 'avg(/Intel_Qlogic Infiniband by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Intel_Qlogic Infiniband: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Intel_Qlogic Infiniband: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Intel_Qlogic Infiniband by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Intel_Qlogic Infiniband by SNMP/icmppingloss,5m)<100'
-                - name: 'Intel_Qlogic Infiniband: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Intel_Qlogic Infiniband by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -100,7 +100,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 5bb2ef0f72244294bcc469710a0a1225
-          name: 'Intel_Qlogic Infiniband: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -113,7 +113,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 8570bf70c217434cb40b9efa74d7e070
-          name: 'Intel_Qlogic Infiniband: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -133,7 +133,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 1c17fbf4b11b45f087668eefa9438341
-          name: 'Intel_Qlogic Infiniband: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -154,7 +154,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9cfafe1389af4e569886c5acd8d95de9
-          name: 'Intel_Qlogic Infiniband: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10222.2.1.1.1.0
           key: system.hw.firmware
@@ -177,7 +177,7 @@ zabbix_export:
           triggers:
             - uuid: 1ca7574040da41a3bf416daa8172d952
               expression: 'last(/Intel_Qlogic Infiniband by SNMP/system.hw.firmware,#1)<>last(/Intel_Qlogic Infiniband by SNMP/system.hw.firmware,#2) and length(last(/Intel_Qlogic Infiniband by SNMP/system.hw.firmware))>0'
-              name: 'Intel_Qlogic Infiniband: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -186,7 +186,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 656086e221e84a9a90cc16855f564571
-          name: 'Intel_Qlogic Infiniband: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.10222.2.1.1.1.0
           key: system.hw.model
@@ -208,7 +208,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f0fece305afd4ef9b7e9e6e9dd297e21
-          name: 'Intel_Qlogic Infiniband: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -232,7 +232,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d1ee46aa709d43919ae3727e4d55af42
-          name: 'Intel_Qlogic Infiniband: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -252,7 +252,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7f06f097558d4ef3801207031e660756
-          name: 'Intel_Qlogic Infiniband: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -274,8 +274,8 @@ zabbix_export:
           triggers:
             - uuid: cfcabcb7d9ca4fd59ed79775bcf059bb
               expression: 'last(/Intel_Qlogic Infiniband by SNMP/system.name,#1)<>last(/Intel_Qlogic Infiniband by SNMP/system.name,#2) and length(last(/Intel_Qlogic Infiniband by SNMP/system.name))>0'
-              name: 'Intel_Qlogic Infiniband: System name has changed'
-              event_name: 'Intel_Qlogic Infiniband: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -285,7 +285,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: db4c4bc058b147a293b12f8737e42a53
-          name: 'Intel_Qlogic Infiniband: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -304,7 +304,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c4c4e044967a432a829ca88d8dcd8c2e
-          name: 'Intel_Qlogic Infiniband: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -323,7 +323,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a182c41cf58b465895ff677ca96e5b65
-          name: 'Intel_Qlogic Infiniband: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -343,12 +343,12 @@ zabbix_export:
           triggers:
             - uuid: ccbd4c4da58f4b72a82371c2f3eaf4e1
               expression: 'max(/Intel_Qlogic Infiniband by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Intel_Qlogic Infiniband: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Intel_Qlogic Infiniband: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Intel_Qlogic Infiniband by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1736,13 +1736,13 @@ zabbix_export:
   triggers:
     - uuid: 20166f9c8d5448a494b6b578471df8cc
       expression: '(last(/Intel_Qlogic Infiniband by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Intel_Qlogic Infiniband by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Intel_Qlogic Infiniband by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Intel_Qlogic Infiniband by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Intel_Qlogic Infiniband: Host has been restarted'
-      event_name: 'Intel_Qlogic Infiniband: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Intel_Qlogic Infiniband: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Intel_Qlogic Infiniband by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

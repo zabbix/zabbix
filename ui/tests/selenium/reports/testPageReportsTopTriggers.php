@@ -1268,11 +1268,11 @@ class testPageReportsTopTriggers extends CWebTest {
 			'trigger_menu' => [
 				'VIEW' => [
 					'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=99252',
-					'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
+					'History' => ['Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
 				],
 				'CONFIGURATION' => [
 					'Trigger' => 'menu-popup-item',
-					'Items' => ['Linux: Number of processes' => 'menu-popup-item']
+					'Items' => ['Number of processes' => 'menu-popup-item']
 				]
 			],
 			'host_menu' => [

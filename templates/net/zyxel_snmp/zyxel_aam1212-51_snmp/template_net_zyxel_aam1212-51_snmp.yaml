@@ -33,7 +33,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 5b6932995b634a5792d3948ba79312e5
-          name: 'ZYXEL AAM1212-51 / IES-612: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -49,7 +49,7 @@ zabbix_export:
           triggers:
             - uuid: 40839f3008b84e3c9ffa8858bd2ab616
               expression: 'max(/ZYXEL AAM1212-51 IES-612 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'ZYXEL AAM1212-51 / IES-612: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -57,7 +57,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 9b04315c5e9a41eea5f50623c83f21d0
-          name: 'ZYXEL AAM1212-51 / IES-612: Contact'
+          name: Contact
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.aam1212.contact
@@ -79,7 +79,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 6b29fd2b27fe4788bef1e4072430d5bd
-          name: 'ZYXEL AAM1212-51 / IES-612: ZyNOS F/W Version'
+          name: 'ZyNOS F/W Version'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.13.1.1.3.1.4.0.0
           key: zyxel.aam1212.fwversion
@@ -99,7 +99,7 @@ zabbix_export:
           triggers:
             - uuid: 02ba3941993f48ca8d5f40b3b19804e8
               expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.fwversion,#1)<>last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.fwversion,#2) and length(last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.fwversion))>0'
-              name: 'ZYXEL AAM1212-51 / IES-612: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -108,7 +108,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 5197238bef51468c80e6a4180babee5b
-          name: 'ZYXEL AAM1212-51 / IES-612: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.25.1.1.0
           key: zyxel.aam1212.hw.uptime
@@ -135,7 +135,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ea699e392c154a79927a056ff050c59d
-          name: 'ZYXEL AAM1212-51 / IES-612: Location'
+          name: Location
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.aam1212.location
@@ -156,7 +156,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: d2cabaa6e083489b8b11e6a349ba1bc9
-          name: 'ZYXEL AAM1212-51 / IES-612: MAC address'
+          name: 'MAC address'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.aam1212.mac
@@ -180,7 +180,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 31840a6849f7437bbb77334128c9e90b
-          name: 'ZYXEL AAM1212-51 / IES-612: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.aam1212.model
@@ -207,14 +207,14 @@ zabbix_export:
           triggers:
             - uuid: 5a3f459afc4f42fb90849e98c7639a96
               expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.model)<>"AAM1212-51 / IES-612"'
-              name: 'ZYXEL AAM1212-51 / IES-612: Template does not match hardware'
+              name: 'Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel AAM1212-51 / IES-612, but connected to {ITEM.VALUE}'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 59628c9211c444228b6d8d9ddb30af54
-          name: 'ZYXEL AAM1212-51 / IES-612: Host name'
+          name: 'Host name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.aam1212.name
@@ -236,7 +236,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 6fe78b9b065243b8bcebf8f6c234f868
-          name: 'ZYXEL AAM1212-51 / IES-612: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
           key: zyxel.aam1212.net.uptime
@@ -257,7 +257,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 33df8d594d7f4e4aa148927b117f30df
-          name: 'ZYXEL AAM1212-51 / IES-612: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.13.1.1.2.1.3.0
           key: zyxel.aam1212.serialnumber
@@ -279,8 +279,8 @@ zabbix_export:
           triggers:
             - uuid: 7528520bca7c4524b7451aeaca440cc5
               expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.serialnumber,#1)<>last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.serialnumber,#2) and length(last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.serialnumber))>0'
-              name: 'ZYXEL AAM1212-51 / IES-612: Device has been replaced'
-              event_name: 'ZYXEL AAM1212-51 / IES-612: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -288,7 +288,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 4efb46536e8a43e78cd26ae90bd2ab83
-          name: 'ZYXEL AAM1212-51 / IES-612: Alarm status'
+          name: 'Alarm status'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.13.1.1.3.1.8.0.0
           key: zyxel.aam1212.slot.alarm
@@ -356,7 +356,7 @@ zabbix_export:
           triggers:
             - uuid: eec541b07a434770b2a3301825cc5e82
               expression: 'find(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.slot.alarm,,"like","moduleNoDefect")=0'
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX} alarm'
+              name: 'Port {#SNMPINDEX} alarm'
               priority: AVERAGE
               description: 'The slot reported an error.'
               tags:
@@ -384,7 +384,7 @@ zabbix_export:
                 formulaid: C
           item_prototypes:
             - uuid: 8b8e4d329490481983d2a1b0209e18a1
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: Administrative status'
+              name: 'Port {#SNMPINDEX}: Administrative status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.adminstatus[{#SNMPINDEX}]'
@@ -408,7 +408,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 010b15528a8d498bb8f77db9c548bc8e
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: ATUC attenuation'
+              name: 'Port {#SNMPINDEX}: ATUC attenuation'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.5.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.atuc.atn[{#SNMPINDEX}]'
@@ -437,15 +437,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 0c78247a1003496abab584a526777a40
                   expression: 'min(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX}'
-                  event_name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
+                  name: 'High the DSL line attenuation in Port {#SNMPINDEX}'
+                  event_name: 'High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: 382d9f2f9458423eb887b6fd28697c3a
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: ATUC output power'
+              name: 'Port {#SNMPINDEX}: ATUC output power'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.atuc.outpwr[{#SNMPINDEX}]'
@@ -471,7 +471,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: a273e455881948a895eb60b453ce8f61
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: ATUC noise margin'
+              name: 'Port {#SNMPINDEX}: ATUC noise margin'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.2.1.4.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.atuc.snrmgn[{#SNMPINDEX}]'
@@ -500,15 +500,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 14cbae6c16c245b09ed46e0cc01a556c
                   expression: 'min(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX}'
-                  event_name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
+                  name: 'Low the DSL line noise margins in Port {#SNMPINDEX}'
+                  event_name: 'Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: 3bfa258832dd49cca9ced6d5d78252d1
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: ATUR attenuation'
+              name: 'Port {#SNMPINDEX}: ATUR attenuation'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.5.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.atur.atn[{#SNMPINDEX}]'
@@ -537,15 +537,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: e917c9a8d6bb4af3a40c6c5b41f90c22
                   expression: 'min(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX}'
-                  event_name: 'ZYXEL AAM1212-51 / IES-612: High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
+                  name: 'High the DSL line attenuation in Port {#SNMPINDEX}'
+                  event_name: 'High the DSL line attenuation in Port {#SNMPINDEX} (>{$ZYXEL.ADSL.ATN.MAX}dB for 5m)'
                   priority: WARNING
                   description: 'The reductions in amplitude of the downstream and upstream DSL signals.'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: da2105dce83d4f619b69a9c8e5875bac
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: ATUR output power'
+              name: 'Port {#SNMPINDEX}: ATUR output power'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.7.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.atur.outpwr[{#SNMPINDEX}]'
@@ -571,7 +571,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: e59b98a685874f888557eb3d1c41a828
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: ATUR noise margin'
+              name: 'Port {#SNMPINDEX}: ATUR noise margin'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.10.94.1.1.3.1.4.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.atur.snrmgn[{#SNMPINDEX}]'
@@ -600,15 +600,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 125b08332e2f409985cade88ab3842f1
                   expression: 'min(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX}'
-                  event_name: 'ZYXEL AAM1212-51 / IES-612: Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
+                  name: 'Low the DSL line noise margins in Port {#SNMPINDEX}'
+                  event_name: 'Low the DSL line noise margins in Port {#SNMPINDEX} (<{$ZYXEL.ADSL.SNR.MIN}dB for 5m)'
                   priority: WARNING
                   description: 'Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: 70fa53318d354503b44b70696cb8ccd2
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: Incoming traffic'
+              name: 'Port {#SNMPINDEX}: Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.in.traffic[{#SNMPINDEX}]'
@@ -633,7 +633,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 53241d402d0f4b4ca826f9712ad1af69
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: Interface name'
+              name: 'Port {#SNMPINDEX}: Interface name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.name[{#SNMPINDEX}]'
@@ -655,7 +655,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 53ff6ee2132a4503890c35919baa2fd8
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: Operational status'
+              name: 'Port {#SNMPINDEX}: Operational status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}]'
@@ -683,7 +683,7 @@ zabbix_export:
                   expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.adsl.operstatus[{#SNMPINDEX}])<>2'
-                  name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: Link down'
+                  name: 'Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -698,7 +698,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 021b85f4efea4be9834e7959ed2471f5
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#SNMPINDEX}: Outgoing traffic'
+              name: 'Port {#SNMPINDEX}: Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.adsl.out.traffic[{#SNMPINDEX}]'
@@ -771,7 +771,7 @@ zabbix_export:
                 formulaid: C
           item_prototypes:
             - uuid: d68dd1f83f5f41f4b372cc0a2261f30e
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#ZYXEL.IF.NAME}: Administrative status'
+              name: 'Port {#ZYXEL.IF.NAME}: Administrative status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.if.adminstatus[{#SNMPINDEX}]'
@@ -795,7 +795,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: f5dd08da51664f1d82a16b0826cdb9ce
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#ZYXEL.IF.NAME}: Incoming traffic'
+              name: 'Port {#ZYXEL.IF.NAME}: Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.if.in.traffic[{#SNMPINDEX}]'
@@ -820,7 +820,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: e2a630669e924f069b98d11a32737411
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#ZYXEL.IF.NAME}: Interface name'
+              name: 'Port {#ZYXEL.IF.NAME}: Interface name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.if.name[{#SNMPINDEX}]'
@@ -842,7 +842,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 6232538bf48a4f12a1f85164dc95bcf8
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#ZYXEL.IF.NAME}: Operational status'
+              name: 'Port {#ZYXEL.IF.NAME}: Operational status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}]'
@@ -870,7 +870,7 @@ zabbix_export:
                   expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.if.operstatus[{#SNMPINDEX}])<>2'
-                  name: 'ZYXEL AAM1212-51 / IES-612: Port {#ZYXEL.IF.NAME}: Link down'
+                  name: 'Port {#ZYXEL.IF.NAME}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -885,7 +885,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: d69676fc00e64c97afd7da416891b0ef
-              name: 'ZYXEL AAM1212-51 / IES-612: Port {#ZYXEL.IF.NAME}: Outgoing traffic'
+              name: 'Port {#ZYXEL.IF.NAME}: Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'zyxel.aam1212.net.if.out.traffic[{#SNMPINDEX}]'
@@ -946,7 +946,7 @@ zabbix_export:
           description: 'An entry in tempTable.'
           item_prototypes:
             - uuid: 82045c5b71b04c62b7525db28f292ad2
-              name: 'ZYXEL AAM1212-51 / IES-612: Temperature "{#ZYXEL.TEMP.ID}"'
+              name: 'Temperature "{#ZYXEL.TEMP.ID}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.1.2.3.1.2.{#SNMPINDEX}'
               key: 'zyxel.aam1212.temp[{#SNMPINDEX}]'
@@ -967,7 +967,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 321b2efb6e8e4117949b3644cc101ff2
                   expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: Temperature {#ZYXEL.TEMP.ID} is in critical state'
+                  name: 'Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
@@ -991,7 +991,7 @@ zabbix_export:
           description: 'An entry in voltageTable.'
           item_prototypes:
             - uuid: 9e73d63d1af2473599e17ab214f03b32
-              name: 'ZYXEL AAM1212-51 / IES-612: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              name: 'Nominal "{#ZYXEL.VOLT.NOMINAL}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.aam1212.volt[{#SNMPINDEX}]'
@@ -1016,7 +1016,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: a7aa1ae207bb462bb23d3f2fca2c3533
                   expression: 'last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
-                  name: 'ZYXEL AAM1212-51 / IES-612: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
+                  name: 'Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
@@ -1136,8 +1136,8 @@ zabbix_export:
   triggers:
     - uuid: 819190f68248439292fc4622c3eec5a9
       expression: '(last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.hw.uptime)>0 and last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.hw.uptime)<10m) or (last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.hw.uptime)=0 and last(/ZYXEL AAM1212-51 IES-612 by SNMP/zyxel.aam1212.net.uptime)<10m)'
-      name: 'ZYXEL AAM1212-51 / IES-612: Host has been restarted'
-      event_name: 'ZYXEL AAM1212-51 / IES-612: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

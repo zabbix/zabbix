@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 87480ce035a94f299c4cf4103eaaf066
-          name: 'Mellanox: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -40,14 +40,14 @@ zabbix_export:
           triggers:
             - uuid: fe4c81a386814dfa80ffc76e1b7da9a1
               expression: 'max(/Mellanox by SNMP/icmpping,#3)=0'
-              name: 'Mellanox: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 50e85be3969447c58fcfeca5d9a1a9bb
-          name: 'Mellanox: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -61,11 +61,11 @@ zabbix_export:
           triggers:
             - uuid: 52b307324c37481693d419df236cbbd7
               expression: 'min(/Mellanox by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox by SNMP/icmppingloss,5m)<100'
-              name: 'Mellanox: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Mellanox: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mellanox by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -73,7 +73,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 7567e999d75442379066babdc9b50894
-          name: 'Mellanox: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -87,13 +87,13 @@ zabbix_export:
           triggers:
             - uuid: 39a9cff305074e1a8b7c6ed0c526fda9
               expression: 'avg(/Mellanox by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Mellanox: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Mellanox: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Mellanox by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox by SNMP/icmppingloss,5m)<100'
-                - name: 'Mellanox: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mellanox by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -101,7 +101,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 0cb8aadeb5554583a65c3496cfed2c1b
-          name: 'Mellanox: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -114,7 +114,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: f62a8b653c3d44d09864a4a4c910aeb1
-          name: 'Mellanox: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -134,7 +134,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c33470549bda45e88ecb8ded7d0b5e87
-          name: 'Mellanox: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CPU.UTIL},1.3.6.1.2.1.25.3.3.1.2]'
           key: system.cpu.util
@@ -155,8 +155,8 @@ zabbix_export:
           triggers:
             - uuid: 26913093ab414fe69ff157102ae54796
               expression: 'min(/Mellanox by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
-              name: 'Mellanox: High CPU utilization'
-              event_name: 'Mellanox: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -164,7 +164,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 64c4f3e890ec4c29be07ba2d06345534
-          name: 'Mellanox: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -185,7 +185,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f867fb976e0b49a895129865e95096c2
-          name: 'Mellanox: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -209,7 +209,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e0d2149e1a114f3a971c324673beae2f
-          name: 'Mellanox: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -229,7 +229,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f63d1f71a97e45b0ab5716299ef298ea
-          name: 'Mellanox: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -251,8 +251,8 @@ zabbix_export:
           triggers:
             - uuid: ff7ad0676a774cf49a4568e752dd916b
               expression: 'last(/Mellanox by SNMP/system.name,#1)<>last(/Mellanox by SNMP/system.name,#2) and length(last(/Mellanox by SNMP/system.name))>0'
-              name: 'Mellanox: System name has changed'
-              event_name: 'Mellanox: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -262,7 +262,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: d7f06d23f6b14677b5183f2cc94fc10d
-          name: 'Mellanox: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -281,7 +281,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f1535f45138b472c945e231a9beb9cc5
-          name: 'Mellanox: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -300,7 +300,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: aba117057e824b6789fca847cae9e0fc
-          name: 'Mellanox: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -320,12 +320,12 @@ zabbix_export:
           triggers:
             - uuid: 6e476399963a414a847c4c514055bf43
               expression: 'max(/Mellanox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Mellanox: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Mellanox: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Mellanox by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -2088,13 +2088,13 @@ zabbix_export:
       expression: |
         (last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])<10m)
         or (last(/Mellanox by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Mellanox by SNMP/system.net.uptime[sysUpTime.0])<10m)
-      name: 'Mellanox: Host has been restarted'
-      event_name: 'Mellanox: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Mellanox: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Mellanox by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

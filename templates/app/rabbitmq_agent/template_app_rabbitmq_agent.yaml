@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 31908a8287be442681a0ded564977ff2
-          name: 'RabbitMQ: Messages acknowledged'
+          name: 'Messages acknowledged'
           type: DEPENDENT
           key: rabbitmq.overview.messages.ack
           delay: '0'
@@ -38,7 +38,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: f78fabbd7e3f44dc81b1cf9c90b26f2e
-          name: 'RabbitMQ: Messages acknowledged per second'
+          name: 'Messages acknowledged per second'
           type: DEPENDENT
           key: rabbitmq.overview.messages.ack.rate
           delay: '0'
@@ -57,7 +57,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 45cf9b5cf5cd4b13b0e140383233799f
-          name: 'RabbitMQ: Messages confirmed'
+          name: 'Messages confirmed'
           type: DEPENDENT
           key: rabbitmq.overview.messages.confirm
           delay: '0'
@@ -75,7 +75,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: bc85a070e1e9451b953d85bb519ed63d
-          name: 'RabbitMQ: Messages confirmed per second'
+          name: 'Messages confirmed per second'
           type: DEPENDENT
           key: rabbitmq.overview.messages.confirm.rate
           delay: '0'
@@ -94,7 +94,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 004da545af4a4f61bd2167281bb9a02b
-          name: 'RabbitMQ: Messages delivered'
+          name: 'Messages delivered'
           type: DEPENDENT
           key: rabbitmq.overview.messages.deliver_get
           delay: '0'
@@ -112,7 +112,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: c00a84c8676544dcbdd74fec13881063
-          name: 'RabbitMQ: Messages delivered per second'
+          name: 'Messages delivered per second'
           type: DEPENDENT
           key: rabbitmq.overview.messages.deliver_get.rate
           delay: '0'
@@ -131,7 +131,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 4215bdf87f0e426f85bd79434a0fb0bb
-          name: 'RabbitMQ: Messages published'
+          name: 'Messages published'
           type: DEPENDENT
           key: rabbitmq.overview.messages.publish
           delay: '0'
@@ -149,7 +149,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: cfadadb681474c7eb0512d1f4d223ff6
-          name: 'RabbitMQ: Messages published per second'
+          name: 'Messages published per second'
           type: DEPENDENT
           key: rabbitmq.overview.messages.publish.rate
           delay: '0'
@@ -168,7 +168,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: bb068ac7c6094fb8a59cd1a003e88c39
-          name: 'RabbitMQ: Messages publish_in'
+          name: 'Messages publish_in'
           type: DEPENDENT
           key: rabbitmq.overview.messages.publish_in
           delay: '0'
@@ -186,7 +186,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: db511bf1cd6c465f8fe1ae6b5fa08660
-          name: 'RabbitMQ: Messages publish_in per second'
+          name: 'Messages publish_in per second'
           type: DEPENDENT
           key: rabbitmq.overview.messages.publish_in.rate
           delay: '0'
@@ -205,7 +205,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 23dcb85dd9bc4fefb1a9682956181c2e
-          name: 'RabbitMQ: Messages publish_out'
+          name: 'Messages publish_out'
           type: DEPENDENT
           key: rabbitmq.overview.messages.publish_out
           delay: '0'
@@ -223,7 +223,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 05e4c745be95412995749c352ec0f925
-          name: 'RabbitMQ: Messages publish_out per second'
+          name: 'Messages publish_out per second'
           type: DEPENDENT
           key: rabbitmq.overview.messages.publish_out.rate
           delay: '0'
@@ -242,7 +242,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 650d6a94e381477299c62cfb2a2252cf
-          name: 'RabbitMQ: Messages returned redeliver'
+          name: 'Messages returned redeliver'
           type: DEPENDENT
           key: rabbitmq.overview.messages.redeliver
           delay: '0'
@@ -260,7 +260,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 6d7eb8880bca4c6e92f65f8a32911599
-          name: 'RabbitMQ: Messages returned redeliver per second'
+          name: 'Messages returned redeliver per second'
           type: DEPENDENT
           key: rabbitmq.overview.messages.redeliver.rate
           delay: '0'
@@ -279,7 +279,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: e3faec09ae0a4d7aa8aab50d71de7bb3
-          name: 'RabbitMQ: Messages returned unroutable'
+          name: 'Messages returned unroutable'
           type: DEPENDENT
           key: rabbitmq.overview.messages.return_unroutable
           delay: '0'
@@ -297,7 +297,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 72267cce69cf490ea626ff3ae17b6362
-          name: 'RabbitMQ: Messages returned unroutable per second'
+          name: 'Messages returned unroutable per second'
           type: DEPENDENT
           key: rabbitmq.overview.messages.return_unroutable.rate
           delay: '0'
@@ -316,7 +316,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 2b03117e863348ee84d94acfe877ef7f
-          name: 'RabbitMQ: Channels total'
+          name: 'Channels total'
           type: DEPENDENT
           key: rabbitmq.overview.object_totals.channels
           delay: '0'
@@ -332,7 +332,7 @@ zabbix_export:
             - tag: component
               value: channels
         - uuid: b3cdd6739a964447b524df4fdd726434
-          name: 'RabbitMQ: Connections total'
+          name: 'Connections total'
           type: DEPENDENT
           key: rabbitmq.overview.object_totals.connections
           delay: '0'
@@ -348,7 +348,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: c39007dbd4374bee943d61b7e90c0f01
-          name: 'RabbitMQ: Consumers total'
+          name: 'Consumers total'
           type: DEPENDENT
           key: rabbitmq.overview.object_totals.consumers
           delay: '0'
@@ -364,7 +364,7 @@ zabbix_export:
             - tag: component
               value: consumers
         - uuid: be0b952e5d08409aa2c65fe143a9193c
-          name: 'RabbitMQ: Exchanges total'
+          name: 'Exchanges total'
           type: DEPENDENT
           key: rabbitmq.overview.object_totals.exchanges
           delay: '0'
@@ -380,7 +380,7 @@ zabbix_export:
             - tag: component
               value: exchanges
         - uuid: d7c86b4921f54924af1b72cd2493da1c
-          name: 'RabbitMQ: Queues total'
+          name: 'Queues total'
           type: DEPENDENT
           key: rabbitmq.overview.object_totals.queues
           delay: '0'
@@ -396,7 +396,7 @@ zabbix_export:
             - tag: component
               value: queues
         - uuid: c98b2b3dd2bd4fec9e7c571bc631167b
-          name: 'RabbitMQ: Messages total'
+          name: 'Messages total'
           type: DEPENDENT
           key: rabbitmq.overview.queue_totals.messages
           delay: '0'
@@ -414,7 +414,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: efaabe175e5f4fffa8a810ea35753475
-          name: 'RabbitMQ: Messages ready for delivery'
+          name: 'Messages ready for delivery'
           type: DEPENDENT
           key: rabbitmq.overview.queue_totals.messages.ready
           delay: '0'
@@ -432,7 +432,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: 6cf09ed9d244464288c8050b10622e3a
-          name: 'RabbitMQ: Messages unacknowledged'
+          name: 'Messages unacknowledged'
           type: DEPENDENT
           key: rabbitmq.overview.queue_totals.messages.unacknowledged
           delay: '0'
@@ -450,7 +450,7 @@ zabbix_export:
             - tag: component
               value: messages
         - uuid: f015f991bcea4c4dbf83dfb013300010
-          name: 'RabbitMQ: Get exchanges'
+          name: 'Get exchanges'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
           history: 1h
           trends: '0'
@@ -465,7 +465,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 943eabfb44164908b9135aa4d6478bea
-          name: 'RabbitMQ: Get overview'
+          name: 'Get overview'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           history: 1h
           trends: '0'
@@ -482,8 +482,8 @@ zabbix_export:
           triggers:
             - uuid: 000d3e773f6e4ebf89f16daa2ce8c168
               expression: 'nodata(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"],30m)=1'
-              name: 'RabbitMQ: Failed to fetch overview data'
-              event_name: 'RabbitMQ: Failed to fetch overview data (or no data for 30m)'
+              name: 'Failed to fetch overview data'
+              event_name: 'Failed to fetch overview data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -509,7 +509,7 @@ zabbix_export:
           description: 'The metrics for an individual exchange.'
           item_prototypes:
             - uuid: 68892e56e0074516b5d052dd7178955f
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages acknowledged per second'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages acknowledged per second'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.ack.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -534,7 +534,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: fcf7807f096d4cddb8fa2b3671814dfa
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages acknowledged'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages acknowledged'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.ack["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -558,7 +558,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 858f8ce62fa04a31902569a712e58234
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages confirmed per second'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages confirmed per second'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.confirm.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -583,7 +583,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 38d41b5d815a40ff816f6fad2395b61a
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages confirmed'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages confirmed'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.confirm["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -607,7 +607,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: ab53a6957ea641fe8b2a7f26c4bcc743
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages delivered per second'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages delivered per second'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.deliver_get.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -632,7 +632,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 412e5003ad2d4e80832ee0551a596791
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages delivered'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages delivered'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.deliver_get["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -656,7 +656,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 32a0c7af8b9940a482a3a1d63ee90940
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages published per second'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages published per second'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.publish.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -681,7 +681,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 1eccbe4450d74d5f9c5b8f7e6279b214
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages published'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages published'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.publish["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -705,7 +705,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 3520a523abd1413f88c1c19978e6d562
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_in per second'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_in per second'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.publish_in.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -730,7 +730,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 520d8301e48540679472bf508a6e293b
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_in'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_in'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.publish_in["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -754,7 +754,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 6beb5e40cb8b416a8722ea77abb7355d
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_out per second'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_out per second'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.publish_out.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -779,7 +779,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: beb929ee395e4caba73f3063c24a1d60
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_out'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages publish_out'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.publish_out["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -803,7 +803,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 7485d5a12fb04a13810ea54b9cc598e1
-              name: 'RabbitMQ: Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered per second'
+              name: 'Exchange {#VHOST}/{#EXCHANGE}/{#TYPE}: Messages redelivered per second'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.redeliver.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -828,7 +828,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 58a06005659943429122d451acb521e0
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages redelivered'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages redelivered'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.redeliver["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -852,7 +852,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 295eeb3bd071400d921efe1f5a924a3e
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages returned unroutable per second'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages returned unroutable per second'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.return_unroutable.rate["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -877,7 +877,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 2901eccbd8ef483ba63c5522755155e7
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages returned unroutable'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Messages returned unroutable'
               type: DEPENDENT
               key: 'rabbitmq.exchange.messages.return_unroutable["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -901,7 +901,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 4491f48f732d40c0b7f29010cf4ca046
-              name: 'RabbitMQ: Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Get data'
+              name: 'Exchange [{#VHOST}][{#EXCHANGE}][{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
@@ -942,7 +942,7 @@ zabbix_export:
           description: 'Specific metrics for the versions: up to and including 3.8.10.'
           item_prototypes:
             - uuid: 4c93b04164d24eb8b9dbdab652afc7bc
-              name: 'RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}'
+              name: 'Healthcheck: alarms in effect in the cluster{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]'
               history: 7d
               description: |
@@ -973,7 +973,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 032949c387c64223b3125ba1120ae082
                   expression: 'last(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: There are active alarms in the cluster'
+                  name: 'There are active alarms in the cluster'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
@@ -1117,7 +1117,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: b1f191f9077f4382b5b87e0085ae2622
-          name: 'RabbitMQ: Service response time'
+          name: 'Service response time'
           key: 'net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]'
           history: 7d
           value_type: FLOAT
@@ -1126,7 +1126,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6229b623f5ff40f9a65e9573b3b86e3f
-          name: 'RabbitMQ: Service ping'
+          name: 'Service ping'
           key: 'net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]'
           history: 7d
           valuemap:
@@ -1141,7 +1141,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 8201cc537b124d9292fcf692922ee0ad
-          name: 'RabbitMQ: Get processes summary'
+          name: 'Get processes summary'
           key: 'proc.get[{$RABBITMQ.PROCESS.NAME.PARAMETER},,,summary]'
           history: '0'
           trends: '0'
@@ -1151,7 +1151,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7dad79be93bd46bba7a2540b38080b06
-          name: 'RabbitMQ: Free disk space'
+          name: 'Free disk space'
           type: DEPENDENT
           key: rabbitmq.node.disk_free
           delay: '0'
@@ -1168,7 +1168,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d8de1eb13f024ce99388fc4bb68d6ad0
-          name: 'RabbitMQ: Disk free alarm'
+          name: 'Disk free alarm'
           type: DEPENDENT
           key: rabbitmq.node.disk_free_alarm
           delay: '0'
@@ -1191,8 +1191,8 @@ zabbix_export:
           triggers:
             - uuid: b68cb12ecd4046fd80a717fb557f04e8
               expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1'
-              name: 'RabbitMQ: Free disk space alarm'
-              event_name: 'RabbitMQ: Free disk space alarm (Free space threshold has been reached)'
+              name: 'Free disk space alarm'
+              event_name: 'Free disk space alarm (Free space threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).'
@@ -1200,7 +1200,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 4e62b476bd11497f9190d1f720f22f75
-          name: 'RabbitMQ: Disk free limit'
+          name: 'Disk free limit'
           type: DEPENDENT
           key: rabbitmq.node.disk_free_limit
           delay: '0'
@@ -1217,7 +1217,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 09aeab86c69846eb82d27c2f82f46d2b
-          name: 'RabbitMQ: Used file descriptors'
+          name: 'Used file descriptors'
           type: DEPENDENT
           key: rabbitmq.node.fd_used
           delay: '0'
@@ -1233,7 +1233,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e059b278ba384133a72dc723c2b2c40b
-          name: 'RabbitMQ: Memory alarm'
+          name: 'Memory alarm'
           type: DEPENDENT
           key: rabbitmq.node.mem_alarm
           delay: '0'
@@ -1256,8 +1256,8 @@ zabbix_export:
           triggers:
             - uuid: ec6ae727fe774b0fa56bb4d9ad773e35
               expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1'
-              name: 'RabbitMQ: Memory alarm'
-              event_name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
+              name: 'Memory alarm'
+              event_name: 'Memory alarm (Memory usage threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).'
@@ -1265,7 +1265,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 54bd4a47d635444e8e2e955325dbb976
-          name: 'RabbitMQ: Memory limit'
+          name: 'Memory limit'
           type: DEPENDENT
           key: rabbitmq.node.mem_limit
           delay: '0'
@@ -1282,7 +1282,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d6a01ec409a6449986c5c0a81ffaf914
-          name: 'RabbitMQ: Memory used'
+          name: 'Memory used'
           type: DEPENDENT
           key: rabbitmq.node.mem_used
           delay: '0'
@@ -1299,7 +1299,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: db91f84a5ad7412c959fbfe4e3b6df88
-          name: 'RabbitMQ: Management plugin version'
+          name: 'Management plugin version'
           type: DEPENDENT
           key: rabbitmq.node.overview.management_version
           delay: '0'
@@ -1320,7 +1320,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 52a0be5049ee40748761d301a644315b
-          name: 'RabbitMQ: RabbitMQ version'
+          name: 'RabbitMQ version'
           type: DEPENDENT
           key: rabbitmq.node.overview.rabbitmq_version
           delay: '0'
@@ -1343,8 +1343,8 @@ zabbix_export:
           triggers:
             - uuid: daf98bb4593d4697bc51423b2f65ba41
               expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0'
-              name: 'RabbitMQ: Version has changed'
-              event_name: 'RabbitMQ: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'RabbitMQ version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1352,7 +1352,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 5e8c1ed0b073461eb14477edac3c756a
-          name: 'RabbitMQ: Number of network partitions'
+          name: 'Number of network partitions'
           type: DEPENDENT
           key: rabbitmq.node.partitions
           delay: '0'
@@ -1373,8 +1373,8 @@ zabbix_export:
           triggers:
             - uuid: 5bed266725e94000804b0ecc7bce6209
               expression: 'min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0'
-              name: 'RabbitMQ: Number of network partitions is too high'
-              event_name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
+              name: 'Number of network partitions is too high'
+              event_name: 'Number of network partitions is too high (more than 0 for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).'
@@ -1382,7 +1382,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 087fcb3992ef4e35bacd4b6e69ef93d3
-          name: 'RabbitMQ: Is running'
+          name: 'Is running'
           type: DEPENDENT
           key: rabbitmq.node.running
           delay: '0'
@@ -1403,7 +1403,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 1ae6f429e99d4ddaa54aa6adab6b8100
-          name: 'RabbitMQ: Runtime run queue'
+          name: 'Runtime run queue'
           type: DEPENDENT
           key: rabbitmq.node.run_queue
           delay: '0'
@@ -1419,7 +1419,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3aa508520f224150a05a7ebb64d22c5e
-          name: 'RabbitMQ: Sockets available'
+          name: 'Sockets available'
           type: DEPENDENT
           key: rabbitmq.node.sockets_total
           delay: '0'
@@ -1435,7 +1435,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: de2cbe02ff6c47d78b6c7105709f4805
-          name: 'RabbitMQ: Sockets used'
+          name: 'Sockets used'
           type: DEPENDENT
           key: rabbitmq.node.sockets_used
           delay: '0'
@@ -1451,7 +1451,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a28b6c8cca5544b79c2d9946c1978c7e
-          name: 'RabbitMQ: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: rabbitmq.node.uptime
           delay: '0'
@@ -1474,8 +1474,8 @@ zabbix_export:
           triggers:
             - uuid: 729c448ebabb417bb7ce17b1634c4484
               expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m'
-              name: 'RabbitMQ: Host has been restarted'
-              event_name: 'RabbitMQ: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1483,7 +1483,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 61730555a0ae4f798ea740effb82764c
-          name: 'RabbitMQ: Get nodes'
+          name: 'Get nodes'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           history: 1h
           trends: '0'
@@ -1498,7 +1498,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1af326f40cdb407a96b34025062b4743
-          name: 'RabbitMQ: Get node overview'
+          name: 'Get node overview'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           history: 1h
           trends: '0'
@@ -1516,7 +1516,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7fb61ad564db42d5a373912491f5c9d3
-          name: 'RabbitMQ: Get queues'
+          name: 'Get queues'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
           history: 1h
           trends: '0'
@@ -1539,7 +1539,7 @@ zabbix_export:
           description: 'Specific metrics for the versions: up to and including 3.8.4.'
           item_prototypes:
             - uuid: 8b959a9d03dc4ae8bed7292973f4fcc4
-              name: 'RabbitMQ: Healthcheck{#SINGLETON}'
+              name: 'Healthcheck{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"]'
               history: 7d
               description: 'It checks whether the RabbitMQ application is running; and whether the channels and queues can be listed successfully; and that no alarms are in effect.'
@@ -1566,7 +1566,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: bf6bcbda20ed46cbb779d9c1f446dfa8
                   expression: 'last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: Node healthcheck failed'
+                  name: 'Node healthcheck failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'For more details see [Health Checks](https://www.rabbitmq.com/monitoring.html#health-checks).'
@@ -1597,7 +1597,7 @@ zabbix_export:
           description: 'Specific metrics for the versions: up to and including 3.8.10.'
           item_prototypes:
             - uuid: 0f1cd729d8f4447db25e0af19eae595d
-              name: 'RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON}'
+              name: 'Healthcheck: expiration date on the certificates{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"]'
               history: 7d
               description: |
@@ -1629,7 +1629,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: d180912136c74e5cb246655ecab75f57
                   expression: 'last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: There are valid TLS certificates expiring in the next month'
+                  name: 'There are valid TLS certificates expiring in the next month'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
@@ -1637,7 +1637,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 701449b128cb42cdb971fc608ba9f29b
-              name: 'RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON}'
+              name: 'Healthcheck: local alarms in effect on this node{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]'
               history: 7d
               description: |
@@ -1668,7 +1668,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 62962f18baa4480294e097fec2cc5e4c
                   expression: 'last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: There are active alarms in the node'
+                  name: 'There are active alarms in the node'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
@@ -1676,7 +1676,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 7a07966d8dde4f2caa9ff95693b86974
-              name: 'RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}'
+              name: 'Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"]'
               history: 7d
               description: |
@@ -1708,7 +1708,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 19e392f9e48e4c8287e04751a2a73843
                   expression: 'last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: There are queues that could potentially lose data if this node goes offline.'
+                  name: 'There are queues that could potentially lose data if this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'It checks whether there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
@@ -1716,7 +1716,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: f6ec1bb1cc4741be852136fac2c63333
-              name: 'RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON}'
+              name: 'Healthcheck: queues with minimum online quorum{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"]'
               history: 7d
               description: |
@@ -1748,7 +1748,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: e063b6dde6a0484ba1561861d8b1f0c1
                   expression: 'last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.'
+                  name: 'There are queues that would lose their quorum and availability if this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'It checks if there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
@@ -1756,7 +1756,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 0d1ad3daf2bb46dba2c9913c1684a0d4
-              name: 'RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}'
+              name: 'Healthcheck: virtual hosts on this node{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]'
               history: 7d
               description: |
@@ -1787,7 +1787,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: b61117e5eeff4d41a9a2f1729ec174b2
                   expression: 'last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"])=0'
-                  name: 'RabbitMQ: There are not running virtual hosts'
+                  name: 'There are not running virtual hosts'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'It checks if there are not running virtual hosts via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.'
@@ -1824,7 +1824,7 @@ zabbix_export:
           description: 'The discovery of the RabbitMQ summary processes.'
           item_prototypes:
             - uuid: 0b195bf594c44b1f869b4a7671f61453
-              name: 'RabbitMQ: CPU utilization'
+              name: 'CPU utilization'
               key: 'proc.cpu.util[{#RABBITMQ.NAME}]'
               history: 7d
               value_type: FLOAT
@@ -1834,7 +1834,7 @@ zabbix_export:
                 - tag: component
                   value: cpu
             - uuid: 882cf9cfecb448f3af17e12bf9aa7bef
-              name: 'RabbitMQ: Get process data'
+              name: 'Get process data'
               type: DEPENDENT
               key: 'rabbitmq.proc.get[{#RABBITMQ.NAME}]'
               delay: '0'
@@ -1854,7 +1854,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 8f1c8d2449c44ab590842184d9deb3a6
-              name: 'RabbitMQ: Number of running processes'
+              name: 'Number of running processes'
               type: DEPENDENT
               key: 'rabbitmq.proc.num[{#RABBITMQ.NAME}]'
               delay: '0'
@@ -1877,13 +1877,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 2979bc7d779b404696f7eac273e99ea7
                   expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])=0'
-                  name: 'RabbitMQ: Process is not running'
+                  name: 'Process is not running'
                   priority: HIGH
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 875ab477c06943d7881ee896936ee8a2
-              name: 'RabbitMQ: Memory usage, %'
+              name: 'Memory usage, %'
               type: DEPENDENT
               key: 'rabbitmq.proc.pmem[{#RABBITMQ.NAME}]'
               delay: '0'
@@ -1902,7 +1902,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 6f13f672d8ce4c9592e0f3f5ec3b0ec4
-              name: 'RabbitMQ: Memory usage (rss)'
+              name: 'Memory usage (rss)'
               type: DEPENDENT
               key: 'rabbitmq.proc.rss[{#RABBITMQ.NAME}]'
               delay: '0'
@@ -1920,7 +1920,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 4faac75027d14304ab071602df8f2937
-              name: 'RabbitMQ: Memory usage (vsize)'
+              name: 'Memory usage (vsize)'
               type: DEPENDENT
               key: 'rabbitmq.proc.vmem[{#RABBITMQ.NAME}]'
               delay: '0'
@@ -1940,32 +1940,32 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 4f2a88d09b1b49879d80e0794ec19e0e
               expression: 'nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0'
-              name: 'RabbitMQ: Failed to fetch nodes data'
-              event_name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
+              name: 'Failed to fetch nodes data'
+              event_name: 'Failed to fetch nodes data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
-                - name: 'RabbitMQ: Process is not running'
+                - name: 'Process is not running'
                   expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])=0'
               tags:
                 - tag: scope
                   value: availability
             - uuid: 253acf98446e4790975b330d44dd6b96
               expression: 'max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0'
-              name: 'RabbitMQ: Node is not running'
+              name: 'Node is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'RabbitMQ node is not running.'
               dependencies:
-                - name: 'RabbitMQ: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0'
               tags:
                 - tag: scope
                   value: availability
             - uuid: af5cfb0004e04562a9720b9e1b41fd5b
               expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0'
-              name: 'RabbitMQ: Service is down'
+              name: 'Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
@@ -1973,12 +1973,12 @@ zabbix_export:
                   value: availability
             - uuid: 5cb80a7552d74e44a83d0825f039f89f
               expression: 'min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN} and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0'
-              name: 'RabbitMQ: Service response time is too high'
-              event_name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              name: 'Service response time is too high'
+              event_name: 'Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
-                - name: 'RabbitMQ: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0'
               tags:
                 - tag: scope
@@ -2024,7 +2024,7 @@ zabbix_export:
           description: 'The metrics for an individual queue.'
           item_prototypes:
             - uuid: 158f41423b094efcb90ac273d1e6349c
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Get data'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Get data'
               type: DEPENDENT
               key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2042,7 +2042,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: fcbee789f2864010b26ac69894659e77
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Consumers'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Consumers'
               type: DEPENDENT
               key: 'rabbitmq.queue.consumers["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2062,7 +2062,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 4b4491d5fb2b41eeae044c3d28de1b18
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Memory'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Memory'
               type: DEPENDENT
               key: 'rabbitmq.queue.memory["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2083,7 +2083,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 223fa7a8372f4e9883d376c9f3e1af2e
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages acknowledged per second'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages acknowledged per second'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.ack.rate["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2106,7 +2106,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 335513a34e6a4909acfa1be278dd31b3
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages acknowledged'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages acknowledged'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.ack["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2128,7 +2128,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 55b774e5aac249edbb8881373060b15b
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages delivered per second'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages delivered per second'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.deliver.rate["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2151,7 +2151,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 2a87988327e1483c84d3f1867bab367f
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages delivered'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages delivered'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.deliver["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2173,7 +2173,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 3f3024da744349b59c7810dfd10d11a3
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Sum of messages delivered per second'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Sum of messages delivered per second'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.deliver_get.rate["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2196,7 +2196,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: ad5e9fa0260e4170887fb2dfdc508959
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Sum of messages delivered'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Sum of messages delivered'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.deliver_get["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2218,7 +2218,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 393306b9cb0148038d02ad9c48cf1fbb
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages published per second'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages published per second'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.publish.rate["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2241,7 +2241,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 44814c9f6f154fdcbab66249d0777eae
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages published'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages published'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.publish["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2263,7 +2263,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 9096e81341374d2fb7dd58e932783afc
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages per second'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages per second'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.rate["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2284,7 +2284,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 8902103fd86746d0851b75a1262e36a9
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages redelivered per second'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages redelivered per second'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.redeliver.rate["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2307,7 +2307,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 3ac1a4b83c9f4d4c8a438d39aca8e82a
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages redelivered'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages redelivered'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages.redeliver["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2329,7 +2329,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: aabd7d6fe6a047d186504386d3a48ae1
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages total'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages total'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2351,15 +2351,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 58986cee2b4846b3b7bd3caf772d7ac6
                   expression: 'min(/RabbitMQ node by Zabbix agent/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}'
-                  name: 'RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}]'
-                  event_name: 'RabbitMQ: Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m)'
+                  name: 'Too many messages in queue [{#VHOST}][{#QUEUE}]'
+                  event_name: 'Too many messages in queue [{#VHOST}][{#QUEUE}] (over {$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"} for 5m)'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: performance
             - uuid: d2e1a2857b314ed3818f92312f5d0043
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages ready per second'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages ready per second'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages_ready.rate["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2380,7 +2380,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 4a75c2d9e0354f47b1c8243bad17bd58
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages ready'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages ready'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages_ready["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2400,7 +2400,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: d5d88879e3b844d7b03ab956a673daff
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages unacknowledged per second'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages unacknowledged per second'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages_unacknowledged.rate["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2421,7 +2421,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: 252dcf1262014ce599a2eec81f7223eb
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages unacknowledged'
+              name: 'Queue [{#VHOST}][{#QUEUE}]: Messages unacknowledged'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages_unacknowledged["{#VHOST}/{#QUEUE}"]'
               delay: '0'

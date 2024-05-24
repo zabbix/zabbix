@@ -11,7 +11,6 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -111,9 +110,9 @@ class ColumnEdit extends CController {
 				'webitems' => true
 			]);
 
-			$db_item = $db_item[0];
-
 			if ($db_item) {
+				$db_item = $db_item[0];
+
 				$item_ms = [
 					'id' => $db_item['itemid'],
 					'prefix' => $db_item['hosts'][0]['name'].NAME_DELIMITER,
@@ -125,6 +124,7 @@ class ColumnEdit extends CController {
 			else {
 				$item_ms = [
 					'id' => $input['itemid'],
+					'prefix' => '',
 					'name' => _('Inaccessible item')
 				];
 			}

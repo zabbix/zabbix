@@ -26,7 +26,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 70dab03a327a4dc0ab9fe8031052584d
-          name: 'Kubernetes: Get nodes'
+          name: 'Get nodes'
           type: SCRIPT
           key: kube.nodes
           delay: 0;s00

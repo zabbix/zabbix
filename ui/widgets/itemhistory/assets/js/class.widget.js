@@ -10,7 +10,6 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -62,7 +61,10 @@ class CWidgetItemHistory extends CWidget {
 					this.#selected_itemid = element.dataset.itemid;
 					this.#selected_clock = element.dataset.clock;
 
-					this.broadcast({_itemid: element.dataset.itemid});
+					this.broadcast({
+						[CWidgetsData.DATA_TYPE_ITEM_ID]: [element.dataset.itemid],
+						[CWidgetsData.DATA_TYPE_ITEM_IDS]: [element.dataset.itemid]
+					});
 				}
 			});
 		}

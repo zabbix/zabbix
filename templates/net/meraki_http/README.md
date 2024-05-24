@@ -48,14 +48,14 @@ Set filters with macros if you want to override default filter parameters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Meraki: Get data|<p>Item for gathering all the organizations and devices from Meraki API.</p>|Script|meraki.get.data|
-|Meraki: Data item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|meraki.get.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get data|<p>Item for gathering all the organizations and devices from Meraki API.</p>|Script|meraki.get.data|
+|Data item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|meraki.get.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Meraki: There are errors in 'Get data' metric||`length(last(/Cisco Meraki dashboard by HTTP/meraki.get.data.errors))>0`|Warning||
+|There are errors in 'Get data' metric||`length(last(/Cisco Meraki dashboard by HTTP/meraki.get.data.errors))>0`|Warning||
 
 ### LLD rule Organizations discovery
 
@@ -112,45 +112,45 @@ Set filters with macros if you want to override default filter parameters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Meraki: Get list of the networks|<p>Item for gathering all the networks of organization from Meraki API.</p>|Script|meraki.get.networks|
-|Meraki: Networks item errors|<p>Item for gathering all the networks item errors.</p>|Dependent item|meraki.get.networks.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Meraki: Get list of the VPN stats|<p>Item for gathering all the VPN stats of the organization.</p>|Script|meraki.get.vpn.stats|
-|Meraki: VPN item errors|<p>Item for gathering all the VPN item errors.</p>|Dependent item|meraki.get.vpn.stats.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Meraki: Get list of configuration changes|<p>Item for viewing the change log for your organization. Gathering once per 20m by default.</p>|HTTP agent|meraki.get.configuration.changes<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
-|Meraki: Get list of adaptive policy aggregate statistics|<p>Item for adaptive policy aggregate statistics for the organization.</p>|HTTP agent|meraki.get.adaptive.policy|
-|Meraki: Groups|<p>Meraki adaptive policy groups count.</p>|Dependent item|meraki.policies.groups<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.groups`</p></li></ul>|
-|Meraki: Custom ACLs|<p>Meraki adaptive policy custom ACLs count.</p>|Dependent item|meraki.policies.custom.acls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.customAcls`</p></li></ul>|
-|Meraki: Policies|<p>Meraki adaptive policies count.</p>|Dependent item|meraki.policies<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.policies`</p></li></ul>|
-|Meraki: Allow policies|<p>Meraki adaptive allow policies count.</p>|Dependent item|meraki.policies.allow<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.allowPolicies`</p></li></ul>|
-|Meraki: Deny policies|<p>Meraki adaptive deny policies count.</p>|Dependent item|meraki.policies.deny<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.denyPolicies`</p></li></ul>|
-|Meraki: Get licenses overview|<p>Return overview of the license state for the organization.</p>|HTTP agent|meraki.get.licenses|
-|Meraki: License status|<p>Meraki license status.</p>|Dependent item|meraki.license.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Meraki: License expire|<p>Meraki license expire time, in seconds left.</p>|Dependent item|meraki.license.expire<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expirationDate`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Meraki: Get list licenses|<p>Return list of the licenses for the organization.</p>|Script|meraki.get.list.licenses|
-|Meraki: Get SAML SSO|<p>Return the enabled SAML SSO settings for the organization.</p>|HTTP agent|meraki.get.saml<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enabled`</p></li><li>Boolean to decimal</li></ul>|
-|Meraki: Get SAML roles|<p>Get list of the SAML roles for this organization.</p>|HTTP agent|meraki.get.saml.roles|
-|Meraki: Get admin's account|<p>Get list of the dashboard administrators in this organization.</p>|HTTP agent|meraki.get.admins|
-|Meraki: Get login security|<p>Return the login security settings for the organization.</p>|HTTP agent|meraki.get.login.security|
-|Meraki: Account lockout attempts|<p>Number of consecutive failed login attempts after which users' accounts will be locked.</p>|Dependent item|meraki.account.lockout.attempts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accountLockoutAttempts`</p></li></ul>|
-|Meraki: Idle timeout minutes|<p>Number of minutes users can remain idle before being logged out of their accounts.</p>|Dependent item|meraki.idle.timeout.minutes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idleTimeoutMinutes`</p></li></ul>|
-|Meraki: Number of different passwords|<p>Number of recent passwords that new password must be distinct from.</p>|Dependent item|meraki.login.num.different.passwords<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.numDifferentPasswords`</p></li></ul>|
-|Meraki: Password expiration days|<p>Number of days after which users will be forced to change their password.</p>|Dependent item|meraki.login.password.expiration.days<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.passwordExpirationDays`</p></li></ul>|
-|Meraki: Enforce account lockout|<p>Boolean indicating whether users' dashboard accounts will be locked out after a specified number of consecutive failed login attempts.</p>|Dependent item|meraki.login.enforce.account.lockout<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceAccountLockout`</p></li><li>Boolean to decimal</li></ul>|
-|Meraki: Enforce different passwords|<p>Boolean indicating whether users, when setting a new password, are forced to choose a new password that is different from any past passwords.</p>|Dependent item|meraki.login.enforce.different.passwords<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceDifferentPasswords`</p></li><li>Boolean to decimal</li></ul>|
-|Meraki: Enforce idle timeout|<p>Boolean indicating whether users will be logged out after being idle for the specified number of minutes.</p>|Dependent item|meraki.login.enforce.idle.timeout<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceIdleTimeout`</p></li><li>Boolean to decimal</li></ul>|
-|Meraki: Enforce login IP ranges|<p>Boolean indicating whether organization will restrict access to the dashboard (including the API) from certain IP addresses.</p>|Dependent item|meraki.login.enforce.login.ip.ranges<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceLoginIpRanges`</p></li><li>Boolean to decimal</li></ul>|
-|Meraki: Enforce password expiration|<p>Boolean indicating whether users are forced to change their password every X days.</p>|Dependent item|meraki.login.enforce.password.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforcePasswordExpiration`</p></li><li>Boolean to decimal</li></ul>|
-|Meraki: Enforce 2FA|<p>Boolean indicating whether users in this organization will be required to use an extra verification code when logging in to the dashboard. This code will be sent to their mobile phones via SMS or can be generated by the authenticator application.</p>|Dependent item|meraki.login.enforce.two.factor.auth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceTwoFactorAuth`</p></li><li>Boolean to decimal</li></ul>|
+|Get list of the networks|<p>Item for gathering all the networks of organization from Meraki API.</p>|Script|meraki.get.networks|
+|Networks item errors|<p>Item for gathering all the networks item errors.</p>|Dependent item|meraki.get.networks.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get list of the VPN stats|<p>Item for gathering all the VPN stats of the organization.</p>|Script|meraki.get.vpn.stats|
+|VPN item errors|<p>Item for gathering all the VPN item errors.</p>|Dependent item|meraki.get.vpn.stats.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get list of configuration changes|<p>Item for viewing the change log for your organization. Gathering once per 20m by default.</p>|HTTP agent|meraki.get.configuration.changes<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
+|Get list of adaptive policy aggregate statistics|<p>Item for adaptive policy aggregate statistics for the organization.</p>|HTTP agent|meraki.get.adaptive.policy|
+|Groups|<p>Meraki adaptive policy groups count.</p>|Dependent item|meraki.policies.groups<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.groups`</p></li></ul>|
+|Custom ACLs|<p>Meraki adaptive policy custom ACLs count.</p>|Dependent item|meraki.policies.custom.acls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.customAcls`</p></li></ul>|
+|Policies|<p>Meraki adaptive policies count.</p>|Dependent item|meraki.policies<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.policies`</p></li></ul>|
+|Allow policies|<p>Meraki adaptive allow policies count.</p>|Dependent item|meraki.policies.allow<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.allowPolicies`</p></li></ul>|
+|Deny policies|<p>Meraki adaptive deny policies count.</p>|Dependent item|meraki.policies.deny<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.denyPolicies`</p></li></ul>|
+|Get licenses overview|<p>Return overview of the license state for the organization.</p>|HTTP agent|meraki.get.licenses|
+|License status|<p>Meraki license status.</p>|Dependent item|meraki.license.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|License expire|<p>Meraki license expire time, in seconds left.</p>|Dependent item|meraki.license.expire<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expirationDate`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get list licenses|<p>Return list of the licenses for the organization.</p>|Script|meraki.get.list.licenses|
+|Get SAML SSO|<p>Return the enabled SAML SSO settings for the organization.</p>|HTTP agent|meraki.get.saml<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enabled`</p></li><li>Boolean to decimal</li></ul>|
+|Get SAML roles|<p>Get list of the SAML roles for this organization.</p>|HTTP agent|meraki.get.saml.roles|
+|Get admin's account|<p>Get list of the dashboard administrators in this organization.</p>|HTTP agent|meraki.get.admins|
+|Get login security|<p>Return the login security settings for the organization.</p>|HTTP agent|meraki.get.login.security|
+|Account lockout attempts|<p>Number of consecutive failed login attempts after which users' accounts will be locked.</p>|Dependent item|meraki.account.lockout.attempts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accountLockoutAttempts`</p></li></ul>|
+|Idle timeout minutes|<p>Number of minutes users can remain idle before being logged out of their accounts.</p>|Dependent item|meraki.idle.timeout.minutes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idleTimeoutMinutes`</p></li></ul>|
+|Number of different passwords|<p>Number of recent passwords that new password must be distinct from.</p>|Dependent item|meraki.login.num.different.passwords<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.numDifferentPasswords`</p></li></ul>|
+|Password expiration days|<p>Number of days after which users will be forced to change their password.</p>|Dependent item|meraki.login.password.expiration.days<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.passwordExpirationDays`</p></li></ul>|
+|Enforce account lockout|<p>Boolean indicating whether users' dashboard accounts will be locked out after a specified number of consecutive failed login attempts.</p>|Dependent item|meraki.login.enforce.account.lockout<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceAccountLockout`</p></li><li>Boolean to decimal</li></ul>|
+|Enforce different passwords|<p>Boolean indicating whether users, when setting a new password, are forced to choose a new password that is different from any past passwords.</p>|Dependent item|meraki.login.enforce.different.passwords<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceDifferentPasswords`</p></li><li>Boolean to decimal</li></ul>|
+|Enforce idle timeout|<p>Boolean indicating whether users will be logged out after being idle for the specified number of minutes.</p>|Dependent item|meraki.login.enforce.idle.timeout<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceIdleTimeout`</p></li><li>Boolean to decimal</li></ul>|
+|Enforce login IP ranges|<p>Boolean indicating whether organization will restrict access to the dashboard (including the API) from certain IP addresses.</p>|Dependent item|meraki.login.enforce.login.ip.ranges<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceLoginIpRanges`</p></li><li>Boolean to decimal</li></ul>|
+|Enforce password expiration|<p>Boolean indicating whether users are forced to change their password every X days.</p>|Dependent item|meraki.login.enforce.password.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforcePasswordExpiration`</p></li><li>Boolean to decimal</li></ul>|
+|Enforce 2FA|<p>Boolean indicating whether users in this organization will be required to use an extra verification code when logging in to the dashboard. This code will be sent to their mobile phones via SMS or can be generated by the authenticator application.</p>|Dependent item|meraki.login.enforce.two.factor.auth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceTwoFactorAuth`</p></li><li>Boolean to decimal</li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Meraki: There are errors in 'Get networks' metric||`length(last(/Cisco Meraki organization by HTTP/meraki.get.networks.errors))>0`|Warning||
-|Meraki: There are errors in 'Get VPNs' metric||`length(last(/Cisco Meraki organization by HTTP/meraki.get.vpn.stats.errors))>0`|Warning||
-|Meraki: Configuration has been changed||`length(last(/Cisco Meraki organization by HTTP/meraki.get.configuration.changes))>3`|Warning||
-|Meraki: License status is not OK||`last(/Cisco Meraki organization by HTTP/meraki.license.status)<>1`|Warning||
-|Meraki: License expires in less than {$MERAKI.LICENSE.EXPIRE} seconds||`last(/Cisco Meraki organization by HTTP/meraki.license.expire)<{$MERAKI.LICENSE.EXPIRE} and last(/Cisco Meraki organization by HTTP/meraki.license.expire)>=0`|Warning||
+|There are errors in 'Get networks' metric||`length(last(/Cisco Meraki organization by HTTP/meraki.get.networks.errors))>0`|Warning||
+|There are errors in 'Get VPNs' metric||`length(last(/Cisco Meraki organization by HTTP/meraki.get.vpn.stats.errors))>0`|Warning||
+|Configuration has been changed||`length(last(/Cisco Meraki organization by HTTP/meraki.get.configuration.changes))>3`|Warning||
+|License status is not OK||`last(/Cisco Meraki organization by HTTP/meraki.license.status)<>1`|Warning||
+|License expires in less than {$MERAKI.LICENSE.EXPIRE} seconds||`last(/Cisco Meraki organization by HTTP/meraki.license.expire)<{$MERAKI.LICENSE.EXPIRE} and last(/Cisco Meraki organization by HTTP/meraki.license.expire)>=0`|Warning||
 
 ### LLD rule Uplinks discovery
 
@@ -306,18 +306,18 @@ Set filters with macros if you want to override default filter parameters.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Meraki: Get device data|<p>Item for gathering device data from Meraki API.</p>|Script|meraki.get.device|
-|Meraki: Device data item errors|<p>Item for gathering errors of the device item.</p>|Dependent item|meraki.get.device.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Meraki: Get status|<p>Item for gathering device status from Meraki API.</p>|HTTP agent|meraki.device.get.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[0]`</p></li></ul>|
-|Meraki: status|<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Meraki: public IP|<p>Device public IP</p><p>Network: {$NETWORK.ID}</p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.public.ip<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.publicIp`</p></li></ul>|
+|Get device data|<p>Item for gathering device data from Meraki API.</p>|Script|meraki.get.device|
+|Device data item errors|<p>Item for gathering errors of the device item.</p>|Dependent item|meraki.get.device.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get status|<p>Item for gathering device status from Meraki API.</p>|HTTP agent|meraki.device.get.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[0]`</p></li></ul>|
+|status|<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|public IP|<p>Device public IP</p><p>Network: {$NETWORK.ID}</p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.public.ip<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.publicIp`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Meraki: There are errors in 'Get device data' metric||`length(last(/Cisco Meraki device by HTTP/meraki.get.device.errors))>0`|Warning||
-|Meraki: Status is not online||`last(/Cisco Meraki device by HTTP/meraki.device.status)<>1`|Warning||
+|There are errors in 'Get device data' metric||`length(last(/Cisco Meraki device by HTTP/meraki.get.device.errors))>0`|Warning||
+|Status is not online||`last(/Cisco Meraki device by HTTP/meraki.device.status)<>1`|Warning||
 
 ### LLD rule Uplinks loss and quality discovery
 

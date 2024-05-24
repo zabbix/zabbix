@@ -11,7 +11,6 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -82,14 +81,14 @@ class BinaryValueGet extends CController {
 					'itemids' => [$db_item[0]['itemid']]
 				]);
 
-				If ($preview == 1) {
+				if ($preview == 1) {
 					if ($history_value) {
-						$image = imagecreatefromstring(base64_decode($history_value[0]['value']));
+						$image = @imagecreatefromstring(base64_decode($history_value[0]['value']));
 
 						if ($image) {
 							ob_start();
 
-							imagepng($preview == 1 ? imageThumb($image, 0, 112) : $image);
+							imagepng(imageThumb($image, 0, 112));
 
 							$result['thumbnail'] = base64_encode(ob_get_clean());
 						}

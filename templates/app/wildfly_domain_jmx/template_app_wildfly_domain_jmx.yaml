@@ -22,7 +22,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: aa30358b46024aef8fa2e3ba387c4fb9
-          name: 'WildFly: Uptime'
+          name: Uptime
           type: JMX
           key: 'jmx["java.lang:type=Runtime","Uptime"]'
           history: 7d
@@ -50,7 +50,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 5c0653e99ddb4f26ae12ce4d6ce9892c
-          name: 'WildFly: Launch type'
+          name: 'Launch type'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","launchType"]'
           history: 7d
@@ -68,7 +68,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 5412059106e844ae89f6f84b4da42388
-          name: 'WildFly: Name'
+          name: Name
           type: JMX
           key: 'jmx["jboss.as:management-root=server","name"]'
           history: 7d
@@ -88,7 +88,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: d5e2f5e277874567a5d46196fd032298
-          name: 'WildFly: Process type'
+          name: 'Process type'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","processType"]'
           history: 7d
@@ -106,7 +106,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: f1bb15824f384e21bb9ae1224abd18e0
-          name: 'WildFly: Version'
+          name: Version
           type: JMX
           key: 'jmx["jboss.as:management-root=server","productVersion"]'
           history: 7d

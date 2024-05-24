@@ -34,7 +34,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: f0a3f0b82e32488aa22929fe035825cb
-          name: 'Cisco IOS: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -48,14 +48,14 @@ zabbix_export:
           triggers:
             - uuid: 77e52d690bc043e389ad8d705dbb86b9
               expression: 'max(/Cisco IOS by SNMP/icmpping,#3)=0'
-              name: 'Cisco IOS: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 0c081f94e6094ad29e1fbc2a3424bedb
-          name: 'Cisco IOS: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -69,11 +69,11 @@ zabbix_export:
           triggers:
             - uuid: 62b3c0a2654f4372a1bad40a0fd2898d
               expression: 'min(/Cisco IOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco IOS by SNMP/icmppingloss,5m)<100'
-              name: 'Cisco IOS: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -81,7 +81,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: dab9ef1df04d403faa4910bf51559035
-          name: 'Cisco IOS: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -95,14 +95,14 @@ zabbix_export:
           triggers:
             - uuid: 1ba34b5e344147d5b27431906037bc04
               expression: 'avg(/Cisco IOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Cisco IOS: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Cisco IOS: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Cisco IOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco IOS by SNMP/icmppingloss,5m)<100'
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -170,7 +170,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8684622dc8d446f0b17ba7687d47b09d
-          name: 'Cisco IOS: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -183,7 +183,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 622767f4dbab49039c63990e4fc58eaa
-          name: 'Cisco IOS: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -220,7 +220,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: ae8e0ecf937c4a9492fe67cc5cd07d6f
-          name: 'Cisco IOS: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -241,7 +241,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a8062a554b8d447f81f7b9ef3229c7e9
-          name: 'Cisco IOS: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.1
           key: system.hw.model
@@ -259,7 +259,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 223fd2fe9699419c824ae310f1c8a631
-          name: 'Cisco IOS: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
           key: system.hw.serialnumber
@@ -279,8 +279,8 @@ zabbix_export:
           triggers:
             - uuid: 7d1460eaf7ad46fd8a1b5df3c20051ba
               expression: 'last(/Cisco IOS by SNMP/system.hw.serialnumber,#1)<>last(/Cisco IOS by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco IOS by SNMP/system.hw.serialnumber))>0'
-              name: 'Cisco IOS: Device has been replaced'
-              event_name: 'Cisco IOS: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -302,7 +302,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f2173cd0262d4a60b5e134e00fed78e6
-          name: 'Cisco IOS: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -326,7 +326,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 361ca9979352405a9dfb9bc13e542a2f
-          name: 'Cisco IOS: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -346,7 +346,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2ddace242ffe487a8641e035cf04dcdd
-          name: 'Cisco IOS: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -368,8 +368,8 @@ zabbix_export:
           triggers:
             - uuid: 2105744d4efd4a239c5b6ab615746a40
               expression: 'last(/Cisco IOS by SNMP/system.name,#1)<>last(/Cisco IOS by SNMP/system.name,#2) and length(last(/Cisco IOS by SNMP/system.name))>0'
-              name: 'Cisco IOS: System name has changed'
-              event_name: 'Cisco IOS: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -379,7 +379,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: fe1dbb23a8794ce9ae3f6c37e63082f8
-          name: 'Cisco IOS: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -398,7 +398,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 290d095f8fbc4cd1aa5ed3d304434f4b
-          name: 'Cisco IOS: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -417,7 +417,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5fe7bc2d46a748d3ace7d1dd0de8127b
-          name: 'Cisco IOS: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.sw.os[sysDescr.0]'
@@ -441,12 +441,12 @@ zabbix_export:
           triggers:
             - uuid: 2d97173405594074bfe2cc6f3d0cae70
               expression: 'last(/Cisco IOS by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco IOS by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Cisco IOS by SNMP/system.sw.os[sysDescr.0]))>0'
-              name: 'Cisco IOS: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Cisco IOS: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Cisco IOS by SNMP/system.name,#1)<>last(/Cisco IOS by SNMP/system.name,#2) and length(last(/Cisco IOS by SNMP/system.name))>0'
               tags:
                 - tag: scope
@@ -467,7 +467,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: cf9bd75166704b2f93446ece0c2d0fab
-          name: 'Cisco IOS: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -487,12 +487,12 @@ zabbix_export:
           triggers:
             - uuid: df7c9ed5d3164e73a792f82ecad6ba13
               expression: 'max(/Cisco IOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Cisco IOS: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -2338,7 +2338,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: bf6d81068770410a929c127d8e7d76c1
-          name: 'Cisco IOS: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -2352,14 +2352,14 @@ zabbix_export:
           triggers:
             - uuid: fd317d3e8d3d45bf97322b8578f30c04
               expression: 'max(/Cisco IOS prior to 12.0_3_T by SNMP/icmpping,#3)=0'
-              name: 'Cisco IOS: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 2af7b5f79fc44d7d992b0bf6277c12bb
-          name: 'Cisco IOS: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -2373,11 +2373,11 @@ zabbix_export:
           triggers:
             - uuid: 3576c96601ef40abbeedbde11768141a
               expression: 'min(/Cisco IOS prior to 12.0_3_T by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco IOS prior to 12.0_3_T by SNMP/icmppingloss,5m)<100'
-              name: 'Cisco IOS: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS prior to 12.0_3_T by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -2385,7 +2385,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 1afa1e8ca21c430598845806bbf0e7a2
-          name: 'Cisco IOS: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -2399,14 +2399,14 @@ zabbix_export:
           triggers:
             - uuid: 2941d30058b14d52bd9a723889c8be26
               expression: 'avg(/Cisco IOS prior to 12.0_3_T by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Cisco IOS: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Cisco IOS: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Cisco IOS prior to 12.0_3_T by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco IOS prior to 12.0_3_T by SNMP/icmppingloss,5m)<100'
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS prior to 12.0_3_T by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -2450,7 +2450,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 53eb0288c9e54490942cedd4ce5f376e
-          name: 'Cisco IOS: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -2463,7 +2463,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: bba5be8b3fa54bfbb354b7a2c20fd353
-          name: 'Cisco IOS: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -2483,7 +2483,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 693b0c779f574d869f47b44c4b3ecd58
-          name: 'Cisco IOS: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.9.2.1.58
           key: 'system.cpu.util[avgBusy5]'
@@ -2501,8 +2501,8 @@ zabbix_export:
           triggers:
             - uuid: 74773fc279864e7daf89cffe9cb2067c
               expression: 'min(/Cisco IOS prior to 12.0_3_T by SNMP/system.cpu.util[avgBusy5],5m)>{$CPU.UTIL.CRIT}'
-              name: 'Cisco IOS: High CPU utilization'
-              event_name: 'Cisco IOS: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -2510,7 +2510,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 495b26e876a04819a02cf22eaba04e0b
-          name: 'Cisco IOS: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -2531,7 +2531,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b5121a382d0245f0906bba4530a82ac4
-          name: 'Cisco IOS: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.1
           key: system.hw.model
@@ -2549,7 +2549,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5934a35b54464f66ab19152ca393b882
-          name: 'Cisco IOS: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
           key: system.hw.serialnumber
@@ -2569,8 +2569,8 @@ zabbix_export:
           triggers:
             - uuid: d53c0d22a67544cf8a2fcd2c8de4d4eb
               expression: 'last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.serialnumber,#1)<>last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.serialnumber))>0'
-              name: 'Cisco IOS: Device has been replaced'
-              event_name: 'Cisco IOS: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -2592,7 +2592,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 732ccfd809b44d7fa923c54e6577851d
-          name: 'Cisco IOS: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -2616,7 +2616,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 30df666e80bd4875ac761306781061da
-          name: 'Cisco IOS: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -2636,7 +2636,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2e55e75a7baa4195b012e750bac90dcb
-          name: 'Cisco IOS: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -2658,8 +2658,8 @@ zabbix_export:
           triggers:
             - uuid: 33b42b1aa448408fa3fb5aadf7375cf8
               expression: 'last(/Cisco IOS prior to 12.0_3_T by SNMP/system.name,#1)<>last(/Cisco IOS prior to 12.0_3_T by SNMP/system.name,#2) and length(last(/Cisco IOS prior to 12.0_3_T by SNMP/system.name))>0'
-              name: 'Cisco IOS: System name has changed'
-              event_name: 'Cisco IOS: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -2669,7 +2669,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 7ecd28b73c0f43a98c3a58467b1cbdc7
-          name: 'Cisco IOS: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -2688,7 +2688,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: cc6e5a6e4f604b639815d9397264c6af
-          name: 'Cisco IOS: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -2707,7 +2707,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 70ef7ce7561640b7bc6b5d30235c0ecc
-          name: 'Cisco IOS: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.sw.os[sysDescr.0]'
@@ -2731,12 +2731,12 @@ zabbix_export:
           triggers:
             - uuid: abe57415ff574b878a2ce2a318be86ee
               expression: 'last(/Cisco IOS prior to 12.0_3_T by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco IOS prior to 12.0_3_T by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Cisco IOS prior to 12.0_3_T by SNMP/system.sw.os[sysDescr.0]))>0'
-              name: 'Cisco IOS: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Cisco IOS: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Cisco IOS prior to 12.0_3_T by SNMP/system.name,#1)<>last(/Cisco IOS prior to 12.0_3_T by SNMP/system.name,#2) and length(last(/Cisco IOS prior to 12.0_3_T by SNMP/system.name))>0'
               tags:
                 - tag: scope
@@ -2757,7 +2757,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5a156e9ca10c49bbb87cf3de1b686cff
-          name: 'Cisco IOS: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -2777,12 +2777,12 @@ zabbix_export:
           triggers:
             - uuid: 86d8603903504287b07a25530c8eda2b
               expression: 'max(/Cisco IOS prior to 12.0_3_T by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Cisco IOS: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS prior to 12.0_3_T by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -3326,7 +3326,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: a94e2b40f0e14bdfb70e66127f8d946b
-          name: 'Cisco IOS: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -3340,14 +3340,14 @@ zabbix_export:
           triggers:
             - uuid: f6fae61d08644d5fa3929f526aee34e4
               expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmpping,#3)=0'
-              name: 'Cisco IOS: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 39baf182f6724813a951b25f6ff5aab4
-          name: 'Cisco IOS: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -3361,11 +3361,11 @@ zabbix_export:
           triggers:
             - uuid: 5c7eae9701be4661a34bbcdb99c094fe
               expression: 'min(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmppingloss,5m)<100'
-              name: 'Cisco IOS: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -3373,7 +3373,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 85748657f67e45189256e7704c6e7a9c
-          name: 'Cisco IOS: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -3387,14 +3387,14 @@ zabbix_export:
           triggers:
             - uuid: 9aebe4a1cfa34c5d92178abc8a6ce06e
               expression: 'avg(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Cisco IOS: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Cisco IOS: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmppingloss,5m)<100'
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -3450,7 +3450,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0f50837172ad475d9d5a27c95be19ab2
-          name: 'Cisco IOS: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -3463,7 +3463,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 22406c415a0a4f6bbd9d44707631f42c
-          name: 'Cisco IOS: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -3500,7 +3500,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 5a37d2e4f308475c932a6bb856d0ffb4
-          name: 'Cisco IOS: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -3521,7 +3521,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 12b69d0a3b844906a950bcedcbb8b9b8
-          name: 'Cisco IOS: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.1
           key: system.hw.model
@@ -3539,7 +3539,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 991021da67c84f96a76154078c45f3be
-          name: 'Cisco IOS: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
           key: system.hw.serialnumber
@@ -3559,8 +3559,8 @@ zabbix_export:
           triggers:
             - uuid: 78723249679b4a288861f4ad8621fd77
               expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.serialnumber,#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.serialnumber))>0'
-              name: 'Cisco IOS: Device has been replaced'
-              event_name: 'Cisco IOS: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -3582,7 +3582,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 927d85dbb82f4b9a9edf4fb6194e7427
-          name: 'Cisco IOS: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -3606,7 +3606,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d8ed796e88f3478ea72d95ddcc68f9ed
-          name: 'Cisco IOS: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -3626,7 +3626,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a26d3babf5674a5e9d9afff94518e6c6
-          name: 'Cisco IOS: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -3648,8 +3648,8 @@ zabbix_export:
           triggers:
             - uuid: 3e09d5d308e449a4974393650b33e64d
               expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.name,#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.name,#2) and length(last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.name))>0'
-              name: 'Cisco IOS: System name has changed'
-              event_name: 'Cisco IOS: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -3659,7 +3659,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 182fd7bfd7b74331b9f3cf8f4a7646cb
-          name: 'Cisco IOS: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -3678,7 +3678,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: da41d408448d4b1aa323e0046ff97598
-          name: 'Cisco IOS: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -3697,7 +3697,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: cf4af497970a415aa45aa66b2ba48115
-          name: 'Cisco IOS: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.sw.os[sysDescr.0]'
@@ -3721,12 +3721,12 @@ zabbix_export:
           triggers:
             - uuid: df85813bb6af4accab8d5191cd452329
               expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.sw.os[sysDescr.0]))>0'
-              name: 'Cisco IOS: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Cisco IOS: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.name,#1)<>last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.name,#2) and length(last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.name))>0'
               tags:
                 - tag: scope
@@ -3747,7 +3747,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 92fa54c5c28b4244b0d22c9041064d15
-          name: 'Cisco IOS: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -3767,12 +3767,12 @@ zabbix_export:
           triggers:
             - uuid: 778749b260bb45c3a926d6bb49c07257
               expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Cisco IOS: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Cisco IOS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -5516,39 +5516,39 @@ zabbix_export:
   triggers:
     - uuid: b98092ddf87247ff91710e2f310dbfb9
       expression: '(last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco IOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco IOS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Cisco IOS: Host has been restarted'
-      event_name: 'Cisco IOS: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Cisco IOS: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Cisco IOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope
           value: notice
     - uuid: f278b8b4eb784107a6d8d3e8437e8a66
       expression: '(last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco IOS prior to 12.0_3_T by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco IOS prior to 12.0_3_T by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Cisco IOS: Host has been restarted'
-      event_name: 'Cisco IOS: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Cisco IOS: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Cisco IOS prior to 12.0_3_T by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope
           value: notice
     - uuid: 806f54999d064eb68a3f46a0d84ee4df
       expression: '(last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Cisco IOS: Host has been restarted'
-      event_name: 'Cisco IOS: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Cisco IOS: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

@@ -34,7 +34,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 7b2fe9a7ee164718933eb456b0068fea
-          name: 'Azure: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.get.errors
           delay: '0'
@@ -57,7 +57,7 @@ zabbix_export:
           triggers:
             - uuid: 502cb582546046a29267715763c46bff
               expression: 'length(last(/Azure by HTTP/azure.get.errors))>0'
-              name: 'Azure: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -65,7 +65,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: fb6abf3631b240b08357ea9ce9ba89a4
-          name: 'Azure: Get resources'
+          name: 'Get resources'
           type: SCRIPT
           key: azure.get.resources
           delay: 10m
@@ -247,7 +247,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 91b2290d65b949ad9ea801763c35cf40
-          name: 'Azure: Get storage accounts'
+          name: 'Get storage accounts'
           type: SCRIPT
           key: azure.get.storage.acc
           delay: 10m
@@ -387,7 +387,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2e425a9ef8d34ea68f7998ceed30ebc4
-          name: 'Azure: Get storage accounts errors'
+          name: 'Get storage accounts errors'
           type: DEPENDENT
           key: azure.get.storage.acc.errors
           delay: '0'
@@ -411,12 +411,12 @@ zabbix_export:
           triggers:
             - uuid: 253f0835cd134d2591bb2be1b9dc9b29
               expression: 'length(last(/Azure by HTTP/azure.get.storage.acc.errors))>0'
-              name: 'Azure: There are errors in storages requests to API'
+              name: 'There are errors in storages requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
               dependencies:
-                - name: 'Azure: There are errors in requests to API'
+                - name: 'There are errors in requests to API'
                   expression: 'length(last(/Azure by HTTP/azure.get.errors))>0'
               tags:
                 - tag: scope
@@ -846,7 +846,7 @@ zabbix_export:
           description: 'The list of all storage accounts available under the subscription.'
           item_prototypes:
             - uuid: 3361508a601748f5aca339f952430889
-              name: 'Azure: Storage account [{#NAME}]: Get data'
+              name: 'Storage account [{#NAME}]: Get data'
               type: SCRIPT
               key: 'azure.get.storage.acc[{#NAME}]'
               history: '0'
@@ -959,7 +959,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 08ce66b39b084182bdb60a5556b88c88
-              name: 'Azure: Storage account [{#NAME}]: Availability'
+              name: 'Storage account [{#NAME}]: Availability'
               type: DEPENDENT
               key: 'azure.storage.availability[{#NAME}]'
               delay: '0'
@@ -990,15 +990,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6a0b3edebded4d848ad76f86f8152377
                   expression: '(min(/Azure by HTTP/azure.storage.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}'
-                  name: 'Azure: Storage account [{#NAME}]: Availability is low'
-                  event_name: 'Azure: Storage account [{#NAME} availability is too low (less than {$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}%)'
+                  name: 'Storage account [{#NAME}]: Availability is low'
+                  event_name: 'Storage account [{#NAME} availability is too low (less than {$AZURE.STORAGE.ACC.AVAILABILITY:"{#NAME}"}%)'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 9ae0af76a37047f5ba84de2f43dfb5c4
-              name: 'Azure: Storage account [{#NAME}]: Blob Availability'
+              name: 'Storage account [{#NAME}]: Blob Availability'
               type: DEPENDENT
               key: 'azure.storage.blob.availability[{#NAME}]'
               delay: '0'
@@ -1029,15 +1029,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 4cd8ac56b50c4120bf9de56bb1f06245
                   expression: '(min(/Azure by HTTP/azure.storage.blob.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}'
-                  name: 'Azure: Storage account [{#NAME}]: Blob Availability is low'
-                  event_name: 'Azure: Storage account [{#NAME} blob availability are too low (less than {$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}%)'
+                  name: 'Storage account [{#NAME}]: Blob Availability is low'
+                  event_name: 'Storage account [{#NAME} blob availability are too low (less than {$AZURE.STORAGE.ACC.BLOB.AVAILABILITY:"{#NAME}"}%)'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: availability
             - uuid: c6437ade4fee44f783ab379fb179508d
-              name: 'Azure: Storage account [{#NAME}]: Blob Capacity'
+              name: 'Storage account [{#NAME}]: Blob Capacity'
               type: DEPENDENT
               key: 'azure.storage.blob.capacity[{#NAME}]'
               delay: '0'
@@ -1063,7 +1063,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 707be15f02a141548ce5f89097c303a0
-              name: 'Azure: Storage account [{#NAME}]: Blob Container Count'
+              name: 'Storage account [{#NAME}]: Blob Container Count'
               type: DEPENDENT
               key: 'azure.storage.blob.container.count[{#NAME}]'
               delay: '0'
@@ -1087,7 +1087,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 9bd8b8f1b5844298a245d449548de46e
-              name: 'Azure: Storage account [{#NAME}]: Blob Count'
+              name: 'Storage account [{#NAME}]: Blob Count'
               type: DEPENDENT
               key: 'azure.storage.blob.count[{#NAME}]'
               delay: '0'
@@ -1111,7 +1111,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: ae28bbd289644619b20b1907212d8293
-              name: 'Azure: Storage account [{#NAME}]: Blob Egress'
+              name: 'Storage account [{#NAME}]: Blob Egress'
               type: DEPENDENT
               key: 'azure.storage.blob.engress[{#NAME}]'
               delay: '0'
@@ -1139,7 +1139,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 8e73a2aba92444dd9c02c6f94227a4e5
-              name: 'Azure: Storage account [{#NAME}]: Blob Index Capacity'
+              name: 'Storage account [{#NAME}]: Blob Index Capacity'
               type: DEPENDENT
               key: 'azure.storage.blob.index.capacity[{#NAME}]'
               delay: '0'
@@ -1165,7 +1165,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: ff40325efb174839bef7bc775049837e
-              name: 'Azure: Storage account [{#NAME}]: Blob Ingress'
+              name: 'Storage account [{#NAME}]: Blob Ingress'
               type: DEPENDENT
               key: 'azure.storage.blob.ingress[{#NAME}]'
               delay: '0'
@@ -1191,7 +1191,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: e17d6f2ed79c4b5eaa54730c82d6840f
-              name: 'Azure: Storage account [{#NAME}]: Blob Success E2E Latency'
+              name: 'Storage account [{#NAME}]: Blob Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.blob.success.e2e.latency[{#NAME}]'
               delay: '0'
@@ -1222,7 +1222,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 727fb792fe5c4229995f7aa5bbb681ed
-              name: 'Azure: Storage account [{#NAME}]: Blob Success Server Latency'
+              name: 'Storage account [{#NAME}]: Blob Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.blob.success.server.latency[{#NAME}]'
               delay: '0'
@@ -1253,7 +1253,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 48ecb880def34474b73a03eb895db3ea
-              name: 'Azure: Storage account [{#NAME}]: Blob Transactions'
+              name: 'Storage account [{#NAME}]: Blob Transactions'
               type: DEPENDENT
               key: 'azure.storage.blob.transactions[{#NAME}]'
               delay: '0'
@@ -1280,7 +1280,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 4198807e1e08439a9009481ddcfd3bab
-              name: 'Azure: Storage account [{#NAME}]: Egress'
+              name: 'Storage account [{#NAME}]: Egress'
               type: DEPENDENT
               key: 'azure.storage.engress[{#NAME}]'
               delay: '0'
@@ -1308,7 +1308,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 43069f165849449d8403d1a8c82fe634
-              name: 'Azure: Storage account [{#NAME}]: File Capacity'
+              name: 'Storage account [{#NAME}]: File Capacity'
               type: DEPENDENT
               key: 'azure.storage.file.capacity[{#NAME}]'
               delay: '0'
@@ -1334,7 +1334,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 3483741c11a141c2866ea58a74a91135
-              name: 'Azure: Storage account [{#NAME}]: File Count'
+              name: 'Storage account [{#NAME}]: File Count'
               type: DEPENDENT
               key: 'azure.storage.file.count[{#NAME}]'
               delay: '0'
@@ -1358,7 +1358,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 7f6d01573bf24d9889f41a14cb581075
-              name: 'Azure: Storage account [{#NAME}]: File Egress'
+              name: 'Storage account [{#NAME}]: File Egress'
               type: DEPENDENT
               key: 'azure.storage.file.engress[{#NAME}]'
               delay: '0'
@@ -1386,7 +1386,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 9f9b6772f9d9478ba3be3a93c5408ba2
-              name: 'Azure: Storage account [{#NAME}]: File Ingress'
+              name: 'Storage account [{#NAME}]: File Ingress'
               type: DEPENDENT
               key: 'azure.storage.file.ingress[{#NAME}]'
               delay: '0'
@@ -1412,7 +1412,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 4cb60e5473ce46a08bc962dc97c1f4db
-              name: 'Azure: Storage account [{#NAME}]: File Share Capacity Quota'
+              name: 'Storage account [{#NAME}]: File Share Capacity Quota'
               type: DEPENDENT
               key: 'azure.storage.file.share.capacity.quota[{#NAME}]'
               delay: '0'
@@ -1437,7 +1437,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 220673a2e99a4108b034d04d79108231
-              name: 'Azure: Storage account [{#NAME}]: File Share Count'
+              name: 'Storage account [{#NAME}]: File Share Count'
               type: DEPENDENT
               key: 'azure.storage.file.share.count[{#NAME}]'
               delay: '0'
@@ -1461,7 +1461,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 47c48f39b9744a92ac13e9db69f6e629
-              name: 'Azure: Storage account [{#NAME}]: File Share Snapshot Size'
+              name: 'Storage account [{#NAME}]: File Share Snapshot Size'
               type: DEPENDENT
               key: 'azure.storage.file.share.snapshot.size[{#NAME}]'
               delay: '0'
@@ -1486,7 +1486,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: f0394f8f2d55471c8ab557045349a6ec
-              name: 'Azure: Storage account [{#NAME}]: File Share Snapshot Count'
+              name: 'Storage account [{#NAME}]: File Share Snapshot Count'
               type: DEPENDENT
               key: 'azure.storage.file.shares.snapshot.count[{#NAME}]'
               delay: '0'
@@ -1510,7 +1510,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 431a6c51418d401697d105a0d9b62d23
-              name: 'Azure: Storage account [{#NAME}]: File Success E2E Latency'
+              name: 'Storage account [{#NAME}]: File Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.file.success.e2e.latency[{#NAME}]'
               delay: '0'
@@ -1541,7 +1541,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 43b6c0b948f64d9daada7aaac520c839
-              name: 'Azure: Storage account [{#NAME}]: File Success Server Latency'
+              name: 'Storage account [{#NAME}]: File Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.file.success.server.latency[{#NAME}]'
               delay: '0'
@@ -1572,7 +1572,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: ed4b7ac10368493ba01c7cbeffba3042
-              name: 'Azure: Storage account [{#NAME}]: File Transactions'
+              name: 'Storage account [{#NAME}]: File Transactions'
               type: DEPENDENT
               key: 'azure.storage.file.transactions[{#NAME}]'
               delay: '0'
@@ -1599,7 +1599,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: caeaa6805904471a8b18480f34ef9807
-              name: 'Azure: Storage account [{#NAME}]: Ingress'
+              name: 'Storage account [{#NAME}]: Ingress'
               type: DEPENDENT
               key: 'azure.storage.ingress[{#NAME}]'
               delay: '0'
@@ -1625,7 +1625,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: be8b82396ff243e8a52864069b192dea
-              name: 'Azure: Storage account [{#NAME}]: Queue Capacity'
+              name: 'Storage account [{#NAME}]: Queue Capacity'
               type: DEPENDENT
               key: 'azure.storage.queue.capacity[{#NAME}]'
               delay: '0'
@@ -1651,7 +1651,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 9174d372235e4d14a4896a79ddcbc051
-              name: 'Azure: Storage account [{#NAME}]: Queue Count'
+              name: 'Storage account [{#NAME}]: Queue Count'
               type: DEPENDENT
               key: 'azure.storage.queue.count[{#NAME}]'
               delay: '0'
@@ -1675,7 +1675,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: b8cff599c4194b4abd74f4a27ca93284
-              name: 'Azure: Storage account [{#NAME}]: Queue Egress'
+              name: 'Storage account [{#NAME}]: Queue Egress'
               type: DEPENDENT
               key: 'azure.storage.queue.engress[{#NAME}]'
               delay: '0'
@@ -1703,7 +1703,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 599f612c3cc64e81a53d507ae0078ab1
-              name: 'Azure: Storage account [{#NAME}]: Queue Ingress'
+              name: 'Storage account [{#NAME}]: Queue Ingress'
               type: DEPENDENT
               key: 'azure.storage.queue.ingress[{#NAME}]'
               delay: '0'
@@ -1729,7 +1729,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 70c7b436a03145c5ab694b3a20ac52b1
-              name: 'Azure: Storage account [{#NAME}]: Queue Message Count'
+              name: 'Storage account [{#NAME}]: Queue Message Count'
               type: DEPENDENT
               key: 'azure.storage.queue.message.count[{#NAME}]'
               delay: '0'
@@ -1753,7 +1753,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: eccdbf48412e4c28afc3bbf87c545cc2
-              name: 'Azure: Storage account [{#NAME}]: Queue Success E2E Latency'
+              name: 'Storage account [{#NAME}]: Queue Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.queue.success.e2e.latency[{#NAME}]'
               delay: '0'
@@ -1784,7 +1784,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 4d9aa2753d944690b01a23bcd44fd52d
-              name: 'Azure: Storage account [{#NAME}]: Queue Success Server Latency'
+              name: 'Storage account [{#NAME}]: Queue Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.queue.success.server.latency[{#NAME}]'
               delay: '0'
@@ -1815,7 +1815,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: e472739df4634b55be2466bd91af9886
-              name: 'Azure: Storage account [{#NAME}]: Queue Transactions'
+              name: 'Storage account [{#NAME}]: Queue Transactions'
               type: DEPENDENT
               key: 'azure.storage.queue.transactions[{#NAME}]'
               delay: '0'
@@ -1842,7 +1842,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 48437de0bdca4f5392c295ca8b82bd0a
-              name: 'Azure: Storage account [{#NAME}]: Success E2E Latency'
+              name: 'Storage account [{#NAME}]: Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.success.e2e.latency[{#NAME}]'
               delay: '0'
@@ -1873,7 +1873,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 7076dbfb45cd49828b96064aa892e8e4
-              name: 'Azure: Storage account [{#NAME}]: Success Server Latency'
+              name: 'Storage account [{#NAME}]: Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.success.server.latency[{#NAME}]'
               delay: '0'
@@ -1904,7 +1904,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 918f1d1c70964e7c9f5521cf99bbb21d
-              name: 'Azure: Storage account [{#NAME}]: Table Availability'
+              name: 'Storage account [{#NAME}]: Table Availability'
               type: DEPENDENT
               key: 'azure.storage.table.availability[{#NAME}]'
               delay: '0'
@@ -1935,15 +1935,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: bfb1e82685224048ba8082447cad57ca
                   expression: '(min(/Azure by HTTP/azure.storage.table.availability[{#NAME}],#3))<{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}'
-                  name: 'Azure: Storage account [{#NAME}]: Table Availability is low'
-                  event_name: 'Azure: Storage account [{#NAME} table availability is too low (less than {$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}%)'
+                  name: 'Storage account [{#NAME}]: Table Availability is low'
+                  event_name: 'Storage account [{#NAME} table availability is too low (less than {$AZURE.STORAGE.ACC.TABLE.AVAILABILITY:"{#NAME}"}%)'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: availability
             - uuid: ee19a3857a7a4650952eb855193991ee
-              name: 'Azure: Storage account [{#NAME}]: Table Capacity'
+              name: 'Storage account [{#NAME}]: Table Capacity'
               type: DEPENDENT
               key: 'azure.storage.table.capacity[{#NAME}]'
               delay: '0'
@@ -1969,7 +1969,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: a3d11321b1cc4c1b9c322c0a7162e76e
-              name: 'Azure: Storage account [{#NAME}]: Table Count'
+              name: 'Storage account [{#NAME}]: Table Count'
               type: DEPENDENT
               key: 'azure.storage.table.count[{#NAME}]'
               delay: '0'
@@ -1993,7 +1993,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: d75bd57fdd9f4377aea7c1e52a109c18
-              name: 'Azure: Storage account [{#NAME}]: Table Egress'
+              name: 'Storage account [{#NAME}]: Table Egress'
               type: DEPENDENT
               key: 'azure.storage.table.engress[{#NAME}]'
               delay: '0'
@@ -2021,7 +2021,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: f2911504457b4d329ae7cf7d7a24594a
-              name: 'Azure: Storage account [{#NAME}]: Table Entity Count'
+              name: 'Storage account [{#NAME}]: Table Entity Count'
               type: DEPENDENT
               key: 'azure.storage.table.entity.count[{#NAME}]'
               delay: '0'
@@ -2045,7 +2045,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 993ca2e5bcd74d27b19998d77f0abec8
-              name: 'Azure: Storage account [{#NAME}]: Table Ingress'
+              name: 'Storage account [{#NAME}]: Table Ingress'
               type: DEPENDENT
               key: 'azure.storage.table.ingress[{#NAME}]'
               delay: '0'
@@ -2071,7 +2071,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 00c441cc77f4447584d4bffbefc304e0
-              name: 'Azure: Storage account [{#NAME}]: Table Success E2E Latency'
+              name: 'Storage account [{#NAME}]: Table Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.table.success.e2e.latency[{#NAME}]'
               delay: '0'
@@ -2102,7 +2102,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: f29e3ad4be034f38932cb85654397926
-              name: 'Azure: Storage account [{#NAME}]: Table Success Server Latency'
+              name: 'Storage account [{#NAME}]: Table Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.table.success.server.latency[{#NAME}]'
               delay: '0'
@@ -2133,7 +2133,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 9ba25e87c5bb466a99855a9fb893283d
-              name: 'Azure: Storage account [{#NAME}]: Table Transactions'
+              name: 'Storage account [{#NAME}]: Table Transactions'
               type: DEPENDENT
               key: 'azure.storage.table.transactions[{#NAME}]'
               delay: '0'
@@ -2160,7 +2160,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 6f68f0d8a63640ffa549fde44e8fe56c
-              name: 'Azure: Storage account [{#NAME}]: Transactions'
+              name: 'Storage account [{#NAME}]: Transactions'
               type: DEPENDENT
               key: 'azure.storage.transactions[{#NAME}]'
               delay: '0'
@@ -2187,7 +2187,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#NAME}'
             - uuid: 08ef07d874db4823bd167482bf049916
-              name: 'Azure: Storage account [{#NAME}]: Used Capacity'
+              name: 'Storage account [{#NAME}]: Used Capacity'
               type: DEPENDENT
               key: 'azure.storage.used.capacity[{#NAME}]'
               delay: '0'
@@ -2608,7 +2608,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 9e247bdb17f44630b9440b59d5ef251b
-          name: 'Azure MongoDB: Autoscale max throughput'
+          name: 'Autoscale max throughput'
           type: DEPENDENT
           key: azure.cosmosdb.autoscale.max.throughput
           delay: '0'
@@ -2625,7 +2625,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 35a7d2c96990407f937e07fd160266a9
-          name: 'Azure MongoDB: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.cosmosdb.data.errors
           delay: '0'
@@ -2649,7 +2649,7 @@ zabbix_export:
           triggers:
             - uuid: dfd484aa8a4e4b759e4e34c5318c7176
               expression: 'length(last(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.data.errors))>0'
-              name: 'Azure MongoDB: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -2657,7 +2657,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 647faea1597c4da6a3cd78694be8e77e
-          name: 'Azure MongoDB: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: azure.cosmosdb.data.get
           history: '0'
@@ -2805,7 +2805,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 947a2eb530754a609fa81c59e29fe7b7
-          name: 'Azure MongoDB: Data usage'
+          name: 'Data usage'
           type: DEPENDENT
           key: azure.cosmosdb.data.usage
           delay: '0'
@@ -2823,7 +2823,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 0bf3da9168144016b663c9b8e76447fa
-          name: 'Azure MongoDB: Document count'
+          name: 'Document count'
           type: DEPENDENT
           key: azure.cosmosdb.document.count
           delay: '0'
@@ -2840,7 +2840,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7fa0f59f8cfa4d9e83086b203e4f71ea
-          name: 'Azure MongoDB: Document quota'
+          name: 'Document quota'
           type: DEPENDENT
           key: azure.cosmosdb.document.quota
           delay: '0'
@@ -2858,7 +2858,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b09f9445d960415185457b89b6a73452
-          name: 'Azure MongoDB: Index usage'
+          name: 'Index usage'
           type: DEPENDENT
           key: azure.cosmosdb.index.usage
           delay: '0'
@@ -2876,7 +2876,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: cd35f04b180542cda50dc5d4e979e54e
-          name: 'Azure MongoDB: Metadata requests'
+          name: 'Metadata requests'
           type: DEPENDENT
           key: azure.cosmosdb.metadata.requests
           delay: '0'
@@ -2895,7 +2895,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e42cf83e456a490295a84cfe9eb288ef
-          name: 'Azure MongoDB: Mongo requests'
+          name: 'Mongo requests'
           type: DEPENDENT
           key: azure.cosmosdb.mongo.requests
           delay: '0'
@@ -2912,7 +2912,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 8fd4068986af444799ae64c6bc8f16a6
-          name: 'Azure MongoDB: Mongo request charge'
+          name: 'Mongo request charge'
           type: DEPENDENT
           key: azure.cosmosdb.mongo.requests.charge
           delay: '0'
@@ -2929,7 +2929,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: fda6b39ce6ef4b8c8418b2e123ecdd17
-          name: 'Azure MongoDB: Normalized RU consumption'
+          name: 'Normalized RU consumption'
           type: DEPENDENT
           key: azure.cosmosdb.normalized.ru.consumption
           delay: '0'
@@ -2947,7 +2947,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: be6800214a0443e899c40f8a4b6c3f21
-          name: 'Azure MongoDB: Physical partition size'
+          name: 'Physical partition size'
           type: DEPENDENT
           key: azure.cosmosdb.physical.partition.size
           delay: '0'
@@ -2965,7 +2965,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e30d5eadde15427484e7a0d1cb38e9e3
-          name: 'Azure MongoDB: Physical partition throughput'
+          name: 'Physical partition throughput'
           type: DEPENDENT
           key: azure.cosmosdb.physical.partition.throughput
           delay: '0'
@@ -2982,7 +2982,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 49311bbfb2584a46b42ed1a7d8fcfd94
-          name: 'Azure MongoDB: Provisioned throughput'
+          name: 'Provisioned throughput'
           type: DEPENDENT
           key: azure.cosmosdb.provisioned.throughput
           delay: '0'
@@ -2999,7 +2999,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6d7175e27d10406191c883dc2e5949e4
-          name: 'Azure MongoDB: Replication latency, P99'
+          name: 'Replication latency, P99'
           type: DEPENDENT
           key: azure.cosmosdb.replication.latency
           delay: '0'
@@ -3021,7 +3021,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: d9b5af0c71874114b48464ce20f8cf3d
-          name: 'Azure MongoDB: Server side latency'
+          name: 'Server side latency'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency
           delay: '0'
@@ -3043,7 +3043,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 7587d3750d1643f085db5931670dc2f3
-          name: 'Azure MongoDB: Server side latency, direct'
+          name: 'Server side latency, direct'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency.direct
           delay: '0'
@@ -3065,7 +3065,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 0aefdc3101fe4bcba4743d6e32671554
-          name: 'Azure MongoDB: Server side latency, gateway'
+          name: 'Server side latency, gateway'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency.gateway
           delay: '0'
@@ -3087,7 +3087,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 42bd03c1753b4f19bc9793b03834cd3d
-          name: 'Azure MongoDB: Service availability'
+          name: 'Service availability'
           type: DEPENDENT
           key: azure.cosmosdb.service.availability
           delay: '0'
@@ -3108,14 +3108,14 @@ zabbix_export:
           triggers:
             - uuid: c7649cd317f04a3d8fec0eebe3df6766
               expression: '(min(/Azure Cosmos DB for MongoDB by HTTP/azure.cosmosdb.service.availability,#3))<{$AZURE.DB.COSMOS.MONGO.AVAILABILITY}'
-              name: 'Azure MongoDB: Cosmos DB for MongoDB account: Availability is low'
+              name: 'Cosmos DB for MongoDB account: Availability is low'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: f4d4d2def5e945ab9048ada4813b7f04
-          name: 'Azure MongoDB: Total request units'
+          name: 'Total request units'
           type: DEPENDENT
           key: azure.cosmosdb.total.request.units
           delay: '0'
@@ -3133,7 +3133,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3dd2cd4edb7746edb9d917c83b280ca3
-          name: 'Azure MongoDB: Total requests'
+          name: 'Total requests'
           type: DEPENDENT
           key: azure.cosmosdb.total.requests
           delay: '0'
@@ -3325,7 +3325,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: f50c96da86654a25b937756cc7f7010e
-          name: 'Azure Cost: Get daily costs'
+          name: 'Get daily costs'
           type: SCRIPT
           key: azure.get.daily.costs
           delay: 0s;h/5m/30
@@ -3527,7 +3527,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: bbf6a0b136464d76a535ca016dcb8ae1
-          name: 'Azure Cost: Get monthly costs'
+          name: 'Get monthly costs'
           type: SCRIPT
           key: azure.get.monthly.costs
           delay: 0s;h/12
@@ -3757,7 +3757,7 @@ zabbix_export:
           description: 'Discovery of daily costs by services.'
           item_prototypes:
             - uuid: 848ccd4cec2c4902990aa25f90f502a8
-              name: 'Azure Cost: Service ["{#AZURE.SERVICE.NAME}"]: Meter ["{#AZURE.BILLING.METER}"]: Subcategory ["{#AZURE.BILLING.METER.SUBCATEGORY}"] daily cost'
+              name: 'Service ["{#AZURE.SERVICE.NAME}"]: Meter ["{#AZURE.BILLING.METER}"]: Subcategory ["{#AZURE.BILLING.METER.SUBCATEGORY}"] daily cost'
               type: DEPENDENT
               key: 'azure.daily.cost["{#AZURE.SERVICE.NAME}", "{#AZURE.BILLING.METER}", "{#AZURE.BILLING.METER.SUBCATEGORY}","{#AZURE.RESOURCE.GROUP}"]'
               delay: '0'
@@ -3820,7 +3820,7 @@ zabbix_export:
           description: 'Discovery of monthly costs.'
           item_prototypes:
             - uuid: f91a60d2c1124eb6b297539b0a115c66
-              name: 'Azure Cost: Month ["{#AZURE.BILLING.MONTH}"] cost'
+              name: 'Month ["{#AZURE.BILLING.MONTH}"] cost'
               type: DEPENDENT
               key: 'azure.monthly.cost["{#AZURE.BILLING.MONTH}"]'
               delay: '0'
@@ -3879,7 +3879,7 @@ zabbix_export:
           description: 'Discovery of monthly costs by location.'
           item_prototypes:
             - uuid: 7fb097f81a8445acaa6b17bdc4daaaa6
-              name: 'Azure Cost: Location: ["{#AZURE.RESOURCE.LOCATION}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
+              name: 'Location: ["{#AZURE.RESOURCE.LOCATION}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
               type: DEPENDENT
               key: 'azure.monthly.location.cost["{#AZURE.RESOURCE.LOCATION}", "{#AZURE.BILLING.MONTH}"]'
               delay: '0'
@@ -3946,7 +3946,7 @@ zabbix_export:
           description: 'Discovery of monthly costs by resource group.'
           item_prototypes:
             - uuid: 9a5ed573ac374c08abf81f2b7296f260
-              name: 'Azure Cost: Resource group: ["{#AZURE.RESOURCE.GROUP}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
+              name: 'Resource group: ["{#AZURE.RESOURCE.GROUP}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
               type: DEPENDENT
               key: 'azure.monthly.resource.group.cost["{#AZURE.RESOURCE.GROUP}", "{#AZURE.BILLING.MONTH}"]'
               delay: '0'
@@ -4013,7 +4013,7 @@ zabbix_export:
           description: 'Discovery of monthly costs by services.'
           item_prototypes:
             - uuid: dbad6436c70e41268e3b59c2a7f0e2a2
-              name: 'Azure Cost: Service ["{#AZURE.SERVICE.NAME}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
+              name: 'Service ["{#AZURE.SERVICE.NAME}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
               type: DEPENDENT
               key: 'azure.monthly.service.cost["{#AZURE.SERVICE.NAME}", "{#AZURE.BILLING.MONTH}"]'
               delay: '0'
@@ -4216,7 +4216,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 2ff1f479e0b447f2b85e75e99bc011fe
-          name: 'Azure Microsoft SQL: Availability status detailed'
+          name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.mssql.availability.details
           delay: '0'
@@ -4237,7 +4237,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: f15e8075ac9a4f1ca6e95106940b246e
-          name: 'Azure Microsoft SQL: Availability state'
+          name: 'Availability state'
           type: DEPENDENT
           key: azure.db.mssql.availability.state
           delay: '0'
@@ -4284,7 +4284,7 @@ zabbix_export:
           triggers:
             - uuid: 5156f35b82084fd3b1d1a11c35757993
               expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=1'
-              name: 'Azure Microsoft SQL: Microsoft SQL database is degraded'
+              name: 'Microsoft SQL database is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -4293,7 +4293,7 @@ zabbix_export:
                   value: availability
             - uuid: 0cf3cce995c241838e13df12d5908b61
               expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=3'
-              name: 'Azure Microsoft SQL: Microsoft SQL database is in unknown state'
+              name: 'Microsoft SQL database is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -4302,7 +4302,7 @@ zabbix_export:
                   value: availability
             - uuid: 2130dc83dee94fdfad87894127c6a578
               expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=2'
-              name: 'Azure Microsoft SQL: Microsoft SQL database is unavailable'
+              name: 'Microsoft SQL database is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -4310,7 +4310,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: ce744d69ed12435db781fbc6100d97ab
-          name: 'Azure Microsoft SQL: Connections failed: System errors'
+          name: 'Connections failed: System errors'
           type: DEPENDENT
           key: azure.db.mssql.connections.failed.system
           delay: '0'
@@ -4327,7 +4327,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 8ec27240f59947858c41762a266cab25
-          name: 'Azure Microsoft SQL: Connections successful'
+          name: 'Connections successful'
           type: DEPENDENT
           key: azure.db.mssql.connections.successful
           delay: '0'
@@ -4344,7 +4344,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 04737f2746444d2fb348a9444964dc7a
-          name: 'Azure Microsoft SQL: CPU limit'
+          name: 'CPU limit'
           type: DEPENDENT
           key: azure.db.mssql.cpu.limit
           delay: '0'
@@ -4362,7 +4362,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e55a199cc0bd4749a69478da8268785d
-          name: 'Azure Microsoft SQL: Percentage CPU'
+          name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.mssql.cpu.percentage
           delay: '0'
@@ -4382,7 +4382,7 @@ zabbix_export:
           triggers:
             - uuid: 506c034e707442519792a4366bc0879d
               expression: 'min(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure Microsoft SQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -4390,7 +4390,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9a4a948f41e4434e9a94b3d9546df896
-          name: 'Azure Microsoft SQL: CPU used'
+          name: 'CPU used'
           type: DEPENDENT
           key: azure.db.mssql.cpu.used
           delay: '0'
@@ -4408,7 +4408,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e8aa1b70a7384ffead05cd2e95a6f10a
-          name: 'Azure Microsoft SQL: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.db.mssql.data.errors
           delay: '0'
@@ -4431,7 +4431,7 @@ zabbix_export:
           triggers:
             - uuid: 62d08fe430bd45e890c81547860d5c3d
               expression: 'length(last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.data.errors))>0'
-              name: 'Azure Microsoft SQL: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -4439,7 +4439,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 741cc1ec6a824e429f06b3d12a8a7082
-          name: 'Azure Microsoft SQL: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: azure.db.mssql.data.get
           history: '0'
@@ -4640,7 +4640,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 75d9288a8240425782cce8701c1bdfa8
-          name: 'Azure Microsoft SQL: Data IO percentage'
+          name: 'Data IO percentage'
           type: DEPENDENT
           key: azure.db.mssql.data.read.percentage
           delay: '0'
@@ -4658,7 +4658,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 81f87d35131c426299b233279f8f6c4b
-          name: 'Azure Microsoft SQL: Deadlocks'
+          name: Deadlocks
           type: DEPENDENT
           key: azure.db.mssql.deadlocks
           delay: '0'
@@ -4675,7 +4675,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 4d78e4691b6f4ab095849e6af2713638
-          name: 'Azure Microsoft SQL: Connections blocked by firewall'
+          name: 'Connections blocked by firewall'
           type: DEPENDENT
           key: azure.db.mssql.firewall.blocked
           delay: '0'
@@ -4692,7 +4692,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 324c16e5da5b40c78d687f1f41a9d180
-          name: 'Azure Microsoft SQL: Log IO percentage'
+          name: 'Log IO percentage'
           type: DEPENDENT
           key: azure.db.mssql.log.write.percentage
           delay: '0'
@@ -4710,7 +4710,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: f417464b2de14e3292d68442570b931d
-          name: 'Azure Microsoft SQL: SQL Server process core percent'
+          name: 'SQL Server process core percent'
           type: DEPENDENT
           key: azure.db.mssql.server.cpu.percent
           delay: '0'
@@ -4731,7 +4731,7 @@ zabbix_export:
             - tag: component
               value: server
         - uuid: b39aa0798a824dafb3f3871b6406106a
-          name: 'Azure Microsoft SQL: SQL Server process memory percent'
+          name: 'SQL Server process memory percent'
           type: DEPENDENT
           key: azure.db.mssql.server.memory.percent
           delay: '0'
@@ -4752,7 +4752,7 @@ zabbix_export:
             - tag: component
               value: server
         - uuid: 754b453cdf464f73b09eced3dd3e5859
-          name: 'Azure Microsoft SQL: Sessions count'
+          name: 'Sessions count'
           type: DEPENDENT
           key: azure.db.mssql.sessions.count
           delay: '0'
@@ -4769,7 +4769,7 @@ zabbix_export:
             - tag: component
               value: sessions
         - uuid: b6696ac3d83841e2a001cdad1aeaea89
-          name: 'Azure Microsoft SQL: Sessions percentage'
+          name: 'Sessions percentage'
           type: DEPENDENT
           key: azure.db.mssql.sessions.percent
           delay: '0'
@@ -4787,7 +4787,7 @@ zabbix_export:
             - tag: component
               value: sessions
         - uuid: fddff3dcbcf44c408314946f01f26a79
-          name: 'Azure Microsoft SQL: Data space allocated'
+          name: 'Data space allocated'
           type: DEPENDENT
           key: azure.db.mssql.storage.allocated
           delay: '0'
@@ -4806,7 +4806,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3d492b552468462ba17524a9c6951dd7
-          name: 'Azure Microsoft SQL: Differential backup storage size'
+          name: 'Differential backup storage size'
           type: DEPENDENT
           key: azure.db.mssql.storage.backup.diff.size
           delay: '0'
@@ -4827,7 +4827,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e8cd0339a82248e3ad777374f219552e
-          name: 'Azure Microsoft SQL: Log backup storage size'
+          name: 'Log backup storage size'
           type: DEPENDENT
           key: azure.db.mssql.storage.backup.log.size
           delay: '0'
@@ -4848,7 +4848,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: c92867a096ad4d89b31a2dba7e560df1
-          name: 'Azure Microsoft SQL: Full backup storage size'
+          name: 'Full backup storage size'
           type: DEPENDENT
           key: azure.db.mssql.storage.backup.size
           delay: '0'
@@ -4869,7 +4869,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6eb5dc0a0b864c0bb35634612472ed38
-          name: 'Azure Microsoft SQL: Data space used percent'
+          name: 'Data space used percent'
           type: DEPENDENT
           key: azure.db.mssql.storage.percent
           delay: '0'
@@ -4890,7 +4890,7 @@ zabbix_export:
           triggers:
             - uuid: a2d6cf9ac67d4d0eb312e9536299b345
               expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure Microsoft SQL: Storage space is critically low'
+              name: 'Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical utilization of the storage space.'
@@ -4899,7 +4899,7 @@ zabbix_export:
                   value: capacity
             - uuid: 6dbf1d3aeb8b44b8bd96a9ca75f5249e
               expression: 'last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure Microsoft SQL: Storage space is low'
+              name: 'Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High utilization of the storage space.'
@@ -4907,7 +4907,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: a0335bde6f3546cdad5bbd2db8fa50b1
-          name: 'Azure Microsoft SQL: Data space used'
+          name: 'Data space used'
           type: DEPENDENT
           key: azure.db.mssql.storage.used
           delay: '0'
@@ -4926,7 +4926,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6ff07a9a680749bfa3deabbec508b7c3
-          name: 'Azure Microsoft SQL: In-Memory OLTP storage percent'
+          name: 'In-Memory OLTP storage percent'
           type: DEPENDENT
           key: azure.db.mssql.storage.xtp.percent
           delay: '0'
@@ -4944,7 +4944,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 76da2f210c084546a19ce156e0aee1d6
-          name: 'Azure Microsoft SQL: Tempdb data file size'
+          name: 'Tempdb data file size'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.data.size
           delay: '0'
@@ -4966,7 +4966,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: dd2986cc6ce441fe9b3ab9b44b5fc103
-          name: 'Azure Microsoft SQL: Tempdb log used percent'
+          name: 'Tempdb log used percent'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.log.percent
           delay: '0'
@@ -4985,7 +4985,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 51212e2af3854079950064bd9d16da83
-          name: 'Azure Microsoft SQL: Tempdb log file size'
+          name: 'Tempdb log file size'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.log.size
           delay: '0'
@@ -5007,7 +5007,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b5d63b2cbcb1470d8559a90cb3df0002
-          name: 'Azure Microsoft SQL: Workers percentage'
+          name: 'Workers percentage'
           type: DEPENDENT
           key: azure.db.mssql.workers.percent
           delay: '0'
@@ -5435,7 +5435,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 7c11fcc4f4b349f8b98fac93ae5e32be
-          name: 'Azure Microsoft SQL: App CPU billed'
+          name: 'App CPU billed'
           type: DEPENDENT
           key: azure.db.mssql.app.cpu.billed
           delay: '0'
@@ -5453,7 +5453,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 6e67a868b2d84838803d3cb464ae9648
-          name: 'Azure Microsoft SQL: App CPU percentage'
+          name: 'App CPU percentage'
           type: DEPENDENT
           key: azure.db.mssql.app.cpu.percent
           delay: '0'
@@ -5472,7 +5472,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: a38a887341914e75a01c7527c40b678f
-          name: 'Azure Microsoft SQL: App memory percentage'
+          name: 'App memory percentage'
           type: DEPENDENT
           key: azure.db.mssql.app.memory.percent
           delay: '0'
@@ -5491,7 +5491,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: c2d3bc4ff95b4e05898dccee3d73a349
-          name: 'Azure Microsoft SQL: Availability status detailed'
+          name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.mssql.availability.details
           delay: '0'
@@ -5512,7 +5512,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 9a3f2e99a768492c859c8f368c6a5cd3
-          name: 'Azure Microsoft SQL: Availability state'
+          name: 'Availability state'
           type: DEPENDENT
           key: azure.db.mssql.availability.state
           delay: '0'
@@ -5559,7 +5559,7 @@ zabbix_export:
           triggers:
             - uuid: 37c52a28908a45378266f68acdf5c308
               expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=1'
-              name: 'Azure Microsoft SQL: Microsoft SQL database is degraded'
+              name: 'Microsoft SQL database is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -5568,7 +5568,7 @@ zabbix_export:
                   value: availability
             - uuid: 20bd79f05f3241a9950a83dcd9e325ba
               expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=3'
-              name: 'Azure Microsoft SQL: Microsoft SQL database is in unknown state'
+              name: 'Microsoft SQL database is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -5577,7 +5577,7 @@ zabbix_export:
                   value: availability
             - uuid: 124813388e9844e8aae5ce474a66a774
               expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=2'
-              name: 'Azure Microsoft SQL: Microsoft SQL database is unavailable'
+              name: 'Microsoft SQL database is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -5585,7 +5585,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 2457708a49d141faa16bd7b4ceb2c0a4
-          name: 'Azure Microsoft SQL: Connections failed: System errors'
+          name: 'Connections failed: System errors'
           type: DEPENDENT
           key: azure.db.mssql.connections.failed.system
           delay: '0'
@@ -5602,7 +5602,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 59e028a7323d4222a4efd727314327c1
-          name: 'Azure Microsoft SQL: Connections successful'
+          name: 'Connections successful'
           type: DEPENDENT
           key: azure.db.mssql.connections.successful
           delay: '0'
@@ -5619,7 +5619,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 0dc1cf6302574c1fbb51583e03409713
-          name: 'Azure Microsoft SQL: CPU limit'
+          name: 'CPU limit'
           type: DEPENDENT
           key: azure.db.mssql.cpu.limit
           delay: '0'
@@ -5637,7 +5637,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 53be31ecfd48472c8edfe223107c0b07
-          name: 'Azure Microsoft SQL: Percentage CPU'
+          name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.mssql.cpu.percentage
           delay: '0'
@@ -5657,7 +5657,7 @@ zabbix_export:
           triggers:
             - uuid: 933a04a1455b4a89b1527f9ce7848259
               expression: 'min(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure Microsoft SQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -5665,7 +5665,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: ec0fc85904e149939836c2818a6ca66a
-          name: 'Azure Microsoft SQL: CPU used'
+          name: 'CPU used'
           type: DEPENDENT
           key: azure.db.mssql.cpu.used
           delay: '0'
@@ -5683,7 +5683,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: d933dbacb2b94e40a757e15f13d51d2d
-          name: 'Azure Microsoft SQL: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.db.mssql.data.errors
           delay: '0'
@@ -5706,7 +5706,7 @@ zabbix_export:
           triggers:
             - uuid: f56b125a8eff49d2aa002609c7df8b34
               expression: 'length(last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.data.errors))>0'
-              name: 'Azure Microsoft SQL: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -5714,7 +5714,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: e1c668773b974deeaf64c0d51d1cb02d
-          name: 'Azure Microsoft SQL: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: azure.db.mssql.data.get
           history: '0'
@@ -5900,7 +5900,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 40b15dd3d7a943d99f1bbe7fb34a9f48
-          name: 'Azure Microsoft SQL: Data IO percentage'
+          name: 'Data IO percentage'
           type: DEPENDENT
           key: azure.db.mssql.data.read.percentage
           delay: '0'
@@ -5918,7 +5918,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 25b97b67d87945b48ae5c44b1db20187
-          name: 'Azure Microsoft SQL: Deadlocks'
+          name: Deadlocks
           type: DEPENDENT
           key: azure.db.mssql.deadlocks
           delay: '0'
@@ -5935,7 +5935,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: de91693b0a3345b4ad2c9aafd2af5325
-          name: 'Azure Microsoft SQL: Connections blocked by firewall'
+          name: 'Connections blocked by firewall'
           type: DEPENDENT
           key: azure.db.mssql.firewall.blocked
           delay: '0'
@@ -5952,7 +5952,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: b41292705c284a77847856c2818d7145
-          name: 'Azure Microsoft SQL: Log IO percentage'
+          name: 'Log IO percentage'
           type: DEPENDENT
           key: azure.db.mssql.log.write.percentage
           delay: '0'
@@ -5970,7 +5970,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 7b772170199f41d4ab614dee66176630
-          name: 'Azure Microsoft SQL: SQL Server process core percent'
+          name: 'SQL Server process core percent'
           type: DEPENDENT
           key: azure.db.mssql.server.cpu.percent
           delay: '0'
@@ -5991,7 +5991,7 @@ zabbix_export:
             - tag: component
               value: server
         - uuid: 5c0a5b745c094475b1e7a0d4f17a5627
-          name: 'Azure Microsoft SQL: SQL Server process memory percent'
+          name: 'SQL Server process memory percent'
           type: DEPENDENT
           key: azure.db.mssql.server.memory.percent
           delay: '0'
@@ -6012,7 +6012,7 @@ zabbix_export:
             - tag: component
               value: server
         - uuid: 924d96d212764c3ab18e5c14daa58840
-          name: 'Azure Microsoft SQL: Sessions percentage'
+          name: 'Sessions percentage'
           type: DEPENDENT
           key: azure.db.mssql.sessions.percent
           delay: '0'
@@ -6030,7 +6030,7 @@ zabbix_export:
             - tag: component
               value: sessions
         - uuid: a87fd8ac96944e57ac58b39a18f6ad41
-          name: 'Azure Microsoft SQL: Data space allocated'
+          name: 'Data space allocated'
           type: DEPENDENT
           key: azure.db.mssql.storage.allocated
           delay: '0'
@@ -6049,7 +6049,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 2f95fd2dd48c4664afc5cd62d02b0b0a
-          name: 'Azure Microsoft SQL: Data space used percent'
+          name: 'Data space used percent'
           type: DEPENDENT
           key: azure.db.mssql.storage.percent
           delay: '0'
@@ -6070,7 +6070,7 @@ zabbix_export:
           triggers:
             - uuid: 4638130e599243fba3206abc85a7447f
               expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure Microsoft SQL: Storage space is critically low'
+              name: 'Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical utilization of the storage space.'
@@ -6079,7 +6079,7 @@ zabbix_export:
                   value: capacity
             - uuid: 4732eab4aabf439fa0b2d80b63e821e5
               expression: 'last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure Microsoft SQL: Storage space is low'
+              name: 'Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High utilization of the storage space.'
@@ -6087,7 +6087,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 3b1fb8f993e74795b38abd56eceace0a
-          name: 'Azure Microsoft SQL: Data space used'
+          name: 'Data space used'
           type: DEPENDENT
           key: azure.db.mssql.storage.used
           delay: '0'
@@ -6106,7 +6106,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: fbd572ca3d3f42eea794ce78a5a27ec1
-          name: 'Azure Microsoft SQL: In-Memory OLTP storage percent'
+          name: 'In-Memory OLTP storage percent'
           type: DEPENDENT
           key: azure.db.mssql.storage.xtp.percent
           delay: '0'
@@ -6124,7 +6124,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: cea8a8ea0eaa4d26a28721882c19d9cd
-          name: 'Azure Microsoft SQL: Tempdb data file size'
+          name: 'Tempdb data file size'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.data.size
           delay: '0'
@@ -6146,7 +6146,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6c8196751a504b82920b7ffa5314a2fc
-          name: 'Azure Microsoft SQL: Tempdb log used percent'
+          name: 'Tempdb log used percent'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.log.percent
           delay: '0'
@@ -6165,7 +6165,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b83992d1001c41b6ad3d13dbb227a733
-          name: 'Azure Microsoft SQL: Tempdb log file size'
+          name: 'Tempdb log file size'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.log.size
           delay: '0'
@@ -6187,7 +6187,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: a4f597ab784a4e31aedc82bfb34feeb7
-          name: 'Azure Microsoft SQL: Workers percentage'
+          name: 'Workers percentage'
           type: DEPENDENT
           key: azure.db.mssql.workers.percent
           delay: '0'
@@ -6618,7 +6618,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 9c87cde45e984ce282d8ba9fbe184f9b
-          name: 'Azure MySQL: Availability status detailed'
+          name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.mysql.availability.details
           delay: '0'
@@ -6639,7 +6639,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 7f2d8e8d94ae4c87ba0480a2d9518f65
-          name: 'Azure MySQL: Availability state'
+          name: 'Availability state'
           type: DEPENDENT
           key: azure.db.mysql.availability.state
           delay: '0'
@@ -6686,7 +6686,7 @@ zabbix_export:
           triggers:
             - uuid: e822fd2214fb41db9b57cdb8eec0444a
               expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=1'
-              name: 'Azure MySQL: MySQL server is degraded'
+              name: 'MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -6695,7 +6695,7 @@ zabbix_export:
                   value: availability
             - uuid: ebb35037a5b646a0bd2c6be44bb1f3c6
               expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=3'
-              name: 'Azure MySQL: MySQL server is in unknown state'
+              name: 'MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -6704,7 +6704,7 @@ zabbix_export:
                   value: availability
             - uuid: 240b861c09a94e209036782b6c7496fa
               expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=2'
-              name: 'Azure MySQL: MySQL server is unavailable'
+              name: 'MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -6712,7 +6712,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: cab6ac822f2c4e118b030e49cc15eaa2
-          name: 'Azure MySQL: Connections aborted'
+          name: 'Connections aborted'
           type: DEPENDENT
           key: azure.db.mysql.connections.aborted
           delay: '0'
@@ -6731,7 +6731,7 @@ zabbix_export:
           triggers:
             - uuid: 3346ea2331c14fa18658eb33e461ec7c
               expression: 'min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED.CONN.MAX.WARN}'
-              name: 'Azure MySQL: Server has aborted connections'
+              name: 'Server has aborted connections'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED.CONN.MAX.WARN}`.'
@@ -6739,7 +6739,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 71b33f0a5d37498dbb57d185ac0f2741
-          name: 'Azure MySQL: Connections active'
+          name: 'Connections active'
           type: DEPENDENT
           key: azure.db.mysql.connections.active
           delay: '0'
@@ -6756,7 +6756,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 1993ae276fe44db6a89451291749f703
-          name: 'Azure MySQL: Connections total'
+          name: 'Connections total'
           type: DEPENDENT
           key: azure.db.mysql.connections.total
           delay: '0'
@@ -6773,7 +6773,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: b235666b98954555ae5e75e757bba707
-          name: 'Azure MySQL: CPU credits consumed'
+          name: 'CPU credits consumed'
           type: DEPENDENT
           key: azure.db.mysql.cpu.credits.consumed
           delay: '0'
@@ -6791,7 +6791,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4f591346d3d34d49b37cfff2a169f57e
-          name: 'Azure MySQL: CPU credits remaining'
+          name: 'CPU credits remaining'
           type: DEPENDENT
           key: azure.db.mysql.cpu.credits.remaining
           delay: '0'
@@ -6809,7 +6809,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: afe4d11c2f474428acc00d153ad2a6e5
-          name: 'Azure MySQL: Percentage CPU'
+          name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.mysql.cpu.percentage
           delay: '0'
@@ -6829,7 +6829,7 @@ zabbix_export:
           triggers:
             - uuid: 5af82cc95239479c86c7ab3dabcfb592
               expression: 'min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure MySQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -6837,7 +6837,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: f960e7667571497c96454b5c4b7b69ff
-          name: 'Azure MySQL: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.db.mysql.data.errors
           delay: '0'
@@ -6860,7 +6860,7 @@ zabbix_export:
           triggers:
             - uuid: 98c1b86b79e9469cac2870fb2ba42949
               expression: 'length(last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.data.errors))>0'
-              name: 'Azure MySQL: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -6868,7 +6868,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: de712334db1440309fa68f9252d4f9bc
-          name: 'Azure MySQL: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
           history: '0'
@@ -7048,7 +7048,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b4a6363aac734b6c8d043718ca667c09
-          name: 'Azure MySQL: IO consumption percent'
+          name: 'IO consumption percent'
           type: DEPENDENT
           key: azure.db.mysql.io.consumption.percent
           delay: '0'
@@ -7066,7 +7066,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: f0f56a67942a40509d6835f3da9eb7e2
-          name: 'Azure MySQL: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: azure.db.mysql.memory.percentage
           delay: '0'
@@ -7084,7 +7084,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 84f3d2b152784993944a2d4c3fad1a59
-          name: 'Azure MySQL: Network out'
+          name: 'Network out'
           type: DEPENDENT
           key: azure.db.mysql.network.egress
           delay: '0'
@@ -7105,7 +7105,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 5f38b6b4e3a849d09022bd34c4347088
-          name: 'Azure MySQL: Network in'
+          name: 'Network in'
           type: DEPENDENT
           key: azure.db.mysql.network.ingress
           delay: '0'
@@ -7126,7 +7126,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 05329dcdb2e14080a43d1bf7553037f6
-          name: 'Azure MySQL: Queries'
+          name: Queries
           type: DEPENDENT
           key: azure.db.mysql.queries
           delay: '0'
@@ -7143,7 +7143,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 80a05247fec04e39a99ccafaefbd0441
-          name: 'Azure MySQL: Replication lag'
+          name: 'Replication lag'
           type: DEPENDENT
           key: azure.db.mysql.replication.lag
           delay: '0'
@@ -7162,7 +7162,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 8d5cd0d3cd0744a5a260a8a0485f6735
-          name: 'Azure MySQL: Backup storage used'
+          name: 'Backup storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.backup.used
           delay: '0'
@@ -7180,7 +7180,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 78f3e03b5caf4f85a3c61513cf242f76
-          name: 'Azure MySQL: Storage limit'
+          name: 'Storage limit'
           type: DEPENDENT
           key: azure.db.mysql.storage.limit
           delay: '0'
@@ -7198,7 +7198,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: ced51184b59643adaa51bef90710166b
-          name: 'Azure MySQL: Storage percent'
+          name: 'Storage percent'
           type: DEPENDENT
           key: azure.db.mysql.storage.percent
           delay: '0'
@@ -7218,7 +7218,7 @@ zabbix_export:
           triggers:
             - uuid: 1703edc1553644e5aa25d35928c5eafd
               expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure MySQL: Storage space is critically low'
+              name: 'Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical utilization of the storage space.'
@@ -7227,7 +7227,7 @@ zabbix_export:
                   value: capacity
             - uuid: a2ec23a5e77c40aa9e45d214f4e06ca1
               expression: 'last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure MySQL: Storage space is low'
+              name: 'Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High utilization of the storage space.'
@@ -7235,7 +7235,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 9f96e947eee646f890742676e9f9a22a
-          name: 'Azure MySQL: Storage used'
+          name: 'Storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.used
           delay: '0'
@@ -7674,7 +7674,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: c7771aa67d3c424490d8de2d6c2d609a
-          name: 'Azure MySQL: Availability status detailed'
+          name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.mysql.availability.details
           delay: '0'
@@ -7695,7 +7695,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: c325b977b26e4e00acc3ea8703895f05
-          name: 'Azure MySQL: Availability state'
+          name: 'Availability state'
           type: DEPENDENT
           key: azure.db.mysql.availability.state
           delay: '0'
@@ -7742,7 +7742,7 @@ zabbix_export:
           triggers:
             - uuid: 91a32645266547d78df3a70b44c7782b
               expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=1'
-              name: 'Azure MySQL: MySQL server is degraded'
+              name: 'MySQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -7751,7 +7751,7 @@ zabbix_export:
                   value: availability
             - uuid: 852aba88476a40aeb2170b933726b7d8
               expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=3'
-              name: 'Azure MySQL: MySQL server is in unknown state'
+              name: 'MySQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -7760,7 +7760,7 @@ zabbix_export:
                   value: availability
             - uuid: 5f2d2254dfc24f5481207585bed0d933
               expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=2'
-              name: 'Azure MySQL: MySQL server is unavailable'
+              name: 'MySQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -7768,7 +7768,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 69aba8caa6874c9d9423926a2ee78e99
-          name: 'Azure MySQL: Connections active'
+          name: 'Connections active'
           type: DEPENDENT
           key: azure.db.mysql.connections.active
           delay: '0'
@@ -7785,7 +7785,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e185b56984914507bc40c07c55153967
-          name: 'Azure MySQL: Connections failed'
+          name: 'Connections failed'
           type: DEPENDENT
           key: azure.db.mysql.connections.failed
           delay: '0'
@@ -7805,7 +7805,7 @@ zabbix_export:
           triggers:
             - uuid: 5b3a09ca04704e6a9972ee4865d358cd
               expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED.CONN.MAX.WARN}'
-              name: 'Azure MySQL: Server has failed connections'
+              name: 'Server has failed connections'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.FAILED.CONN.MAX.WARN}`.'
@@ -7813,7 +7813,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: d0b5864a56094166b76fbc58a5e05c7c
-          name: 'Azure MySQL: Percentage CPU'
+          name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.mysql.cpu.percentage
           delay: '0'
@@ -7833,7 +7833,7 @@ zabbix_export:
           triggers:
             - uuid: 7115fb320e2b4cc1ad1739c8a6cee155
               expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure MySQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -7841,7 +7841,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 2fc253a20100478d91cac13590a64bfc
-          name: 'Azure MySQL: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.db.mysql.data.errors
           delay: '0'
@@ -7864,7 +7864,7 @@ zabbix_export:
           triggers:
             - uuid: df5fa33f8c13413bb9d61ea4470b9b2d
               expression: 'length(last(/Azure MySQL Single Server by HTTP/azure.db.mysql.data.errors))>0'
-              name: 'Azure MySQL: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -7872,7 +7872,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: cd62d92ef0384ea9acf0cae71c88ebc6
-          name: 'Azure MySQL: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: azure.db.mysql.data.get
           history: '0'
@@ -8051,7 +8051,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: a17c365253eb4821841ec82ac8f61106
-          name: 'Azure MySQL: IO consumption percent'
+          name: 'IO consumption percent'
           type: DEPENDENT
           key: azure.db.mysql.io.consumption.percent
           delay: '0'
@@ -8069,7 +8069,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 5c19c08912634993b1f96fb11e5d1ae2
-          name: 'Azure MySQL: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: azure.db.mysql.memory.percentage
           delay: '0'
@@ -8089,7 +8089,7 @@ zabbix_export:
           triggers:
             - uuid: a67b35f1ac674d6692b0b2bcd6f89bd8
               expression: 'min(/Azure MySQL Single Server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
-              name: 'Azure MySQL: High memory utilization'
+              name: 'High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -8097,7 +8097,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: fe1b9846a634412aaa6a76fc05dbe46a
-          name: 'Azure MySQL: Network out'
+          name: 'Network out'
           type: DEPENDENT
           key: azure.db.mysql.network.egress
           delay: '0'
@@ -8119,7 +8119,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 1cc97817bda5470887e3d5d9f2d78650
-          name: 'Azure MySQL: Network in'
+          name: 'Network in'
           type: DEPENDENT
           key: azure.db.mysql.network.ingress
           delay: '0'
@@ -8141,7 +8141,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 8e60794282ea42c7bad1573811b2e498
-          name: 'Azure MySQL: Replication lag'
+          name: 'Replication lag'
           type: DEPENDENT
           key: azure.db.mysql.replication.lag
           delay: '0'
@@ -8160,7 +8160,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 1303a659d17a4e4fa9fa03cef35fef5a
-          name: 'Azure MySQL: Backup storage used'
+          name: 'Backup storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.backup.used
           delay: '0'
@@ -8178,7 +8178,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 4aed6d0c01d1458fbd1f7c7ea5386303
-          name: 'Azure MySQL: Storage limit'
+          name: 'Storage limit'
           type: DEPENDENT
           key: azure.db.mysql.storage.limit
           delay: '0'
@@ -8196,7 +8196,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 5b1b350be6f0409fb7ab842571c3f086
-          name: 'Azure MySQL: Storage percent'
+          name: 'Storage percent'
           type: DEPENDENT
           key: azure.db.mysql.storage.percent
           delay: '0'
@@ -8216,7 +8216,7 @@ zabbix_export:
           triggers:
             - uuid: 3afcb840e8004822a2dada2a89971f69
               expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure MySQL: Storage space is critically low'
+              name: 'Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical utilization of the storage space.'
@@ -8225,7 +8225,7 @@ zabbix_export:
                   value: capacity
             - uuid: 2e605f906b284f769e7c880d4e642b43
               expression: 'last(/Azure MySQL Single Server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure MySQL: Storage space is low'
+              name: 'Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High utilization of the storage space.'
@@ -8233,7 +8233,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 7f553d8a0898477b87a2828e51efcfcc
-          name: 'Azure MySQL: Server log storage limit'
+          name: 'Server log storage limit'
           type: DEPENDENT
           key: azure.db.mysql.storage.server.log.limit
           delay: '0'
@@ -8251,7 +8251,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: cf5a77306c554a24b3741ef065b6d27a
-          name: 'Azure MySQL: Server log storage percent'
+          name: 'Server log storage percent'
           type: DEPENDENT
           key: azure.db.mysql.storage.server.log.percent
           delay: '0'
@@ -8269,7 +8269,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 8ed99a951e264185b1e0f343d7ea0aec
-          name: 'Azure MySQL: Server log storage used'
+          name: 'Server log storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.server.log.used
           delay: '0'
@@ -8287,7 +8287,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 0c9a5496d9884c8e9a434fb232b3208f
-          name: 'Azure MySQL: Storage used'
+          name: 'Storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.used
           delay: '0'
@@ -8669,7 +8669,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 7f7deae517e54cf582ae758a6988037b
-          name: 'Azure PostgreSQL: Availability status detailed'
+          name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.pgsql.availability.details
           delay: '0'
@@ -8690,7 +8690,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: cd9072a3895c42dab794707f3bcaf743
-          name: 'Azure PostgreSQL: Availability state'
+          name: 'Availability state'
           type: DEPENDENT
           key: azure.db.pgsql.availability.state
           delay: '0'
@@ -8737,7 +8737,7 @@ zabbix_export:
           triggers:
             - uuid: 65b5c39b48e248c4866c511bbba91e1b
               expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=1'
-              name: 'Azure PostgreSQL: PostgreSQL server is degraded'
+              name: 'PostgreSQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -8746,7 +8746,7 @@ zabbix_export:
                   value: availability
             - uuid: d8ce86c853064cba80c9883052ed1403
               expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=3'
-              name: 'Azure PostgreSQL: PostgreSQL server is in unknown state'
+              name: 'PostgreSQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -8755,7 +8755,7 @@ zabbix_export:
                   value: availability
             - uuid: 9572c9e56a6b44368bcf2d8a17a220d8
               expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=2'
-              name: 'Azure PostgreSQL: PostgreSQL server is unavailable'
+              name: 'PostgreSQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -8763,7 +8763,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 05ada75c666e45269c3c36159f9902cc
-          name: 'Azure PostgreSQL: Connections active'
+          name: 'Connections active'
           type: DEPENDENT
           key: azure.db.pgsql.connections.active
           delay: '0'
@@ -8780,7 +8780,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 00d1116141874dbfb204ebfe96c203f1
-          name: 'Azure PostgreSQL: Connections failed'
+          name: 'Connections failed'
           type: DEPENDENT
           key: azure.db.pgsql.connections.failed
           delay: '0'
@@ -8798,7 +8798,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: f422f01bf1c9484e880581f31f70e120
-          name: 'Azure PostgreSQL: Connections succeeded'
+          name: 'Connections succeeded'
           type: DEPENDENT
           key: azure.db.pgsql.connections.succeeded
           delay: '0'
@@ -8815,7 +8815,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 1f1270c6981b4d08864572410fdeccde
-          name: 'Azure PostgreSQL: CPU credits consumed'
+          name: 'CPU credits consumed'
           type: DEPENDENT
           key: azure.db.pgsql.cpu.credits.consumed
           delay: '0'
@@ -8833,7 +8833,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: e55082c4a278435286335cebd2ae1cac
-          name: 'Azure PostgreSQL: CPU credits remaining'
+          name: 'CPU credits remaining'
           type: DEPENDENT
           key: azure.db.pgsql.cpu.credits.remaining
           delay: '0'
@@ -8851,7 +8851,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 8d85c5c73c894cdda6324832a703fea2
-          name: 'Azure PostgreSQL: Percentage CPU'
+          name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.pgsql.cpu.percentage
           delay: '0'
@@ -8871,7 +8871,7 @@ zabbix_export:
           triggers:
             - uuid: f8672e4488b740a9a17395689c3d853c
               expression: 'min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure PostgreSQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -8879,7 +8879,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 06c4226667ec4c4489e6d3ad31c3135f
-          name: 'Azure PostgreSQL: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.db.pgsql.data.errors
           delay: '0'
@@ -8902,7 +8902,7 @@ zabbix_export:
           triggers:
             - uuid: 55962f0d8a4c44c9a6b09da705e94c59
               expression: 'length(last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.data.errors))>0'
-              name: 'Azure PostgreSQL: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -8910,7 +8910,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 1792c0566e8a438dad5e299d8f5b9094
-          name: 'Azure PostgreSQL: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: azure.db.pgsql.data.get
           history: '0'
@@ -9103,7 +9103,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9fc7a458995d4ac8a4c1d8550177471d
-          name: 'Azure PostgreSQL: Data disk read Bps'
+          name: 'Data disk read Bps'
           type: DEPENDENT
           key: azure.db.pgsql.disk.bps.read
           delay: '0'
@@ -9122,7 +9122,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 46c500b44164430c952be3a1b2008fb8
-          name: 'Azure PostgreSQL: Data disk write Bps'
+          name: 'Data disk write Bps'
           type: DEPENDENT
           key: azure.db.pgsql.disk.bps.write
           delay: '0'
@@ -9141,7 +9141,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b8812461d49a4ff5a2177c2990969c38
-          name: 'Azure PostgreSQL: Data disk queue depth'
+          name: 'Data disk queue depth'
           type: DEPENDENT
           key: azure.db.pgsql.disk.queue.depth
           delay: '0'
@@ -9159,7 +9159,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 10dd8ed658d8442ca39ac1decf9bc2f8
-          name: 'Azure PostgreSQL: Data disk IOPS'
+          name: 'Data disk IOPS'
           type: DEPENDENT
           key: azure.db.pgsql.iops
           delay: '0'
@@ -9177,7 +9177,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: dee65b110a4842ccba8e74eefc097304
-          name: 'Azure PostgreSQL: Data disk read IOPS'
+          name: 'Data disk read IOPS'
           type: DEPENDENT
           key: azure.db.pgsql.iops.read
           delay: '0'
@@ -9196,7 +9196,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 805dfa040c0a4700acac4b5b1f8a4d11
-          name: 'Azure PostgreSQL: Data disk write IOPS'
+          name: 'Data disk write IOPS'
           type: DEPENDENT
           key: azure.db.pgsql.iops.write
           delay: '0'
@@ -9215,7 +9215,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d1d909c2dd0d42649094ec8339e08881
-          name: 'Azure PostgreSQL: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: azure.db.pgsql.memory.percentage
           delay: '0'
@@ -9235,7 +9235,7 @@ zabbix_export:
           triggers:
             - uuid: aac52a89709044ed987a365a1d5af17b
               expression: 'min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
-              name: 'Azure PostgreSQL: High memory utilization'
+              name: 'High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -9243,7 +9243,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 040898e15a26455a9992c603ca2d45df
-          name: 'Azure PostgreSQL: Network out'
+          name: 'Network out'
           type: DEPENDENT
           key: azure.db.pgsql.network.egress
           delay: '0'
@@ -9264,7 +9264,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 8e398d8b33444a148760ec33622755a6
-          name: 'Azure PostgreSQL: Network in'
+          name: 'Network in'
           type: DEPENDENT
           key: azure.db.pgsql.network.ingress
           delay: '0'
@@ -9285,7 +9285,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: ebebf8b3a2884576abb250fdc2385c6f
-          name: 'Azure PostgreSQL: Backup storage used'
+          name: 'Backup storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.backup.used
           delay: '0'
@@ -9304,7 +9304,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 9bbfba89a1834798b71260536fedab55
-          name: 'Azure PostgreSQL: Storage free'
+          name: 'Storage free'
           type: DEPENDENT
           key: azure.db.pgsql.storage.free
           delay: '0'
@@ -9322,7 +9322,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d9d97e728d1741568fce925c0fca33a8
-          name: 'Azure PostgreSQL: Storage percent'
+          name: 'Storage percent'
           type: DEPENDENT
           key: azure.db.pgsql.storage.percent
           delay: '0'
@@ -9342,7 +9342,7 @@ zabbix_export:
           triggers:
             - uuid: de3142bed28340d9abe518cd3967b024
               expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure PostgreSQL: Storage space is critically low'
+              name: 'Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical utilization of the storage space.'
@@ -9351,7 +9351,7 @@ zabbix_export:
                   value: capacity
             - uuid: e948600affaa4ff4a0ab4e50f4858c0a
               expression: 'last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure PostgreSQL: Storage space is low'
+              name: 'Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High utilization of the storage space.'
@@ -9359,7 +9359,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 4dae6c2c1dbf4492a73fd1834cae6aad
-          name: 'Azure PostgreSQL: Transaction log storage used'
+          name: 'Transaction log storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.txlogs.used
           delay: '0'
@@ -9377,7 +9377,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7a85b5223ec44ff8bc996c9df1673611
-          name: 'Azure PostgreSQL: Storage used'
+          name: 'Storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.used
           delay: '0'
@@ -9395,7 +9395,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6df77ed1d4614ca793df56dbc70d821c
-          name: 'Azure PostgreSQL: Maximum used transaction IDs'
+          name: 'Maximum used transaction IDs'
           type: DEPENDENT
           key: azure.db.pgsql.txid.used.max
           delay: '0'
@@ -9830,7 +9830,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 9eb43a5ffb0d4e07be8d1fccfdecd2aa
-          name: 'Azure PostgreSQL: Availability status detailed'
+          name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.pgsql.availability.details
           delay: '0'
@@ -9851,7 +9851,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: df4c66646f864f79b5f5e9f71dbefe82
-          name: 'Azure PostgreSQL: Availability state'
+          name: 'Availability state'
           type: DEPENDENT
           key: azure.db.pgsql.availability.state
           delay: '0'
@@ -9898,7 +9898,7 @@ zabbix_export:
           triggers:
             - uuid: 699ca12c916746b1bf1e121261771cc3
               expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=1'
-              name: 'Azure PostgreSQL: PostgreSQL server is degraded'
+              name: 'PostgreSQL server is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -9907,7 +9907,7 @@ zabbix_export:
                   value: availability
             - uuid: 14e45ba0bc26409a89d92edfda152947
               expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=3'
-              name: 'Azure PostgreSQL: PostgreSQL server is in unknown state'
+              name: 'PostgreSQL server is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -9916,7 +9916,7 @@ zabbix_export:
                   value: availability
             - uuid: 4dc9113f8a914ac098d8736dba5aed4a
               expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=2'
-              name: 'Azure PostgreSQL: PostgreSQL server is unavailable'
+              name: 'PostgreSQL server is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -9924,7 +9924,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 3d0d3e1fe77740e4bd7b720368707214
-          name: 'Azure PostgreSQL: Connections active'
+          name: 'Connections active'
           type: DEPENDENT
           key: azure.db.pgsql.connections.active
           delay: '0'
@@ -9941,7 +9941,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 353a6ba543a84b32b16a5809ae63b4e1
-          name: 'Azure PostgreSQL: Connections failed'
+          name: 'Connections failed'
           type: DEPENDENT
           key: azure.db.pgsql.connections.failed
           delay: '0'
@@ -9959,7 +9959,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 537330b2372b434ebcea8a77a809c2f3
-          name: 'Azure PostgreSQL: Percentage CPU'
+          name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.pgsql.cpu.percentage
           delay: '0'
@@ -9979,7 +9979,7 @@ zabbix_export:
           triggers:
             - uuid: 33bd2ef88ad3468b9f0b2b1358cc7448
               expression: 'min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
-              name: 'Azure PostgreSQL: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -9987,7 +9987,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 5b132ff050c94daa92b252529a52c535
-          name: 'Azure PostgreSQL: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.db.pgsql.data.errors
           delay: '0'
@@ -10010,7 +10010,7 @@ zabbix_export:
           triggers:
             - uuid: dd3d0be997204f8b9968ef5839fb7a9b
               expression: 'length(last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.data.errors))>0'
-              name: 'Azure PostgreSQL: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -10018,7 +10018,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: e47d863822e64e6292bfa3e684bc2839
-          name: 'Azure PostgreSQL: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: azure.db.pgsql.data.get
           history: '0'
@@ -10198,7 +10198,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9eade85c49bc462aab33b03e37581d87
-          name: 'Azure PostgreSQL: IO consumption percent'
+          name: 'IO consumption percent'
           type: DEPENDENT
           key: azure.db.pgsql.io.consumption.percent
           delay: '0'
@@ -10216,7 +10216,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: e2ee4882b08f45788e6abb698265810e
-          name: 'Azure PostgreSQL: Memory utilization'
+          name: 'Memory utilization'
           type: DEPENDENT
           key: azure.db.pgsql.memory.percentage
           delay: '0'
@@ -10236,7 +10236,7 @@ zabbix_export:
           triggers:
             - uuid: 3119f21167a546369c05d31cda2e0147
               expression: 'min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
-              name: 'Azure PostgreSQL: High memory utilization'
+              name: 'High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
@@ -10244,7 +10244,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: f81eeb98d5e942f296c360ff71e8bf8d
-          name: 'Azure PostgreSQL: Network out'
+          name: 'Network out'
           type: DEPENDENT
           key: azure.db.pgsql.network.egress
           delay: '0'
@@ -10266,7 +10266,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 51f7e35042d04ddb88c7703d1b015d3b
-          name: 'Azure PostgreSQL: Network in'
+          name: 'Network in'
           type: DEPENDENT
           key: azure.db.pgsql.network.ingress
           delay: '0'
@@ -10288,7 +10288,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 1db9e470b527476fae1d26d4b67f855b
-          name: 'Azure PostgreSQL: Replication lag'
+          name: 'Replication lag'
           type: DEPENDENT
           key: azure.db.pgsql.replica.log.delay
           delay: '0'
@@ -10307,7 +10307,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 6cdfda8f9e6640f8a8536f88729d75d6
-          name: 'Azure PostgreSQL: Max lag across replicas in bytes'
+          name: 'Max lag across replicas in bytes'
           type: DEPENDENT
           key: azure.db.pgsql.replica.log.delay.bytes
           delay: '0'
@@ -10326,7 +10326,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 6b06fb0e008640839dc3cda5bcc3f91a
-          name: 'Azure PostgreSQL: Backup storage used'
+          name: 'Backup storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.backup.used
           delay: '0'
@@ -10344,7 +10344,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b8d5ac0b049a4d73b2f35f59c7e7609c
-          name: 'Azure PostgreSQL: Storage limit'
+          name: 'Storage limit'
           type: DEPENDENT
           key: azure.db.pgsql.storage.limit
           delay: '0'
@@ -10362,7 +10362,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 750b4d3438614cc992694136d309c3cb
-          name: 'Azure PostgreSQL: Storage percent'
+          name: 'Storage percent'
           type: DEPENDENT
           key: azure.db.pgsql.storage.percent
           delay: '0'
@@ -10382,7 +10382,7 @@ zabbix_export:
           triggers:
             - uuid: 6538d2c8ed774feb951204308f1458ce
               expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure PostgreSQL: Storage space is critically low'
+              name: 'Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Critical utilization of the storage space.'
@@ -10391,7 +10391,7 @@ zabbix_export:
                   value: capacity
             - uuid: 7f7a004cfc2a492092dd74c475888e8b
               expression: 'last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
-              name: 'Azure PostgreSQL: Storage space is low'
+              name: 'Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'High utilization of the storage space.'
@@ -10399,7 +10399,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 399ef67426494a5cb7a820d056dfd4d5
-          name: 'Azure PostgreSQL: Server log storage limit'
+          name: 'Server log storage limit'
           type: DEPENDENT
           key: azure.db.pgsql.storage.server.log.limit
           delay: '0'
@@ -10417,7 +10417,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: ef6890330ebe4fe09f46b0d2f6d3f827
-          name: 'Azure PostgreSQL: Server log storage percent'
+          name: 'Server log storage percent'
           type: DEPENDENT
           key: azure.db.pgsql.storage.server.log.percent
           delay: '0'
@@ -10435,7 +10435,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 36bd10a959964083ae47349dd83ec695
-          name: 'Azure PostgreSQL: Server log storage used'
+          name: 'Server log storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.server.log.used
           delay: '0'
@@ -10453,7 +10453,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: dcbb87d442a04938b23e68f739f1e36f
-          name: 'Azure PostgreSQL: Storage used'
+          name: 'Storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.used
           delay: '0'
@@ -10832,7 +10832,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: c299999d69904340acd44fead6c7672c
-          name: 'Azure: Availability status detailed'
+          name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.vm.availability.details
           delay: '0'
@@ -10853,7 +10853,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 25e2af44bfbf4e9083ce493d85232088
-          name: 'Azure: Availability state'
+          name: 'Availability state'
           type: DEPENDENT
           key: azure.vm.availability.state
           delay: '0'
@@ -10900,7 +10900,7 @@ zabbix_export:
           triggers:
             - uuid: c0170d8a09ae460da923fe773b2b0bd0
               expression: 'last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=1'
-              name: 'Azure: Virtual machine is degraded'
+              name: 'Virtual machine is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'The resource is in degraded state.'
@@ -10909,7 +10909,7 @@ zabbix_export:
                   value: availability
             - uuid: e1b85765b83445ebbf15f02d782b9858
               expression: 'last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=3'
-              name: 'Azure: Virtual machine is in unknown state'
+              name: 'Virtual machine is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The resource state is unknown.'
@@ -10918,7 +10918,7 @@ zabbix_export:
                   value: availability
             - uuid: b3d764ff735e44f8806cc4d29090719e
               expression: 'last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=2'
-              name: 'Azure: Virtual machine is unavailable'
+              name: 'Virtual machine is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The resource state is unavailable.'
@@ -10926,7 +10926,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: a93308573303437487d151de340fcaed
-          name: 'Azure: VM cached bandwidth consumed percentage'
+          name: 'VM cached bandwidth consumed percentage'
           type: DEPENDENT
           key: azure.vm.cached.bandwidth.consumed.percentage
           delay: '0'
@@ -10943,7 +10943,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 989dec26d97d44b6bd4a84fdbd37dec5
-          name: 'Azure: VM cached IOPS consumed percentage'
+          name: 'VM cached IOPS consumed percentage'
           type: DEPENDENT
           key: azure.vm.cached.iops.consumed.percentage
           delay: '0'
@@ -10960,7 +10960,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: fb0641ca8f104cf1bebdced63cd6af16
-          name: 'Azure: CPU credits consumed'
+          name: 'CPU credits consumed'
           type: DEPENDENT
           key: azure.vm.cpu.credits.consumed
           delay: '0'
@@ -10978,7 +10978,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 963752cbaba046cab1f05b0cbcff3137
-          name: 'Azure: CPU credits remaining'
+          name: 'CPU credits remaining'
           type: DEPENDENT
           key: azure.vm.cpu.credits.remaining
           delay: '0'
@@ -10996,7 +10996,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 492edacf92544a95a5aa7b034efa7931
-          name: 'Azure: Percentage CPU'
+          name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.vm.cpu.percentage
           delay: '0'
@@ -11016,7 +11016,7 @@ zabbix_export:
           triggers:
             - uuid: 9e6d9394570641418b4291befb1e38e5
               expression: 'min(/Azure Virtual Machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}'
-              name: 'Azure: High CPU utilization'
+              name: 'High CPU utilization'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -11024,7 +11024,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 47cda13c203e4f1e9918eb73fd8afa20
-          name: 'Azure: Data disk bandwidth consumed percentage'
+          name: 'Data disk bandwidth consumed percentage'
           type: DEPENDENT
           key: azure.vm.data.disk.bandwidth.consumed.percentage
           delay: '0'
@@ -11043,7 +11043,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3121980d3319431691ed9e98d176430b
-          name: 'Azure: Data disk IOPS consumed percentage'
+          name: 'Data disk IOPS consumed percentage'
           type: DEPENDENT
           key: azure.vm.data.disk.iops.consumed.percentage
           delay: '0'
@@ -11062,7 +11062,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d0fb23206d564e1da746bff3369056c1
-          name: 'Azure: Data disk max burst bandwidth'
+          name: 'Data disk max burst bandwidth'
           type: DEPENDENT
           key: azure.vm.data.disk.max.bandwidth
           delay: '0'
@@ -11081,7 +11081,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6afcbb02c53243faa341670f155678e4
-          name: 'Azure: Data disk max burst IOPS'
+          name: 'Data disk max burst IOPS'
           type: DEPENDENT
           key: azure.vm.data.disk.max.iops
           delay: '0'
@@ -11100,7 +11100,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b81f304bbc2a42df9b0550ecdc1ec6b7
-          name: 'Azure: Data disk queue depth'
+          name: 'Data disk queue depth'
           type: DEPENDENT
           key: azure.vm.data.disk.queue.depth
           delay: '0'
@@ -11118,7 +11118,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 021d92f3075544319191d6f85a701222
-          name: 'Azure: Data disk read rate'
+          name: 'Data disk read rate'
           type: DEPENDENT
           key: azure.vm.data.disk.read.bps
           delay: '0'
@@ -11137,7 +11137,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: cc31283ab96548b7bdcc88e89dfae53c
-          name: 'Azure: Data disk read operations/sec'
+          name: 'Data disk read operations/sec'
           type: DEPENDENT
           key: azure.vm.data.disk.read.ops
           delay: '0'
@@ -11156,7 +11156,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: c61ad4af97c243cca75bbece40eea795
-          name: 'Azure: Data disk target bandwidth'
+          name: 'Data disk target bandwidth'
           type: DEPENDENT
           key: azure.vm.data.disk.target.bandwidth
           delay: '0'
@@ -11175,7 +11175,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 9370988456e74b889700ea5798d17092
-          name: 'Azure: Data disk target IOPS'
+          name: 'Data disk target IOPS'
           type: DEPENDENT
           key: azure.vm.data.disk.target.iops
           delay: '0'
@@ -11194,7 +11194,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 68c730e4904f402cb12fb71b45fede02
-          name: 'Azure: Data disk used burst BPS credits percentage'
+          name: 'Data disk used burst BPS credits percentage'
           type: DEPENDENT
           key: azure.vm.data.disk.used.burst.bandwidth
           delay: '0'
@@ -11213,7 +11213,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 731a82833bdd42c59c453adf8625e3b4
-          name: 'Azure: Data disk used burst IO credits percentage'
+          name: 'Data disk used burst IO credits percentage'
           type: DEPENDENT
           key: azure.vm.data.disk.used.burst.iops
           delay: '0'
@@ -11232,7 +11232,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b8712f8fd60a43f6b099d9eafed19945
-          name: 'Azure: Data disk write rate'
+          name: 'Data disk write rate'
           type: DEPENDENT
           key: azure.vm.data.disk.write.bps
           delay: '0'
@@ -11251,7 +11251,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 87794f5a502b4e2db91f820483e38fb3
-          name: 'Azure: Data disk write operations/sec'
+          name: 'Data disk write operations/sec'
           type: DEPENDENT
           key: azure.vm.data.disk.write.ops
           delay: '0'
@@ -11270,7 +11270,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e253c2a908944be1a033fc3df550d979
-          name: 'Azure: Get errors'
+          name: 'Get errors'
           type: DEPENDENT
           key: azure.vm.data.errors
           delay: '0'
@@ -11293,7 +11293,7 @@ zabbix_export:
           triggers:
             - uuid: 87236c99652643ba800601a461d66d94
               expression: 'length(last(/Azure Virtual Machine by HTTP/azure.vm.data.errors))>0'
-              name: 'Azure: There are errors in requests to API'
+              name: 'There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
@@ -11301,7 +11301,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: cff54514d795495da8bc1152e02631aa
-          name: 'Azure: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: azure.vm.data.get
           history: '0'
@@ -11515,7 +11515,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1dc9f8d45b6f48a38f701f089cbcb279
-          name: 'Azure: Disk read rate'
+          name: 'Disk read rate'
           type: DEPENDENT
           key: azure.vm.disk.read.bytes
           delay: '0'
@@ -11536,7 +11536,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: cd3240d31a4f42a89b5c9817ea288b5a
-          name: 'Azure: Disk read operations/sec'
+          name: 'Disk read operations/sec'
           type: DEPENDENT
           key: azure.vm.disk.read.ops
           delay: '0'
@@ -11554,7 +11554,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b5e2070bde1444ea809ba4e0a29b05d9
-          name: 'Azure: Disk write rate'
+          name: 'Disk write rate'
           type: DEPENDENT
           key: azure.vm.disk.write.bytes
           delay: '0'
@@ -11575,7 +11575,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 0d93d1b510614c1f83418bd481f1e7cb
-          name: 'Azure: Disk write operations/sec'
+          name: 'Disk write operations/sec'
           type: DEPENDENT
           key: azure.vm.disk.write.ops
           delay: '0'
@@ -11593,7 +11593,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3a30a59aabd54c8b8feb1f4a8ba06db5
-          name: 'Azure: Inbound flows'
+          name: 'Inbound flows'
           type: DEPENDENT
           key: azure.vm.flows.inbound
           delay: '0'
@@ -11611,7 +11611,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3964ffbb7ea949f69863edcf91f5c555
-          name: 'Azure: Inbound flows max creation rate'
+          name: 'Inbound flows max creation rate'
           type: DEPENDENT
           key: azure.vm.flows.inbound.max
           delay: '0'
@@ -11629,7 +11629,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 2084cb1d010a4ab494c0826c458d922a
-          name: 'Azure: Outbound flows'
+          name: 'Outbound flows'
           type: DEPENDENT
           key: azure.vm.flows.outbound
           delay: '0'
@@ -11647,7 +11647,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: eac3e6b53d394e3289fc03bf5772799c
-          name: 'Azure: Outbound flows max creation rate'
+          name: 'Outbound flows max creation rate'
           type: DEPENDENT
           key: azure.vm.flows.outbound.max
           delay: '0'
@@ -11665,7 +11665,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 0a354c9b104b468d9749adfd28d1373e
-          name: 'Azure: Available memory'
+          name: 'Available memory'
           type: DEPENDENT
           key: azure.vm.memory.available
           delay: '0'
@@ -11682,7 +11682,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 411c5f6fcb374c4c90e2951a546c0c08
-          name: 'Azure: Network in total'
+          name: 'Network in total'
           type: DEPENDENT
           key: azure.vm.network.in.total
           delay: '0'
@@ -11704,7 +11704,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: ee2ef1d1e2844ae8be2a5f04c86631ba
-          name: 'Azure: Network out total'
+          name: 'Network out total'
           type: DEPENDENT
           key: azure.vm.network.out.total
           delay: '0'
@@ -11726,7 +11726,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 24c58e473c5c4b8388a0e78ae38378fc
-          name: 'Azure: OS disk bandwidth consumed percentage'
+          name: 'OS disk bandwidth consumed percentage'
           type: DEPENDENT
           key: azure.vm.os.disk.bandwidth.consumed.percentage
           delay: '0'
@@ -11745,7 +11745,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 33a7fff9758046e3be07dad6c0a710ca
-          name: 'Azure: OS disk IOPS consumed percentage'
+          name: 'OS disk IOPS consumed percentage'
           type: DEPENDENT
           key: azure.vm.os.disk.iops.consumed.percentage
           delay: '0'
@@ -11764,7 +11764,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7d0ca132bc264ac08e3c55809bdc40d1
-          name: 'Azure: OS disk max burst bandwidth'
+          name: 'OS disk max burst bandwidth'
           type: DEPENDENT
           key: azure.vm.os.disk.max.bandwidth
           delay: '0'
@@ -11783,7 +11783,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 8374282688dc4fabb770c07eb335c666
-          name: 'Azure: OS disk max burst IOPS'
+          name: 'OS disk max burst IOPS'
           type: DEPENDENT
           key: azure.vm.os.disk.max.iops
           delay: '0'
@@ -11802,7 +11802,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: ca8fe9d0ea58482c9bb8b83a716362a2
-          name: 'Azure: OS disk queue depth'
+          name: 'OS disk queue depth'
           type: DEPENDENT
           key: azure.vm.os.disk.queue.depth
           delay: '0'
@@ -11820,7 +11820,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 30265aac759d45769769eae081f570ac
-          name: 'Azure: OS disk read rate'
+          name: 'OS disk read rate'
           type: DEPENDENT
           key: azure.vm.os.disk.read.bps
           delay: '0'
@@ -11839,7 +11839,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: f11fcbbd63234993a9c301dc8bac3e80
-          name: 'Azure: OS disk read operations/sec'
+          name: 'OS disk read operations/sec'
           type: DEPENDENT
           key: azure.vm.os.disk.read.ops
           delay: '0'
@@ -11858,7 +11858,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 5cc422b7da3145fa885a88bb6165e3b9
-          name: 'Azure: OS disk target bandwidth'
+          name: 'OS disk target bandwidth'
           type: DEPENDENT
           key: azure.vm.os.disk.target.bandwidth
           delay: '0'
@@ -11877,7 +11877,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 556941b1df5d470f8de628230b085623
-          name: 'Azure: OS disk target IOPS'
+          name: 'OS disk target IOPS'
           type: DEPENDENT
           key: azure.vm.os.disk.target.iops
           delay: '0'
@@ -11896,7 +11896,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 9d42609950864c899a0d63b94f1d2235
-          name: 'Azure: OS disk used burst BPS credits percentage'
+          name: 'OS disk used burst BPS credits percentage'
           type: DEPENDENT
           key: azure.vm.os.disk.used.burst.bandwidth
           delay: '0'
@@ -11915,7 +11915,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: c08f45df2e594e1fab01ba63df7da05b
-          name: 'Azure: OS disk used burst IO credits percentage'
+          name: 'OS disk used burst IO credits percentage'
           type: DEPENDENT
           key: azure.vm.os.disk.used.burst.iops
           delay: '0'
@@ -11934,7 +11934,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7645519a786b42908f1ec693128899c2
-          name: 'Azure: OS disk write rate'
+          name: 'OS disk write rate'
           type: DEPENDENT
           key: azure.vm.os.disk.write.bps
           delay: '0'
@@ -11953,7 +11953,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 1e9392bc0c934e7d93f743c86e36e23e
-          name: 'Azure: OS disk write operations/sec'
+          name: 'OS disk write operations/sec'
           type: DEPENDENT
           key: azure.vm.os.disk.write.ops
           delay: '0'
@@ -11972,7 +11972,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d6fcff826cfa486d945f33708be2f630
-          name: 'Azure: Premium data disk cache read hit'
+          name: 'Premium data disk cache read hit'
           type: DEPENDENT
           key: azure.vm.premium.data.disk.cache.read.hit
           delay: '0'
@@ -11990,7 +11990,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 288853ee5d08442fa43f8df1dfcc7823
-          name: 'Azure: Premium data disk cache read miss'
+          name: 'Premium data disk cache read miss'
           type: DEPENDENT
           key: azure.vm.premium.data.disk.cache.read.miss
           delay: '0'
@@ -12008,7 +12008,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 66b629ae3d7e4abeaf0282414c91876f
-          name: 'Azure: Premium OS disk cache read hit'
+          name: 'Premium OS disk cache read hit'
           type: DEPENDENT
           key: azure.vm.premium.os.disk.cache.read.hit
           delay: '0'
@@ -12026,7 +12026,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3927f34d5d0649d7ac29703f64054dbf
-          name: 'Azure: Premium OS disk cache read miss'
+          name: 'Premium OS disk cache read miss'
           type: DEPENDENT
           key: azure.vm.premium.os.disk.cache.read.miss
           delay: '0'
@@ -12044,7 +12044,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d6e85395e34b4288988a5287d287f182
-          name: 'Azure: VM uncached bandwidth consumed percentage'
+          name: 'VM uncached bandwidth consumed percentage'
           type: DEPENDENT
           key: azure.vm.uncached.bandwidth.consumed.percentage
           delay: '0'
@@ -12061,7 +12061,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 124203560922429bb32b76c45f24b2b9
-          name: 'Azure: VM uncached IOPS consumed percentage'
+          name: 'VM uncached IOPS consumed percentage'
           type: DEPENDENT
           key: azure.vm.uncached.iops.consumed.percentage
           delay: '0'

@@ -89,11 +89,15 @@ $fields = [
 	$paramsFieldName =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update}))'.
 									' && isset({type}) && '.IN([
 											ITEM_TYPE_SSH, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
-											ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+											ITEM_TYPE_SCRIPT
 										],
 										'type'
 									),
 									getParamFieldLabelByType(getRequest('type', 0))
+								],
+	'browser_script' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update})) '.
+									' && isset({type}) && {type} == '.ITEM_TYPE_BROWSER,
+									_('Script')
 								],
 	'snmp_oid' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 									'(isset({add}) || isset({update})) && isset({type})'.
@@ -538,6 +542,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'publickey' => getRequest('publickey', DB::getDefault('items', 'publickey')),
 			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
 		];
+
+		if ($input['type'] == ITEM_TYPE_BROWSER) {
+			$input['params'] = getRequest('browser_script', '');
+		}
 
 		if ($input['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 			foreach ($input['filter']['conditions'] as &$condition) {
