@@ -53,7 +53,6 @@ use Widgets\ItemHistory\Includes\CWidgetFieldColumnsListView;
 					->setDateFormat(ZBX_FULL_DATE_TIME)
 					->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 					->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-					->addRowClass('js-row-time-period')
 			)
 	)
 	->includeJsFile('widget.edit.js.php')
