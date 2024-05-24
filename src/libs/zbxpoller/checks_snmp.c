@@ -1581,7 +1581,6 @@ reduce_max_vars:
 					break;
 				}
 
-
 				if (SUCCEED != zbx_snmp_choose_index(oid_index, sizeof(oid_index), var->name,
 						var->name_length, root_string_len, root_numeric_len, root_oid))
 				{
@@ -3618,10 +3617,15 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 		{
-			event_base_free(snmp_result.base);
-			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot initialize asynchronous DNS library"));
-			errcodes[j] = CONFIG_ERROR;
-			goto out;
+			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library with resolv.conf");
+			if (NULL == (dnsbase = evdns_base_new(snmp_result.base, 0)))
+			{
+				event_base_free(snmp_result.base);
+				SET_MSG_RESULT(&results[j], zbx_strdup(NULL,
+					"cannot initialize asynchronous DNS library"));
+				errcodes[j] = CONFIG_ERROR;
+				goto out;
+			}
 		}
 
 		zbx_set_snmp_bulkwalk_options(progname);
