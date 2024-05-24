@@ -1650,12 +1650,19 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'type' => CFormElement::RELOADABLE_FILL('Item history'),
 					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
-						// TODO: fix with DEV-3721.
-//						[
-//							'field' => 'Columns',
-//							'type' => 'complex',
-//							'mandatory' => true
-//						],
+						[
+							'field' => 'Layout',
+							'type' => 'radio_button',
+							'possible_values' => ['Horizontal', 'Vertical'],
+							'value' => 'Horizontal'
+						],
+						[
+							'field' => 'Columns',
+							'type' => 'table',
+							'headers' => ['', 'Name', 'Data', 'Action'],
+							'buttons' => ['Add'],
+							'mandatory' => true
+						],
 						[
 							'field' => 'Show lines',
 							'value' => 25,
@@ -1664,6 +1671,28 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							],
 							'mandatory' => true
 						]
+					],
+					'hidden' => [
+						[
+							'field' => 'New values',
+							'type' => 'radio_button',
+							'possible_values' => ['Top', 'Bottom'],
+							'value' => 'Top'
+						],
+						[
+							'field' => 'Show timestamp',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show column header',
+							'type' => 'radio_button',
+							'possible_values' => ['Off', 'Horizontal', 'Vertical'],
+							'value' => 'Vertical'
+						]
+					],
+					'fill_for_hidden' => [
+						'Advanced configuration' => true
 					]
 				]
 			],
