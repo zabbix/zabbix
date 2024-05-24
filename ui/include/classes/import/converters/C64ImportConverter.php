@@ -402,16 +402,6 @@ class C64ImportConverter extends CConverter {
 							],
 							[
 								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
-								'name' => 'time_period.from',
-								'value' => 'now-1y'
-							],
-							[
-								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
-								'name' => 'time_period.to',
-								'value' => 'now'
-							],
-							[
-								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 								'name' => 'reference',
 								'value' => $reference++
 							]

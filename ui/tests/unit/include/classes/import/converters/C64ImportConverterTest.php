@@ -574,16 +574,6 @@ class C64ImportConverterTest extends CImportConverterTest {
 															'type' => 'INTEGER',
 															'name' => 'show_timestamp',
 															'value' => '1'
-														],
-														[
-															'type' => 'STRING',
-															'name' => 'time_period.from',
-															'value' => 'now-1y'
-														],
-														[
-															'type' => 'STRING',
-															'name' => 'time_period.to',
-															'value' => 'now'
 														]
 													]
 												],
