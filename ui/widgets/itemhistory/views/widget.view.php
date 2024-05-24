@@ -274,6 +274,7 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 					(new CButton(null, _('Show')))
 						->addClass($column['show_thumbnail'] ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
 						->addClass('js-show-binary')
+						->setAttribute('data-alt', $column['name'])
 				))
 					->addClass($cell_class)
 					->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)

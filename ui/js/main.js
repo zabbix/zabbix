@@ -257,6 +257,8 @@ var hintBox = {
 	 * Initialize hint box event handlers.
 	 *
 	 * Triggered events:
+	 * - onShowHint.hintBox 	- when show a hintbox.
+	 * - onHideHint.hintBox 	- when hide a hintbox.
 	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
@@ -516,6 +518,8 @@ var hintBox = {
 			Overlay.prototype.recoverFocus.call({'$dialogue': target.hintBoxItem});
 			Overlay.prototype.containFocus.call({'$dialogue': target.hintBoxItem});
 		}
+
+		target.dispatchEvent(new CustomEvent('onShowHint.hintBox'));
 	},
 
 	positionElement: function(e, target, $elem) {
@@ -596,6 +600,7 @@ var hintBox = {
 		}
 
 		hintBox.deleteHint(target);
+		target.dispatchEvent(new CustomEvent('onHideHint.hintBox'));
 	},
 
 	deleteHint: function(target) {

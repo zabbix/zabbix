@@ -96,7 +96,10 @@ class CWidgetItemHistory extends CWidget {
 
 			const url = curl.getUrl();
 
-			this.#binary_buttons.set(button, {url, itemid: cell.dataset.itemid, clock, ns});
+			this.#binary_buttons.set(button, {url, clock, ns,
+				itemid: cell.dataset.itemid,
+				alt: cell.dataset.alt
+			});
 
 			urls.push(url);
 		}
@@ -176,16 +179,18 @@ class CWidgetItemHistory extends CWidget {
 		for (const button of buttons) {
 			button.classList.add(ZBX_STYLE_BTN_LINK);
 
-			const curl = this.#getHintboxContentCUrl(button);
-
 			switch (binary_data.type) {
 				case CWidgetItemHistory.VALUE_TYPE_IMAGE:
-					curl.setArgument('action', 'widget.itemhistory.image_value.get');
-					this.#addHintbox(button, `<img src="${curl.getUrl()}">`);
+					const img = document.createElement('img');
+					img.alt = button.dataset.alt;
+
+					this.#addHintbox(button, img);
 					break;
 
 				case CWidgetItemHistory.VALUE_TYPE_RAW:
+					const curl = this.#getHintboxContentCUrl(button);
 					curl.setArgument('action', 'widget.itemhistory.binary_value.get');
+
 					this.#addHintbox(button, '', curl);
 					break;
 
@@ -199,10 +204,11 @@ class CWidgetItemHistory extends CWidget {
 		for (const button of buttons) {
 			button.style.setProperty('--thumbnail', `url(data:image/png;base64,${binary_data.thumbnail})`);
 
-			const curl = this.#getHintboxContentCUrl(button);
-			curl.setArgument('action', 'widget.itemhistory.image_value.get');
+			const img = document.createElement('img');
+			img.alt = button.dataset.alt;
+			img.src = '#';
 
-			this.#addHintbox(button, `<img src="${curl.getUrl()}">`);
+			this.#addHintbox(button, img);
 		}
 	}
 
@@ -217,14 +223,46 @@ class CWidgetItemHistory extends CWidget {
 		return curl;
 	}
 
-	#addHintbox(button, content = '', curl = null) {
+	#addHintbox(button, content, curl = null) {
 		button.dataset.hintbox = '1';
 		button.dataset.hintboxStatic = '1';
 		button.dataset.hintboxClass = 'dashboard-widget-itemhistory-hintbox' + (content === '' ? ' nowrap' : '');
-		button.dataset.hintboxContents = content || t('Empty value');
 
-		if (curl !== null) {
-			button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
+		if (content instanceof HTMLImageElement) {
+			button.addEventListener('onShowHint.hintBox', e => {
+				const hintBox = e.target.hintBoxItem[0];
+				const container = hintBox.querySelector('.dashboard-widget-itemhistory-hintbox');
+
+				hintBox.classList.add('dashboard-widget-itemhistory-hintbox-image');
+
+				const curl = this.#getHintboxContentCUrl(button);
+
+				curl.setArgument('action', 'widget.itemhistory.image_value.get');
+				content.src = curl.getUrl();
+				container.innerHTML = '';
+				container.append(content);
+
+				if (!content.complete) {
+					hintBox.classList.add('is-loading');
+
+					content.addEventListener('load', () => {
+						hintBox.classList.remove('is-loading');
+					});
+
+					content.addEventListener('error', () => {
+						hintBox.classList.remove('is-loading');
+
+						container.text = t('Image loading error.');
+					});
+				}
+			});
+		}
+		else {
+			button.dataset.hintboxContents = content || t('Empty value.');
+
+			if (curl !== null) {
+				button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
+			}
 		}
 	}
 }
