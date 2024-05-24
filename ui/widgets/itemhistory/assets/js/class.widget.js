@@ -259,6 +259,7 @@ class CWidgetItemHistory extends CWidget {
 		}
 		else {
 			if (curl !== null) {
+				button.dataset.hintboxContents = '';
 				button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
 			}
 			else {
