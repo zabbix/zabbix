@@ -218,12 +218,13 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
  * Purpose: processes SMS alert                                               *
  *                                                                            *
  * Parameters: socket      - [IN] connection socket                           *
- *             ipc_message - [IN] ipc message with media type and alert data  *
- *             allowed     - [IN] allowed list of modem devices               *
+ *             ipc_message        - [IN] ipc message with media type and      *
+ *                                       alert data                           *
+ *             config_sms_devices - [IN] allowed list of modem devices        *
  *                                                                            *
  ******************************************************************************/
 static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
-					const char* allowed)
+					const char* config_sms_devices)
 {
 	zbx_uint64_t	alertid;
 	char		*sendto, *message, *gsm_modem, error[MAX_STRING_LEN];
@@ -231,15 +232,15 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 
 	zbx_alerter_deserialize_sms(ipc_message->data, &alertid, &sendto, &message, &gsm_modem);
 
-	if (NULL != allowed && SUCCEED == zbx_str_in_list(allowed, gsm_modem, ','))
+	if (NULL != config_sms_devices && SUCCEED == zbx_str_in_list(config_sms_devices, gsm_modem, ','))
 	{
 		/* SMS uses its own timeouts */
 		ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "error: SMSDevices not configured for %s", gsm_modem);
-		zbx_snprintf(error, sizeof(error), "error: SMSDevices not configured for %s", gsm_modem);
+		zbx_snprintf(error, sizeof(error), "SMSDevices not configured for %s", gsm_modem);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to send SMS: %s", error);
 		ret = FAIL;
 	}
 
