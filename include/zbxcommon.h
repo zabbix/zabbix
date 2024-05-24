@@ -397,15 +397,28 @@ while (0)
 
 void	zbx_this_should_never_happen_backtrace(void);
 
+#define THIS_SHOULD_NEVER_HAPPEN_TEXT	"Something unexpected has just happened."
+
 #define THIS_SHOULD_NEVER_HAPPEN										\
 														\
 do														\
 {														\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
 	zbx_this_should_never_happen_backtrace();								\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] " THIS_SHOULD_NEVER_HAPPEN_TEXT,	\
+			__FILE__, __func__, ZABBIX_REVISION, __LINE__);						\
 }														\
 while (0)
+
+#define THIS_SHOULD_NEVER_HAPPEN_MSG(fmt, ...)									\
+														\
+do														\
+{														\
+	zbx_this_should_never_happen_backtrace();								\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] " THIS_SHOULD_NEVER_HAPPEN_TEXT,	\
+			__FILE__, __func__, ZABBIX_REVISION, __LINE__);						\
+	zbx_error(fmt, ##__VA_ARGS__);										\
+}														\
+while(0)
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
