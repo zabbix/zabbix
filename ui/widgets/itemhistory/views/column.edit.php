@@ -214,6 +214,26 @@ $form_grid->addItem([
 	(new CFormField($thresholds))->addClass('js-thresholds-row')
 ]);
 
+// Time period selector.
+$time_period_field_view = (new CWidgetFieldTimePeriodView($data['time_period_field']))
+	->setDateFormat(ZBX_FULL_DATE_TIME)
+	->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+	->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+	->setFormName('item_history_column_edit_form')
+	->addClass('js-time-period');
+
+foreach ($time_period_field_view->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+	$form_grid->addItem([
+		$label,
+		(new CFormField($view))->addClass($class)
+	]);
+}
+
+$form_grid->addItem(new CScriptTag([
+	'document.forms.item_history_column_edit_form.fields = {};',
+	$time_period_field_view->getJavaScript()
+]));
+
 // History data.
 $form_grid->addItem([
 	(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),

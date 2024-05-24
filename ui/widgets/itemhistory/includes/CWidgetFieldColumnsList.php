@@ -16,9 +16,13 @@
 
 namespace Widgets\ItemHistory\Includes;
 
-use API;
+use API,
+	CWidgetsData;
 
-use Zabbix\Widgets\CWidgetField;
+use Zabbix\Widgets\{
+	CWidgetField,
+	Fields\CWidgetFieldTimePeriod
+};
 
 class CWidgetFieldColumnsList extends CWidgetField {
 
@@ -48,6 +52,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		'FF465C', 'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
 		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
 	];
+
+	private array $time_period_fields = [];
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
@@ -98,7 +104,38 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			return $errors;
 		}
 
+		$this->time_period_fields = [];
+
 		$columns_values = $this->getValue();
+
+		foreach ($columns_values as $column_index => &$value) {
+			$time_period_field = (new CWidgetFieldTimePeriod($this->name.'.'.$column_index.'.time_period'))
+				->setDefault([
+					CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+					)
+				])
+				->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
+				->acceptDashboard()
+				->acceptWidget()
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+				->prefixLabel('/'.($column_index + 1));
+
+			if (array_key_exists('time_period', $value)) {
+				$time_period_field->setValue($value['time_period']);
+			}
+
+			$errors = $time_period_field->validate($strict);
+
+			if ($errors) {
+				return $errors;
+			}
+
+			$value['time_period'] = $time_period_field->getValue();
+
+			$this->time_period_fields[] = $time_period_field;
+		}
+		unset($value);
 
 		$this->setValue($columns_values);
 
@@ -175,6 +212,12 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				}
 			}
 		}
+
+		foreach ($this->time_period_fields as $time_period_field) {
+			$time_period_field->toApi($widget_fields);
+		}
+
+
 	}
 
 	protected function getValidationRules(bool $strict = false): array {
@@ -199,6 +242,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				'color'				=> ['type' => API_COLOR],
 				'threshold'			=> ['type' => API_NUMERIC]
 			]],
+			'time_period'		=> ['type' => API_ANY],
 			'history'			=> ['type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
 			'monospace_font' 	=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
 			'local_time' 		=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
