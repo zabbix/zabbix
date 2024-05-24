@@ -77,8 +77,8 @@ class CWidgetItemHistory extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			has_custom_time_period: !this.getFieldsReferredData().has('time_period') ? 1 : undefined
-		};
+			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
+		}
 	}
 
 	#makeUrls() {
