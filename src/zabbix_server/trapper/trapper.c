@@ -864,7 +864,7 @@ static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t
 	zbx_free(tmp);
 }
 
-static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_level)
+static void	status_stats_export(struct zbx_json *json)
 {
 	const zbx_status_section_t	*section;
 	const zbx_section_entry_t	*entry;
@@ -884,9 +884,6 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 	/* add status information to JSON */
 	for (section = status_sections; NULL != section->name; section++)
 	{
-		if (access_level < section->access_level)	/* skip sections user has no rights to access */
-			continue;
-
 		if (NULL != section->res && SUCCEED != *section->res)	/* skip section we have no information for */
 			continue;
 
@@ -983,7 +980,10 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		case ZBX_GET_STATUS_FULL:
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
-			status_stats_export(&json, user.type);
+
+			if (USER_TYPE_SUPER_ADMIN == user.type)
+				status_stats_export(&json);
+
 			zbx_json_close(&json);
 			break;
 		default:
