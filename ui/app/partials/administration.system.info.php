@@ -116,27 +116,25 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			))->addClass(ZBX_STYLE_RED)
 		);
 	}
-}
 
-// Warn if database history tables have not been upgraded.
-if (!$data['system_info']['float_double_precision']) {
-	$info_table->addRow([
-		_('Database history tables upgraded'),
-		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
-		''
-	]);
-}
+	// Warn if database history tables have not been upgraded.
+	if (!$data['system_info']['float_double_precision']) {
+		$info_table->addRow([
+			_('Database history tables upgraded'),
+			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+			''
+		]);
+	}
 
-if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
-	$info_table->addRow([
-		_('Database history tables use primary key'),
-		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
-		''
-	]);
-}
+	if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
+		$info_table->addRow([
+			_('Database history tables use primary key'),
+			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+			''
+		]);
+	}
 
-// Check DB version.
-if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+	// Check DB version.
 	foreach ($data['system_info']['dbversion_status'] as $dbversion) {
 		switch ($dbversion['flag']) {
 			case DB_VERSION_LOWER_THAN_MINIMUM:
