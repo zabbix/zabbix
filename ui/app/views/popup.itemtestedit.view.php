@@ -400,6 +400,21 @@ $templates = [
 		),
 	(new CTag('script', true))
 		->setAttribute('type', 'text/x-jquery-tmpl')
+		->setId('preprocessing-step-result-warning')
+		->addItem(
+			(new CDiv([
+				(new CDiv('#{result}'))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+					->setHint('#{result}', 'hintbox-wrap'),
+				NBSP(),
+				makeWarningIcon('#{warning}')
+					->addStyle('margin: 0')
+			]))
+				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; display: inline-flex;')
+		),
+	(new CTag('script', true))
+		->setAttribute('type', 'text/x-jquery-tmpl')
 		->setId('preprocessing-step-action-done')
 		->addItem(
 			(new CDiv([

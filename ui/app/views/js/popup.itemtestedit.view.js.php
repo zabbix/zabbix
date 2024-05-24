@@ -32,21 +32,22 @@
  * @return {jQuery}
  */
 function makeStepResult(step) {
-	if (typeof step.error !== 'undefined') {
+	if (step.error !== undefined) {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= json_encode(_('<empty string>')) ?>}
+			{error: step.error || <?= json_encode(htmlspecialchars(_('<empty string>'))) ?>}
 		));
 	}
-	else if (typeof step.result === 'undefined' || step.result === null) {
+	else if (step.result === undefined || step.result === null) {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('No value')) ?>);
 	}
 	else if (step.result === '') {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('<empty string>')) ?>);
 	}
+	else if (step.warning !== undefined) {
+		return jQuery(new Template(jQuery('#preprocessing-step-result-warning').html()).evaluate(step));
+	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
-		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
-			jQuery.extend({result: step.result})
-		));
+		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(step));
 	}
 	else {
 		return jQuery('<span>').text(step.result);
@@ -363,7 +364,7 @@ function processItemPreprocessingTestResults(steps) {
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
-					]) ?>, {failed: step.result})));
+					]) ?>, {failed: step.result === '' ? <?= json_encode(_('<empty string>')) ?> : step.result})));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
