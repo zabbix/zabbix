@@ -82,17 +82,16 @@ else {
 		$column_index = $is_layout_vertical ? $item_value['column_index'] : 0;
 
 		if ($item_value['clock'] != $clock || array_key_exists($column_index, $row)) {
-			if (count($rows) == $data['show_lines']) {
-				$row = [];
-				break;
-			}
-
 			if ($row) {
 				$rows[] = $row;
 			}
 
 			$clock = $item_value['clock'];
 			$row = [];
+
+			if (count($rows) == $data['show_lines']) {
+				break;
+			}
 		}
 
 		$row[$column_index] = $item_value;
