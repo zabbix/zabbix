@@ -4324,7 +4324,7 @@ static int	DBpatch_6050305(void)
 		ZBX_STR2UINT64(widgetid, row[0]);
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, ZBX_WIDGET_FIELD_TYPE_STR,
-				"time_period.from", "now-1h");
+				"time_period.from", "now-1y");
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, ZBX_WIDGET_FIELD_TYPE_STR,
 				"time_period.to", "now");
 	}
