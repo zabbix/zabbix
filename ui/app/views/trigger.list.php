@@ -348,7 +348,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
 		$description,
-		$trigger['opdata'],
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDWRAP),
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 		(new CDiv([
 			$status,

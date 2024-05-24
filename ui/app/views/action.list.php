@@ -145,10 +145,12 @@ if ($data['actions']) {
 
 		$action_list->addRow([
 			new CCheckBox('actionids['.$action['actionid'].']', $action['actionid']),
-			(new CLink($action['name']))
-				->addClass('js-action-edit')
-				->setAttribute('data-actionid', $action['actionid']),
-			$conditions,
+			(new CCol(
+				(new CLink($action['name']))
+					->addClass('js-action-edit')
+					->setAttribute('data-actionid', $action['actionid'])
+			))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
 			$operations,
 			$status
 		]);

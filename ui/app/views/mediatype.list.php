@@ -144,7 +144,9 @@ foreach ($data['mediatypes'] as $media_type) {
 		$action_links = '';
 	}
 
-	$action_column = (new CCol($action_links))->addStyle('white-space: normal;');
+	$action_column = (new CCol($action_links))
+		->addStyle('white-space: normal;')
+		->addClass(ZBX_STYLE_WORDBREAK);
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
@@ -170,11 +172,11 @@ foreach ($data['mediatypes'] as $media_type) {
 	// append row
 	$media_type_table->addRow([
 		new CCheckBox('mediatypeids['.$media_type['mediatypeid'].']', $media_type['mediatypeid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		CMediatypeHelper::getMediaTypes($media_type['typeid']),
 		$status,
 		$action_column,
-		$details,
+		(new CCol($details))->addClass(ZBX_STYLE_WORDBREAK),
 		$test_link
 	]);
 }

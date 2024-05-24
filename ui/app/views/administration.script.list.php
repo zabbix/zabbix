@@ -212,9 +212,10 @@ foreach ($data['scripts'] as $script) {
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))
+			->addClass(ZBX_STYLE_WORDBREAK),
 		$scope,
-		$actions,
+		(new CCol($actions))->addClass(ZBX_STYLE_WORDBREAK),
 		$type,
 		$execute_on,
 		(new CCol(zbx_nl2br($script['command'])))->addClass(ZBX_STYLE_MONOSPACE_FONT),

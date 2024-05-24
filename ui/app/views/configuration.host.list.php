@@ -497,7 +497,7 @@ foreach ($data['hosts'] as $host) {
 
 	$table->addRow([
 		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),
-		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		[
 			new CLink(_('Items'),
 				(new CUrl('zabbix.php'))
@@ -546,8 +546,8 @@ foreach ($data['hosts'] as $host) {
 			CViewHelper::showNum($host['httpTests'])
 		],
 		getHostInterface($interface),
-		$monitored_by,
-		$hostTemplates,
+		(new CCol($monitored_by))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($hostTemplates))->addClass(ZBX_STYLE_WORDBREAK),
 		[
 			$toggle_status_link,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null

@@ -154,7 +154,7 @@ foreach ($data['triggers'] as $trigger) {
 		$checkBox,
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$description,
-		$trigger['opdata'],
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDWRAP),
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 		$status,
 		$discover,
