@@ -265,11 +265,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if ($items_by_source['binary_items']) {
+			$itemids = array_keys($items_by_source['binary_items']);
+
 			$db_binary_items_values = API::History()->get([
 				'history' => ITEM_VALUE_TYPE_BINARY,
-				'itemids' => array_keys($items_by_source['binary_items']),
+				'itemids' => $itemids,
 				'output' => ['itemid', 'clock', 'ns'],
-				'limit' => $this->fields_values['show_lines'],
+				'limit' => $this->fields_values['show_lines'] * count($itemids),
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN
 			]) ?: [];
