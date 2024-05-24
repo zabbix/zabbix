@@ -1027,7 +1027,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Character column with color'
+						'Name' => 'Character column with color and highlights'
 					],
 					'Columns' => [
 						[
@@ -1047,7 +1047,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 								],
 								[
 									'xpath://input[@id="highlights_1_color"]/..' => '00ACC1',
-									'id:highlights_1_pattern' => 'pattern_2'
+									'id:highlights_1_pattern' => 12345
 								]
 							]
 						]
@@ -1140,6 +1140,29 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Name' => 'Character column with text in max length'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Single line',
+								'Use monospace font' => true,
+								'id:max_length' => 'text'
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/max_length": value must be one of 1-500.'
+				]
+			],
+			// #30.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Name' => 'Character column with too large max length'
 					],
 					'Columns' => [
@@ -1157,7 +1180,361 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'column_error' => 'Invalid parameter "/1/max_length": value must be one of 1-500.'
 				]
 			],
-			// Float, bar, indicators, min, max.
+			// #31.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Float column with text in min'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:min' => 'min'
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/min": a number is expected.'
+				]
+			],
+			// #32.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Float column with text in max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:max' => 'max'
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/max": a number is expected.'
+				]
+			],
+			// #33.
+			[
+				[
+					'fields' => [
+						'Name' => 'Float column with Bar display and calculated min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar'
+							]
+						]
+					]
+				]
+			],
+			// #34.
+			[
+				[
+					'fields' => [
+						'Name' => 'Float column with Bar display and negative min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:min' => -9999,
+								'id:max' => -20
+							]
+						]
+					]
+				]
+			],
+			// #35.
+			[
+				[
+					'fields' => [
+						'Name' => 'Float column with Bar display and float min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:min' => -1.5000009,
+								'id:max' => -30
+							]
+						]
+					]
+				]
+			],
+			// #36.
+			[
+				[
+					'fields' => [
+						'Name' => 'Unsigned column with Indicators display and float min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Indicators',
+								'id:min' => -1.5000009,
+								'id:max' => -500.999
+							]
+						]
+					]
+				]
+			],
+			// #37.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Float column with Indicators display and text in min'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Indicators',
+								'id:min' => 'minimal'
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/min": a number is expected.'
+				]
+			],
+			// #38.
+			[
+				[
+					'fields' => [
+						'Name' => 'Unsigned column with Indicators display and calculated min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Unsigned item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Indicators'
+							]
+						]
+					]
+				]
+			],
+			// #39.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Duplicated Thresholds'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							],
+							'Thresholds' => [
+								[
+									'id:thresholds_0_threshold' => 12
+								],
+								[
+									'id:thresholds_1_threshold' => 12
+								]
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/thresholds/2": value (threshold)=(12) already exists.'
+				]
+			],
+			// #40.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Text in Thresholds'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							],
+							'Thresholds' => [
+								[
+									'id:thresholds_0_threshold' => 'text'
+								]
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
+				]
+			],
+			// #41.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Float with  negative Thresholds'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:min' => 0,
+								'id:max' => 0,
+								'History data' => 'History'
+							],
+							'Thresholds' => [
+								[
+									'xpath://input[@id="thresholds_0_color"]/..' => '039BE5',
+									'id:thresholds_0_threshold' => -12
+								],
+								[
+									'xpath://input[@id="thresholds_1_color"]/..' => '039BE5',
+									'id:thresholds_1_threshold' => -500.99
+								],
+								[
+									'xpath://input[@id="thresholds_2_color"]/..' => '00ACC1',
+									'id:thresholds_2_threshold' => 20.0099
+								]
+							]
+						]
+					]
+				]
+			],
+			// #42.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Float with different colors Thresholds'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Indicators',
+								'id:min' => 9999999,
+								'id:max' => 9999999999999,
+								'History data' => 'Trends'
+							],
+							'Thresholds' => [
+								[
+									'xpath://input[@id="thresholds_0_color"]/..' => 'E91E63',
+									'id:thresholds_0_threshold' => 158
+								],
+								[
+									'xpath://input[@id="thresholds_1_color"]/..' => '039BE5',
+									'id:thresholds_1_threshold' => 19.20
+								]
+							]
+						]
+					]
+				]
+			],
+			// #43.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Float with empty Threshold'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							],
+							'Thresholds' => [
+								[
+									'xpath://input[@id="thresholds_0_color"]/..' => 'E91E63'
+								]
+							]
+						]
+					]
+				]
+			],
+			// #44.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Log item column'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Log item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Use monospace font' => true,
+								'Display local time' => true
+							]
+						]
+					]
+				]
+			],
+			// #45.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Text item column'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Use monospace font' => true
+							]
+						]
+					]
+				]
+			]
 		];
 	}
 
@@ -1235,6 +1612,14 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						$column_overlay_form->getFieldContainer('Highlights')->query('button:Add')->one()
 								->waitUntilClickable()->click();
 						$column_overlay_form->fill($highlight);
+					}
+				}
+
+				if (array_key_exists('Thresholds', $column)) {
+					foreach ($column['Thresholds'] as $threshold) {
+						$column_overlay_form->getFieldContainer('Thresholds')->query('button:Add')->one()
+								->waitUntilClickable()->click();
+						$column_overlay_form->fill($threshold);
 					}
 				}
 
