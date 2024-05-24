@@ -22,7 +22,6 @@ use API,
 	CControllerResponseData,
 	CItemHelper,
 	CNumberParser,
-	CSettingsHelper,
 	Manager;
 
 use	Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
@@ -42,6 +41,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$data = [
 			'name' => $this->getInput('name', $name),
+			'info' => $this->makeWidgetInfo(),
 			'columns' => [],
 			'item_values' => [],
 			'layout' => $this->fields_values['layout'],
@@ -227,6 +227,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
+			'info' => $this->makeWidgetInfo(),
 			'columns' => $columns,
 			'item_values' => $item_values,
 			'layout' => $this->fields_values['layout'],
@@ -336,5 +337,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($column);
 
 		return $items_with_source;
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if ($this->hasInput('has_custom_time_period')) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
+			];
+		}
+
+		return $info;
 	}
 }

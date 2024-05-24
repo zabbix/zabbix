@@ -74,6 +74,13 @@ class CWidgetItemHistory extends CWidget {
 		return Promise.all([super.promiseReady(), this.#thumbnail_loader].filter(promise => promise));
 	}
 
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			has_custom_time_period: !this.getFieldsReferredData().has('time_period') ? 1 : undefined
+		};
+	}
+
 	#makeUrls() {
 		const urls = [];
 
