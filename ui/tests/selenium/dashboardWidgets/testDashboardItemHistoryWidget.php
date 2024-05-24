@@ -1022,28 +1022,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-//			// #25.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'Name' => 'Binary column with error in color'
-//					],
-//					'Columns' => [
-//						[
-//							'fields' => [
-//								'Item' => [
-//									'values' => 'Binary item',
-//									'context' => ['values' => 'Host for all item value types']
-//								]
-//							],
-//							'xpath://input[@id="base_color"]/..' => 'FHTRHR',
-//						]
-//					],
-//					'column_error' => 'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
-//				]
-//			],
-			// #26.
+			// #25.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1075,7 +1054,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #27.
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1106,7 +1085,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'column_error' => 'Invalid parameter "/1/highlights/2": value (pattern)=(pattern_1) already exists.'
 				]
 			],
-			// #28.
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1133,7 +1112,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'column_error' => 'Invalid parameter "/1/highlights/1/pattern": cannot be empty.'
 				]
 			],
-			// #29.
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1156,7 +1135,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'column_error' => 'Invalid parameter "/1/max_length": value must be one of 1-500.'
 				]
 			],
-			// #30.
+			// #29.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1231,10 +1210,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
 
 		if ($update) {
-			$buttons = $form->query('id:list_columns')->asTable()->one()->query('button:Remove')->all();
+			$button_remove = $form->query('id:list_columns')->asTable()->one()->query('button:Remove');
+			$remove_count = $button_remove->count();
 
-			foreach ($buttons as $remove_button) {
-				$remove_button->waitUntilClickable()->click();
+			for ($i = 0; $i < $remove_count; $i++) {
+				$button_remove->waitUntilClickable()->one()->click();
 				$form->waitUntilReloaded();
 			}
 		}
