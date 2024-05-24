@@ -24,6 +24,9 @@
 
 #include <termios.h>
 
+#define	ZBX_AT_ESC	"\x1B"
+#define ZBX_AT_CTRL_Z	"\x1A"
+
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
 	int	i, wlen, len, ret = SUCCEED;
@@ -223,11 +226,21 @@ static int	check_phone_number(const char *number)
 	return SUCCEED;
 }
 
+static int	check_sms_message(const char *message)
+{
+	const char *ptr;
+
+	for (ptr = message; '\0' != *ptr; ptr++)
+	{
+		if (ZBX_AT_CTRL_Z == isprint(*ptr))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len)
 {
-#define	ZBX_AT_ESC	"\x1B"
-#define ZBX_AT_CTRL_Z	"\x1A"
-
 	zbx_sms_scenario scenario[] =
 	{
 		{ZBX_AT_ESC	, NULL		, 0},	/* Send <ESC> */
@@ -254,6 +267,15 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 		zabbix_log(LOG_LEVEL_DEBUG, "invalid phone number \"%s\"", number);
 		if (NULL != error)
 			zbx_snprintf(error, max_error_len, "invalid phone number \"%s\"", number);
+
+		return FAIL;
+	}
+
+	if (SUCCEED != check_sms_message(message))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid message \"%s\"", message);
+		if (NULL != error)
+			zbx_snprintf(error, max_error_len, "invalid message \"%s\"", message);
 
 		return FAIL;
 	}
