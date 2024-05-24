@@ -258,10 +258,11 @@ class CWidgetItemHistory extends CWidget {
 			});
 		}
 		else {
-			button.dataset.hintboxContents = content || t('Empty value.');
-
 			if (curl !== null) {
 				button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
+			}
+			else {
+				button.dataset.hintboxContents = content || t('Empty value.');
 			}
 		}
 	}
