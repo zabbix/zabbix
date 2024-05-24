@@ -517,10 +517,115 @@ class C64ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
+	public function importConverterDataProviderPlainTextWidget(): array {
+		return [
+			[
+				[
+					'templates' => [
+						[
+							'name' => 'template',
+							'dashboards' => [
+								[
+									'pages' => [
+										[
+											'widgets' => [
+												[
+													'type' => 'plaintext',
+													'width' => '6',
+													'fields' => []
+												],
+												[
+													'type' => 'graph',
+													'width' => '3',
+													'fields' => []
+												],
+												[
+													'type' => 'graphprototype',
+													'width' => '4',
+													'fields' => []
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'templates' => [
+						[
+							'name' => 'template',
+							'dashboards' => [
+								[
+									'pages' => [
+										[
+											'widgets' => [
+												[
+													'type' => 'itemhistory',
+													'width' => '18',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAA'
+														],
+														[
+															'type' => 'INTEGER',
+															'name' => 'show_timestamp',
+															'value' => '1'
+														],
+														[
+															'type' => 'STRING',
+															'name' => 'time_period.from',
+															'value' => 'now-1y'
+														],
+														[
+															'type' => 'STRING',
+															'name' => 'time_period.to',
+															'value' => 'now'
+														]
+													]
+												],
+												[
+													'type' => 'graph',
+													'width' => '9',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAB'
+														]
+													]
+												],
+												[
+													'type' => 'graphprototype',
+													'width' => '12',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAC'
+														]
+													]
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider importConverterDataProviderItemTimeout
 	 * @dataProvider importConverterDataProviderExpressionHistoryFunction
 	 * @dataProvider importConverterDataProviderCalcItemFormula
+	 * @dataProvider importConverterDataProviderPlainTextWidget
 	 *
 	 * @param array $data
 	 * @param array $expected
