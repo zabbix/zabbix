@@ -3890,6 +3890,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
 						'Name' => 'SLA report widget with missing SLA'
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "SLA": cannot be empty.'
 				]
 			],
@@ -3906,6 +3907,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'swap_expected' => [
 						'Show periods' => 0
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
@@ -3919,6 +3921,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'SLA' => 'SLA Daily',
 						'Show periods' => '101'
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
@@ -3935,6 +3938,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'swap_expected' => [
 						'Show periods' => 0
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
@@ -3948,6 +3952,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'SLA' => 'SLA Daily',
 						'Show periods' => '-5'
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
@@ -3962,6 +3967,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'From' => 'yesterday',
 						'To' => 'today + 1 day'
 					],
+					'page' => '2nd page',
 					'error_message' => [
 						'Invalid parameter "From": a date is expected.',
 						'Invalid parameter "To": a date is expected.'
@@ -3979,6 +3985,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'From' => '2022/01/01',
 						'To' => '2022/02/01'
 					],
+					'page' => '2nd page',
 					'error_message' => [
 						'Invalid parameter "From": a date is expected.',
 						'Invalid parameter "To": a date is expected.'
@@ -3996,6 +4003,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'From' => '1968-01-01',
 						'To' => '1969-10-10'
 					],
+					'page' => '2nd page',
 					'error_message' => [
 						'Invalid parameter "From": a date is expected.',
 						'Invalid parameter "To": a date is expected.'
@@ -4013,6 +4021,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'From' => '2040-01-01',
 						'To' => '2050-10-10'
 					],
+					'page' => '2nd page',
 					'error_message' => [
 						'Invalid parameter "From": a date is expected.',
 						'Invalid parameter "To": a date is expected.'
@@ -4607,6 +4616,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			if (array_key_exists('Advanced configuration', $reference_data)) {
 				$reopened_form->fill(['Advanced configuration' => true]);
+				$this->assertTrue($reopened_form->query('xpath:.//button[@title="Collapse"]')->one()->isVisible());
 			}
 
 			$this->assertEquals($created_values, $reopened_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))
@@ -4617,7 +4627,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			// Check saved column and item name.
 			if (array_key_exists('Column', $data)) {
 				$row = $reopened_form->query('id:list_columns')->asTable()->one()->getRow(0);
-				$this->assertEquals(CTestArrayHelper::get('Name', $data['Column'], $data['Column']['Item']),
+				$this->assertEquals(CTestArrayHelper::get($data['Column'], 'Name', $data['Column']['Item']),
 						$row->getColumn('Name')->getText()
 				);
 				$this->assertEquals(self::TEMPLATE_ITEM, $row->getColumn('Data')->getText());
