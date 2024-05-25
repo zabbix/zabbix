@@ -4339,7 +4339,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
 
 		// Update widget configuration and save filled in data for further validation.
-		$filled_data = $this->fillWidgetConfigurationFrom($data);
+		$filled_data = $this->fillWidgetConfigurationFrom($data, true);
 
 		// For some fields default values or context should be added to the reference array before comparison.
 		if (array_key_exists('swap_expected', $data)) {
@@ -4358,12 +4358,22 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 *
 	 * @return array
 	 */
-	protected function fillWidgetConfigurationFrom($data) {
+	protected function fillWidgetConfigurationFrom($data, $update = false) {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 		$form->fill($data['fields']);
 
 		if (array_key_exists('Column', $data)) {
+			if ($update) {
+				$button_remove = $form->query('button:Remove');
+				$remove_count = $button_remove->count();
+
+				for ($i = 0; $i < $remove_count; $i++) {
+					$button_remove->waitUntilClickable()->one()->click();
+					$form->waitUntilReloaded();
+				}
+			}
+
 			$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
 			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$column_overlay_form = $column_overlay->asForm();
