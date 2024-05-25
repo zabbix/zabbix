@@ -4380,6 +4380,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			$column_overlay_form->fill($data['Column']);
 			$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 			$column_overlay->waitUntilNotVisible();
+			$form->waitUntilReloaded();
 
 			// Open Advanced config again because after column filling it becomes collapsed.
 			$form->fill(['Advanced configuration' => true]);
