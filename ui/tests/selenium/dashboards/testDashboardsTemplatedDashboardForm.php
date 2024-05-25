@@ -34,7 +34,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	const TEMPLATE = 'Template for dashboard testing';
 	const TEMPLATE_ITEM = 'Templates widget item';
 	protected static $update_templateid; // ID of the "Template for dashboard testing" for template dashboards tests.
-	protected static $host_for_template; // ID of the "Empty host for template" to which a template with dashboards will be linked.
+	protected static $hostid_for_template; // ID of the "Empty host for template" to which a template with dashboards will be linked.
 	protected static $template_itemid; // ID of item "Templates widget item" that is used to create widgets.
 	protected static $dashboardid_with_widgets;
 	protected static $empty_dashboardid;
@@ -60,7 +60,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			'host' => 'Empty host for template',
 			'groups' => [['groupid' => 4]], //Zabbix servers.
 		]);
-		self::$host_for_template = $hosts['hostids'][0];
+		self::$hostid_for_template = $hosts['hostids'][0];
 
 		$templates = CDataHelper::createTemplates([
 			[
@@ -608,7 +608,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 */
 	public static function prepareHostLinkageToTemplateData() {
 		CDataHelper::call('host.update', [
-			'hostid' => self::$host_for_template,
+			'hostid' => self::$hostid_for_template,
 			'templates' => [
 				[
 					'templateid' => self::$update_templateid
@@ -4412,7 +4412,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 * @onBefore prepareHostLinkageToTemplateData
 	 */
 	public function testDashboardsTemplatedDashboardForm_ViewDashboardOnHost() {
-		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::$host_for_template);
+		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::$hostid_for_template);
 		$this->query('xpath://span[text()="Dashboard with all widgets"]')->one()->waitUntilVisible()->click();
 		$this->page->waitUntilReady();
 
