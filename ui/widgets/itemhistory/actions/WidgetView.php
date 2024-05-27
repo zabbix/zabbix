@@ -269,8 +269,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'limit' => $this->fields_values['show_lines'] * count($itemids)
 			]) ?: [];
 
-			foreach ($db_items_values as $item_values) {
-				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$item_values['itemid']][] = $item_values;
+			foreach ($db_items_values as $db_item_value) {
+				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$db_item_value['itemid']][] = $db_item_value;
 			}
 		}
 
@@ -287,11 +287,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'limit' => $this->fields_values['show_lines'] * count($itemids)
 			]) ?: [];
 
-			foreach ($db_items_trends as $item_trends) {
-				$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS][$item_trends['itemid']][] = [
-					'itemid' => $item_trends['itemid'],
-					'value' => $item_trends['value_avg'],
-					'clock' => $item_trends['clock'],
+			foreach ($db_items_trends as $db_item_trend) {
+				$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS][$db_item_trend['itemid']][] = [
+					'itemid' => $db_item_trend['itemid'],
+					'value' => $db_item_trend['value_avg'],
+					'clock' => $db_item_trend['clock'],
 					'ns' => 0
 				];
 			}
@@ -311,8 +311,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'limit' => $this->fields_values['show_lines'] * count($itemids)
 			]) ?: [];
 
-			foreach ($db_binary_items_values as $binary_items_value) {
-				$result['binary_items'][$binary_items_value['itemid']][] = $binary_items_value;
+			foreach ($db_binary_items_values as $db_binary_item_value) {
+				$result['binary_items'][$db_binary_item_value['itemid']][] = $db_binary_item_value;
 			}
 		}
 
