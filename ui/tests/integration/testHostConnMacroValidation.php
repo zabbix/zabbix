@@ -259,7 +259,8 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 0
+				'LogFileSize' => 0,
+				'EnableGlobalScripts' => 1,
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::HOST_NAME,
