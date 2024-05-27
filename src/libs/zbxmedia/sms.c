@@ -24,6 +24,9 @@
 
 #include <termios.h>
 
+#define	ZBX_AT_ESC	"\x1B"
+#define ZBX_AT_CTRL_Z	"\x1A"
+
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
 	int	i, wlen, len, ret = SUCCEED;
@@ -214,11 +217,34 @@ typedef struct
 }
 zbx_sms_scenario;
 
+static int	check_phone_number(const char *number)
+{
+	const char *ptr;
+
+	for (ptr = number; '\0' != *ptr; ptr++)
+	{
+		if (0 == isprint(*ptr) || '"' == *ptr)
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	check_sms_message(const char *message)
+{
+	const char *ptr;
+
+	for (ptr = message; '\0' != *ptr; ptr++)
+	{
+		if (*ZBX_AT_CTRL_Z == *ptr)
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len)
 {
-#define	ZBX_AT_ESC	"\x1B"
-#define ZBX_AT_CTRL_Z	"\x1A"
-
 	zbx_sms_scenario scenario[] =
 	{
 		{ZBX_AT_ESC	, NULL		, 0},	/* Send <ESC> */
@@ -240,12 +266,32 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	int			f, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	if (SUCCEED != check_phone_number(number))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid phone number \"%s\"", number);
+		if (NULL != error)
+			zbx_snprintf(error, max_error_len, "Invalid phone number \"%s\"", number);
+
+		return FAIL;
+	}
+
+	if (SUCCEED != check_sms_message(message))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid message \"%s\"", message);
+		if (NULL != error)
+			zbx_snprintf(error, max_error_len, "Invalid message \"%s\"", message);
+
+		return FAIL;
+	}
 
 	if (-1 == (f = open(device, O_RDWR | O_NOCTTY | O_NDELAY)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "error in open(%s): %s", device, zbx_strerror(errno));
 		if (NULL != error)
-			zbx_snprintf(error, max_error_len, "error in open(%s): %s", device, zbx_strerror(errno));
+		{
+			zbx_snprintf(error, max_error_len, "Cannot open device \"%s\": %s", device,
+					zbx_strerror(errno));
+		}
 		return FAIL;
 	}
 
@@ -257,7 +303,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 		if (NULL != error)
 		{
 			zbx_snprintf(error, (size_t)max_error_len,
-					"error in setting the status flag to 0 (for %s): %s",
+					"Cannot set device \"%s\" status flag to 0: %s",
 					device, zbx_strerror(errno));
 		}
 		ret = FAIL;
