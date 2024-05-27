@@ -2093,7 +2093,7 @@ function get_status() {
 	$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, ZBX_SOCKET_BYTES_LIMIT);
 	$status['is_running'] = $server->isRunning(get_cookie(ZBX_SESSION_NAME));
 
-	if ($status['is_running'] === false) {
+	if ($status['is_running'] === false || CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 		return $status;
 	}
 
