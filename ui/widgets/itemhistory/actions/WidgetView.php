@@ -245,8 +245,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private function getItemValuesByDataSource(array &$columns_config, array $items): array {
 		$time_from = $this->fields_values['time_period']['from_ts'];
-		$time_to = $this->fields_values['time_period']['to_ts'];
-		$history_period = $time_to - $time_from;
+		$time_to = $this->fields_values['time_period']['to_ts'] > time()
+			? time()
+			: $this->fields_values['time_period']['to_ts'];
 
 		$items_by_source = $this->addDataSourceAndPrepareColumns($columns_config, $items, $time_from);
 
@@ -257,6 +258,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]) {
+			$history_period = $time_to - $time_from;
+
 			foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] as $item) {
 				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] += Manager::History()->getLastValues(
 					[$item], $this->fields_values['show_lines'], $history_period
