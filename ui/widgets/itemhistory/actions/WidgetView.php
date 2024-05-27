@@ -338,11 +338,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 						? CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
 						: CWidgetFieldColumnsList::HISTORY_DATA_TRENDS;
 				}
-				else {
-					$item['source'] = $column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
-						? 'history'
-						: 'trends';
-				}
 
 				$items_with_source[$column['history']][$item['value_type']][$itemid] = $item;
 			}
@@ -353,7 +348,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 				else {
 					$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
-					$item['source'] = 'history';
 					$items_with_source[$column['history']][$item['value_type']][$itemid] = $item;
 				}
 			}
