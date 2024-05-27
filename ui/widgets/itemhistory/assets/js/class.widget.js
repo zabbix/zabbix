@@ -67,6 +67,13 @@ class CWidgetItemHistory extends CWidget {
 		return Promise.all([super.promiseReady(), this.#thumbnail_loader].filter(promise => promise));
 	}
 
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
+		}
+	}
+
 	#markSelected(itemid, clock) {
 		this.#values_table.querySelectorAll('.has-broadcast-data').forEach(element => {
 			const data = element.dataset;

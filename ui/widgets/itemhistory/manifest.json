@@ -14,6 +14,11 @@
 			"height": 6
 		},
 		"js_class": "CWidgetItemHistory",
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		},
 		"out": [
 			{
 				"type": "_itemid"

@@ -21,19 +21,26 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CItemHelper,
-	CNumberParser,
-	CSettingsHelper,
-	Manager;
+	CNumberParser;
 
 use	Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
+
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'has_custom_time_period' => 'in 1'
+		]);
+	}
 
 	protected function doAction(): void {
 		$name = $this->widget->getDefaultName();
 
 		$data = [
 			'name' => $this->getInput('name', $name),
+			'info' => $this->makeWidgetInfo(),
 			'columns' => [],
 			'item_values' => [],
 			'layout' => $this->fields_values['layout'],
@@ -219,6 +226,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $name),
+			'info' => $this->makeWidgetInfo(),
 			'columns' => $columns,
 			'item_values' => $item_values,
 			'layout' => $this->fields_values['layout'],
@@ -235,49 +243,57 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getItemValuesByDataSource(array &$columns_config, array $items): array {
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		$time_from = time() - $history_period;
+		$time_from = $this->fields_values['time_period']['from_ts'];
+		$time_to = $this->fields_values['time_period']['to_ts'];
 
 		$items_by_source = $this->addDataSourceAndPrepareColumns($columns_config, $items, $time_from);
 
 		$result = [
 			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
-			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
-			'binary_items' => []
+			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => []
 		];
 
-		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY]) {
-			foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] as $item) {
-				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] += Manager::History()->getLastValues(
-					[$item], $this->fields_values['show_lines'], $history_period
-				);
-			}
-		}
+		foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] as $value_type => $items) {
+			$itemids = array_keys($items);
 
-		if ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS]) {
-			$db_trends = Manager::History()->getAggregatedValues(
-				$items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS], AGGREGATE_LAST, $time_from
-			);
-
-			foreach ($db_trends as $db_trend) {
-				$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS][$db_trend['itemid']][] = $db_trend + ['ns' => 0];
-			}
-		}
-
-		if ($items_by_source['binary_items']) {
-			$itemids = array_keys($items_by_source['binary_items']);
-
-			$db_binary_items_values = API::History()->get([
-				'output' => ['itemid', 'clock', 'ns'],
-				'history' => ITEM_VALUE_TYPE_BINARY,
+			$db_items_values = API::History()->get([
+				'output' => $value_type == ITEM_VALUE_TYPE_BINARY
+					? ['itemid', 'clock', 'ns']
+					: ['itemid', 'value', 'clock', 'ns'],
+				'history' => $value_type,
 				'itemids' => $itemids,
+				'time_from' => $time_from,
+				'time_till' => $time_to,
+				'sortfield' => ['clock', 'ns'],
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => $this->fields_values['show_lines'] * count($itemids)
+			]);
+
+			foreach ($db_items_values as $db_item_value) {
+				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$db_item_value['itemid']][] = $db_item_value;
+			}
+		}
+
+		foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS] as $items) {
+			$itemids = array_keys($items);
+
+			$db_items_trends = API::Trend()->get([
+				'output' => ['itemid', 'value_avg', 'clock'],
+				'itemids' => $itemids,
+				'time_from' => $time_from,
+				'time_till' => $time_to,
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $this->fields_values['show_lines'] * count($itemids)
-			]) ?: [];
+			]);
 
-			foreach ($db_binary_items_values as $binary_items_value) {
-				$result['binary_items'][$binary_items_value['itemid']][] = $binary_items_value;
+			foreach ($db_items_trends as $db_item_trend) {
+				$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS][$db_item_trend['itemid']][] = [
+					'itemid' => $db_item_trend['itemid'],
+					'value' => $db_item_trend['value_avg'],
+					'clock' => $db_item_trend['clock'],
+					'ns' => 0
+				];
 			}
 		}
 
@@ -287,8 +303,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function addDataSourceAndPrepareColumns(array &$columns, array $items, int $time): array {
 		$items_with_source = [
 			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
-			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
-			'binary_items' => []
+			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => []
 		];
 
 		foreach ($columns as &$column) {
@@ -304,28 +319,33 @@ class WidgetView extends CControllerDashboardWidgetView {
 						? CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
 						: CWidgetFieldColumnsList::HISTORY_DATA_TRENDS;
 				}
-				else {
-					$item['source'] = $column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
-						? 'history'
-						: 'trends';
-				}
-
-				$items_with_source[$column['history']][$itemid] = $item;
 			}
 			else {
-				if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-					$column['history'] = 'binary_items';
-					$items_with_source['binary_items'][$itemid] = true;
-				}
-				else {
-					$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
-					$item['source'] = 'history';
-					$items_with_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$itemid] = $item;
-				}
+				$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
 			}
+
+			$items_with_source[$column['history']][$item['value_type']][$itemid] = $item;
 		}
 		unset($column);
 
 		return $items_with_source;
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if ($this->hasInput('has_custom_time_period')) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
+			];
+		}
+
+		return $info;
 	}
 }
