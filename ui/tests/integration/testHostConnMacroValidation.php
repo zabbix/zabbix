@@ -479,7 +479,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey('hostmacroids', $response['result']);
 
 		$this->reloadConfigurationCache();
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$response = CAPIHelper::call('script.execute', [
 			'scriptid' => self::$scriptid,
