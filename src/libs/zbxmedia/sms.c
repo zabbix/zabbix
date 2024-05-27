@@ -26,6 +26,7 @@
 
 #define	ZBX_AT_ESC	"\x1B"
 #define ZBX_AT_CTRL_Z	"\x1A"
+#define ZBX_CTRL_Z	0x1a
 
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
@@ -232,7 +233,7 @@ static int	check_sms_message(const char *message)
 
 	for (ptr = message; '\0' != *ptr; ptr++)
 	{
-		if (ZBX_AT_CTRL_Z == isprint(*ptr))
+		if (ZBX_CTRL_Z == *ptr)
 			return FAIL;
 	}
 
