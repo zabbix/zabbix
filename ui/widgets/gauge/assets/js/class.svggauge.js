@@ -39,6 +39,8 @@ class CSVGGauge {
 	static SVG_NS = 'http://www.w3.org/2000/svg';
 	static XHTML_NS = 'http://www.w3.org/1999/xhtml';
 
+	static SCALE = 1000;
+
 	static LINE_HEIGHT = 1.14;
 	static TEXT_BASELINE = 0.8;
 	static CAPITAL_HEIGHT = 0.72;
@@ -245,7 +247,7 @@ class CSVGGauge {
 		}
 
 		// Fix imprecise calculation of "this.#container" dimensions.
-		this.#container.setAttribute('transform', `translate(0 0) scale(1000)`);
+		this.#container.setAttribute('transform', `translate(0 0) scale(${CSVGGauge.SCALE})`);
 
 		this.#adjustScalableGroup();
 	}
@@ -592,17 +594,16 @@ class CSVGGauge {
 		const contents = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
 		container.appendChild(contents);
 
-		const correction_size = 1000;
 		const correction_font = 10;
 		const padding = 20;
 
-		container.setAttribute('width', `${2 * correction_size}`);
-		container.setAttribute('x', `${-1 * correction_size}`);
+		container.setAttribute('width', `${2 * CSVGGauge.SCALE}`);
+		container.setAttribute('x', `${-1 * CSVGGauge.SCALE}`);
 
 		// Fix imprecise calculation of font size.
-		container.setAttribute('transform', `scale(${1 / correction_size})`);
+		container.setAttribute('transform', `scale(${1 / CSVGGauge.SCALE})`);
 
-		let contents_width = this.#config.angle === 180 ? 2 * correction_size : Math.sqrt(2) * correction_size;
+		let contents_width = this.#config.angle === 180 ? 2 * CSVGGauge.SCALE : Math.sqrt(2) * CSVGGauge.SCALE;
 		contents_width -= contents_width / padding;
 		contents.style.width = `${contents_width}px`;
 
@@ -702,7 +703,6 @@ class CSVGGauge {
 	 * @param {string|null} units_text  Text representation of the units of the value.
 	 */
 	#drawValueAndUnits({value, value_text, units_text}) {
-		const correction_size = 1000;
 		const correction_font = 10;
 
 		const value_font_size = this.#config.value.size * correction_font;
@@ -739,7 +739,7 @@ class CSVGGauge {
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
-		arcs_height *= correction_size;
+		arcs_height *= CSVGGauge.SCALE;
 
 		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
 			&& (this.#config.angle === 270 || !this.#config.needle.show);
