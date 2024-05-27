@@ -80,6 +80,10 @@ window.item_edit_form = new class {
 			}
 		}
 
+		if (form_data.timeout !== '') {
+			this.override_timeout = form_data.timeout;
+		}
+
 		this.overlay = overlays_stack.end();
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
