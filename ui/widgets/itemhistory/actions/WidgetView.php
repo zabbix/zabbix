@@ -267,7 +267,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $this->fields_values['show_lines'] * count($itemids)
-			]) ?: [];
+			]);
 
 			foreach ($db_items_values as $db_item_value) {
 				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$db_item_value['itemid']][] = $db_item_value;
@@ -285,7 +285,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $this->fields_values['show_lines'] * count($itemids)
-			]) ?: [];
+			]);
 
 			foreach ($db_items_trends as $db_item_trend) {
 				$result[CWidgetFieldColumnsList::HISTORY_DATA_TRENDS][$db_item_trend['itemid']][] = [
