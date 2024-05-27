@@ -397,15 +397,13 @@ while (0)
 
 void	zbx_this_should_never_happen_backtrace(void);
 
-#define THIS_SHOULD_NEVER_HAPPEN_TEXT	"Something unexpected has just happened."
-
 #define THIS_SHOULD_NEVER_HAPPEN										\
 														\
 do														\
 {														\
 	zbx_this_should_never_happen_backtrace();								\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] " THIS_SHOULD_NEVER_HAPPEN_TEXT,	\
-			__FILE__, __func__, ZABBIX_REVISION, __LINE__);						\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something unexpected has just "	\
+			"happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
 }														\
 while (0)
 
@@ -413,9 +411,7 @@ while (0)
 														\
 do														\
 {														\
-	zbx_this_should_never_happen_backtrace();								\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] " THIS_SHOULD_NEVER_HAPPEN_TEXT,	\
-			__FILE__, __func__, ZABBIX_REVISION, __LINE__);						\
+	THIS_SHOULD_NEVER_HAPPEN;										\
 	zbx_error(fmt, ##__VA_ARGS__);										\
 }														\
 while(0)
