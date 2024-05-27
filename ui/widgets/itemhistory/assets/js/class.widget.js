@@ -230,10 +230,10 @@ class CWidgetItemHistory extends CWidget {
 
 		if (content instanceof HTMLImageElement) {
 			button.addEventListener('onShowHint.hintBox', e => {
-				const hintBox = e.target.hintBoxItem[0];
-				const container = hintBox.querySelector('.dashboard-widget-itemhistory-hintbox');
+				const hint_box = e.target.hintBoxItem[0];
+				const container = hint_box.querySelector('.dashboard-widget-itemhistory-hintbox');
 
-				hintBox.classList.add('dashboard-widget-itemhistory-hintbox-image');
+				hint_box.classList.add('dashboard-widget-itemhistory-hintbox-image');
 
 				const curl = this.#getHintboxContentCUrl(button);
 
@@ -243,19 +243,41 @@ class CWidgetItemHistory extends CWidget {
 				container.append(content);
 
 				if (!content.complete) {
-					hintBox.classList.add('is-loading');
+					hint_box.classList.add('is-loading');
 
 					content.addEventListener('load', () => {
-						hintBox.classList.remove('is-loading');
+						hint_box.classList.remove('is-loading');
+						e.target.resize_observer = new ResizeObserver((entries) => {
+							entries.forEach(entry => {
+								if (entry.devicePixelContentBoxSize) {
+									const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
+									const size = entry.devicePixelContentBoxSize[0];
+
+									overlay.style.width = `${size.inlineSize}px`;
+									overlay.style.height = `${size.blockSize}px`;
+
+									requestAnimationFrame(() => hintBox.onResize(e, button));
+								}
+							})
+						});
+						e.target.resize_observer.observe(content);
 					});
 
 					content.addEventListener('error', () => {
-						hintBox.classList.remove('is-loading');
+						hint_box.classList.remove('is-loading');
 
 						container.text = t('Image loading error.');
 					});
 				}
 			});
+
+			button.addEventListener('onHideHint.hintBox', e => {
+				if (e.target.resize_observer !== undefined) {
+					e.target.resize_observer.disconnect();
+
+					delete e.target.resize_observer;
+				}
+			})
 		}
 		else {
 			if (curl !== null) {

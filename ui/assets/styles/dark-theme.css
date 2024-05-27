@@ -4525,11 +4525,6 @@ div.dashboard-widget-itemhistory z-bar-gauge {
   min-width: 64px;
   height: 20px; }
 
-.dashboard-widget-itemhistory-hintbox {
-  max-width: 80vh;
-  max-height: 80vh;
-  overflow: auto; }
-
 .dashboard-widget-itemhistory-hintbox-image .dashboard-widget-itemhistory-hintbox {
   overflow: hidden; }
 .dashboard-widget-itemhistory-hintbox-image.is-loading {
