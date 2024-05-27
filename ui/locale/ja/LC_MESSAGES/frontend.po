@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-20 10:10+0000\n"
-"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
+"PO-Revision-Date: 2024-05-23 17:05+0000\n"
+"Last-Translator: Kodai <kodai.terashima@zabbix.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -1080,7 +1080,7 @@ msgstr "アドレス"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "アクティブエージェントのアドレス"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -4157,7 +4157,7 @@ msgstr "PSK変更"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
-msgstr ""
+msgstr "クライアントシークレットの変更"
 
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
@@ -4257,12 +4257,12 @@ msgstr "キーを確認してください。デフォルトの例は使用でき
 
 #: app/views/discovery.check.edit.php:55 app/views/popup.discovery.check.php:58
 msgid "Check type"
-msgstr "チェックのタイプ"
+msgstr "探索方法のタイプ"
 
 #: app/views/configuration.discovery.edit.php:101
 #: app/views/configuration.discovery.list.php:86
 msgid "Checks"
-msgstr "チェック"
+msgstr "探索方法"
 
 #: include/classes/data/CItemData.php:1093
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
@@ -4376,7 +4376,7 @@ msgstr "クライアントID"
 
 #: app/views/mfa.edit.php:120
 msgid "Client secret"
-msgstr ""
+msgstr "クライアントシークレット"
 
 #: widgets/clock/Widget.php:46
 msgid "Clock"
@@ -4464,7 +4464,7 @@ msgstr "障害のクローズ"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
-msgstr ""
+msgstr "認証コード長"
 
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
@@ -4797,7 +4797,7 @@ msgstr "変更の確認"
 
 #: app/views/administration.script.edit.php:332
 msgid "Confirmation text"
-msgstr "確認テキスト"
+msgstr "確認時のメッセージ"
 
 #: app/views/popup.acknowledge.edit.php:115
 msgid "Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation."
@@ -5553,7 +5553,7 @@ msgstr "DNS名"
 #: app/controllers/CControllerAuthenticationEdit.php:457
 #: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
 msgid "DUO Universal Prompt"
-msgstr ""
+msgstr "DUOユニバーサルプロンプト"
 
 #: app/partials/scheduledreport.formgrid.html.php:98
 #: app/partials/scheduledreport.table.html.php:50
@@ -5699,7 +5699,7 @@ msgstr "データセット"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:304
 msgid "Data set aggregation"
-msgstr ""
+msgstr "データセットのアグリゲーション"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:325
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:449
@@ -5949,7 +5949,7 @@ msgstr "デフォルトのホストインベントリモード"
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
-msgstr ""
+msgstr "デフォルトの入力値"
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7061,11 +7061,11 @@ msgstr "グラフ表示"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
-msgstr ""
+msgstr "ローカル時間を表示"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
-msgstr ""
+msgstr "最小/平均/最大を表示"
 
 #: widgets/svggraph/includes/WidgetForm.php:351
 msgid "Display min/max/avg"
@@ -7169,7 +7169,7 @@ msgstr "点線"
 
 #: widgets/piechart/includes/WidgetForm.php:122
 msgid "Doughnut"
-msgstr ""
+msgstr "ドーナツ"
 
 #: widgets/discovery/views/widget.view.php:37
 msgctxt "discovery results in dashboard"
@@ -7220,13 +7220,13 @@ msgstr "ドロップダウン"
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
-msgstr ""
+msgstr "ドロップダウンの項目"
 
 #: app/controllers/CControllerAuthenticationEdit.php:362
 #: app/controllers/CControllerAuthenticationEdit.php:479
 #: app/controllers/CControllerMfaCheck.php:88 app/views/mfa.edit.php:59
 msgid "Duo Universal Prompt"
-msgstr ""
+msgstr "Duoユニバーサルプロンプト"
 
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
@@ -7462,7 +7462,7 @@ msgstr "圧縮の有効化"
 
 #: app/views/administration.script.edit.php:324
 msgid "Enable confirmation"
-msgstr "確認を有効"
+msgstr "実行時の確認を有効"
 
 #: app/views/usergroup.list.php:240
 msgid "Enable debug mode"
@@ -7636,7 +7636,7 @@ msgstr "トラッピングの有効化"
 
 #: app/views/administration.script.edit.php:333
 msgid "Enable user input"
-msgstr ""
+msgstr "ユーザーの入力を許可"
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -8200,7 +8200,7 @@ msgstr "ウィジェットのプロパティの変更に失敗しました。"
 #: app/views/administration.proxygroup.list.php:79
 #: app/views/popup.proxygroup.edit.php:51
 msgid "Failover period"
-msgstr ""
+msgstr "フェイルオーバーの期間"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -8536,7 +8536,7 @@ msgstr "Webインターフェースのアラート表示"
 #: app/views/administration.user.edit.php:731
 #: app/views/administration.user.edit.php:826
 msgid "Frontend notifications"
-msgstr ""
+msgstr "ポップアップ通知"
 
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
@@ -8631,7 +8631,7 @@ msgstr "設定した条件式はマクロではありません"
 #: include/views/configuration.item.edit.php:866
 #: include/views/configuration.item.prototype.edit.php:820
 msgid "Global"
-msgstr ""
+msgstr "グローバル"
 
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
@@ -8644,7 +8644,7 @@ msgstr "グローバルな正規表現\"%1$s\"は存在しません。"
 #: app/views/popup.operation.edit.php:63
 #: include/classes/api/services/CScript.php:950
 msgid "Global script execution on Zabbix server is disabled by server configuration."
-msgstr ""
+msgstr "Zabbixサーバーによるスクリプト実行は設定により無効化されています。"
 
 #: app/partials/administration.system.info.php:138
 msgid "Global scripts on Zabbix server"
@@ -8652,7 +8652,7 @@ msgstr ""
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
-msgstr ""
+msgstr "グローバルタイムアウト"
 
 #: app/partials/hostmacros.inherited.list.html.php:57
 msgid "Global value"
@@ -8931,7 +8931,7 @@ msgstr "グループのbase DN"
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 #: widgets/hostnavigator/includes/WidgetForm.php:102
 msgid "Group by"
-msgstr ""
+msgstr "グルーピング"
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9048,7 +9048,7 @@ msgstr "ハードウェアセンサーの読み込み。 浮動小数点値を�
 
 #: app/views/mfa.edit.php:77
 msgid "Hash function"
-msgstr ""
+msgstr "ハッシュ関数"
 
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
@@ -9153,7 +9153,7 @@ msgstr "行を強調表示"
 
 #: widgets/itemhistory/views/column.edit.php:132
 msgid "Highlights"
-msgstr ""
+msgstr "ハイライト"
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -9180,7 +9180,7 @@ msgstr "ヒストリ"
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "History and trends cleared"
-msgstr ""
+msgstr "ヒストリとトレンドを削除しました"
 
 #: app/views/administration.housekeeping.edit.php:221
 msgid "History and trends compression"
@@ -9218,7 +9218,7 @@ msgstr "ホーム"
 
 #: widgets/honeycomb/Widget.php:29
 msgid "Honeycomb"
-msgstr ""
+msgstr "ハニカム"
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -9336,7 +9336,7 @@ msgstr "ホスト数"
 
 #: app/views/monitoring.host.dashboard.view.php:73
 msgid "Host dashboards"
-msgstr ""
+msgstr "ホストダッシュボード"
 
 #: app/controllers/CControllerHostMassDelete.php:66
 msgid "Host deleted"
@@ -9496,12 +9496,12 @@ msgstr "ホストのラベルタイプ"
 
 #: widgets/tophosts/includes/WidgetForm.php:159
 msgid "Host limit"
-msgstr ""
+msgstr "ホスト数の上限"
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
-msgstr ""
+msgstr "ホストの場所"
 
 #: app/partials/configuration.host.edit.html.php:326
 msgid "Host macros"
@@ -9525,7 +9525,7 @@ msgstr "ホスト名"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
-msgstr ""
+msgstr "ホストナビゲータ"
 
 #: include/hosts.inc.php:284
 msgid "Host networks"
@@ -9533,7 +9533,7 @@ msgstr "ホストネットワーク"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
-msgstr ""
+msgstr "ホストパターン"
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
@@ -9607,7 +9607,7 @@ msgstr "ホストルータ"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:69
 msgid "Host status"
-msgstr ""
+msgstr "ホストのステータス"
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -9615,11 +9615,11 @@ msgstr "ホストのサブネットマスク"
 
 #: widgets/itemnavigator/Widget.php:43
 msgid "Host tag"
-msgstr ""
+msgstr "ホストタグ"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
 msgid "Host tag value"
-msgstr ""
+msgstr "ホストタグの値"
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -10225,7 +10225,7 @@ msgstr "イベントメニュー項目を含める"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 msgid "Include hosts in maintenance"
-msgstr ""
+msgstr "メンテナンス中のホストを含める"
 
 #: include/classes/data/CItemData.php:1117
 msgid "Incoming traffic statistics on network interface. Returns integer"
@@ -11010,15 +11010,15 @@ msgstr "デフォルト表示が設定されている場合は、初期表示設
 
 #: app/views/administration.script.edit.php:339
 msgid "Input prompt"
-msgstr ""
+msgstr "メッセージ表示"
 
 #: app/views/administration.script.edit.php:349
 msgid "Input type"
-msgstr ""
+msgstr "入力形式"
 
 #: app/views/administration.script.edit.php:376
 msgid "Input validation rule"
-msgstr ""
+msgstr "入力値のバリデーションルール"
 
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
@@ -11200,7 +11200,7 @@ msgstr "SAML JITプロビジョニングユーザーグループのマッピン�
 #: jsLoader.php:438
 #, c-format
 msgid "Invalid URL: %1$s"
-msgstr ""
+msgstr "不正なURL: %1$s"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -11232,7 +11232,7 @@ msgstr "ID \"%1$s\"のメディアタイプのメールアドレスが正しく�
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
-msgstr ""
+msgstr "不正な入力値"
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -11688,7 +11688,7 @@ msgstr[0] "アイテムを有効にしました"
 
 #: widgets/itemhistory/Widget.php:26
 msgid "Item history"
-msgstr ""
+msgstr "アイテムのヒストリ"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
@@ -11696,7 +11696,7 @@ msgstr "アイテムが\"取得不可\"の状態"
 
 #: widgets/itemnavigator/includes/WidgetForm.php:107
 msgid "Item limit"
-msgstr ""
+msgstr "アイテム数の上限"
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11705,11 +11705,11 @@ msgstr "アイテムリスト"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
-msgstr ""
+msgstr "アイテム名"
 
 #: widgets/itemnavigator/Widget.php:29
 msgid "Item navigator"
-msgstr ""
+msgstr "アイテムナビゲータ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -11725,7 +11725,7 @@ msgstr "アイテムパターン"
 #: widgets/piechart/views/widget.edit.js.php:208
 #: widgets/svggraph/views/widget.edit.js.php:279
 msgid "Item patterns"
-msgstr ""
+msgstr "アイテムパターン"
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11770,11 +11770,11 @@ msgstr "アイテムのプロトタイプ"
 
 #: widgets/itemnavigator/Widget.php:44
 msgid "Item tag"
-msgstr ""
+msgstr "アイテムタグ"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
 msgid "Item tag value"
-msgstr ""
+msgstr "アイタムタグの値"
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -11783,7 +11783,7 @@ msgstr "アイテムタグ"
 
 #: app/views/administration.timeouts.edit.php:178
 msgid "Item test"
-msgstr ""
+msgstr "アイテムのテスト"
 
 #: jsLoader.php:400
 msgid "Item type does not use interface"
@@ -12304,7 +12304,7 @@ msgstr "障害発生時の条件設定"
 
 #: include/actions.inc.php:866
 msgid "Link template"
-msgstr ""
+msgstr "テンプレートをリンク"
 
 #: app/controllers/CControllerPopupLldOperation.php:142
 #: app/views/popup.lldoperation.php:236 app/views/popup.massupdate.host.php:71
@@ -12725,7 +12725,7 @@ msgstr "手動ホスト処理"
 
 #: app/views/script.userinput.edit.php:100
 msgid "Manual input"
-msgstr ""
+msgstr "手動入力"
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -12952,7 +12952,7 @@ msgstr "概要テーブル内の列と行の最大数"
 #: widgets/piechart/includes/WidgetForm.php:209
 #: widgets/svggraph/includes/WidgetForm.php:359
 msgid "Max number of rows"
-msgstr ""
+msgstr "最大行数"
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
@@ -12981,11 +12981,11 @@ msgstr "最大ズームレベル"
 
 #: app/views/configuration.discovery.edit.php:84
 msgid "Maximum concurrent checks"
-msgstr "最大同時チェック数"
+msgstr "探索の最大並列実行数"
 
 #: app/views/configuration.discovery.edit.php:85
 msgid "Maximum concurrent checks per type"
-msgstr "タイプごとの最大同時チェック数"
+msgstr "タイプごとの探索の最大並列実行数"
 
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -12998,7 +12998,7 @@ msgstr "OSがサポートしている最大プロセス数。整数値を返す�
 #: widgets/piechart/views/widget.edit.js.php:680
 #: widgets/svggraph/views/widget.edit.js.php:805
 msgid "Maximum number of rows"
-msgstr ""
+msgstr "最大の行数"
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -13096,7 +13096,7 @@ msgstr "メディアタイプのマッピング"
 
 #: app/views/administration.timeouts.edit.php:158
 msgid "Media type test"
-msgstr ""
+msgstr "メディアタイプのテスト"
 
 #: app/controllers/CControllerMediatypeTestSend.php:50
 #: app/controllers/CControllerMediatypeTestSend.php:174
@@ -13188,7 +13188,7 @@ msgstr "メニューパス"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
-msgstr ""
+msgstr "これより小さいセクターの場合はマージする"
 
 #: app/partials/scheduledreport.formgrid.html.php:178
 #: app/views/mediatype.message.edit.php:96
@@ -13252,7 +13252,7 @@ msgstr "メソッドが見つかりません。"
 
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
-msgstr ""
+msgstr "認証方法"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13277,7 +13277,7 @@ msgstr "最小値"
 
 #: app/views/popup.proxygroup.edit.php:59
 msgid "Minimum number of proxies"
-msgstr ""
+msgstr "最小のプロキシ数"
 
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
@@ -13285,7 +13285,7 @@ msgstr "最小パスワード長"
 
 #: app/views/administration.proxygroup.list.php:81
 msgid "Minimum proxies"
-msgstr ""
+msgstr "最小のプロキシ"
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -13385,12 +13385,12 @@ msgstr "ホスト\"%2$s\"にはキー\"%1$s\"が設定されていません。"
 
 #: widgets/hostavail/views/widget.view.php:38
 msgid "Mixed"
-msgstr ""
+msgstr "混在"
 
 #: widgets/hostavail/views/widget.view.php:39
 msgctxt "compact table header"
 msgid "Mixed"
-msgstr ""
+msgstr "混在"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:50
@@ -13838,7 +13838,7 @@ msgstr "ネットワークマップ"
 
 #: app/views/administration.timeouts.edit.php:136
 msgid "Network timeouts for UI"
-msgstr ""
+msgstr "Webインターフェースのタイムアウト"
 
 #: include/classes/data/CItemData.php:2429
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
@@ -14018,7 +14018,7 @@ msgstr "新規トリガー"
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
 msgid "New update available"
-msgstr ""
+msgstr "新しいバージョンがリリースされています"
 
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
@@ -14026,11 +14026,11 @@ msgstr "新しいユーザーグループのマッピングの作成"
 
 #: widgets/itemhistory/includes/WidgetForm.php:96
 msgid "New values"
-msgstr ""
+msgstr "最新のデータ"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
-msgstr ""
+msgstr "次のダッシュボード"
 
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
@@ -14959,7 +14959,7 @@ msgstr "OFF"
 #: app/views/administration.proxygroup.list.php:99
 #: app/views/administration.proxy.list.php:166
 msgid "Offline"
-msgstr ""
+msgstr "オフライン"
 
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
@@ -15020,11 +15020,11 @@ msgstr "一度限り"
 #: app/views/administration.proxygroup.list.php:107
 #: app/views/administration.proxy.list.php:170
 msgid "Online"
-msgstr ""
+msgstr "オンライン"
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
-msgstr ""
+msgstr "オンラインのプロキシ"
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15335,7 +15335,7 @@ msgstr "上書き"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
 msgid "Override host"
-msgstr ""
+msgstr "ホストを上書き"
 
 #: app/partials/administration.system.info.php:210
 #: app/views/administration.housekeeping.edit.php:129
@@ -16084,7 +16084,7 @@ msgstr "プレビュー"
 
 #: app/views/monitoring.host.dashboard.view.php:135
 msgid "Previous dashboard"
-msgstr ""
+msgstr "前のダッシュボード"
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:57
@@ -16153,7 +16153,7 @@ msgstr "プライマリPOCスクリーン名"
 #: widgets/honeycomb/includes/WidgetForm.php:148
 #: widgets/honeycomb/views/widget.edit.php:84
 msgid "Primary label"
-msgstr ""
+msgstr "プライマリラベル"
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16771,7 +16771,7 @@ msgstr ""
 
 #: jsLoader.php:195
 msgid "Referred widget is unavailable"
-msgstr ""
+msgstr "参照しているウィジェットが利用できません"
 
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
@@ -16848,7 +16848,7 @@ msgstr "関連するレポート"
 
 #: app/partials/administration.system.info.php:72
 msgid "Release notes"
-msgstr ""
+msgstr "リリースノート"
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -17039,7 +17039,7 @@ msgstr "ホストを削除"
 
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
-msgstr ""
+msgstr "ホストのタグを削除"
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -17879,11 +17879,11 @@ msgstr "\"%1$s\"として保存しました"
 #: widgets/gauge/includes/WidgetForm.php:191
 #: widgets/gauge/views/widget.edit.php:207
 msgid "Scale"
-msgstr ""
+msgstr "目盛り"
 
 #: widgets/gauge/includes/WidgetForm.php:288
 msgid "Scale size"
-msgstr ""
+msgstr "目盛りサイズ"
 
 #: app/views/module.list.php:45
 msgid "Scan directory"
@@ -17891,7 +17891,7 @@ msgstr "ディレクトリスキャン"
 
 #: include/views/mfa.login.php:60
 msgid "Scan this QR code"
-msgstr ""
+msgstr "このQRコードをスキャン"
 
 #: include/views/configuration.httpconf.edit.php:373
 msgid "Scenario"
@@ -18015,7 +18015,7 @@ msgstr "スクリプトにはパラメータがありません。"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
-msgstr ""
+msgstr "スクリプトの実行"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -18117,7 +18117,7 @@ msgstr "セカンダリPOCスクリーン名"
 #: widgets/honeycomb/includes/WidgetForm.php:195
 #: widgets/honeycomb/views/widget.edit.php:98
 msgid "Secondary label"
-msgstr ""
+msgstr "セカンダリラベル"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -18420,7 +18420,7 @@ msgstr "サービスを更新しました"
 
 #: include/classes/api/services/CUser.php:1696
 msgid "Session ID or token is expected."
-msgstr ""
+msgstr "セッションIDかトークンを指定してください。"
 
 #: include/classes/core/ZBase.php:269 include/classes/core/ZBase.php:554
 #: index_sso.php:262 index_sso.php:269
@@ -18599,7 +18599,7 @@ msgstr "表示"
 #: widgets/piechart/includes/WidgetForm.php:205
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
-msgstr ""
+msgstr "アグリゲーション関数を表示"
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -18607,13 +18607,13 @@ msgstr "円弧を表示"
 
 #: widgets/itemhistory/includes/WidgetForm.php:105
 msgid "Show column header"
-msgstr ""
+msgstr "ヘッダの表示"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
 msgid "Show data in maintenance"
-msgstr ""
+msgstr "メンテナンス中のデータを表示"
 
 #: app/partials/monitoring.latest.filter.php:196
 #: app/partials/monitoring.problem.filter.php:305
@@ -18654,7 +18654,7 @@ msgstr "レコード数の表示"
 
 #: widgets/hostavail/includes/WidgetForm.php:66
 msgid "Show only totals"
-msgstr ""
+msgstr "合計のみ表示"
 
 #: app/partials/monitoring.problem.filter.php:281
 #: widgets/problemsbysv/includes/WidgetForm.php:98
@@ -18681,7 +18681,7 @@ msgstr "サイドバーを表示"
 
 #: widgets/systeminfo/includes/WidgetForm.php:42
 msgid "Show software update check details"
-msgstr ""
+msgstr "ソフトウェアアップデート確認の詳細を表示"
 
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
@@ -18716,7 +18716,7 @@ msgstr "HTMLとしてテキストを表示"
 
 #: widgets/itemhistory/views/column.edit.php:251
 msgid "Show thumbnail"
-msgstr ""
+msgstr "サムネイルを表示"
 
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
@@ -18726,11 +18726,11 @@ msgstr "タイムラインを表示"
 
 #: widgets/itemhistory/includes/WidgetForm.php:102
 msgid "Show timestamp"
-msgstr ""
+msgstr "タイムスタンプを表示"
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
-msgstr ""
+msgstr "合計値を表示"
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -18746,7 +18746,7 @@ msgstr "単位を表示"
 
 #: widgets/piechart/includes/WidgetForm.php:210
 msgid "Show value"
-msgstr ""
+msgstr "値を表示"
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -18972,7 +18972,7 @@ msgstr "ソース"
 
 #: widgets/piechart/includes/WidgetForm.php:132
 msgid "Space between sectors"
-msgstr ""
+msgstr "セクター間のスペース"
 
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
@@ -19577,7 +19577,7 @@ msgstr "クローズに利用するタグ名"
 
 #: app/views/usergroup.tagfilter.edit.php:75
 msgid "Tag list"
-msgstr ""
+msgstr "タグリスト"
 
 #: app/partials/monitoring.latest.filter.php:156
 #: app/partials/monitoring.problem.filter.php:260 include/actions.inc.php:67
@@ -19921,7 +19921,7 @@ msgstr "テスト用の件名"
 
 #: app/views/administration.script.edit.php:345
 msgid "Test user input"
-msgstr ""
+msgstr "入力値のテスト"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:152
 #: app/controllers/CControllerPopupItemTestSend.php:256
@@ -23679,7 +23679,7 @@ msgstr "と"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"
-msgstr ""
+msgstr "すべてのエラー"
 
 #: include/views/monitoring.history.php:181
 msgid "as Blue"
@@ -24129,7 +24129,7 @@ msgstr "m/d"
 
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
 msgid "data is missing"
-msgstr ""
+msgstr "データがありません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -24163,7 +24163,7 @@ msgstr "degrees() - 値をラジアンから角度に変換"
 
 #: include/forms.inc.php:504 include/views/js/item.preprocessing.js.php:379
 msgid "delimiter"
-msgstr ""
+msgstr "区切り文字"
 
 #: widgets/actionlog/includes/WidgetForm.php:80
 #: widgets/actionlog/includes/WidgetForm.php:82
@@ -24245,11 +24245,11 @@ msgstr "等しい"
 
 #: include/forms.inc.php:1452 include/views/js/item.preprocessing.js.php:239
 msgid "error does not match"
-msgstr ""
+msgstr "文字列が含まれない"
 
 #: include/forms.inc.php:1451 include/views/js/item.preprocessing.js.php:238
 msgid "error matches"
-msgstr ""
+msgstr "文字列が含まれる"
 
 #: include/views/js/item.preprocessing.js.php:615
 msgid "error message"
@@ -24335,7 +24335,7 @@ msgstr "データの保存期間設定(全体設定)"
 
 #: include/classes/api/services/CScript.php:726
 msgid "global script execution on Zabbix server is disabled by server configuration"
-msgstr ""
+msgstr "Zabbixサーバーによるスクリプト実行は設定により無効化されています"
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -24406,7 +24406,7 @@ msgstr "ホストパターン"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "host patterns"
-msgstr ""
+msgstr "ホストパターン"
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
@@ -25961,7 +25961,7 @@ msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:80
 msgid "wildcard patterns with '*' may be used"
-msgstr ""
+msgstr "「*」を利用したワイルドカード指定が可能です"
 
 #: include/html.inc.php:684 include/html.inc.php:710 include/html.inc.php:730
 #: include/html.inc.php:806
