@@ -19,7 +19,7 @@
  * @var array $data
  */
 
-header('Content-type: image/png');
+header('Content-Type: image/png');
 header('Cache-Control: max-age=86400');
 
 if (!$data['image']) {

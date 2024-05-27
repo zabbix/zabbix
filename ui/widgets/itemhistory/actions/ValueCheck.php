@@ -67,8 +67,8 @@ class ValueCheck extends CController {
 
 		if ($db_item && $db_item[0]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 			$history_value = API::History()->get([
-				'history' => ITEM_VALUE_TYPE_BINARY,
 				'output' => ['value'],
+				'history' => ITEM_VALUE_TYPE_BINARY,
 				'itemids' => $db_item[0]['itemid'],
 				'filter' => [
 					'clock' => $this->getInput('clock'),
@@ -77,15 +77,12 @@ class ValueCheck extends CController {
 			]);
 
 			if ($history_value) {
-				$show_thumbnail = $this->getInput('show_thumbnail', 0);
-				$value = $history_value[0]['value'];
-
-				$image = @imagecreatefromstring(base64_decode($value));
+				$image = @imagecreatefromstring(base64_decode($history_value[0]['value']));
 
 				if ($image) {
 					$result['type'] = self::VALUE_TYPE_IMAGE;
 
-					if ($show_thumbnail == 1) {
+					if ($this->getInput('show_thumbnail', 0) == 1) {
 						ob_start();
 
 						imagepng(imageThumb($image, 0, 112));

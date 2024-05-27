@@ -51,8 +51,8 @@ class ImageValueGet extends CController {
 
 		if ($db_item && $db_item[0]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
 			$history_value = API::History()->get([
-				'history' => ITEM_VALUE_TYPE_BINARY,
 				'output' => ['value'],
+				'history' => ITEM_VALUE_TYPE_BINARY,
 				'itemids' => $db_item[0]['itemid'],
 				'filter' => [
 					'clock' => $this->getInput('clock'),

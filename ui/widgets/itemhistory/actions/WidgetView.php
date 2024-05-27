@@ -268,12 +268,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$itemids = array_keys($items_by_source['binary_items']);
 
 			$db_binary_items_values = API::History()->get([
+				'output' => ['itemid', 'clock', 'ns'],
 				'history' => ITEM_VALUE_TYPE_BINARY,
 				'itemids' => $itemids,
-				'output' => ['itemid', 'clock', 'ns'],
-				'limit' => $this->fields_values['show_lines'] * count($itemids),
 				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => $this->fields_values['show_lines'] * count($itemids)
 			]) ?: [];
 
 			foreach ($db_binary_items_values as $binary_items_value) {
