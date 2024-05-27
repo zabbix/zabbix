@@ -628,10 +628,10 @@ function make_status_of_zbx() {
 				$status['has_status'] ? $status['hosts_count'] : '',
 				$status['has_status']
 					? [
-					(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN),
-					' / ',
-					(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED)
-				]
+						(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN),
+						' / ',
+						(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED)
+					]
 					: ''
 			])
 			->addRow([
@@ -644,12 +644,12 @@ function make_status_of_zbx() {
 				$status['has_status'] ? $status['items_count'] : '',
 				$status['has_status']
 					? [
-					(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN),
-					' / ',
-					(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED),
-					' / ',
-					(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
-				]
+						(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN),
+						' / ',
+						(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED),
+						' / ',
+						(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
+					]
 					: ''
 			])
 			->addRow([
