@@ -651,7 +651,7 @@ window.item_edit_form = new class {
 		const custom_timeout = [].filter.call(this.field.custom_timeout, e => e.matches(':checked')).pop();
 		const inherited_hidden = custom_timeout.value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 
-		if (document.querySelector('[name=custom_timeout]:checked').value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+		if (inherited_hidden) {
 			this.field.timeout.value = this.override_timeout;
 		}
 		else {
@@ -783,7 +783,7 @@ window.item_edit_form = new class {
 	}
 
 	#typeChangeHandler(e) {
-		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value]||'';
+		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value] || '';
 
 		if (this.field.timeout.value === '' || this.override_timeout === undefined) {
 			this.override_timeout = this.field.inherited_timeout.value;
