@@ -651,13 +651,7 @@ window.item_edit_form = new class {
 		const custom_timeout = [].filter.call(this.field.custom_timeout, e => e.matches(':checked')).pop();
 		const inherited_hidden = custom_timeout.value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 
-		if (inherited_hidden) {
-			this.field.timeout.value = this.override_timeout;
-		}
-		else {
-			this.field.timeout.value = this.field.inherited_timeout.value;
-		}
-
+		this.field.timeout.value = inherited_hidden ? this.override_timeout : this.field.inherited_timeout.value;
 		this.form.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
 		this.form.timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
 	}
