@@ -360,6 +360,7 @@ class CSVGPie {
 			.attr('data-hintbox-static', 1)
 			.attr('data-hintbox-track-mouse', 1)
 			.attr('data-hintbox-delay', 0)
+			.attr('data-hintbox-ignore-position-change', 1)
 			.style('stroke-width', this.#config.space)
 			.each((d, index, nodes) => nodes[index]._current = d);
 
