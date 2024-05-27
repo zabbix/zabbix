@@ -44,11 +44,16 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	private static $trigger_actionid_neg;
 	private static $scriptid_action;
 	private static $scriptid;
+	private static $drule_actionid;
+	private static $druleid;
 	private static $hostmacroid;
 	private static $interfaceid;
+	private static $trap2_itemid;
+	private static $ext_itemid;
 
 	const ITEM_TRAP = 'trap1';
-	const INT_TRAP = 'trap_internal';
+	const ITEM_TRAP2 = 'trap2_allowedhosts';
+	const ITEM_EXT = 'item_external';
 	const HOST_NAME = 'test_hostconn';
 
 	/**
@@ -89,17 +94,15 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 		self::$interfaceid = $response['result'][0]['interfaces'][0]['interfaceid'];
 
-		foreach ([self::ITEM_TRAP, self::INT_TRAP] as $value) {
-			$response = $this->call('item.create', [
-				'hostid' => self::$hostid,
-				'name' => $value,
-				'key_' => $value,
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			]);
-			$this->assertArrayHasKey('itemids', $response['result']);
-			$this->assertEquals(1, count($response['result']['itemids']));
-		}
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => self::ITEM_TRAP,
+			'key_' => self::ITEM_TRAP,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
 
 		$response = $this->call('trigger.create', [
 			'description' => 'Trigger for HOST.CONN test',
@@ -247,6 +250,72 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['actionids']));
 		self::$trigger_actionid_neg = $response['result']['actionids'][0];
 
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => self::ITEM_TRAP2,
+			'key_' => self::ITEM_TRAP2,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{HOST.CONN}'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		self::$trap2_itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => self::ITEM_EXT,
+			'key_' => 'script[{HOST.CONN}]',
+			'type' => ITEM_TYPE_EXTERNAL,
+			'delay' => '30s',
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		self::$ext_itemid = $response['result']['itemids'][0];
+
+		$response = $this->call('drule.create', [
+				'name' => 'test discovery rule HOST.CONN',
+				'iprange' => '127.0.0.1-10',
+				'dchecks' => [
+					[
+						'type' => SVC_AGENT,
+						'key_' => 'agent.variant',
+						'ports' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX,
+						'uniq' => 1
+					]
+				],
+				'delay' => '10s',
+				'host_source' => 3,
+				'name_source' => 3
+			]
+		);
+		$this->assertArrayHasKey('druleids', $response['result']);
+		$this->assertEquals(1, count($response['result']['druleids']));
+		self::$druleid = $response['result']['druleids'][0];
+
+		$response = $this->call('action.create', [
+			'name' => 'create_host_d',
+			'eventsource' => EVENT_SOURCE_DISCOVERY,
+			'status' => 0,
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_COMMAND,
+					'opcommand_grp' => [
+						[
+							'groupid' => 4
+						]
+					],
+					'opcommand' => [
+						'scriptid' => self::$scriptid_action
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertEquals(1, count($response['result']['actionids']));
+		self::$drule_actionid = $response['result']['actionids'][0];
+
 		return true;
 	}
 
@@ -290,6 +359,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	 * Test regression of validation.
 	 *
 	 * @required-components server, agent
+	 * @depends testHostConnMacroValidation_testValidMacroManualHostScript
 	 * @configurationDataProvider defaultConfigurationProvider
 	 */
 	public function testHostConnMacroValidation_testValidMacroManualEventScript() {
@@ -325,6 +395,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	 * Test regression of validation.
 	 *
 	 * @required-components server, agent
+	 * @depends testHostConnMacroValidation_testValidMacroManualEventScript
 	 * @configurationDataProvider defaultConfigurationProvider
 	 */
 	public function testHostConnMacroValidation_testValidMacroAction() {
@@ -340,6 +411,51 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertEquals('test_hostconn:echo -n hello 127.0.0.1', $response['result'][0]['message']);
 
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_TRAP, 0);
+	}
+
+	/**
+	 * Test regression of validation.
+	 *
+	 * @required-components server, agent
+	 * @depends testHostConnMacroValidation_testValidMacroAction
+	 * @configurationDataProvider defaultConfigurationProvider
+	 */
+	public function testHostConnMacroValidation_testValidMacroAllowedHosts() {
+		$this->sendSenderValue(self::HOST_NAME, self::ITEM_TRAP2, 1);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'itemids' => [self::$trap2_itemid]
+		], 5, 2);
+		$this->assertEquals(1, count($response['result']));
+	}
+
+	/**
+	 * Test regression of validation.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider defaultConfigurationProvider
+	 */
+	public function testHostConnMacroValidation_testValidMacroItemKey() {
+		$this->clearLog(self::COMPONENT_SERVER);
+
+		$this->call('task.create', [
+			'type' => ZBX_TM_TASK_CHECK_NOW,
+			'request' => [
+				'itemid' => self::$ext_itemid
+			]
+		]);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In get_value_external() key:'script[127.0.0.1]'", true, 60, 1);
+	}
+
+	/**
+	 * Test regression of validation.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider defaultConfigurationProvider
+	 */
+	public function testHostConnMacroValidation_testValidMacroDruleAction() {
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In discovery_register_host() ip:'127.0.0.1' status:0 value:'1'", false, 60, 1);
 	}
 
 	/**
@@ -378,6 +494,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	 * Test injection via manual event script.
 	 *
 	 * @required-components server, agent
+	 * @depends testHostConnMacroValidation_testInvalidMacroManualHostScript
 	 * @configurationDataProvider defaultConfigurationProvider
 	 */
 	public function testHostConnMacroValidation_testInvalidMacroManualEventScript() {
@@ -412,6 +529,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	 * Test injection via invalid trigger action operation.
 	 *
 	 * @required-components server, agent
+	 * @depends testHostConnMacroValidation_testInvalidMacroManualEventScript
 	 * @configurationDataProvider defaultConfigurationProvider
 	 */
 	public function testHostConnMacroValidation_testInvalidMacroAction() {
@@ -446,10 +564,63 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	}
 
 	/**
+	 * Test injection via potentially malicious item key contents.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider defaultConfigurationProvider
+	 */
+	public function testHostConnMacroValidation_testInvalidMacroItemKey() {
+		$this->clearLog(self::COMPONENT_SERVER);
+
+		$this->call('task.create', [
+			'type' => ZBX_TM_TASK_CHECK_NOW,
+			'request' => [
+				'itemid' => self::$ext_itemid
+			]
+		]);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "cannot resolve macro '{HOST.CONN}'", true, 60, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In get_value_external() key:'script[{HOST.CONN}]'", true, 60, 1);
+	}
+
+	/**
+	 * Test injection via potentially malicious item key contents.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider defaultConfigurationProvider
+	 */
+	public function testHostConnMacroValidation_testInvalidMacroAllowedHosts() {
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+		$this->sendSenderValue(self::HOST_NAME, self::ITEM_TRAP2, 1);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot process item "'.self::ITEM_TRAP2.'"',
+			true, 60, 1, true);
+	}
+
+	/**
+	 * Test injection via running an action operation for discovery.
+	 *
+	 * @required-components server, agent
+	 * @configurationDataProvider defaultConfigurationProvider
+	 */
+	public function testHostConnMacroValidation_testInvalidMacroDruleAction() {
+		CDataHelper::call('host.delete', [self::$hostid]);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => [self::$trigger_actionid_neg],
+		], 30, 2);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals("Invalid macro '{HOST.CONN}' value", $response['result'][0]['error']);
+	}
+
+	/**
 	 * Delete all created data after test.
 	 */
 	public static function clearData(): void {
-		CDataHelper::call('action.delete', [self::$trigger_actionid, self::$trigger_actionid_neg]);
+		CDataHelper::call('action.delete', [self::$trigger_actionid, self::$trigger_actionid_neg, self::$drule_actionid]);
+		CDataHelper::call('drule.delete', [self::$druleid]);
 		CDataHelper::call('host.delete', [self::$hostid]);
 		CDataHelper::call('script.delete', [self::$scriptid_action, self::$scriptid]);
 	}
