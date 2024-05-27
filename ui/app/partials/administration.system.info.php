@@ -79,12 +79,11 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 }
 
 if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-	$info_table
-		->addRow([
-			_('Zabbix server version'),
-			$server_version,
-			$server_version_details
-		]);
+	$info_table->addRow([
+		_('Zabbix server version'),
+		$server_version,
+		$server_version_details
+	]);
 }
 
 $info_table->addRow([
@@ -114,9 +113,10 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			$status['has_status'] ? $status['hosts_count'] : '',
 			$status['has_status']
 				? [
-				(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE), ' / ',
-				(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
-			]
+					(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE),
+					' / ',
+					(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
+				]
 				: ''
 		])
 		->addRow([
@@ -130,10 +130,10 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			$status['has_status'] ? $status['items_count'] : '',
 			$status['has_status']
 				? [
-				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE), ' / ',
-				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_COLOR_NEGATIVE), ' / ',
-				(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
-			]
+					(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE), ' / ',
+					(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_COLOR_NEGATIVE), ' / ',
+					(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
+				]
 				: ''
 		])
 		->addRow([
@@ -142,15 +142,15 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			$status['has_status'] ? $status['triggers_count'] : '',
 			$status['has_status']
 				? [
-				$status['triggers_count_enabled'],
-				' / ',
-				$status['triggers_count_disabled'],
-				' [',
-				(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_COLOR_NEGATIVE),
-				' / ',
-				(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_COLOR_POSITIVE),
-				']'
-			]
+					$status['triggers_count_enabled'],
+					' / ',
+					$status['triggers_count_disabled'],
+					' [',
+					(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_COLOR_NEGATIVE),
+					' / ',
+					(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_COLOR_POSITIVE),
+					']'
+				]
 				: ''
 		])
 		->addRow([
