@@ -57,7 +57,7 @@ class ValueCheck extends CController {
 	}
 
 	protected function doAction(): void {
-		$result = [2];
+		$result = [];
 
 		$db_item = API::Item()->get([
 			'output' => ['itemid', 'value_type'],
