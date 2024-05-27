@@ -250,15 +250,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$result = [
 			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
-			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
-			'binary_items' => []
+			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => []
 		];
 
 		foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] as $value_type => $items) {
 			$itemids = array_keys($items);
 
 			$db_items_values = API::History()->get([
-				'output' => ['itemid', 'value', 'clock', 'ns'],
+				'output' => $value_type == ITEM_VALUE_TYPE_BINARY
+					? ['itemid', 'clock', 'ns']
+					: ['itemid', 'value', 'clock', 'ns'],
 				'history' => $value_type,
 				'itemids' => $itemids,
 				'time_from' => $time_from,
@@ -296,33 +297,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if ($items_by_source['binary_items']) {
-			$itemids = array_keys($items_by_source['binary_items']);
-
-			$db_binary_items_values = API::History()->get([
-				'output' => ['itemid', 'clock', 'ns'],
-				'history' => ITEM_VALUE_TYPE_BINARY,
-				'itemids' => $itemids,
-				'time_from' => $time_from,
-				'time_till' => $time_to,
-				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => $this->fields_values['show_lines'] * count($itemids)
-			]) ?: [];
-
-			foreach ($db_binary_items_values as $db_binary_item_value) {
-				$result['binary_items'][$db_binary_item_value['itemid']][] = $db_binary_item_value;
-			}
-		}
-
 		return $result;
 	}
 
 	private function addDataSourceAndPrepareColumns(array &$columns, array $items, int $time): array {
 		$items_with_source = [
 			CWidgetFieldColumnsList::HISTORY_DATA_TRENDS => [],
-			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => [],
-			'binary_items' => []
+			CWidgetFieldColumnsList::HISTORY_DATA_HISTORY => []
 		];
 
 		foreach ($columns as &$column) {
@@ -338,19 +319,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 						? CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
 						: CWidgetFieldColumnsList::HISTORY_DATA_TRENDS;
 				}
-
-				$items_with_source[$column['history']][$item['value_type']][$itemid] = $item;
 			}
 			else {
-				if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-					$column['history'] = 'binary_items';
-					$items_with_source['binary_items'][$itemid] = true;
-				}
-				else {
-					$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
-					$items_with_source[$column['history']][$item['value_type']][$itemid] = $item;
-				}
+				$column['history'] = CWidgetFieldColumnsList::HISTORY_DATA_HISTORY;
 			}
+
+			$items_with_source[$column['history']][$item['value_type']][$itemid] = $item;
 		}
 		unset($column);
 
