@@ -1228,7 +1228,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			if (array_key_exists('dependent_widget', $module)) {
 				$dependent_widget = $dashboard->getWidget($module['dependent_widget']);
 				$this->assertTrue($dependent_widget->isValid());
-				$this->assertEquals(self::INACCESSIBLE_TEXT, $dependent_widget->getContent()->getText());
+				$this->assertEquals("Referred widget is unavailable\nPlease update configuration",
+						$dependent_widget->getContent()->getText()
+				);
 			}
 
 			/**
