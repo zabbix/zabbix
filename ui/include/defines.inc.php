@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0rc1');
+define('ZABBIX_VERSION',		'7.0.0rc3');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
@@ -1736,7 +1736,7 @@ define('WIDGET_CLOCK',				'clock');
 define('WIDGET_GRAPH',				'graph');
 define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
 define('WIDGET_ITEM',				'item');
-define('WIDGET_ITEM_HISTORY',		'itemhistory');
+define('WIDGET_PLAIN_TEXT',			'plaintext');
 define('WIDGET_URL',				'url');
 
 // Inaccessible widget type.

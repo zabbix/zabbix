@@ -1904,44 +1904,52 @@ func TestConfigurator(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 }
 
-func Test_getCapacity(t *testing.T) {
+func Test_getPluginOptions(t *testing.T) {
 	type args struct {
-		optsRaw interface{}
+		optsRaw any
 	}
 	tests := []struct {
-		name string
-		args args
-		want int
+		name                  string
+		args                  args
+		wantCapacity          int
+		wantForceActiveChecks int
 	}{
 		{
 			"default",
 			args{
 				&conf.Node{
 					Name:  "Test",
-					Nodes: []interface{}{},
+					Nodes: []any{},
 				},
 			},
 			1000,
+			0,
 		},
 		{
-			"both_cap",
+			"system_cap_active_checks_and_unexpected_param",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "Capacity",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Value{Value: []byte("10")},
 							},
 						},
 						&conf.Node{
 							Name: "System",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Node{
 									Name: "Capacity",
-									Nodes: []interface{}{
+									Nodes: []any{
 										&conf.Value{Value: []byte("50")},
+									},
+								},
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("1")},
 									},
 								},
 							},
@@ -1950,36 +1958,38 @@ func Test_getCapacity(t *testing.T) {
 				},
 			},
 			50,
+			1,
 		},
 		{
-			"deprecated_cap",
+			"unexpected_param",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "Capacity",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Value{Value: []byte("10")},
 							},
 						},
 					},
 				},
 			},
-			10,
+			1000,
+			0,
 		},
 		{
 			"system_cap",
 			args{
 				&conf.Node{
 					Name: "Test",
-					Nodes: []interface{}{
+					Nodes: []any{
 						&conf.Node{
 							Name: "System",
-							Nodes: []interface{}{
+							Nodes: []any{
 								&conf.Node{
 									Name: "Capacity",
-									Nodes: []interface{}{
+									Nodes: []any{
 										&conf.Value{Value: []byte("50")},
 									},
 								},
@@ -1989,17 +1999,78 @@ func Test_getCapacity(t *testing.T) {
 				},
 			},
 			50,
+			0,
+		},
+		{
+			"active_checks",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []any{
+						&conf.Node{
+							Name: "System",
+							Nodes: []any{
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("1")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			1000,
+			1,
+		},
+		{
+			"no_active_checks",
+			args{
+				&conf.Node{
+					Name: "Test",
+					Nodes: []any{
+						&conf.Node{
+							Name: "System",
+							Nodes: []any{
+								&conf.Node{
+									Name: "ForceActiveChecksOnStart",
+									Nodes: []any{
+										&conf.Value{Value: []byte("0")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			1000,
+			0,
 		},
 		{
 			"nil",
 			args{nil},
 			1000,
+			0,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := getPluginOptions(tt.args.optsRaw, "test"); got != tt.want {
-				t.Errorf("getCapacity() = %v, want %v", got, tt.want)
+			gotCapacity, gotForceActiveChecks := getPluginOptions(tt.args.optsRaw, "test")
+			if gotCapacity != tt.wantCapacity {
+				t.Errorf(
+					"getPluginOptions() got Plugins.<PluginName>.System.Capacity = %v, want %v",
+					gotCapacity,
+					tt.wantCapacity,
+				)
+			}
+
+			if gotForceActiveChecks != tt.wantForceActiveChecks {
+				t.Errorf(
+					"getPluginOptions() got ForceActiveChecksOnStart = %v, want %v",
+					gotForceActiveChecks,
+					tt.wantForceActiveChecks,
+				)
 			}
 		})
 	}

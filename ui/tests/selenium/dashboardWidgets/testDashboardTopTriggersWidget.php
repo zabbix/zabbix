@@ -234,16 +234,16 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::DEFAULT_WIDGET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							],
 							[
 								'type' => 'toptriggers',
 								'name' => self::DELETE_WIDGET,
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
@@ -260,8 +260,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
@@ -278,8 +278,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::DATA_WIDGET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
@@ -1417,11 +1417,11 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			'trigger_menu' => [
 				'VIEW' => [
 					'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=99252',
-					'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
+					'History' => [ 'Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
 				],
 				'CONFIGURATION' => [
 					'Trigger' => 'menu-popup-item',
-					'Items' => ['Linux: Number of processes' => 'menu-popup-item']
+					'Items' => [ 'Number of processes' => 'menu-popup-item']
 				]
 			],
 			'host_menu' => [

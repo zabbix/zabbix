@@ -242,7 +242,7 @@ $item_tab
 		(new CLabel(_('Script'), 'browser_script'))
 			->setAsteriskMark()
 			->setId('js-item-browser-script-label'),
-		(new CFormField((new CMultilineInput('browser_script', $data['params'], [
+		(new CFormField((new CMultilineInput('browser_script', $data['browser_script'], [
 				'title' => _('JavaScript'),
 				'placeholder' => _('script'),
 				'placeholder_textarea' => 'return value',

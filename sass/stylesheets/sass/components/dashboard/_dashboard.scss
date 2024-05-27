@@ -247,10 +247,6 @@
 			font-size: $icon-size;
 		}
 
-		.hidden {
-			display: none;
-		}
-
 		div {
 			padding: 0 5px 5px;
 		}
@@ -273,10 +269,6 @@
 		.dashboard-widget-placeholder-box {
 			background-color: rgba($ui-bg-color, .7);
 		}
-	}
-
-	&.hidden {
-		display: none;
 	}
 }
 

@@ -841,7 +841,9 @@ class CConfigurationImport {
 				}
 				unset($item['interface_ref']);
 
-				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
+				$item['valuemapid'] = 0;
+
+				if ($item['valuemap']) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $item['valuemap']['name']);
 
 					if ($valuemapid === null) {
@@ -1296,6 +1298,8 @@ class CConfigurationImport {
 						}
 					}
 					unset($item_prototype['interface_ref']);
+
+					$item_prototype['valuemapid'] = 0;
 
 					if ($item_prototype['valuemap']) {
 						$valuemapid = $this->referencer->findValuemapidByName($hostid,

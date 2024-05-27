@@ -399,11 +399,15 @@ static int	DBpatch_6050032(void)
 
 static int	DBpatch_6050033(void)
 {
+	zbx_uint64_t	moduleid;
+
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	moduleid = zbx_db_get_maxid("module");
+
 	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
-			" (" ZBX_FS_UI64 ",'toptriggers','widgets/toptriggers',%d,'[]')", zbx_db_get_maxid("module"), 1))
+			" (" ZBX_FS_UI64 ",'toptriggers','widgets/toptriggers',%d,'[]')", moduleid, 1))
 	{
 		return FAIL;
 	}
@@ -478,9 +482,9 @@ static int	DBpatch_6050039(void)
 			" where h.status in (%i,%i)",
 			DEPRECATED_STATUS_PROXY_PASSIVE, DEPRECATED_STATUS_PROXY_ACTIVE);
 
-	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "operating_mode", "description", "tls_connect",
-			"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", "allowed_addresses",
-			"address", "port", (char *)NULL);
+	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "operating_mode", "description",
+			"tls_connect", "tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk",
+			"allowed_addresses", "address", "port", (char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -494,8 +498,8 @@ static int	DBpatch_6050039(void)
 
 		if (DEPRECATED_STATUS_PROXY_ACTIVE == status)
 		{
-			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_ACTIVE, row[3],
-					tls_connect, tls_accept, row[6], row[7], row[8], row[9], row[10],
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_ACTIVE,
+					row[3], tls_connect, tls_accept, row[6], row[7], row[8], row[9], row[10],
 					"127.0.0.1", "10051");
 		}
 		else if (DEPRECATED_STATUS_PROXY_PASSIVE == status)
@@ -515,8 +519,9 @@ static int	DBpatch_6050039(void)
 				zabbix_log(LOG_LEVEL_WARNING, "cannot select interface for proxy '%s'",  row[1]);
 			}
 
-			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_PASSIVE, row[3],
-					tls_connect, tls_accept, row[6], row[7], row[8], row[9], "", address, port);
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_PASSIVE,
+					row[3], tls_connect, tls_accept, row[6], row[7], row[8], row[9], "", address,
+					port);
 		}
 	}
 	zbx_db_free_result(result);
@@ -2056,7 +2061,8 @@ static int	DBpatch_6050165(void)
 					/* zbx_function_param_quote() should always succeed with esc_bs set to 1 */
 					zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON);
 
-					if (0 != strncmp(param, ptr + param_pos, strlen(param))) {
+					if (0 != strncmp(param, ptr + param_pos, strlen(param)))
+					{
 						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr, param_pos);
 						zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 						func_params_changed = changed = 1;
@@ -2075,7 +2081,8 @@ static int	DBpatch_6050165(void)
 		if (0 == buf_offset)
 			continue;
 
-		if (0 != func_params_changed) {
+		if (0 != func_params_changed)
+		{
 			tmp = zbx_db_dyn_escape_string(buf);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
@@ -3629,11 +3636,15 @@ static int	DBpatch_6050255(void)
 
 static int	DBpatch_6050256(void)
 {
+	zbx_uint64_t	moduleid;
+
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	moduleid = zbx_db_get_maxid("module");
+
 	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
-			" (" ZBX_FS_UI64 ",'hostnavigator','widgets/hostnavigator',%d,'[]')", zbx_db_get_maxid("module"), 1))
+			" (" ZBX_FS_UI64 ",'hostnavigator','widgets/hostnavigator',%d,'[]')", moduleid, 1))
 	{
 		return FAIL;
 	}
@@ -4007,11 +4018,15 @@ out:
 
 static int	DBpatch_6050295(void)
 {
+	zbx_uint64_t	moduleid;
+
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	moduleid = zbx_db_get_maxid("module");
+
 	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
-			" (" ZBX_FS_UI64 ",'itemnavigator','widgets/itemnavigator',%d,'[]')", zbx_db_get_maxid("module"), 1))
+			" (" ZBX_FS_UI64 ",'itemnavigator','widgets/itemnavigator',%d,'[]')", moduleid, 1))
 	{
 		return FAIL;
 	}

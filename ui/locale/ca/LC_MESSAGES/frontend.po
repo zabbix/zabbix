@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-11 05:33+0000\n"
+"PO-Revision-Date: 2024-05-15 10:25+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1475,11 +1475,11 @@ msgstr "Qualsevol cadena de caràcters inclosa"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Qualsevol equip existent que no sigui present al fitxer d'importació s'esborrarà. Feu clic a OK per continuar."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Qualsevol plantilla existent que no sigui present al fitxer d'importació s'esborrarà. Feu clic a OK per continuar."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -2080,7 +2080,7 @@ msgstr "Dur al davant"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Navegador"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -7173,7 +7173,7 @@ msgstr "Mostra el gràfic"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
-msgstr ""
+msgstr "Mostra l'hora local"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9272,7 +9272,7 @@ msgstr "Ressalteu la filera sencera"
 
 #: widgets/itemhistory/views/column.edit.php:132
 msgid "Highlights"
-msgstr ""
+msgstr "Destacats"
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -11821,7 +11821,7 @@ msgstr[1] "Elements activats"
 
 #: widgets/itemhistory/Widget.php:26
 msgid "Item history"
-msgstr ""
+msgstr "Historial d'elements"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
@@ -12337,7 +12337,7 @@ msgstr "Darreres dades"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"
-msgstr ""
+msgstr "Darrera versió"
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -14171,7 +14171,7 @@ msgstr "Nous triggers"
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
 msgid "New update available"
-msgstr ""
+msgstr "Nova actualització disponible"
 
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
@@ -14179,7 +14179,7 @@ msgstr "Nou mapatge de grups d'usuaris"
 
 #: widgets/itemhistory/includes/WidgetForm.php:96
 msgid "New values"
-msgstr ""
+msgstr "Nous valors"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -16100,7 +16100,7 @@ msgstr "Si us plau, actualitzeu la configuració"
 
 #: app/partials/administration.system.info.php:47
 msgid "Please upgrade to latest major release."
-msgstr ""
+msgstr "Si us plau, actualitzeu a una versió principal més nova."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
@@ -17005,7 +17005,7 @@ msgstr "Informes relacionats"
 
 #: app/partials/administration.system.info.php:72
 msgid "Release notes"
-msgstr ""
+msgstr "Notes del llançament"
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18772,7 +18772,7 @@ msgstr "Mostra l'arc"
 
 #: widgets/itemhistory/includes/WidgetForm.php:105
 msgid "Show column header"
-msgstr ""
+msgstr "Veure la capçalera de la columna"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
@@ -18846,7 +18846,7 @@ msgstr "Mostra la barra lateral"
 
 #: widgets/systeminfo/includes/WidgetForm.php:42
 msgid "Show software update check details"
-msgstr ""
+msgstr "Veure els detalls de la comprovació d'actualització del programari"
 
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
@@ -18881,7 +18881,7 @@ msgstr "Mostra el text com a HTML"
 
 #: widgets/itemhistory/views/column.edit.php:251
 msgid "Show thumbnail"
-msgstr ""
+msgstr "Veure la miniatura"
 
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
@@ -18891,7 +18891,7 @@ msgstr "Mostra la línia de temps"
 
 #: widgets/itemhistory/includes/WidgetForm.php:102
 msgid "Show timestamp"
-msgstr ""
+msgstr "Veure la marca de temps"
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18994,11 +18994,11 @@ msgstr "Únic"
 
 #: widgets/itemhistory/views/column.edit.php:150
 msgid "Single line"
-msgstr ""
+msgstr "Línia única"
 
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
-msgstr ""
+msgstr "Línia única: el resultat es veurà en una sola línia i es truncarà a la longitud establerta."
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19109,7 +19109,7 @@ msgstr "Informació sobre l'arquitectura del programari. Retorna una cadena"
 
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
-msgstr ""
+msgstr "Darrera verificació d'actualització del programari"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -20323,7 +20323,7 @@ msgstr "Aquesta configuració hauria d'ésser actives, doncs les taules de tend�
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Aquesta configuració ensenya l'hora local en lloc de la marca de temps. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -21613,7 +21613,7 @@ msgstr "Amunt"
 #: app/partials/administration.system.info.php:59
 #: app/partials/administration.system.info.php:64
 msgid "Up to date"
-msgstr ""
+msgstr "Actualitzat"
 
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
@@ -21800,7 +21800,7 @@ msgstr "Emprar el sandboxing iframe"
 
 #: widgets/itemhistory/views/column.edit.php:232
 msgid "Use monospace font"
-msgstr ""
+msgstr "Emprar el tipus de lletra monoespai"
 
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180

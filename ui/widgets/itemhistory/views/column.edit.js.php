@@ -11,7 +11,6 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -68,17 +67,19 @@ window.item_history_column_edit = new class {
 
 		// Initialize item multiselect
 		$('#itemid').on('change', () => {
-			this.#overlay.setLoading();
-
 			const ms_item_data = jQuery('#itemid').multiSelect('getData');
 
 			if (ms_item_data.length > 0) {
+				this.#overlay.setLoading();
+
 				this.#promiseGetItemType(ms_item_data[0].id)
 					.then((type) => {
 						if (this.#form.isConnected) {
 							this.#item_value_type = type;
 							this.#updateForm();
 						}
+					}).finally(() => {
+						this.#overlay.unsetLoading();
 					});
 
 				const name_field = this.#form.querySelector('[name=name]');
@@ -93,8 +94,6 @@ window.item_history_column_edit = new class {
 				this.#item_value_type = null;
 				this.#updateForm();
 			}
-
-			this.#overlay.unsetLoading();
 		});
 
 		colorPalette.setThemeColors(colors);

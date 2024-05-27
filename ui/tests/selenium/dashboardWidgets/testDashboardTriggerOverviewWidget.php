@@ -103,16 +103,16 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 							[
 								'type' => 'trigover',
 								'name' => self::$update_widget,
-								'width' => 24,
-								'height' => 4
+								'width' => 35,
+								'height' => 6
 							],
 							[
 								'type' => 'trigover',
 								'name' => self::$delete_widget,
-								'x' => 0,
-								'y' => 4,
-								'width' => 24,
-								'height' => 4,
+								'x' => 35,
+								'y' => 0,
+								'width' => 37,
+								'height' => 6,
 								'fields' => [
 									[
 										'type' => 0,
