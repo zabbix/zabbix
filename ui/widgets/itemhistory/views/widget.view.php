@@ -82,16 +82,16 @@ else {
 		$column_index = $is_layout_vertical ? $item_value['column_index'] : 0;
 
 		if ($item_value['clock'] != $clock || array_key_exists($column_index, $row)) {
-			if (count($rows) == $data['show_lines']) {
-				break;
-			}
-
 			if ($row) {
 				$rows[] = $row;
 			}
 
 			$clock = $item_value['clock'];
 			$row = [];
+
+			if (count($rows) == $data['show_lines']) {
+				break;
+			}
 		}
 
 		$row[$column_index] = $item_value;
@@ -106,6 +106,8 @@ else {
 	}
 
 	if ($is_layout_vertical) {
+		$column_indexes = array_keys($data['columns']);
+
 		foreach ($rows as $row) {
 			$table_row = [];
 
@@ -115,7 +117,7 @@ else {
 				))->addClass(ZBX_STYLE_NOWRAP);
 			}
 
-			for ($index = 0, $count = count($data['columns']); $index < $count; $index ++) {
+			foreach ($column_indexes as $index) {
 				if (array_key_exists($index, $row)) {
 					$table_row = array_merge($table_row,
 						makeValueCell($data['columns'][$index], $row[$index], 'has-broadcast-data')
@@ -274,8 +276,12 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 
 		case ITEM_VALUE_TYPE_BINARY:
 			return [
-				(new CCol((new CButton(null, _('Show')))->addClass(ZBX_STYLE_BTN)))
-					->addClass('binary-thumbnail')
+				(new CCol(
+					(new CButton(null, _('Show')))
+						->addClass($column['show_thumbnail'] ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
+						->addClass('js-show-binary')
+						->setAttribute('data-alt', $column['name'])
+				))
 					->addClass($cell_class)
 					->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 					->setAttribute('data-itemid', $item_value['itemid'])

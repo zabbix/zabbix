@@ -335,7 +335,7 @@ class CItemHelper extends CItemGeneralHelper {
 			);
 
 			foreach ($items as &$item) {
-				if (!$hk_trends_time) {
+				if (!$hk_history_global) {
 					$item['history'] = timeUnitToSeconds($item['history']);
 
 					if ($item['history'] === null) {

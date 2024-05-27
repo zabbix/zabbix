@@ -1,4 +1,4 @@
-var	parameters = JSON.parse(value);
+parameters = JSON.parse(value);
 
 var	opts = Browser.chromeOptions();
 var	optsFirefox = Browser.firefoxOptions();
@@ -92,7 +92,6 @@ try
 	el = browser.findElement("xpath", "//input[@id='name']");
 	el.sendKeys("A");
 	el.sendKeys("d");
-	Zabbix.sleep(3000);
 	try
 	{
 		Zabbix.log(5, "foo:" + el.getAttribute("foo"));
@@ -137,7 +136,7 @@ try
 	el.click();
 
 	el = browser.findElement("link text", "Data collection"); // animation
-	Zabbix.sleep(500); // animation
+	Zabbix.sleep(250); // animation
 
 	if (el === null)
 	{
@@ -181,7 +180,7 @@ try
 	Zabbix.log(5, "Web length: " + el.length)
 
 	el = browser.findElement("link text", "Alerts");
-	Zabbix.sleep(500); // animation
+	Zabbix.sleep(250); // animation
 	if (el === null)
 	{
 		throw Error("cannot find Alerts");
@@ -267,9 +266,32 @@ try
 		el = browser2.findElement("link text", "Sign out");
 
 		browser2.collectPerfEntries();
-		raw = browser2.getRawPerfEntries();
+
+		try
+		{
+			raw = browser2.getRawPerfEntries()
+		}
+		catch (error) {
+			Zabbix.log(5, "cannot get getRawPerfEntries: " + error);
+		}
+
+		try
+		{
+			raw = browser2.getRawPerfEntriesByType('\'\+\'navigation');
+		}
+		catch (error)
+		{
+			Zabbix.log(5, "cannot get getRawPerfEntriesByType: " + error);
+		}
+
+		if (null === browser2.getError())
+		{
+			throw Error("injection not handled");
+		}
+
+		var raw = browser2.getRawPerfEntriesByType('navigation');
 		browserDashboardResult = browser2.getResult();
-		browserDashboardResult.raw = raw
+		browserDashboardResult.raw = raw.concat(browser2.getRawPerfEntriesByType('resource'));
 
 		summary = browserDashboardResult.performance_data.summary;
 
@@ -315,7 +337,7 @@ catch (err)
 	}
 
 	result = browser.getResult();
-	result["screenshot"] = browser.getScreenshot();
+	var screenshot = browser.getScreenshot();
 	return JSON.stringify(result);
 
 }
