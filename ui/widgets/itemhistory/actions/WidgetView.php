@@ -21,8 +21,7 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CItemHelper,
-	CNumberParser,
-	Manager;
+	CNumberParser;
 
 use	Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
 
