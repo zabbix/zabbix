@@ -639,7 +639,6 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_common_data(zbx_wd_perf_entr
 static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_navigation_data(zbx_wd_perf_entry_t *in)
 {
 	zbx_wd_perf_entry_t	*out;
-	zbx_wd_attr_t		attr;
 
 	out = wd_perf_entry_aggregate_common_data(in);
 	wd_perf_entry_copy_attr(out, WD_PERF_ATTR_TLS_NEGOTIATION_TIME, in, WD_PERF_ATTR_TLS_NEGOTIATION_TIME);
