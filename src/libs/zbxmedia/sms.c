@@ -26,7 +26,6 @@
 
 #define	ZBX_AT_ESC	"\x1B"
 #define ZBX_AT_CTRL_Z	"\x1A"
-#define ZBX_CTRL_Z	0x1a
 
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
@@ -233,7 +232,7 @@ static int	check_sms_message(const char *message)
 
 	for (ptr = message; '\0' != *ptr; ptr++)
 	{
-		if (ZBX_CTRL_Z == *ptr)
+		if (*ZBX_AT_CTRL_Z == *ptr)
 			return FAIL;
 	}
 
@@ -267,7 +266,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "invalid phone number \"%s\"", number);
 		if (NULL != error)
-			zbx_snprintf(error, max_error_len, "invalid phone number \"%s\"", number);
+			zbx_snprintf(error, max_error_len, "Invalid phone number \"%s\"", number);
 
 		return FAIL;
 	}
@@ -276,7 +275,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "invalid message \"%s\"", message);
 		if (NULL != error)
-			zbx_snprintf(error, max_error_len, "invalid message \"%s\"", message);
+			zbx_snprintf(error, max_error_len, "Invalid message \"%s\"", message);
 
 		return FAIL;
 	}
@@ -285,7 +284,10 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "error in open(%s): %s", device, zbx_strerror(errno));
 		if (NULL != error)
-			zbx_snprintf(error, max_error_len, "error in open(%s): %s", device, zbx_strerror(errno));
+		{
+			zbx_snprintf(error, max_error_len, "Cannot open device \"%s\": %s", device,
+					zbx_strerror(errno));
+		}
 		return FAIL;
 	}
 
@@ -296,7 +298,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 
 		if (NULL != error)
 		{
-			zbx_snprintf(error, max_error_len, "error in setting the status flag to 0 (for %s): %s", device,
+			zbx_snprintf(error, max_error_len, "Cannot set device \"%s\" status flag to 0: %s", device,
 					zbx_strerror(errno));
 		}
 	}
