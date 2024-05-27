@@ -6695,7 +6695,7 @@ div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-wi
   .is-loading::before {
     background-color: rgba(0, 0, 0, 0.8);
     content: 'loading';
-    text-indent: 200%;
+    text-indent: -9999px;
     overflow: hidden;
     position: absolute;
     top: 0;
