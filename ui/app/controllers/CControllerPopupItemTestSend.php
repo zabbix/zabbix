@@ -427,11 +427,18 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							}
 						}
 						elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-							$step['result'] = $preproc_test_data['value'];
+							unset($step['result']);
+						}
+						elseif (array_key_exists('truncated', $step) && $step['truncated']) {
+							$step['warning'] = _s('Result is truncated due to its size (%1$s).',
+								convertUnits(['value' => $step['original_size'], 'units' => 'B'])
+							);
 						}
 					}
 
-					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params']);
+					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params'],
+						$step['truncated'], $step['original_size']
+					);
 
 					// Latest executed step due to the error or end of preprocessing.
 					$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
@@ -449,6 +456,12 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							),
 							'result' => $result['result']
 						];
+
+						if (array_key_exists('truncated', $result) && $result['truncated']) {
+							$output['final']['warning'] = _s('Result is truncated due to its size (%1$s).',
+								convertUnits(['value' => $result['original_size'], 'units' => 'B'])
+							);
+						}
 
 						if ($valuemap) {
 							$output['mapped_value'] = CValueMapHelper::applyValueMap($preproc_test_data['value_type'],

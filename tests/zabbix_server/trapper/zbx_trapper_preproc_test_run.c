@@ -131,17 +131,98 @@ void	__wrap_free_result(AGENT_RESULT *result)
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*request;
-	char			*error = NULL;
+	const char		*request, *response = NULL, *value_append = NULL, *expected_truncation = NULL;
+	char			*error = NULL, *value_override = NULL,
+				*request_override = NULL, *response_override = NULL;
 	struct zbx_json_parse	jp;
 	struct zbx_json		out;
 	int			returned_ret, expected_ret;
+	zbx_mock_handle_t	handle;
+	zbx_uint64_t		value_gen_length = 0, expected_data_len = 0;
+	size_t			tmp_alloc = 0, tmp_offset = 0;
 
 	ZBX_UNUSED(state);
 
 	zbx_json_init(&out, 1024);
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	request = zbx_mock_get_parameter_string("in.request");
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.value_gen_length", &handle) &&
+			ZBX_MOCK_SUCCESS == zbx_mock_uint64(handle, &value_gen_length))
+	{
+		#define RANG_GEN_REQUEST "{\
+			\"data\": {\
+				\"steps\": [],\
+				\"value_type\": 1,\
+				\"value\": \"%s\"\
+			},\
+			\"request\": \"preprocessing.test\",\
+			\"sid\": \"6ed71f17963a881bd010e63b01c39484\"\
+		}"
+		#define RANG_GEN_RESPONSE_TRUNCATED "{\
+			\"response\": \"success\",\
+			\"data\": {\
+				\"steps\": [],\
+				\"truncated\": %s,\
+				\"result\": \"%s\",\
+				\"original_size\": %zu\
+			}\
+		}"
+		#define RANG_GEN_RESPONSE_UNTRUNCATED "{\
+			\"response\": \"success\",\
+			\"data\": {\
+				\"steps\": [],\
+				\"result\": \"%s\"\
+			}\
+		}"
+
+		size_t append_len, required_length;
+
+		required_length = value_gen_length;
+		value_append = zbx_mock_get_parameter_string("in.value_append");
+		expected_data_len = zbx_mock_get_parameter_uint64("out.expected_len");
+		expected_truncation = zbx_mock_get_parameter_string("out.expected_truncated");
+
+		required_length += append_len = strlen(value_append);
+		value_override = (char *)malloc((required_length + 1) * sizeof(char));
+
+		memset(value_override, (int)'a', value_gen_length);
+
+		for (size_t i = 0; i < append_len; i++)
+			value_override[i + value_gen_length] = value_append[i];
+
+		value_override[required_length] = '\0';
+		zbx_snprintf_alloc(&request_override, &tmp_alloc, &tmp_offset, RANG_GEN_REQUEST, value_override);
+		request = request_override;
+
+		tmp_alloc = 0;
+		tmp_offset = 0;
+		value_override[expected_data_len] = '\0';
+
+		if (0 == strcmp("true", expected_truncation))
+		{
+			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE_TRUNCATED,
+					expected_truncation, value_override, required_length);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE_UNTRUNCATED,
+					value_override);
+		}
+
+		response = response_override;
+
+		#undef RANG_GEN_REQUEST
+		#undef RANG_GEN_RESPONSE_TRUNCATED
+		#undef RANG_GEN_RESPONSE_UNTRUNCATED
+	}
+	else
+	{
+		request = zbx_mock_get_parameter_string("in.request");
+
+		if (SUCCEED == expected_ret)
+			response = zbx_mock_get_parameter_string("out.response");
+	}
+
 	if (FAIL == zbx_json_open(request, &jp))
 		fail_msg("Invalid request format: %s", zbx_json_strerror());
 
@@ -151,13 +232,16 @@ void	zbx_mock_test_entry(void **state)
 	else
 		printf("zbx_trapper_preproc_test_run output: %s\n", out.buffer);
 
-	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("Return value", expected_ret, returned_ret);
 
 	if (FAIL == returned_ret)
 		zbx_mock_assert_ptr_ne("Error pointer", NULL, error);
 	else
-		zbx_mock_assert_json_eq("Output", zbx_mock_get_parameter_string("out.response"), out.buffer);
+		zbx_mock_assert_json_eq("Output", response, out.buffer);
+
+	zbx_free(value_override);
+	zbx_free(request_override);
+	zbx_free(response_override);
 
 	zbx_free(error);
 	zbx_json_free(&out);

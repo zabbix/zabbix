@@ -685,7 +685,7 @@ class C52ImportConverter extends CConverter {
 	 * @return string
 	 */
 	private static function prepareTemplateName(string $template_name): string {
-		$old_name_match = '/Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
+		$old_name_match = '/^Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) (?<mapped_name>.{3,})/';
 
 		$new_template_name = preg_match($old_name_match, $template_name, $match)
 			? $match['mapped_name']

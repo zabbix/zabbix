@@ -3,6 +3,8 @@
 
 ## Overview
 
+*Please scroll down for AWS ELB Network Load Balancer by HTTP.*
+
 The template is designed to monitor AWS ELB Application Load Balancer by HTTP via Zabbix, and it works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
