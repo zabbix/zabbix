@@ -230,6 +230,16 @@ class testDashboardItemHistoryWidget extends testWidgets {
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => 'now-1y'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => 'now'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.name',
 										'value' => 'Host name'
 									],
@@ -244,6 +254,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 										'value' => 'Available memory'
 									],
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.history',
+										'value' => 1
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.1.itemid',
 										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory'.
@@ -252,6 +267,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.2.name',
 										'value' => 'Available memory in %'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.2.history',
+										'value' => 1
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -269,9 +289,19 @@ class testDashboardItemHistoryWidget extends testWidgets {
 										'value' => $itemids['Test Item history'] // item name in widget 'Simple host with item for Item history widget: Test Item history'.
 									],
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.3.history',
+										'value' => 1
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.4.name',
 										'value' => 'Master item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.4.history',
+										'value' => 1
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -2434,7 +2464,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'host_select' => [
 						'without_data' => 'Simple host with item for Item history widget',
 						'with_data' =>'ЗАББИКС Сервер'
-						],
+					],
 					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
@@ -2447,12 +2477,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							'Value' => '7.7778' // Value rounding is expected.
 						],
 						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 days')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
 							'Name' => 'Host name',
 							'Value' => STRING_255
 						],
 						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-6 days')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
 							'Name' => 'Available memory in %',
 							'Value' => '82.0618 %' // Value rounding is expected.
 						]
@@ -2464,12 +2494,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							'Value' => 'Zabbix Item history'
 						],
 						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 days')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
 							'Name' => 'Host name',
 							'Value' => STRING_255
 						],
 						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-6 days')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
 							'Name' =>  'Available memory in %',
 							'Value' => '82.0618 %' // Value rounding is expected.
 						]
@@ -2477,8 +2507,118 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'item_data' => [
 						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
 						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
-						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-2 days')],
-						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-6 days')]
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
+						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
+					]
+				]
+			],
+			// #7 Test case for Auto/History options check.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'edit_columns' => [
+						'Master item' => ['History data' => 'Auto']
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Master item',
+							'Value' => '1' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						]
+					],
+					'item_data' => [
+						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+							'time' => strtotime('-16 hours')
+						],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
+					]
+				]
+			],
+			// #8 Test case for Time period check.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => 'now-5d',
+						'To' => 'now'
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Host name',
+							'Value' => 'Zabbix Item history'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
+							'Name' => 'Master item',
+							'Value' => '7.7778' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
+							'Name' => 'Available memory in %',
+							'Value' => '82.0618 %' // Value rounding is expected.
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' =>  'Host name',
+							'Value' => 'Zabbix Item history'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
+							'Name' => 'Master item',
+							'Value' => '7.7778' // Value rounding is expected.
+						]
+					],
+					'item_data' => [
+						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
+						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
+						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
 					]
 				]
 			]
@@ -2489,10 +2629,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
-	 *
-	 * @onBeforeOnce extendHistoryPeriod
-	 *
-	 * @onAfterOnce returnHistoryPeriodToDefault
 	 */
 	public function testDashboardItemHistoryWidget_TableData($data) {
 		foreach ($data['item_data'] as $params) {
@@ -2510,10 +2646,14 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				'Show lines' => '25',
 				'Advanced configuration' => true,
 				'New values' => 'Top',
-				'Show timestamp' => true
+				'Show timestamp' => true,
+				'Time period' => 'Custom',
+				'From' => 'now-1y',
+				'To' => 'now'
 			],
 			'columns' => [
-				'Host name' => ['id:display' => 'As is']
+				'Host name' => ['id:display' => 'As is'],
+				'Master item' => ['History data' => 'History']
 			]
 		];
 
@@ -2563,10 +2703,9 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$form->fill($configuration);
 
 		if ($edit_columns !== []) {
-			$table = $form->getFieldContainer('Columns')->asTable();
-
 			foreach ($edit_columns as $name => $settings) {
-				$table->findRow('Name', $name)->query('button:Edit')->one()->click();
+				$form->getFieldContainer('Columns')->asTable()->findRow('Name', $name)
+						->query('button:Edit')->one()->click();
 				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$column_overlay->asForm()->fill($settings);
 				$column_overlay->getFooter()->query('button:Update')->waitUntilClickable()->one()->click();
@@ -2604,7 +2743,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	 * @param string       $selector    selector of tested input
 	 */
 	protected function checkThresholdsHighlights($form, $label, $i, $selector) {
-		$container =  $form->getFieldContainer($label);
+		$container = $form->getFieldContainer($label);
 		$container->query('button:Add')->one()->click();
 		$input = $form->query('xpath:.//input[contains(@id, '.CXPathHelper::escapeQuotes($i.$selector).')]')->one();
 		$this->assertTrue($input->isVisible());
@@ -2614,16 +2753,5 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$container->query('xpath:.//button[contains(@id, '.CXPathHelper::escapeQuotes($i.'_remove').')]')
 				->one()->click();
 		$this->assertFalse($input->isVisible());
-	}
-
-	/**
-	 * GUI "Max history display period" setting should be extended so widget shows all item values.
-	 */
-	public function extendHistoryPeriod() {
-		DBexecute('UPDATE config SET history_period='.zbx_dbstr('1w'));
-	}
-
-	public function returnHistoryPeriodToDefault() {
-		DBexecute('UPDATE config SET history_period='.zbx_dbstr('24h'));
 	}
 }
