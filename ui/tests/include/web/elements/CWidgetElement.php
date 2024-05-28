@@ -37,6 +37,20 @@ class CWidgetElement extends CElement {
 	}
 
 	/**
+	 * Get time interval of widget.
+	 *
+	 * @return string
+	 */
+	public function getTimeInterval() {
+		$this->getHeader()->hoverMouse();
+		$this->query('xpath:.//li[@class="widget-info-button"]/button')->waitUntilPresent()->one()->highlight()->click(true);
+		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+		$hint_text = $hintbox->getText();
+
+		return $hint_text;
+	}
+
+	/**
 	 * Get header of widget.
 	 *
 	 * @return CElement

@@ -40,13 +40,14 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		];
 	}
 
+	const DEFAULT_WIDGET = 'Default Item history Widget';
+	const DELETE_WIDGET = 'Widget for delete';
+	const DATA_WIDET = 'Widget for data check';
+
 	protected static $dashboardid;
 	protected static $dashboard_create;
 	protected static $dashboard_data;
 	protected static $update_widget = 'Update Item history Widget';
-	const DEFAULT_WIDGET = 'Default Item history Widget';
-	const DELETE_WIDGET = 'Widget for delete';
-	const DATA_WIDET = 'Widget for data check';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -154,6 +155,31 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					[
 						'name' => 'Page with created/updated widgets',
 						'widgets' => [
+							[
+								'type' => 'graph',
+								'name' => 'Classic graph for time period reference',
+								'x' => 12,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => $itemids['Test Item history']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'FEDCB'
+									]
+								]
+							],
 							[
 								'type' => 'itemhistory',
 								'name' => self::$update_widget,
@@ -288,7 +314,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			'Override host' => '',
 			'New values' => 'Top',
 			'Show timestamp' => false,
-			'Show column header' => 'Vertical'
+			'Show column header' => 'Vertical',
+			'Time period' => 'Dashboard',
+			'Widget' => '',
+			'id:time_period_from' => 'now-1h',
+			'id:time_period_to' => 'now'
 		];
 		$form->checkValue($default_state);
 
@@ -306,7 +336,15 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			],
 			'id:override_hostid_ms' => [
 				'placeholder' => 'type here to search'
-			]
+			],
+			'id:time_period_from' => [
+				'maxlength' => '255',
+				'placeholder' => 'YYYY-MM-DD hh:mm:ss'
+			],
+			'id:time_period_to' => [
+				'maxlength' => '255',
+				'placeholder' => 'YYYY-MM-DD hh:mm:ss'
+			],
 		];
 
 		foreach ($inputs as $field => $attributes) {
@@ -314,7 +352,16 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 
 		// Check radio buttons.
-		$this->assertEquals(['Top', 'Bottom'], $form->getField('New values')->getLabels()->asText());
+		$radiobuttons = [
+			'Layout' => ['Horizontal', 'Vertical'],
+			'New values' => ['Top', 'Bottom'],
+			'Show column header' => ['Off', 'Horizontal', 'Vertical'],
+			'Time period' => ['Dashboard', 'Widget', 'Custom']
+		];
+
+		foreach ($radiobuttons as $field => $labels) {
+			$this->assertEquals($labels, $form->getField($field)->getLabels()->asText());
+		}
 
 		$refresh_interval = ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
 				'2 minutes', '10 minutes', '15 minutes'];
@@ -378,7 +425,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$column_form->fill(['Item' => 'Binary item']);
 
 		// Check that name is filled automatically.
-		$this->assertEquals('Binary item', $column_form->getField('Name')->getValue());
+		$this->assertEquals('Host for all item value types: Binary item', $column_form->getField('Name')->getValue());
 		$this->assertEquals(['Name', 'Item', 'Base colour', 'Show thumbnail'],
 				array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
 		);
@@ -386,7 +433,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Check fields for character, text and log items.
 		foreach (['Character item', 'Text item', 'Log item'] as $i => $item) {
 			$column_form->fill(['Item' => $item]);
-			$this->assertEquals($item, $column_form->getField('Name')->getValue());
+			$this->assertEquals('Host for all item value types: '.$item, $column_form->getField('Name')->getValue());
 
 			$labels = ($item === 'Log item')
 				? ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font', 'Display local time']
@@ -452,14 +499,43 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$visible_labels = ['Type', 'Show header', 'Name', 'Refresh interval', 'Layout', 'Columns', 'Show lines',
 				'Override host', 'Advanced configuration'
 		];
-		$hidden_labels = ['New values', 'Show timestamp', 'Show column header'];
+		$hidden_labels = ['New values', 'Show timestamp', 'Show column header', 'Time period', 'Widget', 'From', 'To'];
 		$this->assertEquals($visible_labels, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
 		$this->assertEquals($hidden_labels, array_values($form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
 
+		$expanded_labels = ['New values', 'Show timestamp', 'Show column header', 'Time period'];
 		$form->fill(['Advanced configuration' => true]);
-		$this->assertEquals(array_merge($visible_labels, $hidden_labels),
+		$this->assertEquals(array_merge($visible_labels, $expanded_labels),
 				array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
 		);
+
+		$time_period_fields = [
+			'Dashboard' => ['Widget' => false, 'From' => false, 'To' => false],
+			'Widget' => ['Widget' => true, 'From' => false, 'To' => false],
+			'Custom' => ['Widget' => false, 'From' => true, 'To' => true]
+		];
+
+		foreach ($time_period_fields as $label => $visibility) {
+			$form->fill(['Time period' => $label]);
+
+			foreach ($visibility as $field => $status) {
+				$this->assertTrue($form->getField($field)->isEnabled($status));
+			}
+
+			// Check Widget multiselect's placeholder.
+			if ($label === 'Widget') {
+				$this->assertTrue($form->getField('id:time_period_reference_ms')
+						->isAttributePresent(['placeholder' => 'type here to search'])
+				);
+			}
+
+			// Check calendar buttons.
+			if ($label === 'Custom') {
+				foreach (['time_period_from_calendar', 'time_period_to_calendar'] as $button) {
+					$this->assertTrue($form->query('id', $button)->one()->isClickable());
+				}
+			}
+		}
 
 		$dialog->close();
 		$dashboard->save();
@@ -1534,6 +1610,243 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						]
 					]
 				]
+			],
+			// #46.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = widget',
+						'Advanced configuration' => true,
+						'Time period' => 'Widget',
+						'Widget' => 'Classic graph for time period reference'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					]
+				]
+			],
+			// TODO: Uncomment after ZBX-24554 (4) is fixed.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Name' => 'Time period = empty widget',
+//						'Advanced configuration' => true,
+//						'Time period' => 'Widget'
+//					],
+//					'Columns' => [
+//						[
+//							'fields' => [
+//								'Item' => [
+//									'values' => 'Text item',
+//									'context' => ['values' => 'Host for all item value types']
+//								]
+//							]
+//						]
+//					],
+//					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
+//				]
+//			],
+			// #47.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = Custom, empty from/to',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => '',
+						'To' => ''
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
+					]
+				]
+			],
+			// #48.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = Custom, wrong from/to',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => 'test_1',
+						'To' => 'test_2'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": a time is expected.',
+						'Invalid parameter "Time period/To": a time is expected.'
+					]
+				]
+			],
+			// #49.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = Custom, Default from/to',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					]
+				]
+			],
+			// #50.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = Custom',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => 'now-1y',
+						'To' => 'now-1M'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'check_time' => 'now-1y – now-1M'
+				]
+			],
+			// #51.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = Custom, To in future',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'time_shift' => true,
+					'check_time' => 'future'
+				]
+			],
+			// #52.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = Custom, human readable in the past',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'time_shift' => true,
+					'check_time' => 'past'
+				]
+			],
+			// #53.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = Custom, To < From',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => 'now-1M',
+						'To' => 'now-2M'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'error' => 'Minimum time period to display is 1 minute.'
+				]
+			],
+			// #54.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = Custom, period 30s',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'time_shift' => true,
+					'check_time' => 'custom',
+					'error' => 'Minimum time period to display is 1 minute.'
+				]
 			]
 		];
 	}
@@ -1595,8 +1908,38 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				$form->waitUntilReloaded();
 			}
 		}
-
 		$form->fill($data['fields']);
+
+		// Fill time period with data From: now, To: now +/- time shift in human-readable format.
+		if (CTestArrayHelper::get($data, 'time_shift', false)) {
+			$time = time();
+			switch ($data['check_time']) {
+				case 'future':
+					$period = [
+						'From' => date('Y-m-d H:i:s', $time), // Now.
+						'To' => date('Y-m-d H:i:s', ($time + 31536000)) // Now + 1 year.
+					];
+					break;
+
+				case 'past':
+					$period = [
+						'From' => date('Y-m-d H:i:s', $time - 31536000), // Now - 1 Year.
+						'To' => date('Y-m-d H:i:s', ($time)) // Now.
+					];
+					break;
+
+				case 'custom':
+					$period = [
+						'From' => date('Y-m-d H:i:s', $time - 30), // Now - 30 seconds.
+						'To' => date('Y-m-d H:i:s', ($time)) // Now.
+					];
+					break;
+			}
+			$form->fill($period);
+
+			$data['check_time'] = $period['From'].' – '.$period['To'];
+		}
+
 		$values = $form->getValues();
 
 		// Fill Columns field.
@@ -1686,6 +2029,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// Check widgets count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 
+			if (array_key_exists('check_time', $data)) {
+				$this->assertEquals($data['check_time'], $widget->getTimeInterval());
+			}
+
 			// Check new widget update interval.
 			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
 				? '1 minute'
@@ -1711,7 +2058,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 				$column_name = (array_key_exists('Name', $column['fields']))
 					? $column['fields']['Name']
-					: $column['fields']['Item']['values'];
+					: $column['fields']['Item']['context']['values'].': '.$column['fields']['Item']['values'];
 
 				$this->assertEquals($column_name, $row->getColumn('Name')->getText());
 				$this->assertEquals($column['fields']['Item']['context']['values'].': '.$column['fields']['Item']['values'],
