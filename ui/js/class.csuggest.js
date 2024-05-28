@@ -258,10 +258,6 @@ CSuggest.prototype = {
 
 	// keyboard
 	searchFocus: function(e) {
-		if (!e) {
-			e = window.event;
-		}
-
 		var elem = e.element();
 
 		if (elem.match('input[type=text]') || elem.match('textarea') || elem.match('select')) {
@@ -279,10 +275,6 @@ CSuggest.prototype = {
 	},
 
 	keyPressed: function(e) {
-		if (!e) {
-			e = window.event;
-		}
-
 		var key = e.keyCode;
 
 		switch (true) {
