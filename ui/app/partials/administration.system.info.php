@@ -78,89 +78,91 @@ if ($data['system_info']['is_software_update_check_enabled']) {
 	}
 }
 
-$info_table
-	->addRow([
+if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+	$info_table->addRow([
 		_('Zabbix server version'),
 		$server_version,
 		$server_version_details
-	])
-	->addRow([
-		_('Zabbix frontend version'),
-		$frontend_version,
-		$frontend_version_details
 	]);
+}
 
-if ($data['system_info']['is_software_update_check_enabled'] && $data['show_software_update_check_details']) {
+$info_table->addRow([
+	_('Zabbix frontend version'),
+	$frontend_version,
+	$frontend_version_details
+]);
+
+if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+	if ($data['system_info']['is_software_update_check_enabled'] && $data['show_software_update_check_details']) {
+		$info_table
+			->addRow([
+				_('Software update last checked'),
+				$last_checked,
+				''
+			])
+			->addRow([
+				_('Latest release'),
+				$latest_release,
+				$release_notes
+			]);
+	}
+
 	$info_table
 		->addRow([
-			_('Software update last checked'),
-			$last_checked,
+			_('Number of hosts (enabled/disabled)'),
+			$status['has_status'] ? $status['hosts_count'] : '',
+			$status['has_status']
+				? [
+					(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE),
+					' / ',
+					(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
+				]
+				: ''
+		])
+		->addRow([
+			_('Number of templates'),
+			$status['has_status'] ? $status['hosts_count_template'] : '',
 			''
 		])
 		->addRow([
-			_('Latest release'),
-			$latest_release,
-			$release_notes
+			(new CSpan(_('Number of items (enabled/disabled/not supported)')))
+				->setTitle(_('Only items assigned to enabled hosts are counted')),
+			$status['has_status'] ? $status['items_count'] : '',
+			$status['has_status']
+				? [
+					(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE), ' / ',
+					(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_COLOR_NEGATIVE), ' / ',
+					(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
+				]
+				: ''
+		])
+		->addRow([
+			(new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
+				->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted')),
+			$status['has_status'] ? $status['triggers_count'] : '',
+			$status['has_status']
+				? [
+					$status['triggers_count_enabled'],
+					' / ',
+					$status['triggers_count_disabled'],
+					' [',
+					(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_COLOR_NEGATIVE),
+					' / ',
+					(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_COLOR_POSITIVE),
+					']'
+				]
+				: ''
+		])
+		->addRow([
+			_('Number of users (online)'),
+			$status['has_status'] ? $status['users_count'] : '',
+			$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_COLOR_POSITIVE) : ''
+		])
+		->addRow([
+			_('Required server performance, new values per second'),
+			($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '',
+			''
 		]);
-}
-
-$info_table
-	->addRow([
-		_('Number of hosts (enabled/disabled)'),
-		$status['has_status'] ? $status['hosts_count'] : '',
-		$status['has_status']
-			? [
-				(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE), ' / ',
-				(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
-			]
-			: ''
-	])
-	->addRow([
-		_('Number of templates'),
-		$status['has_status'] ? $status['hosts_count_template'] : '',
-		''
-	])
-	->addRow([
-		(new CSpan(_('Number of items (enabled/disabled/not supported)')))
-			->setTitle(_('Only items assigned to enabled hosts are counted')),
-		$status['has_status'] ? $status['items_count'] : '',
-		$status['has_status']
-			? [
-				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_COLOR_POSITIVE), ' / ',
-				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_COLOR_NEGATIVE), ' / ',
-				(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
-			]
-			: ''
-	])
-	->addRow([
-		(new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
-			->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted')),
-		$status['has_status'] ? $status['triggers_count'] : '',
-		$status['has_status']
-			? [
-				$status['triggers_count_enabled'],
-				' / ',
-				$status['triggers_count_disabled'],
-				' [',
-				(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_COLOR_NEGATIVE),
-				' / ',
-				(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_COLOR_POSITIVE),
-				']'
-			]
-			: ''
-	])
-	->addRow([
-		_('Number of users (online)'),
-		$status['has_status'] ? $status['users_count'] : '',
-		$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_COLOR_POSITIVE) : ''
-	]);
-
-if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-	$info_table->addRow([
-		_('Required server performance, new values per second'),
-		($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '',
-		''
-	]);
 
 	// Check requirements.
 	foreach ($data['system_info']['requirements'] as $requirement) {
@@ -182,26 +184,24 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 		);
 	}
-}
 
-if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
-	$info_table->addRow([
-		_('Database history tables use primary key'),
-		(new CSpan(_('No')))->addClass(ZBX_STYLE_COLOR_NEGATIVE),
-		''
-	]);
-}
+	if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
+		$info_table->addRow([
+			_('Database history tables use primary key'),
+			(new CSpan(_('No')))->addClass(ZBX_STYLE_COLOR_NEGATIVE),
+			''
+		]);
+	}
 
-if (!$data['system_info']['is_global_scripts_enabled']) {
-	$info_table->addRow([
-		_('Global scripts on Zabbix server'),
-		(new CSpan(_('Disabled'))),
-		''
-	]);
-}
+	if (!$data['system_info']['is_global_scripts_enabled']) {
+		$info_table->addRow([
+			_('Global scripts on Zabbix server'),
+			(new CSpan(_('Disabled'))),
+			''
+		]);
+	}
 
-// Check DB version.
-if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+	// Check DB version.
 	foreach ($data['system_info']['dbversion_status'] as $dbversion) {
 		switch ($dbversion['flag']) {
 			case DB_VERSION_LOWER_THAN_MINIMUM:

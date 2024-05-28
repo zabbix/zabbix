@@ -26,11 +26,11 @@ class ImageValueGet extends CController {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return true;
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'itemid' =>	'int32|required',
 			'clock' =>	'int32|required',
@@ -40,37 +40,33 @@ class ImageValueGet extends CController {
 		return $this->validateInput($fields);
 	}
 
-	protected function doAction() {
-		$itemid = $this->getInput('itemid', '');
-		$clock = $this->getInput('clock', 0);
-		$ns = $this->getInput('ns', 0);
-
+	protected function doAction(): void {
 		$result = [];
 
-		if ($itemid !== '') {
-			$db_item = API::Item()->get([
-				'output' => ['itemid', 'value_type'],
-				'itemids' => [$itemid],
-				'webitems' => true
+		$db_item = API::Item()->get([
+			'output' => ['itemid', 'value_type'],
+			'itemids' => $this->getInput('itemid'),
+			'webitems' => true
+		]);
+
+		if ($db_item && $db_item[0]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			$history_value = API::History()->get([
+				'output' => ['value'],
+				'history' => ITEM_VALUE_TYPE_BINARY,
+				'itemids' => $db_item[0]['itemid'],
+				'filter' => [
+					'clock' => $this->getInput('clock'),
+					'ns' => $this->getInput('ns')
+				]
 			]);
 
-			if ($db_item && $db_item[0]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				$history_value = API::History()->get([
-					'history' => ITEM_VALUE_TYPE_BINARY,
-					'output' => ['value'],
-					'filter' => [
-						'clock' => $clock,
-						'ns' => $ns
-					],
-					'itemids' => [$db_item[0]['itemid']]
-				]);
-
-				if ($history_value) {
-					$result['image']= @imagecreatefromstring(base64_decode($history_value[0]['value']));
-				}
+			if ($history_value) {
+				$result['image'] = @imagecreatefromstring(base64_decode($history_value[0]['value']));
 			}
 		}
 
-		$this->setResponse((new CControllerResponseData($result))->disableView());
+		$this->setResponse(
+			(new CControllerResponseData($result))->disableView()
+		);
 	}
 }
