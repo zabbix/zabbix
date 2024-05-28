@@ -1641,28 +1641,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #46.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'Time period = widget',
-						'Advanced configuration' => true,
-						'Time period' => 'Widget',
-						'Widget' => 'Classic graph for time period reference'
-					],
-					'Columns' => [
-						[
-							'fields' => [
-								'Item' => [
-									'values' => 'Text item',
-									'context' => ['values' => 'Host for all item value types']
-								]
-							]
-						]
-					]
-				]
-			],
 			// TODO: Uncomment after ZBX-24554 (4) is fixed.
 //			[
 //				[
@@ -1685,7 +1663,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 //					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
 //				]
 //			],
-			// #47.
+			// #46.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1712,7 +1690,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #48.
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1739,7 +1717,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #49.
+			// #48.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1760,7 +1738,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #50.
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1784,7 +1762,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'now-1y – now-1M'
 				]
 			],
-			// #51.
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1807,7 +1785,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'future'
 				]
 			],
-			// #52.
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1830,7 +1808,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'past'
 				]
 			],
-			// #53.
+			// #52.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1854,7 +1832,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'error' => 'Minimum time period to display is 1 minute.'
 				]
 			],
-			// #54.
+			// #53.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1876,6 +1854,28 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'time_shift' => true,
 					'check_time' => 'custom',
 					'error' => 'Minimum time period to display is 1 minute.'
+				]
+			],
+			// #54.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = widget',
+						'Advanced configuration' => true,
+						'Time period' => 'Widget',
+						'Widget' => 'Classic graph for time period reference'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					]
 				]
 			]
 		];
