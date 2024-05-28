@@ -894,7 +894,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 
 		if (num_data != host_names.num_data)
 			continue;
-	
+
 		/* only new hosts or hosts with changed visible name will be validated */
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 			continue;
