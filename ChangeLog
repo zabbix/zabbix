@@ -93,7 +93,6 @@ A......... [ZBX-24258] fixed issue causing error when removing the old MFA metho
 .......PS. [ZBX-24354] fixed item status flapping (vso)
 ........S. [ZBX-24363] fixed proxyid being ignored in item test (kprutkovs)
 ....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
-........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta3
@@ -236,6 +235,7 @@ A.F....... [ZBX-19918] prevented redundant audit log entries of failed logins wh
 .........T [ZBX-23684] fixed transactions query file for PostgreSQL by Zabbix agent template (drasikhov)
 ..F....... [ZBX-23659] fixed incorrect calculation of bar graph polygon in SVG graph widget for negative values (solonkins)
 A.F....... [ZBX-22433] fixed web scenario and web scenario step configuration field trimming and field sorting (ddauksa, Ivo, Sasha)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta1
@@ -797,7 +797,6 @@ A......... [ZBX-23407] improved performance of retrieving last history values wh
 ........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
 .........T [ZBX-24275] fixed item prototype JSONPath preprocessing, added missing volume health metric and triggers in HPE MSA templates (drasikhov)
 .........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
-........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.14
@@ -888,6 +887,7 @@ A.F....... [ZBX-19918] prevented redundant audit log entries of failed logins wh
 .......PS. [ZBX-24095] improved data fetch performance for PostgreSQL (vso)
 ...G...... [ZBX-18859] fixed error event 5858 with ResultCode = 0x80041032 after WMI queries (mprihodko)
 ..F....... [ZBX-23818] fixed clock, graph and graph prototype widget form reloading and field focus when changing values (esekace)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.12
@@ -2595,7 +2595,6 @@ A......... [ZBX-23407] improved performance of retrieving last history values wh
 ........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
 .........T [ZBX-24275] fixed item prototype JSONPath preprocessing, added missing volume health metric and triggers in HPE MSA templates (drasikhov)
 .........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
-........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.29
@@ -2674,6 +2673,7 @@ A.F....... [ZBX-19918] prevented redundant audit log entries of failed logins wh
 ...G...... [ZBX-18859] fixed error event 5858 with ResultCode = 0x80041032 after WMI queries (mprihodko)
 .......PS. [ZBX-24095] improved data fetch performance for PostgreSQL (vso)
 ..F....... [ZBX-23818] fixed clock, graph and graph prototype widget form reloading and field focus when changing values (esekace)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.27
