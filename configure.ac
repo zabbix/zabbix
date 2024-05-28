@@ -839,13 +839,6 @@ clock_gettime(CLOCK_REALTIME, &tp);
 ]])],[AC_DEFINE(HAVE_TIME_CLOCK_GETTIME,1,Define to 1 if function 'clock_gettime' exists.)
 AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
-AC_MSG_CHECKING(for function malloc_trim in malloc.h)
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-#include <malloc.h>
-]], [[malloc_trim(0);
-]])],[AC_DEFINE(HAVE_MALLOC_TRIM,1,Define to 1 if function 'malloc_trim' exists.)
-AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
-
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                      Checks for macros                        *
@@ -891,6 +884,7 @@ AC_CHECK_FUNCS(tzset)
 AC_CHECK_FUNCS(unsetenv)
 AC_CHECK_FUNCS(sigqueue)
 AC_CHECK_FUNCS(round)
+AC_CHECK_FUNCS(malloc_trim)
 
 dnl *****************************************************************
 dnl *                                                               *
