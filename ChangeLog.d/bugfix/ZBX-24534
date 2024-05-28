@@ -1,1 +1,1 @@
-..F....... [ZBX-24534] fixed proxy group page when there is no data found (dpetra)
+..F....... [ZBX-24534] removed number of elements indicator in proxy groups page table footer when there are no results to show (dpetra)
