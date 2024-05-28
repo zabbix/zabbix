@@ -647,6 +647,7 @@ class testFormTabIndicators extends CWebTest {
 					'url' => 'zabbix.php?action=dashboard.view',
 					'form' => 'id:widget-dialogue-form',
 					'widget_type' => 'Pie chart',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Data set',

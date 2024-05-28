@@ -442,6 +442,8 @@ class testDashboardPieChartWidget extends testWidgets {
 		$this->assertEquals(['Add', 'Cancel'],
 				$dialog->getFooter()->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		$dialog->close();
 	}
 
 	public function getPieChartData() {
@@ -1404,7 +1406,6 @@ class testDashboardPieChartWidget extends testWidgets {
 					$form->checkValue($data['fields'][$tab]);
 				}
 			}
-
 			// Assert that DB record exists.
 			$this->assertEquals(1, CDBHelper::getCount($count_sql));
 		}
@@ -1414,6 +1415,8 @@ class testDashboardPieChartWidget extends testWidgets {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 			$this->assertEquals(0, CDBHelper::getCount($count_sql));
 		}
+
+		COverlayDialogElement::find()->one()->close();
 
 	}
 
@@ -1646,7 +1649,13 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		$id = $dashboard_id === null ? self::$dashboard_id : $dashboard_id;
 
-		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.$id)->waitUntilReady();
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.$id);
+
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
+		}
+
+		$this->page->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		if ($page) {
 			$dashboard->selectPage($page);
