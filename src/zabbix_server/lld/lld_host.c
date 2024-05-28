@@ -848,6 +848,21 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
+	/* index existing hosts */
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		host = hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
+			zbx_hashset_insert(&host_hosts, &host, sizeof(&host));
+
+		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
+			zbx_hashset_insert(&host_names, &host, sizeof(&host));
+	}
+
 	/* checking duplicated host names */
 	for (int i = 0; i < hosts->values_num; i++)
 	{
@@ -858,13 +873,13 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
+		/* only new hosts or hosts with changed host name will be validated */
+		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
+			continue;
+
 		zbx_hashset_insert(&host_hosts, &host, sizeof(&host));
 
 		if (num_data != host_hosts.num_data)
-			continue;
-
-		/* only new hosts or hosts with changed host name will be validated */
-		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			continue;
 
 		*error = zbx_strdcatf(*error, "Cannot %s host:"
@@ -890,15 +905,14 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_hashset_insert(&host_names, &host, sizeof(&host));
-
-		if (num_data != host_names.num_data)
-			continue;
-
 		/* only new hosts or hosts with changed visible name will be validated */
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 			continue;
 
+		zbx_hashset_insert(&host_names, &host, sizeof(&host));
+
+		if (num_data != host_names.num_data)
+			continue;
 
 		*error = zbx_strdcatf(*error, "Cannot %s host:"
 				" host with the same visible name \"%s\" already exists.\n",
