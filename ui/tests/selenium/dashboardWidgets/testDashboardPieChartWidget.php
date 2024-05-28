@@ -1406,6 +1406,7 @@ class testDashboardPieChartWidget extends testWidgets {
 					$form->checkValue($data['fields'][$tab]);
 				}
 			}
+
 			// Assert that DB record exists.
 			$this->assertEquals(1, CDBHelper::getCount($count_sql));
 		}
@@ -1417,7 +1418,6 @@ class testDashboardPieChartWidget extends testWidgets {
 		}
 
 		COverlayDialogElement::find()->one()->close();
-
 	}
 
 	/**
