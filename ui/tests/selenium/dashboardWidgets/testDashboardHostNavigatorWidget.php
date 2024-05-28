@@ -62,9 +62,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
 			' ON w.widgetid=wf.widgetid'.
-			' WHERE wf.name!=\'reference\''.
-			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_hostid, wf.value_itemid, wf.value_graphid';
+			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+			' wf.value_itemid, wf.value_graphid';
 
 	/**
 	 * Get 'Group by' table element with mapping set.
@@ -101,15 +100,15 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 								'name' => self::DEFAULT_WIDGET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5
 							],
 							[
 								'type' => 'hostnavigator',
 								'name' => self::DELETE_WIDGET,
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5
 							]
 						]
@@ -127,8 +126,15 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'ZXCVB'
+									]
+								]
 							]
 						]
 					]
