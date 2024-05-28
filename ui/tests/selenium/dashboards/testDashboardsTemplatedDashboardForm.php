@@ -3746,7 +3746,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Show column header' => 'Horizontal'
 					],
 					'Column' => [
-						'Item' => self::TEMPLATE_ITEM
+						'Item' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
 					]
 				]
 			],
@@ -4638,7 +4641,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			// Check saved column and item name.
 			if (array_key_exists('Column', $data)) {
 				$row = $reopened_form->query('id:list_columns')->asTable()->one()->getRow(0);
-				$this->assertEquals(CTestArrayHelper::get($data['Column'], 'Name', $data['Column']['Item']),
+				$this->assertEquals(CTestArrayHelper::get($data['Column'], 'Name',
+						$data['Column']['Item']['context']['values'].': '.$data['Column']['Item']['values']),
 						$row->getColumn('Name')->getText()
 				);
 				$this->assertEquals(self::TEMPLATE_ITEM, $row->getColumn('Data')->getText());
