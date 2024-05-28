@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-27 06:40+0000\n"
+"PO-Revision-Date: 2024-05-27 08:02+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -4446,7 +4446,7 @@ msgstr "Проверка на ошибку в XML"
 
 #: include/items.inc.php:1622
 msgid "Check for error using regular expression"
-msgstr "Проверьте на ошибку при использовании регулярного выражения"
+msgstr "Проверка на ошибки с использованием регулярного выражения"
 
 #: include/items.inc.php:1626
 msgid "Check for not supported value"
@@ -7639,6 +7639,10 @@ msgstr "Пустой входной параметр."
 msgid "Empty map ID."
 msgstr "Пустой ID карты сети."
 
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
+
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
 #: app/views/configuration.discovery.list.php:121
@@ -7680,7 +7684,7 @@ msgstr "Включить SCIM инициализацию"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
-msgstr "Включить журналирование аудита"
+msgstr "Активировать журналирование аудита"
 
 #: app/views/administration.housekeeping.edit.php:223
 msgid "Enable compression"
@@ -10283,6 +10287,10 @@ msgstr "Изображение удалено"
 msgid "Image label type"
 msgstr "Тип подписи к изображению"
 
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
+
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
@@ -12768,7 +12776,7 @@ msgstr "Формат времени в журнале (логе)"
 
 #: app/views/administration.miscconfig.edit.php:82
 msgid "Log unmatched SNMP traps"
-msgstr "Журналировать не совпадающие SNMP трапы"
+msgstr "Журналирование не совпадающих SNMP трапов"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.user.list.php:135
@@ -19106,7 +19114,7 @@ msgstr "Управление боковой панелью"
 
 #: app/views/administration.authentication.edit.php:356
 msgid "Sign"
-msgstr "Войти"
+msgstr "Подпись"
 
 #: include/views/general.login.php:64 include/views/general.login.php:79
 msgid "Sign in"
@@ -21682,7 +21690,7 @@ msgstr "Неизвестный тип значения"
 #: app/views/configuration.discovery.edit.php:89
 #: app/views/connector.edit.php:168 app/views/mediatype.edit.php:446
 msgid "Unlimited"
-msgstr "Неограничено"
+msgstr "Без ограничения"
 
 #: app/partials/configuration.host.edit.html.php:145
 #: app/views/popup.massupdate.host.php:44 app/views/template.edit.php:77
@@ -21976,7 +21984,7 @@ msgstr "Использовать, если важность"
 
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
-msgstr "Использовать sandbox атрибут в iframe"
+msgstr "Использование атрибута sandbox в iframe"
 
 #: widgets/itemhistory/views/column.edit.php:232
 msgid "Use monospace font"
