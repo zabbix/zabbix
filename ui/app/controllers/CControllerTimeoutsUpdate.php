@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -32,6 +27,7 @@ class CControllerTimeoutsUpdate extends CController {
 			'timeout_ssh_agent' =>			'required|not_empty|db config.timeout_ssh_agent',
 			'timeout_telnet_agent' =>		'required|not_empty|db config.timeout_telnet_agent',
 			'timeout_script' =>				'required|not_empty|db config.timeout_script',
+			'timeout_browser' =>			'required|not_empty|db config.timeout_browser',
 			'socket_timeout' =>				'required|not_empty|db config.socket_timeout|time_unit 1:300',
 			'connect_timeout' =>			'required|not_empty|db config.connect_timeout|time_unit 1:30',
 			'media_type_test_timeout' =>	'required|not_empty|db config.media_type_test_timeout|time_unit 1:300',
@@ -79,6 +75,7 @@ class CControllerTimeoutsUpdate extends CController {
 			CSettingsHelper::TIMEOUT_SSH_AGENT => $this->getInput('timeout_ssh_agent'),
 			CSettingsHelper::TIMEOUT_TELNET_AGENT => $this->getInput('timeout_telnet_agent'),
 			CSettingsHelper::TIMEOUT_SCRIPT => $this->getInput('timeout_script'),
+			CSettingsHelper::TIMEOUT_BROWSER => $this->getInput('timeout_browser'),
 			CSettingsHelper::SOCKET_TIMEOUT => $this->getInput('socket_timeout'),
 			CSettingsHelper::CONNECT_TIMEOUT => $this->getInput('connect_timeout'),
 			CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT => $this->getInput('media_type_test_timeout'),

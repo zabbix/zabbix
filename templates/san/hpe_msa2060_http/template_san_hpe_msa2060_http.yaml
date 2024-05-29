@@ -84,7 +84,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: bafec666b170480f941fe25cb3cf903d
-          name: 'HPE MSA: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: hpe.msa.get.data
           history: '0'
@@ -637,7 +637,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3831060089ff497993088472e922df38
-          name: 'HPE MSA: Service ping'
+          name: 'Service ping'
           type: SIMPLE
           key: 'net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"]'
           history: 7d
@@ -4094,7 +4094,7 @@ zabbix_export:
             - name: Controllers
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4110,7 +4110,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4126,7 +4126,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4142,7 +4142,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4158,7 +4158,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4175,7 +4175,7 @@ zabbix_export:
             - name: 'Disk groups'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4191,7 +4191,7 @@ zabbix_export:
                       value: AAAAF
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4207,7 +4207,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4223,7 +4223,7 @@ zabbix_export:
                       value: AAAAH
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4240,7 +4240,7 @@ zabbix_export:
             - name: Fans
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4257,7 +4257,7 @@ zabbix_export:
             - name: Pools
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4274,7 +4274,7 @@ zabbix_export:
             - name: Volumes
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4290,7 +4290,7 @@ zabbix_export:
                       value: AAAAL
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4306,7 +4306,7 @@ zabbix_export:
                       value: AAAAM
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -4322,7 +4322,7 @@ zabbix_export:
                       value: AAAAN
                 - type: graphprototype
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -109,7 +109,7 @@ See the Kubernetes documentation for details about labels and annotations:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Kubernetes: Get nodes|<p>Collecting and processing cluster nodes data via Kubernetes API.</p>|Script|kube.nodes|
+|Get nodes|<p>Collecting and processing cluster nodes data via Kubernetes API.</p>|Script|kube.nodes|
 |Get nodes check|<p>Data collection check.</p>|Dependent item|kube.nodes.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Triggers

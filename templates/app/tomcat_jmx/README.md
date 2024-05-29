@@ -46,13 +46,13 @@ Metrics are collected by JMX.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Tomcat: Version|<p>The version of the Tomcat.</p>|JMX agent|jmx["Catalina:type=Server",serverInfo]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Version|<p>The version of the Tomcat.</p>|JMX agent|jmx["Catalina:type=Server",serverInfo]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Tomcat: Version has been changed|<p>The Tomcat version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0`|Info|**Manual close**: Yes|
+|Version has been changed|<p>The Tomcat version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Global request processors discovery
 

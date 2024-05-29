@@ -22,7 +22,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 5bfda2617dfc43edbe524a5c44b39f18
-          name: 'AWS Cost: Get daily costs'
+          name: 'Get daily costs'
           type: SCRIPT
           key: aws.get.daily.costs
           delay: 0s;h/6
@@ -246,7 +246,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7139ce562d3c439e9686ad5b17ed0f1c
-          name: 'AWS Cost: Get monthly costs'
+          name: 'Get monthly costs'
           type: SCRIPT
           key: aws.get.monthly.costs
           delay: 0s;h9
@@ -522,7 +522,7 @@ zabbix_export:
           description: 'Discovery of monthly costs by services.'
           item_prototypes:
             - uuid: d01ee8df0e204f1a857b8188df47402a
-              name: 'AWS Cost: [{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
+              name: '[{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
               type: DEPENDENT
               key: 'aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]'
               delay: '0'
@@ -588,7 +588,7 @@ zabbix_export:
           description: 'Discovery of daily blended costs by services.'
           item_prototypes:
             - uuid: b6e121c3a1eb49858e942beab12660e2
-              name: 'AWS Cost: Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
+              name: 'Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
               type: DEPENDENT
               key: 'aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]'
               delay: '0'
@@ -636,7 +636,7 @@ zabbix_export:
           description: 'Discovery of monthly costs.'
           item_prototypes:
             - uuid: aaf85a53d1804c858fc20189f0483bad
-              name: 'AWS Cost: [{#AWS.BILLING.MONTH}]: Blended cost per month'
+              name: '[{#AWS.BILLING.MONTH}]: Blended cost per month'
               type: DEPENDENT
               key: 'aws.monthly.cost["{#AWS.BILLING.MONTH}"]'
               delay: '0'
@@ -716,7 +716,7 @@ zabbix_export:
             - name: 'Monthly costs'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -733,7 +733,7 @@ zabbix_export:
             - name: 'Monthly costs by service'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '25'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -750,7 +750,7 @@ zabbix_export:
             - name: 'Daily costs by service'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '20'
                   fields:
                     - type: GRAPH_PROTOTYPE

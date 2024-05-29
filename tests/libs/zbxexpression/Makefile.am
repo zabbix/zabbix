@@ -1,5 +1,7 @@
 if SERVER
 SERVER_tests = \
+	evaluate \
+	evaluate_unknown \
 	evaluate_function \
 	evaluate_stl \
 	evaluate_percentage_deviations_in_remainder \
@@ -15,9 +17,25 @@ if SERVER
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-COMMON_LIB_FILES = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
+MOCK_DATA_DEPS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+MOCK_TEST_DEPS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+
+EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
@@ -92,25 +110,51 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/tests/libzbxmockdummy.a \
-	$(CMOCKA_LIBS) $(YAML_LIBS)
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(MOCK_DATA_DEPS) \
+	$(MOCK_TEST_DEPS)
 
 if HAVE_IPMI
-COMMON_LIB_FILES += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
+EVALUATE_LIB_FILES += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
 endif
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+
+evaluate_SOURCES = \
+	evaluate.c \
+	$(COMMON_SRC_FILES)
+
+evaluate_LDADD = \
+	$(EVALUATE_LIB_FILES) $(TLS_LIBS)
+
+evaluate_LDADD += @SERVER_LIBS@
+
+evaluate_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+evaluate_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
+
+
+evaluate_unknown_SOURCES = \
+	evaluate_unknown.c \
+	$(COMMON_SRC_FILES)
+
+evaluate_unknown_LDADD = \
+	$(EVALUATE_LIB_FILES) $(TLS_LIBS)
+
+evaluate_unknown_LDADD += @SERVER_LIBS@
+
+evaluate_unknown_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+evaluate_unknown_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
 
 substitute_lld_macros_SOURCES = \
 	substitute_lld_macros.c
 
 substitute_lld_macros_LDADD = \
-	$(COMMON_LIB_FILES) $(TLS_LIBS)
+	$(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 substitute_lld_macros_LDADD += @SERVER_LIBS@
 
@@ -126,7 +170,7 @@ macro_fmttime_SOURCES = \
 macro_fmttime_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-macro_fmttime_LDADD += $(COMMON_LIB_FILES) $(TLS_LIBS)
+macro_fmttime_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 macro_fmttime_LDADD += @SERVER_LIBS@
 
@@ -145,7 +189,7 @@ macro_functions_SOURCES = \
 macro_functions_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-macro_functions_LDADD += $(COMMON_LIB_FILES) $(TLS_LIBS)
+macro_functions_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 macro_functions_LDADD += @SERVER_LIBS@
 
@@ -170,7 +214,7 @@ evaluate_function_SOURCES = \
 evaluate_function_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-evaluate_function_LDADD += $(COMMON_LIB_FILES) $(TLS_LIBS)
+evaluate_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 evaluate_function_LDADD += @SERVER_LIBS@
 
@@ -183,7 +227,7 @@ evaluate_stl_SOURCES = \
 evaluate_stl_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-evaluate_stl_LDADD += $(COMMON_LIB_FILES) $(TLS_LIBS)
+evaluate_stl_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 evaluate_stl_LDADD += @SERVER_LIBS@
 
@@ -196,7 +240,7 @@ evaluate_percentage_deviations_in_remainder_SOURCES = \
 evaluate_percentage_deviations_in_remainder_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-evaluate_percentage_deviations_in_remainder_LDADD += $(COMMON_LIB_FILES) $(TLS_LIBS)
+evaluate_percentage_deviations_in_remainder_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 evaluate_percentage_deviations_in_remainder_LDADD += @SERVER_LIBS@
 
@@ -207,7 +251,7 @@ valuemaps_SOURCES = \
 	valuemaps.c \
 	$(COMMON_SRC_FILES)
 
-valuemaps_LDADD = $(COMMON_LIB_FILES) $(TLS_LIBS)
+valuemaps_LDADD = $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 valuemaps_LDADD += @SERVER_LIBS@
 

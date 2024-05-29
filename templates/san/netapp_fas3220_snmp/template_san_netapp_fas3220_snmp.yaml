@@ -26,7 +26,7 @@ zabbix_export:
         - name: Templates/SAN
       items:
         - uuid: 4239eba959f14e0ebc44a0fa7d124042
-          name: 'NetApp FAS3220: Failed disks count'
+          name: 'Failed disks count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.6.4.7.0
           key: 'fas3220.disk[diskFailedCount]'
@@ -40,7 +40,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 980e2c347d254c4d88d918b2171679bb
-          name: 'NetApp FAS3220: Failed disks message'
+          name: 'Failed disks message'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.6.4.10.0
           key: 'fas3220.disk[diskFailedMessage]'
@@ -56,7 +56,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7b6d8c8272714343bd420a32c6763c9e
-          name: 'NetApp FAS3220: Product firmware version'
+          name: 'Product firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.1.6.0
           key: 'fas3220.inventory[productFirmwareVersion]'
@@ -72,7 +72,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3f0418935b9d40e98d129f280ba5ba6b
-          name: 'NetApp FAS3220: Product version'
+          name: 'Product version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.1.2.0
           key: 'fas3220.inventory[productVersion]'
@@ -90,7 +90,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 62c6bb1b70ee4ece865b562e298cafb0
-          name: 'NetApp FAS3220: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -104,14 +104,14 @@ zabbix_export:
           triggers:
             - uuid: 826eb817329249f59b7989c92ca62d99
               expression: 'max(/NetApp FAS3220 by SNMP/icmpping,#3)=0'
-              name: 'NetApp FAS3220: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: f7c934ef77d04c00bdec19f8e3950d85
-          name: 'NetApp FAS3220: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -125,11 +125,11 @@ zabbix_export:
           triggers:
             - uuid: 4fb4b0022ca3433c8da1402f1d996760
               expression: 'min(/NetApp FAS3220 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/NetApp FAS3220 by SNMP/icmppingloss,5m)<100'
-              name: 'NetApp FAS3220: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'NetApp FAS3220: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/NetApp FAS3220 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -137,7 +137,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 72f8c27991b7440ba186f6eb037605cf
-          name: 'NetApp FAS3220: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -151,13 +151,14 @@ zabbix_export:
           triggers:
             - uuid: bb13f4d369294c0d83f8e6d888cbb062
               expression: 'avg(/NetApp FAS3220 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'NetApp FAS3220: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'NetApp FAS3220: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/NetApp FAS3220 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/NetApp FAS3220 by SNMP/icmppingloss,5m)<100'
-                - name: 'NetApp FAS3220: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/NetApp FAS3220 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -165,7 +166,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 4380826947fc4df6a341fe074f42da6a
-          name: 'NetApp FAS3220: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -178,7 +179,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 045800cfeaf6448ab9a9e97f8b5172c1
-          name: 'NetApp FAS3220: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -198,7 +199,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c12c6668d9564855b227dee42a9d86f8
-          name: 'NetApp FAS3220: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -219,7 +220,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 76483f37faf8485b922640a6ef8bb672
-          name: 'NetApp FAS3220: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -243,7 +244,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f46b736cdb7f44fcacf33d272d905db8
-          name: 'NetApp FAS3220: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -253,7 +254,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -263,7 +264,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 65c5b2a3742c4c6d8a04c63bb96b46c6
-          name: 'NetApp FAS3220: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -285,8 +286,8 @@ zabbix_export:
           triggers:
             - uuid: 5266fcf7c9db457885c219385cfd5025
               expression: 'last(/NetApp FAS3220 by SNMP/system.name,#1)<>last(/NetApp FAS3220 by SNMP/system.name,#2) and length(last(/NetApp FAS3220 by SNMP/system.name))>0'
-              name: 'NetApp FAS3220: System name has changed'
-              event_name: 'NetApp FAS3220: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -296,7 +297,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 564b458cee7a4a2bb2b4f4777bead32d
-          name: 'NetApp FAS3220: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -306,7 +307,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -315,7 +316,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2d9d7b390c774a188a07dbb5bb4a583e
-          name: 'NetApp FAS3220: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -334,13 +335,13 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fff713712c44477aa081445d9962c002
-          name: 'NetApp FAS3220: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -354,12 +355,12 @@ zabbix_export:
           triggers:
             - uuid: e778b1ae80174f7aa82085b4882e1160
               expression: 'max(/NetApp FAS3220 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'NetApp FAS3220: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'NetApp FAS3220: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/NetApp FAS3220 by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1476,20 +1477,23 @@ zabbix_export:
             {#TYPE} is integer. Possible values: physical, if-group, vlan, undef.
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
         - macro: '{$IF.UTIL.MAX}'
           value: '95'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
       dashboards:
         - uuid: 868292f4d7f84b0f854938c27f7c911e
           name: 'NetApp FAS3220: Overview'
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1505,7 +1509,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1521,7 +1525,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1685,13 +1689,13 @@ zabbix_export:
   triggers:
     - uuid: d33ca3f0d2f14feca01dce7bdf476776
       expression: '(last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'NetApp FAS3220: Host has been restarted'
-      event_name: 'NetApp FAS3220: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'NetApp FAS3220: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/NetApp FAS3220 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope
@@ -1700,7 +1704,7 @@ zabbix_export:
       expression: 'last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedCount])>0 and last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedMessage],#2)'
       recovery_mode: RECOVERY_EXPRESSION
       recovery_expression: 'last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedCount])=0'
-      name: 'NetApp FAS3220: Number of failed disks has changed'
+      name: 'Number of failed disks has changed'
       opdata: 'Current value: {ITEM.LASTVALUE1}'
       priority: WARNING
       description: '{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}'

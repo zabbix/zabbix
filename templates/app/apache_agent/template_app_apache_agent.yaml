@@ -21,7 +21,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 2d3ebb059bd944ee8a7b95e2c60b08f0
-          name: 'Apache: Total bytes'
+          name: 'Total bytes'
           type: DEPENDENT
           key: apache.bytes
           delay: '0'
@@ -42,7 +42,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: be97c53d82f846cdbc2d0ec640435b6f
-          name: 'Apache: Bytes per second'
+          name: 'Bytes per second'
           type: DEPENDENT
           key: apache.bytes.rate
           delay: '0'
@@ -69,7 +69,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 5919f29c692b468fb5642e83f408c2e5
-          name: 'Apache: Total requests'
+          name: 'Total requests'
           type: DEPENDENT
           key: apache.requests
           delay: '0'
@@ -85,7 +85,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 7e1e674a23d24fafa31b76a048fe9fd0
-          name: 'Apache: Requests per second'
+          name: 'Requests per second'
           type: DEPENDENT
           key: apache.requests.rate
           delay: '0'
@@ -107,7 +107,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 5a4bd2d6c2874d888ec4c82409e1c711
-          name: 'Apache: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: apache.uptime
           delay: '0'
@@ -126,8 +126,8 @@ zabbix_export:
           triggers:
             - uuid: 7872d9665c234f45941ca26206e0255c
               expression: 'last(/Apache by Zabbix agent/apache.uptime)<10m'
-              name: 'Apache: Host has been restarted'
-              event_name: 'Apache: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -135,7 +135,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 78a611c2b15c4ae8949257b6fdf922f1
-          name: 'Apache: Version'
+          name: Version
           type: DEPENDENT
           key: apache.version
           delay: '0'
@@ -158,8 +158,8 @@ zabbix_export:
           triggers:
             - uuid: 5124b17918f545758ca5c936332f51cd
               expression: 'last(/Apache by Zabbix agent/apache.version,#1)<>last(/Apache by Zabbix agent/apache.version,#2) and length(last(/Apache by Zabbix agent/apache.version))>0'
-              name: 'Apache: Version has changed'
-              event_name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Apache version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -167,7 +167,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 35f48761ec6d451bbb8b0d80cd0ccd91
-          name: 'Apache: Workers idle cleanup'
+          name: 'Workers idle cleanup'
           type: DEPENDENT
           key: apache.workers.cleanup
           delay: '0'
@@ -183,7 +183,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ebd391702cbd432ab458578a3cb45361
-          name: 'Apache: Workers closing connection'
+          name: 'Workers closing connection'
           type: DEPENDENT
           key: apache.workers.closing
           delay: '0'
@@ -199,7 +199,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6a961707e7084d8ebc09f572b15ef1fd
-          name: 'Apache: Workers DNS lookup'
+          name: 'Workers DNS lookup'
           type: DEPENDENT
           key: apache.workers.dnslookup
           delay: '0'
@@ -215,7 +215,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: fd383c9ace4647deb9d3e3882554b8d0
-          name: 'Apache: Workers finishing'
+          name: 'Workers finishing'
           type: DEPENDENT
           key: apache.workers.finishing
           delay: '0'
@@ -231,7 +231,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2a02413c0e9144b4a70b8a5a71d680e0
-          name: 'Apache: Workers keepalive (read)'
+          name: 'Workers keepalive (read)'
           type: DEPENDENT
           key: apache.workers.keepalive
           delay: '0'
@@ -247,7 +247,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ed71fb2ec75f4537a2937293add75274
-          name: 'Apache: Workers logging'
+          name: 'Workers logging'
           type: DEPENDENT
           key: apache.workers.logging
           delay: '0'
@@ -263,7 +263,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6c38147f9f3449a194f36a6e6d828865
-          name: 'Apache: Workers reading request'
+          name: 'Workers reading request'
           type: DEPENDENT
           key: apache.workers.reading
           delay: '0'
@@ -279,7 +279,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 47856ac3b68644e0861b593d3083d35b
-          name: 'Apache: Workers sending reply'
+          name: 'Workers sending reply'
           type: DEPENDENT
           key: apache.workers.sending
           delay: '0'
@@ -295,7 +295,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 60cf954a40594cf69afdd1bf0319c031
-          name: 'Apache: Workers slot with no current process'
+          name: 'Workers slot with no current process'
           type: DEPENDENT
           key: apache.workers.slot
           delay: '0'
@@ -311,7 +311,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 441c797164bf4c8da8112d78240abc43
-          name: 'Apache: Workers starting up'
+          name: 'Workers starting up'
           type: DEPENDENT
           key: apache.workers.starting
           delay: '0'
@@ -327,7 +327,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ec87e89ee9304acd8c7a76e863cb4443
-          name: 'Apache: Workers waiting for connection'
+          name: 'Workers waiting for connection'
           type: DEPENDENT
           key: apache.workers.waiting
           delay: '0'
@@ -343,7 +343,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b52addb50ccb415fb63eaf67076991c1
-          name: 'Apache: Total workers busy'
+          name: 'Total workers busy'
           type: DEPENDENT
           key: apache.workers_total.busy
           delay: '0'
@@ -359,7 +359,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6955f78c203b435987b5ab75a1114867
-          name: 'Apache: Total workers idle'
+          name: 'Total workers idle'
           type: DEPENDENT
           key: apache.workers_total.idle
           delay: '0'
@@ -375,7 +375,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 267ca6fe038346e5be1113f3bf9b4023
-          name: 'Apache: Service response time'
+          name: 'Service response time'
           key: 'net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
           history: 7d
           value_type: FLOAT
@@ -386,7 +386,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 369f00e2970048c786ce3bd609e65566
-          name: 'Apache: Service ping'
+          name: 'Service ping'
           key: 'net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
           history: 7d
           valuemap:
@@ -401,7 +401,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 99b1a38ed45b4212974b0bea72b076d2
-          name: 'Apache: Get processes summary'
+          name: 'Get processes summary'
           key: 'proc.get[{$APACHE.PROCESS.NAME.PARAMETER},,,summary]'
           history: '0'
           trends: '0'
@@ -411,7 +411,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 115413a0f5ab4caba418ab841ad81eba
-          name: 'Apache: Get status'
+          name: 'Get status'
           key: 'web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]'
           history: 1h
           trends: '0'
@@ -472,7 +472,7 @@ zabbix_export:
             For more details see [Apache MPM event](https://httpd.apache.org/docs/current/mod/event.html).
           item_prototypes:
             - uuid: 99df2ff5970b4497887371bcd16d5ada
-              name: 'Apache: Bytes per request'
+              name: 'Bytes per request'
               type: DEPENDENT
               key: 'apache.bytes[per_request{#SINGLETON}]'
               delay: '0'
@@ -490,7 +490,7 @@ zabbix_export:
                 - tag: component
                   value: connection
             - uuid: 2e0692f36b924b52ab7b2ff7788b641d
-              name: 'Apache: Connections async closing'
+              name: 'Connections async closing'
               type: DEPENDENT
               key: 'apache.connections[async_closing{#SINGLETON}]'
               delay: '0'
@@ -506,7 +506,7 @@ zabbix_export:
                 - tag: component
                   value: connection
             - uuid: 33d3fec8f45c493097bab986d5ea1e55
-              name: 'Apache: Connections async keepalive'
+              name: 'Connections async keepalive'
               type: DEPENDENT
               key: 'apache.connections[async_keep_alive{#SINGLETON}]'
               delay: '0'
@@ -522,7 +522,7 @@ zabbix_export:
                 - tag: component
                   value: connection
             - uuid: 9ad0e5c49e7c4b939eb7977a5158953f
-              name: 'Apache: Connections async writing'
+              name: 'Connections async writing'
               type: DEPENDENT
               key: 'apache.connections[async_writing{#SINGLETON}]'
               delay: '0'
@@ -538,7 +538,7 @@ zabbix_export:
                 - tag: component
                   value: connection
             - uuid: 0fbfbfae187040c790bb4d68f9e2fae5
-              name: 'Apache: Connections total'
+              name: 'Connections total'
               type: DEPENDENT
               key: 'apache.connections[total{#SINGLETON}]'
               delay: '0'
@@ -554,7 +554,7 @@ zabbix_export:
                 - tag: component
                   value: connection
             - uuid: 778a1bfeaa1b474ba529e6c0a55a9949
-              name: 'Apache: Number of async processes'
+              name: 'Number of async processes'
               type: DEPENDENT
               key: 'apache.process[num{#SINGLETON}]'
               delay: '0'
@@ -626,7 +626,7 @@ zabbix_export:
           description: 'The discovery of the Apache process summary.'
           item_prototypes:
             - uuid: 458bfecc83f64540838e3ffc3a7f3cb1
-              name: 'Apache: Get process data'
+              name: 'Get process data'
               type: DEPENDENT
               key: 'apache.proc.get[{#APACHE.NAME}]'
               delay: '0'
@@ -646,7 +646,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 233b5466014640e4b990ffd81fa19fa1
-              name: 'Apache: Number of running processes'
+              name: 'Number of running processes'
               type: DEPENDENT
               key: 'apache.proc.num[{#APACHE.NAME}]'
               delay: '0'
@@ -669,13 +669,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: b62f49b09d6b4c6ca01ff60cd9dd2209
                   expression: 'last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])=0'
-                  name: 'Apache: Process is not running'
+                  name: 'Process is not running'
                   priority: HIGH
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 683d4489dbb549f3bb5b45d3c2696c4f
-              name: 'Apache: Memory usage, %'
+              name: 'Memory usage, %'
               type: DEPENDENT
               key: 'apache.proc.pmem[{#APACHE.NAME}]'
               delay: '0'
@@ -694,7 +694,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 384bf197e6a241b3b63bb89d009bba6b
-              name: 'Apache: Memory usage (rss)'
+              name: 'Memory usage (rss)'
               type: DEPENDENT
               key: 'apache.proc.rss[{#APACHE.NAME}]'
               delay: '0'
@@ -712,7 +712,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: f20b7a01ff134a128c54ea83af8557e2
-              name: 'Apache: Memory usage (vsize)'
+              name: 'Memory usage (vsize)'
               type: DEPENDENT
               key: 'apache.proc.vmem[{#APACHE.NAME}]'
               delay: '0'
@@ -730,7 +730,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: b73280fb0af64c7899abfc74cc074b13
-              name: 'Apache: CPU utilization'
+              name: 'CPU utilization'
               key: 'proc.cpu.util[{#APACHE.NAME}]'
               history: 7d
               value_type: FLOAT
@@ -742,20 +742,20 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 0166ec63913e4bbea25c54b458b3213a
               expression: 'nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
-              name: 'Apache: Failed to fetch status page'
-              event_name: 'Apache: Failed to fetch status page (or no data for 30m)'
+              name: 'Failed to fetch status page'
+              event_name: 'Failed to fetch status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Apache: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
               tags:
                 - tag: scope
                   value: availability
             - uuid: e24dbf9b89c34d839cb12a22b1103df3
               expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
-              name: 'Apache: Service is down'
+              name: 'Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
@@ -763,12 +763,12 @@ zabbix_export:
                   value: availability
             - uuid: 128905793a4b4a1db5a49f87e87d3383
               expression: 'min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
-              name: 'Apache: Service response time is too high'
-              event_name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              name: 'Service response time is too high'
+              event_name: 'Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
-                - name: 'Apache: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#APACHE.NAME}])>0'
               tags:
                 - tag: scope
@@ -826,7 +826,7 @@ zabbix_export:
             - name: General
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '7'
                   fields:
                     - type: GRAPH
@@ -839,7 +839,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -852,7 +852,7 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   'y': '12'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -867,9 +867,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -881,9 +881,9 @@ zabbix_export:
                       name: reference
                       value: AAAAC
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '12'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

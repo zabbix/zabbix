@@ -8,7 +8,14 @@ zabbix_export:
       template: 'macOS by Zabbix agent'
       name: 'macOS by Zabbix agent'
       description: |
-        It is an official macOS template. It requires Zabbix agent 7.0 or newer.
+        This is an official macOS template. It requires Zabbix agent 7.0 or newer.
+        
+        Notes on filesystem (FS) discovery:
+          - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
+          - BTRFS allocates a default of 10% of the volume for its own needs.
+          - To mitigate potential disasters, FS usage triggers are based on the maximum available space.
+            - Utilization formula: 'pused = 100 - 100 * (available / total - free + available)'
+          - The FS utilization chart, derived from graph prototypes, reflects FS reserved space as the difference between used and available space from the total volume.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -20,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: 96c93b959e884934808b4d3c3b2f93d6
-          name: 'macOS: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -34,17 +41,17 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3e70e8cc76bb4099a3a6b96f5669f059
-          name: 'macOS: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.'
+          description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
             - tag: component
               value: system
         - uuid: 32e67f37a30c4fb28db9119d9e26a996
-          name: 'macOS: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -58,18 +65,18 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: d25aa1f2eae445ceb18b7e4ee5383585
-          name: 'macOS: Maximum number of opened files'
+          name: 'Maximum number of opened files'
           key: kernel.maxfiles
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctl utility or modifying the file /etc/sysctl.conf.'
+          description: 'May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.'
           tags:
             - tag: component
               value: os
           triggers:
             - uuid: 933b14ead0974a9c96d36c833da90ebb
               expression: 'last(/macOS by Zabbix agent/kernel.maxfiles)<1024'
-              name: 'macOS: Configured max number of opened files is too low'
+              name: 'Configured max number of opened files is too low'
               priority: INFO
               tags:
                 - tag: scope
@@ -77,18 +84,18 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 5c376cae54854613a1533eb804bcee56
-          name: 'macOS: Maximum number of processes'
+          name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctl utility or modifying the file /etc/sysctl.conf.'
+          description: 'May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.'
           tags:
             - tag: component
               value: os
           triggers:
             - uuid: 0e89b2e0cad948c0b81bc223d2ed673c
               expression: 'last(/macOS by Zabbix agent/kernel.maxproc)<256'
-              name: 'macOS: Configured max number of processes is too low'
+              name: 'Configured max number of processes is too low'
               priority: INFO
               tags:
                 - tag: scope
@@ -96,7 +103,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 951d874e6b644f9787c7a0d267bafcf8
-          name: 'macOS: Incoming network traffic on en0'
+          name: 'Incoming network traffic on en0'
           key: 'net.if.in[en0]'
           history: 7d
           units: bps
@@ -111,7 +118,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: ac875bd25d484d38b16cb02c30be6b67
-          name: 'macOS: Outgoing network traffic on en0'
+          name: 'Outgoing network traffic on en0'
           key: 'net.if.out[en0]'
           history: 7d
           units: bps
@@ -126,7 +133,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 928f973c004447d099a79e09a8b98cee
-          name: 'macOS: Host boot time'
+          name: 'Host boot time'
           key: system.boottime
           delay: 10m
           history: 7d
@@ -135,18 +142,18 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 5abd63bb64114794ae6d253dcc12afb4
-          name: 'macOS: Processor load (1 min average per core)'
+          name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             - tag: component
               value: cpu
           triggers:
             - uuid: 3cf40421e61b41bab7697bbf9a2649d6
               expression: 'avg(/macOS by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
-              name: 'macOS: Processor load is too high'
+              name: 'Processor load is too high'
               priority: WARNING
               tags:
                 - tag: scope
@@ -154,31 +161,31 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 7e569411a7b4415098d21aaa44068dee
-          name: 'macOS: Processor load (5 min average per core)'
+          name: 'Processor load (5 min average per core)'
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             - tag: component
               value: cpu
         - uuid: 1ddc219f824541ca9c9ef30afda56df2
-          name: 'macOS: Processor load (15 min average per core)'
+          name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
+          description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             - tag: component
               value: cpu
         - uuid: 9c0230c0bb944523bd781c37304bb87b
-          name: 'macOS: Host name'
+          name: 'Host name'
           key: system.hostname
           delay: 1h
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'A host name of the system.'
+          description: 'The host name of the system.'
           inventory_link: NAME
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -190,27 +197,28 @@ zabbix_export:
           triggers:
             - uuid: ffb713a281a543879e4196e4207bdd62
               expression: 'last(/macOS by Zabbix agent/system.hostname,#1)<>last(/macOS by Zabbix agent/system.hostname,#2)'
-              name: 'macOS: Hostname was changed'
+              name: 'Hostname was changed'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 5a7ce2c61d3a4696ac76e0406308e61b
-          name: 'macOS: Host local time'
+          name: 'Host local time'
           key: system.localtime
           history: 7d
           units: unixtime
+          description: 'The local system time of the host.'
           tags:
             - tag: component
               value: os
         - uuid: 5c73ff0f28d24d92955c667e5245cfa0
-          name: 'macOS: System information'
+          name: 'System information'
           key: system.uname
           delay: 1h
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The information as normally returned by the ''uname -a''.'
+          description: 'Information as normally returned by `uname -a`.'
           inventory_link: OS
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -222,30 +230,31 @@ zabbix_export:
           triggers:
             - uuid: 55d8650af70d4aeea56345985e454df9
               expression: 'last(/macOS by Zabbix agent/system.uname,#1)<>last(/macOS by Zabbix agent/system.uname,#2)'
-              name: 'macOS: Host information was changed'
+              name: 'Host information was changed'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 34c001a77a904224aa90338590375870
-          name: 'macOS: System uptime'
+          name: 'System uptime'
           key: system.uptime
           delay: 10m
           history: 7d
           units: uptime
+          description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
           tags:
             - tag: component
               value: os
           triggers:
             - uuid: 1f0cc03186cc4bb98483927f425df8e9
               expression: 'change(/macOS by Zabbix agent/system.uptime)<0'
-              name: 'macOS: Server has just been restarted'
+              name: 'Server has just been restarted'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 31ea6bafabbe440ea1b8d1b6cea74444
-          name: 'macOS: Number of logged in users'
+          name: 'Number of logged in users'
           key: system.users.num
           history: 7d
           description: 'The number of users who are currently logged in.'
@@ -255,7 +264,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 6df0d9e8694d45dfa11e433d8de7be41
-          name: 'macOS: Checksum of /etc/passwd'
+          name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
           history: 7d
@@ -271,34 +280,34 @@ zabbix_export:
           triggers:
             - uuid: 39cfe50a3d2a46ad9a53b9ec7443ec18
               expression: 'last(/macOS by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
-              name: 'macOS: /etc/passwd has been changed'
+              name: '/etc/passwd has been changed'
               priority: WARNING
               tags:
                 - tag: scope
                   value: security
         - uuid: bf99f88e47a64ecab98de4f3cfe6592f
-          name: 'macOS: Get filesystems'
+          name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'The `vfs.fs.get` key acquires raw information set about the file systems. Later to be extracted by preprocessing in dependent items.'
+          description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
             - tag: component
               value: raw
         - uuid: daf35c33bb84443f893bb06bfe10f870
-          name: 'macOS: Available memory'
+          name: 'Available memory'
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
-          description: 'The available memory is defined as free+cached+buffers memory.'
+          description: 'Defined as free + cached + buffers.'
           tags:
             - tag: component
               value: memory
           triggers:
             - uuid: c38dfc1b95d1463585d378f60d6a689a
               expression: 'last(/macOS by Zabbix agent/vm.memory.size[available])<20M'
-              name: 'macOS: Lack of available memory on server'
+              name: 'Lack of available memory on server'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -306,20 +315,21 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 83c0218324a548c4a01054801a4d8b0b
-          name: 'macOS: Total memory'
+          name: 'Total memory'
           key: 'vm.memory.size[total]'
           delay: 1h
           history: 7d
           units: B
+          description: 'Total memory expressed in bytes.'
           tags:
             - tag: component
               value: memory
         - uuid: d00cf9691f6c446fa35dab03b2201aa4
-          name: 'macOS: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
-          description: 'Monitoring the availability status of the agent.'
+          description: 'Used for monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
           tags:
@@ -328,10 +338,10 @@ zabbix_export:
           triggers:
             - uuid: 0766e9c2a02f46e7adbb86dbef67556f
               expression: 'max(/macOS by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'macOS: Zabbix agent is not available'
-              event_name: 'macOS: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
-              description: 'For passive checks only the availability of the agents and a host is used with {$AGENT.TIMEOUT} as the time threshold.'
+              description: 'For passive checks only; the availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -343,20 +353,33 @@ zabbix_export:
           key: vfs.fs.dependent.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
-              - macro: '{#FSTYPE}'
-                value: '@File systems for discovery'
+              - macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.MATCHES}'
                 formulaid: A
-          description: 'Discovery of different types of file systems as defined in the global regular expression "File systems for discovery". Note that the option to exclude dmg software images from discovery is available only with Zabbix agents 6.4 and higher.'
+              - macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+          description: 'The discovery of mounted filesystems with different types. Note that the option to exclude dmg software images from discovery is available only with Zabbix agents 6.4 and higher.'
           item_prototypes:
             - uuid: b7560dc2b6f743458128961cc962bcd3
-              name: '{#FSNAME}: Free inodes, %'
+              name: 'FS [{#FSNAME}]: Inodes: Free, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              description: 'Free metadata space expressed in %.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -365,26 +388,47 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
               trigger_prototypes:
+                - uuid: a1173b22ee4443eda7132f784f5f17bd
+                  expression: 'min(/macOS by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Running out of free inodes'
+                  event_name: '{#FSNAME}: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  opdata: 'Free inodes: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Disk writing may fail if index nodes are exhausted, leading to error messages like "No space left on device" or "Disk is full", despite available free space.'
+                  tags:
+                    - tag: scope
+                      value: capacity
+                    - tag: scope
+                      value: performance
                 - uuid: 91cccd7935854a47bf4ca184b1d4d09a
-                  expression: 'last(/macOS by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree])<20'
-                  name: '{#FSNAME}: Free inodes is less than 20%'
+                  expression: 'min(/macOS by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Running out of free inodes'
+                  event_name: 'FS [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  opdata: 'Free inodes: {ITEM.LASTVALUE1}'
                   priority: WARNING
+                  description: 'Disk writing may fail if index nodes are exhausted, leading to error messages like "No space left on device" or "Disk is full", despite available free space.'
+                  dependencies:
+                    - name: 'FS [{#FSNAME}]: Running out of free inodes'
+                      expression: 'min(/macOS by Zabbix agent/vfs.fs.dependent.inode[{#FSNAME},pfree],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
                   tags:
                     - tag: scope
                       value: capacity
                     - tag: scope
                       value: performance
             - uuid: 29340ac4c5d3419cb4508641e85d787d
-              name: '{#FSNAME}: Free disk space'
+              name: 'FS [{#FSNAME}]: Space: Available'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},free]'
               delay: '0'
               history: 7d
               units: B
+              description: 'Available storage space expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -393,17 +437,22 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: 6d9aa50bddb642499ad575a0cc71146b
-              name: '{#FSNAME}: Free disk space, %'
+              name: 'FS [{#FSNAME}]: Space: Available, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
+              description: |
+                Deprecated metric.
+                Space availability expressed as a percentage, calculated using the current and maximum available spaces.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -412,26 +461,78 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
+                - tag: deprecated
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
+            - uuid: 8630aad4545e4a9ea3bcd4feabfb0444
+              name: 'FS [{#FSNAME}]: Space: Used, in %'
+              type: DEPENDENT
+              key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Calculated as the percentage of currently used space compared to the maximum available space.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.bytes.pused
+              master_item:
+                key: 'vfs.fs.dependent[{#FSNAME},data]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: filesystem
+                  value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
               trigger_prototypes:
-                - uuid: 673dbc5aec474abda3a3b392d31b6c11
-                  expression: 'last(/macOS by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pfree])<20'
-                  name: '{#FSNAME}: Free disk space is less than 20%'
-                  priority: WARNING
+                - uuid: 7282d1a9ff1543f5afdb73b8fd985fec
+                  expression: 'min(/macOS by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Space is critically low'
+                  event_name: 'FS [{#FSNAME}]: Space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)'
+                  opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
+                  priority: AVERAGE
+                  description: |
+                    The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%` limit.
+                    The trigger expression is based on the current used and maximum available spaces.
+                    Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.
+                  manual_close: 'YES'
                   tags:
                     - tag: scope
-                      value: capacity
+                      value: availability
                     - tag: scope
-                      value: performance
+                      value: capacity
+                - uuid: 673dbc5aec474abda3a3b392d31b6c11
+                  expression: 'min(/macOS by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}'
+                  name: 'FS [{#FSNAME}]: Space is low'
+                  event_name: 'FS [{#FSNAME}]: Space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%, total {{?last(//vfs.fs.dependent.size[{#FSNAME},total])/1024/1024/1024}.fmtnum(1)}GB)'
+                  opdata: 'Space used: {{ITEM.LASTVALUE1}.fmtnum(1)}%'
+                  priority: WARNING
+                  description: |
+                    The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%` limit.
+                    The trigger expression is based on the current used and maximum available spaces.
+                    Event name represents the total volume space, which can differ from the maximum available space, depending on the filesystem type.
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: 'FS [{#FSNAME}]: Space is critically low'
+                      expression: 'min(/macOS by Zabbix agent/vfs.fs.dependent.size[{#FSNAME},pused],5m)>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  tags:
+                    - tag: scope
+                      value: availability
+                    - tag: scope
+                      value: capacity
             - uuid: c311ced2b4204b368af1c8a8c27f9c99
-              name: '{#FSNAME}: Total disk space'
+              name: 'FS [{#FSNAME}]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},total]'
               delay: '0'
               history: 7d
               units: B
+              description: 'Total space expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -440,16 +541,19 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: 748612098b4e4befa0f39f11b99eced4
-              name: '{#FSNAME}: Used disk space'
+              name: 'FS [{#FSNAME}]: Space: Used'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},used]'
               delay: '0'
               history: 7d
               units: B
+              description: 'Used storage expressed in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -458,17 +562,20 @@ zabbix_export:
                 key: 'vfs.fs.dependent[{#FSNAME},data]'
               tags:
                 - tag: component
-                  value: filesystem
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
             - uuid: c035c0bc26a24f58900e1af301007914
-              name: '{#FSNAME}: Get filesystem data'
+              name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},data]'
               delay: '0'
               history: 1h
               trends: '0'
               value_type: TEXT
+              description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -477,21 +584,49 @@ zabbix_export:
                 key: vfs.fs.get
               tags:
                 - tag: component
-                  value: filesystem
-                - tag: component
                   value: raw
+                - tag: component
+                  value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+                - tag: fstype
+                  value: '{#FSTYPE}'
           graph_prototypes:
-            - uuid: 6ce28b13df4e4494a4d39750afb25290
-              name: '{#FSNAME}: Disk space usage'
+            - uuid: b0cd424a8eac438ba76df6052a2bdab6
+              name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
+              width: '600'
+              height: '340'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
               graph_items:
-                - color: 199C0D
+                - drawtype: FILLED_REGION
+                  color: F63100
+                  calc_fnc: LAST
+                  item:
+                    host: 'macOS by Zabbix agent'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
+            - uuid: 110b798942874e9d817d6028b1ea2101
+              name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                - color: '787878'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
                   item:
                     host: 'macOS by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},total]'
                 - sortorder: '1'
                   color: F63100
+                  calc_fnc: LAST
+                  item:
+                    host: 'macOS by Zabbix agent'
+                    key: 'vfs.fs.dependent.size[{#FSNAME},used]'
+                - sortorder: '2'
+                  color: 199C09
+                  calc_fnc: LAST
                   item:
                     host: 'macOS by Zabbix agent'
                     key: 'vfs.fs.dependent.size[{#FSNAME},free]'
@@ -501,9 +636,27 @@ zabbix_export:
             - lld_macro: '{#FSNAME}'
               path: $.fsname
             - lld_macro: '{#FSOPTIONS}'
-              path: $.options
+              path: $.fsoptions
             - lld_macro: '{#FSTYPE}'
               path: $.fstype
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var filesystems = JSON.parse(value);
+                  
+                  result = filesystems.map(function (filesystem) {
+                  	return {
+                  		'fsname': filesystem.fsname,
+                  		'fstype': filesystem.fstype,
+                  		'fsoptions': filesystem.fsoptions
+                  	};
+                  });
+                  
+                  return JSON.stringify(result);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           overrides:
             - name: 'Exclude dmg'
               step: '1'
@@ -537,7 +690,7 @@ zabbix_export:
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
-                  value: inode
+                  value: Inodes
                   discover: NO_DISCOVER
       tags:
         - tag: class
@@ -547,15 +700,75 @@ zabbix_export:
       macros:
         - macro: '{$AGENT.TIMEOUT}'
           value: 3m
-          description: 'The timeout after which the agent is considered unavailable. It works only for the agents reachable from Zabbix server/proxy (in passive mode).'
+          description: 'Timeout after which the agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (in passive mode).'
+        - macro: '{$VFS.FS.FSNAME.MATCHES}'
+          value: .+
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+          value: ^(/dev|/sys|/run|/proc|.+/shm$)
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VFS.FS.FSTYPE.MATCHES}'
+          value: ^(btrfs|ext2|ext3|ext4|reiser|xfs|ffs|ufs|jfs|jfs2|vxfs|hfs|apfs|refs|ntfs|fat32|zfs)$
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+          value: ^\s$
+          description: 'Used for filesystem discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
+          value: '10'
+          description: 'The critical threshold of the filesystem metadata utilization.'
+        - macro: '{$VFS.FS.INODE.PFREE.MIN.WARN}'
+          value: '20'
+          description: 'The warning threshold of the filesystem metadata utilization.'
+        - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the filesystem utilization.'
+        - macro: '{$VFS.FS.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'The warning threshold of the filesystem utilization.'
       dashboards:
+        - uuid: 7cd39af9717141d398b86f3e8ea1d9e0
+          name: Filesystems
+          pages:
+            - name: Overview
+              widgets:
+                - type: graphprototype
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '3'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'macOS by Zabbix agent'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+                    - type: STRING
+                      name: reference
+                      value: AAAEB
+                - type: graphprototype
+                  'y': '5'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'macOS by Zabbix agent'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space usage graph, in % (relative to max available)'
+                    - type: STRING
+                      name: reference
+                      value: AAAEC
         - uuid: d66f39e86e2047289acea0bc9a218807
           name: 'System performance'
           pages:
             - widgets:
                 - type: graph
                   name: 'CPU load'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -569,7 +782,7 @@ zabbix_export:
                 - type: graph
                   name: 'Memory usage'
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -580,6 +793,22 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: AAAAB
+                - type: graphprototype
+                  'y': '10'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '3'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'macOS by Zabbix agent'
+                        name: 'FS [{#FSTYPE}({#FSNAME})]: Space utilization chart (relative to total)'
+                    - type: STRING
+                      name: reference
+                      value: AAAEA
       valuemaps:
         - uuid: 0355844b2bee4fb59bddda6175ef4810
           name: zabbix.host.available

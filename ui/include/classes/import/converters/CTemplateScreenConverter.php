@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -28,6 +23,11 @@ class CTemplateScreenConverter extends CConverter {
 	 * Reference display width for widget position and size calculations.
 	 */
 	private const DISPLAY_WIDTH = 1920;
+
+	private const DASHBOARD_MAX_COLUMNS = 24;
+	private const DASHBOARD_MAX_ROWS = 64;
+	private const WIDGET_MIN_ROWS = 2;
+	private const WIDGET_MAX_ROWS = 32;
 
 	/**
 	 * Widget row height on dashboard.
@@ -88,8 +88,8 @@ class CTemplateScreenConverter extends CConverter {
 				];
 
 				// Skip screen items not fitting on dashboard.
-				if (($widget_pos['x'] + $widget_pos['width'] > DASHBOARD_MAX_COLUMNS)
-						|| ($widget_pos['y'] + $widget_pos['height'] > DASHBOARD_MAX_ROWS)) {
+				if (($widget_pos['x'] + $widget_pos['width'] > self::DASHBOARD_MAX_COLUMNS)
+						|| ($widget_pos['y'] + $widget_pos['height'] > self::DASHBOARD_MAX_ROWS)) {
 					continue;
 				}
 
@@ -239,13 +239,17 @@ class CTemplateScreenConverter extends CConverter {
 
 		$dimensions_x_preferred = self::getAxisDimensions($items_x_preferred);
 		$dimensions_x_min = self::getAxisDimensions($items_x_min);
-		$dimensions_x = self::adjustAxisDimensions($dimensions_x_preferred, $dimensions_x_min, DASHBOARD_MAX_COLUMNS);
+		$dimensions_x = self::adjustAxisDimensions($dimensions_x_preferred, $dimensions_x_min,
+			self::DASHBOARD_MAX_COLUMNS
+		);
 
 		$dimensions_y_preferred = self::getAxisDimensions($items_y_preferred);
 		$dimensions_y_min = self::getAxisDimensions($items_y_min);
 
-		if (array_sum($dimensions_y_preferred) > DASHBOARD_MAX_ROWS) {
-			$dimensions_y = self::adjustAxisDimensions($dimensions_y_preferred, $dimensions_y_min, DASHBOARD_MAX_ROWS);
+		if (array_sum($dimensions_y_preferred) > self::DASHBOARD_MAX_ROWS) {
+			$dimensions_y = self::adjustAxisDimensions($dimensions_y_preferred, $dimensions_y_min,
+				self::DASHBOARD_MAX_ROWS
+			);
 		}
 		else {
 			$dimensions_y = $dimensions_y_preferred;
@@ -404,7 +408,7 @@ class CTemplateScreenConverter extends CConverter {
 		}
 
 		return self::limitWidgetSize([
-			'width' => round($width / self::DISPLAY_WIDTH * DASHBOARD_MAX_COLUMNS),
+			'width' => round($width / self::DISPLAY_WIDTH * self::DASHBOARD_MAX_COLUMNS),
 			'height' => round($rows)
 		]);
 	}
@@ -457,8 +461,8 @@ class CTemplateScreenConverter extends CConverter {
 	 */
 	private static function limitWidgetSize(array $size): array {
 		return [
-			'width' => min(DASHBOARD_MAX_COLUMNS, max(1, $size['width'])),
-			'height' => min(DASHBOARD_WIDGET_MAX_ROWS, max(DASHBOARD_WIDGET_MIN_ROWS, $size['height']))
+			'width' => min(self::DASHBOARD_MAX_COLUMNS, max(1, $size['width'])),
+			'height' => min(self::WIDGET_MAX_ROWS, max(self::WIDGET_MIN_ROWS, $size['height']))
 		];
 	}
 

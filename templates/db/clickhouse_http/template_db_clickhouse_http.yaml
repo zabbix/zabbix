@@ -40,7 +40,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 595446e408b844519e8db1ea91543134
-          name: 'ClickHouse: Current distribute connections'
+          name: 'Current distribute connections'
           type: DEPENDENT
           key: clickhouse.connections.distribute
           delay: '0'
@@ -56,7 +56,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: d2d72a607672442b957228f0bea8dcca
-          name: 'ClickHouse: Current HTTP connections'
+          name: 'Current HTTP connections'
           type: DEPENDENT
           key: clickhouse.connections.http
           delay: '0'
@@ -72,7 +72,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 0829591332244c75a219f3b811ebf9ce
-          name: 'ClickHouse: Current Interserver connections'
+          name: 'Current Interserver connections'
           type: DEPENDENT
           key: clickhouse.connections.interserver
           delay: '0'
@@ -88,7 +88,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 88d4855d22604d79927d40c0d3b106c5
-          name: 'ClickHouse: Current MySQL connections'
+          name: 'Current MySQL connections'
           type: DEPENDENT
           key: clickhouse.connections.mysql
           delay: '0'
@@ -106,7 +106,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 11786fff830d4d79b914a22c5f85da7f
-          name: 'ClickHouse: Current TCP connections'
+          name: 'Current TCP connections'
           type: DEPENDENT
           key: clickhouse.connections.tcp
           delay: '0'
@@ -122,7 +122,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: b2341064c7624848bfcac198d3b5ffa9
-          name: 'ClickHouse: Get databases info'
+          name: 'Get databases info'
           type: HTTP_AGENT
           key: clickhouse.databases
           history: '0'
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 46d8ed7374274d71a06119f50463f26c
-          name: 'ClickHouse: Get dictionaries info'
+          name: 'Get dictionaries info'
           type: HTTP_AGENT
           key: clickhouse.dictionaries
           history: '0'
@@ -174,7 +174,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b7bbca72bbd14b20930e60c3c1cdcb8e
-          name: 'ClickHouse: Current distributed files to insert'
+          name: 'Current distributed files to insert'
           type: DEPENDENT
           key: clickhouse.distributed.files
           delay: '0'
@@ -192,8 +192,8 @@ zabbix_export:
           triggers:
             - uuid: 4ecadb993aa74126a807df3af4b892ed
               expression: 'min(/ClickHouse by HTTP/clickhouse.distributed.files,5m)>{$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN}'
-              name: 'ClickHouse: Too many distributed files to insert'
-              event_name: 'ClickHouse: Too many distributed files to insert (over {$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN} for 5 min)'
+              name: 'Too many distributed files to insert'
+              event_name: 'Too many distributed files to insert (over {$CLICKHOUSE.DELAYED.FILES.DISTRIBUTED.COUNT.MAX.WARN} for 5 min)'
               priority: WARNING
               description: 'Clickhouse servers and <remote_servers> in config.xml (https://clickhouse.tech/docs/en/operations/table_engines/distributed/)'
               manual_close: 'YES'
@@ -201,7 +201,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: e056f8519dec4c8dace036bf993a6d47
-          name: 'ClickHouse: Distributed connection fail with retry per second'
+          name: 'Distributed connection fail with retry per second'
           type: DEPENDENT
           key: clickhouse.distributed.files.fail.rate
           delay: '0'
@@ -223,7 +223,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 3859c5ee6f25419f9da7e7899c9a71af
-          name: 'ClickHouse: Distributed connection fail with retry per second'
+          name: 'Distributed connection fail with retry per second'
           type: DEPENDENT
           key: clickhouse.distributed.files.retry.rate
           delay: '0'
@@ -245,7 +245,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 81130b88e0b04b9ea677a80b6fd6ce22
-          name: 'ClickHouse: Delayed insert queries'
+          name: 'Delayed insert queries'
           type: DEPENDENT
           key: clickhouse.insert.delay
           delay: '0'
@@ -264,8 +264,8 @@ zabbix_export:
           triggers:
             - uuid: 164dc9841cdd4b77a650792cf1bac701
               expression: 'min(/ClickHouse by HTTP/clickhouse.insert.delay,5m)>{$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN}'
-              name: 'ClickHouse: Too many throttled insert queries'
-              event_name: 'ClickHouse: Too many throttled insert queries (over {$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN) for 5 min)'
+              name: 'Too many throttled insert queries'
+              event_name: 'Too many throttled insert queries (over {$CLICKHOUSE.DELAYED.INSERTS.MAX.WARN) for 5 min)'
               priority: WARNING
               description: 'Clickhouse have INSERT queries that are throttled due to high number of active data parts for partition in a MergeTree, please decrease INSERT frequency'
               manual_close: 'YES'
@@ -273,7 +273,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: e2477dd38510489c8ea7509e9a37cb50
-          name: 'ClickHouse: Inserted bytes per second'
+          name: 'Inserted bytes per second'
           type: DEPENDENT
           key: clickhouse.inserted_bytes.rate
           delay: '0'
@@ -296,7 +296,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e09cfd7db8be48a485bda8c5f033d210
-          name: 'ClickHouse: Inserted rows per second'
+          name: 'Inserted rows per second'
           type: DEPENDENT
           key: clickhouse.inserted_rows.rate
           delay: '0'
@@ -318,7 +318,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 410f7ee66ee84e3eb27940312ddf23d2
-          name: 'ClickHouse: New INSERT queries per second'
+          name: 'New INSERT queries per second'
           type: DEPENDENT
           key: clickhouse.insert_query.rate
           delay: '0'
@@ -340,7 +340,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 04c970694a6f40c89e4d3b53f27b7530
-          name: 'ClickHouse: Allocated bytes'
+          name: 'Allocated bytes'
           type: DEPENDENT
           key: clickhouse.jemalloc.allocated
           delay: '0'
@@ -357,7 +357,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 7aa71031aec74fbb9a2ec126076705a2
-          name: 'ClickHouse: Mapped memory'
+          name: 'Mapped memory'
           type: DEPENDENT
           key: clickhouse.jemalloc.mapped
           delay: '0'
@@ -374,7 +374,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 32cc450854e94c6a9adbdde3c76b94d7
-          name: 'ClickHouse: Resident memory'
+          name: 'Resident memory'
           type: DEPENDENT
           key: clickhouse.jemalloc.resident
           delay: '0'
@@ -394,7 +394,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: c99265c296f14189aaf65bf68b7d5037
-          name: 'ClickHouse: Max count of parts per partition across all tables'
+          name: 'Max count of parts per partition across all tables'
           type: DEPENDENT
           key: clickhouse.max.part.count.for.partition
           delay: '0'
@@ -412,8 +412,8 @@ zabbix_export:
           triggers:
             - uuid: 21e6d3c6047145c59cbd00032699ee99
               expression: 'min(/ClickHouse by HTTP/clickhouse.max.part.count.for.partition,5m)>{$CLICKHOUSE.PARTS.PER.PARTITION.WARN} * 0.9'
-              name: 'ClickHouse: Too many MergeTree parts'
-              event_name: 'ClickHouse: Too many MergeTree parts (over 90% of {$CLICKHOUSE.PARTS.PER.PARTITION.WARN})'
+              name: 'Too many MergeTree parts'
+              event_name: 'Too many MergeTree parts (over 90% of {$CLICKHOUSE.PARTS.PER.PARTITION.WARN})'
               priority: WARNING
               description: |
                 Descease INSERT queries frequency.
@@ -426,7 +426,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: a4344162643142c9be3b09439b466a5d
-          name: 'ClickHouse: Memory used for queries'
+          name: 'Memory used for queries'
           type: DEPENDENT
           key: clickhouse.memory.tracking
           delay: '0'
@@ -444,7 +444,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 921670c46d9a4e5b85f2049d64298ab4
-          name: 'ClickHouse: Memory used for background merges'
+          name: 'Memory used for background merges'
           type: DEPENDENT
           key: clickhouse.memory.tracking.background
           delay: '0'
@@ -466,7 +466,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: f881ea3cb2a2434d9cfac0d0896279f5
-          name: 'ClickHouse: Memory used for background moves'
+          name: 'Memory used for background moves'
           type: DEPENDENT
           key: clickhouse.memory.tracking.background.moves
           delay: '0'
@@ -488,7 +488,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 3cd23448136c4ea8892483b1fbacec82
-          name: 'ClickHouse: Memory used for merges'
+          name: 'Memory used for merges'
           type: DEPENDENT
           key: clickhouse.memory.tracking.merges
           delay: '0'
@@ -510,7 +510,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 1f4641ef040546e0afcccc818f4d3471
-          name: 'ClickHouse: Memory used for background schedule pool'
+          name: 'Memory used for background schedule pool'
           type: DEPENDENT
           key: clickhouse.memory.tracking.schedule.pool
           delay: '0'
@@ -530,7 +530,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 5e98b9c4f1ee42238f363d76354ef537
-          name: 'ClickHouse: Current running merges'
+          name: 'Current running merges'
           type: DEPENDENT
           key: clickhouse.merge.current
           delay: '0'
@@ -546,7 +546,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 50e33e8fc1904870bdc6d7f13d16943d
-          name: 'ClickHouse: Uncompressed bytes merged per second'
+          name: 'Uncompressed bytes merged per second'
           type: DEPENDENT
           key: clickhouse.merge_bytes.rate
           delay: '0'
@@ -569,7 +569,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a2afbf66601344bdb5ab72a7374bbe8b
-          name: 'ClickHouse: Merged rows per second'
+          name: 'Merged rows per second'
           type: DEPENDENT
           key: clickhouse.merge_rows.rate
           delay: '0'
@@ -591,7 +591,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 83061f56dce24364906cae761419b148
-          name: 'ClickHouse: Network errors per second'
+          name: 'Network errors per second'
           type: DEPENDENT
           key: clickhouse.network.error.rate
           delay: '0'
@@ -615,15 +615,15 @@ zabbix_export:
           triggers:
             - uuid: d49b9e8978bd416f81ea01b935879d81
               expression: 'min(/ClickHouse by HTTP/clickhouse.network.error.rate,5m)>{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}'
-              name: 'ClickHouse: Too many network errors'
-              event_name: 'ClickHouse: Too many network errors (over {$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} in 5m)'
+              name: 'Too many network errors'
+              event_name: 'Too many network errors (over {$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN} in 5m)'
               priority: WARNING
               description: 'Number of errors (timeouts and connection failures) during query execution, background pool tasks and DNS cache update is too high.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: cb40b0cf1296436d9a4e41062d1b3fa9
-          name: 'ClickHouse: Ping'
+          name: Ping
           type: HTTP_AGENT
           key: clickhouse.ping
           history: 7d
@@ -647,7 +647,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 4fb14efc757542c1b50605bdfb2e23cb
-          name: 'ClickHouse: Longest currently running query time'
+          name: 'Longest currently running query time'
           type: HTTP_AGENT
           key: clickhouse.process.elapsed
           history: 7d
@@ -669,15 +669,15 @@ zabbix_export:
           triggers:
             - uuid: 2410e7b63c8340b6b08ec729d7093be6
               expression: 'last(/ClickHouse by HTTP/clickhouse.process.elapsed)>{$CLICKHOUSE.QUERY_TIME.MAX.WARN}'
-              name: 'ClickHouse: There are queries running is long'
-              event_name: 'ClickHouse: There are queries running more than {$CLICKHOUSE.QUERY_TIME.MAX.WARN} seconds'
+              name: 'There are queries running is long'
+              event_name: 'There are queries running more than {$CLICKHOUSE.QUERY_TIME.MAX.WARN} seconds'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 071ae233708b417b97cfeced5021c139
-          name: 'ClickHouse: Current running queries'
+          name: 'Current running queries'
           type: DEPENDENT
           key: clickhouse.query.current
           delay: '0'
@@ -693,7 +693,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 0fb342f6a494443c8389f79439e94791
-          name: 'ClickHouse: New queries per second'
+          name: 'New queries per second'
           type: DEPENDENT
           key: clickhouse.query.rate
           delay: '0'
@@ -715,7 +715,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: fb671accbbaa4bd58a107dc3661419af
-          name: 'ClickHouse: Read syscalls in fly'
+          name: 'Read syscalls in fly'
           type: DEPENDENT
           key: clickhouse.read
           delay: '0'
@@ -731,7 +731,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: eb4c47501d9c4cdf9e55347ccc9a38bd
-          name: 'ClickHouse: Read bytes per second'
+          name: 'Read bytes per second'
           type: DEPENDENT
           key: clickhouse.read_bytes.rate
           delay: '0'
@@ -754,7 +754,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3793962be3494772832796c932947e1d
-          name: 'ClickHouse: Get replicas info'
+          name: 'Get replicas info'
           type: HTTP_AGENT
           key: clickhouse.replicas
           history: '0'
@@ -780,7 +780,7 @@ zabbix_export:
             - tag: component
               value: replicas
         - uuid: 78ed9728eb634df1807c64637c862f9a
-          name: 'ClickHouse: Replication lag across all tables'
+          name: 'Replication lag across all tables'
           type: DEPENDENT
           key: clickhouse.replicas.max.absolute.delay
           delay: '0'
@@ -799,8 +799,8 @@ zabbix_export:
           triggers:
             - uuid: fc47a407b15744e79b70088ec249951a
               expression: 'min(/ClickHouse by HTTP/clickhouse.replicas.max.absolute.delay,5m)>{$CLICKHOUSE.REPLICA.MAX.WARN}'
-              name: 'ClickHouse: Replication lag is too high'
-              event_name: 'ClickHouse: Replication lag is too high (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)'
+              name: 'Replication lag is too high'
+              event_name: 'Replication lag is too high (over {$CLICKHOUSE.REPLICA.MAX.WARN} sec for 5min)'
               priority: WARNING
               description: |
                 When replica have too much lag, it can be skipped from Distributed SELECT Queries without errors
@@ -810,7 +810,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: dd61675348374d2ea06cdde144fe4e26
-          name: 'ClickHouse: Total number read-only Replicas'
+          name: 'Total number read-only Replicas'
           type: DEPENDENT
           key: clickhouse.replicas.readonly.total
           delay: '0'
@@ -826,7 +826,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 5d2a35daf81a49888e3dfab916fab8be
-          name: 'ClickHouse: Total replication tasks in queue'
+          name: 'Total replication tasks in queue'
           type: DEPENDENT
           key: clickhouse.replicas.sum.queue.size
           delay: '0'
@@ -842,7 +842,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 572036e5b2c74197bd61afc753f6e759
-          name: 'ClickHouse: Revision'
+          name: Revision
           type: DEPENDENT
           key: clickhouse.revision
           delay: '0'
@@ -858,7 +858,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: f89f3e27ca4f4e109ae6fe6b74dcc2ca
-          name: 'ClickHouse: New SELECT queries per second'
+          name: 'New SELECT queries per second'
           type: DEPENDENT
           key: clickhouse.select_query.rate
           delay: '0'
@@ -880,7 +880,7 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 6c84e0abd186467882d2d3842749f937
-          name: 'ClickHouse: Get system.asynchronous_metrics'
+          name: 'Get system.asynchronous_metrics'
           type: HTTP_AGENT
           key: clickhouse.system.asynchronous_metrics
           history: '0'
@@ -906,7 +906,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 8aa612d27547446e9457aeaf6e94e320
-          name: 'ClickHouse: Get system.events'
+          name: 'Get system.events'
           type: HTTP_AGENT
           key: clickhouse.system.events
           history: '0'
@@ -932,7 +932,7 @@ zabbix_export:
             - tag: component
               value: system-events
         - uuid: 2193464b67724392905deef21f2f7c20
-          name: 'ClickHouse: Get system.metrics'
+          name: 'Get system.metrics'
           type: HTTP_AGENT
           key: clickhouse.system.metrics
           history: '0'
@@ -958,7 +958,7 @@ zabbix_export:
             - tag: component
               value: system-metrics
         - uuid: 88c843c6d4fd43c794d1447109146312
-          name: 'ClickHouse: Get system.settings'
+          name: 'Get system.settings'
           type: HTTP_AGENT
           key: clickhouse.system.settings
           history: '0'
@@ -989,8 +989,8 @@ zabbix_export:
           triggers:
             - uuid: dfd9500636824ebf9d51d93650d62613
               expression: 'last(/ClickHouse by HTTP/clickhouse.system.settings,#1)<>last(/ClickHouse by HTTP/clickhouse.system.settings,#2) and length(last(/ClickHouse by HTTP/clickhouse.system.settings))>0'
-              name: 'ClickHouse: Configuration has been changed'
-              event_name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Configuration has been changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'ClickHouse configuration has been changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -998,7 +998,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 042f4b688cfe488fbd0e80f40f51ce78
-          name: 'ClickHouse: Get tables info'
+          name: 'Get tables info'
           type: HTTP_AGENT
           key: clickhouse.tables
           history: '0'
@@ -1024,7 +1024,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: 99b894b181b44a4f8ef10280b881b273
-          name: 'ClickHouse: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: clickhouse.uptime
           delay: '0'
@@ -1044,21 +1044,21 @@ zabbix_export:
           triggers:
             - uuid: 975cebc1b4324f83b5a8853fd666a179
               expression: 'nodata(/ClickHouse by HTTP/clickhouse.uptime,30m)=1'
-              name: 'ClickHouse: Failed to fetch info data'
-              event_name: 'ClickHouse: Failed to fetch info data (or no data for 30m)'
+              name: 'Failed to fetch info data'
+              event_name: 'Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
-                - name: 'ClickHouse: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/ClickHouse by HTTP/clickhouse.ping)=0 or last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{$CLICKHOUSE.HOST}","{$CLICKHOUSE.PORT}"]) = 0'
               tags:
                 - tag: scope
                   value: notice
             - uuid: e1316d3a83174cc49ab96ad90c46150b
               expression: 'last(/ClickHouse by HTTP/clickhouse.uptime)<10m'
-              name: 'ClickHouse: Host has been restarted'
-              event_name: 'ClickHouse: {HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'Host has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'The host uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1066,7 +1066,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: d09b77c25dfd45249df05fc3f6d45b7b
-          name: 'ClickHouse: Version'
+          name: Version
           type: HTTP_AGENT
           key: clickhouse.version
           history: 7d
@@ -1092,8 +1092,8 @@ zabbix_export:
           triggers:
             - uuid: 244dcf8dc8584e1686585160c261ef85
               expression: 'last(/ClickHouse by HTTP/clickhouse.version,#1)<>last(/ClickHouse by HTTP/clickhouse.version,#2) and length(last(/ClickHouse by HTTP/clickhouse.version))>0'
-              name: 'ClickHouse: Version has changed'
-              event_name: 'ClickHouse: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'The ClickHouse version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1101,7 +1101,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 5bac794c8c7e438c924cd16b708dc281
-          name: 'ClickHouse: Write syscalls in fly'
+          name: 'Write syscalls in fly'
           type: DEPENDENT
           key: clickhouse.write
           delay: '0'
@@ -1117,7 +1117,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 381805a8145a48c2a1f2586996b66a94
-          name: 'ClickHouse: ZooKeeper exceptions per second'
+          name: 'ZooKeeper exceptions per second'
           type: DEPENDENT
           key: clickhouse.zookeeper.exceptions.rate
           delay: '0'
@@ -1139,7 +1139,7 @@ zabbix_export:
             - tag: component
               value: zookeeper
         - uuid: f8e6a866d8c745d39ed124f19afe8041
-          name: 'ClickHouse: ZooKeeper hardware exceptions per second'
+          name: 'ZooKeeper hardware exceptions per second'
           type: DEPENDENT
           key: clickhouse.zookeeper.hw_exceptions.rate
           delay: '0'
@@ -1161,7 +1161,7 @@ zabbix_export:
             - tag: component
               value: zookeeper
         - uuid: 071fb0471b8e40c3a5bb79c694cecce0
-          name: 'ClickHouse: ZooKeeper requests'
+          name: 'ZooKeeper requests'
           type: DEPENDENT
           key: clickhouse.zookeeper.request
           delay: '0'
@@ -1177,7 +1177,7 @@ zabbix_export:
             - tag: component
               value: zookeeper
         - uuid: 3e344ea728a54bc38b4098e7f6e2d087
-          name: 'ClickHouse: ZooKeeper sessions'
+          name: 'ZooKeeper sessions'
           type: DEPENDENT
           key: clickhouse.zookeeper.session
           delay: '0'
@@ -1195,7 +1195,7 @@ zabbix_export:
           triggers:
             - uuid: 655622aa6c5c48c8b38d5a519602ef05
               expression: 'min(/ClickHouse by HTTP/clickhouse.zookeeper.session,5m)>1'
-              name: 'ClickHouse: Too many ZooKeeper sessions opened'
+              name: 'Too many ZooKeeper sessions opened'
               priority: WARNING
               description: |
                 Number of sessions (connections) to ZooKeeper.
@@ -1204,7 +1204,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 4931797c1034488fb9a2fc01e22b599c
-          name: 'ClickHouse: ZooKeeper user exceptions per second'
+          name: 'ZooKeeper user exceptions per second'
           type: DEPENDENT
           key: clickhouse.zookeeper.user_exceptions.rate
           delay: '0'
@@ -1226,7 +1226,7 @@ zabbix_export:
             - tag: component
               value: zookeeper
         - uuid: b9fbc2f76b9c4de3b196ffc82ec10209
-          name: 'ClickHouse: ZooKeeper wait time'
+          name: 'ZooKeeper wait time'
           type: DEPENDENT
           key: clickhouse.zookeeper.wait.time
           delay: '0'
@@ -1252,7 +1252,7 @@ zabbix_export:
             - tag: component
               value: zookeeper
         - uuid: 696aa071a9b24b29acbce2f1b5c49da3
-          name: 'ClickHouse: ZooKeeper watches'
+          name: 'ZooKeeper watches'
           type: DEPENDENT
           key: clickhouse.zookeeper.watch
           delay: '0'
@@ -1268,7 +1268,7 @@ zabbix_export:
             - tag: component
               value: zookeeper
         - uuid: 68d1e19a6ec2401ba0dd509de7df2812
-          name: 'ClickHouse: Check port availability'
+          name: 'Check port availability'
           type: SIMPLE
           key: 'net.tcp.service[{$CLICKHOUSE.SCHEME},"{$CLICKHOUSE.HOST}","{$CLICKHOUSE.PORT}"]'
           history: 7d
@@ -1286,7 +1286,7 @@ zabbix_export:
           triggers:
             - uuid: 1d4b9842b66b4da9ab3750944b2fa050
               expression: 'last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{$CLICKHOUSE.HOST}","{$CLICKHOUSE.PORT}"])=0'
-              name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable'
+              name: 'Port {$CLICKHOUSE.PORT} is unavailable'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
@@ -1311,7 +1311,7 @@ zabbix_export:
           description: 'Info about databases'
           item_prototypes:
             - uuid: b574ae5a62af4e9bb9d2c7324bc86c96
-              name: 'ClickHouse: {#DB}: Bytes'
+              name: '{#DB}: Bytes'
               type: DEPENDENT
               key: 'clickhouse.db.bytes["{#DB}"]'
               delay: '0'
@@ -1330,7 +1330,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DB}'
             - uuid: 407e1bf7688448abad516318efb6e65a
-              name: 'ClickHouse: {#DB}: Get DB info'
+              name: '{#DB}: Get DB info'
               type: DEPENDENT
               key: 'clickhouse.db.info_raw["{#DB}"]'
               delay: '0'
@@ -1351,7 +1351,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DB}'
             - uuid: 39d06d86884e4da9b9f8d9c0f7028c7c
-              name: 'ClickHouse: {#DB}: Tables'
+              name: '{#DB}: Tables'
               type: DEPENDENT
               key: 'clickhouse.db.tables["{#DB}"]'
               delay: '0'
@@ -1391,7 +1391,7 @@ zabbix_export:
           description: 'Info about dictionaries'
           item_prototypes:
             - uuid: 18cc050ff9c84d01ab61df1283fcce97
-              name: 'ClickHouse: Dictionary {#NAME}: Bytes allocated'
+              name: 'Dictionary {#NAME}: Bytes allocated'
               type: DEPENDENT
               key: 'clickhouse.dictionary.bytes_allocated["{#NAME}"]'
               delay: '0'
@@ -1410,7 +1410,7 @@ zabbix_export:
                 - tag: dictionary
                   value: '{#NAME}'
             - uuid: fa4efa26e3f64fc89c9d7dad39a610ca
-              name: 'ClickHouse: Dictionary {#NAME}: Element count'
+              name: 'Dictionary {#NAME}: Element count'
               type: DEPENDENT
               key: 'clickhouse.dictionary.element_count["{#NAME}"]'
               delay: '0'
@@ -1428,7 +1428,7 @@ zabbix_export:
                 - tag: dictionary
                   value: '{#NAME}'
             - uuid: e736ddf5c02240e7a9e0ea463024ad8e
-              name: 'ClickHouse: Dictionary {#NAME}: Get dictionary info'
+              name: 'Dictionary {#NAME}: Get dictionary info'
               type: DEPENDENT
               key: 'clickhouse.dictionary.info_raw["{#NAME}"]'
               delay: '0'
@@ -1449,7 +1449,7 @@ zabbix_export:
                 - tag: dictionary
                   value: '{#NAME}'
             - uuid: d9e333b7c1694ef482683679275dcd8d
-              name: 'ClickHouse: Dictionary {#NAME}: Load factor'
+              name: 'Dictionary {#NAME}: Load factor'
               type: DEPENDENT
               key: 'clickhouse.dictionary.load_factor["{#NAME}"]'
               delay: '0'
@@ -1493,7 +1493,7 @@ zabbix_export:
           description: 'Info about replicas'
           item_prototypes:
             - uuid: be577e21420244cb9d47c9fb9e23904a
-              name: 'ClickHouse: {#DB}.{#TABLE}: Active replicas'
+              name: '{#DB}.{#TABLE}: Active replicas'
               type: DEPENDENT
               key: 'clickhouse.replica.active_replicas["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1513,7 +1513,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 0a84f6788b3f447d958e031df0e2301c
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica future parts'
+              name: '{#DB}.{#TABLE}: Replica future parts'
               type: DEPENDENT
               key: 'clickhouse.replica.future_parts["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1533,7 +1533,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 11aa8f51d2d1461a989e465390b406de
-              name: 'ClickHouse: {#DB}.{#TABLE}: Get replicas info'
+              name: '{#DB}.{#TABLE}: Get replicas info'
               type: DEPENDENT
               key: 'clickhouse.replica.info_raw["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1556,7 +1556,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 6b49a71fcf244b8cb88e21423ac92ae2
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica queue inserts size'
+              name: '{#DB}.{#TABLE}: Replica queue inserts size'
               type: DEPENDENT
               key: 'clickhouse.replica.inserts_in_queue["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1576,7 +1576,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 29977fdd52c64c4ca0b3565187365a0c
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica readonly'
+              name: '{#DB}.{#TABLE}: Replica readonly'
               type: DEPENDENT
               key: 'clickhouse.replica.is_readonly["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1602,14 +1602,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7cfd2342d3654407a941cb56fde5c6bf
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.is_readonly["{#DB}.{#TABLE}"],5m)=1'
-                  name: 'ClickHouse: {#DB}.{#TABLE} Replica is readonly'
+                  name: '{#DB}.{#TABLE} Replica is readonly'
                   priority: WARNING
                   description: 'This mode is turned on if the config doesn''t have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: a889475b8ddf48109af3dd2b7ed58627
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica session expired'
+              name: '{#DB}.{#TABLE}: Replica session expired'
               type: DEPENDENT
               key: 'clickhouse.replica.is_session_expired["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1633,14 +1633,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 765475cc0be84ce1b85d1f026d08c326
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.is_session_expired["{#DB}.{#TABLE}"],5m)=1'
-                  name: 'ClickHouse: {#DB}.{#TABLE} Replica session is expired'
+                  name: '{#DB}.{#TABLE} Replica session is expired'
                   priority: WARNING
                   description: 'This mode is turned on if the config doesn''t have sections with ZooKeeper, if an unknown error occurred when re-initializing sessions in ZooKeeper, and during session re-initialization in ZooKeeper.'
                   tags:
                     - tag: scope
                       value: performance
             - uuid: 8acd6e2195064708886d9944af264c32
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica lag'
+              name: '{#DB}.{#TABLE}: Replica lag'
               type: DEPENDENT
               key: 'clickhouse.replica.lag["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1663,14 +1663,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 0b06b448c0ad433c94c2a3788ca53e1a
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.lag["{#DB}.{#TABLE}"],5m) > {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN}'
-                  name: 'ClickHouse: {#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high'
-                  event_name: 'ClickHouse: {#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high (More than {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN} for 5m)'
+                  name: '{#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high'
+                  event_name: '{#DB}.{#TABLE}: Difference between log_max_index and log_pointer is too high (More than {$CLICKHOUSE.LOG_POSITION.DIFF.MAX.WARN} for 5m)'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 267603d761864e4cbf764558520ed83c
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica log max index'
+              name: '{#DB}.{#TABLE}: Replica log max index'
               type: DEPENDENT
               key: 'clickhouse.replica.log_max_index["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1690,7 +1690,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 93bf89b0befa4c238f2143c1841ef629
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica log pointer'
+              name: '{#DB}.{#TABLE}: Replica log pointer'
               type: DEPENDENT
               key: 'clickhouse.replica.log_pointer["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1710,7 +1710,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 7b0da84f1e3f4705a209c6be025fc738
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica queue merges size'
+              name: '{#DB}.{#TABLE}: Replica queue merges size'
               type: DEPENDENT
               key: 'clickhouse.replica.merges_in_queue["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1730,7 +1730,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 51a83465b90e4c82835030fec4f79b6f
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica parts to check'
+              name: '{#DB}.{#TABLE}: Replica parts to check'
               type: DEPENDENT
               key: 'clickhouse.replica.parts_to_check["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1750,7 +1750,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 52ef1c26f14842868424f0c5bf81b35b
-              name: 'ClickHouse: {#DB}.{#TABLE}: Replica queue size'
+              name: '{#DB}.{#TABLE}: Replica queue size'
               type: DEPENDENT
               key: 'clickhouse.replica.queue_size["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1772,14 +1772,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6fe0a15168db4abfa1cd2a2ee45d62ad
                   expression: 'min(/ClickHouse by HTTP/clickhouse.replica.queue_size["{#DB}.{#TABLE}"],5m)>{$CLICKHOUSE.QUEUE.SIZE.MAX.WARN:"{#TABLE}"}'
-                  name: 'ClickHouse: {#DB}.{#TABLE}: Too many operations in queue'
-                  event_name: 'ClickHouse: {#DB}.{#TABLE}: Too many operations in queue (over {$CLICKHOUSE.QUEUE.SIZE.MAX.WARN} for 5m)'
+                  name: '{#DB}.{#TABLE}: Too many operations in queue'
+                  event_name: '{#DB}.{#TABLE}: Too many operations in queue (over {$CLICKHOUSE.QUEUE.SIZE.MAX.WARN} for 5m)'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: performance
             - uuid: 0fc2781f4be44f0e85176e5ed05dc05e
-              name: 'ClickHouse: {#DB}.{#TABLE}: Total replicas'
+              name: '{#DB}.{#TABLE}: Total replicas'
               type: DEPENDENT
               key: 'clickhouse.replica.total_replicas["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1801,7 +1801,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: f46f1b8d75c54129b6e2ff9ede2501b5
               expression: 'max(/ClickHouse by HTTP/clickhouse.replica.active_replicas["{#DB}.{#TABLE}"],5m) < last(/ClickHouse by HTTP/clickhouse.replica.total_replicas["{#DB}.{#TABLE}"])'
-              name: 'ClickHouse: {#DB}.{#TABLE}: Number of active replicas less than number of total replicas'
+              name: '{#DB}.{#TABLE}: Number of active replicas less than number of total replicas'
               priority: WARNING
               tags:
                 - tag: scope
@@ -1878,7 +1878,7 @@ zabbix_export:
           description: 'Info about tables'
           item_prototypes:
             - uuid: 3075954290af4f35b1620a5f15d2947d
-              name: 'ClickHouse: {#DB}.{#TABLE}: Bytes'
+              name: '{#DB}.{#TABLE}: Bytes'
               type: DEPENDENT
               key: 'clickhouse.table.bytes["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1899,7 +1899,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: e55b8c504efc41679e90c83cb03bc117
-              name: 'ClickHouse: {#DB}.{#TABLE}: Get table info'
+              name: '{#DB}.{#TABLE}: Get table info'
               type: DEPENDENT
               key: 'clickhouse.table.info_raw["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1922,7 +1922,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: e50e12adb7ef47e6ba40db01e7ae01e4
-              name: 'ClickHouse: {#DB}.{#TABLE}: Parts'
+              name: '{#DB}.{#TABLE}: Parts'
               type: DEPENDENT
               key: 'clickhouse.table.parts["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -1942,7 +1942,7 @@ zabbix_export:
                 - tag: table
                   value: '{#TABLE}'
             - uuid: 0ba557c544854f47bcd9cc65d33f14e7
-              name: 'ClickHouse: {#DB}.{#TABLE}: Rows'
+              name: '{#DB}.{#TABLE}: Rows'
               type: DEPENDENT
               key: 'clickhouse.table.rows["{#DB}.{#TABLE}"]'
               delay: '0'
@@ -2037,7 +2037,7 @@ zabbix_export:
               widgets:
                 - type: item
                   name: 'Service available'
-                  width: '4'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2052,7 +2052,7 @@ zabbix_export:
                       value: '2'
                 - type: graph
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2065,7 +2065,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2078,7 +2078,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '12'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2091,7 +2091,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   'y': '17'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2104,7 +2104,7 @@ zabbix_export:
                       value: AAAAG
                 - type: graph
                   'y': '22'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2117,8 +2117,8 @@ zabbix_export:
                       value: AAAAI
                 - type: item
                   name: 'Port available'
-                  x: '4'
-                  width: '4'
+                  x: '12'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2133,8 +2133,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Uptime
-                  x: '8'
-                  width: '4'
+                  x: '24'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2149,8 +2149,8 @@ zabbix_export:
                       value: '2'
                 - type: item
                   name: Version
-                  x: '12'
-                  width: '4'
+                  x: '36'
+                  width: '12'
                   fields:
                     - type: ITEM
                       name: itemid.0
@@ -2164,9 +2164,9 @@ zabbix_export:
                       name: show.1
                       value: '2'
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '2'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2178,9 +2178,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '7'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2192,9 +2192,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '12'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2206,9 +2206,9 @@ zabbix_export:
                       name: reference
                       value: AAAAF
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '17'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2220,9 +2220,9 @@ zabbix_export:
                       name: reference
                       value: AAAAH
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '22'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -2236,7 +2236,7 @@ zabbix_export:
             - name: Replicas
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER
@@ -2254,8 +2254,8 @@ zabbix_export:
                       name: rows
                       value: '3'
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER
@@ -2290,11 +2290,11 @@ zabbix_export:
   triggers:
     - uuid: 803947a6de9340ed8596510dcbbeacac
       expression: 'last(/ClickHouse by HTTP/clickhouse.ping)=0 or last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{$CLICKHOUSE.HOST}","{$CLICKHOUSE.PORT}"]) = 0'
-      name: 'ClickHouse: Service is down'
+      name: 'Service is down'
       priority: AVERAGE
       manual_close: 'YES'
       dependencies:
-        - name: 'ClickHouse: Port {$CLICKHOUSE.PORT} is unavailable'
+        - name: 'Port {$CLICKHOUSE.PORT} is unavailable'
           expression: 'last(/ClickHouse by HTTP/net.tcp.service[{$CLICKHOUSE.SCHEME},"{$CLICKHOUSE.HOST}","{$CLICKHOUSE.PORT}"])=0'
       tags:
         - tag: scope

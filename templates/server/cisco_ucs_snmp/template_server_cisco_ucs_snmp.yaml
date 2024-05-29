@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 250be2514e9246e08058a403bf674cf6
-          name: 'Cisco UCS: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -40,14 +40,14 @@ zabbix_export:
           triggers:
             - uuid: 301541972752471e86046ce494a2febb
               expression: 'max(/Cisco UCS by SNMP/icmpping,#3)=0'
-              name: 'Cisco UCS: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: c7eaba8c2b7d4b4aa14081957252e33e
-          name: 'Cisco UCS: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -61,11 +61,11 @@ zabbix_export:
           triggers:
             - uuid: e051db53cf32406bb0d5ff9cc8d5ce7b
               expression: 'min(/Cisco UCS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco UCS by SNMP/icmppingloss,5m)<100'
-              name: 'Cisco UCS: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Cisco UCS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco UCS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -73,7 +73,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 88b4a6cc507748e19f08d0ffc9a15368
-          name: 'Cisco UCS: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -87,13 +87,14 @@ zabbix_export:
           triggers:
             - uuid: a11942dac3504b64977c2de3e575d2eb
               expression: 'avg(/Cisco UCS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Cisco UCS: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Cisco UCS: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Cisco UCS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco UCS by SNMP/icmppingloss,5m)<100'
-                - name: 'Cisco UCS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco UCS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -101,7 +102,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 00b0172971e34784836d03e76b3480bd
-          name: 'Cisco UCS: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -114,7 +115,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 50df0ad347d94cffb871256c6340af11
-          name: 'Cisco UCS: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -134,7 +135,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 235302070dc54f148b92027967a6ff2f
-          name: 'Cisco UCS: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -155,7 +156,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a6d61b21f9f044a6912759e02787cb3f
-          name: 'Cisco UCS: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -179,7 +180,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7ba9b86064ad432a9e6d1922ca29edda
-          name: 'Cisco UCS: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -189,7 +190,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -199,7 +200,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 4674d8adc39343f7b46d21cae2ec1310
-          name: 'Cisco UCS: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -221,8 +222,8 @@ zabbix_export:
           triggers:
             - uuid: 3544e4ac11b44d14a6161523081c470e
               expression: 'last(/Cisco UCS by SNMP/system.name,#1)<>last(/Cisco UCS by SNMP/system.name,#2) and length(last(/Cisco UCS by SNMP/system.name))>0'
-              name: 'Cisco UCS: System name has changed'
-              event_name: 'Cisco UCS: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -232,7 +233,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 1b0551aa2d184c8d923788b5d159ed7c
-          name: 'Cisco UCS: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -242,7 +243,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -251,7 +252,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 05fe3cb6d2004e7ea2d37742fc2549d3
-          name: 'Cisco UCS: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -270,13 +271,13 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b80f6a30ad124a1ea863f2fdb868ba6f
-          name: 'Cisco UCS: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -290,12 +291,12 @@ zabbix_export:
           triggers:
             - uuid: 3c487a6b20c746eca9a7efc6058a60d9
               expression: 'max(/Cisco UCS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Cisco UCS: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Cisco UCS: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco UCS by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1183,14 +1184,17 @@ zabbix_export:
           value: '62'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$PSU_CRIT_STATUS:"inoperable"}'
           value: '2'
         - macro: '{$PSU_WARN_STATUS:"degraded"}'
           value: '3'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '60'
         - macro: '{$TEMP_CRIT:"Ambient"}'
@@ -1464,13 +1468,13 @@ zabbix_export:
   triggers:
     - uuid: a933ba0e5c7f4e908afaba4381f65482
       expression: '(last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Cisco UCS: Host has been restarted'
-      event_name: 'Cisco UCS: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Cisco UCS: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Cisco UCS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

@@ -70,64 +70,64 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TrueNAS CORE: ICMP ping|<p>Host accessibility by ICMP.</p><p>0 - ICMP ping fails.</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
-|TrueNAS CORE: ICMP loss|<p>Percentage of lost packets.</p>|Simple check|icmppingloss|
-|TrueNAS CORE: ICMP response time|<p>ICMP ping response time (in seconds).</p>|Simple check|icmppingsec|
-|TrueNAS CORE: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|TrueNAS CORE: System description|<p>MIB: SNMPv2-MIB</p><p>System description of the host.</p>|SNMP agent|system.descr<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|TrueNAS CORE: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node. If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|TrueNAS CORE: System name|<p>MIB: SNMPv2-MIB</p><p>The host name of the system.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|TrueNAS CORE: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining what kind of box is being managed.</p>|SNMP agent|system.objectid<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|TrueNAS CORE: Uptime|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
-|TrueNAS CORE: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items.</p>|SNMP trap|snmptrap.fallback|
-|TrueNAS CORE: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
-|TrueNAS CORE: Interrupts per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of interrupts processed.</p>|SNMP agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|TrueNAS CORE: Context switches per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of context switches.</p>|SNMP agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|TrueNAS CORE: Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The 1 minute load averages.</p>|SNMP agent|system.cpu.load.avg1|
-|TrueNAS CORE: Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The 5 minutes load averages.</p>|SNMP agent|system.cpu.load.avg5|
-|TrueNAS CORE: Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The 15 minutes load averages.</p>|SNMP agent|system.cpu.load.avg15|
-|TrueNAS CORE: Number of CPUs|<p>MIB: HOST-RESOURCES-MIB</p><p>Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|TrueNAS CORE: Free memory|<p>MIB: UCD-SNMP-MIB</p><p>The amount of real/physical memory currently unused or available.</p>|SNMP agent|vm.memory.free<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS CORE: Memory (buffers)|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of real or virtual memory currently allocated for use as memory buffers.</p>|SNMP agent|vm.memory.buffers<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS CORE: Memory (cached)|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of real or virtual memory currently allocated for use as cached memory.</p>|SNMP agent|vm.memory.cached<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS CORE: Total memory|<p>MIB: UCD-SNMP-MIB</p><p>The total memory expressed in bytes.</p>|SNMP agent|vm.memory.total<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS CORE: Available memory|<p>Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.</p>|Calculated|vm.memory.available|
-|TrueNAS CORE: Memory utilization|<p>Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.</p>|Calculated|vm.memory.util|
-|TrueNAS CORE: Total swap space|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of swap space configured for this host.</p>|SNMP agent|system.swap.total<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS CORE: Free swap space|<p>MIB: UCD-SNMP-MIB</p><p>The amount of swap space currently unused or available.</p>|SNMP agent|system.swap.free<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS CORE: Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Calculated|system.swap.pfree<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `100`</p></li></ul>|
-|TrueNAS CORE: ARC size|<p>MIB: FREENAS-MIB</p><p>ARC size in bytes.</p>|SNMP agent|truenas.zfs.arc.size<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|TrueNAS CORE: ARC metadata size|<p>MIB: FREENAS-MIB</p><p>ARC metadata size used in bytes.</p>|SNMP agent|truenas.zfs.arc.meta<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS CORE: ARC data size|<p>MIB: FREENAS-MIB</p><p>ARC data size used in bytes.</p>|SNMP agent|truenas.zfs.arc.data<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|TrueNAS CORE: ARC hits|<p>MIB: FREENAS-MIB</p><p>Total amount of cache hits in the ARC per second.</p>|SNMP agent|truenas.zfs.arc.hits<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|TrueNAS CORE: ARC misses|<p>MIB: FREENAS-MIB</p><p>Total amount of cache misses in the ARC per second.</p>|SNMP agent|truenas.zfs.arc.misses<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|TrueNAS CORE: ARC target size of cache|<p>MIB: FREENAS-MIB</p><p>ARC target size of cache in bytes.</p>|SNMP agent|truenas.zfs.arc.c<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|TrueNAS CORE: ARC target size of MRU|<p>MIB: FREENAS-MIB</p><p>ARC target size of MRU in bytes.</p>|SNMP agent|truenas.zfs.arc.p<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|TrueNAS CORE: ARC cache hit ratio|<p>MIB: FREENAS-MIB</p><p>ARC cache hit ration percentage.</p>|SNMP agent|truenas.zfs.arc.hit.ratio|
-|TrueNAS CORE: ARC cache miss ratio|<p>MIB: FREENAS-MIB</p><p>ARC cache miss ration percentage.</p>|SNMP agent|truenas.zfs.arc.miss.ratio|
-|TrueNAS CORE: L2ARC hits|<p>MIB: FREENAS-MIB</p><p>Hits to the L2 cache per second.</p>|SNMP agent|truenas.zfs.l2arc.hits<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|TrueNAS CORE: L2ARC misses|<p>MIB: FREENAS-MIB</p><p>Misses to the L2 cache per second.</p>|SNMP agent|truenas.zfs.l2arc.misses<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|TrueNAS CORE: L2ARC read rate|<p>MIB: FREENAS-MIB</p><p>Read rate from L2 cache in bytes per second.</p>|SNMP agent|truenas.zfs.l2arc.read<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|TrueNAS CORE: L2ARC write rate|<p>MIB: FREENAS-MIB</p><p>Write rate from L2 cache in bytes per second.</p>|SNMP agent|truenas.zfs.l2arc.write<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|TrueNAS CORE: L2ARC size|<p>MIB: FREENAS-MIB</p><p>L2ARC size in bytes.</p>|SNMP agent|truenas.zfs.l2arc.size<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|TrueNAS CORE: ZIL operations 1 second|<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 1 1.</p>|SNMP agent|truenas.zfs.zil.ops1|
-|TrueNAS CORE: ZIL operations 5 seconds|<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 5 1.</p>|SNMP agent|truenas.zfs.zil.ops5|
-|TrueNAS CORE: ZIL operations 10 seconds|<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 10 1.</p>|SNMP agent|truenas.zfs.zil.ops10|
+|ICMP ping|<p>Host accessibility by ICMP.</p><p>0 - ICMP ping fails.</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
+|ICMP loss|<p>Percentage of lost packets.</p>|Simple check|icmppingloss|
+|ICMP response time|<p>ICMP ping response time (in seconds).</p>|Simple check|icmppingsec|
+|System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|System description|<p>MIB: SNMPv2-MIB</p><p>System description of the host.</p>|SNMP agent|system.descr<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node. If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|System name|<p>MIB: SNMPv2-MIB</p><p>The host name of the system.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining what kind of box is being managed.</p>|SNMP agent|system.objectid<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Uptime|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items.</p>|SNMP trap|snmptrap.fallback|
+|SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
+|Interrupts per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of interrupts processed.</p>|SNMP agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Context switches per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of context switches.</p>|SNMP agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The 1 minute load averages.</p>|SNMP agent|system.cpu.load.avg1|
+|Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The 5 minutes load averages.</p>|SNMP agent|system.cpu.load.avg5|
+|Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The 15 minutes load averages.</p>|SNMP agent|system.cpu.load.avg15|
+|Number of CPUs|<p>MIB: HOST-RESOURCES-MIB</p><p>Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Free memory|<p>MIB: UCD-SNMP-MIB</p><p>The amount of real/physical memory currently unused or available.</p>|SNMP agent|vm.memory.free<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Memory (buffers)|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of real or virtual memory currently allocated for use as memory buffers.</p>|SNMP agent|vm.memory.buffers<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Memory (cached)|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of real or virtual memory currently allocated for use as cached memory.</p>|SNMP agent|vm.memory.cached<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Total memory|<p>MIB: UCD-SNMP-MIB</p><p>The total memory expressed in bytes.</p>|SNMP agent|vm.memory.total<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Available memory|<p>Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.</p>|Calculated|vm.memory.available|
+|Memory utilization|<p>Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.</p>|Calculated|vm.memory.util|
+|Total swap space|<p>MIB: UCD-SNMP-MIB</p><p>The total amount of swap space configured for this host.</p>|SNMP agent|system.swap.total<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Free swap space|<p>MIB: UCD-SNMP-MIB</p><p>The amount of swap space currently unused or available.</p>|SNMP agent|system.swap.free<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Calculated|system.swap.pfree<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `100`</p></li></ul>|
+|ARC size|<p>MIB: FREENAS-MIB</p><p>ARC size in bytes.</p>|SNMP agent|truenas.zfs.arc.size<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ARC metadata size|<p>MIB: FREENAS-MIB</p><p>ARC metadata size used in bytes.</p>|SNMP agent|truenas.zfs.arc.meta<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|ARC data size|<p>MIB: FREENAS-MIB</p><p>ARC data size used in bytes.</p>|SNMP agent|truenas.zfs.arc.data<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|ARC hits|<p>MIB: FREENAS-MIB</p><p>Total amount of cache hits in the ARC per second.</p>|SNMP agent|truenas.zfs.arc.hits<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|ARC misses|<p>MIB: FREENAS-MIB</p><p>Total amount of cache misses in the ARC per second.</p>|SNMP agent|truenas.zfs.arc.misses<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|ARC target size of cache|<p>MIB: FREENAS-MIB</p><p>ARC target size of cache in bytes.</p>|SNMP agent|truenas.zfs.arc.c<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ARC target size of MRU|<p>MIB: FREENAS-MIB</p><p>ARC target size of MRU in bytes.</p>|SNMP agent|truenas.zfs.arc.p<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ARC cache hit ratio|<p>MIB: FREENAS-MIB</p><p>ARC cache hit ration percentage.</p>|SNMP agent|truenas.zfs.arc.hit.ratio|
+|ARC cache miss ratio|<p>MIB: FREENAS-MIB</p><p>ARC cache miss ration percentage.</p>|SNMP agent|truenas.zfs.arc.miss.ratio|
+|L2ARC hits|<p>MIB: FREENAS-MIB</p><p>Hits to the L2 cache per second.</p>|SNMP agent|truenas.zfs.l2arc.hits<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|L2ARC misses|<p>MIB: FREENAS-MIB</p><p>Misses to the L2 cache per second.</p>|SNMP agent|truenas.zfs.l2arc.misses<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|L2ARC read rate|<p>MIB: FREENAS-MIB</p><p>Read rate from L2 cache in bytes per second.</p>|SNMP agent|truenas.zfs.l2arc.read<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|L2ARC write rate|<p>MIB: FREENAS-MIB</p><p>Write rate from L2 cache in bytes per second.</p>|SNMP agent|truenas.zfs.l2arc.write<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|L2ARC size|<p>MIB: FREENAS-MIB</p><p>L2ARC size in bytes.</p>|SNMP agent|truenas.zfs.l2arc.size<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|ZIL operations 1 second|<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 1 1.</p>|SNMP agent|truenas.zfs.zil.ops1|
+|ZIL operations 5 seconds|<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 5 1.</p>|SNMP agent|truenas.zfs.zil.ops5|
+|ZIL operations 10 seconds|<p>MIB: FREENAS-MIB</p><p>The ops column parsed from the command zilstat 10 1.</p>|SNMP agent|truenas.zfs.zil.ops10|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|TrueNAS CORE: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/TrueNAS CORE by SNMP/icmpping,#3)=0`|High||
-|TrueNAS CORE: High ICMP ping loss|<p>ICMP packets loss detected.</p>|`min(/TrueNAS CORE by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TrueNAS CORE by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>TrueNAS CORE: Unavailable by ICMP ping</li></ul>|
-|TrueNAS CORE: High ICMP ping response time|<p>Average ICMP response time is too big.</p>|`avg(/TrueNAS CORE by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>TrueNAS CORE: Unavailable by ICMP ping</li></ul>|
-|TrueNAS CORE: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/TrueNAS CORE by SNMP/system.name,#1)<>last(/TrueNAS CORE by SNMP/system.name,#2) and length(last(/TrueNAS CORE by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|TrueNAS CORE: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TrueNAS CORE by SNMP/system.uptime)<10m`|Info|**Manual close**: Yes|
-|TrueNAS CORE: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/TrueNAS CORE by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>TrueNAS CORE: Unavailable by ICMP ping</li></ul>|
-|TrueNAS CORE: Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/TrueNAS CORE by SNMP/system.cpu.load.avg1,5m)/last(/TrueNAS CORE by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/TrueNAS CORE by SNMP/system.cpu.load.avg5)>0 and last(/TrueNAS CORE by SNMP/system.cpu.load.avg15)>0`|Average||
-|TrueNAS CORE: Lack of available memory|<p>The system is running out of memory.</p>|`min(/TrueNAS CORE by SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/TrueNAS CORE by SNMP/vm.memory.total)>0`|Average||
-|TrueNAS CORE: High memory utilization|<p>The system is running out of free memory.</p>|`min(/TrueNAS CORE by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}`|Average|**Depends on**:<br><ul><li>TrueNAS CORE: Lack of available memory</li></ul>|
-|TrueNAS CORE: High swap space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`min(/TrueNAS CORE by SNMP/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/TrueNAS CORE by SNMP/system.swap.total)>0`|Warning|**Depends on**:<br><ul><li>TrueNAS CORE: Lack of available memory</li><li>TrueNAS CORE: High memory utilization</li></ul>|
+|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/TrueNAS CORE by SNMP/icmpping,#3)=0`|High||
+|High ICMP ping loss|<p>ICMP packets loss detected.</p>|`min(/TrueNAS CORE by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/TrueNAS CORE by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
+|High ICMP ping response time|<p>Average ICMP response time is too big.</p>|`avg(/TrueNAS CORE by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
+|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/TrueNAS CORE by SNMP/system.name,#1)<>last(/TrueNAS CORE by SNMP/system.name,#2) and length(last(/TrueNAS CORE by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TrueNAS CORE by SNMP/system.uptime)<10m`|Info|**Manual close**: Yes|
+|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/TrueNAS CORE by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
+|Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/TrueNAS CORE by SNMP/system.cpu.load.avg1,5m)/last(/TrueNAS CORE by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/TrueNAS CORE by SNMP/system.cpu.load.avg5)>0 and last(/TrueNAS CORE by SNMP/system.cpu.load.avg15)>0`|Average||
+|Lack of available memory|<p>The system is running out of memory.</p>|`min(/TrueNAS CORE by SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/TrueNAS CORE by SNMP/vm.memory.total)>0`|Average||
+|High memory utilization|<p>The system is running out of free memory.</p>|`min(/TrueNAS CORE by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}`|Average|**Depends on**:<br><ul><li>Lack of available memory</li></ul>|
+|High swap space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`min(/TrueNAS CORE by SNMP/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/TrueNAS CORE by SNMP/system.swap.total)>0`|Warning|**Depends on**:<br><ul><li>Lack of available memory</li><li>High memory utilization</li></ul>|
 
 ### LLD rule CPU discovery
 
@@ -139,19 +139,19 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|TrueNAS CORE: CPU idle time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle[{#SNMPINDEX}]|
-|TrueNAS CORE: CPU system time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|TrueNAS CORE: CPU user time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running users' processes that are not niced.</p>|SNMP agent|system.cpu.user[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|TrueNAS CORE: CPU nice time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running users' processes that have been niced.</p>|SNMP agent|system.cpu.nice[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|TrueNAS CORE: CPU iowait time|<p>MIB: UCD-SNMP-MIB</p><p>The amount of time the CPU has been waiting for I/O to complete.</p>|SNMP agent|system.cpu.iowait[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|TrueNAS CORE: CPU interrupt time|<p>MIB: UCD-SNMP-MIB</p><p>The amount of time the CPU has been servicing hardware interrupts.</p>|SNMP agent|system.cpu.interrupt[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|TrueNAS CORE: CPU utilization|<p>The CPU utilization expressed in %.</p>|Dependent item|system.cpu.util[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `//Calculate utilization<br>return (100 - value)`</p></li></ul>|
+|CPU idle time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle[{#SNMPINDEX}]|
+|CPU system time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|CPU user time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running users' processes that are not niced.</p>|SNMP agent|system.cpu.user[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|CPU nice time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running users' processes that have been niced.</p>|SNMP agent|system.cpu.nice[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|CPU iowait time|<p>MIB: UCD-SNMP-MIB</p><p>The amount of time the CPU has been waiting for I/O to complete.</p>|SNMP agent|system.cpu.iowait[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|CPU interrupt time|<p>MIB: UCD-SNMP-MIB</p><p>The amount of time the CPU has been servicing hardware interrupts.</p>|SNMP agent|system.cpu.interrupt[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|CPU utilization|<p>The CPU utilization expressed in %.</p>|Dependent item|system.cpu.util[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `//Calculate utilization<br>return (100 - value)`</p></li></ul>|
 
 ### Trigger prototypes for CPU discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|TrueNAS CORE: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/TrueNAS CORE by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning|**Depends on**:<br><ul><li>TrueNAS CORE: Load average is too high</li></ul>|
+|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/TrueNAS CORE by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning|**Depends on**:<br><ul><li>Load average is too high</li></ul>|
 
 ### LLD rule Block devices discovery
 

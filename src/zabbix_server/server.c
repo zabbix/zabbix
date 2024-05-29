@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "config.h"
@@ -105,6 +100,7 @@
 #include "zbxhttppoller.h"
 #include "zbx_ha_constants.h"
 #include "zbxescalations.h"
+#include "zbxbincommon.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
@@ -353,6 +349,9 @@ static char	*config_ssl_ca_location = NULL;
 static char	*config_ssl_cert_location = NULL;
 static char	*config_ssl_key_location = NULL;
 
+/* browser item */
+static char	*config_webdriver_url = NULL;
+
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
 static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
@@ -376,6 +375,7 @@ static char	*config_file				= NULL;
 static int	config_allow_root			= 0;
 static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
+static char	*config_sms_devices			= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -1130,8 +1130,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"AllowSoftwareUpdateCheck",	&config_allow_software_update_check,	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
-		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_POLLER], ZBX_CFG_TYPE_INT,
+		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER], ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
+		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{0}
 	};
 
@@ -1279,7 +1283,7 @@ int	main(int argc, char **argv)
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 
 	/* initialize libraries before using */
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 	zbx_init_library_nix(get_zbx_progname, get_process_info_by_thread);
 	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
@@ -1314,7 +1318,7 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_TEST_CONFIG;
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
@@ -1330,7 +1334,7 @@ int	main(int argc, char **argv)
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				zbx_print_usage(usage_message, zbx_progname);
+				zbx_print_usage(zbx_progname, usage_message);
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -1541,14 +1545,15 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_max_concurrent_checks_per_poller, get_config_forks,
 							config_java_gateway, config_java_gateway_port,
 							config_externalscripts, zbx_get_value_internal_ext_server,
-							config_ssh_key_location};
+							config_ssh_key_location, config_webdriver_url};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency, get_config_forks,
 							config_stats_allowed_ip, config_java_gateway,
 							config_java_gateway_port, config_externalscripts,
 							config_enable_global_scripts, zbx_get_value_internal_ext_server,
-							config_ssh_key_location, zbx_trapper_process_request_server,
+							config_ssh_key_location, config_webdriver_url,
+							zbx_trapper_process_request_server,
 							zbx_autoreg_update_host_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
@@ -1583,7 +1588,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_confsyncer_frequency, zbx_config_source_ip,
 							config_ssl_ca_location, config_ssl_cert_location,
 							config_ssl_key_location};
-	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location};
+	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location,
+							config_sms_devices};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
 						.workers_num = config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],

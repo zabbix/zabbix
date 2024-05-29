@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -127,8 +122,6 @@
 					cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
 					max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
 					max_rows: <?= DASHBOARD_MAX_ROWS ?>,
-					widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-					widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
 					widget_defaults,
 					configuration_hash,
 					is_editable: false,
@@ -136,8 +129,9 @@
 					can_edit_dashboards: false,
 					is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 					broadcast_options: {
-						_hostid: {rebroadcast: false},
-						_timeperiod: {rebroadcast: true}
+						[CWidgetsData.DATA_TYPE_HOST_ID]: {rebroadcast: false},
+						[CWidgetsData.DATA_TYPE_HOST_IDS]: {rebroadcast: false},
+						[CWidgetsData.DATA_TYPE_TIME_PERIOD]: {rebroadcast: true}
 					},
 					csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 				});
@@ -150,15 +144,19 @@
 					ZABBIX.Dashboard.addDashboardPage(page);
 				}
 
+				const time_period = {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				};
+
+				CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
+
 				ZABBIX.Dashboard.broadcast({
-					_hostid: dashboard_host.hostid,
-					_hostids: [dashboard_host.hostid],
-					_timeperiod: {
-						from: dashboard_time_period.from,
-						from_ts: dashboard_time_period.from_ts,
-						to: dashboard_time_period.to,
-						to_ts: dashboard_time_period.to_ts
-					}
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [dashboard_host.hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [dashboard_host.hostid],
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 				});
 
 				ZABBIX.Dashboard.activate();
@@ -170,7 +168,7 @@
 				});
 			}
 
-			if ('_timeperiod' in broadcast_requirements) {
+			if (CWidgetsData.DATA_TYPE_TIME_PERIOD in broadcast_requirements) {
 				jQuery.subscribe('timeselector.rangeupdate', (e, data) => this.#onTimeSelectorRangeUpdate(data));
 			}
 
@@ -319,18 +317,22 @@
 				return;
 			}
 
+			const time_period = {
+				from: data.from,
+				from_ts: data.from_ts,
+				to: data.to,
+				to_ts: data.to_ts
+			};
+
+			CWidgetsData.setDefault(CWidgetsData.DATA_TYPE_TIME_PERIOD, time_period, {is_comparable: false});
+
 			ZABBIX.Dashboard.broadcast({
-				_timeperiod: {
-					from: data.from,
-					from_ts: data.from_ts,
-					to: data.to,
-					to_ts: data.to_ts
-				}
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
 			});
 		}
 
 		#onFeedback(e) {
-			if (e.detail.type === '_timeperiod' && e.detail.value !== null) {
+			if (e.detail.type === CWidgetsData.DATA_TYPE_TIME_PERIOD && e.detail.value !== null) {
 				this.#skip_time_selector_range_update = true;
 
 				$.publish('timeselector.rangechange', {

@@ -21,7 +21,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 7f6ec0e48d41456896799f487cd8243e
-          name: 'Tomcat: Version'
+          name: Version
           type: JMX
           key: 'jmx["Catalina:type=Server",serverInfo]'
           history: 7d
@@ -41,8 +41,8 @@ zabbix_export:
           triggers:
             - uuid: 152d235652914aa2af78334385334214
               expression: 'last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0'
-              name: 'Tomcat: Version has been changed'
-              event_name: 'Tomcat: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has been changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'The Tomcat version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -520,7 +520,7 @@ zabbix_export:
             - name: General
               widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER
@@ -538,8 +538,8 @@ zabbix_export:
                       name: rows
                       value: '3'
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '15'
                   fields:
                     - type: INTEGER

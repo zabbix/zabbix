@@ -185,8 +185,8 @@ zabbix_export:
           triggers:
             - uuid: 65e7954489854ad3ad1698dead7c4c02
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.bgwriter.checkpoints_req.rate) > {$PG.CHECKPOINTS_REQ.MAX.WARN}'
-              name: 'PostgreSQL: Required checkpoints occur too frequently'
-              event_name: 'PostgreSQL: Required checkpoints occur too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})'
+              name: 'Required checkpoints occur too frequently'
+              event_name: 'Required checkpoints occur too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})'
               priority: AVERAGE
               description: |
                 Checkpoints are points in the sequence of transactions at which it is guaranteed that the heap and index data files have been updated with all information written before that checkpoint. At checkpoint time, all dirty data pages are flushed to disk and a special checkpoint record is written to the log file.
@@ -283,7 +283,7 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 1fc5ba48a0974bd7bf965b5f130deded
-          name: 'PostgreSQL: Get bgwriter'
+          name: 'Get bgwriter'
           key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 1h
           trends: '0'
@@ -297,18 +297,18 @@ zabbix_export:
           triggers:
             - uuid: 768d28b9360b46cda3065f5082ba97ac
               expression: 'nodata(/PostgreSQL by Zabbix agent/pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],30m) = 1'
-              name: 'PostgreSQL: Failed to get items'
-              event_name: 'PostgreSQL: Failed to get items (no data for 30m)'
+              name: 'Failed to get items'
+              event_name: 'Failed to get items (no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               dependencies:
-                - name: 'PostgreSQL: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 70a7581fabd14e05bda762b79811187c
-          name: 'PostgreSQL: Cache hit ratio, %'
+          name: 'Cache hit ratio, %'
           key: 'pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 7d
           value_type: FLOAT
@@ -320,15 +320,15 @@ zabbix_export:
           triggers:
             - uuid: 4d87cc71b40f4b59ad27f30f33b15a69
               expression: 'max(/PostgreSQL by Zabbix agent/pgsql.cache.hit["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m) < {$PG.CACHE_HITRATIO.MIN.WARN}'
-              name: 'PostgreSQL: Cache hit ratio too low'
-              event_name: 'PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)'
+              name: 'Cache hit ratio too low'
+              event_name: 'Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)'
               priority: WARNING
               description: 'Cache hit ratio is lower than {$PG.CACHE_HITRATIO.MIN.WARN} for 5m.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 248cbe5067324b9ca435f2aced5e2a5f
-          name: 'PostgreSQL: Config hash'
+          name: 'Config hash'
           key: 'pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           delay: 15m
           history: 7d
@@ -345,7 +345,7 @@ zabbix_export:
           triggers:
             - uuid: b727cfa6d3de4063b6a2dcb6cc84e27b
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#1)<>last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#2) and length(last(/PostgreSQL by Zabbix agent/pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]))>0'
-              name: 'PostgreSQL: Configuration has changed'
+              name: 'Configuration has changed'
               priority: INFO
               description: 'PostgreSQL configuration has changed.'
               tags:
@@ -453,8 +453,8 @@ zabbix_export:
           triggers:
             - uuid: 54ef12b8ff1e4383a3097c71478ceefa
               expression: 'min(/PostgreSQL by Zabbix agent/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
-              name: 'PostgreSQL: Total number of connections is too high'
-              event_name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
+              name: 'Total number of connections is too high'
+              event_name: 'Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
               priority: AVERAGE
               description: 'Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).'
               tags:
@@ -479,7 +479,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: b0da0c4856a645ca8ef03405d2d8d4a5
-          name: 'PostgreSQL: Get connections sum'
+          name: 'Get connections sum'
           key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: '0'
           trends: '0'
@@ -491,7 +491,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: b44f263fb33e461e8c3d700fb7688c7b
-          name: 'PostgreSQL: Get dbstat'
+          name: 'Get dbstat'
           key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: '0'
           trends: '0'
@@ -503,7 +503,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7cee21f6225340ef80e9cdef7ce20b10
-          name: 'PostgreSQL: Get locks'
+          name: 'Get locks'
           key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: '0'
           trends: '0'
@@ -515,7 +515,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f42bd73b3af6451b8a3a6113dcc1b675
-          name: 'PostgreSQL: Ping time'
+          name: 'Ping time'
           key: 'pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 7d
           value_type: FLOAT
@@ -537,12 +537,12 @@ zabbix_export:
           triggers:
             - uuid: e19b5630737b4c63886b5df77a3c748c
               expression: 'min(/PostgreSQL by Zabbix agent/pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m) > {$PG.PING_TIME.MAX.WARN}'
-              name: 'PostgreSQL: Response too long'
-              event_name: 'PostgreSQL: Response too long (over {$PG.PING_TIME.MAX.WARN})'
+              name: 'Response too long'
+              event_name: 'Response too long (over {$PG.PING_TIME.MAX.WARN})'
               priority: AVERAGE
               description: 'Response is taking too long (over {$PG.PING_TIME.MAX.WARN} for 5m).'
               dependencies:
-                - name: 'PostgreSQL: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
               tags:
                 - tag: scope
@@ -550,7 +550,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: f5bd615243b344cb88dac1e83436cc85
-          name: 'PostgreSQL: Ping'
+          name: Ping
           key: 'pgsql.ping["{$PG.HOST}","{$PG.PORT}"]'
           history: 7d
           description: 'Used to test a connection to see if it is alive. It is set to 0 if the instance doesn''t accept the connections.'
@@ -571,14 +571,14 @@ zabbix_export:
           triggers:
             - uuid: 6d9c2b5353ce4f6baeeb0f254fb7d1e2
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
-              name: 'PostgreSQL: Service is down'
+              name: 'Service is down'
               priority: HIGH
               description: 'Last test of a connection was unsuccessful.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 47bf580e1e4e48cf9c0e94fcf90288ac
-          name: 'PostgreSQL: Get queries'
+          name: 'Get queries'
           key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
           history: '0'
           trends: '0'
@@ -588,7 +588,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d8a509bd011a4ecda5d439295e257e9d
-          name: 'PostgreSQL: Replication: Standby count'
+          name: 'Replication: Standby count'
           key: 'pgsql.replication.count["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 7d
           description: 'Number of standby servers.'
@@ -596,7 +596,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 21f8bea1141249c7a4dfafad5bc3ef41
-          name: 'PostgreSQL: Replication: Lag in seconds'
+          name: 'Replication: Lag in seconds'
           key: 'pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 7d
           units: s
@@ -607,8 +607,8 @@ zabbix_export:
           triggers:
             - uuid: 11831c52e86445498eed42de6a629b65
               expression: 'min(/PostgreSQL by Zabbix agent/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m) > {$PG.REPL_LAG.MAX.WARN}'
-              name: 'PostgreSQL: Streaming lag with master is too high'
-              event_name: 'PostgreSQL: Streaming lag with master is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
+              name: 'Streaming lag with master is too high'
+              event_name: 'Streaming lag with master is too high (over {$PG.REPL_LAG.MAX.WARN} in 5m)'
               priority: AVERAGE
               description: 'Replication lag with master is higher than {$PG.REPL_LAG.MAX.WARN} for 5m.'
               tags:
@@ -617,7 +617,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 09f696124fca4c5b844bf66c9c912b87
-          name: 'PostgreSQL: Replication: Recovery role'
+          name: 'Replication: Recovery role'
           key: 'pgsql.replication.recovery_role["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 7d
           description: 'Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.'
@@ -627,7 +627,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: d449017462704508a4aad51a6b45fb30
-          name: 'PostgreSQL: Replication: Status'
+          name: 'Replication: Status'
           key: 'pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 7d
           description: 'Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.'
@@ -639,7 +639,7 @@ zabbix_export:
           triggers:
             - uuid: aef1e1d2bab540f8ab738b4a3fad863c
               expression: 'max(/PostgreSQL by Zabbix agent/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m)=0'
-              name: 'PostgreSQL: Replication is down'
+              name: 'Replication is down'
               priority: AVERAGE
               description: 'Replication is enabled and data streaming was down for 5m.'
               tags:
@@ -718,7 +718,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: ff26a1c256bd40978f49a7a025538aa1
-          name: 'PostgreSQL: Get transactions'
+          name: 'Get transactions'
           key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: '0'
           trends: '0'
@@ -728,7 +728,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 6418a2f286e64ecabf2295fca063f8af
-          name: 'PostgreSQL: Uptime'
+          name: Uptime
           key: 'pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 7d
           units: uptime
@@ -739,15 +739,15 @@ zabbix_export:
           triggers:
             - uuid: 85565aba402740868a16c0e4639a98fc
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]) < 10m'
-              name: 'PostgreSQL: Service has been restarted'
-              event_name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
+              name: 'Service has been restarted'
+              event_name: 'Service has been restarted (uptime < 10m)'
               priority: AVERAGE
               description: 'PostgreSQL uptime is less than 10 minutes.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 321525ebcea44396922e96deec2e8ad1
-          name: 'PostgreSQL: Version'
+          name: Version
           key: 'pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           delay: 15m
           history: 7d
@@ -764,8 +764,8 @@ zabbix_export:
           triggers:
             - uuid: 8111eb42b0e74fffb43da474677ebc2f
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#1)<>last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#2) and length(last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]))>0'
-              name: 'PostgreSQL: Version has changed'
-              event_name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               tags:
                 - tag: scope
@@ -787,7 +787,7 @@ zabbix_export:
             - tag: component
               value: wal
         - uuid: 7cd6c524ecab41f9a22489866d503361
-          name: 'PostgreSQL: Get WAL'
+          name: 'Get WAL'
           key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           delay: 5m
           history: '0'
@@ -1737,7 +1737,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1753,7 +1753,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graphprototype
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1769,7 +1769,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1785,7 +1785,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graphprototype
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1800,8 +1800,8 @@ zabbix_export:
                       name: reference
                       value: AAAAG
                 - type: graphprototype
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1816,9 +1816,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1833,9 +1833,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1850,9 +1850,9 @@ zabbix_export:
                       name: reference
                       value: AAAAF
                 - type: graphprototype
-                  x: '12'
+                  x: '36'
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1871,7 +1871,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1884,7 +1884,7 @@ zabbix_export:
                       value: AAAAI
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1897,7 +1897,7 @@ zabbix_export:
                       value: AAAAK
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1910,7 +1910,7 @@ zabbix_export:
                       value: AAAAM
                 - type: graph
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1922,8 +1922,8 @@ zabbix_export:
                       name: reference
                       value: AAAAO
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1935,9 +1935,9 @@ zabbix_export:
                       name: reference
                       value: AAAAJ
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1949,9 +1949,9 @@ zabbix_export:
                       name: reference
                       value: AAAAL
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1963,9 +1963,9 @@ zabbix_export:
                       name: reference
                       value: AAAAN
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

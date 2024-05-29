@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcachehistory.h"
@@ -70,8 +65,8 @@ static zbx_history_sync_f	sync_history_cb = NULL;
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
-/* the maximum number of characters for history cache values */
-#define ZBX_HISTORY_VALUE_LEN	(1024 * 64)
+/* the maximum number of characters for history cache values (except binary) */
+#define ZBX_HISTORY_VALUE_LEN		(1024 * 64)
 
 typedef struct
 {
@@ -2030,7 +2025,10 @@ static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_u
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, ZBX_HISTORY_VALUE_LEN) + 1;
+		size_t	maxlen = (ITEM_VALUE_TYPE_BIN == item_value_type ? ZBX_HISTORY_BIN_VALUE_LEN :
+				ZBX_HISTORY_VALUE_LEN);
+
+		item_value->value.value_str.len = (size_t)zbx_db_strlen_n(value_orig, maxlen) + 1;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
 
 		item_value->value.value_str.pvalue = string_values_offset;

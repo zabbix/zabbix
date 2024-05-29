@@ -78,16 +78,16 @@ Servername=<instanceip>;Port=5432;Driver=/usr/lib64/psqlodbcw.so;SSLmode=require
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PostgreSQL: Get bgwriter|<p>Collect all metrics from pg_stat_bgwriter:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p>|Database monitor|db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Get archive|<p>Collect archive status metrics.</p>|Database monitor|db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Get dbstat|<p>Collect all metrics from pg_stat_database per database:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Database monitor|db.odbc.select[pgsql.dbstat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Get dbstat sum|<p>Collect all metrics from pg_stat_database as sums for all databases:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Database monitor|db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Get connections sum|<p>Collect all metrics from pg_stat_activity:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p>|Database monitor|db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Get WAL|<p>Collect write-ahead log (WAL) metrics.</p>|Database monitor|db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Get locks|<p>Collect all metrics from pg_locks per database:</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p>|Database monitor|db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Get replication|<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p>|Database monitor|db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|PostgreSQL: Get queries|<p>Collect all metrics by query execution time.</p>|Database monitor|db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Version|<p>PostgreSQL version.</p>|Database monitor|db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Get bgwriter|<p>Collect all metrics from pg_stat_bgwriter:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p>|Database monitor|db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Get archive|<p>Collect archive status metrics.</p>|Database monitor|db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Get dbstat|<p>Collect all metrics from pg_stat_database per database:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Database monitor|db.odbc.select[pgsql.dbstat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Get dbstat sum|<p>Collect all metrics from pg_stat_database as sums for all databases:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Database monitor|db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Get connections sum|<p>Collect all metrics from pg_stat_activity:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p>|Database monitor|db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Get WAL|<p>Collect write-ahead log (WAL) metrics.</p>|Database monitor|db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Get locks|<p>Collect all metrics from pg_locks per database:</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p>|Database monitor|db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Get replication|<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p>|Database monitor|db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get queries|<p>Collect all metrics by query execution time.</p>|Database monitor|db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Version|<p>PostgreSQL version.</p>|Database monitor|db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |WAL: Bytes written|<p>WAL write, in bytes.</p>|Dependent item|pgsql.wal.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write`</p></li><li>Change per second</li></ul>|
 |WAL: Bytes received|<p>WAL receive, in bytes.</p>|Dependent item|pgsql.wal.receive<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.receive`</p></li><li>Change per second</li></ul>|
 |WAL: Segments count|<p>Number of WAL segments.</p>|Dependent item|pgsql.wal.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
@@ -131,26 +131,26 @@ Servername=<instanceip>;Port=5432;Driver=/usr/lib64/psqlodbcw.so;SSLmode=require
 |Connections sum: Waiting|<p>Total number of waiting connections:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</p>|Dependent item|pgsql.connections.sum.waiting<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.waiting`</p></li></ul>|
 |Connections sum: Idle in transaction (aborted)|<p>Total number of connections in a transaction state but not executing a query, and where one of the statements in the transaction caused an error.</p>|Dependent item|pgsql.connections.sum.idle_in_transaction_aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idle_in_transaction_aborted`</p></li></ul>|
 |Connections sum: Disabled|<p>Total number of disabled connections.</p>|Dependent item|pgsql.connections.sum.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disabled`</p></li></ul>|
-|PostgreSQL: Age of oldest xid|<p>Age of oldest xid.</p>|Database monitor|db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Database monitor|db.odbc.select[pgsql.autovacuum.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Cache hit ratio, %|<p>Cache hit ratio.</p>|Calculated|pgsql.cache.hit|
-|PostgreSQL: Uptime|<p>Time since the server started.</p>|Database monitor|db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Replication: Lag in bytes|<p>Replication lag with master, in bytes.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.b,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.sec,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.recovery_role,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Replication: Standby count|<p>Number of standby servers.</p>|Database monitor|db.odbc.select[pgsql.replication.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.status,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
-|PostgreSQL: Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.</p>|Database monitor|db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Age of oldest xid|<p>Age of oldest xid.</p>|Database monitor|db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Database monitor|db.odbc.select[pgsql.autovacuum.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Cache hit ratio, %|<p>Cache hit ratio.</p>|Calculated|pgsql.cache.hit|
+|Uptime|<p>Time since the server started.</p>|Database monitor|db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Replication: Lag in bytes|<p>Replication lag with master, in bytes.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.b,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.sec,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.recovery_role,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Replication: Standby count|<p>Number of standby servers.</p>|Database monitor|db.odbc.select[pgsql.replication.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.status,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.</p>|Database monitor|db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PostgreSQL: Version has changed||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]))>0`|Info||
-|PostgreSQL: Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by ODBC/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
-|PostgreSQL: Oldest xid is too big||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) > 18000000`|Average||
-|PostgreSQL: Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) < 10m`|Average||
-|PostgreSQL: Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"])=0`|High||
+|Version has changed||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]))>0`|Info||
+|Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by ODBC/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
+|Oldest xid is too big||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) > 18000000`|Average||
+|Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) < 10m`|Average||
+|Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"])=0`|High||
 
 ### LLD rule Replication discovery
 
