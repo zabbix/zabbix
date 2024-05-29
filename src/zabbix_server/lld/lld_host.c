@@ -730,30 +730,30 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 
 static zbx_hash_t	lld_host_host_hash(const void *d)
 {
-	const zbx_lld_host_t	*host = *(const zbx_lld_host_t **)d;
+	const zbx_lld_host_t	*host = *(const zbx_lld_host_t *const *)d;
 
 	return ZBX_DEFAULT_STRING_HASH_FUNC(host->host);
 }
 
 static int	lld_host_host_compare(const void *d1, const void *d2)
 {
-	const zbx_lld_host_t	*host1 = *(const zbx_lld_host_t **)d1;
-	const zbx_lld_host_t	*host2 = *(const zbx_lld_host_t **)d2;
+	const zbx_lld_host_t	*host1 = *(const zbx_lld_host_t * const *)d1;
+	const zbx_lld_host_t	*host2 = *(const zbx_lld_host_t * const *)d2;
 
 	return strcmp(host1->host, host2->host);
 }
 
 static zbx_hash_t	lld_host_name_hash(const void *d)
 {
-	const zbx_lld_host_t	*host = *(const zbx_lld_host_t **)d;
+	const zbx_lld_host_t	*host = *(const zbx_lld_host_t * const *)d;
 
 	return ZBX_DEFAULT_STRING_HASH_FUNC(host->name);
 }
 
 static int	lld_host_name_compare(const void *d1, const void *d2)
 {
-	const zbx_lld_host_t	*host1 = *(const zbx_lld_host_t **)d1;
-	const zbx_lld_host_t	*host2 = *(const zbx_lld_host_t **)d2;
+	const zbx_lld_host_t	*host1 = *(const zbx_lld_host_t * const *)d1;
+	const zbx_lld_host_t	*host2 = *(const zbx_lld_host_t * const *)d2;
 
 	return strcmp(host1->name, host2->name);
 }
