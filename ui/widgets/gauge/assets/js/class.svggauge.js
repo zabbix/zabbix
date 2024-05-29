@@ -724,6 +724,16 @@ class CSVGGauge {
 		if (this.#config.units.show) {
 			this.#elements.value_and_units.units.container.textContent = value !== null ? units_text : '';
 
+			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BEFORE
+					|| this.#config.units.position === CSVGGauge.UNITS_POSITION_AFTER) {
+				if (units_text !== null) {
+					this.#elements.value_and_units.space.container.style.display = '';
+				}
+				else {
+					this.#elements.value_and_units.space.container.style.display = 'none';
+				}
+			}
+
 			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_ABOVE
 					|| this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW) {
 
