@@ -542,10 +542,16 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 #else	/* !defined(_WINDOWS) && !defined(__MINGW32__) */
 
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+
 #ifdef HAVE_RES_NDESTROY
 #	define zbx_free_res(ptr) res_ndestroy(ptr);
 #else
 #	define zbx_free_res(ptr) res_nclose(ptr);
+#endif
+
+#else
+#	define zbx_free_res(ptr)
 #endif
 
 #if defined(HAVE_RES_NINIT) && !defined(_AIX)
