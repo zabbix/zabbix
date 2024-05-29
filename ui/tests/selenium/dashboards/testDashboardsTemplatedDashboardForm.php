@@ -3695,7 +3695,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'Column' => [
 						'Name' => 'Column1',
-						'Item' => self::TEMPLATE_ITEM
+						'Item' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
@@ -3711,7 +3714,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'Column' => [
 						'Name' => 'Column1',
-						'Item' => self::TEMPLATE_ITEM
+						'Item' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
@@ -3730,7 +3736,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'Column' => [
 						'Name' => 'Column1',
-						'Item' => self::TEMPLATE_ITEM
+						'Item' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
 					]
 				]
 			],

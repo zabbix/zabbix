@@ -1866,6 +1866,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						'Time period' => 'Widget',
 						'Widget' => 'Classic graph for time period reference'
 					],
+					'clear_custom' => true,
 					'Columns' => [
 						[
 							'fields' => [
@@ -1938,6 +1939,17 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				$form->waitUntilReloaded();
 			}
 		}
+
+		// Reset custom period fields to defaults, because they are saved from previous cases.
+		if ($update && CTestArrayHelper::get($data, 'clear_custom', false)) {
+			$form->fill([
+				'Advanced configuration' => true,
+				'Time period' => 'Custom',
+				'From' => 'now-1h',
+				'To' => 'now'
+			]);
+		}
+
 		$form->fill($data['fields']);
 
 		// Fill time period with data From: now, To: now +/- time shift in human-readable format.
