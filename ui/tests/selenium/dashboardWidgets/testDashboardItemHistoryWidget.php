@@ -54,13 +54,13 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	 * because it can change.
 	 */
 	protected $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid'.
-			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid';
+	' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+	' w.width, w.height'.
+	' FROM widget_field wf'.
+	' INNER JOIN widget w'.
+	' ON w.widgetid=wf.widgetid'.
+	' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+	' wf.value_itemid, wf.value_graphid';
 
 	public static function prepareData() {
 		// Create host for widget header and data tests.
@@ -394,7 +394,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 
 		$refresh_interval = ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
-				'2 minutes', '10 minutes', '15 minutes'];
+				'2 minutes', '10 minutes', '15 minutes'
+		];
 		$this->assertEquals($refresh_interval, $form->getField('Refresh interval')->getOptions()->asText());
 
 		// Check Column popup.
@@ -2184,7 +2185,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			'Item' => [
 				'values' => 'Test Item history',
 				'context' => ['values' => 'Simple host with item for Item history widget']
-		]]);
+			]
+		]);
 		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay->waitUntilNotVisible();
 		$form->waitUntilReloaded();
