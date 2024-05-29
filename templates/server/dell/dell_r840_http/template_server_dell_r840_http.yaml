@@ -20,7 +20,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 57f456366d3442f394ea3524c1f2855b
-          name: 'Dell R840: Firmware version'
+          name: 'Firmware version'
           type: DEPENDENT
           key: dell.server.hw.firmware
           delay: '0'
@@ -43,7 +43,7 @@ zabbix_export:
           triggers:
             - uuid: 9fa14edc793842ba8858dd09d1c3058c
               expression: 'last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware,#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware,#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware))>0'
-              name: 'Dell R840: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -52,7 +52,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 0002bc9eaeb34479819b027f58460970
-          name: 'Dell R840: Hardware model name'
+          name: 'Hardware model name'
           type: DEPENDENT
           key: dell.server.hw.model
           delay: '0'
@@ -74,7 +74,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5031003a95fe4a23a3a706813f1221c4
-          name: 'Dell R840: Hardware serial number'
+          name: 'Hardware serial number'
           type: DEPENDENT
           key: dell.server.hw.serialnumber
           delay: '0'
@@ -98,8 +98,8 @@ zabbix_export:
           triggers:
             - uuid: 5932f468c8614187aefc284a5c2e1475
               expression: 'last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber))>0'
-              name: 'Dell R840: Device has been replaced'
-              event_name: 'Dell R840: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -107,7 +107,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: de315f6a1fd44475a7c5a84ae337f37c
-          name: 'Dell R840: Overall system health status'
+          name: 'Overall system health status'
           type: DEPENDENT
           key: dell.server.status
           delay: '0'
@@ -132,7 +132,7 @@ zabbix_export:
           triggers:
             - uuid: 41fac4cfc084411081db8d7a4b81e18d
               expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Critical")=1'
-              name: 'Dell R840: Server is in a critical state'
+              name: 'Server is in a critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults.'
@@ -141,18 +141,18 @@ zabbix_export:
                   value: availability
             - uuid: 60a19490be4142be800a8a9fc2c3917d
               expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Warning")=1'
-              name: 'Dell R840: Server is in warning state'
+              name: 'Server is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings.'
               dependencies:
-                - name: 'Dell R840: Server is in a critical state'
+                - name: 'Server is in a critical state'
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Critical")=1'
               tags:
                 - tag: scope
                   value: availability
         - uuid: b7f3a7fba3924e7ab12d692b62dccda5
-          name: 'Dell R840: Get system'
+          name: 'Get system'
           type: HTTP_AGENT
           key: dell.server.system.get
           history: '0'
@@ -263,7 +263,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c98a5cd525ea4a93a9c48ba4a817a434
-          name: 'Dell R840: Redfish API'
+          name: 'Redfish API'
           type: SIMPLE
           key: 'net.tcp.service[https]'
           history: 7d
@@ -282,7 +282,7 @@ zabbix_export:
           triggers:
             - uuid: bb504167936543818487aef62bb5bbb1
               expression: 'last(/DELL PowerEdge R840 by HTTP/net.tcp.service[https])=0'
-              name: 'Dell R840: Redfish API service is unavailable'
+              name: 'Redfish API service is unavailable'
               priority: HIGH
               description: 'The service is unavailable or does not accept TCP connections.'
               tags:
@@ -300,7 +300,7 @@ zabbix_export:
           description: 'Discovery of a cache of disk array controllers.'
           item_prototypes:
             - uuid: 12b53eaff1194969addf13ae2d47fbdf
-              name: 'Dell R840: {#BATTERY_NAME} Status'
+              name: '{#BATTERY_NAME} Status'
               type: HTTP_AGENT
               key: 'dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}]'
               history: 7d
@@ -326,7 +326,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 4e8f7f543ff9448ba091117548a7957c
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
-                  name: 'Dell R840: {#BATTERY_NAME} is in a critical state'
+                  name: '{#BATTERY_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
@@ -335,12 +335,12 @@ zabbix_export:
                       value: availability
                 - uuid: 76035c29874c4ad5912737230b0fcfcb
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Warning")=1'
-                  name: 'Dell R840: {#BATTERY_NAME} is in warning state'
+                  name: '{#BATTERY_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    - name: 'Dell R840: {#BATTERY_NAME} is in a critical state'
+                    - name: '{#BATTERY_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
                   tags:
                     - tag: scope
@@ -459,7 +459,7 @@ zabbix_export:
           description: 'Discovery of disk array controllers.'
           item_prototypes:
             - uuid: e679f6d481ac411fa6d5ffd7d8293e14
-              name: 'Dell R840: {#CNTLR_NAME} in slot {#SLOT} Status'
+              name: '{#CNTLR_NAME} in slot {#SLOT} Status'
               type: HTTP_AGENT
               key: 'dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}]'
               history: 7d
@@ -485,7 +485,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 94f468fe3f8142b4903a4e4f7186d5f8
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
-                  name: 'Dell R840: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
+                  name: '{#CNTLR_NAME} in slot {#SLOT} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
@@ -494,12 +494,12 @@ zabbix_export:
                       value: availability
                 - uuid: 9b4f65ee67b748469d4226d556211de1
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Warning")=1'
-                  name: 'Dell R840: {#CNTLR_NAME} in slot {#SLOT} is in warning state'
+                  name: '{#CNTLR_NAME} in slot {#SLOT} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    - name: 'Dell R840: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
+                    - name: '{#CNTLR_NAME} in slot {#SLOT} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
                   tags:
                     - tag: scope
@@ -619,7 +619,7 @@ zabbix_export:
           description: 'Discovery of FAN sensors.'
           item_prototypes:
             - uuid: 2099dd04605646ecacaba58e1defa4f2
-              name: 'Dell R840: {#SENSOR_NAME} Get sensor'
+              name: '{#SENSOR_NAME} Get sensor'
               type: HTTP_AGENT
               key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               history: '0'
@@ -636,7 +636,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 76a021e37c19459fa224fa1ec694a8da
-              name: 'Dell R840: {#SENSOR_NAME} Speed'
+              name: '{#SENSOR_NAME} Speed'
               type: DEPENDENT
               key: 'dell.server.sensor.fan.speed[{#SENSOR_NAME}]'
               delay: '0'
@@ -653,7 +653,7 @@ zabbix_export:
                 - tag: component
                   value: fan
             - uuid: 77ea551bc11949b59ce5a653d3823f99
-              name: 'Dell R840: {#SENSOR_NAME} Status'
+              name: '{#SENSOR_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.sensor.fan.status[{#SENSOR_NAME}]'
               delay: '0'
@@ -676,7 +676,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 45d2e75c18b34f5aa1e46296d71debe4
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
-                  name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
+                  name: '{#SENSOR_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
@@ -685,12 +685,12 @@ zabbix_export:
                       value: availability
                 - uuid: 9b5b5fd923624f05bb7c9cce28f29116
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Warning")=1'
-                  name: 'Dell R840: {#SENSOR_NAME} is in warning state'
+                  name: '{#SENSOR_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    - name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
+                    - name: '{#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   tags:
                     - tag: scope
@@ -791,7 +791,7 @@ zabbix_export:
           description: 'The NetworkInterface schema describes links to the NetworkAdapter and represents the functionality available to the containing system.'
           item_prototypes:
             - uuid: 412f27eb6d014433a98c0b1eeb5dacb7
-              name: 'Dell R840: {#IFNAME} Get interface'
+              name: '{#IFNAME} Get interface'
               type: HTTP_AGENT
               key: 'dell.server.net.if.get[{#IFNAME}]'
               history: '0'
@@ -808,7 +808,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: c633aac31c3d45738007dac60f538950
-              name: 'Dell R840: {#IFNAME} Status'
+              name: '{#IFNAME} Status'
               type: DEPENDENT
               key: 'dell.server.net.if.health[{#IFNAME}]'
               delay: '0'
@@ -831,7 +831,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: f46e4a69e41a42d091f378d7dc0fa3c2
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
-                  name: 'Dell R840: {#IFNAME} is in a critical state'
+                  name: '{#IFNAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
@@ -840,18 +840,18 @@ zabbix_export:
                       value: availability
                 - uuid: e325ba5c20834fa6ad7db6cb2a12a927
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Warning")=1'
-                  name: 'Dell R840: {#IFNAME} is in warning state'
+                  name: '{#IFNAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    - name: 'Dell R840: {#IFNAME} is in a critical state'
+                    - name: '{#IFNAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: f784b9a5e50549dab4fd3522998ae65d
-              name: 'Dell R840: {#IFNAME} Speed'
+              name: '{#IFNAME} Speed'
               type: DEPENDENT
               key: 'dell.server.net.if.speed[{#IFNAME}]'
               delay: '0'
@@ -871,7 +871,7 @@ zabbix_export:
                 - tag: component
                   value: network
             - uuid: 7b948100c1c14ec18c676d5b53e04fd7
-              name: 'Dell R840: {#IFNAME} State'
+              name: '{#IFNAME} State'
               type: DEPENDENT
               key: 'dell.server.net.if.state[{#IFNAME}]'
               delay: '0'
@@ -892,7 +892,7 @@ zabbix_export:
                 - tag: component
                   value: network
             - uuid: c9412c81178a4e4c81b87163d0d47ae9
-              name: 'Dell R840: {#IFNAME} Link status'
+              name: '{#IFNAME} Link status'
               type: DEPENDENT
               key: 'dell.server.net.if.status[{#IFNAME}]'
               delay: '0'
@@ -917,7 +917,7 @@ zabbix_export:
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")="Down" and last(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")<>"Down" or {$IFCONTROL:"{#IFNAME}"}=0'
-                  name: 'Dell R840: {#IFNAME} Link down'
+                  name: '{#IFNAME} Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -1047,7 +1047,7 @@ zabbix_export:
           description: 'Discovery of physical disks.'
           item_prototypes:
             - uuid: 429273af827045d1b4914ab41bcefcf1
-              name: 'Dell R840: {#DISK_NAME} Get disk'
+              name: '{#DISK_NAME} Get disk'
               type: HTTP_AGENT
               key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               history: '0'
@@ -1066,7 +1066,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: d3cd9e2c0b7745ebb069e3d7bba8f4ae
-              name: 'Dell R840: {#DISK_NAME} Media type'
+              name: '{#DISK_NAME} Media type'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.media_type[{#DISK_NAME}]'
               delay: '0'
@@ -1089,7 +1089,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 941a692ea9dd4246ad990f8926e267ab
-              name: 'Dell R840: {#DISK_NAME} Model name'
+              name: '{#DISK_NAME} Model name'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.model[{#DISK_NAME}]'
               delay: '0'
@@ -1112,7 +1112,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 6af8448b44614fecbf532fac3a0a8e49
-              name: 'Dell R840: {#DISK_NAME} Serial number'
+              name: '{#DISK_NAME} Serial number'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]'
               delay: '0'
@@ -1137,8 +1137,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 859aeaa7bebb4958ac82b19d787a1d34
                   expression: 'last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0'
-                  name: 'Dell R840: {#DISK_NAME} has been replaced'
-                  event_name: 'Dell R840: {#DISK_NAME} has been replaced (new serial number received)'
+                  name: '{#DISK_NAME} has been replaced'
+                  event_name: '{#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -1146,7 +1146,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 3a9ce45d4ced4053b52f68453705066d
-              name: 'Dell R840: {#DISK_NAME} Size'
+              name: '{#DISK_NAME} Size'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.size[{#DISK_NAME}]'
               delay: '0'
@@ -1169,7 +1169,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 03ef4df980114b6aaa42e5ae965813b9
-              name: 'Dell R840: {#DISK_NAME} Status'
+              name: '{#DISK_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.status[{#DISK_NAME}]'
               delay: '0'
@@ -1194,7 +1194,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 92c13e7385be48f898a74ee54d8ec382
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
-                  name: 'Dell R840: {#DISK_NAME} is in a critical state'
+                  name: '{#DISK_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
@@ -1203,12 +1203,12 @@ zabbix_export:
                       value: availability
                 - uuid: a1c432739ea942c7a7463531d4b268c9
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Warning")=1'
-                  name: 'Dell R840: {#DISK_NAME} is in warning state'
+                  name: '{#DISK_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    - name: 'Dell R840: {#DISK_NAME} is in a critical state'
+                    - name: '{#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
                   tags:
                     - tag: scope
@@ -1329,7 +1329,7 @@ zabbix_export:
           description: 'Discovery of PSU sensors.'
           item_prototypes:
             - uuid: 74024c4d58b64da18551a96c9bcf8b0b
-              name: 'Dell R840: {#SENSOR_NAME} Get sensor'
+              name: '{#SENSOR_NAME} Get sensor'
               type: HTTP_AGENT
               key: 'dell.server.sensor.psu.get[{#SENSOR_NAME}]'
               history: '0'
@@ -1346,7 +1346,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: c9ea5871c9214aa1986bf0f2b78ad47c
-              name: 'Dell R840: {#SENSOR_NAME} Status'
+              name: '{#SENSOR_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.sensor.psu.status[{#SENSOR_NAME}]'
               delay: '0'
@@ -1369,7 +1369,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 4b381c89bf0e41f1843eff537f20db34
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
-                  name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
+                  name: '{#SENSOR_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
@@ -1378,12 +1378,12 @@ zabbix_export:
                       value: availability
                 - uuid: 4f72a8417a9048449ab56353c27fe0b7
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Warning")=1'
-                  name: 'Dell R840: {#SENSOR_NAME} is in warning state'
+                  name: '{#SENSOR_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    - name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
+                    - name: '{#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   tags:
                     - tag: scope
@@ -1498,7 +1498,7 @@ zabbix_export:
           description: 'Discovery of temperature sensors.'
           item_prototypes:
             - uuid: a6dec856a1394b62b31897d697e9c0ed
-              name: 'Dell R840: {#SENSOR_NAME} Get sensor'
+              name: '{#SENSOR_NAME} Get sensor'
               type: HTTP_AGENT
               key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               history: '0'
@@ -1515,7 +1515,7 @@ zabbix_export:
                 - tag: component
                   value: temperature
             - uuid: e2a386c8abfa4bcdac269d780bcc4ee9
-              name: 'Dell R840: {#SENSOR_NAME} Status'
+              name: '{#SENSOR_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.sensor.temp.status[{#SENSOR_NAME}]'
               delay: '0'
@@ -1538,7 +1538,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 8611c1a1594a45318da88cd556db6310
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
-                  name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
+                  name: '{#SENSOR_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
@@ -1547,18 +1547,18 @@ zabbix_export:
                       value: availability
                 - uuid: 9f9ff19a71274eef890776c942b3dfa1
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Warning")=1'
-                  name: 'Dell R840: {#SENSOR_NAME} is in warning state'
+                  name: '{#SENSOR_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    - name: 'Dell R840: {#SENSOR_NAME} is in a critical state'
+                    - name: '{#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 2de5e243052b4adf86921ea83ef33026
-              name: 'Dell R840: {#SENSOR_NAME} Value'
+              name: '{#SENSOR_NAME} Value'
               type: DEPENDENT
               key: 'dell.server.sensor.temp.value[{#SENSOR_NAME}]'
               delay: '0'
@@ -1685,7 +1685,7 @@ zabbix_export:
           description: 'Discovery of virtual disks.'
           item_prototypes:
             - uuid: ef158ff3dd4644c3b00ead75590d4a22
-              name: 'Dell R840: {#DISK_NAME} Get disk'
+              name: '{#DISK_NAME} Get disk'
               type: HTTP_AGENT
               key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               history: '0'
@@ -1702,7 +1702,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 736e0df33a1a44b99cdf8c93f12db99a
-              name: 'Dell R840: {#DISK_NAME} RAID status'
+              name: '{#DISK_NAME} RAID status'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.raidstatus[{#DISK_NAME}]'
               delay: '0'
@@ -1725,7 +1725,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 1247bccb744a4b8b81c4d98c275dbf96
-              name: 'Dell R840: {#DISK_NAME} Read policy'
+              name: '{#DISK_NAME} Read policy'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.readpolicy[{#DISK_NAME}]'
               delay: '0'
@@ -1748,7 +1748,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 9e299d9046de421e8c35a64894ee8f34
-              name: 'Dell R840: {#DISK_NAME} Size'
+              name: '{#DISK_NAME} Size'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.size[{#DISK_NAME}]'
               delay: '0'
@@ -1771,7 +1771,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: e0ac8a63aa634240941b2497d40c7d1f
-              name: 'Dell R840: {#DISK_NAME} Current state'
+              name: '{#DISK_NAME} Current state'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.state[{#DISK_NAME}]'
               delay: '0'
@@ -1794,7 +1794,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 1bb3f5e218bf4f1d984e160bb8e4a169
-              name: 'Dell R840: {#DISK_NAME} Status'
+              name: '{#DISK_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.status[{#DISK_NAME}]'
               delay: '0'
@@ -1819,7 +1819,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6c9e68f155634b9e95beeaf4cbf06ce2
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
-                  name: 'Dell R840: {#DISK_NAME} is in a critical state'
+                  name: '{#DISK_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
@@ -1828,18 +1828,18 @@ zabbix_export:
                       value: availability
                 - uuid: ceb271b06657474aa9a9b0c4c7462474
                   expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Warning")=1'
-                  name: 'Dell R840: {#DISK_NAME} is in warning state'
+                  name: '{#DISK_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    - name: 'Dell R840: {#DISK_NAME} is in a critical state'
+                    - name: '{#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 5b5679210d5f4f9e915d20a0e529b338
-              name: 'Dell R840: {#DISK_NAME} Write policy'
+              name: '{#DISK_NAME} Write policy'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.writepolicy[{#DISK_NAME}]'
               delay: '0'

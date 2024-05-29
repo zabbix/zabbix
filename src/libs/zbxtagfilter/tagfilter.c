@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxtagfilter.h"
@@ -23,7 +18,7 @@
 #include "zbxdbhigh.h"	// for ZBX_CONDITION_EVAL_TYPE_*
 #include "zbxalgo.h"
 
-ZBX_PTR_VECTOR_IMPL(match_tags, zbx_match_tag_t*)
+ZBX_PTR_VECTOR_IMPL(match_tags_ptr, zbx_match_tag_t*)
 
 static int	match_single_tag(const zbx_match_tag_t *mtag, zbx_tag_t * const *tags, int tags_num)
 {
@@ -74,7 +69,7 @@ static int	match_single_tag(const zbx_match_tag_t *mtag, zbx_tag_t * const *tags
  *               FAIL    - no matching tags found                             *
  *                                                                            *
  ******************************************************************************/
-static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags,
+static int	match_tag_range(const zbx_vector_match_tags_ptr_t *mtags, const zbx_vector_tags_ptr_t *etags,
 		int *mt_pos, int *et_pos)
 {
 	const char	*tag_name;
@@ -158,7 +153,7 @@ static int	match_tag_range(const zbx_vector_match_tags_t *mtags, const zbx_vecto
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	match_tags_andor(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags)
+static int	match_tags_andor(const zbx_vector_match_tags_ptr_t *mtags, const zbx_vector_tags_ptr_t *etags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -185,7 +180,7 @@ static int	match_tags_andor(const zbx_vector_match_tags_t *mtags, const zbx_vect
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	match_tags_or(const zbx_vector_match_tags_t *mtags, const zbx_vector_tags_t *etags)
+static int	match_tags_or(const zbx_vector_match_tags_ptr_t *mtags, const zbx_vector_tags_ptr_t *etags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -210,7 +205,8 @@ static int	match_tags_or(const zbx_vector_match_tags_t *mtags, const zbx_vector_
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_match_tags(int eval_type, const zbx_vector_match_tags_t *match_tags, const zbx_vector_tags_t *entity_tags)
+int	zbx_match_tags(int eval_type, const zbx_vector_match_tags_ptr_t *match_tags,
+		const zbx_vector_tags_ptr_t *entity_tags)
 {
 	if (ZBX_CONDITION_EVAL_TYPE_AND_OR != eval_type && ZBX_CONDITION_EVAL_TYPE_OR != eval_type)
 	{

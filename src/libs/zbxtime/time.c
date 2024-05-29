@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxtime.h"
@@ -55,6 +50,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	static ZBX_THREAD_LOCAL LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
+	int					sec_diff;
 #else
 	struct timeval	tv;
 	int		rc = -1;
@@ -142,8 +138,10 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #endif	/* not _WINDOWS */
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
-			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
+	sec_diff = ts->sec - last_ts.sec;
+
+	/* correction window is 1 sec before the corrected last _ftime clock reading */
+	if ((0 == sec_diff && ts->ns <= last_ts.ns) || (-1 == sec_diff && ts->ns > last_ts.ns))
 #else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
 #endif

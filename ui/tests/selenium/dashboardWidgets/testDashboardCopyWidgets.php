@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -45,7 +40,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	// Values for replacing widgets.
 	private static $replaced_widget_name = "Test widget for replace";
-	const REPLACED_WIDGET_SIZE = [ 'width' => '13', 'height' => '8'];
+	const REPLACED_WIDGET_SIZE = [ 'width' => '21', 'height' => '3'];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -145,11 +140,6 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		$replaces = self::$replaced_widget_name;
 
-		// Write name for replacing widget next case.
-		if ($replace) {
-			self::$replaced_widget_name = $widget_name;
-		}
-
 		// Use the appropriate dashboard and page in case of templated dashboard widgets.
 		if ($templated) {
 			$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
@@ -230,6 +220,8 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget_form = $copied_widget->edit();
 			$copied_widget_form->fill(['Map' => 'Test copy Map navigation tree']);
 			$copied_widget_form->submit();
+
+			$copied_widget = $dashboard->getWidget($widget_name);
 		}
 
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
@@ -246,14 +238,18 @@ class testDashboardCopyWidgets extends CWebTest {
 		$this->assertEquals($original_form, $copied_form);
 
 		// Close overlay and save dashboard to get new widget size from DB.
-		$copied_overlay = COverlayDialogElement::find()->one();
-		$copied_overlay->close();
+		COverlayDialogElement::find()->one()->close();
 
 		if ($templated) {
 			$this->query('button:Save changes')->one()->click();
 		}
 		else {
 			$dashboard->save();
+		}
+
+		// Write name for replacing widget next case.
+		if ($replace) {
+			self::$replaced_widget_name = $widget_name;
 		}
 
 		$this->page->waitUntilReady();
@@ -298,7 +294,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
+					'name' => 'Item history widget',
 					'copy to' => 'same page'
 				]
 			],
@@ -334,7 +330,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
+					'name' => 'Item history widget',
 					'copy to' => 'another page'
 				]
 			],
@@ -353,6 +349,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Gauge widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Host navigator widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Item navigator widget',
 					'copy to' => 'another page'
 				]
 			],
@@ -388,7 +396,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
+					'name' => 'Item history widget',
 					'copy to' => 'another dashboard'
 				]
 			],
@@ -413,6 +421,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Gauge widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Host navigator widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Item navigator widget',
 					'copy to' => 'another template'
 				]
 			],
@@ -556,8 +576,8 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'module_name' => 'Plain text',
-					'widget_name' => 'Plain text widget',
+					'module_name' => 'Item history',
+					'widget_name' => 'Item history widget',
 					'action' => 'copy widget',
 					'template' => true
 				]

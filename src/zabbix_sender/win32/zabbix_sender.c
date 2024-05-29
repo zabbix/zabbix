@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zabbix_sender.h"
@@ -47,7 +42,6 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, z
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
 {
-	zbx_socket_t					sock;
 	zbx_config_tls_t				config_tls;
 	int						ret, i;
 	struct zbx_json					json;
@@ -109,22 +103,10 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	memset(&config_tls, 0, sizeof(config_tls));
 	config_tls.connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 
-	if (SUCCEED == (ret = zbx_connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
-		0, 0, &config_tls)))
-	{
-		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
-		{
-			if (SUCCEED == (ret = zbx_tcp_recv(&sock)))
-			{
-				if (NULL != result)
-					*result = zbx_strdup(NULL, sock.buffer);
-			}
-		}
+	ret = zbx_comms_exchange_with_redirect(source, &zbx_addrs, GET_SENDER_TIMEOUT, 30, 0, 0, &config_tls,
+			json.buffer, NULL, NULL, result, NULL);
 
-		zbx_tcp_close(&sock);
-	}
-
-	if (FAIL == ret && NULL != result)
+	if (SUCCEED != ret && NULL != result)
 		*result = zbx_strdup(NULL, zbx_socket_strerror());
 
 	zbx_json_free(&json);

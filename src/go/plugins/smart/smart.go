@@ -1,34 +1,27 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package smart
 
 import (
 	"encoding/json"
-	"fmt"
-	"regexp"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
@@ -57,6 +50,7 @@ type Options struct {
 type Plugin struct {
 	plugin.Base
 	options Options
+	ctl     SmartController
 }
 
 func init() {
@@ -71,8 +65,6 @@ func init() {
 	}
 }
 
-var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
-
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
@@ -82,6 +74,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
 	}
+
+	p.ctl = NewSmartCtl(p.Logger, p.options.Path, p.options.Timeout)
 }
 
 // Validate -
@@ -106,19 +100,19 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case diskDiscovery:
 		jsonArray, err = p.diskDiscovery()
 		if err != nil {
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 		}
 
 	case diskGet:
 		jsonArray, err = p.diskGet(params)
 		if err != nil {
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 		}
 
 	case attributeDiscovery:
 		jsonArray, err = p.attributeDiscovery()
 		if err != nil {
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 		}
 
 	default:
@@ -150,20 +144,13 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 
 	jsonArray, err = json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return
 }
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
-	for _, v := range params {
-		err := clearString(v)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	switch len(params) {
 	case twoParameters:
 		return p.diskGetSingle(params[firstParameter], params[secondParameter])
@@ -177,15 +164,15 @@ func (p *Plugin) diskGet(params []string) ([]byte, error) {
 }
 
 func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
-	executable := path
+	args := []string{"-a", path, "-j"}
 
 	if raidType != "" {
-		executable = fmt.Sprintf("%s -d %s", executable, raidType)
+		args = []string{"-a", path, "-d", raidType, "-j"}
 	}
 
-	device, err := p.executeSingle(executable)
+	device, err := p.ctl.Execute(args...)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to execute smartctl")
 	}
 
 	out, err := setSingleDiskFields(device)
@@ -195,7 +182,7 @@ func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
 
 	jsonArray, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return jsonArray, nil
@@ -215,7 +202,7 @@ func (p *Plugin) diskGetAll() (jsonArray []byte, err error) {
 	if fields == nil {
 		jsonArray, err = json.Marshal([]string{})
 		if err != nil {
-			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 		}
 
 		return
@@ -223,7 +210,7 @@ func (p *Plugin) diskGetAll() (jsonArray []byte, err error) {
 
 	jsonArray, err = json.Marshal(fields)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return
@@ -253,7 +240,7 @@ func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
 
 	jsonArray, err = json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return
@@ -264,12 +251,12 @@ func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
 func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 	attr := make(map[string]interface{})
 	if err = json.Unmarshal(dev, &attr); err != nil {
-		return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	var sd singleDevice
 	if err = json.Unmarshal(dev, &sd); err != nil {
-		return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	diskType := getType(getTypeFromJson(attr), getRateFromJson(attr), getTablesFromJson(attr))
@@ -330,7 +317,7 @@ func setDiskFields(deviceJsons map[string]jsonDevice) (out []interface{}, err er
 	for k, v := range deviceJsons {
 		b := make(map[string]interface{})
 		if err = json.Unmarshal([]byte(v.jsonData), &b); err != nil {
-			return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+			return out, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 		}
 
 		b["disk_name"] = cutPrefix(k)
@@ -448,12 +435,4 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	}
 
 	return ssdType
-}
-
-func clearString(str string) error {
-	if !cleanRegex.MatchString(str) {
-		return zbxerr.New(fmt.Sprintf("invalid characters found in parameter '%s'", str))
-	}
-
-	return nil
 }

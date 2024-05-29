@@ -1468,7 +1468,7 @@ out:
       - value: value 5.7
         ts: 2017-01-10 10:00:05.700000000 +00:00
       status: ZBX_ITEM_STATUS_CACHED_ALL
-      active_range: 0
+      active_range: 1196
       values_total: 15
       db_cached_from: 2017-01-10 10:00:01.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL

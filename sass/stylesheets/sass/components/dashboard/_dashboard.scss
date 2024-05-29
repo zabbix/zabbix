@@ -94,7 +94,8 @@
 				border-radius: 2px;
 
 				@if $ui-transitions {
-					transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
+					transition: background-color $ui-transition-duration,
+								border-color $ui-transition-duration;
 				}
 
 				span {
@@ -246,10 +247,6 @@
 			font-size: $icon-size;
 		}
 
-		.hidden {
-			display: none;
-		}
-
 		div {
 			padding: 0 5px 5px;
 		}
@@ -272,10 +269,6 @@
 		.dashboard-widget-placeholder-box {
 			background-color: rgba($ui-bg-color, .7);
 		}
-	}
-
-	&.hidden {
-		display: none;
 	}
 }
 
@@ -408,6 +401,39 @@
 				bottom: -8px;
 			}
 		}
+
+		&.no-data {
+			&:not(.no-data-without-icon) {
+				height: 100%;
+
+				thead {
+					th, td {
+						height: 1%;
+					}
+				}
+
+				tbody {
+					tr {
+						td {
+							vertical-align: middle;
+						}
+
+						&:last-child {
+							td {
+								border-bottom: 0;
+							}
+						}
+
+						.no-data-message {
+							&[class^="zi-"], &[class*=" zi-"] {
+								margin-top: 0;
+								margin-bottom: 0;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	&.no-padding {
@@ -434,8 +460,12 @@
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
 			height: 0;
-			transition: height $ui-transition-duration, margin-top $ui-transition-duration,
-				box-shadow $ui-transition-duration;
+
+			@if $ui-transitions {
+				transition: height $ui-transition-duration,
+							margin-top $ui-transition-duration,
+							box-shadow $ui-transition-duration;
+			}
 		}
 
 		.dashboard-grid-widget-contents {
@@ -479,20 +509,6 @@
 			opacity: 1;
 		}
 	}
-
-	&.ui-resizable-resizing.resizing-top {
-		.dashboard-grid-widget-container {
-			top: auto;
-			bottom: 0;
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-left {
-		.dashboard-grid-widget-container {
-			left: auto;
-			right: 0;
-		}
-	}
 }
 
 .dashboard-grid-iterator-container {
@@ -521,8 +537,12 @@
 	opacity: 0;
 
 	// Transition for opacity is set for best border disappearance on different themes.
-	transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
-		opacity .15s .15s ease-out, box-shadow $ui-transition-duration ease-out;
+	@if $ui-transitions {
+		transition: margin-top $ui-transition-duration ease-out,
+					height $ui-transition-duration ease-out,
+					opacity .15s .15s ease-out,
+					box-shadow $ui-transition-duration ease-out;
+	}
 
 	// Not to loose hovered header while widget underneath is updating.
 	z-index: 3;
@@ -588,7 +608,9 @@
 	// To allow overflowing of the floating headers of child widgets.
 	overflow: visible;
 
-	transition: margin-top $ui-transition-duration ease-out;
+	@if $ui-transitions {
+		transition: margin-top $ui-transition-duration ease-out;
+	}
 }
 
 .dashboard-grid-iterator-placeholder {
@@ -657,8 +679,11 @@
 			opacity: 1;
 
 			// Not inheriting opacity transition here.
-			transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
-				box-shadow $ui-transition-duration ease-out;
+			@if $ui-transitions {
+				transition: margin-top $ui-transition-duration ease-out,
+							height $ui-transition-duration ease-out,
+							box-shadow $ui-transition-duration ease-out;
+			}
 		}
 
 		.dashboard-grid-iterator-actions {
@@ -670,20 +695,6 @@
 				margin-top: calc(-4rem - 8px);
 				height: calc(4rem + 8px);
 			}
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-top {
-		.dashboard-grid-iterator-container {
-			top: auto;
-			bottom: 0;
-		}
-	}
-
-	&.ui-resizable-resizing.resizing-left {
-		.dashboard-grid-iterator-container {
-			left: auto;
-			right: 0;
 		}
 	}
 
@@ -846,9 +857,11 @@
 			}
 		}
 
-		&:not(.dashboard-grid-widget-focus) {
-			transition-property: width, height, left, top;
-			transition-duration: 0.15s;
+		@if $ui-transitions {
+			&:not(.ui-draggable-dragging):not(.dashboard-grid-widget-focus) {
+				transition-property: height, top;
+				transition-duration: 0.15s;
+			}
 		}
 	}
 
@@ -931,6 +944,20 @@
 				border-top: 0;
 			}
 		}
+
+		@if $ui-transitions {
+			&:not(.ui-draggable-dragging):not(.dashboard-grid-iterator-focus) {
+				transition-property: height, top;
+				transition-duration: 0.15s;
+			}
+
+			.dashboard-grid-widget {
+				&:not(.dashboard-grid-widget-focus) {
+					transition-property: height, top;
+					transition-duration: 0s;
+				}
+			}
+		}
 	}
 
 	.dashboard-grid-widget-placeholder {
@@ -948,20 +975,22 @@
 	}
 }
 
-@keyframes zoom-in-out {
-	0% {
-		transform: scale(1);
+@if $ui-transitions {
+	@keyframes zoom-in-out {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.05);
+		}
+		100% {
+			transform: scale(1);
+		}
 	}
-	50% {
-		transform: scale(1.05);
-	}
-	100% {
-		transform: scale(1);
-	}
-}
 
-.new-widget {
-	animation: zoom-in-out $ui-controls-transition-duration linear;
+	.new-widget {
+		animation: zoom-in-out $ui-controls-transition-duration linear;
+	}
 }
 
 %dashboard-widget-td {

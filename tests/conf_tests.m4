@@ -1,20 +1,15 @@
 #
-# Zabbix
 # Copyright (C) 2001-2024 Zabbix SIA
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# This program is free software: you can redistribute it and/or modify it under the terms of
+# the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Affero General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# You should have received a copy of the GNU Affero General Public License along with this program.
+# If not, see <https://www.gnu.org/licenses/>.
 #
 
 AC_DEFUN([CONF_TESTS],
@@ -57,27 +52,34 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/Makefile
 			tests/libs/zbxalgo/Makefile
 			tests/libs/zbxcommon/Makefile
+			tests/test_zbxcommon/Makefile
 			tests/libs/zbxcomms/Makefile
 			tests/libs/zbxcommshigh/Makefile
 			tests/libs/zbxcfg/Makefile
 			tests/libs/zbxdbcache/Makefile
 			tests/libs/zbxdbhigh/Makefile
 			tests/libs/zbxeval/Makefile
+			tests/libs/zbxexpr/Makefile
+			tests/libs/zbxfile/Makefile
 			tests/libs/zbxhistory/Makefile
 			tests/libs/zbxjson/Makefile
 			tests/libs/zbxmodules/Makefile
+			tests/libs/zbxnum/Makefile
 			tests/libs/zbxpoller/Makefile
+			tests/libs/zbxparam/Makefile
 			tests/libs/zbxpreproc/Makefile
 			tests/libs/zbxprometheus/Makefile
 			tests/libs/zbxregexp/Makefile
 			tests/libs/zbxexpression/Makefile
-			tests/libs/zbxfile/Makefile
 			tests/libs/zbxsysinfo/Makefile
 			tests/libs/zbxsysinfo/common/Makefile
+			tests/libs/zbxstr/Makefile
 			tests/libs/zbxtagfilter/Makefile
 			tests/libs/zbxtrends/Makefile
 			tests/libs/zbxhttp/Makefile
 			tests/libs/zbxtime/Makefile
+			tests/libs/zbxvariant/Makefile
+			tests/libs/zbxxml/Makefile
 			tests/zabbix_server/Makefile
 			tests/zabbix_server/pinger/Makefile
 			tests/zabbix_server/service/Makefile

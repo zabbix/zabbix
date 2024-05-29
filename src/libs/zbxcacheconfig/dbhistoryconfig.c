@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcacheconfig.h"
@@ -27,6 +22,7 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxtagfilter.h"
+#include "proxy_group.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
 
@@ -41,6 +37,7 @@ static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZB
 
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxyid = src_host->proxyid;
+	dst_host->monitored_by = src_host->monitored_by;
 	dst_host->status = src_host->status;
 
 	zbx_strscpy(dst_host->host, src_host->host);
@@ -48,7 +45,7 @@ static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZB
 	if (ZBX_ITEM_GET_HOSTNAME & mode)
 		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
 
-	if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories,
+	if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&(get_dc_config())->host_inventories,
 			&src_host->hostid)))
 	{
 		dst_host->inventory_mode = (signed char)host_inventory->inventory_mode;
@@ -169,6 +166,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 	const ZBX_DC_HOST	*dc_host = NULL;
 	zbx_config_hk_t		config_hk;
 	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
 	memset(errcodes, 0, sizeof(int) * num);
 
@@ -176,7 +174,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(dc_config->items), &itemids[i])))
 		{
 			errcodes[i] = FAIL;
 			continue;
@@ -184,7 +182,8 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 
 		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
 		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(dc_config->hosts),
+					&dc_item->hostid)))
 			{
 				errcodes[i] = FAIL;
 				continue;
@@ -194,7 +193,7 @@ void	zbx_dc_config_history_sync_get_items_by_itemids(zbx_history_sync_item_t *it
 		dc_get_history_sync_host(&items[i].host, dc_host, mode);
 		dc_get_history_sync_item(&items[i], dc_item);
 
-		config_hk = config->config->hk;
+		config_hk = dc_config->config->hk;
 	}
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
@@ -254,7 +253,7 @@ void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *item
 
 	for (i = 0; i < itemids->values_num; i++)
 	{
-		if (NULL != zbx_hashset_search(&config->items, &itemids->values[i]))
+		if (NULL != zbx_hashset_search(&(get_dc_config())->items, &itemids->values[i]))
 			zbx_vector_uint64_remove_noorder(itemids, i--);
 	}
 
@@ -285,7 +284,8 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&(get_dc_config())->functions,
+				&functionids[i])))
 		{
 			errcodes[i] = FAIL;
 			continue;
@@ -320,7 +320,7 @@ void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t 
 
 	for (size_t i = 0; i < functionids_num; i++)
 	{
-		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&(get_dc_config())->functions,
 				&functionids[i])))
 		{
 			continue;
@@ -358,7 +358,7 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 	{
 		/* skip items which are not in configuration cache and items without triggers */
 
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])) ||
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(get_dc_config())->items, &itemids[i])) ||
 				NULL == dc_item->triggers)
 		{
 			continue;
@@ -491,7 +491,7 @@ void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *a
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	zbx_hashset_iter_reset(&config->actions, &iter);
+	zbx_hashset_iter_reset(&(get_dc_config())->actions, &iter);
 
 	while (NULL != (dc_action = (const zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -517,6 +517,7 @@ static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZB
 {
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxyid = src_host->proxyid;
+	dst_host->monitored_by = src_host->monitored_by;
 	dst_host->status = src_host->status;
 
 	if (ZBX_ITEM_GET_HOST & mode)
@@ -576,7 +577,8 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	{
 		const ZBX_DC_INTERFACE		*dc_interface;
 
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&(get_dc_config())->interfaces,
+				&src_item->interfaceid);
 
 		DCget_interface(&dst_item->interface, dc_interface);
 	}
@@ -656,7 +658,7 @@ static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items
 
 		if (NULL == dc_host || dc_host->hostid != items[i].host.hostid)
 		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts,
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(get_dc_config())->hosts,
 					&items[i].host.hostid)))
 			{
 				errcodes[i] = FAIL;
@@ -711,7 +713,7 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
 		dc_get_history_recv_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
 	}
 
-	maintenances_num = config->maintenances.num_data;
+	maintenances_num = get_dc_config()->maintenances.num_data;
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	dc_get_history_recv_item_maintenances(items, errcodes, num, maintenances_num);
@@ -740,6 +742,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
 	memset(errcodes, 0, sizeof(int) * num);
 
@@ -747,7 +750,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 
 	for (i = 0; i < num; i++)
 	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(dc_config->items), &itemids[i])))
 		{
 			errcodes[i] = FAIL;
 			continue;
@@ -755,7 +758,8 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 
 		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
 		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(dc_config->hosts),
+					&dc_item->hostid)))
 			{
 				errcodes[i] = FAIL;
 				continue;
@@ -766,7 +770,7 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 		dc_get_history_recv_item(&items[i], dc_item, mode);
 	}
 
-	maintenances_num = config->maintenances.num_data;
+	maintenances_num = get_dc_config()->maintenances.num_data;
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	dc_get_history_recv_item_maintenances(items, errcodes, num, maintenances_num);
@@ -803,13 +807,13 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 		if (FAIL == zbx_is_counted_in_item_queue(items[i].type, items[i].key_orig))
 			continue;
 
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &items[i].itemid)))
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&(get_dc_config())->items, &items[i].itemid)))
 			continue;
 
 		if (ITEM_STATUS_ACTIVE != dc_item->status)
 			continue;
 
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&(get_dc_config())->hosts, &dc_item->hostid)))
 			continue;
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
@@ -818,7 +822,8 @@ void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_val
 		if (ZBX_LOC_NOWHERE != dc_item->location)
 			continue;
 
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &dc_item->interfaceid);
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&(get_dc_config())->interfaces,
+				&dc_item->interfaceid);
 
 		/* update nextcheck for items that are counted in queue for monitoring purposes */
 		DCitem_nextcheck_update(dc_item, dc_interface, ZBX_ITEM_COLLECTED, values[i].ts.sec,
@@ -840,7 +845,7 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	zbx_hashset_iter_reset(&config->connectors, &iter);
+	zbx_hashset_iter_reset(&(get_dc_config())->connectors, &iter);
 	while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_connector_filter_t		connector_filter;
@@ -866,11 +871,11 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 		connector_filter.connectorid = dc_connector->connectorid;
 		connector_filter.tags_evaltype = dc_connector->tags_evaltype;
-		zbx_vector_match_tags_create(&connector_filter.connector_tags);
+		zbx_vector_match_tags_ptr_create(&connector_filter.connector_tags);
 
 		if (0 != dc_connector->tags.values_num)
 		{
-			zbx_vector_match_tags_reserve(&connector_filter.connector_tags,
+			zbx_vector_match_tags_ptr_reserve(&connector_filter.connector_tags,
 					(size_t)dc_connector->tags.values_num);
 
 			for (i = 0; i < dc_connector->tags.values_num; i++)
@@ -883,11 +888,11 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 				connector_tag->value = zbx_strdup(NULL, dc_connector->tags.values[i]->value);
 				connector_tag->op = dc_connector->tags.values[i]->op;
 
-				zbx_vector_match_tags_append(&connector_filter.connector_tags, connector_tag);
+				zbx_vector_match_tags_ptr_append(&connector_filter.connector_tags, connector_tag);
 			}
 		}
 
-		zbx_vector_match_tags_sort(&connector_filter.connector_tags, zbx_compare_match_tags);
+		zbx_vector_match_tags_ptr_sort(&connector_filter.connector_tags, zbx_compare_match_tags);
 
 		zbx_vector_connector_filter_append(connector_filter_dest, connector_filter);
 	}
@@ -898,8 +903,8 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 
 void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
 {
-	zbx_vector_match_tags_clear_ext(&connector_filter.connector_tags, zbx_match_tag_free);
-	zbx_vector_match_tags_destroy(&connector_filter.connector_tags);
+	zbx_vector_match_tags_ptr_clear_ext(&connector_filter.connector_tags, zbx_match_tag_free);
+	zbx_vector_match_tags_ptr_destroy(&connector_filter.connector_tags);
 }
 
 static void	substitute_orig_unmasked(const char *orig, char **data)
@@ -938,17 +943,18 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 	zbx_hashset_iter_t	iter;
 	int			connectors_updated = FAIL, global_macro_updated = FAIL;
 	zbx_uint64_t		global_revision;
+	zbx_dc_config_t		*dc_config = get_dc_config();
 
-	if (config->revision.config == *config_revision)
+	if (get_dc_config()->revision.config == *config_revision)
 		return;
 
 	global_revision = *config_revision;
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	if (config->revision.connector != *connector_revision)
+	if (get_dc_config()->revision.connector != *connector_revision)
 	{
-		zbx_hashset_iter_reset(&config->connectors, &iter);
+		zbx_hashset_iter_reset(&(dc_config->connectors), &iter);
 		while (NULL != (dc_connector = (zbx_dc_connector_t *)zbx_hashset_iter_next(&iter)))
 		{
 			if (ZBX_CONNECTOR_STATUS_ENABLED != dc_connector->status)
@@ -972,7 +978,7 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 				connector->time_flush = 0;
 			}
 
-			connector->revision = config->revision.connector;
+			connector->revision = dc_config->revision.connector;
 			connector->protocol = dc_connector->protocol;
 			connector->data_type = dc_connector->data_type;
 			connector->url_orig = zbx_strdup(connector->url_orig, dc_connector->url);
@@ -1007,17 +1013,17 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 					dc_connector->attempt_interval);
 		}
 
-		*connector_revision = config->revision.connector;
+		*connector_revision = dc_config->revision.connector;
 		connectors_updated = SUCCEED;
 	}
 
-	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &global_revision))
+	if (SUCCEED != um_cache_get_host_revision(dc_config->um_cache, 0, &global_revision))
 		global_revision = 0;
 
 	if (global_revision > *config_revision)
 		global_macro_updated = SUCCEED;
 
-	*config_revision = config->revision.config;
+	*config_revision = dc_config->revision.config;
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
@@ -1057,4 +1063,111 @@ void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_ha
 		zbx_dc_close_user_macros(um_handle);
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host information by name                                      *
+ *                                                                            *
+ * Parameters: host      - [IN] host name                                     *
+ *             sock      - [IN] connection socket                             *
+ *             mode      - [IN] host retrieval mode                           *
+ *             recv_host - [OUT] host information                             *
+ *             redirect  - [OUT] host redirection data (optional)             *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, unsigned int mode,
+		zbx_history_recv_host_t *recv_host, zbx_comms_redirect_t *redirect)
+{
+	const ZBX_DC_HOST	*dc_host = NULL;
+	int			ret = FAIL;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_conn_attr_t	attr;
+	char			*error = NULL;
+
+	if (FAIL == zbx_tls_get_attr(sock, &attr, &error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get connection attributes: %s", __func__, error);
+		zbx_free(error);
+		return FAIL;
+	}
+#else
+	zbx_tls_conn_attr_t	attr = {.connection_type = ZBX_TCP_SEC_UNENCRYPTED};
+
+	ZBX_UNUSED(sock);
+
+#endif
+	RDLOCK_CACHE;
+
+	if (NULL != redirect && SUCCEED == dc_get_host_redirect(host, &attr, redirect))
+	{
+		ret = SUCCEED_PARTIAL;
+		goto out;
+	}
+
+	if (NULL != (dc_host = DCfind_host(host)))
+	{
+		dc_get_history_recv_host(recv_host, dc_host, mode);
+		ret = SUCCEED;
+	}
+out:
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host information by name                                      *
+ *                                                                            *
+ * Parameters: host      - [IN] host name                                     *
+ *             sock      - [IN] connection socket                             *
+ *             recv_host - [OUT] host information                             *
+ *             redirect  - [OUT] host redirection data (optional)             *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_host_by_name(const char *host, const zbx_socket_t *sock, zbx_history_recv_host_t *recv_host,
+		zbx_comms_redirect_t *redirect)
+{
+	return dc_config_get_host_by_name(host, sock, ZBX_ITEM_GET_HOSTINFO, recv_host, redirect);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get host identifier by name                                       *
+ *                                                                            *
+ * Parameters: host     - [IN] host name                                      *
+ *             sock     - [IN] connection socket                              *
+ *             hostid   - [OUT] host identifier                               *
+ *             redirect - [OUT] host redirection data (optional)              *
+ *                                                                            *
+ * Return value: SUCCEED         - host found                                 *
+ *               SUCCEED_PARTIAL - redirection data was specified and host is *
+ *                                 not monitored by the this instance         *
+ *               FAIL            - host not found                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
+		zbx_comms_redirect_t *redirect)
+{
+	zbx_history_recv_host_t	recv_host;
+	int			ret;
+
+	if (SUCCEED == (ret = dc_config_get_host_by_name(host, sock, 0, &recv_host, redirect)))
+		*hostid = recv_host.hostid;
+
+	return ret;
+}
+
+
 #undef ZBX_CONNECTOR_STATUS_ENABLED
+

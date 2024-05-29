@@ -28,7 +28,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 3c2d368291294faa98c01a27f36ad805
-          name: 'HPE iLO: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: hpe.ilo.get_data
           delay: '{$ILO.INTERVAL}'
@@ -337,7 +337,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7378f10ce1314462ba2f9d80562f5430
-          name: 'HPE iLO: Get data check'
+          name: 'Get data check'
           type: DEPENDENT
           key: hpe.ilo.get_data.check
           delay: '0'
@@ -361,7 +361,7 @@ zabbix_export:
           triggers:
             - uuid: b3327a76234b4ac6b049dec49bdd6a78
               expression: 'length(last(/HPE iLO by HTTP/hpe.ilo.get_data.check))>0'
-              name: 'HPE iLO: Failed to get data from API'
+              name: 'Failed to get data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
@@ -393,7 +393,7 @@ zabbix_export:
           description: 'Discovers computer systems.'
           item_prototypes:
             - uuid: 2815e03a856e4c0389ee2fb545d6c97f
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: BIOS current version'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: BIOS current version'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.bios.current_version[{#SYSTEM_ID}]'
               delay: '0'
@@ -421,8 +421,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 2f207309d0724a2e8e93c13967fc8eed
                   expression: 'change(/HPE iLO by HTTP/hpe.ilo.computer_system.bios.current_version[{#SYSTEM_ID}])=1 and length(last(/HPE iLO by HTTP/hpe.ilo.computer_system.bios.current_version[{#SYSTEM_ID}]))>0'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: BIOS version has changed'
-                  event_name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: BIOS version has changed (new version: {ITEM.VALUE})'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: BIOS version has changed'
+                  event_name: 'Computer system [{#SYSTEM_HOSTNAME}]: BIOS version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'The current version of BIOS has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -430,7 +430,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 4c05d540ca87440bbf251bdf61d31a5d
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Get data'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.get_data[{#SYSTEM_ID}]'
               delay: '0'
@@ -453,7 +453,7 @@ zabbix_export:
                 - tag: computer-system
                   value: '{#SYSTEM_HOSTNAME}'
             - uuid: cd7fc29d4de64b0f8fb754451d5764e3
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Model'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.model[{#SYSTEM_ID}]'
               delay: '0'
@@ -479,7 +479,7 @@ zabbix_export:
                 - tag: computer-system
                   value: '{#SYSTEM_HOSTNAME}'
             - uuid: 74a4746fec48417bb5e1ce6f341936f4
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Serial number'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Serial number'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.serial_number[{#SYSTEM_ID}]'
               delay: '0'
@@ -507,7 +507,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 060a4bcb1cdd463884fd95272464530d
                   expression: 'change(/HPE iLO by HTTP/hpe.ilo.computer_system.serial_number[{#SYSTEM_ID}])=1 and length(last(/HPE iLO by HTTP/hpe.ilo.computer_system.serial_number[{#SYSTEM_ID}]))>0'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Computer system has been replaced'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Computer system has been replaced'
                   priority: INFO
                   description: 'The computer system serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -515,7 +515,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 30a1ab95416a42779abe242ac264d813
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Status'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.status[{#SYSTEM_ID}]'
               delay: '0'
@@ -557,7 +557,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 438fdce5e1374b5a94b0206cdd4a2728
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.computer_system.status[{#SYSTEM_ID}])=2'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Computer system is in critical state'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Computer system is in critical state'
                   priority: HIGH
                   description: 'The computer system is in critical condition that requires immediate attention.'
                   tags:
@@ -567,11 +567,11 @@ zabbix_export:
                       value: performance
                 - uuid: 704b86207b3a443a8359b3d75c92d0b4
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.computer_system.status[{#SYSTEM_ID}])=1'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Computer system is in warning state'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Computer system is in warning state'
                   priority: WARNING
                   description: 'The computer system is in condition that requires attention.'
                   dependencies:
-                    - name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Computer system is in critical state'
+                    - name: 'Computer system [{#SYSTEM_HOSTNAME}]: Computer system is in critical state'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.computer_system.status[{#SYSTEM_ID}])=2'
                   tags:
                     - tag: scope
@@ -579,7 +579,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: 09d4a47c8ba94c4c83e47bbd58ec6cc7
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: System type'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: System type'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.type[{#SYSTEM_ID}]'
               delay: '0'
@@ -625,7 +625,7 @@ zabbix_export:
                 - tag: computer-system
                   value: '{#SYSTEM_HOSTNAME}'
             - uuid: 19cb6014269c4e548daa07526c0eac95
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: CPU utilization, in %'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: CPU utilization, in %'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.cpu_util[{#SYSTEM_ID}]'
               delay: '0'
@@ -649,7 +649,7 @@ zabbix_export:
                 - tag: computer-system
                   value: '{#SYSTEM_HOSTNAME}'
             - uuid: 7c71b7e1963c499d8a4151aba47da539
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: I/O bus utilization, in %'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: I/O bus utilization, in %'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.io_bus_util[{#SYSTEM_ID}]'
               delay: '0'
@@ -673,7 +673,7 @@ zabbix_export:
                 - tag: computer-system
                   value: '{#SYSTEM_HOSTNAME}'
             - uuid: 13b463539dbb4692a4635bdef2a76367
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Memory bus utilization, in %'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Memory bus utilization, in %'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.memory_bus_util[{#SYSTEM_ID}]'
               delay: '0'
@@ -768,7 +768,7 @@ zabbix_export:
           description: 'Discovers storage controllers.'
           item_prototypes:
             - uuid: aa246b9ca7454479b9396851f4be67aa
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Get data'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.controller.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
@@ -799,7 +799,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE_ID}'
             - uuid: 5aeac2d722a14086b64980e0cd4a985a
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Model'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.controller.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
@@ -833,7 +833,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE_ID}'
             - uuid: 5a8101bfc94b48d2b67fd6670949ab96
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Serial number'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Serial number'
               type: DEPENDENT
               key: 'hpe.ilo.controller.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
@@ -869,7 +869,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 66694866af4e49d7becb699c29b73b3e
                   expression: 'change(/HPE iLO by HTTP/hpe.ilo.controller.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}])=1 and length(last(/HPE iLO by HTTP/hpe.ilo.controller.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]))>0'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Controller has been replaced'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Controller has been replaced'
                   priority: INFO
                   description: 'The controller serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -877,7 +877,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 6c0527d5f10b4be0a9384de104128a9b
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Status'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.controller.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
@@ -925,7 +925,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: c50abeed60fe4b5a95dd788606fbddda
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.controller.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}])=2'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Controller is in critical state'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Controller is in critical state'
                   priority: HIGH
                   description: 'The controller is in critical condition that requires immediate attention.'
                   tags:
@@ -935,11 +935,11 @@ zabbix_export:
                       value: performance
                 - uuid: b4fff1c834a04b66843937b1a56fe7d1
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.controller.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}])=1'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Controller is in warning state'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Controller is in warning state'
                   priority: WARNING
                   description: 'The controller is in condition that requires attention.'
                   dependencies:
-                    - name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Controller is in critical state'
+                    - name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Controller is in critical state'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.controller.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}])=2'
                   tags:
                     - tag: scope
@@ -1007,7 +1007,7 @@ zabbix_export:
           description: 'Discovers storage drives.'
           item_prototypes:
             - uuid: c3935598d1b14f8a9ceaadd315ffd64e
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Capacity'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Capacity'
               type: DEPENDENT
               key: 'hpe.ilo.drive.capacity[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
@@ -1038,7 +1038,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE_ID}'
             - uuid: 408d4190763c476599dbb8793ee09a65
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Get data'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.drive.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
@@ -1069,7 +1069,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE_ID}'
             - uuid: 368329ea2b4b45b2ac5edfb103002915
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Media type'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Media type'
               type: DEPENDENT
               key: 'hpe.ilo.drive.media_type[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
@@ -1108,7 +1108,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE_ID}'
             - uuid: 9800f0f0171542de87508f062c1397e7
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Model'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.drive.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
@@ -1142,7 +1142,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE_ID}'
             - uuid: a8cf9573ca704edab0fd130a0a3bda76
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Predicted media life left, in %'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Predicted media life left, in %'
               type: DEPENDENT
               key: 'hpe.ilo.drive.predicted_life_left[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
@@ -1173,7 +1173,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE_ID}'
             - uuid: 3122f6ef74f84974b8094022f86f68bb
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Serial number'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Serial number'
               type: DEPENDENT
               key: 'hpe.ilo.drive.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
@@ -1209,7 +1209,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 723b48e56ef447ab940c0e6bb6ecddd6
                   expression: 'change(/HPE iLO by HTTP/hpe.ilo.drive.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}])=1 and length(last(/HPE iLO by HTTP/hpe.ilo.drive.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]))>0'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Drive has been replaced'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Drive has been replaced'
                   priority: INFO
                   description: 'The drive serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -1217,7 +1217,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: a2218789f4734f72921665308dc3eb5d
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Status indicator'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Status indicator'
               type: DEPENDENT
               key: 'hpe.ilo.drive.status_indicator[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
@@ -1275,7 +1275,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: e58f3af90e124520bf0c138979480913
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.drive.status_indicator[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}])=1'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Drive has failed'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Drive has failed'
                   priority: HIGH
                   description: 'The drive has failed.'
                   tags:
@@ -1285,11 +1285,11 @@ zabbix_export:
                       value: performance
                 - uuid: d78d4771170d4668bc6c2ca941bf85f1
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.drive.status_indicator[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}])=3'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Drive is predicted to fail soon'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Drive is predicted to fail soon'
                   priority: HIGH
                   description: 'The drive is still working but predicted to fail soon.'
                   dependencies:
-                    - name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Drive has failed'
+                    - name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Drive has failed'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.drive.status_indicator[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}])=1'
                   tags:
                     - tag: scope
@@ -1363,7 +1363,7 @@ zabbix_export:
           description: 'Discovers chassis fans.'
           item_prototypes:
             - uuid: bd8bceea000a4677b982b56a119ece7e
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Get data'
+              name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.fan.get_data[{#CHASSIS_ID}, {#FAN_ID}]'
               delay: '0'
@@ -1390,7 +1390,7 @@ zabbix_export:
                 - tag: fan
                   value: '{#FAN_ID}'
             - uuid: d30cdb96ceb9470dbba0b30112c3a05b
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Speed, in %'
+              name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Speed, in %'
               type: DEPENDENT
               key: 'hpe.ilo.fan.speed[{#CHASSIS_ID}, {#FAN_ID}]'
               delay: '0'
@@ -1415,7 +1415,7 @@ zabbix_export:
                 - tag: fan
                   value: '{#FAN_ID}'
             - uuid: 4006994b11a54c5fa3eda5516b8ca94e
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Status'
+              name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.fan.status[{#CHASSIS_ID}, {#FAN_ID}]'
               delay: '0'
@@ -1461,7 +1461,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: c46cf15eae394d3a812ff660382a498c
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.fan.status[{#CHASSIS_ID}, {#FAN_ID}])=2'
-                  name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Fan is in critical state'
+                  name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Fan is in critical state'
                   priority: HIGH
                   description: 'The fan is in critical condition that requires immediate attention.'
                   tags:
@@ -1471,11 +1471,11 @@ zabbix_export:
                       value: performance
                 - uuid: de0dd5f0180c433d8fcf77411c4af0d1
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.fan.status[{#CHASSIS_ID}, {#FAN_ID}])=1'
-                  name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Fan is in warning state'
+                  name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Fan is in warning state'
                   priority: WARNING
                   description: 'The fan is in condition that requires attention.'
                   dependencies:
-                    - name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Fan is in critical state'
+                    - name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Fan is in critical state'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.fan.status[{#CHASSIS_ID}, {#FAN_ID}])=2'
                   tags:
                     - tag: scope
@@ -1530,7 +1530,7 @@ zabbix_export:
           description: 'Discovers managers.'
           item_prototypes:
             - uuid: 822317e3e16741c88cc749d5f5b7e67c
-              name: 'HPE iLO: Manager [{#MANAGER_ID}]: Current firmware version'
+              name: 'Manager [{#MANAGER_ID}]: Current firmware version'
               type: DEPENDENT
               key: 'hpe.ilo.manager.firmware.current_version[{#MANAGER_ID}]'
               delay: '0'
@@ -1558,8 +1558,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: d15f89292b3b4b309bee523a0d46217b
                   expression: 'change(/HPE iLO by HTTP/hpe.ilo.manager.firmware.current_version[{#MANAGER_ID}])=1 and length(last(/HPE iLO by HTTP/hpe.ilo.manager.firmware.current_version[{#MANAGER_ID}]))>0'
-                  name: 'HPE iLO: Manager [{#MANAGER_ID}]: Firmware version has changed'
-                  event_name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Firmware version has changed (new version: {ITEM.VALUE})'
+                  name: 'Manager [{#MANAGER_ID}]: Firmware version has changed'
+                  event_name: 'Computer system [{#SYSTEM_HOSTNAME}]: Firmware version has changed (new version: {ITEM.VALUE})'
                   priority: INFO
                   description: 'The current firmware version of the manager has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -1567,7 +1567,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 1ae004d3b9804fbe9d62325999e9cabd
-              name: 'HPE iLO: Manager [{#MANAGER_ID}]: Get data'
+              name: 'Manager [{#MANAGER_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.manager.get_data[{#MANAGER_ID}]'
               delay: '0'
@@ -1590,7 +1590,7 @@ zabbix_export:
                 - tag: manager
                   value: '{#MANAGER_ID}'
             - uuid: 20008a9fb19841edb7901dc8304bfdf8
-              name: 'HPE iLO: Manager [{#MANAGER_ID}]: Model'
+              name: 'Manager [{#MANAGER_ID}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.manager.model[{#MANAGER_ID}]'
               delay: '0'
@@ -1616,7 +1616,7 @@ zabbix_export:
                 - tag: manager
                   value: '{#MANAGER_ID}'
             - uuid: f178ab2358d842e98d137fcf62ba5dba
-              name: 'HPE iLO: Manager [{#MANAGER_ID}]: Status'
+              name: 'Manager [{#MANAGER_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.manager.status[{#MANAGER_ID}]'
               delay: '0'
@@ -1658,7 +1658,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: faa446c01db44748bf68b08f5d3491cd
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.manager.status[{#MANAGER_ID}])=2'
-                  name: 'HPE iLO: Manager [{#MANAGER_ID}]: Manager is in critical state'
+                  name: 'Manager [{#MANAGER_ID}]: Manager is in critical state'
                   priority: HIGH
                   description: 'The manager is in critical condition that requires immediate attention.'
                   tags:
@@ -1668,11 +1668,11 @@ zabbix_export:
                       value: performance
                 - uuid: 1835e489df4942d3bb6ffba0e68d838e
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.manager.status[{#MANAGER_ID}])=1'
-                  name: 'HPE iLO: Manager [{#MANAGER_ID}]: Manager is in warning state'
+                  name: 'Manager [{#MANAGER_ID}]: Manager is in warning state'
                   priority: WARNING
                   description: 'The manager is in condition that requires attention.'
                   dependencies:
-                    - name: 'HPE iLO: Manager [{#MANAGER_ID}]: Manager is in critical state'
+                    - name: 'Manager [{#MANAGER_ID}]: Manager is in critical state'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.manager.status[{#MANAGER_ID}])=2'
                   tags:
                     - tag: scope
@@ -1680,7 +1680,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: fab6652c9346461eb232342fa8b88b95
-              name: 'HPE iLO: Manager [{#MANAGER_ID}]: Manager type'
+              name: 'Manager [{#MANAGER_ID}]: Manager type'
               type: DEPENDENT
               key: 'hpe.ilo.manager.type[{#MANAGER_ID}]'
               delay: '0'
@@ -1754,7 +1754,7 @@ zabbix_export:
           description: 'Discovers chassis power supply units (PSU).'
           item_prototypes:
             - uuid: adb24bee15a341ffbe51047c0798a906
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Get data'
+              name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.psu.get_data[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
@@ -1779,7 +1779,7 @@ zabbix_export:
                 - tag: psu
                   value: '{#PSU_ID}'
             - uuid: c51caa30b1ab4399a1132e4c3ea50c9f
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Last power output'
+              name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Last power output'
               type: DEPENDENT
               key: 'hpe.ilo.psu.last_power_output[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
@@ -1802,7 +1802,7 @@ zabbix_export:
                 - tag: psu
                   value: '{#PSU_ID}'
             - uuid: d3edb80dc18f4a92ac06a0025b7e1a76
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Line input voltage'
+              name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Line input voltage'
               type: DEPENDENT
               key: 'hpe.ilo.psu.line_input_voltage[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
@@ -1825,7 +1825,7 @@ zabbix_export:
                 - tag: psu
                   value: '{#PSU_ID}'
             - uuid: f7594bdb44d1464c8cf1476ceb473215
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Model'
+              name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.psu.model[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
@@ -1853,7 +1853,7 @@ zabbix_export:
                 - tag: psu
                   value: '{#PSU_ID}'
             - uuid: 96a3b57288e94c71b4f8ac15bc7a8a14
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Serial number'
+              name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Serial number'
               type: DEPENDENT
               key: 'hpe.ilo.psu.serial_number[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
@@ -1883,7 +1883,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 4a20457b63f14f9dba0e57a4a1be9336
                   expression: 'change(/HPE iLO by HTTP/hpe.ilo.psu.serial_number[{#CHASSIS_ID}, {#PSU_ID}])=1 and length(last(/HPE iLO by HTTP/hpe.ilo.psu.serial_number[{#CHASSIS_ID}, {#PSU_ID}]))>0'
-                  name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: PSU has been replaced'
+                  name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: PSU has been replaced'
                   priority: INFO
                   description: 'The PSU serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -1891,7 +1891,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 5194da566bce4f7ca1073ab56201d32b
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Status'
+              name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.psu.status[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
@@ -1935,7 +1935,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 5e35becc5b6f4a0b8aee83bd85053dfa
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.psu.status[{#CHASSIS_ID}, {#PSU_ID}])=2'
-                  name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: PSU is in critical state'
+                  name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: PSU is in critical state'
                   priority: HIGH
                   description: 'The PSU is in critical condition that requires immediate attention.'
                   tags:
@@ -1945,11 +1945,11 @@ zabbix_export:
                       value: performance
                 - uuid: 6a905448f75c47c09392668b9b636117
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.psu.status[{#CHASSIS_ID}, {#PSU_ID}])=1'
-                  name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: PSU is in warning state'
+                  name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: PSU is in warning state'
                   priority: WARNING
                   description: 'The PSU is in condition that requires attention.'
                   dependencies:
-                    - name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: PSU is in critical state'
+                    - name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: PSU is in critical state'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.psu.status[{#CHASSIS_ID}, {#PSU_ID}])=2'
                   tags:
                     - tag: scope
@@ -2027,7 +2027,7 @@ zabbix_export:
           description: 'Discovers chassis temperature sensors.'
           item_prototypes:
             - uuid: 0067035f746a4317988d70844e71dd7a
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Get data'
+              name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.sensor.get_data[{#CHASSIS_ID}, {#SENSOR_ID}]'
               delay: '0'
@@ -2056,7 +2056,7 @@ zabbix_export:
                 - tag: sensor-context
                   value: '{#SENSOR_CONTEXT}'
             - uuid: ef3c3472c21a4716b9b3362e7b33644c
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Status'
+              name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.sensor.status[{#CHASSIS_ID}, {#SENSOR_ID}]'
               delay: '0'
@@ -2104,7 +2104,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 143900a50f0044f884fe04ba32afe38d
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.sensor.status[{#CHASSIS_ID}, {#SENSOR_ID}])=2'
-                  name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Sensor is in critical state'
+                  name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Sensor is in critical state'
                   priority: HIGH
                   description: 'The sensor is in critical condition that requires immediate attention.'
                   tags:
@@ -2114,11 +2114,11 @@ zabbix_export:
                       value: performance
                 - uuid: 66c09f1d58ee436f96cb2d8e034fce05
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.sensor.status[{#CHASSIS_ID}, {#SENSOR_ID}])=1'
-                  name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Sensor is in warning state'
+                  name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Sensor is in warning state'
                   priority: WARNING
                   description: 'The sensor is in condition that requires attention.'
                   dependencies:
-                    - name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Sensor is in critical state'
+                    - name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Sensor is in critical state'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.sensor.status[{#CHASSIS_ID}, {#SENSOR_ID}])=2'
                   tags:
                     - tag: scope
@@ -2126,7 +2126,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: 04e0faf0a3b54f84a13341bab1238b60
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Temperature'
+              name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Temperature'
               type: DEPENDENT
               key: 'hpe.ilo.sensor.temperature[{#CHASSIS_ID}, {#SENSOR_ID}]'
               delay: '0'
@@ -2218,7 +2218,7 @@ zabbix_export:
           description: 'Discovers computer system storages.'
           item_prototypes:
             - uuid: 51a5467f6d5948da803123a360ca2973
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Get data'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.storage.get_data[{#SYSTEM_ID}, {#STORAGE_ID}]'
               delay: '0'
@@ -2243,7 +2243,7 @@ zabbix_export:
                 - tag: storage
                   value: '{#STORAGE_ID}'
             - uuid: bec36e3da5ed4d71808669b5e298a62a
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Status'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.storage.status[{#SYSTEM_ID}, {#STORAGE_ID}]'
               delay: '0'
@@ -2287,7 +2287,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 3cbf371fee974ae18cc48a5c8751d002
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.storage.status[{#SYSTEM_ID}, {#STORAGE_ID}])=2'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Storage is in critical state'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Storage is in critical state'
                   priority: HIGH
                   description: 'The computer system is in critical condition that requires immediate attention.'
                   tags:
@@ -2297,11 +2297,11 @@ zabbix_export:
                       value: performance
                 - uuid: f7971c1b03874ba38d56e97cecb415f8
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.storage.status[{#SYSTEM_ID}, {#STORAGE_ID}])=1'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Storage is in warning state'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Storage is in warning state'
                   priority: WARNING
                   description: 'The computer system is in condition that requires attention.'
                   dependencies:
-                    - name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Storage is in critical state'
+                    - name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Storage is in critical state'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.storage.status[{#SYSTEM_ID}, {#STORAGE_ID}])=2'
                   tags:
                     - tag: scope
@@ -2366,7 +2366,7 @@ zabbix_export:
           description: 'Discovers storage volumes.'
           item_prototypes:
             - uuid: 9128fbbb6f0a450abb03f427cf22210f
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Capacity'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Capacity'
               type: DEPENDENT
               key: 'hpe.ilo.volume.capacity[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
               delay: '0'
@@ -2395,7 +2395,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 709f9a2cf82445988bced0b404524e05
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Get data'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.volume.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
               delay: '0'
@@ -2424,7 +2424,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: b42c7a7314a9463d959925fb5b0fd275
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: RAID level'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: RAID level'
               type: DEPENDENT
               key: 'hpe.ilo.volume.raid_level[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
               delay: '0'
@@ -2477,7 +2477,7 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: c4829f0dac1c42edad3161ac9df74ea6
-              name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Status'
+              name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.volume.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
               delay: '0'
@@ -2525,7 +2525,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: eec0cede62004a56ac9ddce26be52f7f
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.volume.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}])=2'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Volume is in critical state'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Volume is in critical state'
                   priority: HIGH
                   description: 'The volume is in critical condition that requires immediate attention.'
                   tags:
@@ -2535,11 +2535,11 @@ zabbix_export:
                       value: performance
                 - uuid: fff82b7d4fea43ed8099fc43e1fc5421
                   expression: 'last(/HPE iLO by HTTP/hpe.ilo.volume.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}])=1'
-                  name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Volume is in warning state'
+                  name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Volume is in warning state'
                   priority: WARNING
                   description: 'The volume is in condition that requires attention.'
                   dependencies:
-                    - name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Volume is in critical state'
+                    - name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Volume is in critical state'
                       expression: 'last(/HPE iLO by HTTP/hpe.ilo.volume.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}])=2'
                   tags:
                     - tag: scope
@@ -2636,7 +2636,7 @@ zabbix_export:
             - name: 'HPE iLO: Computer systems'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -2653,7 +2653,7 @@ zabbix_export:
             - name: 'HPE iLO: Fans'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -2670,7 +2670,7 @@ zabbix_export:
             - name: 'HPE iLO: Thermal sensors'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH_PROTOTYPE
@@ -2687,7 +2687,7 @@ zabbix_export:
             - name: 'HPE iLO: Power supplies'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -2703,7 +2703,7 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

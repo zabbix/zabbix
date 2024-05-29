@@ -1,23 +1,17 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "module.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcomms.h"
@@ -27,9 +21,12 @@
 #include "zbxversion.h"
 #include "zbxlog.h"
 #include "zbxjson.h"
+#include "zbxbincommon.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
 #endif
 
 typedef enum
@@ -204,7 +201,7 @@ struct zbx_option	longopts[] =
 	{"tls-cipher13",		1,	NULL,	'A'},
 	{"tls-cipher",			1,	NULL,	'B'},
 	{"protocol",			1,	NULL,	'P'},
-	{NULL}
+	{0}
 };
 
 /* short options */
@@ -376,9 +373,9 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
-	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
@@ -423,7 +420,7 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_print_version(title_message);
@@ -520,7 +517,7 @@ int	main(int argc, char **argv)
 				}
 				break;
 			default:
-				zbx_print_usage(usage_message, zbx_progname);
+				zbx_print_usage(zbx_progname, usage_message);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -536,7 +533,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == host || NULL == key)
 	{
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		ret = FAIL;
 	}
 

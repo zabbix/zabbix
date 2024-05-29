@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -61,8 +56,6 @@ class CControllerTemplateCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$clone = $this->hasInput('clone');
-
 		try {
 			DBstart();
 			$template_name = $this->getInput('template_name', '');
@@ -142,15 +135,19 @@ class CControllerTemplateCreate extends CController {
 
 			$result = API::Template()->create($template);
 
-			$src_templateid = $this->getInput('clone_templateid', 0);
-
-			if ($result === false
-					|| !$this->createValueMaps($result['templateids'][0], $this->getInput('valuemaps', []))
-					|| ($clone && !$this->copyFromCloneSourceTemplate($src_templateid, $result['templateids'][0]))) {
+			if ($result === false) {
 				throw new Exception();
 			}
 
-			$result = DBend();
+			$template = ['templateid' => $result['templateids'][0]] + $template;
+			$src_templateid = $this->getInput('clone_templateid', 0);
+
+			if (!$this->createValueMaps($template['templateid'], $this->getInput('valuemaps', []))
+					|| ($this->hasInput('clone') && !$this->copyFromCloneSourceTemplate($src_templateid, $template))) {
+				throw new Exception();
+			}
+
+			$result = DBend(true);
 		}
 		catch (Exception $e) {
 			$result = false;
@@ -197,18 +194,18 @@ class CControllerTemplateCreate extends CController {
 	 * Copy http tests, items, triggers, graphs, discovery rules and template dashboards from source template to target
 	 * template.
 	 *
-	 * @param string $src_templateid  Source templateid.
-	 * @param string $templateid      Target templateid.
+	 * @param string $src_templateid
+	 * @param array  $dst_template
 	 *
 	 * @return bool
 	 */
-	private function copyFromCloneSourceTemplate(string $src_templateid, string $templateid): bool {
+	private function copyFromCloneSourceTemplate(string $src_templateid, array $dst_template): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
-		if (!copyHttpTests($src_templateid, $templateid)
-				|| !CItemHelper::cloneTemplateItems($src_templateid, $templateid)
-				|| !CTriggerHelper::cloneTemplateTriggers($src_templateid, $templateid)
-				|| !CGraphHelper::cloneTemplateGraphs($src_templateid, $templateid)
-				|| !CLldRuleHelper::cloneTemplateItems($src_templateid, $templateid)) {
+		if (!copyHttpTests($src_templateid, $dst_template['templateid'])
+			|| !CItemHelper::cloneTemplateItems($src_templateid, $dst_template)
+			|| !CTriggerHelper::cloneTemplateTriggers($src_templateid, $dst_template['templateid'])
+			|| !CGraphHelper::cloneTemplateGraphs($src_templateid, $dst_template['templateid'])
+			|| !CLldRuleHelper::cloneTemplateItems($src_templateid, $dst_template)) {
 			return false;
 		}
 
@@ -221,7 +218,9 @@ class CControllerTemplateCreate extends CController {
 		]);
 
 		if ($db_template_dashboards) {
-			$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards, $templateid);
+			$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards,
+				$dst_template['templateid']
+			);
 
 			if (!API::TemplateDashboard()->create($db_template_dashboards)) {
 				return false;

@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -88,8 +83,14 @@ class CControllerPopupActionOperationEdit extends CController {
 		$recovery = (int) $this->getInput('recovery');
 		$operation_types = $this->popupConfigOperationTypes($eventsource, $recovery);
 
+		$scripts_with_warning = [];
+
 		foreach ($operation_types as $type) {
 			$operation_type[$type['value']] = $type['name'];
+
+			if ($type['has_warning']) {
+				$scripts_with_warning[] = $type['value'];
+			}
 		}
 
 		$media_types = API::MediaType()->get(['output' => ['mediatypeid', 'name', 'status']]);
@@ -145,6 +146,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			'recovery' => $recovery,
 			'operation' => $operation,
 			'operation_types' => $operation_type,
+			'scripts_with_warning' => $scripts_with_warning,
 			'mediatype_options' => $media_types,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
@@ -313,13 +315,14 @@ class CControllerPopupActionOperationEdit extends CController {
 
 			$operation_type_options[] = [
 				'value' => 'cmd['.$operation_type.']',
-				'name' => operation_type2str($operation_type)
+				'name' => operation_type2str($operation_type),
+				'has_warning' => false
 			];
 		}
 
 		if ($scripts_allowed) {
 			$db_scripts = API::Script()->get([
-				'output' => ['scriptid', 'name'],
+				'output' => ['scriptid', 'name', 'type', 'execute_on'],
 				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION]
 			]);
 
@@ -327,9 +330,15 @@ class CControllerPopupActionOperationEdit extends CController {
 				CArrayHelper::sort($db_scripts, ['name']);
 
 				foreach ($db_scripts as $db_script) {
+					$has_warning = !CSettingsHelper::isGlobalScriptsEnabled()
+						&& $db_script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+						&& ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
+							|| $db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY);
+
 					$operation_type_options[] = [
 						'value' => 'scriptid['.$db_script['scriptid'].']',
-						'name' => $db_script['name']
+						'name' => $db_script['name'],
+						'has_warning' => $has_warning
 					];
 				}
 			}

@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -68,7 +63,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 
 			$host = [
 				'status' => $this->getInput('status', HOST_STATUS_NOT_MONITORED),
-				'proxyid' => $this->getInput('proxyid', 0),
+				'monitored_by' => $this->getInput('monitored_by', ZBX_MONITORED_BY_SERVER),
 				'groups' => $this->processHostGroups($this->getInput('groups', [])),
 				'interfaces' => $this->processHostInterfaces($this->getInput('interfaces', [])),
 				'tags' => $this->processTags($this->getInput('tags', [])),
@@ -82,6 +77,13 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 				'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
 				'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
 			];
+
+			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+				$host['proxyid'] = $this->getInput('proxyid', 0);
+			}
+			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+				$host['proxy_groupid'] = $this->getInput('proxy_groupid', 0);
+			}
 
 			$this->getInputs($host, [
 				'host', 'visiblename', 'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
@@ -100,17 +102,22 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			$host = CArrayHelper::renameKeys($host, ['visiblename' => 'name']);
 
 			$clone = $this->hasInput('clone');
-			$src_hostid = $this->getInput('clone_hostid', '');
+			$src_hostid = $this->getInput('clone_hostid', 0);
 
-			if ($src_hostid) {
+			if ($clone && $src_hostid != 0) {
 				$host = $this->extendHostCloneEncryption($host, $src_hostid);
 			}
 
 			$result = API::Host()->create($host);
 
-			if ($result === false
-					|| !$this->createValueMaps($result['hostids'][0])
-					|| ($clone && !$this->copyFromCloneSourceHost($src_hostid, $result['hostids'][0]))) {
+			if ($result === false) {
+				throw new Exception();
+			}
+
+			$host = ['hostid' => $result['hostids'][0]] + $host;
+
+			if (!$this->createValueMaps($host['hostid'])
+					|| ($clone && !$this->copyFromCloneSourceHost($src_hostid, $host))) {
 				throw new Exception();
 			}
 
@@ -195,21 +202,17 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	/**
 	 * Copy http tests, items, triggers, discovery rules and graphs from source host to target host.
 	 *
-	 * @param string $src_hostid  Source hostid.
-	 * @param string $hostid      Target hostid.
+	 * @param string $src_hostid
+	 * @param array  $dst_host
 	 *
 	 * @return bool
 	 */
-	private function copyFromCloneSourceHost(string $src_hostid, string $hostid): bool {
+	private function copyFromCloneSourceHost(string $src_hostid, array $dst_host): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
-		if (!copyHttpTests($src_hostid, $hostid)
-				|| !CItemHelper::cloneHostItems($src_hostid, $hostid)
-				|| !CTriggerHelper::cloneHostTriggers($src_hostid, $hostid)
-				|| !CGraphHelper::cloneHostGraphs($src_hostid, $hostid)
-				|| !CLldRuleHelper::cloneHostItems($src_hostid, $hostid)) {
-			return false;
-		}
-
-		return true;
+		return copyHttpTests($src_hostid, $dst_host['hostid'])
+			&& CItemHelper::cloneHostItems($src_hostid, $dst_host)
+			&& CTriggerHelper::cloneHostTriggers($src_hostid, $dst_host['hostid'])
+			&& CGraphHelper::cloneHostGraphs($src_hostid, $dst_host['hostid'])
+			&& CLldRuleHelper::cloneHostItems($src_hostid, $dst_host);
 	}
 }

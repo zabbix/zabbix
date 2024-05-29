@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -62,15 +57,7 @@ class CAuthenticationHelper {
 	 */
 	public static function get(string $field): string {
 		if (!self::$params) {
-			self::$params = API::Authentication()->get([
-				'output' => [
-					'authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
-					'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
-					'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules',
-					'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid', 'mfa_status',
-					'mfaid'
-				]
-			]);
+			self::$params = API::Authentication()->get(['output' => CAuthentication::getOutputFields()]);
 
 			if (self::$params === false) {
 				throw new Exception(_('Unable to load authentication API parameters.'));
@@ -78,6 +65,10 @@ class CAuthenticationHelper {
 		}
 
 		return self::$params[$field];
+	}
+
+	public static function reset() {
+		self::$params = [];
 	}
 
 	/**

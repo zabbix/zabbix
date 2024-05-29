@@ -11,10 +11,15 @@ zabbix_export:
         The template to monitor Elasticsearch by Zabbix that work without any external scripts.
         It works with both standalone and cluster instances.
         The metrics are collected in one pass remotely using an HTTP agent.
-        They are getting values from REST API _cluster/health, _cluster/stats, _nodes/stats requests.
-        You can set {$ELASTICSEARCH.USERNAME} and {$ELASTICSEARCH.PASSWORD} macros in the template for using on the host level.
-        If you use an atypical location ES API, don't forget to change the macros {$ELASTICSEARCH.SCHEME},{$ELASTICSEARCH.PORT}.
+        They are getting values from REST API '_cluster/health', '_cluster/stats', '_nodes/stats' requests.
         
+        Setup:
+        
+        1. Set the hostname or IP address of the Elasticsearch host in the '{$ELASTICSEARCH.HOST}' macro.
+        
+        2. Set the login and password in the '{$ELASTICSEARCH.USERNAME}' and '{$ELASTICSEARCH.PASSWORD}' macros.
+        
+        3. If you use an atypical location of ES API, don't forget to change the macros '{$ELASTICSEARCH.SCHEME}','{$ELASTICSEARCH.PORT}'.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/399473-discussion-thread-for-official-zabbix-template-for-elasticsearch
         
@@ -26,7 +31,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: f3531c005c7f477b9916b4bf1ad273c2
-          name: 'ES: Delayed unassigned shards'
+          name: 'Delayed unassigned shards'
           type: DEPENDENT
           key: es.cluster.delayed_unassigned_shards
           delay: '0'
@@ -42,7 +47,7 @@ zabbix_export:
             - tag: component
               value: shards
         - uuid: 7f587fd270be4eb68d81ae1de2a3ca1f
-          name: 'ES: Get cluster health'
+          name: 'Get cluster health'
           type: HTTP_AGENT
           key: es.cluster.get_health
           history: '0'
@@ -53,12 +58,12 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns the health status of a cluster.'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_cluster/health?timeout=5s'
           tags:
             - tag: component
               value: raw
         - uuid: 7066a66f352e4d79ba4aec11c0c5c611
-          name: 'ES: Get cluster stats'
+          name: 'Get cluster stats'
           type: HTTP_AGENT
           key: es.cluster.get_stats
           history: '0'
@@ -69,12 +74,12 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns cluster statistics.'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_cluster/stats'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_cluster/stats'
           tags:
             - tag: component
               value: raw
         - uuid: 500a763b9bfd4044b2d3bc95d3a0586c
-          name: 'ES: Inactive shards percentage'
+          name: 'Inactive shards percentage'
           type: DEPENDENT
           key: es.cluster.inactive_shards_percent_as_number
           delay: '0'
@@ -95,7 +100,7 @@ zabbix_export:
             - tag: component
               value: shards
         - uuid: e0b684d5992a496981cf6fb9bb85be62
-          name: 'ES: Number of initializing shards'
+          name: 'Number of initializing shards'
           type: DEPENDENT
           key: es.cluster.initializing_shards
           delay: '0'
@@ -113,14 +118,14 @@ zabbix_export:
           triggers:
             - uuid: ee59684bb2044540ad0306a5b6deb408
               expression: 'min(/Elasticsearch Cluster by HTTP/es.cluster.initializing_shards,10m)>0'
-              name: 'ES: Cluster has the initializing shards'
+              name: 'Cluster has the initializing shards'
               priority: AVERAGE
               description: 'The cluster has the initializing shards longer than 10 minutes.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 7d3c87e2fcae49438a14380f7d5faa81
-          name: 'ES: Number of data nodes'
+          name: 'Number of data nodes'
           type: DEPENDENT
           key: es.cluster.number_of_data_nodes
           delay: '0'
@@ -139,7 +144,7 @@ zabbix_export:
             - tag: component
               value: nodes
         - uuid: 4ec7496b441643f39df3e25c0225e6ec
-          name: 'ES: Number of nodes'
+          name: 'Number of nodes'
           type: DEPENDENT
           key: es.cluster.number_of_nodes
           delay: '0'
@@ -160,7 +165,7 @@ zabbix_export:
           triggers:
             - uuid: 5be4cb40e72442aca18ea014adbead23
               expression: 'change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)<0'
-              name: 'ES: The number of nodes within the cluster has decreased'
+              name: 'The number of nodes within the cluster has decreased'
               priority: INFO
               manual_close: 'YES'
               tags:
@@ -168,14 +173,14 @@ zabbix_export:
                   value: notice
             - uuid: 2fba2b29425b4ff9a4008db9bde49d7f
               expression: 'change(/Elasticsearch Cluster by HTTP/es.cluster.number_of_nodes)>0'
-              name: 'ES: The number of nodes within the cluster has increased'
+              name: 'The number of nodes within the cluster has increased'
               priority: INFO
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 2c84eea7f4a642f8892cb7f50febb562
-          name: 'ES: Number of pending tasks'
+          name: 'Number of pending tasks'
           type: DEPENDENT
           key: es.cluster.number_of_pending_tasks
           delay: '0'
@@ -191,7 +196,7 @@ zabbix_export:
             - tag: component
               value: tasks
         - uuid: 981818f43a3c4b36b36e4b3c4e3468e9
-          name: 'ES: Number of relocating shards'
+          name: 'Number of relocating shards'
           type: DEPENDENT
           key: es.cluster.relocating_shards
           delay: '0'
@@ -207,7 +212,7 @@ zabbix_export:
             - tag: component
               value: shards
         - uuid: b9568a6370dc40efae45ac1e0b719dd7
-          name: 'ES: Cluster health status'
+          name: 'Cluster health status'
           type: DEPENDENT
           key: es.cluster.status
           delay: '0'
@@ -243,7 +248,7 @@ zabbix_export:
           triggers:
             - uuid: f3bb7e96f6074063bad76521e1dce24f
               expression: 'last(/Elasticsearch Cluster by HTTP/es.cluster.status)=2'
-              name: 'ES: Health is RED'
+              name: 'Health is RED'
               priority: HIGH
               description: |
                 One or more primary shards are unassigned, so some data is unavailable.
@@ -253,7 +258,7 @@ zabbix_export:
                   value: availability
             - uuid: 33a6ef13f7b240768841919482709411
               expression: 'last(/Elasticsearch Cluster by HTTP/es.cluster.status)=255'
-              name: 'ES: Health is UNKNOWN'
+              name: 'Health is UNKNOWN'
               priority: HIGH
               description: 'The health status of the cluster is unknown or cannot be obtained.'
               tags:
@@ -261,7 +266,7 @@ zabbix_export:
                   value: availability
             - uuid: 99f36c2aa5d64248b96d1fc97c3b3065
               expression: 'last(/Elasticsearch Cluster by HTTP/es.cluster.status)=1'
-              name: 'ES: Health is YELLOW'
+              name: 'Health is YELLOW'
               priority: AVERAGE
               description: |
                 All primary shards are assigned, but one or more replica shards are unassigned.
@@ -270,7 +275,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 2295e2ba3d4949feb3519ac85ba6ff86
-          name: 'ES: Task max waiting in queue'
+          name: 'Task max waiting in queue'
           type: DEPENDENT
           key: es.cluster.task_max_waiting_in_queue
           delay: '0'
@@ -291,7 +296,7 @@ zabbix_export:
             - tag: component
               value: tasks
         - uuid: 85e82cba1e5c479caede2a94c58239be
-          name: 'ES: Number of unassigned shards'
+          name: 'Number of unassigned shards'
           type: DEPENDENT
           key: es.cluster.unassigned_shards
           delay: '0'
@@ -309,14 +314,14 @@ zabbix_export:
           triggers:
             - uuid: 35bdd54f27a64009b96a06a12508f99c
               expression: 'min(/Elasticsearch Cluster by HTTP/es.cluster.unassigned_shards,10m)>0'
-              name: 'ES: Cluster has the unassigned shards'
+              name: 'Cluster has the unassigned shards'
               priority: AVERAGE
               description: 'The cluster has the unassigned shards longer than 10 minutes.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: db2f3161eaff4eb0b25d4191b423c733
-          name: 'ES: Indices with shards assigned to nodes'
+          name: 'Indices with shards assigned to nodes'
           type: DEPENDENT
           key: es.indices.count
           delay: '0'
@@ -335,7 +340,7 @@ zabbix_export:
             - tag: component
               value: indices
         - uuid: 25cb1e0203334efd96d3e626f81b4670
-          name: 'ES: Number of non-deleted documents'
+          name: 'Number of non-deleted documents'
           type: DEPENDENT
           key: es.indices.docs.count
           delay: '0'
@@ -356,7 +361,7 @@ zabbix_export:
             - tag: component
               value: documents
         - uuid: 54f51a653e014290aa3f91deaca44e47
-          name: 'ES: Nodes with the data role'
+          name: 'Nodes with the data role'
           type: DEPENDENT
           key: es.nodes.count.data
           delay: '0'
@@ -375,7 +380,7 @@ zabbix_export:
             - tag: component
               value: nodes
         - uuid: 613ab3469f234e278af99d61e57b46bd
-          name: 'ES: Nodes with the ingest role'
+          name: 'Nodes with the ingest role'
           type: DEPENDENT
           key: es.nodes.count.ingest
           delay: '0'
@@ -394,7 +399,7 @@ zabbix_export:
             - tag: component
               value: nodes
         - uuid: e7b36f37b86845339a306dacf874164a
-          name: 'ES: Nodes with the master role'
+          name: 'Nodes with the master role'
           type: DEPENDENT
           key: es.nodes.count.master
           delay: '0'
@@ -415,14 +420,14 @@ zabbix_export:
           triggers:
             - uuid: 8011883baef04aa0bed343d1bb0df288
               expression: 'last(/Elasticsearch Cluster by HTTP/es.nodes.count.master)=2'
-              name: 'ES: Cluster has only two master nodes'
+              name: 'Cluster has only two master nodes'
               priority: DISASTER
               description: 'The cluster has only two nodes with a master role and will be unavailable if one of them breaks.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: c3ea99e5897b4663a3239d0edd66f1f0
-          name: 'ES: Total available size to JVM in all file stores'
+          name: 'Total available size to JVM in all file stores'
           type: DEPENDENT
           key: es.nodes.fs.available_in_bytes
           delay: '0'
@@ -445,7 +450,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b8c3c5d8866d4a6b9c6847b5c8da0631
-          name: 'ES: Total size of all file stores'
+          name: 'Total size of all file stores'
           type: DEPENDENT
           key: es.nodes.fs.total_in_bytes
           delay: '0'
@@ -465,7 +470,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 66c22b8b2b8b40fda7ac6f0ae472befd
-          name: 'ES: Get nodes stats'
+          name: 'Get nodes stats'
           type: HTTP_AGENT
           key: es.nodes.get_stats
           history: '0'
@@ -476,12 +481,12 @@ zabbix_export:
           password: '{$ELASTICSEARCH.PASSWORD}'
           description: 'Returns cluster nodes statistics.'
           timeout: 30s
-          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_nodes/stats'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_nodes/stats'
           tags:
             - tag: component
               value: raw
         - uuid: 2dcf54f21cbd4af9a7931e3a2522685c
-          name: 'ES: Cluster uptime'
+          name: 'Cluster uptime'
           type: DEPENDENT
           key: es.nodes.jvm.max_uptime
           delay: '0'
@@ -504,8 +509,8 @@ zabbix_export:
           triggers:
             - uuid: d28aa18c85cb4f48a9e7b8ba55d65400
               expression: 'last(/Elasticsearch Cluster by HTTP/es.nodes.jvm.max_uptime)<10m'
-              name: 'ES: Cluster has been restarted'
-              event_name: 'ES: Cluster has been restarted (uptime < 10m)'
+              name: 'Cluster has been restarted'
+              event_name: 'Cluster has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -513,9 +518,9 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 671888d47c724e54aca78fbe1b3ecaed
-          name: 'ES: Service response time'
+          name: 'Service response time'
           type: SIMPLE
-          key: 'net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]'
+          key: 'net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]'
           history: 7d
           value_type: FLOAT
           units: s
@@ -525,22 +530,22 @@ zabbix_export:
               value: network
           triggers:
             - uuid: 2a3f3b96e5dd47de998ccc17f109e149
-              expression: 'min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
-              name: 'ES: Service response time is too high'
-              event_name: 'ES: Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
+              expression: 'min(/Elasticsearch Cluster by HTTP/net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"],5m)>{$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN}'
+              name: 'Service response time is too high'
+              event_name: 'Service response time is too high (over {$ELASTICSEARCH.RESPONSE_TIME.MAX.WARN} for 5m)'
               priority: WARNING
               description: 'The performance of the TCP service is very low.'
               manual_close: 'YES'
               dependencies:
-                - name: 'ES: Service is down'
-                  expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0'
+                - name: 'Service is down'
+                  expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"])=0'
               tags:
                 - tag: scope
                   value: performance
         - uuid: d0d38ce55f844a51a0f2131c86bec1ae
-          name: 'ES: Service status'
+          name: 'Service status'
           type: SIMPLE
-          key: 'net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"]'
+          key: 'net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]'
           history: 7d
           description: 'Checks if the service is running and accepting TCP connections.'
           valuemap:
@@ -556,8 +561,8 @@ zabbix_export:
               value: network
           triggers:
             - uuid: b4d76f68ce94492f96bbfbb778d1f144
-              expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{HOST.CONN}","{$ELASTICSEARCH.PORT}"])=0'
-              name: 'ES: Service is down'
+              expression: 'last(/Elasticsearch Cluster by HTTP/net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"])=0'
+              name: 'Service is down'
               priority: AVERAGE
               description: 'The service is unavailable or does not accept TCP connections.'
               manual_close: 'YES'
@@ -1774,7 +1779,7 @@ zabbix_export:
                     host: 'Elasticsearch Cluster by HTTP'
                     key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
           timeout: 15s
-          url: '{$ELASTICSEARCH.SCHEME}://{HOST.CONN}:{$ELASTICSEARCH.PORT}/_nodes/_all/nodes'
+          url: '{$ELASTICSEARCH.SCHEME}://{$ELASTICSEARCH.HOST}:{$ELASTICSEARCH.PORT}/_nodes/_all/nodes'
           lld_macro_paths:
             - lld_macro: '{#ES.NODE}'
               path: $..name.first()
@@ -1803,6 +1808,9 @@ zabbix_export:
         - macro: '{$ELASTICSEARCH.HEAP_USED.MAX.WARN}'
           value: '85'
           description: 'The maximum percent in the use of JVM heap for warning trigger expression.'
+        - macro: '{$ELASTICSEARCH.HOST}'
+          value: '<SET ELASTICSEARCH HOST>'
+          description: 'The hostname or IP address of the Elasticsearch host.'
         - macro: '{$ELASTICSEARCH.INDEXING_LATENCY.MAX.WARN}'
           value: '100'
           description: 'Maximum of indexing latency in milliseconds for trigger expression.'
@@ -1844,7 +1852,7 @@ zabbix_export:
   triggers:
     - uuid: a2f33888d2774325b7955b633a7aae81
       expression: '(last(/Elasticsearch Cluster by HTTP/es.nodes.fs.total_in_bytes)-last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes))/(last(/Elasticsearch Cluster by HTTP/es.cluster.number_of_data_nodes)-1)>last(/Elasticsearch Cluster by HTTP/es.nodes.fs.available_in_bytes)'
-      name: 'ES: Cluster does not have enough space for resharding'
+      name: 'Cluster does not have enough space for resharding'
       priority: HIGH
       description: 'There is not enough disk space for index resharding.'
       tags:

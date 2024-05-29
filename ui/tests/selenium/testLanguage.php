@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
@@ -95,9 +90,9 @@ class testLanguage extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->checkLanguage($data['message'], $data['page_title'], $data['html_lang'], $data['defaultdb_lang']);
 
-		// Red info icon check.
-		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:red')->one()->getText());
+		// Yellow info icon check.
+		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
+		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
 
 		// After logout, warning message and login menu has system language.
 		$this->page->logout();
@@ -167,9 +162,9 @@ class testLanguage extends CWebTest {
 		$this->page->open('zabbix.php?action=userprofile.edit');
 		$form = $this->query('name:user_form')->one()->asForm();
 
-		// Red info icon check.
-		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->one()->click();
-		$this->assertEquals($data['info'], $this->query('class:red')->one()->getText());
+		// Yellow info icon check.
+		$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->click();
+		$this->assertEquals($data['info'], $this->query('class:hintbox-wrap')->one()->getText());
 
 		// Change user language to different from System.
 		$form->fill($data['field']);

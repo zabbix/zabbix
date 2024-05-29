@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcommon.h"
@@ -127,6 +122,11 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "internal poller";
 		case ZBX_PROCESS_TYPE_DBCONFIGWORKER:
 			return "configuration syncer worker";
+		case ZBX_PROCESS_TYPE_PG_MANAGER:
+			return "proxy group manager";
+		case ZBX_PROCESS_TYPE_BROWSERPOLLER:
+			return "browser poller";
+			break;
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
@@ -195,28 +195,6 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 	}
 }
 
-const char	*zbx_interface_type_string(zbx_interface_type_t type)
-{
-	switch (type)
-	{
-		case INTERFACE_TYPE_AGENT:
-			return "Zabbix agent";
-		case INTERFACE_TYPE_SNMP:
-			return "SNMP";
-		case INTERFACE_TYPE_IPMI:
-			return "IPMI";
-		case INTERFACE_TYPE_JMX:
-			return "JMX";
-		case INTERFACE_TYPE_OPT:
-			return "optional";
-		case INTERFACE_TYPE_ANY:
-			return "any";
-		case INTERFACE_TYPE_UNKNOWN:
-		default:
-			return "unknown";
-	}
-}
-
 const char	*zbx_sysinfo_ret_string(int ret)
 {
 	switch (ret)
@@ -234,6 +212,8 @@ const char	*zbx_result_string(int result)
 {
 	switch (result)
 	{
+		case SUCCEED_PARTIAL:
+			return "SUCCEED_PARTIAL";
 		case SUCCEED:
 			return "SUCCEED";
 		case FAIL:
@@ -254,6 +234,12 @@ const char	*zbx_result_string(int result)
 			return "SIG_ERROR";
 		case SYSINFO_RET_FAIL:
 			return "SYSINFO_RET_FAIL";
+		case CONNECT_ERROR:
+			return "CONNECT_ERROR";
+		case SEND_ERROR:
+			return "SEND_ERROR";
+		case RECV_ERROR:
+			return "RECV_ERROR";
 		default:
 			return "unknown";
 	}

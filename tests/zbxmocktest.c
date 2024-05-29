@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
@@ -32,7 +27,7 @@ unsigned char	get_program_type(void)
 	return program_type;
 }
 
-static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
 	1, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
@@ -77,16 +72,17 @@ static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
+	0 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
 };
 
 int	get_config_forks(unsigned char process_type)
 {
-	return CONFIG_FORKS[process_type];
+	return config_forks[process_type];
 }
 
 void	set_config_forks(unsigned char process_type, int forks)
 {
-	CONFIG_FORKS[process_type] = forks;
+	config_forks[process_type] = forks;
 }
 
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
@@ -102,10 +98,6 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 }
 
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
-
-char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
-char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
-int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 /* not used in tests, defined for linking with comms.c */
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
@@ -142,9 +134,9 @@ int	main (void)
 	};
 
 	zbx_set_log_level(LOG_LEVEL_INFORMATION);
-	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
-	zbx_init_library_nix(get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

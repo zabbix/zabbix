@@ -1,3 +1,17 @@
+/*
+** Copyright (C) 2001-2024 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockhelper.h"
@@ -40,7 +54,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_result(&result);
 	zbx_init_agent_request(&request);
 
-	zbx_init_library_sysinfo(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	zbx_init_library_sysinfo(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 	if (SUCCEED != zbx_parse_item_key(itemkey, &request))
 		fail_msg("Invalid item key format '%s'", itemkey);

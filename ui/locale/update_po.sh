@@ -35,7 +35,7 @@ function run
 	cd "$workdir" || die
 
 	local pofiles=locale/*/LC_MESSAGES/frontend.po
-	local curpot=locale/en/LC_MESSAGES/frontend.pot
+	local curpot=locale/en_US/LC_MESSAGES/frontend.pot
 	local oldpot=locale/old.pot
 	local newpot=locale/new.pot
 	local cur_msgids=locale/cur_msgids

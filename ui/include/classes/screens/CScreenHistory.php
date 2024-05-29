@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -300,8 +295,8 @@ class CScreenHistory extends CScreenBase {
 				]);
 
 				// Array $history_data will be modified according page and rows on page.
-				$pagination = CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP,
-					new CUrl($this->page_file)
+				$history_table->setPageNavigation(
+					CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP, new CUrl($this->page_file))
 				);
 
 				foreach ($history_data as $data) {
@@ -385,7 +380,7 @@ class CScreenHistory extends CScreenBase {
 					$history_table->addRow($row);
 				}
 
-				$output[] = [$history_table, $pagination];
+				$output[] = $history_table;
 			}
 			/**
 			 * View type: 500 latest values.
@@ -493,12 +488,11 @@ class CScreenHistory extends CScreenBase {
 					}
 				}
 
-				// Array $history_data will be modified according page and rows on page.
-				$pagination = CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP,
-					new CUrl($this->page_file)
-				);
-
-				$history_table = (new CTableInfo())->setHeader($table_header);
+				$history_table = (new CTableInfo())
+					->setHeader($table_header)
+					->setPageNavigation(
+						CPagerHelper::paginate($this->page, $history_data, ZBX_SORT_UP, new CUrl($this->page_file))
+					);
 
 				foreach ($history_data as $history_data_row) {
 					$row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_data_row['clock'])))
@@ -523,7 +517,7 @@ class CScreenHistory extends CScreenBase {
 					$history_table->addRow($row);
 				}
 
-				$output[] = [$history_table, $pagination];
+				$output[] = $history_table;
 			}
 		}
 

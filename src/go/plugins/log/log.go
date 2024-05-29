@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package log
@@ -25,13 +20,13 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/zbxlib"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 var impl Plugin
@@ -48,10 +43,9 @@ type Plugin struct {
 }
 
 type metadata struct {
-	key       string
-	params    []string
-	blob      unsafe.Pointer
-	lastcheck time.Time
+	key    string
+	params []string
+	blob   unsafe.Pointer
 }
 
 func init() {
@@ -91,7 +85,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if meta.Data == nil {
 		data = &metadata{key: key, params: params}
 		runtime.SetFinalizer(data, func(d *metadata) { zbxlib.FreeActiveMetric(d.blob) })
-		if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
+
+		data.blob, err = zbxlib.NewActiveMetric(ctx.ItemID(), key, params, meta.LastLogsize(), meta.Mtime())
+		if err != nil {
 			return nil, err
 		}
 		meta.Data = data
@@ -102,7 +98,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			data.key = key
 			data.params = params
 			// recreate if item key has been changed
-			if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
+			data.blob, err = zbxlib.NewActiveMetric(ctx.ItemID(), key, params, meta.LastLogsize(), meta.Mtime())
+			if err != nil {
 				return nil, err
 			}
 		}
@@ -116,11 +113,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	// with flexible checks there are no guaranteed refresh time,
 	// so using number of seconds elapsed since last check
 	now := time.Now()
-	refresh := zbxlib.GetCheckIntervalSeconds(ctx.ItemID(), ctx.Delay(), now, data.lastcheck)
+	nextcheck := zbxlib.GetNextcheckSeconds(ctx.ItemID(), ctx.Delay(), now)
 	logitem := zbxlib.LogItem{Results: make([]*zbxlib.LogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
-	zbxlib.ProcessLogCheck(data.blob, &logitem, refresh, grxp.Cblob, ctx.ItemID())
-	data.lastcheck = now
+	zbxlib.ProcessLogCheck(data.blob, &logitem, nextcheck, grxp.Cblob, ctx.ItemID())
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))

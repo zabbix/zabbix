@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxmocktest.h"
@@ -27,7 +22,7 @@
 #include "module.h"
 #include "zbxsysinfo.h"
 
-extern zbx_vector_ptr_t	key_access_rules;
+#include "../../../src/libs/zbxsysinfo/sysinfo.h"
 
 static int	zbx_mock_str_to_key_access_type(const char *str)
 {
@@ -78,9 +73,10 @@ void	zbx_mock_test_entry(void **state)
 
 	rules = zbx_mock_get_parameter_uint64("out.number_of_rules");
 
-	if ((int)rules != key_access_rules.values_num)
+	if ((int)rules != (get_key_access_rules())->values_num)
 	{
-		fail_msg("Number of key access rules is %d, but %d expected", key_access_rules.values_num, (int)rules);
+		fail_msg("Number of key access rules is %d, but %d expected", (get_key_access_rules())->values_num,
+				(int)rules);
 	}
 
 	hmetrics = zbx_mock_get_parameter_handle("out.metrics");

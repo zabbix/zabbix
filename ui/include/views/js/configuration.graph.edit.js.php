@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -45,7 +40,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class="list-numbered-item">:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -124,7 +119,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class="list-numbered-item">:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -194,7 +189,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class="list-numbered-item">:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -265,7 +260,7 @@
 
 		<!-- row number -->
 		<td>
-			<span class="list-numbered-item">:</span>
+			<span class="<?= ZBX_STYLE_LIST_NUMBERED_ITEM ?>">:</span>
 		</td>
 
 		<!-- name -->
@@ -613,37 +608,21 @@
 				$obj.attr('id', 'tmp' + $obj.attr('id'));
 			});
 
-			// Rewrite IDs to new order.
-			$('#itemsTable tbody tr.graph-item').each(function() {
-				const $obj = $(this);
+			for (const [index, row] of document.querySelectorAll('#itemsTable tbody tr.graph-item').entries()) {
+				row.id = row.id.substring(3).replace(/\d+/, `${index}`);
 
-				// Rewrite IDs in input fields.
-				$obj.find('*[id]').each(function() {
-					const $obj = $(this);
-					const id = $obj.attr('id').substring(3);
-					const part1 = id.substring(0, id.indexOf('items_') + 5);
-					let part2 = id.substring(id.indexOf('items_') + 6);
+				row.querySelectorAll('[id]').forEach(element => {
+					element.id = element.id.substring(3).replace(/\d+/, `${index}`);
 
-					part2 = part2.substring(part2.indexOf('_') + 1);
-
-					$obj.attr('id', part1 + '_' + i + '_' + part2);
-
-					// Set sortorder.
-					if (part2 === 'sortorder') {
-						$obj.val(i);
+					if (element.id.includes('sortorder')) {
+						element.value = index;
 					}
 				});
 
-				// Rewrite IDs in <tr>.
-				const id = $obj.attr('id').substring(3);
-				const part1 = id.substring(0, id.indexOf('items_') + 5);
-
-				$obj.attr('id', part1 + '_' + i);
-
-				i++;
-			});
-
-			i = 0;
+				row.querySelectorAll('[name]').forEach(element => {
+					element.name = element.name.replace(/\d+/, `${index}`);
+				});
+			}
 
 			$('#itemsTable tbody tr.graph-item').each(function() {
 				// Set remove number.

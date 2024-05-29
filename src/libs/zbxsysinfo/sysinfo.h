@@ -1,26 +1,23 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
 #include "zbxsysinfo.h"
+
+#include "zbxalgo.h"
 
 #define ZBX_PROC_STAT_ALL	0
 #define ZBX_PROC_STAT_RUN	1
@@ -121,6 +118,7 @@ const char	*sysinfo_get_config_hostname(void);
 const char	*sysinfo_get_config_hostnames(void);
 const char	*sysinfo_get_config_host_metadata(void);
 const char	*sysinfo_get_config_host_metadata_item(void);
+const char	*sysinfo_get_config_service_name(void);
 
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
 
@@ -243,4 +241,6 @@ void	collect_vmstat_data(ZBX_VMSTAT_DATA *vmstat);
 #endif
 
 int	sysinfo_get_config_timeout(void);
+
+zbx_vector_ptr_t	*get_key_access_rules(void);
 #endif /* ZABBIX_SYSINFO_H */

@@ -22,7 +22,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: b4978a9a4cff4ce88fbc82683b61eec4
-          name: 'MS Exchange: Databases total mounted'
+          name: 'Databases total mounted'
           key: 'perf_counter_en["\MSExchange Active Manager(_total)\Database Mounted"]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d
@@ -35,7 +35,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 9b59700d8db8472fbde41c85c7a06ffc
-          name: 'MS Exchange [Client Access Server]: ActiveSync: ping command pending'
+          name: 'ActiveSync: ping command pending'
           key: 'perf_counter_en["\MSExchange ActiveSync\Ping Commands Pending", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d
@@ -45,7 +45,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: fa70b4e2d17c44c6945dd2d1c971c34c
-          name: 'MS Exchange [Client Access Server]: ActiveSync: requests per second'
+          name: 'ActiveSync: requests per second'
           key: 'perf_counter_en["\MSExchange ActiveSync\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d
@@ -55,7 +55,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 8528015c73134a239d7ac235464788dd
-          name: 'MS Exchange [Client Access Server]: ActiveSync: sync commands per second'
+          name: 'ActiveSync: sync commands per second'
           key: 'perf_counter_en["\MSExchange ActiveSync\Sync Commands/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d
@@ -65,7 +65,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 456cb7af0b224a59afabae36d24d2cbc
-          name: 'MS Exchange [Client Access Server]: Autodiscover: requests per second'
+          name: 'Autodiscover: requests per second'
           key: 'perf_counter_en["\MSExchangeAutodiscover\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d
@@ -75,7 +75,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: b9a539175cbb4259b064a787a25e9dbe
-          name: 'MS Exchange [Client Access Server]: Availability Service: availability requests per second'
+          name: 'Availability Service: availability requests per second'
           key: 'perf_counter_en["\MSExchange Availability Service\Availability Requests (sec)", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d
@@ -85,7 +85,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 3c2a83dfef35497baf8c38b801854882
-          name: 'MS Exchange [Client Access Server]: Outlook Web App: current unique users'
+          name: 'Outlook Web App: current unique users'
           key: 'perf_counter_en["\MSExchange OWA\Current Unique Users", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d
@@ -95,7 +95,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 2c7fd331673e4d84aa09551222469b08
-          name: 'MS Exchange [Client Access Server]: Outlook Web App: requests per second'
+          name: 'Outlook Web App: requests per second'
           key: 'perf_counter_en["\MSExchange OWA\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d
@@ -105,7 +105,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 9808449df53148a9a988a69d66944371
-          name: 'MS Exchange [Client Access Server]: MSExchangeWS: requests per second'
+          name: 'MSExchangeWS: requests per second'
           key: 'perf_counter_en["\MSExchangeWS\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}]'
           delay: '{$MS.EXCHANGE.PERF.INTERVAL}'
           history: 7d

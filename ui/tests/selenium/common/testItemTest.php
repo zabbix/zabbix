@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -40,7 +35,7 @@ class testItemTest extends CWebTest {
 		];
 	}
 
-	const HOST_ID = 99136;		// 'Test item host' monitored by 'Proxy for Discovery rule'
+	const HOST_ID = 99136;		// 'Test item host'  monitored by 'Active proxy 1'.
 	const TEMPLATE_ID = 99137;	// 'Test Item Template'
 
 	/**
@@ -769,7 +764,8 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxyid',
+						'test_with' => 'id:test_with',
+						'proxy' => 'xpath:.//div[@id="proxyid"]/..',
 						'version' => 'id:interface_details_version',
 						'context' => 'id:interface_details_contextname',
 						'security' => 'id:interface_details_securityname',
@@ -784,7 +780,8 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxyid',
+						'test_with' => 'id:test_with',
+						'proxy' => 'xpath:.//div[@id="proxyid"]/..',
 						'version' => 'id:interface_details_version',
 						'community' => 'id:interface_details_community'
 					];
@@ -793,7 +790,8 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxyid'
+						'test_with' => 'id:test_with',
+						'proxy' => 'xpath:.//div[@id="proxyid"]/..'
 					];
 				}
 
@@ -812,26 +810,42 @@ class testItemTest extends CWebTest {
 							$fields_value = [
 								'address' => $host_interface[0],
 								'port' => $host_interface[1],
-								'proxy' => $proxy
+								'test_with' => 'Proxy',
+								'proxy' => [$proxy]
 							];
 						}
 						else {
 							$fields_value = [
 								'address' => '',
 								'port' => '',
-								'proxy' => '(no proxy)'
+								'test_with' => 'Server'
 							];
 						}
-						$fields_state = ['address' => true, 'port' => true, 'proxy' => true];
+						$fields_state = ['address' => true, 'port' => true, 'test_with' => true, 'proxy' => true];
 						break;
 
 					case 'SNMP agent':
 						if (CTestArrayHelper::get($data, 'snmp_fields.version') === 'SNMPv3') {
+							$fields_state = [
+								'address' => true,
+								'port' => true,
+								'test_with' => true,
+								'version' => true,
+								'context' => true,
+								'security' => true,
+								'security_level' => true,
+								'authentication_protocol' => true,
+								'authentication_passphrase' => true,
+								'privacy_protocol' => true,
+								'privacy_passphrase' => true
+							];
+
 							if ($is_host) {
 								$fields_value = [
 									'address' => $host_interface[0],
 									'port' => $host_interface[1],
-									'proxy' => $proxy,
+									'test_with' => 'Proxy',
+									'proxy' => [$proxy],
 									'version' => 'SNMPv3',
 									'context' => $data['snmp_fields']['context'],
 									'security' => $data['snmp_fields']['security'],
@@ -841,12 +855,14 @@ class testItemTest extends CWebTest {
 									'privacy_protocol' => $data['snmp_fields']['privacy_protocol'],
 									'privacy_passphrase' => $data['snmp_fields']['privacy_passphrase']
 								];
+
+								$fields_state['proxy'] = true;
 							}
 							else {
 								$fields_value = [
 									'address' => '',
 									'port' => '',
-									'proxy' => '(no proxy)',
+									'test_with' => 'Server',
 									'version' => 'SNMPv2',
 									'context' => '',
 									'security' => '',
@@ -857,60 +873,60 @@ class testItemTest extends CWebTest {
 									'privacy_passphrase' => ''
 								];
 							}
-
+						}
+						else {
 							$fields_state = [
 								'address' => true,
 								'port' => true,
-								'proxy' => true,
+								'test_with' => true,
 								'version' => true,
-								'context' => true,
-								'security' => true,
-								'security_level' => true,
-								'authentication_protocol' => true,
-								'authentication_passphrase' => true,
-								'privacy_protocol' => true,
-								'privacy_passphrase' => true
+								'community' => true
 							];
-						}
-						else {
+
 							if ($is_host) {
 								$fields_value = [
 									'address' => $host_interface[0],
 									'port' => $host_interface[1],
-									'proxy' => $proxy,
+									'test_with' => 'Proxy',
+									'proxy' => [$proxy],
 									'version' => CTestArrayHelper::get($data, 'snmp_fields.version', 'SNMPv2'),
 									'community' => CTestArrayHelper::get($data, 'snmp_fields.community', 'public')
 								];
+
+								$fields_state['proxy'] = true;
 							}
 							else {
 								$fields_value = [
 									'address' => '',
 									'port' => '',
-									'proxy' => '(no proxy)',
+									'test_with' => 'Server',
 									'version' => 'SNMPv2',
 									'community' => ''
 								];
 							}
-
-							$fields_state = [
-								'address' => true,
-								'port' => true,
-								'proxy' => true,
-								'version' => true,
-								'community' => true
-							];
 						}
 						break;
 
 					case 'SSH agent':
 					case 'TELNET agent':
 					case 'Simple check':
+						$fields_state = [
+							'address' => true,
+							'port' => false,
+							'test_with' => true
+						];
+
 						$fields_value = [
 							'address' => $is_host ? $host_interface[0] : '',
 							'port' => '',
-							'proxy' => $is_host ? $proxy : '(no proxy)'
+							'test_with' => ($is_host) ? 'Proxy' : 'Server'
 						];
-						$fields_state = ['address' => true, 'port' => false, 'proxy' => true];
+
+						if ($is_host) {
+							$fields_value['proxy'] = [$proxy];
+							$fields_state['proxy'] = true;
+						}
+
 						break;
 
 					case 'Zabbix internal':
@@ -918,25 +934,56 @@ class testItemTest extends CWebTest {
 					case 'Database monitor':
 					case 'HTTP agent':
 					case 'JMX agent':
+						$fields_state = [
+							'address' => false,
+							'port' => false,
+							'test_with' => true
+						];
+
 						$fields_value = [
 							'address' => '',
 							'port' => '',
-							'proxy' => $is_host ? $proxy : '(no proxy)'
+							'test_with' => ($is_host) ? 'Proxy' : 'Server'
 						];
-						$fields_state = ['address' => false, 'port' => false, 'proxy' => true];
+
+						if ($is_host) {
+							$fields_value['proxy'] = [$proxy];
+							$fields_state['proxy'] = true;
+						}
+
 						break;
 
 					case 'Calculated':
-						$fields_value = ['address' => '', 'port' => '', 'proxy' => '(no proxy)'];
-						$fields_state = ['address' => false, 'port' => false, 'proxy' => false];
+						$fields_state = [
+							'address' => false,
+							'port' => false,
+							'test_with' => false
+						];
+
+						$fields_value = [
+							'address' => '',
+							'port' => '',
+							'test_with' => 'Server'
+						];
+
+						if ($is_host) {
+							$fields_value['proxy'] = '';
+							$fields_state['proxy'] = true;
+						}
+
 						break;
 				}
 
 				foreach ($fields_value as $field => $value) {
-					$this->assertEquals($elements[$field]->getValue(), $value);
+					$this->assertEquals($value, $elements[$field]->getValue());
 				}
 				foreach ($fields_state as $field => $state) {
 					$this->assertTrue($elements[$field]->isEnabled($state));
+
+					// Check that proxy multiselect is not visible if "Test with" is set to "Server".
+					if ($field === 'test_with' && $fields_value[$field] === 'Server') {
+						$this->assertFalse($test_form->query('id:proxyid')->one()->isDisplayed());
+					}
 				}
 
 				// Check value fields.

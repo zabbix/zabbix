@@ -54,23 +54,23 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SD-WAN: Authentication|<p>Cisco SD-WAN authentication with service account parameters and temporary-generated token usage.</p><p>Returns an authentication token and session id; it is required only once and is used for all dependent script items.</p><p>A session will expire after 30 minutes of inactivity or after 24 hours, which is the total lifespan of a session.</p><p>Check the template documentation for the details.</p>|Script|sd_wan.authentication|
-|SD-WAN: Authentication item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|sd_wan.auth.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Get devices|<p>Item for gathering all devices from Cisco SD-WAN API.</p>|Dependent item|sd_wan.get.devices<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|SD-WAN: Get devices item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|sd_wan.get.devices.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Invalid certificates|<p>Number of invalid certificates.</p>|Dependent item|sd_wan.invalid_certificates<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.cert_valid != "Valid")].length()`</p></li></ul>|
-|SD-WAN: Total devices|<p>The total number of all devices.</p>|Dependent item|sd_wan.total.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Number of vEdge devices|<p>The total number of vEdge devices.</p>|Dependent item|sd_wan.vedge.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.type == "vedge")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Number of vBond devices|<p>The total number of vBond devices.</p>|Dependent item|sd_wan.vbond.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.type == "vbond")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Number of vSmart devices|<p>The total number of vSmart devices.</p>|Dependent item|sd_wan.vsmart.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.type == "vsmart")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Number of vManage devices|<p>The total number of vManage devices.</p>|Dependent item|sd_wan.vmanage.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.type == "vmanage")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Authentication|<p>Cisco SD-WAN authentication with service account parameters and temporary-generated token usage.</p><p>Returns an authentication token and session id; it is required only once and is used for all dependent script items.</p><p>A session will expire after 30 minutes of inactivity or after 24 hours, which is the total lifespan of a session.</p><p>Check the template documentation for the details.</p>|Script|sd_wan.authentication|
+|Authentication item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|sd_wan.auth.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get devices|<p>Item for gathering all devices from Cisco SD-WAN API.</p>|Dependent item|sd_wan.get.devices<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get devices item errors|<p>Item for gathering all the data item errors.</p>|Dependent item|sd_wan.get.devices.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Invalid certificates|<p>Number of invalid certificates.</p>|Dependent item|sd_wan.invalid_certificates<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.cert_valid != "Valid")].length()`</p></li></ul>|
+|Total devices|<p>The total number of all devices.</p>|Dependent item|sd_wan.total.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Number of vEdge devices|<p>The total number of vEdge devices.</p>|Dependent item|sd_wan.vedge.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.type == "vedge")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Number of vBond devices|<p>The total number of vBond devices.</p>|Dependent item|sd_wan.vbond.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.type == "vbond")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Number of vSmart devices|<p>The total number of vSmart devices.</p>|Dependent item|sd_wan.vsmart.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.type == "vsmart")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Number of vManage devices|<p>The total number of vManage devices.</p>|Dependent item|sd_wan.vmanage.devices<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.devices[?(@.type == "vmanage")].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SD-WAN: Authentication has failed||`length(last(/Cisco SD-WAN by HTTP/sd_wan.auth.errors))>0`|Average||
-|SD-WAN: There are errors in the 'Get devices' metric||`length(last(/Cisco SD-WAN by HTTP/sd_wan.get.devices.errors))>0`|Warning||
+|Authentication has failed||`length(last(/Cisco SD-WAN by HTTP/sd_wan.auth.errors))>0`|Average||
+|There are errors in the 'Get devices' metric||`length(last(/Cisco SD-WAN by HTTP/sd_wan.get.devices.errors))>0`|Warning||
 
 ### LLD rule Devices discovery
 
@@ -107,59 +107,59 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SD-WAN: Get interfaces data|<p>Item for gathering device interfaces from Cisco SD-WAN API.</p>|Script|sd_wan.get.interfaces|
-|SD-WAN: Device interfaces item errors|<p>Item for gathering errors of the device interfaces.</p>|Dependent item|sd_wan.get.interfaces.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Get routes data|<p>Item for gathering device routes from Cisco SD-WAN API.</p>|Script|sd_wan.get.routes|
-|SD-WAN: Device routes item errors|<p>Item for gathering errors of the device routes.</p>|Dependent item|sd_wan.get.routes.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Get device data|<p>Item for gathering device data from Cisco SD-WAN API.</p>|Script|sd_wan.get.device|
-|SD-WAN: Device data item errors|<p>Item for gathering errors of the device item.</p>|Dependent item|sd_wan.get.device.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Control connections|<p>The number of control connections.</p>|Dependent item|sd_wan.device.control_conn<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.controlConnections`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Matches regular expression: `^[0-9]+$`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|SD-WAN: Certificate validity|<p>Validity status of the device certificate.</p>|Dependent item|sd_wan.device.certificate_validity<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["certificate-validity"]`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|SD-WAN: Total memory|<p>Total memory, expressed in bytes.</p>|Dependent item|sd_wan.device.memory.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_total`</p></li></ul>|
-|SD-WAN: Available memory|<p>The amount of physical memory (in bytes) immediately available for the allocation to a process or for a system use in the device.</p>|Dependent item|sd_wan.device.memory.avail<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_free`</p></li></ul>|
-|SD-WAN: Memory (buffers)|<p>The amount of physical memory (in bytes) used by the kernel buffers.</p>|Dependent item|sd_wan.device.memory.buffers<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_buffers`</p></li></ul>|
-|SD-WAN: Memory (cached)|<p>The amount of physical memory (in bytes) used by the page cache and slabs.</p>|Dependent item|sd_wan.device.memory.cached<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_cached`</p></li></ul>|
-|SD-WAN: Used memory|<p>The amount of physical memory (in bytes) used by applications on the device.</p>|Dependent item|sd_wan.device.memory.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_used`</p></li></ul>|
-|SD-WAN: Memory utilization|<p>Calculated percentage of the memory used, in %.</p>|Calculated|sd_wan.device.memory.util|
-|SD-WAN: Number of CPUs|<p>The total number of CPU.</p>|Dependent item|sd_wan.device.cpu.num<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cpu_count`</p></li></ul>|
-|SD-WAN: Load average (1m avg)|<p>The average number of processes being or waiting executed over past 1 minute.</p>|Dependent item|sd_wan.device.cpu.load[avg1]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min1_avg`</p></li></ul>|
-|SD-WAN: Load average (5m avg)|<p>The average number of processes being or waiting executed over past 5 minutes.</p>|Dependent item|sd_wan.device.cpu.load[avg5]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min5_avg`</p></li></ul>|
-|SD-WAN: Load average (15m avg)|<p>The average number of processes being or waiting executed over past 15 minutes.</p>|Dependent item|sd_wan.device.cpu.load[avg15]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min15_avg`</p></li></ul>|
-|SD-WAN: CPU idle time|<p>The time the CPU has spent doing nothing.</p>|Dependent item|sd_wan.device.cpu.util[idle]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_idle`</p></li></ul>|
-|SD-WAN: CPU system time|<p>The time the CPU has spent running the kernel and its processes.</p>|Dependent item|sd_wan.device.cpu.util[system]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_system`</p></li></ul>|
-|SD-WAN: CPU user time|<p>The time the CPU has spent running users' processes that are not niced.</p>|Dependent item|sd_wan.device.cpu.util[user]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_user`</p></li></ul>|
-|SD-WAN: CPU utilization|<p>CPU utilization, expressed in %.</p>|Dependent item|sd_wan.device.cpu.util<p>**Preprocessing**</p><ul><li><p>JavaScript: `return (100 - value);`</p></li></ul>|
-|SD-WAN: Device reachability|<p>Reachability to the vManager and/or the entire network.</p>|Dependent item|sd_wan.device.reachability<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.reachability`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|SD-WAN: Device state|<p>The device current state.</p>|Dependent item|sd_wan.device.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|SD-WAN: Device state description|<p>The description of the device current state.</p>|Dependent item|sd_wan.device.state_descr<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state_description`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|SD-WAN: Operating system|<p>The device operating system.</p>|Dependent item|sd_wan.device.os<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["device-os"]`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|SD-WAN: Operating system architecture|<p>The architecture of the operating system.</p>|Dependent item|sd_wan.device.arch<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.platform`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|SD-WAN: Device role|<p>The device role in the network.</p>|Dependent item|sd_wan.device.role<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.device_role`</p><p>⛔️Custom on fail: Set value to: `-1`</p></li></ul>|
-|SD-WAN: Model name|<p>The model name of the device.</p>|Dependent item|sd_wan.device.model<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["device-model"]`</p></li></ul>|
-|SD-WAN: Number of processes|<p>The total number of processes in any state.</p>|Dependent item|sd_wan.device.proc.num<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.procs`</p></li></ul>|
-|SD-WAN: Serial Number|<p>The device serial number.</p>|Dependent item|sd_wan.device.serialnumber<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["board-serial"]`</p></li></ul>|
-|SD-WAN: System name|<p>The system host name.</p>|Dependent item|sd_wan.device.hostname<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["host-name"]`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|SD-WAN: System uptime|<p>The system uptime is calculated on the basis of boot time.</p>|Dependent item|sd_wan.device.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["uptime-date"]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|SD-WAN: Version|<p>The version of the device software.</p>|Dependent item|sd_wan.device.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Get interfaces data|<p>Item for gathering device interfaces from Cisco SD-WAN API.</p>|Script|sd_wan.get.interfaces|
+|Device interfaces item errors|<p>Item for gathering errors of the device interfaces.</p>|Dependent item|sd_wan.get.interfaces.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get routes data|<p>Item for gathering device routes from Cisco SD-WAN API.</p>|Script|sd_wan.get.routes|
+|Device routes item errors|<p>Item for gathering errors of the device routes.</p>|Dependent item|sd_wan.get.routes.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get device data|<p>Item for gathering device data from Cisco SD-WAN API.</p>|Script|sd_wan.get.device|
+|Device data item errors|<p>Item for gathering errors of the device item.</p>|Dependent item|sd_wan.get.device.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Control connections|<p>The number of control connections.</p>|Dependent item|sd_wan.device.control_conn<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.controlConnections`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Matches regular expression: `^[0-9]+$`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|Certificate validity|<p>Validity status of the device certificate.</p>|Dependent item|sd_wan.device.certificate_validity<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["certificate-validity"]`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Total memory|<p>Total memory, expressed in bytes.</p>|Dependent item|sd_wan.device.memory.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_total`</p></li></ul>|
+|Available memory|<p>The amount of physical memory (in bytes) immediately available for the allocation to a process or for a system use in the device.</p>|Dependent item|sd_wan.device.memory.avail<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_free`</p></li></ul>|
+|Memory (buffers)|<p>The amount of physical memory (in bytes) used by the kernel buffers.</p>|Dependent item|sd_wan.device.memory.buffers<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_buffers`</p></li></ul>|
+|Memory (cached)|<p>The amount of physical memory (in bytes) used by the page cache and slabs.</p>|Dependent item|sd_wan.device.memory.cached<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_cached`</p></li></ul>|
+|Used memory|<p>The amount of physical memory (in bytes) used by applications on the device.</p>|Dependent item|sd_wan.device.memory.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_used`</p></li></ul>|
+|Memory utilization|<p>Calculated percentage of the memory used, in %.</p>|Calculated|sd_wan.device.memory.util|
+|Number of CPUs|<p>The total number of CPU.</p>|Dependent item|sd_wan.device.cpu.num<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_cpu_count`</p></li></ul>|
+|Load average (1m avg)|<p>The average number of processes being or waiting executed over past 1 minute.</p>|Dependent item|sd_wan.device.cpu.load[avg1]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min1_avg`</p></li></ul>|
+|Load average (5m avg)|<p>The average number of processes being or waiting executed over past 5 minutes.</p>|Dependent item|sd_wan.device.cpu.load[avg5]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min5_avg`</p></li></ul>|
+|Load average (15m avg)|<p>The average number of processes being or waiting executed over past 15 minutes.</p>|Dependent item|sd_wan.device.cpu.load[avg15]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min15_avg`</p></li></ul>|
+|CPU idle time|<p>The time the CPU has spent doing nothing.</p>|Dependent item|sd_wan.device.cpu.util[idle]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_idle`</p></li></ul>|
+|CPU system time|<p>The time the CPU has spent running the kernel and its processes.</p>|Dependent item|sd_wan.device.cpu.util[system]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_system`</p></li></ul>|
+|CPU user time|<p>The time the CPU has spent running users' processes that are not niced.</p>|Dependent item|sd_wan.device.cpu.util[user]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cpu_user`</p></li></ul>|
+|CPU utilization|<p>CPU utilization, expressed in %.</p>|Dependent item|sd_wan.device.cpu.util<p>**Preprocessing**</p><ul><li><p>JavaScript: `return (100 - value);`</p></li></ul>|
+|Device reachability|<p>Reachability to the vManager and/or the entire network.</p>|Dependent item|sd_wan.device.reachability<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.reachability`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Device state|<p>The device current state.</p>|Dependent item|sd_wan.device.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Device state description|<p>The description of the device current state.</p>|Dependent item|sd_wan.device.state_descr<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state_description`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Operating system|<p>The device operating system.</p>|Dependent item|sd_wan.device.os<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["device-os"]`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Operating system architecture|<p>The architecture of the operating system.</p>|Dependent item|sd_wan.device.arch<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.platform`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Device role|<p>The device role in the network.</p>|Dependent item|sd_wan.device.role<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.device_role`</p><p>⛔️Custom on fail: Set value to: `-1`</p></li></ul>|
+|Model name|<p>The model name of the device.</p>|Dependent item|sd_wan.device.model<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["device-model"]`</p></li></ul>|
+|Number of processes|<p>The total number of processes in any state.</p>|Dependent item|sd_wan.device.proc.num<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.procs`</p></li></ul>|
+|Serial Number|<p>The device serial number.</p>|Dependent item|sd_wan.device.serialnumber<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["board-serial"]`</p></li></ul>|
+|System name|<p>The system host name.</p>|Dependent item|sd_wan.device.hostname<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["host-name"]`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System uptime|<p>The system uptime is calculated on the basis of boot time.</p>|Dependent item|sd_wan.device.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$["uptime-date"]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Version|<p>The version of the device software.</p>|Dependent item|sd_wan.device.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SD-WAN: There are errors in the 'Get interfaces data' metric||`length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.interfaces.errors))>0`|Warning||
-|SD-WAN: There are errors in the 'Get routes data' metric||`length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.routes.errors))>0`|Warning||
-|SD-WAN: There are errors in the 'Get device data' metric||`length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.device.errors))>0`|Warning||
-|SD-WAN: Device certificate is invalid||`last(/Cisco SD-WAN device by HTTP/sd_wan.device.certificate_validity)=1`|Warning||
-|SD-WAN: Lack of available memory||`max(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.avail,5m)<{$SDWAN.MEMORY.AVAILABLE.MIN} and last(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.total)>0`|Average||
-|SD-WAN: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.util,5m)>{$SDWAN.MEMORY.UTIL.MAX}`|Average|**Depends on**:<br><ul><li>SD-WAN: Lack of available memory</li></ul>|
-|SD-WAN: Load average is too high|<p>The load average per CPU is too high. The system might be slow to respond.</p>|`min(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg1],5m)/last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.num)>{$SDWAN.LA.PER.CPU.MAX.WARN} and last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg5])>0 and last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg15])>0`|Average||
-|SD-WAN: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.util,5m)>{$SDWAN.CPU.UTIL.CRIT}`|Warning|**Depends on**:<br><ul><li>SD-WAN: Load average is too high</li></ul>|
-|SD-WAN: Device is not reachable|<p>Device is not reachable to the vManager and/or the entire network.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.reachability)<>0`|Warning||
-|SD-WAN: Device state is not green|<p>The device current state is not green.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.state)<>0 and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.state_descr))>0`|Average||
-|SD-WAN: Operating system description has changed|<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.os,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.os,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>SD-WAN: Device has been replaced</li></ul>|
-|SD-WAN: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber))>0`|Info|**Manual close**: Yes|
-|SD-WAN: System name has changed|<p>System name has changed. Ack to close.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname))>0`|Info|**Manual close**: Yes|
-|SD-WAN: Device has been restarted|<p>The host uptime is less than 10 minutes</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.uptime)<10m`|Info|**Manual close**: Yes|
+|There are errors in the 'Get interfaces data' metric||`length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.interfaces.errors))>0`|Warning||
+|There are errors in the 'Get routes data' metric||`length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.routes.errors))>0`|Warning||
+|There are errors in the 'Get device data' metric||`length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.device.errors))>0`|Warning||
+|Device certificate is invalid||`last(/Cisco SD-WAN device by HTTP/sd_wan.device.certificate_validity)=1`|Warning||
+|Lack of available memory||`max(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.avail,5m)<{$SDWAN.MEMORY.AVAILABLE.MIN} and last(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.total)>0`|Average||
+|High memory utilization|<p>The system is running out of free memory.</p>|`min(/Cisco SD-WAN device by HTTP/sd_wan.device.memory.util,5m)>{$SDWAN.MEMORY.UTIL.MAX}`|Average|**Depends on**:<br><ul><li>Lack of available memory</li></ul>|
+|Load average is too high|<p>The load average per CPU is too high. The system might be slow to respond.</p>|`min(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg1],5m)/last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.num)>{$SDWAN.LA.PER.CPU.MAX.WARN} and last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg5])>0 and last(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.load[avg15])>0`|Average||
+|High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco SD-WAN device by HTTP/sd_wan.device.cpu.util,5m)>{$SDWAN.CPU.UTIL.CRIT}`|Warning|**Depends on**:<br><ul><li>Load average is too high</li></ul>|
+|Device is not reachable|<p>Device is not reachable to the vManager and/or the entire network.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.reachability)<>0`|Warning||
+|Device state is not green|<p>The device current state is not green.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.state)<>0 and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.state_descr))>0`|Average||
+|Operating system description has changed|<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.os,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.os,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Device has been replaced</li></ul>|
+|Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.serialnumber))>0`|Info|**Manual close**: Yes|
+|System name has changed|<p>System name has changed. Ack to close.</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname,#1)<>last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname,#2) and length(last(/Cisco SD-WAN device by HTTP/sd_wan.device.hostname))>0`|Info|**Manual close**: Yes|
+|Device has been restarted|<p>The host uptime is less than 10 minutes</p>|`last(/Cisco SD-WAN device by HTTP/sd_wan.device.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Network interfaces discovery
 

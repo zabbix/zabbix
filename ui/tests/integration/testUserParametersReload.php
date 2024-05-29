@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
@@ -26,12 +21,10 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server, agent, agent2
  * @configurationDataProvider configurationProvider
- * @backup items, history_str
+ * @backup items, history_str, hosts
  * @hosts agentd, agent2
  */
 class testUserParametersReload extends CIntegrationTest {
-
-	const USER_PARAM_RELOAD_DELAY 	= 10;
 
 	const ITEM_NAME_01		= 'usrprm01';
 	const ITEM_NAME_02		= 'usrprm02';
@@ -160,12 +153,13 @@ class testUserParametersReload extends CIntegrationTest {
 	}
 
 	/**
-	 * Component configuration provider.
-	 *
-	 * @return array
+	 * Check reloaded user parameters
 	 */
-	public function configurationProvider_singleParam() {
-		return [
+	public function testUserParametersReload() {
+
+		// Test single user parameter: usrprm01
+
+		$config = [
 			self::COMPONENT_AGENT => [
 				'UserParameter' => self::ITEM_NAME_01.',echo singleParam.01'
 			],
@@ -173,61 +167,68 @@ class testUserParametersReload extends CIntegrationTest {
 				'UserParameter' => self::ITEM_NAME_01.',echo singleParam.01'
 			]
 		];
-	}
 
-	/**
-	 * Check reloaded user parameters (usrprm01 only)
-	 *
-	 * @configurationDataProvider configurationProvider_singleParam
-	 */
-	public function testUserParametersReload_singleParam() {
+		$this->executeUserParamReload($config);
+
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'singleParam.01');
 			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
 		}
-	}
 
-	/**
-	 * Component configuration provider.
-	 *
-	 * @return array
-	 */
-	public function configurationProvider_multipleParams() {
-		return [
+		// Test multiple user parameters: usrprm01 and usrprm02
+
+		// Currently multiple identical configuration parameters are not allowed, so use include instead
+		$config = [
 			self::COMPONENT_AGENT => [
-				'UserParameter' => [
-					self::ITEM_NAME_01.',echo multipleParams.01',
-					self::ITEM_NAME_02.',echo multipleParams.02'
-				]
+				'UserParameter' => self::ITEM_NAME_01.',echo multipleParams.01',
+				'Include' => PHPUNIT_CONFIG_DIR.self::COMPONENT_AGENT.'_usrprm.conf'
 			],
 			self::COMPONENT_AGENT2 => [
-				'UserParameter' => [
-					self::ITEM_NAME_01.',echo multipleParams.01',
-					self::ITEM_NAME_02.',echo multipleParams.02'
-				]
+				'UserParameter' => self::ITEM_NAME_01.',echo multipleParams.01',
+				'Include' => PHPUNIT_CONFIG_DIR.self::COMPONENT_AGENT2.'_usrprm.conf'
 			]
 		];
-	}
 
-	/**
-	 * Check reloaded user parameters (usrprm01 and usrprm01)
-	 *
-	 * @configurationDataProvider configurationProvider_multipleParams
-	 */
-	public function testUserParametersReload_multipleParams() {
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			if (file_put_contents(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf', 'UserParameter='.self::ITEM_NAME_02.',echo multipleParams.02') === false) {
+				throw new Exception('Failed to create include configuration file');
+			}
+		}
+
+		$this->executeUserParamReload($config);
+
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'multipleParams.01');
 			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NORMAL, 'multipleParams.02');
+			$this->assertTrue(@unlink(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf'));
+		}
+
+		// Test no user parameters
+
+		$this->executeUserParamReload();
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
 		}
 	}
 
 	/**
-	 * Check reloaded user parameters (no user parameters)
+	 * Update configuration file and reload user parameters.
+	 *
+	 * @param array $config		user parameters
 	 */
-	public function testUserParametersReload_noParams() {
+	public function executeUserParamReload($config = null) {
+		$def_config = self::getDefaultComponentConfiguration();
+
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED);
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
+			if ($config !== null) {
+				$config[$component] = array_merge($config[$component], $def_config[$component]);
+			} else {
+				$config = $def_config;
+			}
+			self::prepareComponentConfiguration($component, $config);
+			self::reloadUserParameters($component);
 		}
 	}
 

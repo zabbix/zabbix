@@ -20,7 +20,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 3d96f6e755934bc8a4ee7300a165adae
-          name: 'Velocloud: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: velocloud.get
           history: '0'
@@ -157,7 +157,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 9df4ba5324d94d0fb54d3231311016a6
-          name: 'Velocloud: Clear data'
+          name: 'Clear data'
           type: DEPENDENT
           key: velocloud.get.clear_metrics
           delay: '0'
@@ -176,7 +176,7 @@ zabbix_export:
             - tag: component
               value: orchestrator
         - uuid: 8a54309d8abc4fc7816b168329243de4
-          name: 'Velocloud: Get data collection errors'
+          name: 'Get data collection errors'
           type: DEPENDENT
           key: velocloud.get.error
           delay: '0'
@@ -199,14 +199,14 @@ zabbix_export:
           triggers:
             - uuid: a0623655a2fa4f60962ad560b8bb5a13
               expression: 'length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0'
-              name: 'Velocloud: There are errors in aggregate script item'
+              name: 'There are errors in aggregate script item'
               priority: WARNING
               description: 'There are errors in aggregate script item.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 3f589e2191c5419fb89cc33639595ae9
-          name: 'Velocloud: Orchestrator API version'
+          name: 'Orchestrator API version'
           type: DEPENDENT
           key: velocloud.orchestrator.api_version
           delay: '0'
@@ -226,8 +226,8 @@ zabbix_export:
           triggers:
             - uuid: 5a95d9c614e74c2c8b6181fc8dff2226
               expression: 'nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1'
-              name: 'Velocloud: Failed to fetch aggregate data'
-              event_name: 'Velocloud: Failed to fetch aggregate data (or no data for 30m)'
+              name: 'Failed to fetch aggregate data'
+              event_name: 'Failed to fetch aggregate data (or no data for 30m)'
               priority: AVERAGE
               description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -235,7 +235,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: ab24d8fc4c2a4130bca1b4b6d4f311ae
-          name: 'Velocloud: Orchestrator build'
+          name: 'Orchestrator build'
           type: DEPENDENT
           key: velocloud.orchestrator.build
           delay: '0'
@@ -258,7 +258,7 @@ zabbix_export:
           triggers:
             - uuid: 37c16b3cbd8b4680ab85a1fea819611f
               expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build))>0'
-              name: 'Velocloud: Orchestrator build has been changed'
+              name: 'Orchestrator build has been changed'
               priority: INFO
               description: 'Velocloud Orchestrator build has been changed.'
               manual_close: 'YES'
@@ -266,7 +266,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 1f60b61051494ab495de4dfe2cd83450
-          name: 'Velocloud: Orchestrator version'
+          name: 'Orchestrator version'
           type: DEPENDENT
           key: velocloud.orchestrator.version
           delay: '0'
@@ -289,7 +289,7 @@ zabbix_export:
           triggers:
             - uuid: a1d8e4d61a804c8fb11b33f590f0885c
               expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version))>0'
-              name: 'Velocloud: Orchestrator version has been changed'
+              name: 'Orchestrator version has been changed'
               priority: INFO
               description: 'Velocloud Orchestrator version has been changed.'
               manual_close: 'YES'
@@ -297,7 +297,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 1206789df5b44af7ba1c5416662344dd
-          name: 'Velocloud: System properties'
+          name: 'System properties'
           type: HTTP_AGENT
           key: velocloud.system.properties
           delay: 6h
@@ -323,7 +323,7 @@ zabbix_export:
           triggers:
             - uuid: 58541dfe798843fa822276e84a32b919
               expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)'
-              name: 'Velocloud: System properties have changed'
+              name: 'System properties have changed'
               priority: INFO
               description: 'System properties have changed.'
               manual_close: 'YES'
@@ -1922,7 +1922,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: Utilization
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1940,7 +1940,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Best loss'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1957,7 +1957,7 @@ zabbix_export:
                 - type: graphprototype
                   name: 'Packets summary'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1973,8 +1973,8 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   name: 'Bytes summary'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1992,7 +1992,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Path overview'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: INTEGER

@@ -12,5 +12,3 @@ libzbxcommon_a_SOURCES = \
 	common_log.c
 
 libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS)
-
-

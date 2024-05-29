@@ -142,7 +142,7 @@ Access rights are set using policies. Each service has its own policy file, ther
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|OpenStack: Get access token and service catalog|<p>Authorizes user on the OpenStack Identity service and gets the service catalog.</p>|Script|openstack.identity.auth|
+|Get access token and service catalog|<p>Authorizes user on the OpenStack Identity service and gets the service catalog.</p>|Script|openstack.identity.auth|
 
 ### LLD rule OpenStack: Nova discovery
 
@@ -253,32 +253,32 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Nova: Get absolute limits|<p>Gets absolute limits for the project.</p>|HTTP agent|openstack.nova.limits.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.limits.absolute`</p><p>⛔️Custom on fail: Set error to: `Could not get absolute project limits`</p></li></ul>|
-|Nova: Get servers|<p>Gets a list of servers.</p>|HTTP agent|openstack.nova.servers.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.servers`</p><p>⛔️Custom on fail: Set error to: `Could not get servers list`</p></li></ul>|
-|Nova: Get compute services|<p>Gets a list of compute services and its data.</p>|HTTP agent|openstack.nova.services.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p><p>⛔️Custom on fail: Set error to: `Could not get compute services list`</p></li></ul>|
-|Nova: Get hypervisors|<p>Gets a list of hypervisors and its data.</p>|HTTP agent|openstack.nova.hypervisors.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hypervisors`</p><p>⛔️Custom on fail: Set error to: `Could not get hypervisors list`</p></li></ul>|
-|Nova: Get availability zones|<p>Gets a list of availability zones and its data.</p>|HTTP agent|openstack.nova.availability_zone.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.availabilityZoneInfo`</p><p>⛔️Custom on fail: Set error to: `Could not get availability zones list`</p></li></ul>|
-|Nova: Get tenants|<p>Gets a list of tenants and its data.</p>|Script|openstack.nova.tenant.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tenant_usages`</p><p>⛔️Custom on fail: Set error to: `Could not get tenant list`</p></li></ul>|
-|Nova: Instances count, current|<p>Number of servers in each tenant.</p>|Dependent item|openstack.nova.limits.instances.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalInstancesUsed`</p></li></ul>|
-|Nova: Instances count, max|<p>Number of allowed servers for each tenant.</p>|Dependent item|openstack.nova.limits.instances.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalInstances`</p></li></ul>|
-|Nova: Instances count, free|<p>Number of available servers for each tenant.</p>|Calculated|openstack.nova.limits.instances.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Nova: vCPUs usage, current|<p>Number of used server cores in each tenant.</p>|Dependent item|openstack.nova.limits.vcpu.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalCoresUsed`</p></li></ul>|
-|Nova: vCPUs usage, max|<p>Number of allowed server cores for each tenant.</p>|Dependent item|openstack.nova.limits.vcpu.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalCores`</p></li></ul>|
-|Nova: vCPUs usage, free|<p>Number of available server cores for each tenant.</p>|Calculated|openstack.nova.limits.vcpu.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Nova: RAM usage, current|<p>Amount of used server RAM.</p>|Dependent item|openstack.nova.limits.ram.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalRAMUsed`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|Nova: RAM usage, max|<p>Amount of allowed server RAM.</p>|Dependent item|openstack.nova.limits.ram.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalRAMSize`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|Nova: RAM usage, free|<p>Amount of available server RAM.</p>|Calculated|openstack.nova.limits.ram.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get absolute limits|<p>Gets absolute limits for the project.</p>|HTTP agent|openstack.nova.limits.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.limits.absolute`</p><p>⛔️Custom on fail: Set error to: `Could not get absolute project limits`</p></li></ul>|
+|Get servers|<p>Gets a list of servers.</p>|HTTP agent|openstack.nova.servers.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.servers`</p><p>⛔️Custom on fail: Set error to: `Could not get servers list`</p></li></ul>|
+|Get compute services|<p>Gets a list of compute services and its data.</p>|HTTP agent|openstack.nova.services.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p><p>⛔️Custom on fail: Set error to: `Could not get compute services list`</p></li></ul>|
+|Get hypervisors|<p>Gets a list of hypervisors and its data.</p>|HTTP agent|openstack.nova.hypervisors.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hypervisors`</p><p>⛔️Custom on fail: Set error to: `Could not get hypervisors list`</p></li></ul>|
+|Get availability zones|<p>Gets a list of availability zones and its data.</p>|HTTP agent|openstack.nova.availability_zone.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.availabilityZoneInfo`</p><p>⛔️Custom on fail: Set error to: `Could not get availability zones list`</p></li></ul>|
+|Get tenants|<p>Gets a list of tenants and its data.</p>|Script|openstack.nova.tenant.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tenant_usages`</p><p>⛔️Custom on fail: Set error to: `Could not get tenant list`</p></li></ul>|
+|Instances count, current|<p>Number of servers in each tenant.</p>|Dependent item|openstack.nova.limits.instances.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalInstancesUsed`</p></li></ul>|
+|Instances count, max|<p>Number of allowed servers for each tenant.</p>|Dependent item|openstack.nova.limits.instances.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalInstances`</p></li></ul>|
+|Instances count, free|<p>Number of available servers for each tenant.</p>|Calculated|openstack.nova.limits.instances.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|vCPUs usage, current|<p>Number of used server cores in each tenant.</p>|Dependent item|openstack.nova.limits.vcpu.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalCoresUsed`</p></li></ul>|
+|vCPUs usage, max|<p>Number of allowed server cores for each tenant.</p>|Dependent item|openstack.nova.limits.vcpu.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalCores`</p></li></ul>|
+|vCPUs usage, free|<p>Number of available server cores for each tenant.</p>|Calculated|openstack.nova.limits.vcpu.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|RAM usage, current|<p>Amount of used server RAM.</p>|Dependent item|openstack.nova.limits.ram.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalRAMUsed`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|RAM usage, max|<p>Amount of allowed server RAM.</p>|Dependent item|openstack.nova.limits.ram.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalRAMSize`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|RAM usage, free|<p>Amount of available server RAM.</p>|Calculated|openstack.nova.limits.ram.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Nova: Current instances count is too high|<p>Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}% of the max available instances count.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))`|High||
-|Nova: Current instances count is high|<p>Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}% of the max available instances count.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))`|Warning|**Depends on**:<br><ul><li>Nova: Current instances count is too high</li></ul>|
-|Nova: Current vCPU usage is too high|<p>Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.HIGH}% of the max available vCPU usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))`|High||
-|Nova: Current vCPU usage is high|<p>Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.WARN}% of the max available vCPU usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))`|Warning|**Depends on**:<br><ul><li>Nova: Current vCPU usage is too high</li></ul>|
-|Nova: Current RAM usage is too high|<p>Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.HIGH}% of the max available RAM usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))`|High||
-|Nova: Current RAM usage is high|<p>Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.WARN}% of the max available RAM usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))`|Warning|**Depends on**:<br><ul><li>Nova: Current RAM usage is too high</li></ul>|
+|Current instances count is too high|<p>Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}% of the max available instances count.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))`|High||
+|Current instances count is high|<p>Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}% of the max available instances count.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))`|Warning|**Depends on**:<br><ul><li>Current instances count is too high</li></ul>|
+|Current vCPU usage is too high|<p>Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.HIGH}% of the max available vCPU usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))`|High||
+|Current vCPU usage is high|<p>Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.WARN}% of the max available vCPU usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))`|Warning|**Depends on**:<br><ul><li>Current vCPU usage is too high</li></ul>|
+|Current RAM usage is too high|<p>Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.HIGH}% of the max available RAM usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))`|High||
+|Current RAM usage is high|<p>Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.WARN}% of the max available RAM usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))`|Warning|**Depends on**:<br><ul><li>Current RAM usage is too high</li></ul>|
 
 ### LLD rule Nova: Servers discovery
 

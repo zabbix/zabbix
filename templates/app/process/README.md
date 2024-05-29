@@ -41,7 +41,7 @@ Custom processes set in macros:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|OS: Get process summary|<p>The summary of data metrics for all processes.</p>|Zabbix agent|proc.get[,,,summary]|
+|Get process summary|<p>The summary of data metrics for all processes.</p>|Zabbix agent|proc.get[,,,summary]|
 
 ### LLD rule Processes discovery
 

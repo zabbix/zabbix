@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,14 +24,14 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({popup_url, form_name, host_interfaces, host_is_discovered, warnings}) {
+	init({popup_url, form_name, host_interfaces, proxy_groupid, host_is_discovered, warnings}) {
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		history.replaceState({}, '', popup_url);
 
-		host_edit.init({form_name, host_interfaces, host_is_discovered});
+		host_edit.init({form_name, host_interfaces, proxy_groupid, host_is_discovered});
 
 		if (warnings.length) {
 			const message_box = warnings.length == 1
@@ -59,6 +54,9 @@ window.host_edit_popup = {
 			if (target.classList.contains('js-edit-linked-template')) {
 				this.editTemplate({templateid: e.target.dataset.templateid});
 			}
+			else if (target.classList.contains('js-edit-proxy')) {
+				this.editProxy(e.target.dataset.proxyid);
+			}
 			else if (target.classList.contains('js-update-item')) {
 				this.editItem(target, target.dataset);
 			}
@@ -75,6 +73,24 @@ window.host_edit_popup = {
 		const overlay = PopUp('template.edit', parameters, {
 			dialogueid: 'templates-form',
 			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) =>
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
+		);
+	},
+
+	editProxy(proxyid) {
+		if (!this.isConfirmed()) {
+			return;
+		}
+
+		overlayDialogueDestroy(this.overlay.dialogueid);
+
+		const overlay = PopUp('popup.proxy.edit', {proxyid}, {
+			dialogueid: 'proxy_edit',
+			dialogue_class: 'modal-popup-static',
 			prevent_navigation: true
 		});
 

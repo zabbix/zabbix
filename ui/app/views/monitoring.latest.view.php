@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -54,10 +49,13 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CTabFilter())
 		->setId('monitoring_latest_filter')
 		->setOptions($data['tabfilter_options'])
-		->addSubfilter(new CPartial('monitoring.latest.subfilter',
-			array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
-		)
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+
+	if ($data['mandatory_filter_set'] && $data['items'] || $data['subfilter_set']) {
+		$filter->addSubfilter(new CPartial('monitoring.latest.subfilter',
+			array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
+		);
+	}
 
 	foreach ($data['filter_tabs'] as $tab) {
 		$tab['tab_view'] = $data['filter_view'];
@@ -75,7 +73,7 @@ else {
 $html_page
 	->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
 		array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-			'tags', 'maintenances', 'items_rw'
+			'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
 		])
 	)))
 	->show();
@@ -86,7 +84,8 @@ $html_page
 		'refresh_url' => $data['refresh_url'],
 		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval'],
-		'checkbox_object' => 'itemids'
+		'checkbox_object' => 'itemids',
+		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set']
 	]).');
 '))
 	->setOnDocumentReady()

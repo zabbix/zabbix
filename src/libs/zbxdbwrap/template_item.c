@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbhigh.h"
@@ -29,6 +24,7 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxinterface.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 
@@ -256,7 +252,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		ZBX_STR2UCHAR(item->evaltype, row[27]);
 
 		item->interfaceid_orig = 0;
-		switch (interface_type = get_interface_type_by_item_type(item->type))
+		switch (interface_type = zbx_get_interface_type_by_item_type(item->type))
 		{
 			case INTERFACE_TYPE_UNKNOWN:
 			case INTERFACE_TYPE_OPT:
@@ -265,10 +261,10 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			case INTERFACE_TYPE_ANY:
 				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 				{
-					if (0 != interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1])
+					if (0 != interfaceids[zbx_get_interface_type_priority(i) - 1])
 						break;
 				}
-				item->interfaceid = interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1];
+				item->interfaceid = interfaceids[zbx_get_interface_type_priority(i) - 1];
 				break;
 			default:
 				item->interfaceid = interfaceids[interface_type - 1];
@@ -1070,6 +1066,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 		zbx_free(sql);
 	}
+
+	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 /******************************************************************************

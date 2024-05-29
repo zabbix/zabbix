@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
@@ -24,6 +19,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for testing changing rank of trigger-based events/problems
  *
  * @required-components server
+ * @configurationDataProvider serverConfigurationProvider
  * @backup hosts,items,triggers,task,task_data,acknowledges,event_symptom,events,problem
  */
 class testEventsCauseAndSymptoms extends CIntegrationTest {
@@ -330,7 +326,22 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			$trigger_id = $response['result']['triggerids'][0];
 			self::$trigger_ids[$i] = $trigger_id;
 		}
+	}
 
+	/**
+	 * Component configuration provider for server.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'EnableGlobalScripts' => 1
+			]
+		];
+	}
+
+	private function createScripts() {
 		// create a script for testing cause events
 		$response = $this->call('script.create', [
 			'name' => self::TEST_CAUSE_EVENTS_SCRIPT_NAME,
@@ -364,9 +375,13 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (3)
 	 * [C] (4)
 	 * [C] (5)
+	 *
+	 * @configurationDataProvider serverConfigurationProvider
+	 *
 	 */
 	public function testEventsCauseAndSymptoms_startEvents()
 	{
+		$this->createScripts();
 		// start events/problems
 		for ($i = 1; $i <= self::EVENT_COUNT ; $i++) {
 			$item_key = self::TRAPPER_ITEM_KEY_PREFIX . (string) $i;
@@ -402,7 +417,9 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)
 	 * |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_startEvents
+	 *
 	 */
 	public function testEventsCauseAndSymptoms_rankAsSymptom() {
 		$this->markAsSymptoms([
@@ -444,6 +461,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)          <-- no change is expected here
 	 * |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankAsSymptom
 	 *
 	 */
@@ -486,6 +504,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 *  |----[S] (4)
 	 *  |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_swapCauseAndSymptom
 	 *
 	 */
@@ -527,6 +546,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 *  |----[S] (4)
 	 *  |----[S] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankCauseAsSymptomOfSymptom
 	 *
 	 */
@@ -574,6 +594,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	 * [C] (4)
 	 * [C] (5)
 	 *
+	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testEventsCauseAndSymptoms_rankAsCause1
 	 *
 	 */

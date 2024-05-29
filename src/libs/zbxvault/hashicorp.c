@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "hashicorp.h"
@@ -24,13 +19,14 @@
 #include "zbxhttp.h"
 #include "zbxstr.h"
 
-int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
+int	zbx_hashicorp_kvs_get(const char *vault_url, const char *prefix, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
 		long timeout, zbx_kvs_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);
+	ZBX_UNUSED(prefix);
 	ZBX_UNUSED(token);
 	ZBX_UNUSED(ssl_cert_file);
 	ZBX_UNUSED(ssl_key_file);
@@ -56,16 +52,23 @@ int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *
 		return FAIL;
 	}
 
-	zbx_strsplit_first(path, '/', &left, &right);
-	if (NULL == right)
+	if (NULL == prefix || '\0' == *prefix)
 	{
-		*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
-		free(left);
-		return FAIL;
+		zbx_strsplit_first(path, '/', &left, &right);
+
+		if (NULL == right)
+		{
+			*error = zbx_dsprintf(*error, "cannot find separator \"\\\" in path");
+			free(left);
+			return FAIL;
+		}
+		url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", vault_url, left, right);
+
+		zbx_free(right);
+		zbx_free(left);
 	}
-	url = zbx_dsprintf(NULL, "%s/v1/%s/data/%s", vault_url, left, right);
-	zbx_free(right);
-	zbx_free(left);
+	else
+		url = zbx_dsprintf(NULL, "%s%s%s", vault_url, prefix, path);
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
 

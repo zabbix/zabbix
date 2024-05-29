@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxexpression.h"
@@ -32,6 +27,7 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
+#include "zbxip.h"
 
 /******************************************************************************
  *                                                                            *
@@ -310,12 +306,27 @@ int	expr_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char *
 	switch (request)
 	{
 		case ZBX_REQUEST_HOST_IP:
+			if (FAIL == zbx_is_ip(interface.ip_orig))
+				return FAIL;
+
 			*replace_to = zbx_strdup(*replace_to, interface.ip_orig);
 			break;
 		case ZBX_REQUEST_HOST_DNS:
+			if (FAIL == zbx_is_ip(interface.dns_orig) &&
+					FAIL == zbx_validate_hostname(interface.dns_orig))
+			{
+				return FAIL;
+			}
+
 			*replace_to = zbx_strdup(*replace_to, interface.dns_orig);
 			break;
 		case ZBX_REQUEST_HOST_CONN:
+			if (FAIL == zbx_is_ip(interface.addr) &&
+					FAIL == zbx_validate_hostname(interface.addr))
+			{
+				return FAIL;
+			}
+
 			*replace_to = zbx_strdup(*replace_to, interface.addr);
 			break;
 		case ZBX_REQUEST_HOST_PORT:
@@ -935,7 +946,7 @@ static inventory_field_t	inventory_fields[] =
 	{MVAR_INVENTORY_POC_SECONDARY_CELL, 67},
 	{MVAR_INVENTORY_POC_SECONDARY_SCREEN, 68},
 	{MVAR_INVENTORY_POC_SECONDARY_NOTES, 69},
-	{NULL}
+	{0}
 };
 
 /******************************************************************************

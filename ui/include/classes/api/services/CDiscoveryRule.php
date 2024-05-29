@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -34,10 +29,10 @@ class CDiscoveryRule extends CItemGeneral {
 
 	public const OUTPUT_FIELDS = ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'status',
 		'trapper_hosts', 'templateid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-		'privatekey', 'interfaceid', 'description', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url',
-		'query_fields', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
-		'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-		'verify_host', 'allow_traps', 'state', 'error', 'parameters'
+		'privatekey', 'interfaceid', 'description', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+		'enabled_lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes',
+		'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file',
+		'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'state', 'error', 'parameters'
 	];
 
 	/**
@@ -57,7 +52,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	const SUPPORTED_ITEM_TYPES = [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 		ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
-		ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+		ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+		ITEM_TYPE_BROWSER
 	];
 
 	/**
@@ -260,6 +256,11 @@ class CDiscoveryRule extends CItemGeneral {
 				$options['filter']['lifetime'] = getTimeUnitFilters($options['filter']['lifetime']);
 			}
 
+			if (array_key_exists('enabled_lifetime', $options['filter'])
+					&& $options['filter']['enabled_lifetime'] !== null) {
+				$options['filter']['enabled_lifetime'] = getTimeUnitFilters($options['filter']['enabled_lifetime']);
+			}
+
 			if (array_key_exists('state', $options['filter']) && $options['filter']['state'] !== null) {
 				$this->dbFilter('item_rtdata ir', ['filter' => ['state' => $options['filter']['state']]] + $options,
 					$sqlParts
@@ -311,29 +312,8 @@ class CDiscoveryRule extends CItemGeneral {
 			self::prepareItemsForApi($result, false);
 
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['formula', 'evaltype']);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
-
-			foreach ($result as &$rule) {
-				// unset the fields that are returned in the filter
-				unset($rule['formula'], $rule['evaltype']);
-
-				if ($options['selectFilter'] !== null) {
-					$filter = $this->unsetExtraFields([$rule['filter']],
-						['conditions', 'formula', 'evaltype'],
-						$options['selectFilter']
-					);
-					$filter = reset($filter);
-					if (isset($filter['conditions'])) {
-						foreach ($filter['conditions'] as &$condition) {
-							unset($condition['item_conditionid'], $condition['itemid']);
-						}
-						unset($condition);
-					}
-
-					$rule['filter'] = $filter;
-				}
-			}
-			unset($rule);
 		}
 
 		foreach ($result as &$item) {
@@ -343,7 +323,7 @@ class CDiscoveryRule extends CItemGeneral {
 		unset($item);
 
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
 
 		return $result;
@@ -554,72 +534,70 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($options['selectFilter'] !== null) {
-			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
-			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
-			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
+			$has_evaltype = $this->outputIsRequested('evaltype', $options['selectFilter']);
+			$has_formula = $this->outputIsRequested('formula', $options['selectFilter']);
+			$has_eval_formula = $this->outputIsRequested('eval_formula', $options['selectFilter']);
+			$has_conditions = $this->outputIsRequested('conditions', $options['selectFilter']);
 
-			$filters = [];
-			foreach ($result as $rule) {
-				$filters[$rule['itemid']] = [
-					'evaltype' => $rule['evaltype'],
-					'formula' => isset($rule['formula']) ? $rule['formula'] : ''
-				];
+			foreach ($result as &$item) {
+				$item['filter'] = [];
+
+				if ($has_evaltype) {
+					$item['filter']['evaltype'] = $item['evaltype'];
+				}
 			}
+			unset($item);
 
-			// adding conditions
-			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = DB::select('item_condition', [
-					'output' => ['item_conditionid', 'macro', 'value', 'itemid', 'operator'],
-					'filter' => ['itemid' => $itemIds],
-					'preservekeys' => true,
-					'sortfield' => ['item_conditionid']
-				]);
-				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
+			if ($has_formula || $has_eval_formula || $has_conditions) {
+				$db_conditions = DBselect(
+					'SELECT c.itemid,c.item_conditionid,c.macro,c.operator,c.value'.
+					' FROM item_condition c'.
+					' WHERE '.dbConditionInt('c.itemid', $itemIds)
+				);
 
-				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
+				$item_conditions = [];
 
-				foreach ($filters as &$filter) {
-					// in case of a custom expression - use the given formula
-					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $filter['formula'];
+				while ($db_condition = DBfetch($db_conditions)) {
+					$item_conditions[$db_condition['itemid']][$db_condition['item_conditionid']] =
+						array_diff_key($db_condition, array_flip(['item_conditionid', 'itemid']));
+				}
+
+				foreach ($result as &$item) {
+					$eval_formula = '';
+					$conditions = array_key_exists($item['itemid'], $item_conditions)
+						? $item_conditions[$item['itemid']]
+						: [];
+
+					if ($item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $item['formula']);
+
+						$eval_formula = $item['formula'];
 					}
-					// in other cases - generate the formula automatically
 					else {
-						// sort the conditions by macro before generating the formula
-						$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
-						$conditions = order_macros($conditions, 'macro');
+						CConditionHelper::sortLldRuleConditions($conditions);
 
-						$formulaConditions = [];
-						foreach ($conditions as $condition) {
-							$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
-						}
-						$formula = CConditionHelper::getFormula($formulaConditions, $filter['evaltype']);
+						$eval_formula = CConditionHelper::getEvalFormula($conditions, 'macro', (int) $item['evaltype']);
 					}
 
-					// generate formulaids from the effective formula
-					$formulaIds = CConditionHelper::getFormulaIds($formula);
-					foreach ($filter['conditions'] as &$condition) {
-						$condition['formulaid'] = $formulaIds[$condition['item_conditionid']];
-					}
-					unset($condition);
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
 
-					// generated a letter based formula only for rules with custom expressions
-					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
+					if ($has_formula) {
+						$item['filter']['formula'] = $item['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+							? $eval_formula
+							: '';
 					}
 
-					if ($evalFormulaRequested) {
-						$filter['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
+					if ($has_eval_formula) {
+						$item['filter']['eval_formula'] = $eval_formula;
+					}
+
+					if ($has_conditions) {
+						$item['filter']['conditions'] = array_values($conditions);
 					}
 				}
-				unset($filter);
+				unset($item);
 			}
-
-			// add filters to the result
-			foreach ($result as &$rule) {
-				$rule['filter'] = $filters[$rule['itemid']];
-			}
-			unset($rule);
 		}
 
 		// Add LLD macro paths.
@@ -660,62 +638,48 @@ class CDiscoveryRule extends CItemGeneral {
 			]);
 
 			if ($filter_requested && $overrides) {
-				$conditions = DB::select('lld_override_condition', [
-					'output' => ['lld_override_conditionid', 'macro', 'value', 'lld_overrideid', 'operator'],
-					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => ['lld_override_conditionid'],
-					'preservekeys' => true
-				]);
+				$db_conditions = DBselect(
+					'SELECT c.lld_overrideid,c.lld_override_conditionid,c.macro,c.operator,c.value'.
+					' FROM lld_override_condition c'.
+					' WHERE '.dbConditionInt('c.lld_overrideid', array_keys($overrides))
+				);
 
-				$relation_map = $this->createRelationMap($conditions, 'lld_overrideid', 'lld_override_conditionid');
+				$override_conditions = [];
+
+				while ($db_condition = DBfetch($db_conditions)) {
+					$override_conditions[$db_condition['lld_overrideid']][$db_condition['lld_override_conditionid']] =
+						array_diff_key($db_condition, array_flip(['lld_override_conditionid', 'lld_overrideid']));
+				}
 
 				foreach ($overrides as &$override) {
+					$eval_formula = '';
+					$conditions = array_key_exists($override['lld_overrideid'], $override_conditions)
+						? $override_conditions[$override['lld_overrideid']]
+						: [];
+
+					if ($override['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $override['formula']);
+
+						$eval_formula = $override['formula'];
+					}
+					else {
+						CConditionHelper::sortLldRuleConditions($conditions);
+
+						$eval_formula =
+							CConditionHelper::getEvalFormula($conditions, 'macro', (int) $override['evaltype']);
+					}
+
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
+
 					$override['filter'] = [
 						'evaltype' => $override['evaltype'],
-						'formula' => $override['formula']
+						'formula' => $override['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION ? $eval_formula : '',
+						'eval_formula' => $eval_formula,
+						'conditions' => array_values($conditions)
 					];
+
 					unset($override['evaltype'], $override['formula']);
-				}
-				unset($override);
-
-				$overrides = $relation_map->mapMany($overrides, $conditions, 'conditions');
-
-				foreach ($overrides as &$override) {
-					$override['filter'] += ['conditions' => $override['conditions']];
-					unset($override['conditions']);
-
-					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $override['filter']['formula'];
-					}
-					else {
-						$conditions = zbx_toHash($override['filter']['conditions'], 'lld_override_conditionid');
-						$conditions = order_macros($conditions, 'macro');
-						$formula_conditions = [];
-
-						foreach ($conditions as $condition) {
-							$formula_conditions[$condition['lld_override_conditionid']] = $condition['macro'];
-						}
-
-						$formula = CConditionHelper::getFormula($formula_conditions, $override['filter']['evaltype']);
-					}
-
-					$formulaids = CConditionHelper::getFormulaIds($formula);
-
-					foreach ($override['filter']['conditions'] as &$condition) {
-						$condition['formulaid'] = $formulaids[$condition['lld_override_conditionid']];
-						unset($condition['lld_override_conditionid'], $condition['lld_overrideid']);
-					}
-					unset($condition);
-
-					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$override['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
-						$override['filter']['eval_formula'] = $override['filter']['formula'];
-					}
-					else {
-						$override['filter']['eval_formula'] = CConditionHelper::replaceNumericIds($formula,
-							$formulaids
-						);
-					}
 				}
 				unset($override);
 			}
@@ -937,23 +901,38 @@ class CDiscoveryRule extends CItemGeneral {
 		self::addFlags($items, ZBX_FLAG_DISCOVERY_RULE);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['uuid'], ['hostid', 'key_']], 'fields' => [
-			'host_status' =>		['type' => API_ANY],
-			'flags' =>				['type' => API_ANY],
-			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			'host_status' =>			['type' => API_ANY],
+			'flags' =>					['type' => API_ANY],
+			'uuid' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
-			'hostid' =>				['type' => API_ANY],
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
-			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
-			'key_' =>				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
-			'lifetime' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'preprocessing' =>		self::getPreprocessingValidationRules(),
-			'lld_macro_paths' =>	self::getLldMacroPathsValidationRules(),
-			'filter' =>				self::getFilterValidationRules('items', 'item_condition'),
-			'overrides' =>			self::getOverridesValidationRules()
+			'hostid' =>					['type' => API_ANY],
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
+			'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
+			'key_' =>					['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
+			'lifetime_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]), 'default' => DB::getDefault('items', 'lifetime_type')],
+			'lifetime' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime'), 'default' => DB::getDefault('items', 'lifetime')],
+											['else' => true, 'type' => API_TIME_UNIT, 'in' => '0', 'default' => 0]
+			]],
+			'enabled_lifetime_type' =>	['type' => API_MULTIPLE, 'default' => DB::getDefault('items', 'enabled_lifetime_type'), 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY])],
+											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('items', 'enabled_lifetime_type')]
+			]],
+			'enabled_lifetime' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
+												['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
+											]],
+											['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
+			]],
+			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'preprocessing' =>			self::getPreprocessingValidationRules(),
+			'lld_macro_paths' =>		self::getLldMacroPathsValidationRules(),
+			'filter' =>					self::getFilterValidationRules('items', 'item_condition'),
+			'overrides' =>				self::getOverridesValidationRules()
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -966,6 +945,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
+		self::checkLifetimeFields($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
 		self::checkFilterFormula($items);
@@ -1053,7 +1033,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'lifetime_type' => ['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -1071,7 +1052,8 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		$db_items = DB::select('items', [
-			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
+				'enabled_lifetime_type', 'enabled_lifetime', 'description', 'status'],
 				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),
 			'itemids' => array_column($items, 'itemid'),
@@ -1083,6 +1065,12 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
 			$item['host_status'] = $db_item['host_status'];
+
+			$item += ['lifetime_type' => $db_item['lifetime_type']];
+
+			$item += $item['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY
+				? ['enabled_lifetime_type' => DB::getDefault('items', 'enabled_lifetime_type')]
+				: ['enabled_lifetime_type' => $db_item['enabled_lifetime_type']];
 
 			$api_input_rules = $db_item['templateid'] == 0
 				? self::getValidationRules()
@@ -1098,7 +1086,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid',
+			['hostid', 'flags', 'lifetime', 'enabled_lifetime']
+		);
 
 		self::validateUniqueness($items);
 
@@ -1106,6 +1096,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
+		self::checkLifetimeFields($items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
 		self::checkFilterFormula($items);
@@ -1118,22 +1109,37 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'host_status' =>		['type' => API_ANY],
-			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			'host_status' =>			['type' => API_ANY],
+			'uuid' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
-			'itemid' =>				['type' => API_ANY],
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
-			'type' =>				['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
-			'key_' =>				['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
-			'lifetime' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'preprocessing' =>		self::getPreprocessingValidationRules(),
-			'lld_macro_paths' =>	self::getLldMacroPathsValidationRules(),
-			'filter' =>				self::getFilterValidationRules('items', 'item_condition'),
-			'overrides' =>			self::getOverridesValidationRules()
+			'itemid' =>					['type' => API_ANY],
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
+			'type' =>					['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
+			'key_' =>					['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
+			'lifetime_type' =>			['type' => API_ANY],
+			'lifetime' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
+											['else' => true, 'type' => API_TIME_UNIT, 'in' => '0']
+			]],
+			'enabled_lifetime_type' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY])],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'enabled_lifetime_type')]
+			]],
+			'enabled_lifetime' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
+												['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
+											]],
+											['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
+			]],
+			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'preprocessing' =>			self::getPreprocessingValidationRules(),
+			'lld_macro_paths' =>		self::getLldMacroPathsValidationRules(),
+			'filter' =>					self::getFilterValidationRules('items', 'item_condition'),
+			'overrides' =>				self::getOverridesValidationRules()
 		]];
 	}
 
@@ -1142,19 +1148,34 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'host_status' =>		['type' => API_ANY],
-			'uuid' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'itemid' =>				['type' => API_ANY],
-			'name' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'type' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'key_' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'lifetime' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'preprocessing' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'lld_macro_paths' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'filter' =>				self::getFilterValidationRules('items', 'item_condition'),
-			'overrides' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
+			'host_status' =>			['type' => API_ANY],
+			'uuid' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'itemid' =>					['type' => API_ANY],
+			'name' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'type' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'key_' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'lifetime_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY])],
+			'lifetime' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
+											['else' => true, 'type' => API_TIME_UNIT, 'in' => '0']
+			]],
+			'enabled_lifetime_type' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_INT32, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY])],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'enabled_lifetime_type')]
+			]],
+			'enabled_lifetime' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'lifetime_type', 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER])], 'type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'enabled_lifetime_type', 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
+												['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
+											]],
+											['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'enabled_lifetime')]
+			]],
+			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'preprocessing' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'lld_macro_paths' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'filter' =>					self::getFilterValidationRules('items', 'item_condition'),
+			'overrides' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
 		]];
 	}
 
@@ -1358,19 +1379,16 @@ class CDiscoveryRule extends CItemGeneral {
 		];
 		$db_filters = DBselect(DB::makeSql($base_table, $options));
 
-		$object_formulaids = [];
-
 		while ($db_filter = DBfetch($db_filters)) {
-			if ($db_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$object_formulaids[$db_filter[$base_pk]] = CConditionHelper::getFormulaIds($db_filter['formula']);
+			$conditions = [];
 
-				$db_filter['formula'] = CConditionHelper::replaceNumericIds($db_filter['formula'],
-					$object_formulaids[$db_filter[$base_pk]]
-				);
+			if ($db_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::addFormulaIds($conditions, $db_filter['formula']);
+				CConditionHelper::replaceConditionIds($db_filter['formula'], $conditions);
 			}
 
 			$db_objects[$db_filter[$base_pk]]['filter'] =
-				array_diff_key($db_filter, array_flip([$base_pk])) + ['conditions' => []];
+				array_diff_key($db_filter, array_flip([$base_pk])) + ['conditions' => $conditions];
 		}
 
 		$options = [
@@ -1381,14 +1399,15 @@ class CDiscoveryRule extends CItemGeneral {
 
 		while ($db_condition = DBfetch($db_conditions)) {
 			if ($db_objects[$db_condition[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$db_condition['formulaid'] = $object_formulaids[$db_condition[$base_pk]][$db_condition[$condition_pk]];
+				$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] +=
+					array_diff_key($db_condition, array_flip([$base_pk]));
 			}
 			else {
 				$db_condition['formulaid'] = '';
-			}
 
-			$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] =
-				array_diff_key($db_condition, array_flip([$base_pk]));
+				$db_objects[$db_condition[$base_pk]]['filter']['conditions'][$db_condition[$condition_pk]] =
+					array_diff_key($db_condition, array_flip([$base_pk]));
+			}
 		}
 	}
 
@@ -1591,6 +1610,36 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
+	 * Check if lifetime value is greater than enabled_lifetime value.
+	 *
+	 * @param array $items
+	 */
+	private static function checkLifetimeFields(array $items): void {
+		foreach ($items as $i => $item) {
+			if ($item['lifetime_type'] != ZBX_LLD_DELETE_AFTER
+					|| $item['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER || $item['lifetime'][0] === '{'
+					|| $item['enabled_lifetime'][0] === '{') {
+				continue;
+			}
+
+			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
+			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
+
+			if ($item['lifetime'] == 0 && $item['enabled_lifetime'] == 0) {
+				continue;
+			}
+
+			if ($item['enabled_lifetime'] >= $item['lifetime']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/enabled_lifetime',
+						_s('cannot be greater than or equal to the value of parameter "%1$s"', '/'.($i + 1).'/lifetime')
+					)
+				);
+			}
+		}
+	}
+
+	/**
 	 * Check that all constants of formula are specified in the filter conditions of the given LLD rules or overrides.
 	 *
 	 * @param array  $objects
@@ -1772,6 +1821,48 @@ class CDiscoveryRule extends CItemGeneral {
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_LLD_RULE, $items, $db_items);
 	}
 
+	protected static function addFieldDefaultsByType(array &$items, array $db_items): void {
+		parent::addFieldDefaultsByType($items, $db_items);
+
+		self::addFieldDefaultsByLifetimeType($items, $db_items);
+		self::addFieldDefaultsByEnabledLifetimeType($items, $db_items);
+	}
+
+	private static function addFieldDefaultsByLifetimeType(array &$items, array $db_items): void {
+		$field_defaults = [
+			'enabled_lifetime' => DB::getDefault('items', 'enabled_lifetime')
+		];
+
+		foreach ($items as &$item) {
+			if (array_key_exists('lifetime_type', $item)
+					&& $item['lifetime_type'] != $db_items[$item['itemid']]['lifetime_type']) {
+				if ($item['lifetime_type'] != ZBX_LLD_DELETE_AFTER) {
+					$item['lifetime'] = 0;
+				}
+
+				if ($item['lifetime_type'] == ZBX_LLD_DELETE_IMMEDIATELY) {
+					$item += $field_defaults;
+				}
+			}
+		}
+		unset($item);
+	}
+
+	private static function addFieldDefaultsByEnabledLifetimeType(array &$items, array $db_items): void {
+		$field_defaults = [
+			'enabled_lifetime' => DB::getDefault('items', 'enabled_lifetime')
+		];
+
+		foreach ($items as &$item) {
+			if (array_key_exists('enabled_lifetime_type', $item)
+					&& $item['enabled_lifetime_type'] != $db_items[$item['itemid']]['enabled_lifetime_type']
+					&& $item['enabled_lifetime_type'] != ZBX_LLD_DISABLE_AFTER) {
+				$item += $field_defaults;
+			}
+		}
+		unset($item);
+	}
+
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
@@ -1904,8 +1995,9 @@ class CDiscoveryRule extends CItemGeneral {
 				if ($db_objects === null
 						|| $object['filter']['formula'] != $db_objects[$object[$base_pk]]['filter']['formula']
 						|| array_key_exists($i, $_upd_objectids)) {
-					$upd_object['formula'] = CConditionHelper::replaceLetterIds($object['filter']['formula'],
-						array_column($object['filter']['conditions'], $condition_pk, 'formulaid')
+					$upd_object['formula'] = $object['filter']['formula'];
+					CConditionHelper::replaceFormulaIds($upd_object['formula'],
+						array_column($object['filter']['conditions'], null, $condition_pk)
 					);
 				}
 			}
@@ -1960,26 +2052,15 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$condition_indexes = [];
-
-				foreach ($object['filter']['conditions'] as $j => $condition) {
-					$condition_indexes[$condition['formulaid']] = $j;
-				}
-
-				$formula = CConditionHelper::replaceLetterIds($object['filter']['formula'], $condition_indexes);
-				$formulaids = CConditionHelper::getFormulaIds($formula);
-
-				$object['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
+				CConditionHelper::resetFormulaIds($object['filter']['formula'], $object['filter']['conditions']);
 			}
 
 			$changed = false;
 			$db_conditions = $db_objects !== null ? $db_objects[$object[$base_pk]]['filter']['conditions'] : [];
 
-			foreach ($object['filter']['conditions'] as $j => &$condition) {
-				if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$condition['formulaid'] = $formulaids[$j];
-				}
-				elseif ($db_objects !== null
+			foreach ($object['filter']['conditions'] as &$condition) {
+				if ($db_objects !== null
+						&& $object['filter']['evaltype'] != $db_objects[$object[$base_pk]]['filter']['evaltype']
 						&& $db_objects[$object[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 					$condition['formulaid'] = '';
 				}
@@ -2507,7 +2588,10 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	public static function linkTemplateObjects(array $templateids, array $hostids): void {
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(
+				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
+				],
 				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
 			),
 			'filter' => [
@@ -2529,7 +2613,7 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($db_items as $db_item) {
 			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
 
-			if ($db_item['type'] == ITEM_TYPE_SCRIPT) {
+			if (in_array($db_item['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 				$item += ['parameters' => []];
 			}
 
@@ -2725,7 +2809,10 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(
+				['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
+				],
 				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),
 			'itemids' => array_keys($upd_db_items)
@@ -2849,7 +2936,10 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	private static function getChildObjectsUsingTemplateid(array $items, array $db_items, array $hostids): array {
 		$upd_db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(
+				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
+				],
 				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),
 			'filter' => [
@@ -3273,7 +3363,11 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyDiscoveryRule($discoveryid, $hostid) {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
-			'output' => array_merge(['itemid', 'hostid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(
+				[
+					'itemid', 'hostid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
+				],
 				CItemType::FIELD_NAMES
 			),
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
@@ -3360,6 +3454,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 			$dstDiscovery['master_itemid'] = $master_items[0]['itemid'];
 		}
+
+		$dstDiscovery = ['hostid' => $dstDiscovery['hostid']] + getSanitizedItemFields([
+			'templateid' => 0,
+			'flags' => ZBX_FLAG_DISCOVERY_RULE,
+			'hosts' => [$dst_host]
+		] + $dstDiscovery);
 
 		// save new discovery
 		$newDiscovery = $this->create([$dstDiscovery]);
@@ -3462,6 +3562,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param string $dst_host['hostid']
 	 * @param string $dst_host['host']
 	 * @param array  $dst_host['interfaces']
+	 * @param int    $dst_host['status']
 	 *
 	 * @throws APIException
 	 */
@@ -3682,7 +3783,11 @@ class CDiscoveryRule extends CItemGeneral {
 					$dst_item['master_itemid'] = $master_item_links[$src_item['master_itemid']][$dst_host['hostid']];
 				}
 
-				$dst_items[] = ['hostid' => $dst_host['hostid'], 'ruleid' => $dst_ruleid] + $dst_item;
+				$dst_items[] = ['hostid' => $dst_host['hostid'], 'ruleid' => $dst_ruleid] + getSanitizedItemFields([
+					'templateid' => 0,
+					'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+					'hosts' => [$dst_host]
+				] + $dst_item);
 			}
 
 			$response = API::ItemPrototype()->create($dst_items);

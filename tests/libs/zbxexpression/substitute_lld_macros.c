@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcommon.h"
@@ -28,7 +23,7 @@
 #include "zbxmockutil.h"
 
 
-static void	get_macros(const char *path, zbx_vector_lld_macro_path_t *macros)
+static void	get_macros(const char *path, zbx_vector_lld_macro_path_ptr_t *macros)
 {
 	zbx_lld_macro_path_t	*macro;
 	zbx_mock_handle_t	hmacros, hmacro;
@@ -44,7 +39,7 @@ static void	get_macros(const char *path, zbx_vector_lld_macro_path_t *macros)
 		macro = (zbx_lld_macro_path_t *)zbx_malloc(NULL, sizeof(zbx_lld_macro_path_t));
 		macro->lld_macro = zbx_strdup(NULL, zbx_mock_get_object_member_string(hmacro, "macro"));
 		macro->path = zbx_strdup(NULL, zbx_mock_get_object_member_string(hmacro, "path"));
-		zbx_vector_lld_macro_path_append(macros, macro);
+		zbx_vector_lld_macro_path_ptr_append(macros, macro);
 
 		macros_num++;
 	}
@@ -97,12 +92,12 @@ void	zbx_mock_test_entry(void **state)
 	int				expected_ret, returned_ret, flags;
 	char				*expression;
 	const char			*expected_expression, *lld_row;
-	zbx_vector_lld_macro_path_t	macros;
+	zbx_vector_lld_macro_path_ptr_t	macros;
 	struct zbx_json_parse		jp;
 
 	ZBX_UNUSED(state);
 
-	zbx_vector_lld_macro_path_create(&macros);
+	zbx_vector_lld_macro_path_ptr_create(&macros);
 	get_macros("in.macros", &macros);
 	flags = get_flags("in.flags");
 
@@ -121,6 +116,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_str_eq("resulting expression", expected_expression, expression);
 
 	zbx_free(expression);
-	zbx_vector_lld_macro_path_clear_ext(&macros, zbx_lld_macro_path_free);
-	zbx_vector_lld_macro_path_destroy(&macros);
+	zbx_vector_lld_macro_path_ptr_clear_ext(&macros, zbx_lld_macro_path_free);
+	zbx_vector_lld_macro_path_ptr_destroy(&macros);
 }

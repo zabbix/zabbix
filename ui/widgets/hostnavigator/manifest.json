@@ -1,0 +1,39 @@
+{
+	"manifest_version": 2.0,
+	"id": "hostnavigator",
+	"type": "widget",
+	"name": "Host navigator",
+	"namespace": "HostNavigator",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Displays host hierarchy with ability to control other widgets based on selected host.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/host_navigator",
+	"widget": {
+		"size": {
+			"width": 12,
+			"height": 5
+		},
+		"js_class": "CWidgetHostNavigator",
+		"in": {
+			"groupids": {
+				"type": "_hostgroupid"
+			}
+		},
+		"out": [
+			{
+				"type": "_hostid"
+			},
+			{
+				"type": "_hostids"
+			}
+		]
+	},
+	"actions": {
+		"widget.hostnavigator.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.hostnavigator.js", "class.widget.js", "class.widget-field.host-grouping.js"]
+	}
+}

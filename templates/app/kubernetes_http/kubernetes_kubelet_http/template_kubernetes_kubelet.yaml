@@ -23,7 +23,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 1f94bbb521cb41dfa093e1408efbb15a
-          name: 'Kubernetes: Get cadvisor metrics'
+          name: 'Get cadvisor metrics'
           type: HTTP_AGENT
           key: kube.cadvisor.metrics
           history: '0'
@@ -40,7 +40,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: bc395860d45b45cb89401fc7e50bc015
-          name: 'Kubernetes: Containers restarts'
+          name: 'Containers restarts'
           type: DEPENDENT
           key: kube.kubelet.containers.restarts
           delay: '0'
@@ -57,7 +57,7 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: e524234eea87438d9ee2a1db9f24cfbb
-          name: 'Kubernetes: Containers running'
+          name: 'Containers running'
           type: DEPENDENT
           key: kube.kubelet.containers.running
           delay: '0'
@@ -74,7 +74,7 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: cff44957e9a54d5d887d4f92b3e4da72
-          name: 'Kubernetes: CPU cores, total'
+          name: 'CPU cores, total'
           type: DEPENDENT
           key: kube.kubelet.cpu.cores
           delay: '0'
@@ -93,7 +93,7 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: 6735723da30d41dcb7bd46c954b2998f
-          name: 'Kubernetes: Machine memory, bytes'
+          name: 'Machine memory, bytes'
           type: DEPENDENT
           key: kube.kubelet.machine.memory
           delay: '0'
@@ -113,7 +113,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: c71fc79a77104ef4a0d6b89d5f7b7bad
-          name: 'Kubernetes: Get kubelet metrics'
+          name: 'Get kubelet metrics'
           type: HTTP_AGENT
           key: kube.kubelet.metrics
           history: '0'
@@ -130,7 +130,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 46635d3fee04488caa4b07de7709f71e
-          name: 'Kubernetes: Pods running'
+          name: 'Pods running'
           type: DEPENDENT
           key: kube.kubelet.pods.running
           delay: '0'
@@ -147,7 +147,7 @@ zabbix_export:
             - tag: component
               value: pods
         - uuid: d1388216cb384ff08c984919572b0ffb
-          name: 'Kubernetes: File descriptors, max'
+          name: 'File descriptors, max'
           type: DEPENDENT
           key: kube.kubelet.process_max_fds
           delay: '0'
@@ -166,7 +166,7 @@ zabbix_export:
             - tag: component
               value: descriptors
         - uuid: dc3a6371dcb34ae5b65cbf5224d4712c
-          name: 'Kubernetes: File descriptors, open'
+          name: 'File descriptors, open'
           type: DEPENDENT
           key: kube.kubelet.process_open_fds
           delay: '0'
@@ -185,7 +185,7 @@ zabbix_export:
             - tag: component
               value: descriptors
         - uuid: c382b67cf7e947fbb9c29e86446ffac5
-          name: 'Kubernetes: Virtual memory, bytes'
+          name: 'Virtual memory, bytes'
           type: DEPENDENT
           key: kube.kubelet.virtual.memory
           delay: '0'
@@ -205,7 +205,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 11da04549bd840b0a8d5c70ff0d2b46f
-          name: 'Kubernetes: Containers last state terminated'
+          name: 'Containers last state terminated'
           type: DEPENDENT
           key: kube.kublet.containers.terminated
           delay: '0'
@@ -222,7 +222,7 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: 7c8cc6c3ed8e412eb69e7ab8e2fe7e12
-          name: 'Kubernetes: Get pods'
+          name: 'Get pods'
           type: HTTP_AGENT
           key: kube.pods
           history: '0'
@@ -247,7 +247,7 @@ zabbix_export:
           lifetime: '0'
           item_prototypes:
             - uuid: 8f8b1df2a801475a92604544b2019b2e
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory page cache'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory page cache'
               type: DEPENDENT
               key: 'kube.kubelet.container.memory.cache["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
               delay: '0'
@@ -276,7 +276,7 @@ zabbix_export:
                 - tag: pod
                   value: '{#POD}'
             - uuid: 6dcf948e79b94f3f96677a7948d2dfd4
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage'
               type: DEPENDENT
               key: 'kube.kubelet.container.memory.max_usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
               delay: '0'
@@ -305,7 +305,7 @@ zabbix_export:
                 - tag: pod
                   value: '{#POD}'
             - uuid: 47d35c31a52643c1b587efcec57f9dff
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS'
               type: DEPENDENT
               key: 'kube.kubelet.container.memory.rss["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
               delay: '0'
@@ -334,7 +334,7 @@ zabbix_export:
                 - tag: pod
                   value: '{#POD}'
             - uuid: 2cf31296f67947ec85f576773352a25b
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Swap'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Swap'
               type: DEPENDENT
               key: 'kube.kubelet.container.memory.swap["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
               delay: '0'
@@ -363,7 +363,7 @@ zabbix_export:
                 - tag: pod
                   value: '{#POD}'
             - uuid: 146d17ecec7149efb20878d7e0466eeb
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage'
               type: DEPENDENT
               key: 'kube.kubelet.container.memory.usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
               delay: '0'
@@ -392,7 +392,7 @@ zabbix_export:
                 - tag: pod
                   value: '{#POD}'
             - uuid: d3a24d207c6d4201a5e7235f246e0c59
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set'
               type: DEPENDENT
               key: 'kube.kubelet.container.memory.working_set["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
               delay: '0'
@@ -455,7 +455,7 @@ zabbix_export:
           lifetime: '0'
           item_prototypes:
             - uuid: 41e8f027979a462983789f1f45a9e332
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s'
               type: DEPENDENT
               key: 'kube.pod.container_cpu_load_average_10s[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -477,7 +477,7 @@ zabbix_export:
                 - tag: pod
                   value: '{#NAME}'
             - uuid: 434c913e7547435bb74c922f81f3ff7a
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total'
               type: DEPENDENT
               key: 'kube.pod.container_cpu_system_seconds_total[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -503,7 +503,7 @@ zabbix_export:
                 - tag: pod
                   value: '{#NAME}'
             - uuid: 08ae25c1a6a34fae9f3131b14c061e4d
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Usage seconds, total'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Usage seconds, total'
               type: DEPENDENT
               key: 'kube.pod.container_cpu_usage_seconds_total[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -529,7 +529,7 @@ zabbix_export:
                 - tag: pod
                   value: '{#NAME}'
             - uuid: e0b1c1edcc3c4738a71b46712a085ed0
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total'
+              name: 'Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total'
               type: DEPENDENT
               key: 'kube.pod.container_cpu_user_seconds_total[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -573,7 +573,7 @@ zabbix_export:
           delay: '0'
           item_prototypes:
             - uuid: c569ce73bfb44098be3ceb8d016e3d24
-              name: 'Kubernetes: Host [{#HOST}] Request method [{#METHOD}] Code:[{#CODE}]'
+              name: 'Host [{#HOST}] Request method [{#METHOD}] Code:[{#CODE}]'
               type: DEPENDENT
               key: 'kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]'
               delay: '0'
@@ -634,7 +634,7 @@ zabbix_export:
           delay: '0'
           item_prototypes:
             - uuid: 13de106611a347e0907dda9ff52f3a20
-              name: 'Kubernetes: [{#OP_TYPE}] Runtime operations bucket: {#LE}'
+              name: '[{#OP_TYPE}] Runtime operations bucket: {#LE}'
               type: DEPENDENT
               key: 'kube.kublet.runtime_ops_duration_seconds_bucket[{#LE},"{#OP_TYPE}"]'
               delay: '0'
@@ -655,7 +655,7 @@ zabbix_export:
                 - tag: component
                   value: operations
             - uuid: 3d9545d396b24ef6b87eb730ad93cda7
-              name: 'Kubernetes: [{#OP_TYPE}] Operations, p50'
+              name: '[{#OP_TYPE}] Operations, p50'
               type: CALCULATED
               key: 'kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]'
               history: 7d
@@ -668,7 +668,7 @@ zabbix_export:
                 - tag: component
                   value: operations
             - uuid: 039a47a0b20741e79701fecb924e6a08
-              name: 'Kubernetes: [{#OP_TYPE}] Operations, p90'
+              name: '[{#OP_TYPE}] Operations, p90'
               type: CALCULATED
               key: 'kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]'
               history: 7d
@@ -681,7 +681,7 @@ zabbix_export:
                 - tag: component
                   value: operations
             - uuid: e846265636ac433ba2bce034aca1e394
-              name: 'Kubernetes: [{#OP_TYPE}] Operations, p95'
+              name: '[{#OP_TYPE}] Operations, p95'
               type: CALCULATED
               key: 'kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]'
               history: 7d
@@ -694,7 +694,7 @@ zabbix_export:
                 - tag: component
                   value: operations
             - uuid: 68f17a6132dd48deb3825efd2b83b6ce
-              name: 'Kubernetes: [{#OP_TYPE}] Operations, p99'
+              name: '[{#OP_TYPE}] Operations, p99'
               type: CALCULATED
               key: 'kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]'
               history: 7d
@@ -707,7 +707,7 @@ zabbix_export:
                 - tag: component
                   value: operations
             - uuid: 736abc78366e44b69234caf56abe8a4a
-              name: 'Kubernetes: [{#OP_TYPE}] Runtime operations total, rate'
+              name: '[{#OP_TYPE}] Runtime operations total, rate'
               type: DEPENDENT
               key: 'kube.kublet.runtime_ops_total.rate["{#OP_TYPE}"]'
               delay: '0'
@@ -853,7 +853,7 @@ zabbix_export:
             - name: Operations
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

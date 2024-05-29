@@ -22,7 +22,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: bf1b74b98d5b4311afeb721059c01da9
-          name: 'Mantis BT: Get projects'
+          name: 'Get projects'
           type: HTTP_AGENT
           key: mantisbt.get.projects
           delay: 1h
@@ -889,7 +889,7 @@ zabbix_export:
               widgets:
                 - type: graphprototype
                   name: 'Mantis BT: Issues total'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -906,7 +906,7 @@ zabbix_export:
                 - type: graphprototype
                   name: 'Mantis BT: Issues by priority'
                   'y': '5'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -922,9 +922,9 @@ zabbix_export:
                       value: AAAAB
                 - type: graphprototype
                   name: 'Mantis BT: Issues by resolution'
-                  x: '6'
+                  x: '18'
                   'y': '5'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -940,9 +940,9 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   name: 'Mantis BT: Issues by severity'
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -958,9 +958,9 @@ zabbix_export:
                       value: AAAAD
                 - type: graphprototype
                   name: 'Mantis BT: Issues by status'
-                  x: '18'
+                  x: '54'
                   'y': '5'
-                  width: '6'
+                  width: '18'
                   height: '5'
                   fields:
                     - type: INTEGER
