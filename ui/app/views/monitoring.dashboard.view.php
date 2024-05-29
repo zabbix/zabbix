@@ -19,21 +19,13 @@
  * @var array $data
  */
 
-if (array_key_exists('error', $data)) {
-	show_error_message($data['error']);
-
-	return;
-}
-
-$this->addJsFile('d3.js');
-$this->addJsFile('flickerfreescreen.js');
-$this->addJsFile('gtlc.js');
-$this->addJsFile('leaflet.js');
-$this->addJsFile('leaflet.markercluster.js');
+$this->addJsFile('class.coverride.js');
+$this->addJsFile('class.crangecontrol.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
-$this->addJsFile('class.geomaps.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
+$this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.widgets-data.js');
 $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
@@ -45,18 +37,27 @@ $this->addJsFile('class.widget-field.checkbox-list.js');
 $this->addJsFile('class.widget-field.multiselect.js');
 $this->addJsFile('class.widget-field.time-period.js');
 $this->addJsFile('class.widget-select.popup.js');
-$this->addJsFile('class.form.fieldset.collapsible.js');
-$this->addJsFile('class.calendar.js');
+$this->addJsFile('items.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.coverride.js');
-$this->addJsFile('class.crangecontrol.js');
-$this->addJsFile('colorpicker.js');
-$this->addJsFile('class.csvggraph.js');
+
+if (array_key_exists('error', $data)) {
+	show_error_message($data['error']);
+
+	return;
+}
+
+$this->addJsFile('d3.js');
+$this->addJsFile('class.calendar.js');
 $this->addJsFile('class.cnavtree.js');
+$this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('items.js');
+$this->addJsFile('colorpicker.js');
+$this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('gtlc.js');
+$this->addJsFile('leaflet.js');
+$this->addJsFile('leaflet.markercluster.js');
+$this->addJsFile('class.geomaps.js');
 $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
