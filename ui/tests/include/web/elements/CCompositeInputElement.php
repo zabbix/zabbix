@@ -28,7 +28,7 @@ class CCompositeInputElement extends CElement {
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:.//input')->waitUntilPresent()->one();
+		return $this->query('xpath:./input')->waitUntilPresent()->one();
 	}
 
 	/**
