@@ -31,6 +31,7 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxinterface.h"
+#include "zbxip.h"
 
 /******************************************************************************
  *                                                                            *
@@ -352,8 +353,7 @@ static void	resolve_user_macros(zbx_uint64_t userid, const char *m, char **user_
 	}
 }
 
-static int	resolve_host_target_macros(const char *m, const zbx_dc_host_t *dc_host, zbx_dc_interface_t *interface,
-		int *require_address, char **replace_to)
+static int	resolve_host_target_macros(const char *m, const zbx_dc_host_t *dc_host, char **replace_to)
 {
 	int	ret = SUCCEED;
 
@@ -362,18 +362,11 @@ static int	resolve_host_target_macros(const char *m, const zbx_dc_host_t *dc_hos
 
 	if (0 == strcmp(m, MVAR_HOST_TARGET_DNS))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(interface, dc_host->hostid, 0)))
-			*replace_to = zbx_strdup(*replace_to, interface->dns_orig);
-
-		*require_address = 1;
+		ret = expr_dc_get_interface_value(dc_host->hostid, 0, replace_to, ZBX_REQUEST_HOST_DNS);
 	}
 	else if (0 == strcmp(m, MVAR_HOST_TARGET_CONN))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(interface, dc_host->hostid, 0)))
-			*replace_to = zbx_strdup(*replace_to, interface->addr);
-
-		*require_address = 1;
-
+		ret = expr_dc_get_interface_value(dc_host->hostid, 0, replace_to, ZBX_REQUEST_HOST_CONN);
 	}
 	else if (0 == strcmp(m, MVAR_HOST_TARGET_HOST))
 	{
@@ -381,10 +374,7 @@ static int	resolve_host_target_macros(const char *m, const zbx_dc_host_t *dc_hos
 	}
 	else if (0 == strcmp(m, MVAR_HOST_TARGET_IP))
 	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(interface, dc_host->hostid, 0)))
-			*replace_to = zbx_strdup(*replace_to, interface->ip_orig);
-
-		*require_address = 1;
+		ret = expr_dc_get_interface_value(dc_host->hostid, 0, replace_to, ZBX_REQUEST_HOST_IP);
 	}
 	else if (0 == strcmp(m, MVAR_HOST_TARGET_NAME))
 	{
@@ -542,6 +532,21 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	is_strict_macro(const char *macro)
+{
+	const char	*strict_macros[] = {MVAR_HOST_IP, MVAR_IPADDRESS, MVAR_HOST_DNS,
+			MVAR_HOST_CONN, MVAR_HOST_TARGET_DNS, MVAR_HOST_TARGET_CONN,
+			MVAR_HOST_TARGET_IP};
+
+	for (int i = 0; i < (int)ARRSIZE(strict_macros); i++)
+	{
+		if (0 == strcmp(strict_macros[i], macro))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values.         *
@@ -556,7 +561,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 {
 	char				c, *replace_to = NULL, sql[64], *m_ptr;
 	const char			*m;
-	int				N_functionid, indexed_macro, require_address, ret, res = SUCCEED,
+	int				N_functionid, indexed_macro, ret, res = SUCCEED,
 					pos = 0, found, user_names_found = 0, raw_value;
 	size_t				data_alloc, data_len;
 	zbx_dc_interface_t		interface;
@@ -598,7 +603,6 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			found = zbx_token_find(*data, pos, &token, token_search))
 	{
 		indexed_macro = 0;
-		require_address = 0;
 		N_functionid = 1;
 		raw_value = 0;
 		pos = token.loc.l;
@@ -1059,8 +1063,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == (macro_type & (ZBX_MACRO_TYPE_SCRIPT_NORMAL | ZBX_MACRO_TYPE_SCRIPT_RECOVERY)))
 				{
-					ret = resolve_host_target_macros(m, dc_host, &interface, &require_address,
-							&replace_to);
+					ret = resolve_host_target_macros(m, dc_host, &replace_to);
 				}
 			}
 			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_TRIGGER == c_event->object)
@@ -1470,8 +1473,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else
 				{
-					ret = resolve_host_target_macros(m, dc_host, &interface, &require_address,
-							&replace_to);
+					ret = resolve_host_target_macros(m, dc_host, &replace_to);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_AUTOREGISTRATION == c_event->source)
@@ -1572,8 +1574,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else
 				{
-					ret = resolve_host_target_macros(m, dc_host, &interface, &require_address,
-							&replace_to);
+					ret = resolve_host_target_macros(m, dc_host, &replace_to);
 				}
 			}
 			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
@@ -2254,7 +2255,12 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			{
 				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
 				{
-					replace_to = zbx_strdup(replace_to, c_interface->ip_orig);
+					if (FAIL == zbx_is_ip(c_interface->ip_orig))
+					{
+						ret = FAIL;
+					}
+					else
+						replace_to = zbx_strdup(replace_to, c_interface->ip_orig);
 				}
 				else
 				{
@@ -2266,7 +2272,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			{
 				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
 				{
-					replace_to = zbx_strdup(replace_to, c_interface->dns_orig);
+					if (FAIL == zbx_is_ip(c_interface->dns_orig) &&
+							FAIL == zbx_validate_hostname(c_interface->dns_orig))
+					{
+						ret = FAIL;
+					}
+					else
+						replace_to = zbx_strdup(replace_to, c_interface->dns_orig);
 				}
 				else
 				{
@@ -2278,7 +2290,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			{
 				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
 				{
-					replace_to = zbx_strdup(replace_to, c_interface->addr);
+					if (FAIL == zbx_is_ip(c_interface->addr) &&
+							FAIL == zbx_validate_hostname(c_interface->addr))
+					{
+						ret = FAIL;
+					}
+					else
+						replace_to = zbx_strdup(replace_to, c_interface->addr);
 				}
 				else
 				{
@@ -2333,21 +2351,15 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				replace_to = zbx_strdup(replace_to, dc_host->name);
 			else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-					replace_to = zbx_strdup(replace_to, interface.ip_orig);
-				require_address = 1;
+				ret = expr_dc_get_interface_value(dc_host->hostid, 0, &replace_to, ZBX_REQUEST_HOST_IP);
 			}
 			else if	(0 == strcmp(m, MVAR_HOST_DNS))
 			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-					replace_to = zbx_strdup(replace_to, interface.dns_orig);
-				require_address = 1;
+				ret = expr_dc_get_interface_value(dc_host->hostid, 0, &replace_to, ZBX_REQUEST_HOST_DNS);
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
-				if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-					replace_to = zbx_strdup(replace_to, interface.addr);
-				require_address = 1;
+				ret = expr_dc_get_interface_value(dc_host->hostid, 0, &replace_to, ZBX_REQUEST_HOST_CONN);
 			}
 			else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 			{
@@ -2684,24 +2696,25 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				zbx_free(replace_to);
 		}
 
-		if (NULL != replace_to)
-		{
-			if (1 == require_address && NULL != strstr(replace_to, "{$"))
-			{
-				/* Macros should be already expanded. An unexpanded user macro means either unknown */
-				/* macro or macro value validation failure.                                         */
-				zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
-						(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
-				res = FAIL;
-			}
-		}
 		}
 
 		if (FAIL == ret)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'",
 					(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
-			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
+
+			if (ZBX_TOKEN_MACRO == token.type && SUCCEED == is_strict_macro(m))
+			{
+				if (NULL != error)
+				{
+					/* return error if strict macro resolving failed */
+					zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
+							(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
+				}
+				res = FAIL;
+			}
+			else
+				replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
 		if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_MACRO == token.type && 0 == indexed_macro))

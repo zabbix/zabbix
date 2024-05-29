@@ -6071,10 +6071,8 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	unsigned char		tag;
 	zbx_uint64_t		item_paramid, itemid;
 	int			found, ret, i, index;
-	ZBX_DC_ITEM		*item;
 	zbx_dc_item_param_t	*item_param;
 	zbx_vector_ptr_t	items;
-	ZBX_DC_ITEM		*dc_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6083,6 +6081,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		zbx_vector_ptr_t	*params;
+		ZBX_DC_ITEM		*item;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -6119,6 +6118,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		zbx_vector_ptr_t	*params;
+		ZBX_DC_ITEM		*item;
 
 		if (NULL == (item_param =
 				(zbx_dc_item_param_t *)zbx_hashset_search(&config->items_params, &rowid)))
@@ -6149,9 +6149,10 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	for (i = 0; i < items.values_num; i++)
 	{
 		zbx_vector_ptr_t	*params;
+		ZBX_DC_ITEM		*item;
 
-		dc_item = (ZBX_DC_ITEM *)items.values[i];
-		dc_item_update_revision(dc_item, revision);
+		item = (ZBX_DC_ITEM *)items.values[i];
+		dc_item_update_revision(item, revision);
 
 		params = dc_item_parameters(item, item->type);
 

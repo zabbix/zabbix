@@ -32,7 +32,7 @@ class CsrfFormUpdate extends CController {
 			->getUrl()
 		);
 		$response->setFormData($data);
-		CMessageHelper::setSuccessTitle(_('CSRF token validation succeeded.'));
+		CMessageHelper::setSuccessTitle('CSRF token validation succeeded.');
 		$this->setResponse($response);
 	}
 }
