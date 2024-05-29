@@ -1,21 +1,18 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
+
+#include "cachehistory_server.h"
 
 #include "zbxcacheconfig.h"
 #include "zbx_trigger_constants.h"
@@ -31,6 +28,64 @@
 #include "zbxeval.h"
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
+
+static void	extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *triggers)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __func__, triggers->values_num);
+
+	zbx_vector_uint64_reserve(functionids, triggers->values_num);
+
+	for (int i = 0; i < triggers->values_num; i++)
+	{
+		zbx_dc_trigger_t	*tr = triggers->values[i];
+
+		if (NULL != tr->new_error)
+			continue;
+
+		zbx_eval_get_functionids(tr->eval_ctx, functionids);
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
+			zbx_eval_get_functionids(tr->eval_ctx_r, functionids);
+	}
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() functionids_num:%d", __func__, functionids->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: expand macros in a trigger expression.                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	expand_normal_trigger_macros(zbx_eval_context_t *ctx, const zbx_db_event *event, char *error,
+		size_t maxerrlen)
+{
+	int	i;
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		if (ZBX_EVAL_TOKEN_VAR_MACRO != token->type && ZBX_EVAL_TOKEN_VAR_STR != token->type)
+		{
+			continue;
+		}
+
+		/* all trigger macros are already extracted into strings */
+		if (ZBX_VARIANT_STR != token->value.type)
+			continue;
+
+		if (FAIL == zbx_substitute_macros(&token->value.data.str, error, maxerrlen,
+				zbx_macro_event_trigger_expr_resolv, event))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
 
 typedef struct
 {
@@ -420,31 +475,6 @@ static void	substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_dc_tr
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *triggers)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __func__, triggers->values_num);
-
-	zbx_vector_uint64_reserve(functionids, triggers->values_num);
-
-	for (int i = 0; i < triggers->values_num; i++)
-	{
-		zbx_dc_trigger_t	*tr = triggers->values[i];
-
-		if (NULL != tr->new_error)
-			continue;
-
-		zbx_eval_get_functionids(tr->eval_ctx, functionids);
-
-		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
-			zbx_eval_get_functionids(tr->eval_ctx_r, functionids);
-	}
-
-	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() functionids_num:%d", __func__, functionids->values_num);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute expression functions with their values.                *
@@ -517,39 +547,6 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
 	}
 
 	*result = value.data.dbl;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: expand macros in a trigger expression.                            *
- *                                                                            *
- ******************************************************************************/
-static int	expand_normal_trigger_macros(zbx_eval_context_t *ctx, const zbx_db_event *event, char *error,
-		size_t maxerrlen)
-{
-	int	i;
-
-	for (i = 0; i < ctx->stack.values_num; i++)
-	{
-		zbx_eval_token_t	*token = &ctx->stack.values[i];
-
-		if (ZBX_EVAL_TOKEN_VAR_MACRO != token->type && ZBX_EVAL_TOKEN_VAR_STR != token->type)
-		{
-			continue;
-		}
-
-		/* all trigger macros are already extracted into strings */
-		if (ZBX_VARIANT_STR != token->value.type)
-			continue;
-
-		if (FAIL == zbx_substitute_macros(&token->value.data.str, error, maxerrlen,
-				zbx_macro_event_trigger_expr_resolv, event))
-		{
-			return FAIL;
-		}
-	}
 
 	return SUCCEED;
 }

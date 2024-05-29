@@ -284,7 +284,7 @@ zbx_macro_resolv_data_t;
  * Return value: SUCCEED         - when recognised macro were found and it's  *
  *                                 value were assigned to replace_to pointer  *
  *               SUCCEED_PARTIAL - when resolver itself did everything, no    *
- *                                 futher checks are required *special case*  *
+ *                                 further checks are required *special case* *
  *               FAIL            - when data gathering failed: value will be  *
  *                                 get to *UNKNOWN*                           *
  *                                                                            *

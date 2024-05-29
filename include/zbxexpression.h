@@ -136,9 +136,6 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
 
-void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vector_uint64_t *history_itemids,
-		const zbx_history_sync_item_t *history_items, const int *history_errcodes);
-
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
