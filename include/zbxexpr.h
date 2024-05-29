@@ -299,12 +299,9 @@ typedef int (*zbx_macro_resolv_func_t)(zbx_macro_resolv_data_t *p, va_list args,
 int		zbx_is_indexed_macro(const char *str, const zbx_token_t *token);
 const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char **macros, int *N_functionid);
 char		*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+const char	**zbx_get_indexable_macros(void);
 
 int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
-int	zbx_substitute_macros_ref(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
-int	zbx_substitute_macros_expr(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
-int	zbx_substitute_macros_ref_expr(char **data, char *error, size_t maxerrlen,
-		zbx_macro_resolv_func_t resolver, ...);
 
 /* macro function calculation */
 int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);

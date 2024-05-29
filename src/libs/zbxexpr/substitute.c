@@ -58,6 +58,11 @@ static const char	*ex_macros[] =
 	NULL
 };
 
+const char	**zbx_get_indexable_macros(void)
+{
+	return ex_macros;
+}
+
 static int	substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, va_list args)
 {
@@ -99,8 +104,8 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 				continue;
 			case ZBX_TOKEN_MACRO:
 				if (0 != zbx_is_indexed_macro(*data, &p.token) &&
-						NULL != (p.macro = zbx_macro_in_list(*data, p.token.loc, ex_macros,
-						&p.index)))
+						NULL != (p.macro = zbx_macro_in_list(*data, p.token.loc,
+						zbx_get_indexable_macros(), &p.index)))
 				{
 					p.indexed = 1;
 				}
@@ -237,49 +242,6 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 	va_start(args, resolver);
 
 	ret = substitute_macros_args(ZBX_TOKEN_SEARCH_BASIC, data, error, maxerrlen, resolver, args);
-
-	va_end(args);
-
-	return ret;
-}
-
-int	zbx_substitute_macros_ref(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...)
-{
-	int	ret;
-	va_list	args;
-
-	va_start(args, resolver);
-
-	ret = substitute_macros_args(ZBX_TOKEN_SEARCH_REFERENCES, data, error, maxerrlen, resolver, args);
-
-	va_end(args);
-
-	return ret;
-}
-
-int	zbx_substitute_macros_expr(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...)
-{
-	int	ret;
-	va_list	args;
-
-	va_start(args, resolver);
-
-	ret = substitute_macros_args(ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, data, error, maxerrlen, resolver, args);
-
-	va_end(args);
-
-	return ret;
-}
-
-int	zbx_substitute_macros_ref_expr(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...)
-{
-	int	ret;
-	va_list	args;
-
-	va_start(args, resolver);
-
-	ret = substitute_macros_args(ZBX_TOKEN_SEARCH_REFERENCES | ZBX_TOKEN_SEARCH_EXPRESSION_MACRO, data, error,
-			maxerrlen, resolver, args);
 
 	va_end(args);
 
