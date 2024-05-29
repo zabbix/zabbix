@@ -444,14 +444,15 @@ char 	*socket_poll_error(short revents)
  *                                                                            *
  * Purpose: wait for socket to become writable and without errors (connected) *
  *                                                                            *
- * Parameters: s     - [IN] socket descriptor                                 *
- *             error - [OUT] the error message                                *
+ * Parameters: s       - [IN] socket descriptor                               *
+ *             timeout - [OUT]                                                *
+ *             error   - [OUT] the error message                              *
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_socket_pollout(zbx_socket_t *s, char **error)
+int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error)
 {
 	int		rc;
 	zbx_pollfd_t	pd;
@@ -459,25 +460,33 @@ static int	zbx_socket_pollout(zbx_socket_t *s, char **error)
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
 
-	while (0 >= (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+	while (0 >= (rc = zbx_socket_poll(&pd, 1, timeout)))
 	{
 		if (-1 == rc && SUCCEED != zbx_socket_had_nonblocking_error())
 		{
-			*error = zbx_strdup(NULL, "cannot wait for connection");
+			if (NULL != error)
+				*error = zbx_strdup(NULL, "cannot wait for connection");
+
 			return FAIL;
 		}
 
 		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
-			*error = zbx_strdup(NULL, "connection timed out");
+			if (NULL != error)
+				*error = zbx_strdup(NULL, "connection timed out");
+
 			return FAIL;
 		}
 	}
 
 	if (POLLOUT != (pd.revents & (POLLOUT | POLLERR | POLLHUP | POLLNVAL)))
 	{
-		*error = socket_poll_error(pd.revents);
-		zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x", (unsigned)pd.revents);
+		if (NULL != error)
+		{
+			*error = socket_poll_error(pd.revents);
+			zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x", (unsigned)pd.revents);
+		}
+
 		return FAIL;
 	}
 
@@ -652,7 +661,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout))
 		goto out;
 
-	if (SUCCEED != zbx_socket_pollout(s, &error))
+	if (SUCCEED != zbx_socket_pollout(s, ZBX_SOCKET_POLL_TIMEOUT, &error))
 	{
 		void		(*func_socket_close)(zbx_socket_t *s);
 
