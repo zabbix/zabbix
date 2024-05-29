@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 if SERVER
 SERVER_tests = prometheus_filter_init zbx_prometheus_pattern zbx_prometheus_to_json prometheus_parse_row

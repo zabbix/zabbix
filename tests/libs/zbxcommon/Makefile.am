@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 BINARIES_tests = \
 	init_library_common

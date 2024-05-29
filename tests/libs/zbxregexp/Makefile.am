@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 if SERVER
 noinst_PROGRAMS = wildcard_match

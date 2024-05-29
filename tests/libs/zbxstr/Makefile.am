@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 BINARIES_tests = \
 	zbx_str_extract \

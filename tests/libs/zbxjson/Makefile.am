@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 noinst_PROGRAMS = \
 	zbx_json_open_path \

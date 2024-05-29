@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 BINARIES_tests = \
 	zbx_function_find \

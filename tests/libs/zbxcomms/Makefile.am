@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 if IPV6
 noinst_PROGRAMS = zbx_tcp_check_allowed_peers

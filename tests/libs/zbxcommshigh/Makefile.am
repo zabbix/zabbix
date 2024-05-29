@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 if SERVER
 ZLIB_tests = zbx_tcp_recv_ext_zlib

@@ -1,4 +1,4 @@
-include ../Makefile.common
+include ../Makefile.include
 
 BINARIES_tests = \
 	replace_key_params_dyn
