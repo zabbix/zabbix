@@ -1000,6 +1000,9 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 			{
 				host = *phost;
 
+				if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+					continue;
+
 				*error = zbx_strdcatf(*error, "Cannot %s host:"
 						" host with the same name \"%s\" (\"%s\") already exists.\n",
 						(0 != host->hostid ? "update" : "create"), host->host,
@@ -1017,6 +1020,9 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 			if (NULL != (phost = zbx_hashset_search(&host_names, &phost_local)))
 			{
 				host = *phost;
+
+				if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+					continue;
 
 				*error = zbx_strdcatf(*error, "Cannot %s host:"
 						" host with the same visible name \"%s\" already exists.\n",
