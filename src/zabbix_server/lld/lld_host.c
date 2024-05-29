@@ -996,9 +996,6 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 			zbx_lld_host_t	host_local = {.host = row[0], .name = row[1]}, *phost_local = &host_local,
 					**phost;
 
-			if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
-				continue;
-
 			if (NULL != (phost = zbx_hashset_search(&host_hosts, &phost_local)))
 			{
 				host = *phost;
