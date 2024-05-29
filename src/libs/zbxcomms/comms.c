@@ -446,7 +446,7 @@ char 	*socket_poll_error(short revents)
  *                                                                            *
  * Parameters: s       - [IN] socket descriptor                               *
  *             timeout - [OUT]                                                *
- *             error   - [OUT] the error message                              *
+ *             error   - [OUT] error message                                  *
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
