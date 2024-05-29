@@ -18,16 +18,16 @@
  */
 class CDashboardWidgetPlaceholder {
 
-	static ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-widget-placeholder';
-	static ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-widget-placeholder-box';
-	static ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL = 'dashboard-widget-placeholder-label';
-	static ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-widget-placeholder-resizing';
+	static ZBX_STYLE_CLASS = 'dashboard-widget-placeholder';
+	static ZBX_STYLE_BOX = 'dashboard-widget-placeholder-box';
+	static ZBX_STYLE_LABEL = 'dashboard-widget-placeholder-label';
+	static ZBX_STYLE_RESIZING = 'dashboard-widget-placeholder-resizing';
 
-	static WIDGET_PLACEHOLDER_STATE_ADD_NEW = 0;
-	static WIDGET_PLACEHOLDER_STATE_RESIZING = 1;
-	static WIDGET_PLACEHOLDER_STATE_POSITIONING = 2;
+	static STATE_ADD_NEW = 0;
+	static STATE_RESIZING = 1;
+	static STATE_POSITIONING = 2;
 
-	static WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET = 'widget-placeholder-add-new-widget';
+	static EVENT_ADD_NEW_WIDGET = 'widget-placeholder-add-new-widget';
 
 	/**
 	 * @type {HTMLDivElement}
@@ -75,13 +75,13 @@ class CDashboardWidgetPlaceholder {
 		this.#cell_width = cell_width;
 		this.#cell_height = cell_height;
 
-		this.#target.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER);
+		this.#target.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_CLASS);
 
 		this.#placeholder_box = document.createElement('div');
-		this.#placeholder_box.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_BOX);
+		this.#placeholder_box.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_BOX);
 
 		this.#placeholder_box_label = document.createElement('div');
-		this.#placeholder_box_label.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL);
+		this.#placeholder_box_label.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_LABEL);
 
 		this.#placeholder_box_label_wrap = document.createElement('div');
 
@@ -89,7 +89,7 @@ class CDashboardWidgetPlaceholder {
 		this.#placeholder_box.appendChild(this.#placeholder_box_label);
 		this.#target.appendChild(this.#placeholder_box);
 
-		this.setState(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_ADD_NEW);
+		this.setState(CDashboardWidgetPlaceholder.STATE_ADD_NEW);
 	}
 
 	/**
@@ -104,7 +104,7 @@ class CDashboardWidgetPlaceholder {
 	/**
 	 * Set state of the new widget placeholder.
 	 *
-	 * @param {number} state  WIDGET_PLACEHOLDER_STATE_* constant.
+	 * @param {number} state  STATE_* constant.
 	 *
 	 * @returns {CDashboardWidgetPlaceholder}
 	 */
@@ -112,13 +112,13 @@ class CDashboardWidgetPlaceholder {
 		this.#target.classList.add(ZBX_STYLE_DISPLAY_NONE);
 
 		this.#target.classList.remove('disabled');
-		this.#placeholder_box.classList.remove(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
+		this.#placeholder_box.classList.remove(CDashboardWidgetPlaceholder.ZBX_STYLE_RESIZING);
 		this.#placeholder_box_label_wrap.textContent = '';
 
 		this.off('click', this.#listeners.onAddNewClick);
 
 		switch (state) {
-			case CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_ADD_NEW:
+			case CDashboardWidgetPlaceholder.STATE_ADD_NEW:
 				const link = document.createElement('a');
 
 				link.textContent = t('Add a new widget');
@@ -130,13 +130,13 @@ class CDashboardWidgetPlaceholder {
 
 				break;
 
-			case CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_RESIZING:
-				this.#placeholder_box.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING);
+			case CDashboardWidgetPlaceholder.STATE_RESIZING:
+				this.#placeholder_box.classList.add(CDashboardWidgetPlaceholder.ZBX_STYLE_RESIZING);
 				this.#placeholder_box_label_wrap.textContent = t('Release to create a widget.');
 
 				break;
 
-			case CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_STATE_POSITIONING:
+			case CDashboardWidgetPlaceholder.STATE_POSITIONING:
 				this.#placeholder_box_label_wrap.textContent = t('Click and drag to desired size.');
 
 				break;
@@ -218,7 +218,7 @@ class CDashboardWidgetPlaceholder {
 		onAddNewClick: (e) => {
 			e.stopImmediatePropagation();
 
-			this.fire(CDashboardWidgetPlaceholder.WIDGET_PLACEHOLDER_EVENT_ADD_NEW_WIDGET);
+			this.fire(CDashboardWidgetPlaceholder.EVENT_ADD_NEW_WIDGET);
 		}
 	}
 

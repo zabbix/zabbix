@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
 #include "browser_element.h"
 #include "browser_error.h"
 #include "duktape.h"
@@ -79,16 +78,8 @@ static duk_ret_t	wd_element_dtor(duk_context *ctx)
 static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const char *elementid)
 {
 	zbx_wd_element_t	*el;
-	zbx_es_env_t		*env;
 
 	zabbix_log(LOG_LEVEL_TRACE, "Element::Element()");
-
-	if (NULL == (env = zbx_es_get_env(ctx)))
-	{
-		(void)browser_push_error(ctx, wd, "cannot access internal environment");
-
-		return duk_throw(ctx);
-	}
 
 	el = (zbx_wd_element_t *)zbx_malloc(NULL, sizeof(zbx_wd_element_t));
 	el->wd = webdriver_addref(wd);
@@ -120,6 +111,13 @@ static duk_ret_t	wd_element_send_keys(duk_context *ctx)
 	int			err_index = -1;
 
 	el = wd_element(ctx);
+
+	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	{
+		err_index = browser_push_error(ctx,  el->wd, "missing keys parameter");
+
+		goto out;
+	}
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &keys))
 	{
@@ -207,6 +205,13 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 
 	el = wd_element(ctx);
 
+	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	{
+		err_index = browser_push_error(ctx,  el->wd, "missing name parameter");
+
+		goto out;
+	}
+
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
 	{
 		err_index = browser_push_error(ctx, el->wd, "cannot convert name parameter to utf8");
@@ -247,6 +252,13 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 	int			err_index = -1;
 
 	el = wd_element(ctx);
+
+	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	{
+		err_index = browser_push_error(ctx,  el->wd, "missing name parameter");
+
+		goto out;
+	}
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
 	{
@@ -289,7 +301,7 @@ static duk_ret_t	wd_element_get_text(duk_context *ctx)
 
 	if (SUCCEED != webdriver_get_element_info(el->wd, el->id, "text", NULL, &value, &error))
 	{
-		err_index = browser_push_error(ctx, el->wd, "cannot get element property: %s", error);
+		err_index = browser_push_error(ctx, el->wd, "cannot get element text: %s", error);
 		zbx_free(error);
 
 		goto out;

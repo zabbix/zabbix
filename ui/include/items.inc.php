@@ -1561,8 +1561,6 @@ function getParamFieldNameByType($itemType) {
 	switch ($itemType) {
 		case ITEM_TYPE_SCRIPT:
 			return 'script';
-		case ITEM_TYPE_BROWSER:
-			return 'browser_script';
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_JMX:
@@ -1579,7 +1577,6 @@ function getParamFieldNameByType($itemType) {
 function getParamFieldLabelByType($itemType) {
 	switch ($itemType) {
 		case ITEM_TYPE_SCRIPT:
-		case ITEM_TYPE_BROWSER:
 			return _('Script');
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
