@@ -244,7 +244,27 @@ void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	evdns_getaddrinfo(dnsbase, addr, NULL, &hints, async_dns_event, task);
+	if (NULL == dnsbase)
+	{
+		if (AI_NUMERICHOST == hints.ai_flags)
+		{
+			struct timeval	tv = {task->timeout, 0};
+
+			task->ai = zbx_malloc(NULL, sizeof(hints));
+			memcpy(task->ai, &hints, sizeof(hints));
+			task->address = zbx_strdup(task->address, addr);
+			evtimer_add(task->timeout_event, &tv);
+			async_event(-1, 0, task);
+		}
+		else
+		{
+			task->error = zbx_strdup(task->error, "unable to retrive DNS, DNS library not initialized");
+			zabbix_log(LOG_LEVEL_WARNING, "%s", task->error);
+			async_event(-1, EV_TIMEOUT, task);
+		}
+	}
+	else
+		evdns_getaddrinfo(dnsbase, addr, NULL, &hints, async_dns_event, task);
 }
 
 zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event)

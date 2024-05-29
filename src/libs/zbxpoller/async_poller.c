@@ -413,22 +413,20 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library with resolv.conf");
-		if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, 0)))
+	}
+	else
+	{
+
+		timeout = zbx_dsprintf(NULL, "%d", poller_args_in->config_comms->config_timeout);
+
+		if (0 != evdns_base_set_option(poller_config->dnsbase, "timeout:", timeout))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
+			zabbix_log(LOG_LEVEL_ERR, "cannot set timeout to asynchronous DNS library");
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_free(timeout);
 	}
-
-	timeout = zbx_dsprintf(NULL, "%d", poller_args_in->config_comms->config_timeout);
-
-	if (0 != evdns_base_set_option(poller_config->dnsbase, "timeout:", timeout))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot set timeout to asynchronous DNS library");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_free(timeout);
 }
 
 static void	async_poller_dns_destroy(zbx_poller_config_t *poller_config)

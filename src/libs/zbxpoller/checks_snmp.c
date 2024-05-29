@@ -3618,14 +3618,6 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library with resolv.conf");
-			if (NULL == (dnsbase = evdns_base_new(snmp_result.base, 0)))
-			{
-				event_base_free(snmp_result.base);
-				SET_MSG_RESULT(&results[j], zbx_strdup(NULL,
-					"cannot initialize asynchronous DNS library"));
-				errcodes[j] = CONFIG_ERROR;
-				goto out;
-			}
 		}
 
 		zbx_set_snmp_bulkwalk_options(progname);
@@ -3645,7 +3637,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			}
 		}
 
-		evdns_base_free(dnsbase, 0);
+		if (NULL != dnsbase)
+			evdns_base_free(dnsbase, 0);
 		event_base_free(snmp_result.base);
 
 		zbx_unset_snmp_bulkwalk_options();
