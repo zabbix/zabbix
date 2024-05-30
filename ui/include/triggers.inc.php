@@ -1909,20 +1909,6 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 }
 
 /**
- * Check if user has read permissions for triggers.
- *
- * @param $triggerids
- *
- * @return bool
- */
-function isReadableTriggers(array $triggerids) {//TODO:::DELETE
-	return count($triggerids) == API::Trigger()->get([
-		'triggerids' => $triggerids,
-		'countOutput' => true
-	]);
-}
-
-/**
  * Returns a list of the trigger dependencies.
  *
  * @param array  $triggers

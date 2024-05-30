@@ -139,7 +139,6 @@ class CDocHelper {
 	const QUEUE_OVERVIEW =										'web_interface/frontend_sections/administration/queue#overview-by-item-type';
 	const QUEUE_OVERVIEW_PROXY =								'web_interface/frontend_sections/administration/queue#overview-by-proxy';
 	const REPORT_STATUS =										'web_interface/frontend_sections/reports/status_of_zabbix';
-	const REPORT2 =												'web_interface/frontend_sections/reports/availability';
 	const REPORT4 =												'web_interface/frontend_sections/reports/notifications';
 	const REPORTS_AUDITLOG_LIST =								'web_interface/frontend_sections/reports/audit_log';
 	const REPORTS_AVAILABILITYREPORT =							'web_interface/frontend_sections/reports/availability';

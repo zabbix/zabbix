@@ -15,34 +15,6 @@
 
 
 /**
- * Check if user has read permissions for host groups.
- *
- * @param array $groupids
- *
- * @return bool
- */
-function isReadableHostGroups(array $groupids) {//TODO:::DELETE
-	return count($groupids) == API::HostGroup()->get([
-		'countOutput' => true,
-		'groupids' => $groupids
-	]);
-}
-
-/**
- * Check if user has read permissions for template groups.
- *
- * @param array $groupids
- *
- * @return bool
- */
-function isReadableTemplateGroups(array $groupids) {//TODO:::DELETE
-	return count($groupids) == API::TemplateGroup()->get([
-		'countOutput' => true,
-		'groupids' => $groupids
-	]);
-}
-
-/**
  * Check if user has write permissions for host groups.
  *
  * @param array $groupids
