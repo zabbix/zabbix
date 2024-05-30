@@ -60,7 +60,7 @@ Metrics are collected by JMX.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |DB: Connections: State|<p>The state of the database connection.</p>|JMX agent|jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=state,name=value",Value]|
-|DB: Connections: failed per minute|<p>The count of database connection failures registered in one minute.</p><p>Units: fpm - fails per minute.</p>|JMX agent|jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=failures,name=counter",Count]<p>**Preprocessing**</p><ul><li>Simple change: </li></ul>|
+|DB: Connections: Failed per minute|<p>The count of database connection failures registered in one minute.</p><p>Units: fpm - fails per minute.</p>|JMX agent|jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=failures,name=counter",Count]<p>**Preprocessing**</p><ul><li>Simple change: </li></ul>|
 |DB: Pool: Connections: Idle|<p>Idle connection count of the database pool.</p>|JMX agent|jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=pool,category03=numIdle,name=value",Value]|
 |DB: Pool: Connections: Active|<p>Active connection count of the database pool.</p>|JMX agent|jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=pool,category03=numActive,name=value",Value]|
 |DB: Reads|<p>Database read operations from Jira per second.</p><p>Units: rps - read operations per second.</p>|JMX agent|jmx["com.atlassian.jira:type=db.reads",invocation\.count]<p>**Preprocessing**</p><ul><li>Change per second: </li></ul>|

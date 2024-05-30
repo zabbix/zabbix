@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-30T08:01:55Z'
+  date: '2024-05-30T11:32:34Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -267,7 +267,7 @@ zabbix_export:
             - tag: component
               value: issue
         - uuid: bb565c20d5ad4cf1a94aea5966ec12fa
-          name: 'DB: Connections: failed per minute'
+          name: 'DB: Connections: Failed per minute'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=failures,name=counter",Count]'
           delay: 0;m0-59
