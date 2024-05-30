@@ -16,6 +16,9 @@
 #define ZABBIX_ASYNCPOLLER_H
 
 #include "zbxcommon.h"
+
+#define ZBX_RES_CONF_FILE "/etc/resolv.conf"
+
 #ifdef HAVE_LIBEVENT
 #include <event.h>
 

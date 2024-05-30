@@ -3626,7 +3626,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 				errcodes[j] = CONFIG_ERROR;
 				goto out;
 			}
-			if (0 != (ret = evdns_base_resolv_conf_parse(dnsbase, DNS_OPTIONS_ALL, "/etc/resolv.conf")))
+			if (0 != (ret = evdns_base_resolv_conf_parse(dnsbase, DNS_OPTIONS_ALL, ZBX_RES_CONF_FILE)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result:%s",
 					zbx_resolv_conf_errstr(ret));
