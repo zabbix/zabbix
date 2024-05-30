@@ -47,7 +47,7 @@ $table = (new CTable())
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->setColumns($header_columns);
 
-// fields`
+// fields
 $options = [
 	'show_inherited_tags' => $show_inherited_tags
 ];
