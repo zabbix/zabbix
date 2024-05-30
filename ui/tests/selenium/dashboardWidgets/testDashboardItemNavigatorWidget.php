@@ -30,10 +30,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 		return [
 			CMessageBehavior::class,
 			CTableBehavior::class,
-			[
-				'class' => CTagBehavior::class,
-				'tag_selector' => 'id:tags_table_item_tags'
-			]
+			CTagBehavior::class
 		];
 	}
 
@@ -287,5 +284,708 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
+	}
+
+	public static function getWidgetData() {
+		return [
+			// #0.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item limit' => ''
+					],
+					'error' => 'Invalid parameter "Item limit": value must be one of 1-9999.'
+				]
+			],
+			// #1.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item limit' => ' '
+					],
+					'error' => 'Invalid parameter "Item limit": value must be one of 1-9999.'
+				]
+			],
+			// #2.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item limit' => '0'
+					],
+					'error' => 'Invalid parameter "Item limit": value must be one of 1-9999.'
+				]
+			],
+			// #3.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item limit' => 'test'
+					],
+					'error' => 'Invalid parameter "Item limit": value must be one of 1-9999.'
+				]
+			],
+			// #4.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host group'],
+						['attribute' => 'Host group']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
+				]
+			],
+			// #5.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host name'],
+						['attribute' => 'Host name']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
+				]
+			],
+			// #6.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host group'],
+						['attribute' => 'Host name'],
+						['attribute' => 'Host group']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
+				]
+			],
+			// #7.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host tag value']
+					],
+					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
+				]
+			],
+			// #8.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Item tag value']
+					],
+					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
+				]
+			],
+			// #9.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host tag value'],
+						['attribute' => 'Host tag value']
+					],
+					'error' => [
+						'Invalid parameter "Group by": tag cannot be empty.',
+						'Invalid parameter "Group by": rows must be unique.'
+					]
+				]
+			],
+			// #10.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item limit' => '0'
+					],
+					'group_by' => [
+						['attribute' => 'Item tag value'],
+						['attribute' => 'Item tag value']
+					],
+					'error' => [
+						'Invalid parameter "Group by": tag cannot be empty.',
+						'Invalid parameter "Group by": rows must be unique.',
+						'Invalid parameter "Item limit": value must be one of 1-9999.'
+					]
+				]
+			],
+			// #11.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => []
+				]
+			],
+			// #12.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Show header' => false,
+						'Refresh interval' => 'No refresh'
+					]
+				]
+			],
+			// #13.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Host groups' => 'First Group for Item navigator check',
+						'Refresh interval' => '10 seconds'
+					]
+				]
+			],
+			// #14.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Host groups' => [
+							'First Group for Item navigator check',
+							'Second Group for Item navigator check'
+						],
+						'Refresh interval' => '30 seconds'
+					]
+				]
+			],
+			// #15.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Hosts' => [
+							'First host for Item navigator widget',
+							'Second host for Item navigator widget'
+						],
+						'Refresh interval' => '1 minute'
+					]
+				]
+			],
+			// #16.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Host tags' => 'Or',
+						'Refresh interval' => '2 minutes'
+					]
+				]
+			],
+			// #17.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Item patterns' => 'available*',
+						'Refresh interval' => '10 minutes'
+					]
+				]
+			],
+			// #18.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Item tags' => 'Or',
+						'Refresh interval' => '15 minutes'
+					]
+				]
+			],
+			// #19.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Host tags' => 'And/Or',
+						'Item tags' => 'And/Or',
+						'Item limit' => '1',
+						'Refresh interval' => 'Default (1 minute)'
+					]
+				]
+			],
+			// #20.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Item limit' => '9999'
+					]
+				]
+			],
+			// #21.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'State => Normal',
+						'State' => 'Normal'
+					]
+				]
+			],
+			// #22.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'State => Not supported',
+						'State' => 'Not supported'
+					]
+				]
+			],
+			// #23.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Show problems => All',
+						'Show problems' => 'All'
+					]
+				]
+			],
+			// #24.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Show problems => None',
+						'Show problems' => 'None'
+					]
+				]
+			],
+			// #25.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check all "Group by" attributes'
+					],
+					'group_by' => [
+						['attribute' => 'Host tag value', 'tag' => STRING_255],
+						['attribute' => 'Item tag value', 'tag' => STRING_255],
+						['attribute' => 'Host name'],
+						['attribute' => 'Host group']
+					]
+				]
+			],
+			// #26.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => STRING_255,
+						'Show header' => true,
+						'Host groups' => [
+							'First Group for Item navigator check',
+							'Second Group for Item navigator check'
+						],
+						'Hosts' => [
+							'First host for Item navigator widget',
+							'Second host for Item navigator widget'
+						],
+						'Host tags' => 'Or',
+						'id:host_tags_0_tag' => STRING_255,
+						'id:host_tags_0_operator' => 'Does not contain',
+						'id:host_tags_0_value' => STRING_255,
+						'Item patterns' => 'memory*',
+						'Item tags' => 'Or',
+						'id:item_tags_0_tag' => STRING_255,
+						'id:item_tags_0_operator' => 'Does not equal',
+						'id:item_tags_0_value' => STRING_255,
+						'State' => 'All',
+						'Show problems' => 'Unsuppressed',
+						'Item limit' => '111'
+					]
+				]
+			],
+			// #27.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '  Test trailing spaces  ',
+						'Item limit' => ' 1 ',
+						'id:host_tags_0_tag' => '  Host  ',
+						'id:host_tags_0_operator' => 'Does not equal',
+						'id:host_tags_0_value' => '  test  ',
+						'id:item_tags_0_tag' => '  Item  ',
+						'id:item_tags_0_operator' => 'Does not contain',
+						'id:item_tags_0_value' => '  test  ',
+						'Item tags' => 'And/Or'
+					],
+					'trim' => ['Name', 'Item limit', 'id:host_tags_0_tag', 'id:host_tags_0_value', 'id:item_tags_0_tag', 'id:item_tags_0_value']
+				]
+			],
+			// #28.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Empty tag and value'
+					],
+					'tags' => [
+						'host' => [
+							['name' => '', 'operator' => 'Contains', 'value' => '']
+						],
+						'item' => [
+							['name' => '', 'operator' => 'Contains', 'value' => '']
+						]
+					]
+				]
+			],
+			// #29.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Different types of macro in input fields {$A}'
+					],
+					'tags' => [
+						'host' => [
+							['name' => '{HOST.NAME}', 'operator' => 'Does not contain', 'value' => '{HOST.CONN}']
+						],
+						'item' => [
+							['name' => '{ITEM.NAME}', 'operator' => 'Does not contain', 'value' => '{ITEM.VALUE}']
+						]
+					],
+					'group_by' => [
+						['attribute' => 'Host tag value', 'tag' => '{HOST.NAME}'],
+						['attribute' => 'Item tag value', 'tag' => '{ITEM.NAME}']
+					]
+				]
+			],
+			// #30 Check that host and item tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check tags table'
+					],
+					'tags' => [
+						'host' => [
+							['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
+							['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag'],
+							['name' => 'Check host tag with operator - Equals ⚠️', 'operator' => 'Equals', 'value' => 'Warning ⚠️'],
+							['name' => 'Check host tag with operator - Exists', 'operator' => 'Exists'],
+							['name' => 'Check host tag with operator - Contains ❌', 'operator' => 'Contains', 'value' => 'tag value ❌'],
+							['name' => 'Check host tag with operator - Does not exist', 'operator' => 'Does not exist'],
+							['name' => 'Check host tag with operator - Does not equal', 'operator' => 'Does not equal', 'value' => 'Average'],
+							['name' => 'Check host tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
+						],
+						'item' => [
+							['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
+							['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag'],
+							['name' => 'Check item tag with operator - Equals 🌵', 'operator' => 'Equals', 'value' => 'Warning 🌵'],
+							['name' => 'Check item tag with operator - Exists', 'operator' => 'Exists'],
+							['name' => 'Check item tag with operator - Contains 🐙', 'operator' => 'Contains', 'value' => 'tag value 🐙'],
+							['name' => 'Check item tag with operator - Does not exist', 'operator' => 'Does not exist'],
+							['name' => 'Check item tag with operator - Does not equal', 'operator' => 'Does not equal', 'value' => 'Average'],
+							['name' => 'Check item tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getWidgetData
+	 */
+	public function testDashboardItemNavigatorWidget_Create($data) {
+		$this->checkWidgetForm($data);
+	}
+
+	/**
+	 * @dataProvider getWidgetData
+	 */
+	public function testDashboardItemNavigatorWidget_Update($data) {
+		$this->checkWidgetForm($data, true);
+	}
+
+	public function testDashboardItemNavigatorWidget_SimpleUpdate() {
+		$old_hash = CDBHelper::getHash(self::SQL);
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->getWidget(self::$update_widget)->edit()->submit();
+		$dashboard->save();
+		$this->page->waitUntilReady();
+
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	/**
+	 * Perform Item navigator widget creation or update and verify the result.
+	 *
+	 * @param boolean $update	updating is performed
+	 */
+	protected function checkWidgetForm($data, $update = false) {
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::SQL);
+		}
+
+		$data['fields']['Name'] = ($data['fields'] === [])
+			? ''
+			: CTestArrayHelper::get($data, 'fields.Name', 'Item navigator '.microtime());
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		$form = $update
+			? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
+			: $dashboard->edit()->addWidget()->asForm();
+
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item navigator')]);
+		$form->fill($data['fields']);
+
+		if (array_key_exists('tags', $data)) {
+			foreach ($data['tags'] as $entity => $values) {
+				$this->setTagSelector('id:tags_table_'.$entity.'_tags');
+				$this->setTags($values);
+			}
+		}
+
+		if (array_key_exists('group_by', $data)) {
+			$this->getGroupByTable()->fill($data['group_by']);
+		}
+
+		if ($data['expected'] === TEST_GOOD) {
+			$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
+		}
+
+		$form->submit();
+
+		// Trim leading and trailing spaces from expected results if necessary.
+		if (CTestArrayHelper::get($data, 'trim', false)) {
+			$data = CTestArrayHelper::trim($data);
+		}
+
+		if ($data['expected'] === TEST_BAD) {
+			$this->assertMessage($data['expected'], null, $data['error']);
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+		}
+		else {
+			// If name is empty string it is replaced by default widget name "Item navigator".
+			$header = ($data['fields']['Name'] === '') ? 'Item navigator' : $data['fields']['Name'];
+			if ($update) {
+				self::$update_widget = $header;
+			}
+
+			COverlayDialogElement::ensureNotPresent();
+			$widget = $dashboard->getWidget($header);
+
+			// Save Dashboard to ensure that widget is correctly saved.
+			$dashboard->save()->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+			// Check widgets count.
+			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+			// Check new widget update interval.
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
+				? '1 minute'
+				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
+			$this->assertEquals($refresh, $widget->getRefreshInterval());
+
+			// Check new widget form fields and values in frontend.
+			$saved_form = $widget->edit();
+			$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
+			$saved_form->checkValue($data['fields']);
+
+			if (array_key_exists('tags', $data)) {
+				foreach ($data['tags'] as $entity => $values) {
+					$this->setTagSelector('id:tags_table_'.$entity.'_tags');
+					$this->assertTags($values);
+				}
+			}
+
+			// Close widget window and cancel editing the dashboard.
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->cancelEditing();
+		}
+	}
+
+	public static function getCancelData() {
+		return [
+			// Cancel update widget.
+			[
+				[
+					'update' => true,
+					'save_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'update' => true,
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel create widget.
+			[
+				[
+					'save_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCancelData
+	 */
+	public function testDashboardItemNavigatorWidget_Cancel($data) {
+		$old_hash = CDBHelper::getHash(self::SQL);
+		$new_name = 'Widget to be cancelled';
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		// Start updating or creating a widget.
+		if (CTestArrayHelper::get($data, 'update', false)) {
+			$form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
+		}
+		else {
+			$form = $dashboard->addWidget()->asForm();
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item navigator')]);
+		}
+
+		$form->fill([
+			'Name' => $new_name,
+			'Refresh interval' => '15 minutes',
+			'Host tags' => 'Or',
+			'id:host_tags_0_tag' => 'host',
+			'id:host_tags_0_operator' => 'Does not contain',
+			'id:host_tags_0_value' => 'cancel',
+			'Item patterns' => 'available*',
+			'id:item_tags_0_tag' => 'item',
+			'id:item_tags_0_operator' => 'Does not contain',
+			'id:item_tags_0_value' => 'cancel',
+			'State' => 'Normal',
+			'Show problems' => 'All',
+			'Item limit' => '777'
+		]);
+		$this->getGroupByTable()->fill([
+			['attribute' => 'Host tag value', 'tag' => 'windows'],
+			['attribute' => 'Item tag value', 'tag' => 'memory']
+		]);
+
+		// Save or cancel widget.
+		if (CTestArrayHelper::get($data, 'save_widget', false)) {
+			$form->submit();
+
+			// Check that changes took place on the unsaved dashboard.
+			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
+		}
+		else {
+			$dialog = COverlayDialogElement::find()->one();
+			$dialog->query('button:Cancel')->one()->click();
+			$dialog->ensureNotPresent();
+
+			if (CTestArrayHelper::get($data, 'update', false)) {
+				foreach ([self::DEFAULT_WIDGET => true, $new_name => false] as $name => $valid) {
+					$dashboard->getWidget($name, false)->isValid($valid);
+				}
+			}
+
+			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		}
+
+		// Save or cancel dashboard update.
+		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
+			$dashboard->save();
+		}
+		else {
+			$dashboard->cancelEditing();
+		}
+
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+	}
+
+	public function testDashboardItemNavigatorWidget_Delete() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$widget = $dashboard->getWidget(self::DELETE_WIDGET);
+		$dashboard->deleteWidget(self::DELETE_WIDGET);
+		$widget->waitUntilNotPresent();
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Check that widget is not present on dashboard.
+		$this->assertFalse($dashboard->getWidget(self::DELETE_WIDGET, false)->isValid());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
+				' LEFT JOIN widget w'.
+					' ON w.widgetid=wf.widgetid'.
+					' WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET)
+		));
+	}
+
+	/**
+	 * Row highlight check.
+	 */
+	public function testDashboardItemNavigatorWidget_RowHighlight() {
+		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
+				['Item patterns' => '*memory in*']);
+		$this->checkRowHighlight(self::DEFAULT_WIDGET, true);
+		CDashboardElement::find()->one()->save();
+		$this->checkRowHighlight(self::DEFAULT_WIDGET);
+	}
+
+	/**
+	 * Check if row with item is highlighted on click.
+	 *
+	 * @param string		$widget_name		widget name
+	 * @param boolean 		$edit				edit is performed
+	 */
+	protected function checkRowHighlight($widget_name, $edit = false) {
+		$widget = $edit
+			? CDashboardElement::find()->one()->edit()->getWidget($widget_name)
+			: CDashboardElement::find()->one()->getWidget($widget_name);
+
+		$widget->waitUntilReady();
+		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
+		$this->assertFalse($widget->query($locator)->one(false)->isValid());
+		$widget->query('xpath://span[@title="Available memory in %"]')->waitUntilReady()->one()->click();
+		$this->assertTrue($widget->query($locator)->one()->isVisible());
+	}
+
+	/**
+	 * Opens widget edit form and fills in data.
+	 *
+	 * @param string		$dashboardid		dashboard id
+	 * @param string		$widget_name		widget name
+	 * @param array			$configuration    	widget parameter(s)
+	 */
+	protected function setWidgetConfiguration($dashboardid, $widget_name, $configuration) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
+		$form->fill($configuration);
+		$form->submit();
 	}
 }
