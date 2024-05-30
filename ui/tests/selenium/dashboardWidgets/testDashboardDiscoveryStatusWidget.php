@@ -566,7 +566,8 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		// Check the table content.
 		$this->assertEquals($widget_data->getHeadersText(), ['Discovery rule', 'Up', 'Down']);
 		$this->assertEquals('No data found', $widget_data->query('xpath:.//div[@class="no-data-message zi-search-large"]')
-				->one()->getText());
+				->one()->getText()
+		);
 	}
 
 	protected function checkWidgetForm($data, $update = false) {
