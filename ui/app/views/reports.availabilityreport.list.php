@@ -129,7 +129,8 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 								'srctbl' => 'template_triggers',
 								'srcfld1' => 'triggerid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_triggers_'
+								'dstfld1' => 'filter_triggers_',
+								'with_monitored_triggers' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -149,7 +150,7 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_host_groups_',
-								'with_triggers' => true,
+								'with_monitored_triggers' => true,
 								'enrich_parent_groups' => true
 							]
 						]
@@ -174,7 +175,7 @@ else {
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_host_groups_',
-								'with_triggers' => true,
+								'with_monitored_triggers' => true,
 								'enrich_parent_groups' => true
 							]
 						]
@@ -198,7 +199,7 @@ else {
 								'srcfld1' => 'hostid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_hosts_',
-								'with_triggers' => true,
+								'with_monitored_triggers' => true,
 								'real_hosts' => 1
 							]
 						]

@@ -1434,6 +1434,7 @@ class CControllerPopupGeneric extends CController {
 				$options += [
 					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
 					'selectHosts' => ['name'],
+					'selectItems' => ['status'],
 					'selectDependencies' => ['triggerid', 'expression', 'description'],
 					'expandDescription' => true
 				];
@@ -1447,6 +1448,23 @@ class CControllerPopupGeneric extends CController {
 
 				if (!$this->template_preselect_required || $this->templateids) {
 					$records = API::Trigger()->get($options);
+
+					if ($this->hasInput('with_monitored_triggers')) {
+						foreach ($records as $id => $record) {
+							foreach ($record['items'] as $item) {
+								if ($item['status'] != ITEM_STATUS_ACTIVE) {
+									unset($records[$id]);
+
+									break;
+								}
+							}
+
+							if ($record['status'] != TRIGGER_STATUS_ENABLED) {
+								unset($records[$id]);
+							}
+						}
+
+					}
 				}
 				else {
 					$records = [];
