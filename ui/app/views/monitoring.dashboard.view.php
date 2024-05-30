@@ -19,8 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.coverride.js');
-$this->addJsFile('class.crangecontrol.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
@@ -37,8 +35,6 @@ $this->addJsFile('class.widget-field.checkbox-list.js');
 $this->addJsFile('class.widget-field.multiselect.js');
 $this->addJsFile('class.widget-field.time-period.js');
 $this->addJsFile('class.widget-select.popup.js');
-$this->addJsFile('items.js');
-$this->addJsFile('layout.mode.js');
 
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
@@ -49,12 +45,16 @@ if (array_key_exists('error', $data)) {
 $this->addJsFile('d3.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('class.cnavtree.js');
+$this->addJsFile('class.coverride.js');
+$this->addJsFile('class.crangecontrol.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('colorpicker.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('items.js');
+$this->addJsFile('layout.mode.js');
 $this->addJsFile('leaflet.js');
 $this->addJsFile('leaflet.markercluster.js');
 $this->addJsFile('class.geomaps.js');
