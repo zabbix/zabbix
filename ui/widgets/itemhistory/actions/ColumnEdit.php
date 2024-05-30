@@ -99,7 +99,7 @@ class ColumnEdit extends CController {
 		$item_ms = [];
 		$item_value_type = null;
 
-		if (array_key_exists('itemid', $input) && $input['itemid'] !== '' ) {
+		if (array_key_exists('itemid', $input) && $input['itemid'] !== '') {
 			$output = ['itemid', 'value_type'];
 			$output[] = $this->hasInput('templateid') ? 'name' : 'name_resolved';
 
@@ -110,9 +110,9 @@ class ColumnEdit extends CController {
 				'webitems' => true
 			]);
 
-			$db_item = $db_item[0];
-
 			if ($db_item) {
+				$db_item = $db_item[0];
+
 				$item_ms = [
 					'id' => $db_item['itemid'],
 					'prefix' => $db_item['hosts'][0]['name'].NAME_DELIMITER,
@@ -124,6 +124,7 @@ class ColumnEdit extends CController {
 			else {
 				$item_ms = [
 					'id' => $input['itemid'],
+					'prefix' => '',
 					'name' => _('Inaccessible item')
 				];
 			}

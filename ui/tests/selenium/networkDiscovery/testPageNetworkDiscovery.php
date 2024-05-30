@@ -21,6 +21,8 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup drules
  *
+ * @onBefore prepareDiscoveryErrorData
+ *
  * @dataSource NetworkDiscovery, Proxies
  */
 class testPageNetworkDiscovery extends CWebTest {
@@ -41,6 +43,58 @@ class testPageNetworkDiscovery extends CWebTest {
 	 * SQL query which selects all values from table drules.
 	 */
 	const SQL = 'SELECT * FROM drules';
+
+	const CUSTOM_ERROR_RULE = 'Discovery rule for testing error';
+	const SYMBOLS_ERROR_RULE = 'Discovery rule with error (4-byte symbols)';
+	const DISABLED_ERROR_RULE = 'Disabled discovery rule for testing error';
+
+	const ERROR_MESSAGES = [
+		self::CUSTOM_ERROR_RULE => 'Test error message for a discovery rule.',
+		self::SYMBOLS_ERROR_RULE => 'Test error message with symbols: ᵭᵻᵴᶜṌṼẻṜὙ🛑😐🗼🁨☕',
+		self::DISABLED_ERROR_RULE => 'Error for discovery rule with disabled status'
+	];
+
+	public function prepareDiscoveryErrorData() {
+		CDataHelper::call('drule.create', [
+			[
+				'name' => self::CUSTOM_ERROR_RULE,
+				'iprange' => '192.168.1.1-255',
+				'status' => DRULE_STATUS_ACTIVE,
+				'dchecks' => [
+					[
+						'type' => SVC_HTTP
+					]
+				]
+			],
+			[
+				'name' => self::SYMBOLS_ERROR_RULE,
+				'iprange' => '192.168.1.1-255',
+				'status' => DRULE_STATUS_ACTIVE,
+				'dchecks' => [
+					[
+						'type' => SVC_HTTP
+					]
+				]
+			],
+			[
+				'name' => self::DISABLED_ERROR_RULE,
+				'iprange' => '192.168.1.1-255',
+				'status' => DRULE_STATUS_DISABLED,
+				'dchecks' => [
+					[
+						'type' => SVC_HTTP
+					]
+				]
+			]
+		]);
+
+		// Add custom error messages using database.
+		foreach (array_keys(self::ERROR_MESSAGES) as $rule_name) {
+			DBexecute('UPDATE drules SET error='.zbx_dbstr(self::ERROR_MESSAGES[$rule_name]).' WHERE name='.
+					zbx_dbstr($rule_name)
+			);
+		}
+	}
 
 	/**
 	 * Function which checks layout of Network Discovery page.
@@ -93,6 +147,18 @@ class testPageNetworkDiscovery extends CWebTest {
 		// Check if fields "Name" length is as expected.
 		$this->assertEquals(255, $form->query('xpath:.//input[@name="filter_name"]')->one()->getAttribute('maxlength'));
 
+		// Check the presence and data of the error hintboxes for a specific rows.
+		foreach ([self::CUSTOM_ERROR_RULE, self::SYMBOLS_ERROR_RULE] as $rule_name) {
+			$table->findRow('Name', $rule_name)->getColumn('Info')->query('button')->one()->click();
+			$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+
+			$this->assertEquals(self::ERROR_MESSAGES[$rule_name], $hintbox->one()->getText());
+			$hintbox->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();
+		}
+
+		// Check that correct amount of hintboxes is present in the table.
+		$this->assertEquals(2, $table->query('class:rel-container')->all()->count());
+
 		/**
 		 * Check if counter displays correct number of rows and check if previously disabled buttons are enabled,
 		 * upon selecting discovery rules.
@@ -144,7 +210,9 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'expected' => [
 						'External network',
+						self::SYMBOLS_ERROR_RULE,
 						'Discovery rule for update',
+						self::CUSTOM_ERROR_RULE,
 						'Discovery rule for proxy delete test',
 						'Discovery rule for cancelling scenario'
 					]
@@ -165,6 +233,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule for clone',
 						'Discovery rule for changing checks',
 						'Disabled discovery rule for update',
+						self::DISABLED_ERROR_RULE,
 						"<img src=\"x\" onerror=\"alert('UWAGA');\"/>"
 					]
 				]
@@ -177,8 +246,10 @@ class testPageNetworkDiscovery extends CWebTest {
 					'expected' => [
 						'Local network',
 						'External network',
+						self::SYMBOLS_ERROR_RULE,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
+						self::CUSTOM_ERROR_RULE,
 						'Discovery rule for successful deleting',
 						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
@@ -187,6 +258,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule for changing checks',
 						'Discovery rule for cancelling scenario',
 						'Disabled discovery rule for update',
+						self::DISABLED_ERROR_RULE,
 						"<img src=\"x\" onerror=\"alert('UWAGA');\"/>"
 					]
 				]
@@ -197,8 +269,10 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => 'RULE'
 					],
 					'expected' => [
+						self::SYMBOLS_ERROR_RULE,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
+						self::CUSTOM_ERROR_RULE,
 						'Discovery rule for successful deleting',
 						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
@@ -206,7 +280,8 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule for clone',
 						'Discovery rule for changing checks',
 						'Discovery rule for cancelling scenario',
-						'Disabled discovery rule for update'
+						'Disabled discovery rule for update',
+						self::DISABLED_ERROR_RULE
 					]
 				]
 			],
@@ -216,8 +291,10 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => 'Disco'
 					],
 					'expected' => [
+						self::SYMBOLS_ERROR_RULE,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
+						self::CUSTOM_ERROR_RULE,
 						'Discovery rule for successful deleting',
 						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
@@ -225,7 +302,8 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule for clone',
 						'Discovery rule for changing checks',
 						'Discovery rule for cancelling scenario',
-						'Disabled discovery rule for update'
+						'Disabled discovery rule for update',
+						self::DISABLED_ERROR_RULE
 					]
 				]
 			],
@@ -317,6 +395,25 @@ class testPageNetworkDiscovery extends CWebTest {
 					'single' => true
 				]
 			],
+			// Single network discovery with error change of status to Enabled by link.
+			[
+				[
+					'name' => self::DISABLED_ERROR_RULE,
+					'default' => DRULE_STATUS_DISABLED,
+					'link' => true,
+					'single' => true,
+					'hintbox' => self::ERROR_MESSAGES[self::DISABLED_ERROR_RULE]
+				]
+			],
+			// Single network discovery with error change of status to Disabled by link.
+			[
+				[
+					'name' => self::SYMBOLS_ERROR_RULE,
+					'default' => DRULE_STATUS_ACTIVE,
+					'link' => true,
+					'single' => true
+				]
+			],
 			// Single network discovery's row Enabling.
 			[
 				[
@@ -394,6 +491,23 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'cancel' => true,
 					'action' => 'Disable'
+				]
+			],
+			// Disable action for discovery rule with error hintbox.
+			[
+				[
+					'name' => self::CUSTOM_ERROR_RULE,
+					'single' => true,
+					'action' => 'Disable'
+				]
+			],
+			// Enable action for discovery rule with error hintbox.
+			[
+				[
+					'name' => self::CUSTOM_ERROR_RULE,
+					'single' => true,
+					'action' => 'Enable',
+					'hintbox' => self::ERROR_MESSAGES[self::CUSTOM_ERROR_RULE]
 				]
 			],
 			// Cancel enable action for multiple discovery rules.
@@ -486,6 +600,17 @@ class testPageNetworkDiscovery extends CWebTest {
 			$this->assertEquals($data['default'] ? 'Enabled' : 'Disabled',
 					$row->getColumnData('Status', $data['default'] ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED)
 			);
+
+			if ($data['default'] === DRULE_STATUS_DISABLED && array_key_exists('hintbox', $data)) {
+				$this->assertEquals($data['hintbox'], $table->findRow('Name', $data['name'])->getColumn('Info')
+						->query('button')->one()->getAttribute('data-hintbox-contents')
+				);
+			}
+			else {
+				$this->assertFalse($table->findRow('Name', $data['name'])->getColumn('Info')
+						->query('class:rel-container')->exists()
+				);
+			}
 		}
 		else {
 			$this->selectTableRows($data['name']);
@@ -514,6 +639,22 @@ class testPageNetworkDiscovery extends CWebTest {
 							(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').
 							' '.lcfirst($data['action']).'d'
 					);
+				}
+
+				if (array_key_exists('hintbox', $data)) {
+					$this->assertEquals($data['hintbox'], $table->findRow('Name', $data['name'])->getColumn('Info')
+							->query('button')->one()->getAttribute('data-hintbox-contents')
+					);
+				}
+
+				if ($data['action'] === 'Disable') {
+					$names = (array_key_exists('single', $data)) ? [$data['name']] : $data['name'];
+
+					foreach ($names as $name) {
+						$this->assertFalse($table->findRow('Name', $name)->getColumn('Info')
+								->query('class:rel-container')->exists()
+						);
+					}
 				}
 
 				CMessageElement::find()->one()->close();

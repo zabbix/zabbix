@@ -19,11 +19,12 @@
  * @var array $data
  */
 
-header('Content-type: image/png');
+header('Content-Type: image/png');
+header('Cache-Control: max-age=86400');
 
-if ($data['image'] !== '') {
-	echo imagepng($data['image']);
+if (!$data['image']) {
+	http_response_code(404);
 }
-else {
-	echo $data['image'];
+elseif (!imagepng($data['image'])) {
+	http_response_code(500);
 }
