@@ -126,9 +126,6 @@ $translate_strings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
-	'class.overlay.js' => [
-		'Operation details' => _('Operation details')
-	],
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),
 		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' => _('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
@@ -359,6 +356,7 @@ $translate_strings = [
 		'Configuration' => _('Configuration'),
 		'Clone' => _('Clone'),
 		'Create new' => _('Create new'),
+		'Create new report' => _('Create new report'),
 		'Create trigger' => _('Create trigger'),
 		'Create dependent item' => _('Create dependent item'),
 		'Create dependent discovery rule' => _('Create dependent discovery rule'),
@@ -389,6 +387,7 @@ $translate_strings = [
 		'URL' => _('URL'),
 		'URLs' => _('URLs'),
 		'Values' => _('Values'),
+		'View related reports' => _('View related reports'),
 		'Web' => _('Web'),
 		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
