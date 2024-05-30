@@ -30,8 +30,6 @@ $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
-$this->addJsFile('items.js');
-$this->addJsFile('layout.mode.js');
 
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
@@ -54,6 +52,8 @@ $this->addJsFile('class.svg.map.js');
 $this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
+$this->addJsFile('items.js');
+$this->addJsFile('layout.mode.js');
 $this->addJsFile('leaflet.js');
 $this->addJsFile('leaflet.markercluster.js');
 $this->addJsFile('class.geomaps.js');
