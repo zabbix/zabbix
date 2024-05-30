@@ -3584,7 +3584,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 	zbx_snmp_sess_t		ssp;
 	char			error[MAX_STRING_LEN];
 	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = ZBX_MAX_SNMP_ITEMS + 1,
-				bulk = SNMP_BULK_ENABLED, ret;
+				bulk = SNMP_BULK_ENABLED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__func__, items[0].host.host, items[0].interface.addr, num);
@@ -3617,19 +3617,23 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 		{
+			int	ret;
+
 			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library with resolv.conf");
+
 			if (NULL == (dnsbase = evdns_base_new(snmp_result.base, 0)))
 			{
 				event_base_free(snmp_result.base);
 				SET_MSG_RESULT(&results[j], zbx_strdup(NULL,
-					"cannot initialize asynchronous DNS library"));
+						"cannot initialize asynchronous DNS library"));
 				errcodes[j] = CONFIG_ERROR;
 				goto out;
 			}
+
 			if (0 != (ret = evdns_base_resolv_conf_parse(dnsbase, DNS_OPTIONS_ALL, ZBX_RES_CONF_FILE)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result:%s",
-					zbx_resolv_conf_errstr(ret));
+						zbx_resolv_conf_errstr(ret));
 			}
 		}
 

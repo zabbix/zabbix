@@ -257,10 +257,7 @@ zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event)
 
 	return ZBX_ASYNC_TASK_STOP;
 }
-
-#endif
-
-const char 	*zbx_resolv_conf_errstr(const int error)
+const char	*zbx_resolv_conf_errstr(const int error)
 {
 	switch (error)
 	{
@@ -280,3 +277,5 @@ const char 	*zbx_resolv_conf_errstr(const int error)
 			return "unknown";
 	}
 }
+
+#endif

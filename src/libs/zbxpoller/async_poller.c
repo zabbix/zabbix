@@ -409,11 +409,13 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in)
 {
 	char	*timeout;
-	int	ret;
 
 	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 	{
+		int	ret;
+
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library with resolv.conf");
+
 		if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, 0)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
@@ -423,7 +425,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 		if (0 != (ret = evdns_base_resolv_conf_parse(poller_config->dnsbase, DNS_OPTIONS_ALL,
 			ZBX_RES_CONF_FILE)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result:%s", zbx_resolv_conf_errstr(ret));
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s", zbx_resolv_conf_errstr(ret));
 		}
 	}
 
