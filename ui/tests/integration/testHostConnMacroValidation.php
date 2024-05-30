@@ -192,6 +192,8 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$scriptid_action = $response['result']['scriptids'][0];
 
+		DBexecute("update config set server_status=''");
+
 		$response = $this->call('action.create', [
 			'esc_period' => '1m',
 			'eventsource' => EVENT_SOURCE_TRIGGERS,
