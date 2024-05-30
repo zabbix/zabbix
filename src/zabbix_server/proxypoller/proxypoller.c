@@ -1,28 +1,24 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "proxypoller.h"
 
-#include "proxyconfigread/proxyconfig_read.h"
-#include "trapper/proxydata.h"
+#include "proxyconfigread/proxyconfigread.h"
+#include "trapper/trapper_server.h"
 #include "cachehistory/cachehistory_server.h"
 #include "discovery/discovery_server.h"
+#include "autoreg/autoreg_server.h"
 
 #include "zbxexpression.h"
 #include "zbxdbwrap.h"
@@ -413,7 +409,8 @@ static int	proxy_process_proxy_data(zbx_dc_proxy_t *proxy, const char *answer, z
 	if (SUCCEED != (ret = zbx_process_proxy_data(proxy, &jp, ts, PROXY_OPERATING_MODE_PASSIVE, events_cbs,
 			proxydata_frequency, zbx_discovery_update_host_server, zbx_discovery_update_service_server,
 			zbx_discovery_update_service_down_server, zbx_discovery_find_host_server,
-			zbx_discovery_update_drule_server, more, &error)))
+			zbx_discovery_update_drule_server, zbx_autoreg_host_free_server, zbx_autoreg_flush_hosts_server,
+			zbx_autoreg_prepare_host_server, more, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->name, proxy->addr, error);

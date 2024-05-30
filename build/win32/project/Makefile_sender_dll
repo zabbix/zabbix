@@ -54,7 +54,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
-	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcfg\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxgetopt\getopt.o \
 	..\..\..\src\libs\zbxhash\md5.o \

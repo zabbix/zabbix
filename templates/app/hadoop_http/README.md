@@ -43,7 +43,7 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 |----|-----------|----|-----------------------|
 |ResourceManager: Service status|<p>Hadoop ResourceManager API port availability.</p>|Simple check|net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |ResourceManager: Service response time|<p>Hadoop ResourceManager API performance.</p>|Simple check|net.tcp.service.perf["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"]|
-|Hadoop: Get ResourceManager stats||HTTP agent|hadoop.resourcemanager.get|
+|Get ResourceManager stats||HTTP agent|hadoop.resourcemanager.get|
 |ResourceManager: Uptime||Dependent item|hadoop.resourcemanager.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |ResourceManager: Get info||Dependent item|hadoop.resourcemanager.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=~'Hadoop:service=ResourceManager,name=*')]`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li></ul>|
 |ResourceManager: RPC queue & processing time|<p>Average time spent on processing RPC requests.</p>|Dependent item|hadoop.resourcemanager.rpc_processing_time_avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
@@ -56,7 +56,7 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 |ResourceManager: Shutdown NMs|<p>Number of Shutdown NodeManagers.</p>|Dependent item|hadoop.resourcemanager.num_shutdown_nm<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |NameNode: Service status|<p>Hadoop NameNode API port availability.</p>|Simple check|net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |NameNode: Service response time|<p>Hadoop NameNode API performance.</p>|Simple check|net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"]|
-|Hadoop: Get NameNode stats||HTTP agent|hadoop.namenode.get|
+|Get NameNode stats||HTTP agent|hadoop.namenode.get|
 |NameNode: Uptime||Dependent item|hadoop.namenode.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=='java.lang:type=Runtime')].Uptime.first()`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |NameNode: Get info||Dependent item|hadoop.namenode.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.beans[?(@.name=~'Hadoop:service=NameNode,name=*')]`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li></ul>|
 |NameNode: RPC queue & processing time|<p>Average time spent on processing RPC requests.</p>|Dependent item|hadoop.namenode.rpc_processing_time_avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
@@ -75,8 +75,8 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 |NameNode: Blocks allocable|<p>Maximum number of blocks allocable.</p>|Dependent item|hadoop.namenode.block_capacity<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |NameNode: Total blocks|<p>Count of blocks tracked by NameNode.</p>|Dependent item|hadoop.namenode.blocks_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |NameNode: Under-replicated blocks|<p>The number of blocks with insufficient replication.</p>|Dependent item|hadoop.namenode.under_replicated_blocks<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
-|Hadoop: Get NodeManagers states||HTTP agent|hadoop.nodemanagers.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Hadoop: Get DataNodes states||HTTP agent|hadoop.datanodes.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get NodeManagers states||HTTP agent|hadoop.nodemanagers.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get DataNodes states||HTTP agent|hadoop.datanodes.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 

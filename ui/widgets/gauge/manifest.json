@@ -10,10 +10,16 @@
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/gauge",
 	"widget": {
 		"size": {
-			"width": 6,
+			"width": 18,
 			"height": 5
 		},
-		"js_class": "CWidgetGauge"
+		"js_class": "CWidgetGauge",
+		"in": {
+			"itemid": {
+				"type": "_itemid",
+				"required": true
+			}
+		}
 	},
 	"actions": {
 		"widget.gauge.view": {

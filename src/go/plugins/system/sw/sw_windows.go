@@ -2,36 +2,31 @@
 // +build windows
 
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package sw
 
 import (
-	"errors"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"strconv"
 	"strings"
-	"fmt"
 
 	"golang.org/x/sys/windows/registry"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/win32"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 const (
@@ -56,7 +51,7 @@ const (
 	regLab            = "BuildLab"
 	regLabEX          = "BuildLabEx"
 
-	regVersionKey     = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+	regVersionKey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 )
 
 type system_info struct {
@@ -128,7 +123,7 @@ func getBuildString(handle registry.Key, inclDesc bool) (result string, err erro
 	result = joinNonEmptyStrings(".", []string{major, minor})
 	if len(result) > 0 {
 		if inclDesc {
-			result = fmt.Sprintf("Build %s", result);
+			result = fmt.Sprintf("Build %s", result)
 		}
 		return result, nil
 	}
@@ -223,7 +218,7 @@ func (p *Plugin) getOSVersionJSON() (result interface{}, err error) {
 
 	info.VersionFull, _ = getFullOSInfoString(handle)
 	info.VersionPretty, _ = getPrettyOSInfoString(handle)
-	info.Build, _ =  getBuildString(handle, false)
+	info.Build, _ = getBuildString(handle, false)
 
 	info.ProductName, _ = getRegistryValue(handle, regProductName, registry.SZ)
 	info.Major, _ = getRegistryValue(handle, regMajor, registry.SZ)

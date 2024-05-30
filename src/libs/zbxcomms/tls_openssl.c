@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcomms.h"
@@ -2391,6 +2386,8 @@ int	zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char *
 		return FAIL;
 	}
 
+	attr->connection_type = sock->connection_type;
+
 	return SUCCEED;
 }
 
@@ -2400,10 +2397,10 @@ int	zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char *
  *          context of established connection                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *attr, const char *tls_issuer,
-		const char *tls_subject, const char *tls_psk_identity, const char **msg)
+int	zbx_tls_validate_attr(const zbx_tls_conn_attr_t *attr, const char *tls_issuer, const char *tls_subject,
+		const char *tls_psk_identity, const char **msg)
 {
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	if (ZBX_TCP_SEC_TLS_CERT == attr->connection_type)
 	{
 		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *tls_issuer && 0 != strcmp(tls_issuer, attr->issuer))
@@ -2420,7 +2417,7 @@ int	zbx_tls_validate_attr(const zbx_socket_t *sock, const zbx_tls_conn_attr_t *a
 		}
 	}
 #if defined(HAVE_OPENSSL_WITH_PSK)
-	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	else if (ZBX_TCP_SEC_TLS_PSK == attr->connection_type)
 	{
 		if (NULL != tls_psk_identity)
 		{

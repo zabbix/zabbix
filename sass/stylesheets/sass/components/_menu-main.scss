@@ -47,7 +47,7 @@
 				float: right;
 				top: 4px;
 				font-size: $icon-medium-size * .5;
-				content: $zi-chevron-down;
+				content: $zi-chevron-down-thin;
 				transform: rotate(0deg);
 
 				@if $ui-transitions {

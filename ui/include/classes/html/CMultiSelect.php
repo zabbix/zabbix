@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,6 +24,8 @@ class CMultiSelect extends CTag {
 	 * Search method used for autocomplete requests.
 	 */
 	const SEARCH_METHOD = 'multiselect.get';
+
+	const FILTER_PRESELECT_ACCEPT_ID = 'id';
 
 	/**
 	 * @var array
@@ -255,7 +252,7 @@ class CMultiSelect extends CTag {
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
-					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros'
+					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros', 'exclude_provisioned'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -429,6 +426,11 @@ class CMultiSelect extends CTag {
 					$popup_parameters['resolve_macros'] = '1';
 					$autocomplete_parameters['resolve_macros'] = true;
 				}
+
+				if (array_key_exists('exclude_provisioned', $parameters) && $parameters['exclude_provisioned']) {
+					$popup_parameters['exclude_provisioned'] = 1;
+					$autocomplete_parameters['exclude_provisioned'] = 1;
+				}
 			}
 
 			$mapped_options['popup']['parameters'] = $popup_parameters;
@@ -443,7 +445,7 @@ class CMultiSelect extends CTag {
 		$is_valid = true;
 
 		foreach (array_keys($field) as $option) {
-			if (!in_array($option, ['id', 'submit_as', 'submit_parameters', 'multiple'])) {
+			if (!in_array($option, ['id', 'accept', 'submit_as', 'submit_parameters', 'multiple'])) {
 				error('unsupported option: '.$path.'[\''.$option.'\']');
 				$is_valid = false;
 			}
@@ -454,8 +456,12 @@ class CMultiSelect extends CTag {
 			$is_valid = false;
 		}
 
-		if (array_key_exists('submit_as', $field)
-				&& (!is_string($field['submit_as']) || $field['submit_as'] === '')) {
+		if (array_key_exists('accept', $field) && $field['accept'] !== self::FILTER_PRESELECT_ACCEPT_ID) {
+			error('invalid property: '.$path.'[\'accept\']');
+			$is_valid = false;
+		}
+
+		if (!array_key_exists('submit_as', $field) || !is_string($field['submit_as']) || $field['submit_as'] === '') {
 			error('invalid property: '.$path.'[\'submit_as\']');
 			$is_valid = false;
 		}

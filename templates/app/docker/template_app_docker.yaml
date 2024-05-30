@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 1d77b27beba04822a67bdedac22ec522
-          name: 'Docker: Architecture'
+          name: Architecture
           type: DEPENDENT
           key: docker.architecture
           delay: '0'
@@ -40,7 +40,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 32c441b73b90400fa0e6972798ae1f4c
-          name: 'Docker: Cgroup driver'
+          name: 'Cgroup driver'
           type: DEPENDENT
           key: docker.cgroup_driver
           delay: '0'
@@ -60,7 +60,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 6edcd2fbe7c446738d323ce7f1c11810
-          name: 'Docker: Get containers'
+          name: 'Get containers'
           key: docker.containers
           history: '0'
           trends: '0'
@@ -69,7 +69,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 75f55b1f18c54af6ad0b3045cb230bd3
-          name: 'Docker: Containers paused'
+          name: 'Containers paused'
           type: DEPENDENT
           key: docker.containers.paused
           delay: '0'
@@ -85,7 +85,7 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: 976bf10901404fd290b6628af437e8e4
-          name: 'Docker: Containers running'
+          name: 'Containers running'
           type: DEPENDENT
           key: docker.containers.running
           delay: '0'
@@ -101,7 +101,7 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: 40179a84ffd14742b9df87f48a2eaa90
-          name: 'Docker: Containers stopped'
+          name: 'Containers stopped'
           type: DEPENDENT
           key: docker.containers.stopped
           delay: '0'
@@ -117,7 +117,7 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: cacbbf17fd0144c79ecdcbf9e3ef9290
-          name: 'Docker: Containers total'
+          name: 'Containers total'
           type: DEPENDENT
           key: docker.containers.total
           delay: '0'
@@ -133,7 +133,7 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: 4d116791a88d4d4e8dd4a9013f9bc39f
-          name: 'Docker: Containers size'
+          name: 'Containers size'
           type: DEPENDENT
           key: docker.containers_size
           delay: '0'
@@ -151,7 +151,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: fcf42585b871488f91a92d04b0cc748d
-          name: 'Docker: CPU CFS Period enabled'
+          name: 'CPU CFS Period enabled'
           type: DEPENDENT
           key: docker.cpu_cfs_period.enabled
           delay: '0'
@@ -175,7 +175,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 54d3fa0099f24f75a6a414b7caf1b85a
-          name: 'Docker: CPU CFS Quota enabled'
+          name: 'CPU CFS Quota enabled'
           type: DEPENDENT
           key: docker.cpu_cfs_quota.enabled
           delay: '0'
@@ -199,7 +199,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ceddc2b06f4a4cb4acec3dc74c02ce3f
-          name: 'Docker: CPU Set enabled'
+          name: 'CPU Set enabled'
           type: DEPENDENT
           key: docker.cpu_set.enabled
           delay: '0'
@@ -223,7 +223,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2ad923020baf48c5a43f6c875ad45561
-          name: 'Docker: CPU Shares enabled'
+          name: 'CPU Shares enabled'
           type: DEPENDENT
           key: docker.cpu_shares.enabled
           delay: '0'
@@ -247,7 +247,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 4f7221691d494c60b40abb6dd5c14719
-          name: 'Docker: Get data_usage'
+          name: 'Get data_usage'
           key: docker.data_usage
           history: '0'
           trends: '0'
@@ -256,7 +256,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0a258c42f6aa4eeeb355fec491710764
-          name: 'Docker: Debug enabled'
+          name: 'Debug enabled'
           type: DEPENDENT
           key: docker.debug.enabled
           delay: '0'
@@ -279,7 +279,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: edb61f5ce3504f57bf32ddf2e50e4e3d
-          name: 'Docker: Default runtime'
+          name: 'Default runtime'
           type: DEPENDENT
           key: docker.default_runtime
           delay: '0'
@@ -299,7 +299,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 1ce2471ca651487288ad1aef9286da5f
-          name: 'Docker: Storage driver'
+          name: 'Storage driver'
           type: DEPENDENT
           key: docker.driver
           delay: '0'
@@ -322,7 +322,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 14a7686d3bd74533aa8406297d419dfd
-          name: 'Docker: Goroutines'
+          name: Goroutines
           type: DEPENDENT
           key: docker.goroutines
           delay: '0'
@@ -338,7 +338,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8b2be6316b8d4d019443062f0809b579
-          name: 'Docker: Get images'
+          name: 'Get images'
           key: docker.images
           history: '0'
           trends: '0'
@@ -347,7 +347,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: ab4a4d92e4c04ff685b687cf14414b06
-          name: 'Docker: Images available'
+          name: 'Images available'
           type: DEPENDENT
           key: docker.images.top_level
           delay: '0'
@@ -363,7 +363,7 @@ zabbix_export:
             - tag: component
               value: images
         - uuid: d83337b0ea2c4f16be4b5b9c3a48755b
-          name: 'Docker: Images total'
+          name: 'Images total'
           type: DEPENDENT
           key: docker.images.total
           delay: '0'
@@ -379,7 +379,7 @@ zabbix_export:
             - tag: component
               value: images
         - uuid: bf4f531b727c47f0aa30de14d4b41b49
-          name: 'Docker: Images size'
+          name: 'Images size'
           type: DEPENDENT
           key: docker.images_size
           delay: '0'
@@ -397,7 +397,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3d8265e0495d4cbe97535f281a957b3e
-          name: 'Docker: Get info'
+          name: 'Get info'
           key: docker.info
           history: '0'
           trends: '0'
@@ -406,7 +406,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3545c86b7db9494c94dcda09386ac827
-          name: 'Docker: IPv4 Forwarding enabled'
+          name: 'IPv4 Forwarding enabled'
           type: DEPENDENT
           key: docker.ipv4_forwarding.enabled
           delay: '0'
@@ -429,7 +429,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: cb1e486a170b4d668a77d0918f22e51c
-          name: 'Docker: Kernel memory enabled'
+          name: 'Kernel memory enabled'
           type: DEPENDENT
           key: docker.kernel_mem.enabled
           delay: '0'
@@ -452,7 +452,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 77a61a63d6ed4583a0c39ce377b11d4f
-          name: 'Docker: Kernel memory TCP enabled'
+          name: 'Kernel memory TCP enabled'
           type: DEPENDENT
           key: docker.kernel_mem_tcp.enabled
           delay: '0'
@@ -475,7 +475,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: d645713e25c74686a47cf859725e655f
-          name: 'Docker: Kernel version'
+          name: 'Kernel version'
           type: DEPENDENT
           key: docker.kernel_version
           delay: '0'
@@ -495,7 +495,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2f512e64ba414e86806f19c0be803a3e
-          name: 'Docker: Layers size'
+          name: 'Layers size'
           type: DEPENDENT
           key: docker.layers_size
           delay: '0'
@@ -511,7 +511,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 671cd65ddae046f5ba9b0f83241976ac
-          name: 'Docker: Live restore enabled'
+          name: 'Live restore enabled'
           type: DEPENDENT
           key: docker.live_restore.enabled
           delay: '0'
@@ -534,7 +534,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: be0cb2d07d12497b8b411e094fed6087
-          name: 'Docker: Logging driver'
+          name: 'Logging driver'
           type: DEPENDENT
           key: docker.logging_driver
           delay: '0'
@@ -554,7 +554,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: e0da86d370a049e3a2d6a82e49ea1f37
-          name: 'Docker: Memory total'
+          name: 'Memory total'
           type: DEPENDENT
           key: docker.mem.total
           delay: '0'
@@ -570,7 +570,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: b08c91f28e094c4faa3e004d3fb3057d
-          name: 'Docker: Memory limit enabled'
+          name: 'Memory limit enabled'
           type: DEPENDENT
           key: docker.mem_limit.enabled
           delay: '0'
@@ -593,7 +593,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 812a6b9902a44dd7a803c7218555afe7
-          name: 'Docker: Name'
+          name: Name
           type: DEPENDENT
           key: docker.name
           delay: '0'
@@ -612,19 +612,19 @@ zabbix_export:
           triggers:
             - uuid: 2c62bb4d95684e6984447027d117ff4d
               expression: 'nodata(/Docker by Zabbix agent 2/docker.name,30m)=1'
-              name: 'Docker: Failed to fetch info data'
-              event_name: 'Docker: Failed to fetch info data (or no data for 30m)'
+              name: 'Failed to fetch info data'
+              event_name: 'Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Docker: Service is down'
+                - name: 'Service is down'
                   expression: 'last(/Docker by Zabbix agent 2/docker.ping)=0'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 5e4999067e6948f893dc465f8e5a2b5f
-          name: 'Docker: NCPU'
+          name: NCPU
           type: DEPENDENT
           key: docker.ncpu
           delay: '0'
@@ -639,7 +639,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f64919a3a5dc4f429f2992eb7ae5223c
-          name: 'Docker: NEvents listener'
+          name: 'NEvents listener'
           type: DEPENDENT
           key: docker.nevents_listener
           delay: '0'
@@ -654,7 +654,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: ce025599e68d447f9a1f5c076502e2f2
-          name: 'Docker: Nfd'
+          name: Nfd
           type: DEPENDENT
           key: docker.nfd
           delay: '0'
@@ -670,7 +670,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: e164279251ce471abaae599bf1885bbb
-          name: 'Docker: OomKill disabled'
+          name: 'OomKill disabled'
           type: DEPENDENT
           key: docker.oomkill.disabled
           delay: '0'
@@ -693,7 +693,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 78a5af9aa6a741d4ac976d0949414b68
-          name: 'Docker: Operating system'
+          name: 'Operating system'
           type: DEPENDENT
           key: docker.operating_system
           delay: '0'
@@ -713,7 +713,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 3acc93aa0fe64696a5560adcb3dd5acc
-          name: 'Docker: OS type'
+          name: 'OS type'
           type: DEPENDENT
           key: docker.os_type
           delay: '0'
@@ -733,7 +733,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 58ecaf4ae7f04316b6bf019cabadfd3e
-          name: 'Docker: Pids limit enabled'
+          name: 'Pids limit enabled'
           type: DEPENDENT
           key: docker.pids_limit.enabled
           delay: '0'
@@ -754,7 +754,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3c8f26e4b80f4356bde061ccddb95f2c
-          name: 'Docker: Ping'
+          name: Ping
           key: docker.ping
           history: 7d
           valuemap:
@@ -771,14 +771,14 @@ zabbix_export:
           triggers:
             - uuid: a4f00b4d25b54acfa61475c94651d8a5
               expression: 'last(/Docker by Zabbix agent 2/docker.ping)=0'
-              name: 'Docker: Service is down'
+              name: 'Service is down'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 864eae0a62374f729143d6efc4f1655a
-          name: 'Docker: Docker root dir'
+          name: 'Docker root dir'
           type: DEPENDENT
           key: docker.root_dir
           delay: '0'
@@ -798,7 +798,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a7e5441fe4d64848a7c5e374ea99ad54
-          name: 'Docker: Server version'
+          name: 'Server version'
           type: DEPENDENT
           key: docker.server_version
           delay: '0'
@@ -820,8 +820,8 @@ zabbix_export:
           triggers:
             - uuid: f5f4fb1337264ac2bec6b6505dfe180b
               expression: 'last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0'
-              name: 'Docker: Version has changed'
-              event_name: 'Docker: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Docker version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -829,7 +829,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: fcbe64ee979a4787a4b0f06836b258bd
-          name: 'Docker: Swap limit enabled'
+          name: 'Swap limit enabled'
           type: DEPENDENT
           key: docker.swap_limit.enabled
           delay: '0'
@@ -854,7 +854,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6c81479dba77465ebcd335a5f3d08e19
-          name: 'Docker: Volumes size'
+          name: 'Volumes size'
           type: DEPENDENT
           key: docker.volumes_size
           delay: '0'
@@ -1942,7 +1942,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1955,7 +1955,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1968,7 +1968,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1980,8 +1980,8 @@ zabbix_export:
                       name: reference
                       value: AAAAE
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1993,9 +1993,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

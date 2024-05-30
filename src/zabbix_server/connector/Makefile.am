@@ -7,6 +7,5 @@ libconnector_a_CFLAGS = \
 
 libconnector_a_SOURCES = \
 	connector_manager.c \
-	connector_manager.h \
 	connector_worker.c \
-	connector_worker.h
+	connector_server.h

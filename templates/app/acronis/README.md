@@ -49,7 +49,7 @@ This is all the configuration needed for this integration.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Acronis CPC: Get access token|<p>Authorizes API user and receives access token.</p>|HTTP agent|acronis.cpc.account_manager.get_token<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get access token|<p>Authorizes API user and receives access token.</p>|HTTP agent|acronis.cpc.account_manager.get_token<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### LLD rule Acronis CPC: MSP Discovery
 
@@ -133,15 +133,15 @@ This is the default behaviour.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Acronis CPC: Register integration|<p>Registers integration on Acronis services.</p>|Script|acronis.cpc.register.integration|
-|Acronis CPC: Get alerts|<p>Fetches all alerts.</p>|HTTP agent|acronis.cpc.alerts.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
-|Acronis CPC: Get customers|<p>Fetches all customers.</p>|HTTP agent|acronis.cpc.customers.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
-|Acronis CPC: Get devices|<p>Fetches all devices.</p>|HTTP agent|acronis.cpc.devices.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
-|Acronis CPC: Alerts with "ok" severity|<p>Gets count of alerts with "ok" severity.</p>|Dependent item|acronis.cpc.alerts.severity.ok<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'ok')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Acronis CPC: Alerts with "warning" severity|<p>Gets count of alerts with "warning" severity.</p>|Dependent item|acronis.cpc.alerts.severity.warn<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'warning')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Acronis CPC: Alerts with "error" severity|<p>Gets count of alerts with "error" severity.</p>|Dependent item|acronis.cpc.alerts.severity.err<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'error')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Acronis CPC: Alerts with "critical" severity|<p>Gets count of alerts with "critical" severity.</p>|Dependent item|acronis.cpc.alerts.severity.crit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'critical')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Acronis CPC: Alerts with "information" severity|<p>Gets count of alerts with "information" severity.</p>|Dependent item|acronis.cpc.alerts.severity.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'information')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Register integration|<p>Registers integration on Acronis services.</p>|Script|acronis.cpc.register.integration|
+|Get alerts|<p>Fetches all alerts.</p>|HTTP agent|acronis.cpc.alerts.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
+|Get customers|<p>Fetches all customers.</p>|HTTP agent|acronis.cpc.customers.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
+|Get devices|<p>Fetches all devices.</p>|HTTP agent|acronis.cpc.devices.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
+|Alerts with "ok" severity|<p>Gets count of alerts with "ok" severity.</p>|Dependent item|acronis.cpc.alerts.severity.ok<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'ok')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alerts with "warning" severity|<p>Gets count of alerts with "warning" severity.</p>|Dependent item|acronis.cpc.alerts.severity.warn<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'warning')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alerts with "error" severity|<p>Gets count of alerts with "error" severity.</p>|Dependent item|acronis.cpc.alerts.severity.err<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'error')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alerts with "critical" severity|<p>Gets count of alerts with "critical" severity.</p>|Dependent item|acronis.cpc.alerts.severity.crit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'critical')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Alerts with "information" severity|<p>Gets count of alerts with "information" severity.</p>|Dependent item|acronis.cpc.alerts.severity.info<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'information')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### LLD rule Acronis CPC: Alerts discovery
 

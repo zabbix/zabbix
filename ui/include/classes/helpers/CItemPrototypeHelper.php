@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -81,25 +76,23 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	}
 
 	/**
-	 * @param array $src_options
-	 * @param array $dst_options
-	 * @param array $dst_ruleids
+	 * @param array  $dst_ruleids
+	 * @param string $dst_ruleids[<src_ruleid>][<dst_hostid]  ID of target LLD rule.
+	 * @param array  $dst_hosts
 	 *
 	 * @return bool
 	 */
-	public static function copy(array $src_options, array $dst_options, array $dst_ruleids): bool {
-		$src_items = self::getSourceItemPrototypes($src_options);
+	public static function copy(array $dst_ruleids, array $dst_hosts): bool {
+		$src_items = CItemPrototypeHelper::getSourceItemPrototypes(['discoveryids' => array_keys($dst_ruleids)]);
 
 		if (!$src_items) {
 			return true;
 		}
 
-		$dst_hostids = reset($dst_options);
-
-		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hostids);
+		$dst_valuemapids = self::getDestinationValueMaps($src_items, $dst_hosts);
 
 		try {
-			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_options);
+			$dst_interfaceids = self::getDestinationHostInterfaces($src_items, $dst_hosts);
 		}
 		catch (Exception $e) {
 			return false;
@@ -116,17 +109,14 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			}
 		}
 
-		$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_options);
+		$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_hosts);
 
 		do {
 			$dst_items = [];
 
-			foreach ($dst_hostids as $dst_hostid) {
+			foreach ($dst_hosts as $dst_hostid => $dst_host) {
 				foreach ($src_items as $src_item) {
-					$dst_item = [
-						'hostid' => $dst_hostid,
-						'ruleid' => $dst_ruleids[$src_item['discoveryRule']['itemid']][$dst_hostid]
-					] + array_diff_key($src_item, array_flip(['itemid', 'hosts', 'discoveryRule']));
+					$dst_item = array_diff_key($src_item, array_flip(['itemid', 'hosts', 'discoveryRule']));
 
 					if (array_key_exists($src_item['itemid'], $dst_valuemapids)) {
 						$dst_item['valuemapid'] = $dst_valuemapids[$src_item['itemid']][$dst_hostid];
@@ -140,7 +130,14 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 						$dst_item['master_itemid'] = $dst_master_itemids[$src_item['itemid']][$dst_hostid];
 					}
 
-					$dst_items[] = $dst_item;
+					$dst_items[] = [
+						'hostid' => $dst_hostid,
+						'ruleid' => $dst_ruleids[$src_item['discoveryRule']['itemid']][$dst_hostid]
+					] + getSanitizedItemFields([
+						'templateid' => 0,
+						'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						'hosts' => [$dst_host]
+					] + $dst_item);
 				}
 			}
 
@@ -153,7 +150,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			$_src_items = [];
 
 			if ($src_dep_items) {
-				foreach ($dst_hostids as $dst_hostid) {
+				foreach ($dst_hosts as $dst_hostid => $foo) {
 					foreach ($src_items as $src_item) {
 						$dst_itemid = array_shift($response['itemids']);
 

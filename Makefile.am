@@ -10,6 +10,7 @@ SUBDIRS = \
 	misc
 
 EXTRA_DIST = \
+	README.md \
 	bin \
 	build \
 	ui \
@@ -204,9 +205,17 @@ tests: tests_build
 	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(CMOCKA_LIBRARY_PATH):$(YAML_LIBRARY_PATH); \
 	tests/tests_run.pl
 
-clean: clean-recursive modules_clean
+clean: clean-recursive modules_clean build_test_zbxcommon_clean
 	cd tests && $(MAKE) clean
 endif
+
+build_test_zbxcommon:
+	$(MAKE) $(AM_MAKEFLAGS) && \
+	cd tests/test_zbxcommon && \
+	$(MAKE) $(AM_MAKEFLAGS)
+
+build_test_zbxcommon_clean:
+	cd tests/test_zbxcommon && $(MAKE) clean
 
 sbom: sbom-ui
 

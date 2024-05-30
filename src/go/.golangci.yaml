@@ -176,6 +176,8 @@ linters-settings:
       - .WithStack(
       # zabbix'es custom errors
       - errs.New(
+      - errs.WrapConst(
+      - errs.Wrap()
 
 linters:
   enable-all: true

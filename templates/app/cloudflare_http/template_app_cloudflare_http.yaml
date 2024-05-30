@@ -19,7 +19,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 2be79391779a4cd395723e62694262e8
-          name: 'Cloudflare: Total bandwidth'
+          name: 'Total bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.all
           delay: '0'
@@ -36,7 +36,7 @@ zabbix_export:
             - tag: component
               value: bandwidth
         - uuid: 7f5900d6c707405789624f84f502b042
-          name: 'Cloudflare: Cached bandwidth'
+          name: 'Cached bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.cached
           delay: '0'
@@ -53,7 +53,7 @@ zabbix_export:
             - tag: component
               value: bandwidth
         - uuid: c5ab8cc281ff4f75bd4ada79d2c0d1e8
-          name: 'Cloudflare: Cache hit ratio of bandwidth'
+          name: 'Cache hit ratio of bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.cache_hit_ratio
           delay: '0'
@@ -73,15 +73,15 @@ zabbix_export:
           triggers:
             - uuid: acf573785c394924aae8ef74b2683fd1
               expression: 'max(/Cloudflare by HTTP/cloudflare.bandwidth.cache_hit_ratio,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}'
-              name: 'Cloudflare: Cached bandwidth is too low'
-              event_name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
+              name: 'Cached bandwidth is too low'
+              event_name: 'Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 901db6b121c7473485c91b0f27e7cf50
-          name: 'Cloudflare: SSL encrypted bandwidth'
+          name: 'SSL encrypted bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.ssl.encrypted
           delay: '0'
@@ -98,7 +98,7 @@ zabbix_export:
             - tag: component
               value: bandwidth
         - uuid: 4637d88e62204f9d8fb9fc0f179c5319
-          name: 'Cloudflare: Unencrypted bandwidth'
+          name: 'Unencrypted bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.ssl.unencrypted
           delay: '0'
@@ -115,7 +115,7 @@ zabbix_export:
             - tag: component
               value: bandwidth
         - uuid: 96e88a64df014997b8c675cbc4bb97a1
-          name: 'Cloudflare: Uncached bandwidth'
+          name: 'Uncached bandwidth'
           type: DEPENDENT
           key: cloudflare.bandwidth.uncached
           delay: '0'
@@ -132,7 +132,7 @@ zabbix_export:
             - tag: component
               value: bandwidth
         - uuid: 6eff62f2786d42a7925bd516a1c2a958
-          name: 'Cloudflare: DNS queries'
+          name: 'DNS queries'
           type: DEPENDENT
           key: cloudflare.dns.query.all
           delay: '0'
@@ -149,7 +149,7 @@ zabbix_export:
             - tag: component
               value: dns
         - uuid: 4612a834ef054740ba5fea529a08e220
-          name: 'Cloudflare: Stale DNS queries'
+          name: 'Stale DNS queries'
           type: DEPENDENT
           key: cloudflare.dns.query.stale
           delay: '0'
@@ -166,7 +166,7 @@ zabbix_export:
             - tag: component
               value: dns
         - uuid: 4aeb289b631a402390a833e3c5227d38
-          name: 'Cloudflare: Uncached DNS queries'
+          name: 'Uncached DNS queries'
           type: DEPENDENT
           key: cloudflare.dns.query.uncached
           delay: '0'
@@ -183,7 +183,7 @@ zabbix_export:
             - tag: component
               value: dns
         - uuid: 9450a68208fd4cb8bde009296d722064
-          name: 'Cloudflare: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: cloudflare.get
           delay: 0;m01
@@ -300,15 +300,15 @@ zabbix_export:
             			datetime_geq: \"" + datetime_start_str + "\",  datetime_leq: \"" + datetime_end_str + "\"\
             			}) {\
             				sum{\
-            					requests\
-            					cachedRequests\
-            					encryptedRequests\
-            					responseStatusMap{ requests edgeResponseStatus }\
-            					bytes\
-            					cachedBytes\
-            					encryptedBytes\
-            					threats\
-            					pageViews\
+            					requests \
+            					cachedRequests \
+            					encryptedRequests \
+            					responseStatusMap{ requests edgeResponseStatus } \
+            					bytes \
+            					cachedBytes \
+            					encryptedBytes \
+            					threats \
+            					pageViews \
             				}\
             				uniq{uniques}\
             				}\
@@ -416,7 +416,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 71efacd9f1dc46a7aa29876c8bf7906c
-          name: 'Cloudflare: Total page views'
+          name: 'Total page views'
           type: DEPENDENT
           key: cloudflare.pageviews.all
           delay: '0'
@@ -433,7 +433,7 @@ zabbix_export:
             - tag: component
               value: pageviews
         - uuid: d4a7431b1f6a4d3ab11551a36c98fbf7
-          name: 'Cloudflare: Total requests'
+          name: 'Total requests'
           type: DEPENDENT
           key: cloudflare.requests.all
           delay: '0'
@@ -450,7 +450,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: cc9d651cdec94afeb12ead87b3c3e8f3
-          name: 'Cloudflare: Cached requests'
+          name: 'Cached requests'
           type: DEPENDENT
           key: cloudflare.requests.cached
           delay: '0'
@@ -466,7 +466,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: e1c2a1280d25439f8020b3ebc451d892
-          name: 'Cloudflare: Cache hit ratio % over time'
+          name: 'Cache hit ratio % over time'
           type: DEPENDENT
           key: cloudflare.requests.cache_hit_ratio
           delay: '0'
@@ -484,7 +484,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 228912bdae724d70b1abe79510b69082
-          name: 'Cloudflare: Non-2xx responses ratio'
+          name: 'Non-2xx responses ratio'
           type: DEPENDENT
           key: cloudflare.requests.others_ratio
           delay: '0'
@@ -504,8 +504,8 @@ zabbix_export:
           triggers:
             - uuid: e76f4a61dd094419b6e0af706758e545
               expression: 'min(/Cloudflare by HTTP/cloudflare.requests.others_ratio,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}'
-              name: 'Cloudflare: Ratio of non-2xx responses is too high'
-              event_name: 'Cloudflare: Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements)'
+              name: 'Ratio of non-2xx responses is too high'
+              event_name: 'Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'A large number of errors can indicate a malfunction of the site.'
@@ -513,7 +513,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 0f427419265a4ef09f052a03c539125d
-          name: 'Cloudflare: Response codes 1xx'
+          name: 'Response codes 1xx'
           type: DEPENDENT
           key: cloudflare.requests.response_100
           delay: '0'
@@ -530,7 +530,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 3ade3e726d314382a3e841b3d5cb5834
-          name: 'Cloudflare: Response codes 2xx'
+          name: 'Response codes 2xx'
           type: DEPENDENT
           key: cloudflare.requests.response_200
           delay: '0'
@@ -547,7 +547,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 2caff86e7ca5400889f3b2bd4b6ba986
-          name: 'Cloudflare: Response codes 3xx'
+          name: 'Response codes 3xx'
           type: DEPENDENT
           key: cloudflare.requests.response_300
           delay: '0'
@@ -564,7 +564,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: b3510ec2adc74e10824365012c13250f
-          name: 'Cloudflare: Response codes 4xx'
+          name: 'Response codes 4xx'
           type: DEPENDENT
           key: cloudflare.requests.response_400
           delay: '0'
@@ -581,7 +581,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 714ef2cbecbe4a93b20988a0bc6863a7
-          name: 'Cloudflare: Response codes 5xx'
+          name: 'Response codes 5xx'
           type: DEPENDENT
           key: cloudflare.requests.response_500
           delay: '0'
@@ -598,7 +598,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: d39fcd4fdc594257bea91de0890d326b
-          name: 'Cloudflare: SSL encrypted requests'
+          name: 'SSL encrypted requests'
           type: DEPENDENT
           key: cloudflare.requests.ssl.encrypted
           delay: '0'
@@ -615,7 +615,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: acbbc431dfc3431583123380edb6da38
-          name: 'Cloudflare: Unencrypted requests'
+          name: 'Unencrypted requests'
           type: DEPENDENT
           key: cloudflare.requests.ssl.unencrypted
           delay: '0'
@@ -632,7 +632,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 6100ff50001543ae83e84ab2c47260f3
-          name: 'Cloudflare: 2xx responses ratio'
+          name: '2xx responses ratio'
           type: DEPENDENT
           key: cloudflare.requests.success_ratio
           delay: '0'
@@ -650,7 +650,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 7907f68e795b40fca1bd520556ea1fff
-          name: 'Cloudflare: Uncached requests'
+          name: 'Uncached requests'
           type: DEPENDENT
           key: cloudflare.requests.uncached
           delay: '0'
@@ -667,7 +667,7 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: 328051a78529494e943edda567aa0e24
-          name: 'Cloudflare: Total threats'
+          name: 'Total threats'
           type: DEPENDENT
           key: cloudflare.threats.all
           delay: '0'
@@ -683,7 +683,7 @@ zabbix_export:
             - tag: component
               value: threats
         - uuid: d1a2ec213b084701805f3f974af25a21
-          name: 'Cloudflare: Unique visitors'
+          name: 'Unique visitors'
           type: DEPENDENT
           key: cloudflare.uniques.all
           delay: '0'
@@ -706,7 +706,7 @@ zabbix_export:
           value: cloudflare
       macros:
         - macro: '{$CLOUDFLARE.API.TOKEN}'
-          value: '<change>'
+          type: SECRET_TEXT
           description: 'Your Cloudflare API Token.'
         - macro: '{$CLOUDFLARE.API.URL}'
           value: 'https://api.cloudflare.com/client/v4'
@@ -718,7 +718,7 @@ zabbix_export:
           value: '30'
           description: 'Maximum responses with errors in %.'
         - macro: '{$CLOUDFLARE.ZONE_ID}'
-          value: '<change>'
+          type: SECRET_TEXT
           description: 'Your Cloudflare Site Zone ID.'
       dashboards:
         - uuid: 51f1013e8a3d492faed27fe80b68fc53
@@ -726,7 +726,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -739,7 +739,7 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -752,7 +752,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graph
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -765,7 +765,7 @@ zabbix_export:
                       value: AAAAE
                 - type: graph
                   'y': '15'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -777,8 +777,8 @@ zabbix_export:
                       name: reference
                       value: AAAAG
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -790,9 +790,9 @@ zabbix_export:
                       name: reference
                       value: AAAAB
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '5'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -804,9 +804,9 @@ zabbix_export:
                       name: reference
                       value: AAAAD
                 - type: graph
-                  x: '12'
+                  x: '36'
                   'y': '10'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH

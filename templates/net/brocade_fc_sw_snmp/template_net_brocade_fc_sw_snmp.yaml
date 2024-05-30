@@ -30,7 +30,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 79adbe7d5d8f4dd6a172bfc3e2d8b23d
-          name: 'Brocade FC: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -44,14 +44,14 @@ zabbix_export:
           triggers:
             - uuid: 0c73f37e7ffc4acf83a7edeb84398aba
               expression: 'max(/Brocade FC by SNMP/icmpping,#3)=0'
-              name: 'Brocade FC: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 4ae37446cb1e4a2d95f55a41dd295bdf
-          name: 'Brocade FC: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -65,11 +65,11 @@ zabbix_export:
           triggers:
             - uuid: eea2256c85764c12b1da83dd8d1a9fe3
               expression: 'min(/Brocade FC by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade FC by SNMP/icmppingloss,5m)<100'
-              name: 'Brocade FC: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Brocade FC: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Brocade FC by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -77,7 +77,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 4c8f61f10759487087d5942756f478b2
-          name: 'Brocade FC: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -91,13 +91,14 @@ zabbix_export:
           triggers:
             - uuid: 17df26093a5f42fdb19715371c85f733
               expression: 'avg(/Brocade FC by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Brocade FC: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Brocade FC: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Brocade FC by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade FC by SNMP/icmppingloss,5m)<100'
-                - name: 'Brocade FC: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Brocade FC by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -105,7 +106,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: c7e6790a311c4b4582093cd28341306a
-          name: 'Brocade FC: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -118,7 +119,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 62ae879ca6ab46aebc8655534acbba06
-          name: 'Brocade FC: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -138,7 +139,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b17a06635cb2400f9c6d0f848fd38868
-          name: 'Brocade FC: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.26.1.0
           key: 'system.cpu.util[swCpuUsage.0]'
@@ -154,8 +155,8 @@ zabbix_export:
           triggers:
             - uuid: 68a50684095941cb90f22fbc8d632e7a
               expression: 'min(/Brocade FC by SNMP/system.cpu.util[swCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'Brocade FC: High CPU utilization'
-              event_name: 'Brocade FC: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -163,7 +164,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 8340ccd92ba940b497375aba810394a4
-          name: 'Brocade FC: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -184,7 +185,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: c6e2d4c076b14ed19fbcb08caa32e5be
-          name: 'Brocade FC: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.1.6.0
           key: system.hw.firmware
@@ -203,7 +204,7 @@ zabbix_export:
           triggers:
             - uuid: 9c5ae10dbafb45658f25f0279a8a1934
               expression: 'last(/Brocade FC by SNMP/system.hw.firmware,#1)<>last(/Brocade FC by SNMP/system.hw.firmware,#2) and length(last(/Brocade FC by SNMP/system.hw.firmware))>0'
-              name: 'Brocade FC: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -212,7 +213,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 3c68a1be050d4c1287e63eb7b3b81f8f
-          name: 'Brocade FC: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.1.10.0
           key: system.hw.serialnumber
@@ -232,8 +233,8 @@ zabbix_export:
           triggers:
             - uuid: 9939f98da99c435a9b5505e55e8abb5f
               expression: 'last(/Brocade FC by SNMP/system.hw.serialnumber,#1)<>last(/Brocade FC by SNMP/system.hw.serialnumber,#2) and length(last(/Brocade FC by SNMP/system.hw.serialnumber))>0'
-              name: 'Brocade FC: Device has been replaced'
-              event_name: 'Brocade FC: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -241,7 +242,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: a988240abba8442da83fdbcb789d0138
-          name: 'Brocade FC: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -265,7 +266,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 88c5304ddeca47779b76d9806b1edc68
-          name: 'Brocade FC: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -275,7 +276,7 @@ zabbix_export:
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -285,7 +286,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d8d912cb5c924f6587c83f08aa0c8ae1
-          name: 'Brocade FC: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -307,8 +308,8 @@ zabbix_export:
           triggers:
             - uuid: 0e624c73fdca490e809ffe9235cda610
               expression: 'last(/Brocade FC by SNMP/system.name,#1)<>last(/Brocade FC by SNMP/system.name,#2) and length(last(/Brocade FC by SNMP/system.name))>0'
-              name: 'Brocade FC: System name has changed'
-              event_name: 'Brocade FC: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -318,7 +319,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 237a5614cb634773853f6d5f42096773
-          name: 'Brocade FC: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -328,7 +329,7 @@ zabbix_export:
           units: uptime
           description: |
             MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            Time (in hundredths of a second) since the network management portion of the system was last re-initialized.
           preprocessing:
             - type: MULTIPLIER
               parameters:
@@ -337,7 +338,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 939c63320b8e4199b87cc4759011da3c
-          name: 'Brocade FC: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -356,7 +357,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 29f1dda8042d4fd18d7da9eb95fea76c
-          name: 'Brocade FC: Overall system health status'
+          name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.1.7.0
           key: 'system.status[swOperStatus.0]'
@@ -378,7 +379,7 @@ zabbix_export:
           triggers:
             - uuid: b91af8b94e2047538376be9911beadee
               expression: 'count(/Brocade FC by SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
-              name: 'Brocade FC: System status is in critical state'
+              name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
@@ -389,12 +390,12 @@ zabbix_export:
                   value: performance
             - uuid: b17d4a2bae804c968984b763fa4562fc
               expression: 'count(/Brocade FC by SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"offline\"}")=1 or count(/Brocade FC by SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"testing\"}")=1'
-              name: 'Brocade FC: System status is in warning state'
+              name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings'
               dependencies:
-                - name: 'Brocade FC: System status is in critical state'
+                - name: 'System status is in critical state'
                   expression: 'count(/Brocade FC by SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               tags:
                 - tag: scope
@@ -402,7 +403,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9a8441cae4fb4c698502a20d5ce23ddf
-          name: 'Brocade FC: Memory utilization'
+          name: 'Memory utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.1588.2.1.1.1.26.6.0
           key: 'vm.memory.util[swMemUsage.0]'
@@ -418,8 +419,8 @@ zabbix_export:
           triggers:
             - uuid: 1991ae08b008488380db02160b15160e
               expression: 'min(/Brocade FC by SNMP/vm.memory.util[swMemUsage.0],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'Brocade FC: High memory utilization'
-              event_name: 'Brocade FC: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -428,13 +429,13 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 00b66dbea9464b55bbab004e0eb57c7b
-          name: 'Brocade FC: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -448,12 +449,12 @@ zabbix_export:
           triggers:
             - uuid: 1c67a764531b48f1a931a9a928a8708d
               expression: 'max(/Brocade FC by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Brocade FC: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Brocade FC: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Brocade FC by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -781,8 +782,8 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)
                     
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
@@ -1094,10 +1095,13 @@ zabbix_export:
           value: '3'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
+          description: 'Warning threshold of ICMP packet loss in %.'
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
+          description: 'Warning threshold of the average ICMP response time in seconds.'
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
+          description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
         - macro: '{$IF.UTIL.MAX}'
           value: '90'
         - macro: '{$IFCONTROL}'
@@ -1137,6 +1141,7 @@ zabbix_export:
           value: '4'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
+          description: 'Time interval for the SNMP availability trigger.'
         - macro: '{$TEMP_CRIT}'
           value: '75'
         - macro: '{$TEMP_CRIT_LOW}'
@@ -1153,7 +1158,7 @@ zabbix_export:
               widgets:
                 - type: graph
                   name: 'Memory utilization'
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1166,8 +1171,8 @@ zabbix_export:
                       value: AAAAA
                 - type: graph
                   name: 'CPU utilization'
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1814,13 +1819,13 @@ zabbix_export:
   triggers:
     - uuid: 42bb10d788484b92ac7290e171ee28a2
       expression: '(last(/Brocade FC by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Brocade FC by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Brocade FC by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Brocade FC by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Brocade FC: Host has been restarted'
-      event_name: 'Brocade FC: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Brocade FC: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Brocade FC by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

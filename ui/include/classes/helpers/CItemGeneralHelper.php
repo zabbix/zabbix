@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -25,9 +20,23 @@ class CItemGeneralHelper {
 	 * Get item fields default values.
 	 */
 	public static function getDefaults(): array {
+		// Default script value for browser type items.
+		$browser_script = <<<'JAVASCRIPT'
+var browser = new Browser(Browser.chromeOptions());
+
+try {
+	browser.navigate("https://example.com");
+	browser.collectPerfEntries();
+}
+finally {
+	return JSON.stringify(browser.getResult());
+}
+JAVASCRIPT;
+
 		return [
 			'allow_traps' => DB::getDefault('items', 'allow_traps'),
 			'authtype' => DB::getDefault('items', 'authtype'),
+			'browser_script' => $browser_script,
 			'custom_timeout' => ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED,
 			'delay_flex' => [],
 			'delay' => ZBX_ITEM_DELAY_DEFAULT,
@@ -53,7 +62,6 @@ class CItemGeneralHelper {
 			'name' => '',
 			'output_format' => DB::getDefault('items', 'output_format'),
 			'parameters' => [],
-			'params' => [],
 			'params_ap' => DB::getDefault('items', 'params'),
 			'params_es' => DB::getDefault('items', 'params'),
 			'params_f' => DB::getDefault('items', 'params'),
@@ -263,6 +271,23 @@ class CItemGeneralHelper {
 			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
 		}
 
+		$params_field = [
+			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_BROWSER => 'browser_script',
+			ITEM_TYPE_SSH => 'params_es',
+			ITEM_TYPE_TELNET => 'params_es',
+			ITEM_TYPE_DB_MONITOR => 'params_ap',
+			ITEM_TYPE_CALCULATED => 'params_f'
+		];
+
+		if (array_key_exists($item['type'], $params_field)) {
+			$field = $params_field[$item['type']];
+			$item[$field] = $item['params'];
+			$item['params'] = '';
+		}
+
+		$item += static::getDefaults();
+
 		return $item;
 	}
 
@@ -358,6 +383,21 @@ class CItemGeneralHelper {
 			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $input['delay_flex']);
 		}
 
+		$params_field = [
+			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_BROWSER => 'browser_script',
+			ITEM_TYPE_SSH => 'params_es',
+			ITEM_TYPE_TELNET => 'params_es',
+			ITEM_TYPE_DB_MONITOR => 'params_ap',
+			ITEM_TYPE_CALCULATED => 'params_f'
+		];
+		$input['params'] = '';
+
+		if (array_key_exists($input['type'], $params_field)) {
+			$field = $params_field[$input['type']];
+			$input['params'] = $input[$field];
+		}
+
 		return CArrayHelper::renameKeys($input, $field_map);
 	}
 
@@ -402,20 +442,6 @@ class CItemGeneralHelper {
 		};
 
 		$input['delay_flex'] = $custom_intervals;
-		$params_field = [
-			ITEM_TYPE_SCRIPT => 'script',
-			ITEM_TYPE_SSH => 'params_es',
-			ITEM_TYPE_TELNET => 'params_es',
-			ITEM_TYPE_DB_MONITOR => 'params_ap',
-			ITEM_TYPE_CALCULATED => 'params_f'
-		];
-		$input['params'] = '';
-
-		if (array_key_exists($input['type'], $params_field)) {
-			$field = $params_field[$input['type']];
-			$input['params'] = $input[$field];
-		}
-
 		$query_fields = [];
 		$headers = [];
 
@@ -435,7 +461,7 @@ class CItemGeneralHelper {
 			CArrayHelper::sort($query_fields, ['sortorder']);
 			CArrayHelper::sort($headers, ['sortorder']);
 		}
-		else if ($input['type'] == ITEM_TYPE_SCRIPT) {
+		elseif (in_array($input['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 			$parameters = [];
 
 			foreach ($input['parameters'] as $parameter) {
@@ -487,21 +513,21 @@ class CItemGeneralHelper {
 
 	/**
 	 * @param array  $src_items
-	 * @param array  $dst_items
+	 * @param array  $dst_hosts
 	 *
 	 * @return array
 	 */
-	protected static function getDestinationValueMaps(array $src_items, array $dst_hostids): array {
+	protected static function getDestinationValueMaps(array $src_items, array $dst_hosts): array {
 		$item_indexes = [];
 		$dst_valuemapids = [];
+
+		$dst_hostids = array_keys($dst_hosts);
 
 		foreach ($src_items as $src_item) {
 			if ($src_item['valuemapid'] != 0) {
 				$item_indexes[$src_item['valuemapid']][] = $src_item['itemid'];
 
-				foreach ($dst_hostids as $dst_hostid) {
-					$dst_valuemapids[$src_item['itemid']][$dst_hostid] = 0;
-				}
+				$dst_valuemapids[$src_item['itemid']] = array_fill_keys($dst_hostids, 0);
 			}
 		}
 
@@ -541,24 +567,22 @@ class CItemGeneralHelper {
 
 	/**
 	 * @param array  $src_items
-	 * @param array  $dst_options
+	 * @param array  $dst_hosts
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	protected static function getDestinationHostInterfaces(array $src_items, array $dst_options): array {
-		$dst_hostids = reset($dst_options);
+	protected static function getDestinationHostInterfaces(array $src_items, array $dst_hosts): array {
+		$dst_hostids = array_keys($dst_hosts);
 
-		if (!array_key_exists('hostids', $dst_options)) {
+		if (reset($dst_hosts)['status'] == HOST_STATUS_TEMPLATE) {
 			$dst_interfaceids = [];
 
 			if (in_array(reset($src_items)['hosts'][0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
 				foreach ($src_items as $src_item) {
 					if ($src_item['interfaceid'] != 0) {
-						foreach ($dst_hostids as $dst_hostid) {
-							$dst_interfaceids[$src_item['itemid']][$dst_hostid] = 0;
-						}
+						$dst_interfaceids[$src_item['itemid']] = array_fill_keys($dst_hostids, 0);
 					}
 				}
 			}
@@ -571,9 +595,7 @@ class CItemGeneralHelper {
 
 		foreach ($src_items as $src_item) {
 			if (itemTypeInterface($src_item['type']) !== false) {
-				foreach ($dst_hostids as $dst_hostid) {
-					$dst_interfaceids[$src_item['itemid']][$dst_hostid] = 0;
-				}
+				$dst_interfaceids[$src_item['itemid']] = array_fill_keys($dst_hostids, 0);
 			}
 
 			if ($src_item['interfaceid'] != 0) {
@@ -681,25 +703,21 @@ class CItemGeneralHelper {
 
 	/**
 	 * @param array  $src_items
-	 * @param array  $dst_options
+	 * @param array  $dst_hosts
 	 *
 	 * @return array
 	 *
 	 * @throws Exception
 	 */
-	protected static function getDestinationMasterItems(array $src_items, array $dst_options): array {
-		$dst_hostids = reset($dst_options);
-
+	protected static function getDestinationMasterItems(array $src_items, array $dst_hosts): array {
+		$dst_hostids = array_keys($dst_hosts);
 		$item_indexes = [];
 		$dst_master_itemids = [];
 
 		foreach ($src_items as $src_item) {
 			if ($src_item['master_itemid'] != 0) {
 				$item_indexes[$src_item['master_itemid']][] = $src_item['itemid'];
-
-				foreach ($dst_hostids as $dst_hostid) {
-					$dst_master_itemids[$src_item['itemid']][$dst_hostid] = 0;
-				}
+				$dst_master_itemids[$src_item['itemid']] = array_fill_keys($dst_hostids, 0);
 			}
 		}
 
@@ -713,13 +731,14 @@ class CItemGeneralHelper {
 			'webitems' => true,
 			'preservekeys' => true
 		]);
-
+		$host_filter = reset($dst_hosts)['status'] == HOST_STATUS_TEMPLATE
+			? ['templateids' => $dst_hostids]
+			: ['hostids' => $dst_hostids];
 		$dst_master_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_'],
 			'filter' => ['key_' => array_unique(array_column($src_master_items, 'key_'))],
 			'webitems' => true
-		] + $dst_options);
-
+		] + $host_filter);
 		$_dst_master_itemids = [];
 
 		foreach ($dst_master_items as $dst_master_item) {

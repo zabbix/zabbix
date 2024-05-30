@@ -1,33 +1,27 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+require_once dirname(__FILE__).'/include/defines.inc.php';
 
 // get language translations
 require_once dirname(__FILE__).'/include/locales.inc.php';
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 
-setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : 'en_GB');
+setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : ZBX_DEFAULT_LANG);
 
 require_once dirname(__FILE__).'/include/js.inc.php';
-
-require_once dirname(__FILE__).'/include/defines.inc.php';
 require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
@@ -38,6 +32,7 @@ $available_js = [
 	'class.dashboard.page.js' => '',
 	'class.dashboard.print.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
+	'class.widgets-data.js' => '',
 	'class.widget-base.js' => '',
 	'class.widget.js' => '',
 	'class.widget.inaccessible.js' => '',
@@ -105,6 +100,7 @@ $available_js = [
 	'class.script.js' => '',
 	'class.scrollable.js' => '',
 	'class.sidebar.js' => '',
+	'class.software-version-check.js' => '',
 	'class.sortable.js' => '',
 	'class.svg.canvas.js' => 'vector/',
 	'class.svg.map.js' => 'vector/',
@@ -114,6 +110,7 @@ $available_js = [
 	'class.tabfilteritem.js' => '',
 	'class.tagfilteritem.js' => '',
 	'class.template.js' => '',
+	'class.navigationtree.js' => '',
 	'init.js' => '',
 	'class.tab-indicators.js' => '',
 	// templates
@@ -190,6 +187,8 @@ $translate_strings = [
 			_('Widget is too small for the specified number of columns and rows.')
 	],
 	'class.widget.misconfigured.js' => [
+		'Please update configuration' => _('Please update configuration'),
+		'Referred widget is unavailable' => _('Referred widget is unavailable'),
 		'Refresh interval' => _('Refresh interval')
 	],
 	'class.widget-select.popup.js' => [
@@ -200,8 +199,12 @@ $translate_strings = [
 	'class.widget-field.multiselect.js' => [
 		'Dashboard' => _('Dashboard'),
 		'Widget' => _('Widget'),
+		'Unavailable widget' => _('Unavailable widget'),
 		'Dashboard is used as data source.' => _('Dashboard is used as data source.'),
 		'Another widget is used as data source.' => _('Another widget is used as data source.')
+	],
+	'class.widget-field.time-period.js' => [
+		'Unavailable widget' => _('Unavailable widget')
 	],
 	'functions.js' => [
 		'Error' => _('Error'),
@@ -415,7 +418,10 @@ $translate_strings = [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
-	'class.csvgauge.js' => [
+	'class.csvggauge.js' => [
+		'No data' => _('No data')
+	],
+	'class.svghoneycomb.js' => [
 		'No data' => _('No data')
 	],
 	'common.js' => [
@@ -440,6 +446,10 @@ $translate_strings = [
 		'Open URL' => _('Open URL'),
 		'Unexpected server error.' => _('Unexpected server error.'),
 		'URL opening confirmation' => _('URL opening confirmation')
+	],
+	'class.navigationtree.js' => [
+		'Maintenance with data collection' => _('Maintenance with data collection'),
+		'Maintenance without data collection' => _('Maintenance without data collection')
 	]
 ];
 
@@ -470,6 +480,7 @@ if (empty($_GET['files'])) {
 		'class.sidebar.js',
 		'class.sortable.js',
 		'class.template.js',
+		'class.navigationtree.js',
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',

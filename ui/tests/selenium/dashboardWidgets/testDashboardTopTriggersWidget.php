@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -239,16 +234,16 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::DEFAULT_WIDGET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							],
 							[
 								'type' => 'toptriggers',
 								'name' => self::DELETE_WIDGET,
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
@@ -265,8 +260,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
@@ -283,8 +278,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 								'name' => self::DATA_WIDGET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
-								'height' => 5
+								'width' => 36,
+								'height' => 3
 							]
 						]
 					]
@@ -706,7 +701,6 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		}
 
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		// Trim leading and trailing spaces from expected results if necessary.
 		if (array_key_exists('trim', $data)) {
@@ -730,12 +724,17 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
-			$dashboard->save();
-			$this->page->waitUntilReady();
+			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check widgets count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+			// Check new widget update interval.
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
+				? 'No refresh'
+				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
+			$this->assertEquals($refresh, $widget->getRefreshInterval());
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -746,17 +745,9 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				$this->assertTags($data['tags']);
 			}
 
-			$saved_form->submit();
-			COverlayDialogElement::ensureNotPresent();
-			$dashboard->save();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
-				? 'No refresh'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
-			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			// Close widget window and cancel editing the dashboard.
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->cancelEditing();
 		}
 	}
 
@@ -1426,11 +1417,11 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			'trigger_menu' => [
 				'VIEW' => [
 					'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=99252',
-					'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
+					'History' => [ 'Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
 				],
 				'CONFIGURATION' => [
 					'Trigger' => 'menu-popup-item',
-					'Items' => ['Linux: Number of processes' => 'menu-popup-item']
+					'Items' => [ 'Number of processes' => 'menu-popup-item']
 				]
 			],
 			'host_menu' => [

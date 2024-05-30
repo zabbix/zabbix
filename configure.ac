@@ -1,25 +1,20 @@
 dnl
-dnl Zabbix
 dnl Copyright (C) 2001-2024 Zabbix SIA
 dnl
-dnl This program is free software; you can redistribute it and/or modify
-dnl it under the terms of the GNU General Public License as published by
-dnl the Free Software Foundation; either version 2 of the License, or
-dnl (at your option) any later version.
+dnl This program is free software: you can redistribute it and/or modify it under the terms of
+dnl the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 dnl
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-dnl GNU General Public License for more details.
+dnl This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+dnl without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+dnl See the GNU Affero General Public License for more details.
 dnl
-dnl You should have received a copy of the GNU General Public License
-dnl along with this program; if not, write to the Free Software
-dnl Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+dnl You should have received a copy of the GNU Affero General Public License along with this program.
+dnl If not, see <https://www.gnu.org/licenses/>.
 dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0beta3])
+AC_INIT([Zabbix],[7.0.0rc3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1876,6 +1871,7 @@ if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
+		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
@@ -1906,6 +1902,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/zabbix_agent/active_checks/libzbxactive_checks.a \
+		\${abs_top_builddir}/src/zabbix_agent/metrics/libzbxmetrics.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2000,12 +1997,12 @@ AC_CONFIG_FILES([
 	src/libs/zbxautoreg/Makefile
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
-	src/libs/zbxdbconfigworker/Makefile
 	src/libs/zbxcommon/Makefile
+	src/libs/zbxbincommon/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
-	src/libs/zbxconf/Makefile
+	src/libs/zbxcfg/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcurl/Makefile
 	src/libs/zbxdb/Makefile
@@ -2033,6 +2030,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxhttp/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxip/Makefile
+	src/libs/zbxinterface/Makefile
 	src/libs/zbxipcservice/Makefile
 	src/libs/zbxipmi/Makefile
 	src/libs/zbxjson/Makefile
@@ -2041,6 +2039,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxmedia/Makefile
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxmutexs/Makefile
+	src/libs/zbxpgservice/Makefile
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
@@ -2049,6 +2048,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxpoller/Makefile
 	src/libs/zbxagentget/Makefile
 	src/libs/zbxpreproc/Makefile
+	src/libs/zbxpreprocbase/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxproxybuffer/Makefile
 	src/libs/zbxregexp/Makefile
@@ -2091,15 +2091,18 @@ AC_CONFIG_FILES([
 	src/libs/zbxxml/Makefile
 	src/libs/zbxalerter/Makefile
 	src/libs/zbxpinger/Makefile
+	src/libs/zbxescalations/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
 	src/zabbix_agent/agent_conf/Makefile
 	src/zabbix_agent/listener/Makefile
+	src/zabbix_agent/metrics/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/autoreg/Makefile
 	src/zabbix_proxy/cachehistory/Makefile
 	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
@@ -2115,6 +2118,8 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/trapper/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
+	src/zabbix_server/audit/Makefile
+	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
 	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/cachehistory/Makefile
@@ -2128,6 +2133,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/lld/Makefile
+	src/zabbix_server/pgmanager/Makefile
 	src/zabbix_server/operations/Makefile
 	src/zabbix_server/poller/Makefile
 	src/zabbix_server/preproc/Makefile

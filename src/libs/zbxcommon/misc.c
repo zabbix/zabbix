@@ -1,42 +1,22 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcommon.h"
 
 #include "zbxstr.h"
 
-const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
-{
-	INTERFACE_TYPE_AGENT,
-	INTERFACE_TYPE_SNMP,
-	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_IPMI
-};
-
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
-
-#ifdef _WINDOWS
-
-char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
-char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
-
-#endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 
@@ -228,107 +208,11 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 	return v;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: prints application parameters on stdout with layout suitable for  *
- *          80-column terminal                                                *
- *                                                                            *
- * Parameters:  usage_message - [IN]                                          *
- *              progname      - [IN]                                          *
- *                                                                            *
- ******************************************************************************/
-void	zbx_print_usage(const char **usage_message, const char *progname)
-{
-#define ZBX_MAXCOL	79
-#define ZBX_SPACE1	"  "			/* left margin for the first line */
-#define ZBX_SPACE2	"               "	/* left margin for subsequent lines */
-	const char	**p = usage_message;
-
-	if (NULL != *p)
-		printf("Usage:\n");
-
-	while (NULL != *p)
-	{
-		size_t	pos;
-
-		printf("%s%s", ZBX_SPACE1, progname);
-		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(progname);
-
-		while (NULL != *p)
-		{
-			size_t	len;
-
-			len = strlen(*p);
-
-			if (ZBX_MAXCOL > pos + len)
-			{
-				pos += len + 1;
-				printf(" %s", *p);
-			}
-			else
-			{
-				pos = ZBX_CONST_STRLEN(ZBX_SPACE2) + len + 1;
-				printf("\n%s %s", ZBX_SPACE2, *p);
-			}
-
-			p++;
-		}
-
-		printf("\n");
-		p++;
-	}
-#undef ZBX_MAXCOL
-#undef ZBX_SPACE1
-#undef ZBX_SPACE2
-}
-
 static const char	copyright_message[] =
 	"Copyright (C) 2024 Zabbix SIA\n"
-	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
+	"License AGPLv3: GNU Affero General Public License version 3 <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
-
-static const char	help_message_footer[] =
-	"Report bugs to: <https://support.zabbix.com>\n"
-	"Zabbix home page: <https://www.zabbix.com>\n"
-	"Documentation: <https://www.zabbix.com/documentation>";
-
-/******************************************************************************
- *                                                                            *
- * Purpose: prints help of application parameters on stdout by application    *
- *          request with parameter '-h'                                       *
- *                                                                            *
- * Parameters: param         - [IN] pointer to modification parameter         *
- *             help_message  - [IN]                                           *
- *             usage_message - [IN]                                           *
- *             progname      - [IN]                                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname)
-{
-	const char	**p = help_message;
-
-	zbx_print_usage(usage_message, progname);
-	printf("\n");
-
-	while (NULL != *p)
-	{
-		if (NULL != param && NULL != strstr(*p, "{DEFAULT_CONFIG_FILE}"))
-		{
-			char	*ptr;
-
-			ptr = zbx_string_replace(*p++, "{DEFAULT_CONFIG_FILE}", param);
-			printf("%s\n", ptr);
-			zbx_free(ptr);
-			continue;
-		}
-
-		printf("%s\n", *p++);
-	}
-
-	printf("\n");
-	puts(help_message_footer);
-}
 
 /******************************************************************************
  *                                                                            *
@@ -484,39 +368,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Return value: Interface type                                               *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-unsigned char	get_interface_type_by_item_type(unsigned char type)
-{
-	switch (type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			return INTERFACE_TYPE_AGENT;
-		case ITEM_TYPE_SNMP:
-		case ITEM_TYPE_SNMPTRAP:
-			return INTERFACE_TYPE_SNMP;
-		case ITEM_TYPE_IPMI:
-			return INTERFACE_TYPE_IPMI;
-		case ITEM_TYPE_JMX:
-			return INTERFACE_TYPE_JMX;
-		case ITEM_TYPE_SIMPLE:
-		case ITEM_TYPE_EXTERNAL:
-		case ITEM_TYPE_SSH:
-		case ITEM_TYPE_TELNET:
-			return INTERFACE_TYPE_ANY;
-		case ITEM_TYPE_HTTPAGENT:
-		case ITEM_TYPE_SCRIPT:
-			return INTERFACE_TYPE_OPT;
-		default:
-			return INTERFACE_TYPE_UNKNOWN;
-	}
-}
-
 void	zbx_alarm_flag_set(void)
 {
 	zbx_timed_out = 1;
@@ -576,3 +427,4 @@ zbx_uint64_t	suffix2factor(char c)
 			return 1;
 	}
 }
+

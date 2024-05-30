@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -47,6 +42,12 @@
 					.addEventListener('click', (e) => this.executeNow(e.target));
 			}
 
+			document.querySelectorAll('#filter_lifetime_type, #filter_enabled_lifetime_type').forEach(element => {
+				element.addEventListener('change', () => this.updateLostResourcesFields());
+			});
+
+			this.updateLostResourcesFields();
+
 			this.form.addEventListener('click', (e) => {
 				const target = e.target;
 
@@ -60,6 +61,20 @@
 			const disabled = document.querySelector('[name="filter_state"]:checked').value != -1;
 
 			document.querySelectorAll('[name="filter_status"]').forEach(radio => radio.disabled = disabled);
+		},
+
+		updateLostResourcesFields() {
+			const lifetime_type = document.querySelector('[name="filter_lifetime_type"]:checked').value;
+			const enabled_lifetime_type = document.querySelector('[name="filter_enabled_lifetime_type"]:checked').value;
+
+			document.querySelectorAll('[name="filter_enabled_lifetime_type"]').forEach(radio =>
+				radio.disabled = lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>
+			);
+
+			document.getElementById('filter_lifetime').disabled = lifetime_type != <?= ZBX_LLD_DELETE_AFTER ?>;
+			document.getElementById('filter_enabled_lifetime').disabled =
+				enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>
+					|| lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
 		},
 
 		editItem(target, data) {

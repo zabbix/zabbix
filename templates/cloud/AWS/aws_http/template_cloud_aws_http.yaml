@@ -969,8 +969,6 @@ zabbix_export:
               group_links:
                 - group:
                     name: Applications
-              templates:
-                - name: 'AWS ELB Application Load Balancer by HTTP'
               macros:
                 - macro: '{$AWS.ELB.ARN}'
                   value: '{#AWS.ELB.ARN}'
@@ -1032,6 +1030,18 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     - name: 'AWS ELB Application Load Balancer by HTTP'
+            - name: 'Network Load Balancers'
+              step: '2'
+              filter:
+                conditions:
+                  - macro: '{#AWS.ELB.TYPE}'
+                    value: ^network$
+                    formulaid: A
+              operations:
+                - operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    - name: 'AWS ELB Network Load Balancer by HTTP'
         - uuid: c1127e674b7548b2802cd8771f3a4768
           name: 'RDS instances discovery'
           type: SCRIPT

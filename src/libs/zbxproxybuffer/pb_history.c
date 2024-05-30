@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "pb_history.h"
@@ -166,7 +161,7 @@ try_again:
 				zbx_db_free_result(result);
 
 				gapid = id;
-				pb_wait_handles(&pb_data->history_handleids);
+				pb_wait_handles(&get_pb_data()->history_handleids);
 
 				goto try_again;
 			}
@@ -540,7 +535,7 @@ static zbx_list_item_t	*pb_history_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows)
 			if (0 == size)
 				size = pb_history_estimate_row_size(row->value, row->source);
 
-			if (FAIL == pb_free_space(pb_data, size))
+			if (FAIL == pb_free_space(get_pb_data(), size))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "history record with size " ZBX_FS_SIZE_T
 						" is too large for proxy memory buffer, discarding", size);
@@ -607,8 +602,8 @@ void	pb_history_flush(zbx_pb_t *pb)
 
 	pb_history_add_rows_db(&pb->history, NULL, &lastid);
 
-	if (pb_data->history_lastid_db < lastid)
-		pb_data->history_lastid_db = lastid;
+	if (get_pb_data()->history_lastid_db < lastid)
+		get_pb_data()->history_lastid_db = lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -716,6 +711,7 @@ int	pb_history_has_mem_rows(zbx_pb_t *pb)
 zbx_pb_history_data_t	*zbx_pb_history_open(void)
 {
 	zbx_pb_history_data_t	*data;
+	zbx_pb_t		*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -723,9 +719,9 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 
 	pb_lock();
 
-	data->handleid = pb_register_handle(pb_data, &pb_data->history_handleids);
+	data->handleid = pb_register_handle(pb_data, &(pb_data->history_handleids));
 
-	if (PB_DATABASE == (data->state = pb_dst[pb_data->state]))
+	if (PB_DATABASE == (data->state = get_pb_dst(pb_data->state)))
 		pb_data->db_handles_num++;
 
 	pb_unlock();
@@ -736,7 +732,7 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 		data->rows_num = 0;
 	}
 
-	if (PB_DATABASE == pb_dst[data->state])
+	if (PB_DATABASE == get_pb_dst(data->state))
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
 				"severity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
@@ -752,10 +748,11 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
  *                                                                            *
  * Purpose: flush the cached history data and free the handle                 *
  *                                                                            *
- ******************************************************************************/
+ **********************************************************************/
 void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 {
 	zbx_uint64_t	lastid = 0;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -774,15 +771,15 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 		{
 			pd_fallback_to_database(pb_data, "cached records are too old");
 		}
-		else if (PB_MEMORY == pb_dst[pb_data->state])
+		else if (PB_MEMORY == get_pb_dst(pb_data->state))
 		{
 			if (NULL == (next = pb_history_add_rows_mem(pb_data, &data->rows)))
 				goto out;
 
 			if (PB_DATABASE_MEMORY == pb_data->state)
 			{
-				pd_fallback_to_database(pb_data, "not enough space to complete transition to memory"
-						" mode");
+				pd_fallback_to_database(pb_data, "not enough space to complete transition to"
+						" memory mode");
 			}
 			else
 			{
@@ -823,7 +820,7 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 
 	pb_data->db_handles_num--;
 out:
-	pb_deregister_handle(&pb_data->history_handleids, data->handleid);
+	pb_deregister_handle(&(pb_data->history_handleids), data->handleid);
 	pb_unlock();
 
 	pb_history_data_free(data);
@@ -868,8 +865,8 @@ int	zbx_pb_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 
 	pb_lock();
 
-	if (PB_MEMORY == (state = pb_src[pb_data->state]))
-		ret = pb_history_get_mem(pb_data, j, lastid, more);
+	if (PB_MEMORY == (state = get_pb_src(get_pb_data()->state)))
+		ret = pb_history_get_mem(get_pb_data(), j, lastid, more);
 
 	pb_unlock();
 
@@ -888,7 +885,8 @@ int	zbx_pb_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
  ******************************************************************************/
 void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
 {
-	int	state;
+	int		state;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
@@ -896,7 +894,7 @@ void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
 
 	pb_data->history_lastid_sent = lastid;
 
-	if (PB_MEMORY == (state = pb_src[pb_data->state]))
+	if (PB_MEMORY == (state = get_pb_src(pb_data->state)))
 		pb_history_clear(pb_data, lastid);
 
 	pb_unlock();
@@ -915,6 +913,7 @@ void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
 zbx_uint64_t	zbx_pb_history_get_unsent_num(void)
 {
 	zbx_uint64_t	lastid_sent, lastid;
+	zbx_pb_t	*pb_data = get_pb_data();
 
 	pb_lock();
 

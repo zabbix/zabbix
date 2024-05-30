@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -134,7 +129,7 @@ class WidgetForm extends CWidgetForm {
 				: null;
 
 			if ($lefty_min !== null && $lefty_max !== null && $lefty_min >= $lefty_max) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').'/'._('Max'),
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Left Y').': '._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
@@ -150,7 +145,7 @@ class WidgetForm extends CWidgetForm {
 				: null;
 
 			if ($righty_min !== null && $righty_max !== null && $righty_min >= $righty_max) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').'/'._('Max'),
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Right Y').': '._('Max'),
 					_('Y axis MAX value must be greater than Y axis MIN value')
 				);
 			}
@@ -303,12 +298,12 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('lefty_min', _('Min')))
-					->setFullName(_('Left Y').'/'._('Min'))
+					->prefixLabel(_('Left Y'))
 					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('lefty_max', _('Max')))
-					->setFullName(_('Left Y').'/'._('Max'))
+					->prefixLabel(_('Left Y'))
 					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -329,12 +324,12 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('righty_min', _('Min')))
-					->setFullName(_('Right Y').'/'._('Min'))
+					->prefixLabel(_('Right Y'))
 					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('righty_max', _('Max')))
-					->setFullName(_('Right Y').'/'._('Max'))
+					->prefixLabel(_('Right Y'))
 					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(

@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -33,6 +28,9 @@ class CControllerProxyCreate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'name' =>					'required|not_empty|db proxy.name',
+			'proxy_groupid' =>			'db proxy.proxy_groupid',
+			'local_address' =>			'db proxy.local_address',
+			'local_port' =>				'db proxy.local_port',
 			'operating_mode' =>			'required|db proxy.operating_mode|in '.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
 			'address' =>				'db proxy.address',
 			'port' =>					'db proxy.port',
@@ -57,12 +55,31 @@ class CControllerProxyCreate extends CController {
 			'timeout_http_agent' =>		'db proxy.timeout_http_agent',
 			'timeout_ssh_agent' =>		'db proxy.timeout_ssh_agent',
 			'timeout_telnet_agent' =>	'db proxy.timeout_telnet_agent',
-			'timeout_script' =>			'db proxy.timeout_script'
+			'timeout_script' =>			'db proxy.timeout_script',
+			'timeout_browser' =>		'db proxy.timeout_browser'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			if ($this->getInput('proxy_groupid', 0) != 0) {
+				if ($this->getInput('local_address', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.',
+						_s('%1$s: %2$s', _('Address for active agents'), _('Address')), _('cannot be empty')
+					));
+
+					$ret = false;
+				}
+
+				if ($this->getInput('local_port', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.',
+						_s('%1$s: %2$s', _('Address for active agents'), _('Port')), _('cannot be empty')
+					));
+
+					$ret = false;
+				}
+			}
+
 			switch ($this->getInput('operating_mode')) {
 				case PROXY_OPERATING_MODE_ACTIVE:
 					if (!$this->hasInput('tls_accept_none') && !$this->hasInput('tls_accept_psk')
@@ -77,16 +94,18 @@ class CControllerProxyCreate extends CController {
 					break;
 
 				case PROXY_OPERATING_MODE_PASSIVE:
-					if ($this->getInput('address', '')	== '') {
-						info(
-							_s('Incorrect value for field "%1$s": %2$s.', _('Address'), _('cannot be empty'))
-						);
+					if ($this->getInput('address', '') === '') {
+						info(_s('Incorrect value for field "%1$s": %2$s.',
+							_s('%1$s: %2$s', _('Interface'), _('Address')), _('cannot be empty')
+						));
 
 						$ret = false;
 					}
 
 					if ($this->getInput('port', '') === '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('Port'), _('cannot be empty')));
+						info(_s('Incorrect value for field "%1$s": %2$s.',
+							_s('%1$s: %2$s', _('Interface'), _('Port')), _('cannot be empty')
+						));
 
 						$ret = false;
 					}
@@ -128,7 +147,8 @@ class CControllerProxyCreate extends CController {
 					'timeout_http_agent' =>		'required|not_empty',
 					'timeout_ssh_agent' =>		'required|not_empty',
 					'timeout_telnet_agent' =>	'required|not_empty',
-					'timeout_script' =>			'required|not_empty'
+					'timeout_script' =>			'required|not_empty',
+					'timeout_browser' =>		'required|not_empty'
 				];
 
 				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
@@ -183,6 +203,12 @@ class CControllerProxyCreate extends CController {
 			'tls_psk', 'tls_issuer', 'tls_subject'
 		]);
 
+		if ($this->getInput('proxy_groupid', 0) != 0) {
+			$proxy['proxy_groupid'] = $this->getInput('proxy_groupid');
+			$proxy['local_address'] = $this->getInput('local_address');
+			$proxy['local_port'] = $this->getInput('local_port');
+		}
+
 		switch ($this->getInput('operating_mode')) {
 			case PROXY_OPERATING_MODE_ACTIVE:
 				$proxy['allowed_addresses'] = $this->getInput('allowed_addresses', '');
@@ -215,7 +241,7 @@ class CControllerProxyCreate extends CController {
 		if ($custom_timeouts == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
 			$this->getInputs($proxy, ['custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check',
 				'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
-				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			]);
 		}
 

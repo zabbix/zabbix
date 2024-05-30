@@ -6,7 +6,6 @@
 The template to monitor HPE MSA 2060 by HTTP.
 It works without any external scripts and uses the script item.
 
-
 ## Requirements
 
 Zabbix version: 7.0 and higher.
@@ -22,17 +21,17 @@ This template has been tested on:
 
 ## Setup
 
-1. Create user "zabbix" with monitor role on the storage.
+1. Create a user with a monitor role on the storage, for example "zabbix".
 2. Link the template to a host.
-3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which API is accessible.
-4. Change {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
-
+3. Set the hostname or IP address of the host in the {$HPE.MSA.API.HOST} macro and configure the username and password in the {$HPE.MSA.API.USERNAME} and {$HPE.MSA.API.PASSWORD} macros.
+4. Change the {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
 |{$HPE.MSA.API.SCHEME}|<p>Connection scheme for API.</p>|`https`|
+|{$HPE.MSA.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
 |{$HPE.MSA.API.PORT}|<p>Connection port for API.</p>|`443`|
 |{$HPE.MSA.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`30s`|
 |{$HPE.MSA.API.USERNAME}|<p>Specify user name for API.</p>|`zabbix`|
@@ -47,7 +46,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|HPE MSA: Get data|<p>The JSON with result of API requests.</p>|Script|hpe.msa.get.data|
+|Get data|<p>The JSON with result of API requests.</p>|Script|hpe.msa.get.data|
 |Get system|<p>The system data.</p>|Dependent item|hpe.msa.get.system<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.system[0]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get FRU|<p>FRU data.</p>|Dependent item|hpe.msa.get.fru<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['frus']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get fans|<p>Fans data.</p>|Dependent item|hpe.msa.get.fans<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['fans']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -70,7 +69,7 @@ This template has been tested on:
 |System name|<p>The name of the storage system.</p>|Dependent item|hpe.msa.system.name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['system-name']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Vendor name|<p>The vendor name.</p>|Dependent item|hpe.msa.system.vendor_name<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['vendor-name']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |System health|<p>System health status.</p>|Dependent item|hpe.msa.system.health<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric']`</p><p>⛔️Custom on fail: Set value to: `4`</p></li></ul>|
-|HPE MSA: Service ping|<p>Check if HTTP/HTTPS service accepts TCP connections.</p>|Simple check|net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Service ping|<p>Check if HTTP/HTTPS service accepts TCP connections.</p>|Simple check|net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -80,7 +79,7 @@ This template has been tested on:
 |System health is in degraded state|<p>System health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=1`|Warning||
 |System health is in fault state|<p>System health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=2`|Average||
 |System health is in unknown state|<p>System health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=3`|Info||
-|Service is down or unavailable|<p>HTTP/HTTPS service is down or unable to establish TCP connection.</p>|`max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0`|High||
+|Service is down or unavailable|<p>HTTP/HTTPS service is down or unable to establish TCP connection.</p>|`max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"],5m)=0`|High||
 
 ### LLD rule Controllers discovery
 
@@ -222,6 +221,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Volume [{#NAME}]: Get data|<p>The discovered volume data.</p>|Dependent item|hpe.msa.get.volumes["{#NAME}",data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@['volume-name'] == "{#NAME}")].first()`</p></li></ul>|
+|Volume [{#NAME}]: Health|<p>Volume health status.</p>|Dependent item|hpe.msa.volumes["{#DURABLE.ID}",health]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric']`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Volume [{#NAME}]: Get statistics data|<p>The discovered volume statistics data.</p>|Dependent item|hpe.msa.get.volumes.statistics["{#NAME}",data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@['volume-name'] == "{#NAME}")].first()`</p></li></ul>|
 |Volume [{#NAME}]: Blocks size|<p>The size of a block, in bytes.</p>|Dependent item|hpe.msa.volumes.blocks["{#NAME}",size]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['blocksize']`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Volume [{#NAME}]: Blocks allocated|<p>The amount of blocks currently allocated to the volume.</p>|Dependent item|hpe.msa.volumes.blocks["{#NAME}",allocated]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['allocated-size-numeric']`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -238,6 +238,14 @@ This template has been tested on:
 |Volume [{#NAME}]: Cache: Read misses, rate|<p>For the controller that owns the volume, the number of times the block to be read is not found in cache per second.</p>|Dependent item|hpe.msa.volumes.cache.read.misses["{#NAME}",rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['read-cache-misses']`</p></li><li>Change per second</li></ul>|
 |Volume [{#NAME}]: Cache: Write hits, rate|<p>For the controller that owns the volume, the number of times the block written to is found in cache per second.</p>|Dependent item|hpe.msa.volumes.cache.write.hits["{#NAME}",rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['write-cache-hits']`</p></li><li>Change per second</li></ul>|
 |Volume [{#NAME}]: Cache: Write misses, rate|<p>For the controller that owns the volume, the number of times the block written to is not found in cache per second.</p>|Dependent item|hpe.msa.volumes.cache.write.misses["{#NAME}",rate]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['write-cache-misses']`</p></li><li>Change per second</li></ul>|
+
+### Trigger prototypes for Volumes discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Volume [{#NAME}]: Volume health is in degraded state|<p>Volume health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=1`|Warning||
+|Volume [{#NAME}]: Volume health is in fault state|<p>Volume health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=2`|Average||
+|Volume [{#NAME}]: Volume health is in unknown state|<p>Volume health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=3`|Info||
 
 ### LLD rule Enclosures discovery
 
@@ -360,7 +368,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Disk [{#DURABLE.ID}]: Get data|<p>The discovered disk data.</p>|Dependent item|hpe.msa.get.disks["{#DURABLE.ID}",data]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@['durable-id'] == "{#DURABLE.ID}")].first()`</p></li></ul>|
-|Disk [{#DURABLE.ID}]: Health|<p>Disk health status.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",health]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric'].first()`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Disk [{#DURABLE.ID}]: Health|<p>Disk health status.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",health]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['health-numeric']`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disk [{#DURABLE.ID}]: Temperature status|<p>Disk temperature status.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",temperature_status]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['temperature-status-numeric']`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>In range: `1 -> 3`</p><p>⛔️Custom on fail: Set value to: `4`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disk [{#DURABLE.ID}]: Temperature|<p>Temperature of the disk.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",temperature]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['temperature-numeric']`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Disk [{#DURABLE.ID}]: Type|<p>Disk type:</p><p>SAS: Enterprise SAS spinning disk.</p><p>SAS MDL: Midline SAS spinning disk.</p><p>SSD SAS: SAS solit-state disk.</p>|Dependent item|hpe.msa.disks["{#DURABLE.ID}",type]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['description-numeric']`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|

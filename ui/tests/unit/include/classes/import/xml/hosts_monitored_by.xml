@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>7.0</version>
+    <host_groups>
+        <host_group>
+            <uuid>62f70d82dcef45579e96953876649b4c</uuid>
+            <name>Hosts</name>
+        </host_group>
+    </host_groups>
+    <hosts>
+        <host>
+            <host>host1</host>
+            <name>host1</name>
+            <groups>
+                <group>
+                    <name>Hosts</name>
+                </group>
+            </groups>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+        <host>
+            <host>host2</host>
+            <name>host2</name>
+            <monitored_by>PROXY</monitored_by>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
+            <groups>
+                <group>
+                    <name>Hosts</name>
+                </group>
+            </groups>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+        <host>
+            <host>host3</host>
+            <name>host3</name>
+            <monitored_by>PROXY_GROUP</monitored_by>
+            <proxy_group>
+                <name>Proxy group</name>
+            </proxy_group>
+            <groups>
+                <group>
+                    <name>Hosts</name>
+                </group>
+            </groups>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+    </hosts>
+</zabbix_export>

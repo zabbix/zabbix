@@ -6,7 +6,8 @@ SUBDIRS = \
 
 noinst_LIBRARIES = \
 	libzbxmocktest.a \
-	libzbxmockdata.a
+	libzbxmockdata.a \
+	libzbxmockdummy.a	
 
 libzbxmocktest_a_CFLAGS = \
 	$(CMOCKA_CFLAGS) \
@@ -38,3 +39,10 @@ libzbxmockdata_a_SOURCES = \
 	zbxmockhelper.h \
 	zbxmockjson.c \
 	zbxmockjson.h
+
+libzbxmockdummy_a_CFLAGS = \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
+
+libzbxmockdummy_a_SOURCES = \
+	zbxmockdummy.c

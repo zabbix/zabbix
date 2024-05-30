@@ -52,8 +52,8 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Control-M: Get Control-M servers|<p>Gets a list of servers.</p>|HTTP agent|controlm.servers|
-|Control-M: Get SLA services|<p>Gets all the SLA active services.</p>|HTTP agent|controlm.services|
+|Get Control-M servers|<p>Gets a list of servers.</p>|HTTP agent|controlm.servers|
+|Get SLA services|<p>Gets all the SLA active services.</p>|HTTP agent|controlm.services|
 
 ### LLD rule Server discovery
 
@@ -149,24 +149,24 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Control-M: Get Control-M server stats|<p>Gets the statistics of the server.</p>|HTTP agent|controlm.server.stats<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.name == '{$SERVER.NAME}')].first()`</p><p>⛔️Custom on fail: Set error to: `Could not get server stats.`</p></li></ul>|
-|Control-M: Get jobs|<p>Gets the status of jobs.</p>|HTTP agent|controlm.jobs|
-|Control-M: Get agents|<p>Gets agents for the server.</p>|HTTP agent|controlm.agents|
-|Control-M: Jobs statistics|<p>Gets the statistics of jobs.</p>|Dependent item|controlm.jobs.statistics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['returned', 'total']`</p></li></ul>|
-|Control-M: Jobs returned|<p>Gets the count of returned jobs.</p>|Dependent item|controlm.jobs.statistics.returned<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[0]`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Control-M: Jobs total|<p>Gets the count of total jobs.</p>|Dependent item|controlm.jobs.statistics.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[1]`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Control-M: Server state|<p>Gets the metric of the server state.</p>|Dependent item|server.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p><p>⛔️Custom on fail: Set error to: `Could not get server state.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Control-M: Server message|<p>Gets the metric of the server message.</p>|Dependent item|server.message<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.message`</p><p>⛔️Custom on fail: Set error to: `Could not get server message.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Control-M: Server version|<p>Gets the metric of the server version.</p>|Dependent item|server.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p><p>⛔️Custom on fail: Set error to: `Could not get server version.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get Control-M server stats|<p>Gets the statistics of the server.</p>|HTTP agent|controlm.server.stats<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.name == '{$SERVER.NAME}')].first()`</p><p>⛔️Custom on fail: Set error to: `Could not get server stats.`</p></li></ul>|
+|Get jobs|<p>Gets the status of jobs.</p>|HTTP agent|controlm.jobs|
+|Get agents|<p>Gets agents for the server.</p>|HTTP agent|controlm.agents|
+|Jobs statistics|<p>Gets the statistics of jobs.</p>|Dependent item|controlm.jobs.statistics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['returned', 'total']`</p></li></ul>|
+|Jobs returned|<p>Gets the count of returned jobs.</p>|Dependent item|controlm.jobs.statistics.returned<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[0]`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Jobs total|<p>Gets the count of total jobs.</p>|Dependent item|controlm.jobs.statistics.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[1]`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Server state|<p>Gets the metric of the server state.</p>|Dependent item|server.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p><p>⛔️Custom on fail: Set error to: `Could not get server state.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Server message|<p>Gets the metric of the server message.</p>|Dependent item|server.message<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.message`</p><p>⛔️Custom on fail: Set error to: `Could not get server message.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Server version|<p>Gets the metric of the server version.</p>|Dependent item|server.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p><p>⛔️Custom on fail: Set error to: `Could not get server version.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Control-M: Server is down|<p>The server is down.</p>|`last(/Control-M server by HTTP/server.state)=0 or last(/Control-M server by HTTP/server.state)=10`|High||
-|Control-M: Server disconnected|<p>The server is disconnected.</p>|`last(/Control-M server by HTTP/server.message,#1)="Disconnected"`|High||
-|Control-M: Server error|<p>The server has encountered an error.</p>|`last(/Control-M server by HTTP/server.message,#1)<>"Connected" and last(/Control-M server by HTTP/server.message,#1)<>"Disconnected" and last(/Control-M server by HTTP/server.message,#1)<>""`|High||
-|Control-M: Server version has changed|<p>The server version has changed. Acknowledge to close the problem manually.</p>|`last(/Control-M server by HTTP/server.version,#1)<>last(/Control-M server by HTTP/server.version,#2) and length(last(/Control-M server by HTTP/server.version))>0`|Info|**Manual close**: Yes|
+|Server is down|<p>The server is down.</p>|`last(/Control-M server by HTTP/server.state)=0 or last(/Control-M server by HTTP/server.state)=10`|High||
+|Server disconnected|<p>The server is disconnected.</p>|`last(/Control-M server by HTTP/server.message,#1)="Disconnected"`|High||
+|Server error|<p>The server has encountered an error.</p>|`last(/Control-M server by HTTP/server.message,#1)<>"Connected" and last(/Control-M server by HTTP/server.message,#1)<>"Disconnected" and last(/Control-M server by HTTP/server.message,#1)<>""`|High||
+|Server version has changed|<p>The server version has changed. Acknowledge to close the problem manually.</p>|`last(/Control-M server by HTTP/server.version,#1)<>last(/Control-M server by HTTP/server.version,#2) and length(last(/Control-M server by HTTP/server.version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Jobs discovery
 

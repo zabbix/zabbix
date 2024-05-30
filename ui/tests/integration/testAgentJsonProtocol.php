@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
@@ -228,23 +223,31 @@ class testAgentJsonProtocol extends CIntegrationTest {
 
 	private function checkItemTest($agent_component, $sleep_sec) {
 		$item_test_data = [
-			'type' => '0',
-			'proxyid' => '0',
-			'key' => 'system.run[sleep ' . $sleep_sec . ' && echo ok]',
-			'timeout' => '6s',
-			'interface' => [
-				'address' => '127.0.0.1',
-				'port' => $this->getConfigurationValue($agent_component, 'ListenPort'),
-				'type' => 0
+			'item' => [
+				'type' => ITEM_TYPE_ZABBIX,
+				'key' => 'system.run[sleep ' . $sleep_sec . ' && echo ok]',
+				'timeout' => '6s',
+				"value_type" => "4"
 			],
-			'host' => ['tls_connect' => '1']
+			'host' => [
+				'tls_connect' => HOST_ENCRYPTION_NONE,
+				'proxyid' => '0',
+				'interface' => [
+					'address' => '127.0.0.1',
+					'port' => (int) $this->getConfigurationValue($agent_component, 'ListenPort'),
+					'type' => INTERFACE_TYPE_UNKNOWN
+				]
+			]
 		];
 
 		$server = new CZabbixServer('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'), 8, 10, ZBX_SOCKET_BYTES_LIMIT);
 		$result = $server->testItem($item_test_data, self::$sid);
+
 		$this->assertFalse($result === false);
-		$this->assertArrayHasKey('result', $result);
-		$this->assertEquals($result['result'], 'ok');
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item']);
+		$this->assertArrayHasKey('result', $result['item']);
+		$this->assertEquals($result['item']['result'], 'ok');
 	}
 
 	/**

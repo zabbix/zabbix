@@ -33,7 +33,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 1a075e6ed87c4d40b912956e9c02573f
-          name: 'OPNsense: DHCP server status'
+          name: 'DHCP server status'
           type: SNMP_AGENT
           snmp_oid: '.1.3.6.1.2.1.25.4.2.1.7["index",".1.3.6.1.2.1.25.4.2.1.2","dhcpd"]'
           key: opnsense.dhcpd.status
@@ -55,7 +55,7 @@ zabbix_export:
           triggers:
             - uuid: fba46d0094bc4f0e98537ceca27dd6bc
               expression: 'last(/OPNsense by SNMP/opnsense.dhcpd.status)=0'
-              name: 'OPNsense: DHCP server is not running'
+              name: 'DHCP server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Please check DHCP server settings.'
@@ -63,7 +63,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: c52c2b9a3d4e4446a8af02e5a51e9c55
-          name: 'OPNsense: DNS server status'
+          name: 'DNS server status'
           type: SNMP_AGENT
           snmp_oid: '.1.3.6.1.2.1.25.4.2.1.7["index",".1.3.6.1.2.1.25.4.2.1.2","unbound"]'
           key: opnsense.dns.status
@@ -85,7 +85,7 @@ zabbix_export:
           triggers:
             - uuid: 0e2cbbbd999d476a84cb93a9b7ef42d6
               expression: 'last(/OPNsense by SNMP/opnsense.dns.status)=0'
-              name: 'OPNsense: DNS server is not running'
+              name: 'DNS server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Please check DNS server settings.'
@@ -93,7 +93,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 4bc80f5cece045cfa103fa9d4e5db9c6
-          name: 'OPNsense: Web server status'
+          name: 'Web server status'
           type: SNMP_AGENT
           snmp_oid: '.1.3.6.1.2.1.25.4.2.1.7["index",".1.3.6.1.2.1.25.4.2.1.2","lighttpd"]'
           key: opnsense.lighttpd.status
@@ -115,7 +115,7 @@ zabbix_export:
           triggers:
             - uuid: 7864dec91012436f89b728019bf99fda
               expression: 'last(/OPNsense by SNMP/opnsense.lighttpd.status)=0'
-              name: 'OPNsense: Web server is not running'
+              name: 'Web server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Please check lighttpd service status.'
@@ -123,7 +123,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 6a77c077e6bb44439ad766de038f71f1
-          name: 'OPNsense: Packets with bad offset'
+          name: 'Packets with bad offset'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.2.0
           key: opnsense.packets.bad.offset
@@ -141,7 +141,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: f8503508e3e646c781d637d1aefaf21a
-          name: 'OPNsense: Fragmented packets'
+          name: 'Fragmented packets'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.3.0
           key: opnsense.packets.fragment
@@ -159,7 +159,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: ae0bfb3bd36e4b05ae490c4b70ba1313
-          name: 'OPNsense: Packets matched a filter rule'
+          name: 'Packets matched a filter rule'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.1.0
           key: opnsense.packets.match
@@ -177,7 +177,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3983366c271f4e9896d738c58f2d850f
-          name: 'OPNsense: Packets dropped due to memory limitation'
+          name: 'Packets dropped due to memory limitation'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.6.0
           key: opnsense.packets.mem.drop
@@ -195,7 +195,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 7c8d4623d2fd4b77b0749caa67530bb2
-          name: 'OPNsense: Normalized packets'
+          name: 'Normalized packets'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.5.0
           key: opnsense.packets.normalize
@@ -213,7 +213,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 7b845d8282ee4c1394c71c22ada31da9
-          name: 'OPNsense: Short packets'
+          name: 'Short packets'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.4.0
           key: opnsense.packets.short
@@ -231,7 +231,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: f2b82b136ea943909a7b6317bf8b7785
-          name: 'OPNsense: Packet filter running status'
+          name: 'Packet filter running status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.1.1.0
           key: opnsense.pf.status
@@ -249,7 +249,7 @@ zabbix_export:
           triggers:
             - uuid: 42d9a74d984d4ac2bf778be74cd8588f
               expression: 'last(/OPNsense by SNMP/opnsense.pf.status)<>1'
-              name: 'OPNsense: Packet filter is not running'
+              name: 'Packet filter is not running'
               opdata: 'Current running state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check PF status.'
@@ -257,7 +257,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 289cece23b5d4f17ba50d0373db4ed33
-          name: 'OPNsense: Firewall rules count'
+          name: 'Firewall rules count'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.12325.1.200.1.11.1.0
           key: opnsense.rules.count
@@ -269,7 +269,7 @@ zabbix_export:
             - tag: component
               value: firewall
         - uuid: 6e40ddbf15a54b0e8ae2d1c52d5c2eba
-          name: 'OPNsense: Source tracking table current'
+          name: 'Source tracking table current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.4.1.0
           key: opnsense.source.tracking.table.count
@@ -281,7 +281,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: a9b848d5c2254efdaf74ff48ce4003c4
-          name: 'OPNsense: Source tracking table limit'
+          name: 'Source tracking table limit'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.5.2.0
           key: opnsense.source.tracking.table.limit
@@ -293,7 +293,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 1452fc4e67564233b12dc892fde1959a
-          name: 'OPNsense: Source tracking table utilization in %'
+          name: 'Source tracking table utilization in %'
           type: CALCULATED
           key: opnsense.source.tracking.table.pused
           history: 7d
@@ -307,8 +307,8 @@ zabbix_export:
           triggers:
             - uuid: d1f03d136f30401b8f70cbc3196446ee
               expression: 'min(/OPNsense by SNMP/opnsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}'
-              name: 'OPNsense: Source tracking table usage is high'
-              event_name: 'OPNsense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.'
+              name: 'Source tracking table usage is high'
+              event_name: 'Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the number of sticky connections.'
@@ -316,7 +316,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 1c399a2204bc44d4a9b1a4017840fd75
-          name: 'OPNsense: States table current'
+          name: 'States table current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.3.1.0
           key: opnsense.state.table.count
@@ -328,7 +328,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3bd8ea1e2cb44b4cb0f7d16a9339b9e4
-          name: 'OPNsense: States table limit'
+          name: 'States table limit'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.12325.1.200.1.5.1.0
           key: opnsense.state.table.limit
@@ -340,7 +340,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 17a0f633e2a14e63b0282b785a66c62a
-          name: 'OPNsense: States table utilization in %'
+          name: 'States table utilization in %'
           type: CALCULATED
           key: opnsense.state.table.pused
           history: 7d
@@ -354,8 +354,8 @@ zabbix_export:
           triggers:
             - uuid: f31e301def314e9b81ee0f8a26dc1e37
               expression: 'min(/OPNsense by SNMP/opnsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}'
-              name: 'OPNsense: State table usage is high'
-              event_name: 'OPNsense: State table usage more than {$STATE.TABLE.UTIL.MAX}.'
+              name: 'State table usage is high'
+              event_name: 'State table usage more than {$STATE.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the number of connections.'
@@ -363,13 +363,13 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 00f2e8aa55754a7b9063afc1d7749d85
-          name: 'OPNsense: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
-            Possible value:
+            Possible values:
             0 - not available
             1 - available
             2 - unknown
@@ -383,7 +383,7 @@ zabbix_export:
           triggers:
             - uuid: f2cb074945624a8184ceb1ab3d3b2f52
               expression: 'max(/OPNsense by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'OPNsense: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -445,7 +445,7 @@ zabbix_export:
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 3a687275a219460c92433bda90be8d59
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 traffic blocked'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 traffic blocked'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.8["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.in.block.v4.bps[{#SNMPINDEX}]'
@@ -471,7 +471,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: d34be70208614a599e8706ede8d28f6d
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 packets blocked'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 packets blocked'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.12["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.in.block.v4.pps[{#SNMPINDEX}]'
@@ -494,7 +494,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: e6bc104196ad44f8abf8b7609b464f07
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 traffic blocked'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 traffic blocked'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.16["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.in.block.v6.bps[{#SNMPINDEX}]'
@@ -520,7 +520,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: b9335034e4f94bb1b15f5b74a6467f89
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 packets blocked'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 packets blocked'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.20["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.in.block.v6.pps[{#SNMPINDEX}]'
@@ -543,7 +543,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 77ad7ea9f85d419a81d99531ba71ef1d
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packets discarded'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound packets discarded'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
               key: 'net.if.in.discards[{#SNMPINDEX}]'
@@ -567,7 +567,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: c6f650d534c94a1bb0bf1faca829c538
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packets with errors'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound packets with errors'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
               key: 'net.if.in.errors[{#SNMPINDEX}]'
@@ -591,19 +591,19 @@ zabbix_export:
                   expression: 'min(/OPNsense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/OPNsense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
-                  name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate'
-                  event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  name: 'Interface [{#IFNAME}({#IFALIAS})]: High input error rate'
+                  event_name: 'Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
                   dependencies:
-                    - name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                    - name: 'Interface [{#IFNAME}({#IFALIAS})]: Link down'
                       expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: da65b40184d84a2a98dd595e17794875
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 traffic passed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 traffic passed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.7["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.in.pass.v4.bps[{#SNMPINDEX}]'
@@ -629,7 +629,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 367629501e4248e0b6de19e7123b0df6
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 packets passed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 packets passed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.11["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.in.pass.v4.pps[{#SNMPINDEX}]'
@@ -652,7 +652,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: a21b0c97af544225971a6d0a2ddeaf2c
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 traffic passed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 traffic passed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.15["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.in.pass.v6.bps[{#SNMPINDEX}]'
@@ -678,7 +678,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 23daac718d7743248b4e9e5dd9d537bf
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 packets passed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 packets passed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.19["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.in.pass.v6.pps[{#SNMPINDEX}]'
@@ -701,7 +701,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: df19df9d63604ec294a49478a0963da2
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Bits received'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Bits received'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'net.if.in[{#SNMPINDEX}]'
@@ -725,7 +725,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 0be1b473b51541c38012847e52ae9e1f
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 traffic blocked'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 traffic blocked'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.10["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.out.block.v4.bps[{#SNMPINDEX}]'
@@ -751,7 +751,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 7f335123af85457cb5b8c43279f26b27
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 packets blocked'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 packets blocked'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.14["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.out.block.v4.pps[{#SNMPINDEX}]'
@@ -774,7 +774,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: dae11126c26543a7afd3c169fbc76cd5
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 traffic blocked'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 traffic blocked'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.18["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.out.block.v6.bps[{#SNMPINDEX}]'
@@ -800,7 +800,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: a877f2c800874ce9bbf972ef8eb277be
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 packets blocked'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 packets blocked'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.22["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.out.block.v6.pps[{#SNMPINDEX}]'
@@ -823,7 +823,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: d80bb6eac4ab43b58c6c785340b77494
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packets discarded'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound packets discarded'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
               key: 'net.if.out.discards[{#SNMPINDEX}]'
@@ -847,7 +847,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 357f0ab9a5814f06a04e5e2983226e26
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packets with errors'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound packets with errors'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
               key: 'net.if.out.errors[{#SNMPINDEX}]'
@@ -871,19 +871,19 @@ zabbix_export:
                   expression: 'min(/OPNsense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'max(/OPNsense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
-                  name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate'
-                  event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  name: 'Interface [{#IFNAME}({#IFALIAS})]: High output error rate'
+                  event_name: 'Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
                   priority: WARNING
                   description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
                   dependencies:
-                    - name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                    - name: 'Interface [{#IFNAME}({#IFALIAS})]: Link down'
                       expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: be3ab46dc43d45da88917689e02b9f70
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 traffic passed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 traffic passed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.9["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.out.pass.v4.bps[{#SNMPINDEX}]'
@@ -909,7 +909,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: ec0b70c2c7d8452aaefefb737f567735
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 packets passed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 packets passed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.13["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.out.pass.v4.pps[{#SNMPINDEX}]'
@@ -932,7 +932,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 993af213503d4cf8b921ed630a01e7f9
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 traffic passed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 traffic passed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.17["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.out.pass.v6.bps[{#SNMPINDEX}]'
@@ -958,7 +958,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: d4c3d02a4e024d1a881789f9588c05f7
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 packets passed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 packets passed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.21["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.out.pass.v6.pps[{#SNMPINDEX}]'
@@ -981,7 +981,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 1f6a8e8f3cc746249001293fba59fcf3
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Bits sent'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Bits sent'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'net.if.out[{#SNMPINDEX}]'
@@ -1005,7 +1005,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: bce50f45634d41b6a4ab8616e3a4d804
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Rules references count'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Rules references count'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.6["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
               key: 'net.if.rules.refs[{#SNMPINDEX}]'
@@ -1023,7 +1023,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 76c91001f4b64ba99c132c3dd476cb88
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Speed'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'net.if.speed[{#SNMPINDEX}]'
@@ -1047,7 +1047,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 1b352c1f96e84f2fb72c6414c0e15b29
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Operational status'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Operational status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'net.if.status[{#SNMPINDEX}]'
@@ -1077,7 +1077,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 4a189b213b8e40589be007367361d70e
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
-                  name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  name: 'Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -1088,7 +1088,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 2874d024da724dc687d0d8fa940fcf87
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Interface type'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Interface type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
               key: 'net.if.type[{#SNMPINDEX}]'
@@ -1129,12 +1129,12 @@ zabbix_export:
               recovery_expression: |
                 (change(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
                 (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.'
               dependencies:
-                - name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                - name: 'Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 - tag: scope
@@ -1145,13 +1145,13 @@ zabbix_export:
                 last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/OPNsense by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])'
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage'
-              event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage'
+              event_name: 'Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               dependencies:
-                - name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                - name: 'Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 - tag: scope
@@ -1162,20 +1162,20 @@ zabbix_export:
                 last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/OPNsense by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])'
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage'
-              event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage'
+              event_name: 'Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               dependencies:
-                - name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                - name: 'Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 - tag: scope
                   value: performance
           graph_prototypes:
             - uuid: d9c786ac274149ac9145499a85d25c35
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packet filter traffic'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound packet filter traffic'
               graph_items:
                 - color: 1A7C11
                   item:
@@ -1221,7 +1221,7 @@ zabbix_export:
                     host: 'OPNsense by SNMP'
                     key: 'net.if.in.block.v6.pps[{#SNMPINDEX}]'
             - uuid: ab44b919a9d94955b27bf9a4499e4bf5
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 1A7C11
@@ -1259,7 +1259,7 @@ zabbix_export:
                     host: 'OPNsense by SNMP'
                     key: 'net.if.in.discards[{#SNMPINDEX}]'
             - uuid: 21b603de7402416fb2f472e56010f5f6
-              name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packet filter traffic'
+              name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound packet filter traffic'
               graph_items:
                 - color: 1A7C11
                   item:
@@ -1368,7 +1368,7 @@ zabbix_export:
             - name: 'Packet filter'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: GRAPH
@@ -1382,7 +1382,7 @@ zabbix_export:
             - name: 'Network traffic'
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -1392,13 +1392,13 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'OPNsense by SNMP'
-                        name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packet filter traffic'
+                        name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound packet filter traffic'
                     - type: STRING
                       name: reference
                       value: AAAAB
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -1408,13 +1408,13 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'OPNsense by SNMP'
-                        name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packet filter traffic'
+                        name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound packet filter traffic'
                     - type: STRING
                       name: reference
                       value: AAAAC
                 - type: graphprototype
                   'y': '20'
-                  width: '24'
+                  width: '72'
                   height: '10'
                   fields:
                     - type: INTEGER
@@ -1424,7 +1424,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'OPNsense by SNMP'
-                        name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
+                        name: 'Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
                     - type: STRING
                       name: reference
                       value: AAAAD

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbwrap.h"
@@ -39,6 +34,7 @@
 #include "zbxdbhigh.h"
 #include "zbxhash.h"
 #include "zbxstr.h"
+#include "zbxinterface.h"
 
 typedef enum
 {
@@ -858,12 +854,12 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 					" and",
 				/* item types with interface types INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT);
+				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -872,7 +868,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		while (SUCCEED == ret && NULL != (trow = zbx_db_fetch(tresult)))
 		{
 			type = (unsigned char)atoi(trow[0]);
-			type = get_interface_type_by_item_type(type);
+			type = zbx_get_interface_type_by_item_type(type);
 
 			if (INTERFACE_TYPE_ANY == type)
 			{
@@ -5908,6 +5904,12 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
+	/* delete host_proxy links */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_proxy where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
 	/* delete host */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
@@ -6547,8 +6549,13 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	}
 	zbx_db_free_result(result);
 
+	sql_offset = 0;
+
 	if (0 == hgsets.values_num)
+	{
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		goto skip_permissions;
+	}
 
 	/* calculate hash for last hgset in vector */
 	hgset_hash_add(hgsets.values[hgsets.values_num - 1]);
@@ -6556,7 +6563,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	zbx_vector_uint64_sort(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select hostid,hgsetid from host_hgset where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values, hgsetids.values_num);
 

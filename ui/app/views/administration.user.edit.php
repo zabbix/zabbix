@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -167,7 +162,8 @@ if ($data['change_password']) {
 
 	$current_password = (new CPassBox('current_password'))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired();
+		->setAriaRequired()
+		->setAttribute('autocomplete', 'off');
 
 	if ($data['action'] !== 'user.edit') {
 		$current_password->setAttribute('autofocus', 'autofocus');
@@ -187,11 +183,13 @@ if ($data['change_password']) {
 			(new CPassBox('password1', $data['password1']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autocomplete', 'off')
 		])
 		->addRow((new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autocomplete', 'off')
 		)
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
@@ -266,15 +264,14 @@ else {
 	setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
 
 	if (!function_exists('bindtextdomain')) {
-		$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
+		$language_error = makeErrorIcon('Translations are unavailable because the PHP gettext module is missing.');
+
 		$lang_select->setReadonly();
 	}
 	elseif (!$all_locales_available) {
-		$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
-	}
-
-	if ($language_error) {
-		$language_error = makeErrorIcon($language_error);
+		$language_error = makeWarningIcon(
+			_('You are not able to choose some of the languages, because locales for them are not installed on the web server.')
+		);
 	}
 
 	$timezone_select
@@ -340,20 +337,15 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			$media_name = $media['name'];
 
 			if ($media['active'] == MEDIA_STATUS_ACTIVE) {
-				$status_action = 'return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);';
-				$status_label = _('Enabled');
-				$status_class = ZBX_STYLE_GREEN;
+				$status = (new CButtonLink(_('Enabled')))
+					->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
+					->addClass(ZBX_STYLE_GREEN);
 			}
 			else {
-				$status_action = 'return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);';
-				$status_label = _('Disabled');
-				$status_class = ZBX_STYLE_RED;
+				$status = (new CButtonLink(_('Disabled')))
+					->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
+					->addClass(ZBX_STYLE_RED);
 			}
-
-			$status = (new CButtonLink($status_label))
-				->onClick(!$data['readonly'] ? $status_action : null)
-				->addClass(!$data['readonly'] ? $status_class : null)
-				->setEnabled(!$data['readonly']);
 		}
 		else {
 			$media_name = [
@@ -370,9 +362,14 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
 			'period' => $media['period'],
 			'severity' => $media['severity'],
-			'active' => $media['active']
+			'active' => $media['active'],
+			'userdirectory_mediaid' => $media['userdirectory_mediaid']
 		];
 		$media_severity = [];
+
+		if (array_key_exists('mediaid', $media)) {
+			$parameters['mediaid'] = $media['mediaid'];
+		}
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severity_name = CSeverityHelper::getName($severity);
@@ -408,12 +405,11 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButtonLink(_('Edit')))
 							->setAttribute('data-parameters', json_encode($parameters))
-							->setEnabled(!$data['readonly'])
 							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters),
 								{dialogue_class: "modal-popup-generic"});'
 							),
 						(new CButtonLink(_('Remove')))
-							->setEnabled(!$data['readonly'])
+							->setEnabled(!$parameters['userdirectory_mediaid'])
 							->onClick('removeMedia('.$index.');')
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -425,7 +421,6 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		(new CDiv([
 			$media_table_info,
 			(new CButtonLink(_('Add')))
-				->setEnabled(!$data['readonly'])
 				->onClick('PopUp("popup.media", '.
 					json_encode(['dstfrm' => $user_form->getName()]).
 					', {dialogue_class: "modal-popup-generic"});'

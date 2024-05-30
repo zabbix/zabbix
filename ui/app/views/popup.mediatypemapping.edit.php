@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -31,6 +26,10 @@ $form_action = (new CUrl('zabbix.php'))
 $form = (new CForm('post', $form_action))
 	->setId('media-type-mapping-edit-form')
 	->setName('media-type-mapping-edit-form');
+
+if (array_key_exists('userdirectory_mediaid', $data)) {
+	$form->addVar('userdirectory_mediaid', $data['userdirectory_mediaid']);
+}
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -64,6 +63,36 @@ $form
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setId('attribute')
 			)
+		])
+		->addItem([
+			new CLabel(_('User media')),
+			new CFormField((new CFormGrid([
+				[
+					(new CLabel(_('When active'), 'period'))->setAsteriskMark(),
+					new CFormField((new CTextBox('period', $data['period'], false,
+							DB::getFieldLength('userdirectory_media', 'period')
+						))
+							->setAriaRequired()
+							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
+					)
+				],
+				[
+					new CLabel(_('Use if severity')),
+					new CFormField(
+						(new CCheckBoxList('severity'))
+							->setOptions(CSeverityHelper::getSeverities())
+							->setChecked($data['severities'])
+							->setVertical(true)
+					)
+				],
+				[
+					new CLabel(_('Create enabled'), 'active'),
+					new CFormField(
+						(new CCheckBox('active', MEDIA_STATUS_ACTIVE))
+							->setChecked($data['active'] == MEDIA_STATUS_ACTIVE)
+					)
+				]
+			]))->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP))
 		])
 	)
 	->addItem(

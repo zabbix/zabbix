@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -26,7 +21,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup config, widget
  *
- * @dataSource AllItemValueTypes
+ * @dataSource AllItemValueTypes, GlobalMacros
  *
  * @onBefore prepareDashboardData
  */
@@ -47,18 +42,6 @@ class testDashboardGaugeWidget extends testWidgets {
 	const HOST = 'Host for all item value types';
 	const DELETE_GAUGE = 'Gauge for deleting';
 	const GAUGE_ITEM = 'Float item';
-
-	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_hostid';
 
 	/**
 	 * Id of the dashboard where gauge widget is created and updated.
@@ -318,8 +301,8 @@ class testDashboardGaugeWidget extends testWidgets {
 
 		// Check fields' labels and required fields.
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colours',
-				'Show', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
-				'Thresholds', 'Override host'],
+				'Show', 'Override host', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
+				'Thresholds'],
 				$form->getLabels()->asText()
 		);
 
@@ -500,11 +483,11 @@ class testDashboardGaugeWidget extends testWidgets {
 						['threshold' => '10']
 					],
 					'error' => [
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -557,11 +540,11 @@ class testDashboardGaugeWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Min": cannot be empty.',
 						'Invalid parameter "Max": cannot be empty.',
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -590,11 +573,12 @@ class testDashboardGaugeWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -651,11 +635,11 @@ class testDashboardGaugeWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
@@ -686,11 +670,11 @@ class testDashboardGaugeWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -1279,8 +1263,8 @@ class testDashboardGaugeWidget extends testWidgets {
 		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$this->page->removeFocus();
 
-		// Sleep waits until the gauge is animated.
-		sleep(1);
+		// Wait until the gauge is animated.
+		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 }

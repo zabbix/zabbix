@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,6 +24,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'authtype'				=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'headers'				=> 'array',
 			'hostid'				=> 'db hosts.hostid',
+			'test_with'				=> 'in '.implode(',', [self::TEST_WITH_SERVER, self::TEST_WITH_PROXY]),
 			'proxyid'				=> 'id',
 			'http_authtype'			=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'http_password'			=> 'string',
@@ -47,6 +43,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
 			'script'				=> 'string',
+			'browser_script'		=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
@@ -144,6 +141,15 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 					}
 				}
 			}
+
+			if ($this->hasInput('test_with') && $this->getInput('test_with') == self::TEST_WITH_PROXY
+					&& $this->getInput('proxyid', 0) == 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.',
+					_s('%1$s: %2$s', _('Test with'), _('Proxy')), _('cannot be empty')
+				));
+
+				$ret = false;
+			}
 		}
 
 		if ($messages = array_column(get_and_clear_messages(), 'message')) {
@@ -164,44 +170,6 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		// Get post data for particular item type.
-		$data = $this->getItemTestProperties($this->getInputAll(), true);
-
-		// Apply effective macros values to properties.
-		$data = $this->resolveItemPropertyMacros($data);
-
-		if ($this->item_type != ITEM_TYPE_CALCULATED) {
-			unset($data['value_type']);
-		}
-		else {
-			$data['host']['hostid'] = $this->getInput('hostid');
-		}
-
-		// Rename fields according protocol.
-		$data = CArrayHelper::renameKeys($data, [
-			'params_ap' => 'params',
-			'params_es' => 'params',
-			'params_f' => 'params',
-			'script' => 'params',
-			'http_username' => 'username',
-			'http_password' => 'password',
-			'http_authtype' => 'authtype',
-			'item_type' => 'type'
-		]);
-
-		// Only non-empty fields need to be sent to server.
-		$data = $this->unsetEmptyValues($data);
-
-		self::transformFields($data);
-
-		/*
-		 * Server will turn off status code check if field value is empty. If field is not present, then server will
-		 * default to check if status code is 200.
-		 */
-		if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $data)) {
-			$data['status_codes'] = '';
-		}
-
 		$output = [
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -213,26 +181,41 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
-		$result = $server->testItem($data, CSessionHelper::getId());
+		$result = $server->testItem($this->prepareTestData(), CSessionHelper::getId());
 
 		// Handle the response.
 		if ($result === false) {
 			error($server->getError());
 		}
-		elseif (is_array($result)) {
-			if (array_key_exists('result', $result)) {
-				$output['prev_value'] = $this->getInput('value', '');
-				$output['prev_time'] = $this->getPrevTime();
-				$output['value'] = $result['result'];
-				$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
-			}
+		elseif (array_key_exists('error', $result)) {
+			error($result['error']);
+		}
+		elseif (array_key_exists('error', $result['item'])) {
+			error($result['item']['error']);
+		}
+		else {
+			$output['prev_value'] = $this->getInput('value', '');
+			$output['prev_time'] = $this->getPrevTime();
+			$output['value'] = $result['item']['result'];
+			$output['eol'] = $result['item']['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
 
-			if (array_key_exists('error', $result) && $result['error'] !== '') {
-				error($result['error']);
+			if (array_key_exists('truncated', $result['item']) && $result['item']['truncated']) {
+				$output['value_warning'] = _s('Result is truncated due to its size (%1$s).',
+					convertUnits(['value' => $result['item']['original_size'], 'units' => 'B'])
+				);
 			}
 		}
 
-		if ($messages = get_and_clear_messages()) {
+		$messages = get_and_clear_messages();
+
+		if ($messages) {
+			foreach ($messages as &$message) {
+				if ($message['message'] === '') {
+					$message['message'] = _('<empty string>');
+				}
+			}
+			unset($message);
+
 			$output['error']['messages'] = array_column($messages, 'message');
 		}
 

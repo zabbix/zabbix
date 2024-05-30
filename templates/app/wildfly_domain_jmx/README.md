@@ -47,11 +47,11 @@ Depending on your server setup, you may need to specify a custom JMX scheme in m
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|WildFly: Launch type|<p>The manner in which the server process was launched. Either "DOMAIN" for a domain mode server launched by a Host Controller, "STANDALONE" for a standalone server launched from the command line, or "EMBEDDED" for a standalone server launched as an embedded part of an application running in the same virtual machine.</p>|JMX agent|jmx["jboss.as:management-root=server","launchType"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|WildFly: Name|<p>For standalone mode: The name of this server. If not set, defaults to the runtime value of InetAddress.getLocalHost().getHostName().</p><p>For domain mode: The name given to this domain</p>|JMX agent|jmx["jboss.as:management-root=server","name"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|WildFly: Process type|<p>The type of process represented by this root resource.</p>|JMX agent|jmx["jboss.as:management-root=server","processType"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|WildFly: Version|<p>The version of the WildFly Core based product release.</p>|JMX agent|jmx["jboss.as:management-root=server","productVersion"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|WildFly: Uptime|<p>WildFly server uptime.</p>|JMX agent|jmx["java.lang:type=Runtime","Uptime"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Launch type|<p>The manner in which the server process was launched. Either "DOMAIN" for a domain mode server launched by a Host Controller, "STANDALONE" for a standalone server launched from the command line, or "EMBEDDED" for a standalone server launched as an embedded part of an application running in the same virtual machine.</p>|JMX agent|jmx["jboss.as:management-root=server","launchType"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Name|<p>For standalone mode: The name of this server. If not set, defaults to the runtime value of InetAddress.getLocalHost().getHostName().</p><p>For domain mode: The name given to this domain</p>|JMX agent|jmx["jboss.as:management-root=server","name"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Process type|<p>The type of process represented by this root resource.</p>|JMX agent|jmx["jboss.as:management-root=server","processType"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Version|<p>The version of the WildFly Core based product release.</p>|JMX agent|jmx["jboss.as:management-root=server","productVersion"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Uptime|<p>WildFly server uptime.</p>|JMX agent|jmx["java.lang:type=Runtime","Uptime"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 
 ### Triggers
 

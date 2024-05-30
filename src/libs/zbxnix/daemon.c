@@ -1,24 +1,20 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxnix.h"
 
+#include "nix_internal.h"
 #include "fatal.h"
 #include "sigcommon.h"
 
@@ -39,9 +35,6 @@ static int	parent_pid = -1;
 static zbx_get_config_str_f		get_pid_file_pathname_cb = NULL;
 static zbx_get_threads_f		get_threads_func_cb;
 static zbx_get_config_int_f		get_threads_num_func_cb;
-
-extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
-		int *local_process_num);
 
 static zbx_signal_handler_f	sigusr_handler;
 static zbx_signal_redirect_f	signal_redirect_handler;
@@ -88,7 +81,7 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	int	threads_num = get_threads_num_func_cb();
 	for (i = 0; i < threads_num; i++)
 	{
-		if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
+		if (FAIL == nix_get_process_info_by_thread_func_cb()(i + 1, &process_type, &process_num))
 			break;
 
 		if (proc_type != process_type)
@@ -225,7 +218,7 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
 	struct sigaction	phan;
 
 	signal_redirect_handler = signal_redirect_cb;
-	sig_parent_pid = (int)getpid();
+	set_sig_parent_pid((int)getpid());
 
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = SA_SIGINFO;

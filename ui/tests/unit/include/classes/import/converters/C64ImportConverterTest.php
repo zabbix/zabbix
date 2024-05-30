@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -85,6 +80,12 @@ class C64ImportConverterTest extends CImportConverterTest {
 
 		foreach ($expected_lld_rules as &$lld_rule) {
 			$lld_rule['item_prototypes'] = $expected_items;
+		}
+		unset($lld_rule);
+
+		foreach ($expected_lld_rules as &$lld_rule) {
+			$lld_rule['lifetime'] = '30d';
+			$lld_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
 		}
 		unset($lld_rule);
 
@@ -211,7 +212,11 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'trigger_prototypes' => $source_triggers
 					]
 				],
-				'trigger_prototypes' => $source_triggers
+				'trigger_prototypes' => $source_triggers,
+				'lifetime' => '30d',
+				'lifetime_type' => CXmlConstantName::LLD_DELETE_AFTER,
+				'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER,
+				'enabled_lifetime' => '0'
 			]
 		];
 		$expected_lld_rules = [
@@ -224,7 +229,11 @@ class C64ImportConverterTest extends CImportConverterTest {
 						'trigger_prototypes' => $expected_triggers
 					]
 				],
-				'trigger_prototypes' => $expected_triggers
+				'trigger_prototypes' => $expected_triggers,
+				'lifetime' => '30d',
+				'lifetime_type' => CXmlConstantName::LLD_DELETE_AFTER,
+				'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER,
+				'enabled_lifetime' => '0'
 			]
 		];
 
@@ -285,6 +294,10 @@ class C64ImportConverterTest extends CImportConverterTest {
 
 		$source_mediatypes = [
 			[
+				'type' => CXmlConstantName::EMAIL,
+				'content_type' => CXmlConstantName::MESSAGE_FORMAT_HTML
+			],
+			[
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [
 					[
@@ -315,6 +328,10 @@ class C64ImportConverterTest extends CImportConverterTest {
 			]
 		];
 		$expected_mediatypes = [
+			[
+				'type' => CXmlConstantName::EMAIL,
+				'message_format' => CXmlConstantName::MESSAGE_FORMAT_HTML
+			],
 			[
 				'type' => CXmlConstantName::SCRIPT,
 				'parameters' => [
@@ -447,7 +464,10 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $source_item_prototypes
+									'item_prototypes' => $source_item_prototypes,
+									'lifetime' => '30d',
+									'lifetime_type' => CXmlConstantName::LLD_DELETE_AFTER,
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
 							]
 						]
@@ -471,7 +491,10 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $expected_item_prototypes
+									'item_prototypes' => $expected_item_prototypes,
+									'lifetime' => '30d',
+									'lifetime_type' => CXmlConstantName::LLD_DELETE_AFTER,
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
 							]
 						]
@@ -482,7 +505,103 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'discovery_rules' => [
 								[
 									'type' => CXmlConstantName::ZABBIX_PASSIVE,
-									'item_prototypes' => $expected_item_prototypes
+									'item_prototypes' => $expected_item_prototypes,
+									'lifetime' => '30d',
+									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
+	public function importConverterDataProviderPlainTextWidget(): array {
+		return [
+			[
+				[
+					'templates' => [
+						[
+							'name' => 'template',
+							'dashboards' => [
+								[
+									'pages' => [
+										[
+											'widgets' => [
+												[
+													'type' => 'plaintext',
+													'width' => '6',
+													'fields' => []
+												],
+												[
+													'type' => 'graph',
+													'width' => '3',
+													'fields' => []
+												],
+												[
+													'type' => 'graphprototype',
+													'width' => '4',
+													'fields' => []
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'templates' => [
+						[
+							'name' => 'template',
+							'dashboards' => [
+								[
+									'pages' => [
+										[
+											'widgets' => [
+												[
+													'type' => 'itemhistory',
+													'width' => '18',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAA'
+														],
+														[
+															'type' => 'INTEGER',
+															'name' => 'show_timestamp',
+															'value' => '1'
+														]
+													]
+												],
+												[
+													'type' => 'graph',
+													'width' => '9',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAB'
+														]
+													]
+												],
+												[
+													'type' => 'graphprototype',
+													'width' => '12',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAC'
+														]
+													]
+												]
+											]
+										]
+									]
 								]
 							]
 						]
@@ -496,6 +615,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 	 * @dataProvider importConverterDataProviderItemTimeout
 	 * @dataProvider importConverterDataProviderExpressionHistoryFunction
 	 * @dataProvider importConverterDataProviderCalcItemFormula
+	 * @dataProvider importConverterDataProviderPlainTextWidget
 	 *
 	 * @param array $data
 	 * @param array $expected

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdiscoverer.h"
@@ -303,6 +298,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
 	zbx_vector_uint64_t	dserviceids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_uint64_create(&dserviceids);
 
 	for (int i = 0; i < services->values_num; i++)
@@ -600,7 +596,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 					host_status, result->now, events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
-				events_cbs->process_events_cb(NULL, NULL);
+				events_cbs->process_events_cb(NULL, NULL, NULL);
 
 			if (NULL != events_cbs->clean_events_cb)
 				events_cbs->clean_events_cb();
@@ -879,7 +875,7 @@ zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const z
 	result->druleid = druleid;
 	result->unique_dcheckid = unique_dcheckid;
 	result->ip = result->dnsname = NULL;
-	result->now = (int)time(NULL);
+	result->now = time(NULL);
 	result->processed_checks_per_ip = 0;
 
 	return result;
@@ -896,7 +892,7 @@ static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_d
 
 		zbx_vector_discoverer_services_ptr_create(&dst->services);
 		dst->ip = zbx_strdup(NULL, ip);
-		dst->now = (int)time(NULL);
+		dst->now = time(NULL);
 		dst->unique_dcheckid = unique_dcheckid;
 		dst->dnsname = zbx_strdup(NULL, "");
 	}

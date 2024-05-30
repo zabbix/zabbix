@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxmedia.h"
@@ -283,7 +278,7 @@ static char	*email_encode_part(const char *data, size_t data_size)
 }
 
 static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
-		const char *mailsubject, const char *mailbody, unsigned char content_type)
+		const char *mailsubject, const char *mailbody, unsigned char message_format)
 {
 	char		*tmp = NULL, *base64 = NULL;
 	char		*localsubject = NULL, *localbody = NULL, *from = NULL, *to = NULL;
@@ -311,7 +306,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 
 	/* prepare body */
 
-	if (ZBX_MEDIA_CONTENT_TYPE_MULTI != content_type)
+	if (ZBX_MEDIA_MESSAGE_FORMAT_MULTI != message_format)
 	{
 		char	*tmp_body;
 
@@ -362,7 +357,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 			"MIME-Version: 1.0\r\n",
 			from, to, inreplyto, str_time, localsubject);
 
-	if (ZBX_MEDIA_CONTENT_TYPE_MULTI == content_type)
+	if (ZBX_MEDIA_MESSAGE_FORMAT_MULTI == message_format)
 	{
 		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset,
 				"Content-Type: multipart/mixed; boundary=" ZBX_MULTIPART_MIXED_BOUNDARY "\r\n");
@@ -372,7 +367,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
 				"Content-Type: %s; charset=\"UTF-8\"\r\n"
 				"Content-Transfer-Encoding: base64\r\n",
-				ZBX_MEDIA_CONTENT_TYPE_HTML == content_type ? "text/html" : "text/plain");
+				ZBX_MEDIA_MESSAGE_FORMAT_HTML == message_format ? "text/html" : "text/plain");
 	}
 
 	zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset,
@@ -525,7 +520,7 @@ static const char	*socket_error(zbx_socket_t *s, int socket_errno)
 
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
-		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout,
+		const char *mailsubject, const char *mailbody, unsigned char message_format, int timeout,
 		const char *config_source_ip, char **error)
 {
 #define OK_220	"220"
@@ -646,7 +641,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		goto close;
 	}
 
-	cmdp = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody, content_type);
+	cmdp = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody, message_format);
 	err = zbx_tcp_send_raw(&s, cmdp);
 	zbx_free(cmdp);
 
@@ -707,14 +702,11 @@ out:
 #define SMTP_SECURITY_STARTTLS	1
 #define SMTP_SECURITY_SSL	2
 
-/* SMTP authentication options */
-#define SMTP_AUTHENTICATION_NONE		0
-#define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
 static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char smtp_security, unsigned char
 		smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
-		const char *username, const char *password, unsigned char content_type, int timeout,
+		const char *username, const char *password, unsigned char message_format, int timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, char **error)
 {
 #ifdef HAVE_LIBCURL
@@ -849,7 +841,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		goto error;
 
 	payload_status.payload = smtp_prepare_payload(from_mails, to_mails, inreplyto, mailsubject, mailbody,
-			content_type);
+			message_format);
 	payload_status.payload_len = strlen(payload_status.payload);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_UPLOAD, 1L)) ||
@@ -909,7 +901,7 @@ out:
 	ZBX_UNUSED(smtp_authentication);
 	ZBX_UNUSED(username);
 	ZBX_UNUSED(password);
-	ZBX_UNUSED(content_type);
+	ZBX_UNUSED(message_format);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(config_source_ip);
 	ZBX_UNUSED(config_ssl_ca_location);
@@ -938,7 +930,7 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type, int timeout, const char *config_source_ip,
+		unsigned char message_format, int timeout, const char *config_source_ip,
 		const char *config_ssl_ca_location, char **error)
 {
 	int			ret = FAIL;
@@ -961,13 +953,13 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	if (SMTP_SECURITY_NONE == smtp_security && SMTP_AUTHENTICATION_NONE == smtp_authentication)
 	{
 		ret = send_email_plain(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto,
-				mailsubject, mailbody, content_type, timeout, config_source_ip, error);
+				mailsubject, mailbody, message_format, timeout, config_source_ip, error);
 	}
 	else
 	{
 		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto, mailsubject,
 				mailbody, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
-				username, password, content_type, timeout, config_source_ip, config_ssl_ca_location,
+				username, password, message_format, timeout, config_source_ip, config_ssl_ca_location,
 				error);
 	}
 
@@ -985,14 +977,12 @@ clean:
 
 	return ret;
 }
-#undef SMTP_AUTHENTICATION_NONE
-#undef SMTP_AUTHENTICATION_NORMAL_PASSWORD
 
 #undef SMTP_SECURITY_NONE
 #undef SMTP_SECURITY_STARTTLS
 #undef SMTP_SECURITY_SSL
 
-char	*zbx_email_make_body(const char *message, unsigned char content_type,  const char *attachment_name,
+char	*zbx_email_make_body(const char *message, unsigned char message_format,  const char *attachment_name,
 		const char *attachment_type, const char *attachment, size_t attachment_size)
 {
 	size_t	body_alloc = 0, body_offset = 0;
@@ -1011,7 +1001,7 @@ char	*zbx_email_make_body(const char *message, unsigned char content_type,  cons
 			"\r\n"
 			"%s\r\n"
 			"\r\n",
-			ZBX_MEDIA_CONTENT_TYPE_HTML == content_type ? "text/html" : "text/plain",
+			ZBX_MEDIA_MESSAGE_FORMAT_HTML == message_format ? "text/html" : "text/plain",
 			localbody);
 
 	zbx_free(localbody);

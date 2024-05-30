@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -116,7 +111,7 @@ class testScimGroup extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['user_active'],
-				'userdirectoryid' => self::$data['userdirectoryids']['saml'],
+				'passwd' => 'scimuserPassw0rd',
 				'name' => 'Jim',
 				'surname' => 'Halpert',
 				'usrgrps' => [['usrgrpid' => 7]],
@@ -126,12 +121,16 @@ class testScimGroup extends CAPIScimTest {
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userids']['user_active'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryids']['saml']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create inactive user with newly created userdirectoryid for SAML.
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['user_inactive'],
-				'userdirectoryid' => self::$data['userdirectoryids']['saml'],
+				'passwd' => 'scimuserPassw0rd',
 				'name' => 'Pam',
 				'surname' => 'Beesly',
 				'usrgrps' => [['usrgrpid' => 9]],
@@ -141,6 +140,10 @@ class testScimGroup extends CAPIScimTest {
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userids']['user_inactive'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryids']['saml']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create SCIM group without members.
 		$group_wo_members = DB::insert('scim_group', [['name' => self::$data['scim_group_names']['group_wo_members']]]);
@@ -182,11 +185,15 @@ class testScimGroup extends CAPIScimTest {
 		$user = CDataHelper::call('user.create', [
 			[
 				'username' => self::$data['usernames']['ldap_user'],
-				'userdirectoryid' => self::$data['userdirectoryids']['ldap']
+				'passwd' => 'scimuserPassw0rd'
 			]
 		]);
 		$this->assertArrayHasKey('userids', $user);
 		self::$data['userids']['ldap_user'] = $user['userids'][0];
+		DB::update('users', [
+			'values' => ['userdirectoryid' => self::$data['userdirectoryids']['ldap']],
+			'where' => ['userid' => $user['userids'][0]]
+		]);
 
 		// Create authorization token to execute requests.
 		$tokenid = CDataHelper::call('token.create', [

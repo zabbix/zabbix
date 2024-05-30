@@ -30,6 +30,7 @@ OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
 	..\..\..\src\libs\zbxalgo\hashset.o \
+	..\..\..\src\libs\zbxbincommon\bincommon.o \
 	..\..\..\src\libs\zbxcrypto\endian.o \
 	..\..\..\src\libs\zbxip\ip.o \
 	..\..\..\src\libs\zbxip\iprange.o \
@@ -50,7 +51,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
-	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcfg\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxgetopt\getopt.o \

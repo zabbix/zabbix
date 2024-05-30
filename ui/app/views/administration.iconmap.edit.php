@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -60,7 +55,7 @@ if ($data['iconmapid'] != 0) {
 $table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setId('iconMapTable')
-	->addClass('list-numbered')
+	->addClass(ZBX_STYLE_LIST_NUMBERED)
 	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', _('Action')]);
 
 $i = 0;
@@ -68,7 +63,7 @@ foreach ($data['iconmap']['mappings'] as $mapping) {
 	$table->addRow(
 		(new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-			(new CSpan(':'))->addClass('list-numbered-item'),
+			(new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM),
 			(new CSelect('iconmap[mappings]['.$i.'][inventory_link]'))
 				->setValue($mapping['inventory_link'])
 				->addOptions(CSelect::createOptionsFromArray($data['inventory_list'])),

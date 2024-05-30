@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "actions.h"
@@ -35,6 +30,7 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxescalations.h"
 
 void	zbx_ack_task_free(zbx_ack_task_t *ack_task)
 {
@@ -2839,18 +2835,6 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/* data structures used to create new and recover existing escalations */
-
-typedef struct
-{
-	zbx_uint64_t	actionid;
-	const zbx_db_event	*event;
-}
-zbx_escalation_new_t;
-
-ZBX_PTR_VECTOR_DECL(escalation_new_ptr, zbx_escalation_new_t *)
-ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
-
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if event is recovery event                                 *
@@ -3102,25 +3086,33 @@ static void	prepare_actions_conditions_eval(zbx_vector_action_eval_ptr_t *action
  *                                                                            *
  * Purpose: processes all actions of each event in list                       *
  *                                                                            *
- * Parameters: events        - [IN] events to apply actions for               *
- *             closed_events - [IN] Vector of closed event data -             *
- *                                  (PROBLEM eventid, OK eventid) pairs.      *
+ * Parameters: events          - [IN] events to apply actions for             *
+ *             closed_events   - [IN] Vector of closed event data -           *
+ *                                    (PROBLEM eventid, OK eventid) pairs.    *
+ *             escalations     - [IN/OUT]                                     *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events)
+void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events,
+		zbx_vector_escalation_new_ptr_t *escalations)
 {
 	zbx_vector_action_eval_ptr_t	actions;
-	zbx_vector_escalation_new_ptr_t	new_escalations;
 	zbx_vector_uint64_pair_t	rec_escalations;
 	zbx_hashset_t			uniq_conditions[EVENT_SOURCE_COUNT];
 	zbx_vector_db_event_t		esc_events[EVENT_SOURCE_COUNT];
 	zbx_hashset_iter_t		iter;
 	zbx_condition_t			*condition;
 	zbx_dc_um_handle_t		*um_handle;
+	zbx_vector_escalation_new_ptr_t *new_escalations = escalations, local_escalations, local_rec_escalations;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events->values_num);
 
-	zbx_vector_escalation_new_ptr_create(&new_escalations);
+	if (NULL == escalations)
+	{
+		new_escalations = &local_escalations;
+		zbx_vector_escalation_new_ptr_create(new_escalations);
+	}
+
+	zbx_vector_escalation_new_ptr_create(&local_rec_escalations);
 	zbx_vector_uint64_pair_create(&rec_escalations);
 
 	for (int i = 0; i < EVENT_SOURCE_COUNT; i++)
@@ -3156,7 +3148,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	/*    operations) for events that match action conditions.                                                   */
 	for (int i = 0; i < events->values_num; i++)
 	{
-		const zbx_db_event	*event;
+		zbx_db_event	*event;
 
 		if (FAIL == is_escalation_event((event = events->values[i])))
 			continue;
@@ -3176,8 +3168,9 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 				/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTOREGISTRATION events  */
 				new_escalation = (zbx_escalation_new_t *)zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
 				new_escalation->actionid = action->actionid;
+				new_escalation->escalationid = 0;
 				new_escalation->event = event;
-				zbx_vector_escalation_new_ptr_append(&new_escalations, new_escalation);
+				zbx_vector_escalation_new_ptr_append(new_escalations, new_escalation);
 
 				if (EVENT_SOURCE_DISCOVERY == event->source ||
 						EVENT_SOURCE_AUTOREGISTRATION == event->source)
@@ -3217,11 +3210,13 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		/* 3.2. Select escalations that must be recovered. */
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select eventid,escalationid"
-				" from escalations"
+				"select es.eventid,es.escalationid,ev.object,ev.objectid"
+				" from escalations es"
+				" left join events ev"
+					" on ev.eventid=es.eventid"
 				" where");
 
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values,
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "es.eventid", eventids.values,
 				eventids.values_num);
 		result = zbx_db_select("%s", sql);
 
@@ -3231,8 +3226,13 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_uint64_pair_t	pair;
+			zbx_escalation_new_t	*new_escalation;
+			zbx_uint64_t		eventid, escalationid, objectid;
+			int			object;
+			zbx_db_event		*event;
 
 			ZBX_STR2UINT64(pair.first, row[0]);
+			eventid = pair.first;
 
 			if (FAIL == (index = zbx_vector_uint64_pair_bsearch(closed_events, pair,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -3242,8 +3242,24 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 			}
 
 			pair.second = closed_events->values[index].second;
-			ZBX_DBROW2UINT64(pair.first, row[1]);
+			ZBX_DBROW2UINT64(escalationid, row[1]);
+			pair.first = escalationid;
 			zbx_vector_uint64_pair_append(&rec_escalations, pair);
+			ZBX_STR2UINT64(objectid, row[3]);
+			object = atoi(row[2]);
+
+			new_escalation = (zbx_escalation_new_t *)zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
+			new_escalation->actionid = 0;
+			new_escalation->escalationid = escalationid;
+
+			event = (zbx_db_event *)zbx_malloc(NULL, sizeof(zbx_db_event));
+			memset(event, 0, sizeof(zbx_db_event));
+
+			event->eventid = eventid;
+			event->object = object;
+			event->objectid = objectid;
+			new_escalation->event = event;
+			zbx_vector_escalation_new_ptr_append(&local_rec_escalations, new_escalation);
 		}
 
 		zbx_db_free_result(result);
@@ -3252,17 +3268,18 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	}
 
 	/* 4. Create new escalations in DB. */
-	if (0 != new_escalations.values_num)
+	if (0 != new_escalations->values_num)
 	{
 		zbx_db_insert_t	db_insert;
+		zbx_uint64_t	escalationid = zbx_db_get_maxid_num("escalations", new_escalations->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
 					"itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
 
-		for (int j = 0; j < new_escalations.values_num; j++)
+		for (int j = 0; j < new_escalations->values_num; j++)
 		{
 			zbx_uint64_t		triggerid = 0, itemid = 0;
-			zbx_escalation_new_t	*new_escalation = new_escalations.values[j];
+			zbx_escalation_new_t	*new_escalation = new_escalations->values[j];
 
 			switch (new_escalation->event->object)
 			{
@@ -3275,23 +3292,34 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 					break;
 			}
 
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), new_escalation->actionid,
+			zbx_db_insert_add_values(&db_insert, escalationid, new_escalation->actionid,
 					(int)ESCALATION_STATUS_ACTIVE, triggerid, itemid,
 					new_escalation->event->eventid, __UINT64_C(0), __UINT64_C(0));
+			new_escalation->escalationid = escalationid++;
 
-			zbx_free(new_escalation);
+			if (NULL == escalations)
+				zbx_free(new_escalation);
 		}
 
-		zbx_db_insert_autoincrement(&db_insert, "escalationid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
+
+	if (NULL == escalations)
+		zbx_vector_escalation_new_ptr_destroy(new_escalations);
 
 	/* 5. Modify recovered escalations in DB. */
 	if (0 != rec_escalations.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
+
+		if (NULL != escalations)
+		{
+			zbx_vector_escalation_new_ptr_append_array(new_escalations, local_rec_escalations.values,
+					local_rec_escalations.values_num);
+			zbx_vector_escalation_new_ptr_clear(&local_rec_escalations);
+		}
 
 		zbx_vector_uint64_pair_sort(&rec_escalations, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -3316,7 +3344,8 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	}
 
 	zbx_vector_uint64_pair_destroy(&rec_escalations);
-	zbx_vector_escalation_new_ptr_destroy(&new_escalations);
+	zbx_vector_escalation_new_ptr_clear_ext(&local_rec_escalations, zbx_escalation_new_ptr_free);
+	zbx_vector_escalation_new_ptr_destroy(&local_rec_escalations);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

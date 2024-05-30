@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_DBSYNC_H
@@ -44,6 +39,10 @@
 #define ZBX_DBSYNC_UPDATE_MACROS		__UINT64_C(0x0080)
 
 #define ZBX_DBSYNC_TRIGGER_ERROR	0x80
+
+
+#define ZBX_DBSYNC_TYPE_DIFF		0
+#define ZBX_DBSYNC_TYPE_CHANGELOG	1
 
 /******************************************************************************
  *                                                                            *
@@ -77,6 +76,9 @@ struct zbx_dbsync
 	/* the synchronization mode (see ZBX_DBSYNC_* defines) */
 	unsigned char			mode;
 
+
+	unsigned char			type;
+
 	/* the number of columns in diff */
 	int				columns_num;
 
@@ -104,13 +106,15 @@ struct zbx_dbsync
 	zbx_uint64_t	remove_num;
 };
 
-void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache);
+void	zbx_dbsync_env_init(zbx_dc_config_t *cache);
 int	zbx_dbsync_env_prepare(unsigned char mode);
 void	zbx_dbsync_env_flush_changelog(void);
 void	zbx_dbsync_env_clear(void);
 int	zbx_dbsync_env_changelog_num(void);
+int	zbx_dbsync_env_changelog_dbsyncs_new_records(void);
 
 void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
+void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
 int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
@@ -164,5 +168,8 @@ int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
 
 int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
+
+int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

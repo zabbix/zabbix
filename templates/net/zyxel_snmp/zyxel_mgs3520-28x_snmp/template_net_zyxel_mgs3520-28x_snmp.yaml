@@ -35,7 +35,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: dd305c07637b49c985aef490fb237359
-          name: 'ZYXEL MGS3520-28x: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -51,7 +51,7 @@ zabbix_export:
           triggers:
             - uuid: 3bf5d80d383e4e98853caa02063d69c9
               expression: 'max(/ZYXEL MGS3520-28x by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'ZYXEL MGS3520-28x: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -59,7 +59,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: be1d951beb564638a6102fe4b35fede0
-          name: 'ZYXEL MGS3520-28x: Contact'
+          name: Contact
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.3520_28.contact
@@ -81,7 +81,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: abdb31aeb0034998b91ab8f9b475409f
-          name: 'ZYXEL MGS3520-28x: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.2.4.0
           key: zyxel.3520_28.cpuusage
@@ -98,8 +98,8 @@ zabbix_export:
           triggers:
             - uuid: 96ed7ee3906541ea9cb2c95cf4da1a62
               expression: 'min(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL MGS3520-28x: High CPU utilization'
-              event_name: 'ZYXEL MGS3520-28x: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -107,7 +107,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: dd0ab3fa502b43969eec05ffd687450e
-          name: 'ZYXEL MGS3520-28x: ZyNOS F/W Version'
+          name: 'ZyNOS F/W Version'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.6.0
           key: zyxel.3520_28.fwversion
@@ -127,7 +127,7 @@ zabbix_export:
           triggers:
             - uuid: 3785991565b948c2a1e1a2a140c42df4
               expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion,#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion,#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion))>0'
-              name: 'ZYXEL MGS3520-28x: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -136,7 +136,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 8f050b29d1eb43e4a150383c9edd2467
-          name: 'ZYXEL MGS3520-28x: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.25.1.1.0
           key: zyxel.3520_28.hw.uptime
@@ -163,7 +163,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d9923ed59ef14cbebfe2f6d24c0d8414
-          name: 'ZYXEL MGS3520-28x: Location'
+          name: Location
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.3520_28.location
@@ -184,7 +184,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 65116a646d734290926de9444a58ff2d
-          name: 'ZYXEL MGS3520-28x: MAC address'
+          name: 'MAC address'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.3520_28.mac
@@ -208,7 +208,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 89d6942524f84e6d80d02a80be25ce57
-          name: 'ZYXEL MGS3520-28x: Memory utilization'
+          name: 'Memory utilization'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.2.5.0
           key: zyxel.3520_28.memusage
@@ -222,8 +222,8 @@ zabbix_export:
           triggers:
             - uuid: 1a999dff1dd9481083681741e71aba76
               expression: 'min(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.memusage,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'ZYXEL MGS3520-28x: High memory utilization'
-              event_name: 'ZYXEL MGS3520-28x: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:
@@ -232,7 +232,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 2dced10921704f8a9ccaabb2f951af15
-          name: 'ZYXEL MGS3520-28x: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.3520_28.model
@@ -259,14 +259,14 @@ zabbix_export:
           triggers:
             - uuid: d72bc70a67014d818d593d6c484fc9ee
               expression: 'not(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.model)="MGS3520-28" or last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.model)="MGS3520-28F")'
-              name: 'ZYXEL MGS3520-28x: Template does not match hardware'
+              name: 'Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel MGS3520-28x series, but connected to {ITEM.VALUE}'
               tags:
                 - tag: scope
                   value: notice
         - uuid: bccc98beb7ea45d6a7463de339e8877e
-          name: 'ZYXEL MGS3520-28x: Host name'
+          name: 'Host name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.3520_28.name
@@ -288,7 +288,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 78959009721a453c8b8a2c49eb26c90c
-          name: 'ZYXEL MGS3520-28x: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
           key: zyxel.3520_28.net.uptime
@@ -309,7 +309,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 095d82b3c92340debb324844a6c7f8a8
-          name: 'ZYXEL MGS3520-28x: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.12.0
           key: zyxel.3520_28.serialnumber
@@ -331,8 +331,8 @@ zabbix_export:
           triggers:
             - uuid: e953886c5a464fc18bb1e221d801901c
               expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber))>0'
-              name: 'ZYXEL MGS3520-28x: Device has been replaced'
-              event_name: 'ZYXEL MGS3520-28x: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -349,7 +349,7 @@ zabbix_export:
           description: 'An entry in fanRpmTable.'
           item_prototypes:
             - uuid: dd26e2542d174248af94102230e3b590
-              name: 'ZYXEL MGS3520-28x: {#ZYXEL.FAN.DESCRIPTION}'
+              name: '{#ZYXEL.FAN.DESCRIPTION}'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3520_28.fan[{#SNMPINDEX}]'
@@ -370,7 +370,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 9eedeb7aaba943c0947896cd50b39c7f
                   expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}'
-                  name: 'ZYXEL MGS3520-28x: {#ZYXEL.FAN.DESCRIPTION} is in critical state'
+                  name: '{#ZYXEL.FAN.DESCRIPTION} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
@@ -410,7 +410,7 @@ zabbix_export:
                 formulaid: D
           item_prototypes:
             - uuid: 43cf7ba65c39475b9614ed4b95e9b398
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Administrative status'
+              name: 'Port {#SNMPINDEX}: Administrative status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.adminstatus[{#SNMPINDEX}]'
@@ -434,7 +434,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: de6bab43bf544489976261919ae52e98
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Interface name'
+              name: 'Port {#SNMPINDEX}: Interface name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.descr[{#SNMPINDEX}]'
@@ -456,7 +456,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 01f3cc6551bb4703b199e6c996ad48ce
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link speed'
+              name: 'Port {#SNMPINDEX}: Link speed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.highspeed[{#SNMPINDEX}]'
@@ -480,7 +480,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 68b987f900c0467ea77a8c8eb661f6d0
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming broadcast packages'
+              name: 'Port {#SNMPINDEX}: Incoming broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.in.broadcastpkts[{#SNMPINDEX}]'
@@ -503,7 +503,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: ddcef9809ee34de5bec1acbdc8abc162
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming multicast packages'
+              name: 'Port {#SNMPINDEX}: Incoming multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.in.multicastpkts[{#SNMPINDEX}]'
@@ -527,7 +527,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: e8c2a3a8ba654311bc90901502983b7a
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming traffic'
+              name: 'Port {#SNMPINDEX}: Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.in.traffic[{#SNMPINDEX}]'
@@ -552,7 +552,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 003eb52b5fe44f509b3c04eef9cc2aa7
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming unicast packages'
+              name: 'Port {#SNMPINDEX}: Incoming unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.in.ucastpkts[{#SNMPINDEX}]'
@@ -575,7 +575,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 8e060cde0fae44d792080fbc7da5a2a1
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming utilization'
+              name: 'Port {#SNMPINDEX}: Incoming utilization'
               type: CALCULATED
               key: 'zyxel.3520_28.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
@@ -600,7 +600,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 15a2c17e0bba4f0d824790c3caa9840f
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link type'
+              name: 'Port {#SNMPINDEX}: Link type'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.2.1.1.2.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.link_type[{#SNMPINDEX}]'
@@ -622,7 +622,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: f42c5604726d4d21a840418e5668287c
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Interface description'
+              name: 'Port {#SNMPINDEX}: Interface description'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.1.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.name[{#SNMPINDEX}]'
@@ -644,7 +644,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: cfd32eee855647b79c95d6f151f13407
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Operational status'
+              name: 'Port {#SNMPINDEX}: Operational status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}]'
@@ -672,7 +672,7 @@ zabbix_export:
                   expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])<>2'
-                  name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link down'
+                  name: 'Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -687,7 +687,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 26f87786719c4192949536c74c146b4d
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing broadcast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.out.broadcastpkts[{#SNMPINDEX}]'
@@ -711,7 +711,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 4227a6eb8cce4dd8ab582ffce2788e6e
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing multicast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.out.multicastpkts[{#SNMPINDEX}]'
@@ -736,7 +736,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 9a7eb0b7569d4111a33d84d03b5018e4
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing traffic'
+              name: 'Port {#SNMPINDEX}: Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.out.traffic[{#SNMPINDEX}]'
@@ -762,7 +762,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 768be526caa345b2b23996016a19e217
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing unicast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.out.ucastpkts[{#SNMPINDEX}]'
@@ -786,7 +786,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: e2b22f4c39974628a4476120b310a6fb
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing utilization'
+              name: 'Port {#SNMPINDEX}: Outgoing utilization'
               type: CALCULATED
               key: 'zyxel.3520_28.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
@@ -811,7 +811,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 285f30d057f8438ab0d94367bcd6bdfc
-              name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Speed Duplex'
+              name: 'Port {#SNMPINDEX}: Speed Duplex'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.1.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.3520_28.net.if.speed_duplex[{#SNMPINDEX}]'
@@ -931,7 +931,7 @@ zabbix_export:
           description: 'SFP DDM module discovery.'
           item_prototypes:
             - uuid: f3f9077d771544bfa666f58b6ae59e9c
-              name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              name: 'SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.2.1.6.{#SNMPINDEX}'
               key: 'zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]'
@@ -959,8 +959,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 27cd25ea30fa4f1c9b7b431218241d0c
                   expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
-                  event_name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
@@ -968,8 +968,8 @@ zabbix_export:
                       value: notice
                 - uuid: 1188909e81c14c23aa9eefbb25a4c367
                   expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
-                  event_name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
@@ -1023,7 +1023,7 @@ zabbix_export:
           description: 'SFP module discovery.'
           item_prototypes:
             - uuid: da89b981488d4a71b1a4c70032669ddc
-              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Date code'
+              name: 'SFP {#SNMPINDEX}: Date code'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3520_28.sfp.datecode[{#SNMPINDEX}]'
@@ -1046,7 +1046,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 743a5eaf2c1049d4bf517c7e6f1f350d
-              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Part number'
+              name: 'SFP {#SNMPINDEX}: Part number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3520_28.sfp.part[{#SNMPINDEX}]'
@@ -1069,7 +1069,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: e40f07be73ca4e15acc109f8565f491b
-              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Revision'
+              name: 'SFP {#SNMPINDEX}: Revision'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3520_28.sfp.revision[{#SNMPINDEX}]'
@@ -1092,7 +1092,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 42db7a2affe54f059015adeae188efea
-              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Serial number'
+              name: 'SFP {#SNMPINDEX}: Serial number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.4.{#SNMPINDEX}'
               key: 'zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]'
@@ -1117,8 +1117,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: b9c3894fed8140c684be7c1fe2bbca8d
                   expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced'
-                  event_name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -1126,7 +1126,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 8ff52d1298f74fa0a211c80373c25f9b
-              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Status'
+              name: 'SFP {#SNMPINDEX}: Status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.3520_28.sfp.status[{#SNMPINDEX}]'
@@ -1149,7 +1149,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: b11f1d31e3a04b39b6e9ec40a800a7d5
-              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Transceiver'
+              name: 'SFP {#SNMPINDEX}: Transceiver'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3520_28.sfp.transceiver[{#SNMPINDEX}]'
@@ -1172,7 +1172,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 2656c166a30d4ee19465c8e9b2986a10
-              name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Vendor'
+              name: 'SFP {#SNMPINDEX}: Vendor'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.2.{#SNMPINDEX}'
               key: 'zyxel.3520_28.sfp.vendor[{#SNMPINDEX}]'
@@ -1203,7 +1203,7 @@ zabbix_export:
           description: 'An entry in tempTable.'
           item_prototypes:
             - uuid: bbdae35cdac341ce8f092b693ced4210
-              name: 'ZYXEL MGS3520-28x: Temperature "{#ZYXEL.TEMPDESCRIPTION}"'
+              name: 'Temperature "{#ZYXEL.TEMPDESCRIPTION}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.2.1.3.{#SNMPINDEX}'
               key: 'zyxel.3520_28.temp[{#SNMPINDEX}]'
@@ -1224,7 +1224,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: c2d4142fb8934eb7b66f5a5e4fa04398
                   expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
-                  name: 'ZYXEL MGS3520-28x: Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state'
+                  name: 'Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
@@ -1248,7 +1248,7 @@ zabbix_export:
           description: 'An entry in voltageTable.'
           item_prototypes:
             - uuid: 2b00ed37531f4dfc81aa2669cf227854
-              name: 'ZYXEL MGS3520-28x: Nominal "{#ZYXEL.DESCRIPTION}"'
+              name: 'Nominal "{#ZYXEL.DESCRIPTION}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.3.1.3.{#SNMPINDEX}'
               key: 'zyxel.3520_28.volt[{#SNMPINDEX}]'
@@ -1273,7 +1273,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 22b6f2f48eae4167b31c8fe3ccbc138a
                   expression: 'last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
-                  name: 'ZYXEL MGS3520-28x: Voltage {#ZYXEL.DESCRIPTION} is in critical state'
+                  name: 'Voltage {#ZYXEL.DESCRIPTION} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
@@ -1364,7 +1364,7 @@ zabbix_export:
           pages:
             - widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -1465,8 +1465,8 @@ zabbix_export:
   triggers:
     - uuid: 308761b6dffb44c7b827f6ca76312233
       expression: '(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)>0 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)<10m) or (last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)=0 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.uptime)<10m)'
-      name: 'ZYXEL MGS3520-28x: Host has been restarted'
-      event_name: 'ZYXEL MGS3520-28x: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

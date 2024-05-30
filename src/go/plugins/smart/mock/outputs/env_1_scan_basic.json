@@ -1,0 +1,43 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 3],
+    "svn_revision": "5338",
+    "platform_info": "x86_64-w64-mingw32-2016-1607",
+    "build_info": "(sf-7.3-1)",
+    "argv": ["smartctl", "--scan", "-j"],
+    "exit_status": 0
+  },
+  "devices": [
+    {
+      "name": "/dev/sda",
+      "info_name": "/dev/sda [SAT]",
+      "type": "sat",
+      "protocol": "ATA"
+    },
+    {
+      "name": "/dev/sdb",
+      "info_name": "/dev/sdb",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/csmi0,0",
+      "info_name": "/dev/csmi0,0",
+      "type": "ata",
+      "protocol": "ATA"
+    },
+    {
+      "name": "/dev/csmi0,2",
+      "info_name": "/dev/csmi0,2",
+      "type": "ata",
+      "protocol": "ATA"
+    },
+    {
+      "name": "/dev/csmi0,3",
+      "info_name": "/dev/csmi0,3",
+      "type": "ata",
+      "protocol": "ATA"
+    }
+  ]
+}

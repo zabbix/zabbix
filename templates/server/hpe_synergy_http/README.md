@@ -22,7 +22,8 @@ This template has been tested on:
 ## Setup
 
 1. Link template to the host.
-2. Configure macros {$HPE.SYNERGY.API.USERNAME} and {$HPE.SYNERGY.API.PASSWORD}.
+2. Set the hostname or IP address of the host in the {$HPE.SYNERGY.API.HOST} macro and configure the username and password in the {$HPE.SYNERGY.API.USERNAME} and {$HPE.SYNERGY.API.PASSWORD} macros.
+3. Change the {$HPE.SYNERGY.API.SCHEME} and {$HPE.SYNERGY.API.PORT} macros if needed.
 
 ### Macros used
 
@@ -32,36 +33,37 @@ This template has been tested on:
 |{$HPE.SYNERGY.API.USERNAME}|<p>Specify user name for API.</p>|`zabbix`|
 |{$HPE.SYNERGY.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|
 |{$HPE.SYNERGY.API.SCHEME}|<p>The API scheme (http/https).</p>|`https`|
+|{$HPE.SYNERGY.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
 |{$HPE.SYNERGY.API.PORT}|<p>The API port.</p>|`443`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|HPE Synergy: Get data|<p>The JSON with the result from requests to API.</p>|Script|hpe.synergy.get.data|
-|HPE Synergy: Get errors|<p>A list of errors from API requests.</p>|Dependent item|hpe.synergy.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HPE Synergy: Get enclosures data|<p>A list of enclosures.</p>|Dependent item|hpe.synergy.get.enclosures<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enclosures`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get datacenters data|<p>Data of the datacenters.</p>|Dependent item|hpe.synergy.get.datacenters<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.datacenters`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get ethernet networks data|<p>Data of the ethernet networks.</p>|Dependent item|hpe.synergy.get.ethernet_networks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["ethernet-networks"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get fabrics data|<p>Data of the fabrics.</p>|Dependent item|hpe.synergy.get.fabrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fabrics`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get FC networks data|<p>Data of the FC networks.</p>|Dependent item|hpe.synergy.get.fc_networks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["fc-networks"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get hypervisor managers data|<p>Data of the hypervisor managers.</p>|Dependent item|hpe.synergy.get.hypervisor_managers<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["hypervisor-managers"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get interconnects data|<p>Data of the interconnects.</p>|Dependent item|hpe.synergy.get.interconnects<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.interconnects`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get logical enclosures data|<p>Data of the logical enclosures.</p>|Dependent item|hpe.synergy.get.logical_enclosures<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["logical-enclosures"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get racks data|<p>Data of the racks.</p>|Dependent item|hpe.synergy.get.racks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.racks`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get server hardware data|<p>Data of the server hardware.</p>|Dependent item|hpe.synergy.get.server_hardware<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["server-hardware"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get storage pools data|<p>Data of the storage pools.</p>|Dependent item|hpe.synergy.get.storage_pools<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["storage-pools"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get storage systems data|<p>Data of the storage systems.</p>|Dependent item|hpe.synergy.get.storage_systems<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["storage-systems"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get storage volumes data|<p>Data of the storage volumes.</p>|Dependent item|hpe.synergy.get.storage_volumes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["storage-volumes"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Get uplink sets data|<p>Data of the uplink sets.</p>|Dependent item|hpe.synergy.get.uplink_sets<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["uplink-sets"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|HPE Synergy: Service ping|<p>Checks if the service is running and accepting the TCP connections.</p>|Simple check|net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Get data|<p>The JSON with the result from requests to API.</p>|Script|hpe.synergy.get.data|
+|Get errors|<p>A list of errors from API requests.</p>|Dependent item|hpe.synergy.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get enclosures data|<p>A list of enclosures.</p>|Dependent item|hpe.synergy.get.enclosures<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enclosures`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get datacenters data|<p>Data of the datacenters.</p>|Dependent item|hpe.synergy.get.datacenters<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.datacenters`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get ethernet networks data|<p>Data of the ethernet networks.</p>|Dependent item|hpe.synergy.get.ethernet_networks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["ethernet-networks"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get fabrics data|<p>Data of the fabrics.</p>|Dependent item|hpe.synergy.get.fabrics<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fabrics`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get FC networks data|<p>Data of the FC networks.</p>|Dependent item|hpe.synergy.get.fc_networks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["fc-networks"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get hypervisor managers data|<p>Data of the hypervisor managers.</p>|Dependent item|hpe.synergy.get.hypervisor_managers<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["hypervisor-managers"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get interconnects data|<p>Data of the interconnects.</p>|Dependent item|hpe.synergy.get.interconnects<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.interconnects`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get logical enclosures data|<p>Data of the logical enclosures.</p>|Dependent item|hpe.synergy.get.logical_enclosures<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["logical-enclosures"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get racks data|<p>Data of the racks.</p>|Dependent item|hpe.synergy.get.racks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.racks`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get server hardware data|<p>Data of the server hardware.</p>|Dependent item|hpe.synergy.get.server_hardware<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["server-hardware"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get storage pools data|<p>Data of the storage pools.</p>|Dependent item|hpe.synergy.get.storage_pools<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["storage-pools"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get storage systems data|<p>Data of the storage systems.</p>|Dependent item|hpe.synergy.get.storage_systems<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["storage-systems"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get storage volumes data|<p>Data of the storage volumes.</p>|Dependent item|hpe.synergy.get.storage_volumes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["storage-volumes"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get uplink sets data|<p>Data of the uplink sets.</p>|Dependent item|hpe.synergy.get.uplink_sets<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.["uplink-sets"]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Service ping|<p>Checks if the service is running and accepting the TCP connections.</p>|Simple check|net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|HPE Synergy: There are errors in requests to API|<p>Zabbix has received errors from API.</p>|`length(last(/HPE Synergy by HTTP/hpe.synergy.get.errors))>0`|Average|**Depends on**:<br><ul><li>HPE Synergy: Service is unavailable</li></ul>|
-|HPE Synergy: Service is unavailable||`max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
+|There are errors in requests to API|<p>Zabbix has received errors from API.</p>|`length(last(/HPE Synergy by HTTP/hpe.synergy.get.errors))>0`|Average|**Depends on**:<br><ul><li>Service is unavailable</li></ul>|
+|Service is unavailable||`max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
 
 ### LLD rule Appliance bays discovery
 

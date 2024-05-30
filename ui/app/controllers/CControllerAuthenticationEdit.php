@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -31,14 +26,12 @@ class CControllerAuthenticationEdit extends CController {
 	 * @return bool
 	 */
 	protected function checkInput() {
+		global $ALLOW_HTTP_AUTH;
+
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
 			'disabled_usrgrpid' =>				'id',
-			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
-			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-			'http_strip_domains' =>				'db config.http_strip_domains',
-			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
 			'ldap_default_row_index' =>			'int32',
@@ -77,6 +70,15 @@ class CControllerAuthenticationEdit extends CController {
 			'mfa_removed_mfaids' =>				'array_id'
 		];
 
+		if ($ALLOW_HTTP_AUTH) {
+			$fields += [
+				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
+				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
+				'http_strip_domains' =>		'db config.http_strip_domains',
+				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
+			];
+		}
+
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -96,12 +98,15 @@ class CControllerAuthenticationEdit extends CController {
 	}
 
 	protected function doAction() {
+		global $ALLOW_HTTP_AUTH;
+
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 
 		$data = [
 			'action_submit' => 'authentication.update',
 			'action_passw_change' => 'authentication.edit',
+			'is_http_auth_allowed' => $ALLOW_HTTP_AUTH,
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'form_refresh' => $this->getInput('form_refresh', 0)
@@ -110,10 +115,6 @@ class CControllerAuthenticationEdit extends CController {
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
 			CAuthenticationHelper::DISABLED_USER_GROUPID,
-			CAuthenticationHelper::HTTP_AUTH_ENABLED,
-			CAuthenticationHelper::HTTP_LOGIN_FORM,
-			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
-			CAuthenticationHelper::HTTP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_AUTH_ENABLED,
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
@@ -127,6 +128,16 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::MFA_STATUS,
 			CAuthenticationHelper::MFAID
 		];
+
+		if ($ALLOW_HTTP_AUTH) {
+			$auth_params = array_merge($auth_params, [
+				CAuthenticationHelper::HTTP_AUTH_ENABLED,
+				CAuthenticationHelper::HTTP_LOGIN_FORM,
+				CAuthenticationHelper::HTTP_STRIP_DOMAINS,
+				CAuthenticationHelper::HTTP_CASE_SENSITIVE
+			]);
+		}
+
 		$auth = [];
 		foreach ($auth_params as $param) {
 			$auth[$param] = CAuthenticationHelper::get($param);
@@ -136,10 +147,6 @@ class CControllerAuthenticationEdit extends CController {
 			$config_fields = [
 				'authentication_type' => DB::getDefault('config', 'authentication_type'),
 				'disabled_usrgrpid' => 0,
-				'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
-				'http_login_form' => DB::getDefault('config', 'http_login_form'),
-				'http_strip_domains' => DB::getDefault('config', 'http_strip_domains'),
-				'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 				'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 				'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 				'jit_provision_interval' => $auth[CAuthenticationHelper::JIT_PROVISION_INTERVAL],
@@ -168,6 +175,16 @@ class CControllerAuthenticationEdit extends CController {
 				'passwd_check_rules' => 0,
 				'mfa_status' => MFA_DISABLED
 			];
+
+			if ($ALLOW_HTTP_AUTH) {
+				$config_fields += [
+					'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
+					'http_login_form' => DB::getDefault('config', 'http_login_form'),
+					'http_strip_domains' => DB::getDefault('config', 'http_strip_domains'),
+					'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
+				];
+			}
+
 			$this->getInputs($data, array_keys($config_fields));
 			$data += $config_fields;
 
@@ -337,7 +354,7 @@ class CControllerAuthenticationEdit extends CController {
 				$mfa_method['usrgrps'] = $db_mfa_methods[$mfa_method['mfaid']]['usrgrps'];
 			}
 
-			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');
+			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('Duo Universal Prompt');
 		}
 		unset($mfa_method);
 
@@ -454,7 +471,7 @@ class CControllerAuthenticationEdit extends CController {
 		$mfa_methods = array_values($mfa_methods);
 
 		foreach ($mfa_methods as &$mfa_method) {
-			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');
+			$mfa_method['type_name'] = ($mfa_method['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('Duo Universal Prompt');
 		}
 		unset($mfa_method);
 

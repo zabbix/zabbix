@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -25,6 +20,8 @@
  * @var CView $this
  * @var array $data
  */
+
+use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 $form = new CWidgetFormView($data);
 
@@ -44,6 +41,10 @@ $form
 	)
 	->addField(
 		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(3)
+	)
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
+		: null
 	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
@@ -69,17 +70,10 @@ $form
 				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-thresholds')
 			)
 	)
-	->addField($data['templateid'] === null
-		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
-		: null
-	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_gauge_form.init('.json_encode([
-		'thresholds_colors' => ['FF465C', 'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7',
-			'EC1594', 'BAE37D', '6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB',
-			'894BBC', '6D6D6D'
-		]
-	], JSON_THROW_ON_ERROR).');')
+			'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE
+		], JSON_THROW_ON_ERROR).');')
 	->show();
 
 

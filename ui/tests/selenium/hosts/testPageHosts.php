@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
@@ -243,7 +238,7 @@ class testPageHosts extends CLegacyWebTest {
 			$this->assertTableDataColumn($data['expected']);
 		}
 		else {
-			// Check that 'No data found.' string is returned if no results are expected.
+			// Check that 'No data found' string is returned if no results are expected.
 			$this->assertTableData();
 		}
 
@@ -355,7 +350,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Simple form test host']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTableStats(1);
 	}
 
 	public function testPageHosts_FilterByProxy() {
@@ -367,17 +362,22 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_1 for filter']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Proxy_1 for filter']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_2 for filter']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 3 of 3 found']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Proxy_2 for filter']");
+		$this->assertTableStats(3);
 		$this->zbxTestClickButtonMultiselect('filter_proxyids_');
-		$this->zbxTestLaunchOverlayDialog('Proxies');
-		$this->zbxTestClickLinkTextWait('Proxy_1 for filter');
+
+		$proxies_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('Proxies', $proxies_dialog->getTitle());
+		$proxies_dialog->query('class:list-table')->one()->asTable()->findRow('Name', 'Proxy_1 for filter')->select();
+		$proxies_dialog->asForm()->submit();
+		$proxies_dialog->ensureNotPresent();
+
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTableStats(1);
 	}
 
 	public function testPageHosts_FilterNone() {
@@ -386,11 +386,12 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
 		$filter->submit();
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+		$this->assertTableStats();
 		$filter->invalidate();
 		$filter->getField('Name')->fill('%');
 		$filter->submit();
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+		$this->page->waitUntilReady();
+		$this->assertTableStats();
 	}
 
 	public function testPageHosts_FilterByAllFields() {
@@ -405,7 +406,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->submit();
 		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->HostName);
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTableStats(1);
 	}
 
 	public function testPageHosts_FilterReset() {

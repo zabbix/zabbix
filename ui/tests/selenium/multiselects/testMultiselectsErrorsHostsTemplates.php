@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -24,11 +19,26 @@ require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 /**
  * Test for assuring that bug from ZBX-23302 is not reproducing, respectively
  * that multiselects' dialogs do not contain any errors before and after filling.
+ *
+ * @onBefore prepareProxyData
+ *
+ * @backup hosts
  */
 class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 
 	const HOST = 'Template inheritance test host';
 	const TEMPLATE = 'AIX by Zabbix agent';
+
+	public static function prepareProxyData() {
+		CDataHelper::call('proxy.create',
+			[
+				[
+					'name' => 'Proxy for Multiselects test',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				]
+			]
+		);
+	}
 
 	public static function getCheckDialogsData() {
 		return [
@@ -39,12 +49,12 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 					'checked_multiselects' => [
 						['Host groups' => 'Host groups'],
 						['Templates' => 'Templates', 'Template group' => 'Template groups'],
-						['Proxy' => 'Proxies']
+						['Proxies' => 'Proxies']
 					],
 					// Fill this filter to enable 'Proxy' multiselect.
 					'filter' => ['Monitored by' => 'Proxy'],
 					'filled_multiselects' => [
-						['Proxy' => 'Proxy for Actions']
+						['Proxy' => 'Proxy for Multiselects test']
 					]
 				]
 			],

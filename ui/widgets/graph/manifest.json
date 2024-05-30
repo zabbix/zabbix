@@ -11,6 +11,14 @@
 	"widget": {
 		"js_class": "CWidgetGraph",
 		"in": {
+			"graphid": {
+				"type": "_graphid",
+				"required": true
+			},
+			"itemid": {
+				"type": "_itemid",
+				"required": true
+			},
 			"time_period": {
 				"type": "_timeperiod"
 			}

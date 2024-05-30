@@ -10,7 +10,7 @@
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/favorite_graphs",
 	"widget": {
 		"size": {
-			"width": 4,
+			"width": 12,
 			"height": 3
 		},
 		"refresh_rate": 900

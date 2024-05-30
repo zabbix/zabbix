@@ -24,7 +24,7 @@ This template has been tested on:
 
 You should enable the mini-HTTP Server, add the option webenabled=yes in the general section of the manager.conf file and create Asterisk Manager user with system and command write permissions within your Asterisk instance. 
 Disable the PJSIP driver if you do not use PJSIP or do not have PJSIP endpoints.
-Please, define AMI address in the {$AMI.URL} macro. Also, the Zabbix host should have an Agent interface with the AMI address to check Asterisk service status.
+Please, define AMI address in the {$AMI.URL} macro. Also, set the hostname or IP address of the AMI host in the {$AMI.HOST} macro for Zabbix to check Asterisk service status.
 Then you can define {$AMI.USERNAME} and {$AMI.SECRET} macros in the template for using on the host level.
 If there are errors, increase the logging to debug level and see the Zabbix server log.
 
@@ -33,6 +33,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 |Name|Description|Default|
 |----|-----------|-------|
 |{$AMI.URL}|<p>The Asterisk Manager API URL in the format `<scheme>://<host>:<port>/<prefix>/rawman`.</p>|`http://asterisk:8088/asterisk/rawman`|
+|{$AMI.HOST}|<p>The hostname or IP address of the Asterisk Manager API host.</p>|`<SET AMI HOST>`|
 |{$AMI.PORT}|<p>AMI port number for checking service availability.</p>|`5038`|
 |{$AMI.USERNAME}|<p>The Asterisk Manager name.</p>|`zabbix`|
 |{$AMI.SECRET}|<p>The Asterisk Manager secret.</p>|`zabbix`|
@@ -48,46 +49,46 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Asterisk: Service status|<p>Asterisk Manager API port availability.</p>|Simple check|net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|Asterisk: Service response time|<p>Asterisk Manager API performance.</p>|Simple check|net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"]|
-|Asterisk: Get stats|<p>Asterisk system information in JSON format.</p>|HTTP agent|asterisk.get_stats<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Asterisk: Version|<p>Service version</p>|Dependent item|asterisk.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li></ul>|
-|Asterisk: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|asterisk.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime`</p></li></ul>|
-|Asterisk: Uptime after reload|<p>System uptime after a config reload in 'N days, hh:mm:ss' format.</p>|Dependent item|asterisk.uptime_reload<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime_reload`</p></li></ul>|
-|Asterisk: Active channels|<p>The number of active channels at the moment.</p>|Dependent item|asterisk.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_channels`</p></li></ul>|
-|Asterisk: Active calls|<p>The number of active calls at the moment.</p>|Dependent item|asterisk.active_calls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_calls`</p></li></ul>|
-|Asterisk: Calls processed|<p>The number of calls processed after the last service restart.</p>|Dependent item|asterisk.calls_processed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.calls_processed`</p></li></ul>|
-|Asterisk: Calls processed per second|<p>The number of calls processed per second.</p>|Dependent item|asterisk.calls_processed.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.calls_processed`</p></li><li>Change per second</li></ul>|
-|Asterisk: Total queues|<p>The number of configured queues.</p>|Dependent item|asterisk.total_queues<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.total`</p></li></ul>|
-|Asterisk: SIP monitored online|<p>The number of monitored online SIP peers.</p>|Dependent item|asterisk.sip.monitored_online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.monitored_online`</p></li></ul>|
-|Asterisk: SIP monitored offline|<p>The number of monitored offline SIP peers.</p>|Dependent item|asterisk.sip.monitored_offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.monitored_offline`</p></li></ul>|
-|Asterisk: SIP unmonitored online|<p>The number of unmonitored online SIP peers.</p>|Dependent item|asterisk.sip.unmonitored_online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.unmonitored_online`</p></li></ul>|
-|Asterisk: SIP unmonitored offline|<p>The number of unmonitored offline SIP peers.</p>|Dependent item|asterisk.sip.unmonitored_offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.unmonitored_offline`</p></li></ul>|
-|Asterisk: SIP peers|<p>The total number of SIP peers.</p>|Dependent item|asterisk.sip.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.total`</p></li></ul>|
-|Asterisk: SIP trunks active channels|<p>The total number of SIP trunks active channels.</p>|Dependent item|asterisk.sip.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.active_channels`</p></li></ul>|
-|Asterisk: IAX online peers|<p>The number of online IAX peers.</p>|Dependent item|asterisk.iax.online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.online`</p></li></ul>|
-|Asterisk: IAX offline peers|<p>The number of offline IAX peers.</p>|Dependent item|asterisk.iax.offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.offline`</p></li></ul>|
-|Asterisk: IAX unmonitored peers|<p>The number of unmonitored IAX peers.</p>|Dependent item|asterisk.iax.unmonitored<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.unmonitored`</p></li></ul>|
-|Asterisk: IAX peers|<p>The total number of IAX peers.</p>|Dependent item|asterisk.iax.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.total`</p></li></ul>|
-|Asterisk: IAX trunks active channels|<p>The total number of IAX trunks active channels.</p>|Dependent item|asterisk.iax.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.active_channels`</p></li></ul>|
-|Asterisk: PJSIP available endpoints|<p>The number of available PJSIP peers.</p>|Dependent item|asterisk.pjsip.available<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.available`</p></li></ul>|
-|Asterisk: PJSIP unavailable endpoints|<p>The number of unavailable PJSIP peers.</p>|Dependent item|asterisk.pjsip.unavailable<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.unavailable`</p></li></ul>|
-|Asterisk: PJSIP endpoints|<p>The total number of PJSIP peers.</p>|Dependent item|asterisk.pjsip.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.total`</p></li></ul>|
-|Asterisk: PJSIP trunks active channels|<p>The total number of PJSIP trunks active channels.</p>|Dependent item|asterisk.pjsip.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.active_channels`</p></li></ul>|
+|Service status|<p>Asterisk Manager API port availability.</p>|Simple check|net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Service response time|<p>Asterisk Manager API performance.</p>|Simple check|net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"]|
+|Get stats|<p>Asterisk system information in JSON format.</p>|HTTP agent|asterisk.get_stats<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Version|<p>Service version</p>|Dependent item|asterisk.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li></ul>|
+|Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|asterisk.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime`</p></li></ul>|
+|Uptime after reload|<p>System uptime after a config reload in 'N days, hh:mm:ss' format.</p>|Dependent item|asterisk.uptime_reload<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime_reload`</p></li></ul>|
+|Active channels|<p>The number of active channels at the moment.</p>|Dependent item|asterisk.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_channels`</p></li></ul>|
+|Active calls|<p>The number of active calls at the moment.</p>|Dependent item|asterisk.active_calls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_calls`</p></li></ul>|
+|Calls processed|<p>The number of calls processed after the last service restart.</p>|Dependent item|asterisk.calls_processed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.calls_processed`</p></li></ul>|
+|Calls processed per second|<p>The number of calls processed per second.</p>|Dependent item|asterisk.calls_processed.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.calls_processed`</p></li><li>Change per second</li></ul>|
+|Total queues|<p>The number of configured queues.</p>|Dependent item|asterisk.total_queues<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue.total`</p></li></ul>|
+|SIP monitored online|<p>The number of monitored online SIP peers.</p>|Dependent item|asterisk.sip.monitored_online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.monitored_online`</p></li></ul>|
+|SIP monitored offline|<p>The number of monitored offline SIP peers.</p>|Dependent item|asterisk.sip.monitored_offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.monitored_offline`</p></li></ul>|
+|SIP unmonitored online|<p>The number of unmonitored online SIP peers.</p>|Dependent item|asterisk.sip.unmonitored_online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.unmonitored_online`</p></li></ul>|
+|SIP unmonitored offline|<p>The number of unmonitored offline SIP peers.</p>|Dependent item|asterisk.sip.unmonitored_offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.unmonitored_offline`</p></li></ul>|
+|SIP peers|<p>The total number of SIP peers.</p>|Dependent item|asterisk.sip.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.total`</p></li></ul>|
+|SIP trunks active channels|<p>The total number of SIP trunks active channels.</p>|Dependent item|asterisk.sip.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sip.active_channels`</p></li></ul>|
+|IAX online peers|<p>The number of online IAX peers.</p>|Dependent item|asterisk.iax.online<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.online`</p></li></ul>|
+|IAX offline peers|<p>The number of offline IAX peers.</p>|Dependent item|asterisk.iax.offline<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.offline`</p></li></ul>|
+|IAX unmonitored peers|<p>The number of unmonitored IAX peers.</p>|Dependent item|asterisk.iax.unmonitored<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.unmonitored`</p></li></ul>|
+|IAX peers|<p>The total number of IAX peers.</p>|Dependent item|asterisk.iax.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.total`</p></li></ul>|
+|IAX trunks active channels|<p>The total number of IAX trunks active channels.</p>|Dependent item|asterisk.iax.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.active_channels`</p></li></ul>|
+|PJSIP available endpoints|<p>The number of available PJSIP peers.</p>|Dependent item|asterisk.pjsip.available<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.available`</p></li></ul>|
+|PJSIP unavailable endpoints|<p>The number of unavailable PJSIP peers.</p>|Dependent item|asterisk.pjsip.unavailable<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.unavailable`</p></li></ul>|
+|PJSIP endpoints|<p>The total number of PJSIP peers.</p>|Dependent item|asterisk.pjsip.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.total`</p></li></ul>|
+|PJSIP trunks active channels|<p>The total number of PJSIP trunks active channels.</p>|Dependent item|asterisk.pjsip.active_channels<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pjsip.active_channels`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Asterisk: Service is down||`last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0`|Average|**Manual close**: Yes|
-|Asterisk: Service response time is too high||`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
-|Asterisk: Version has changed|<p>The Asterisk version has changed. Acknowledge to close the problem manually.</p>|`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0`|Info|**Manual close**: Yes|
-|Asterisk: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime)<10m`|Info|**Manual close**: Yes|
-|Asterisk: Failed to fetch AMI page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
-|Asterisk: has been reloaded|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m`|Info|**Manual close**: Yes|
-|Asterisk: Total number of active channels of SIP trunks is too high|<p>The SIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}`|Warning||
-|Asterisk: Total number of active channels of IAX trunks is too high|<p>The IAX trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}`|Warning||
-|Asterisk: Total number of active channels of PJSIP trunks is too high|<p>The PJSIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}`|Warning||
+|Service is down||`last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0`|Average|**Manual close**: Yes|
+|Service response time is too high||`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|Version has changed|<p>The Asterisk version has changed. Acknowledge to close the problem manually.</p>|`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0`|Info|**Manual close**: Yes|
+|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime)<10m`|Info|**Manual close**: Yes|
+|Failed to fetch AMI page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|has been reloaded|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m`|Info|**Manual close**: Yes|
+|Total number of active channels of SIP trunks is too high|<p>The SIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}`|Warning||
+|Total number of active channels of IAX trunks is too high|<p>The IAX trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}`|Warning||
+|Total number of active channels of PJSIP trunks is too high|<p>The PJSIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}`|Warning||
 
 ### LLD rule SIP peers discovery
 

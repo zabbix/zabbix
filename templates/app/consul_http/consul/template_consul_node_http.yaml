@@ -24,7 +24,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 9f90fe43daaa43369b000754e1630e41
-          name: 'Consul: ACL: resolves, rate'
+          name: 'ACL: resolves, rate'
           type: DEPENDENT
           key: consul.acl.resolves.rate
           delay: '0'
@@ -47,7 +47,7 @@ zabbix_export:
             - tag: component
               value: acl
         - uuid: 1c969d5d7546444e91e883661d63890b
-          name: 'Consul: Catalog: deregister, rate'
+          name: 'Catalog: deregister, rate'
           type: DEPENDENT
           key: consul.catalog.deregister.rate
           delay: '0'
@@ -70,7 +70,7 @@ zabbix_export:
             - tag: component
               value: catalog
         - uuid: 8f01480896f8426688aee08e2ee0fc20
-          name: 'Consul: Catalog: register, rate'
+          name: 'Catalog: register, rate'
           type: DEPENDENT
           key: consul.catalog.register.rate
           delay: '0'
@@ -93,7 +93,7 @@ zabbix_export:
             - tag: component
               value: catalog
         - uuid: dabcb6819c9444a6a287a6458056ef31
-          name: 'Consul: Number of checks'
+          name: 'Number of checks'
           type: DEPENDENT
           key: consul.checks_number
           delay: '0'
@@ -112,7 +112,7 @@ zabbix_export:
             - tag: component
               value: consul
         - uuid: 8e48706f9bda4689bec45f4a80fcc3cb
-          name: 'Consul: Number of check monitors'
+          name: 'Number of check monitors'
           type: DEPENDENT
           key: consul.check_monitors_number
           delay: '0'
@@ -131,7 +131,7 @@ zabbix_export:
             - tag: component
               value: consul
         - uuid: 2706adc5e5a64c4480269938e2b90fc1
-          name: 'Consul: Client RPC, per second'
+          name: 'Client RPC, per second'
           type: DEPENDENT
           key: consul.client_rpc
           delay: '0'
@@ -158,7 +158,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 3fd30bfd7c324c53a346974c9f38e9db
-          name: 'Consul: Client RPC failed ,per second'
+          name: 'Client RPC failed ,per second'
           type: DEPENDENT
           key: consul.client_rpc_failed
           delay: '0'
@@ -182,7 +182,7 @@ zabbix_export:
             - tag: component
               value: rpc
         - uuid: 12b9bbac571b431ea06a13a7154ef673
-          name: 'Consul: Process CPU seconds, total'
+          name: 'Process CPU seconds, total'
           type: DEPENDENT
           key: consul.cpu_seconds_total.rate
           delay: '0'
@@ -206,7 +206,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 7513b847ac754a25972adb3547a871ca
-          name: 'Consul: GC pause, p50'
+          name: 'GC pause, p50'
           type: DEPENDENT
           key: consul.gc_pause.p50
           delay: '0'
@@ -233,7 +233,7 @@ zabbix_export:
             - tag: component
               value: gs
         - uuid: 3ec74713a835498197e59df962e27bab
-          name: 'Consul: GC pause, p90'
+          name: 'GC pause, p90'
           type: DEPENDENT
           key: consul.gc_pause.p90
           delay: '0'
@@ -260,7 +260,7 @@ zabbix_export:
             - tag: component
               value: gc
         - uuid: 2b3cbe778f1c4d858e43320b8c25960d
-          name: 'Consul: Get local services'
+          name: 'Get local services'
           type: SCRIPT
           key: consul.get_local_services
           history: '0'
@@ -372,7 +372,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f2fb4c76b4974319846d4773cfb64b0c
-          name: 'Consul: Get local services check'
+          name: 'Get local services check'
           type: DEPENDENT
           key: consul.get_local_services.check
           delay: '0'
@@ -396,14 +396,14 @@ zabbix_export:
           triggers:
             - uuid: 5cf09b213c044033af1d8e1d8821bc38
               expression: 'length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0'
-              name: 'Consul: Failed to get local services'
+              name: 'Failed to get local services'
               priority: WARNING
               description: 'Failed to get local services. Check debug log for more information.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: c0e199969c19444fb68fd8497fcab047
-          name: 'Consul: Get instance metrics'
+          name: 'Get instance metrics'
           type: HTTP_AGENT
           key: consul.get_metrics
           history: '0'
@@ -425,7 +425,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 7e2689de8d78499fb52d718989b7ec8b
-          name: 'Consul: Get node info'
+          name: 'Get node info'
           type: HTTP_AGENT
           key: consul.get_node_info
           history: '0'
@@ -445,7 +445,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2bcd79ab2c0a4ef88c0d2386d9bec1ff
-          name: 'Consul: Goroutine count'
+          name: 'Goroutine count'
           type: DEPENDENT
           key: consul.goroutines
           delay: '0'
@@ -463,7 +463,7 @@ zabbix_export:
             - tag: component
               value: goroutines
         - uuid: 6613be65c0794e76a210263810a4692d
-          name: 'Consul: KV store: apply, p50'
+          name: 'KV store: apply, p50'
           type: DEPENDENT
           key: consul.kvs.apply.p50
           delay: '0'
@@ -487,7 +487,7 @@ zabbix_export:
             - tag: component
               value: kvs
         - uuid: 2dc05550018c4d67bab58bd8f86bc365
-          name: 'Consul: KV store: apply, p90'
+          name: 'KV store: apply, p90'
           type: DEPENDENT
           key: consul.kvs.apply.p90
           delay: '0'
@@ -511,7 +511,7 @@ zabbix_export:
             - tag: component
               value: kvs
         - uuid: 978bf96102d0411f8c18e92652a003c4
-          name: 'Consul: KV store: apply, rate'
+          name: 'KV store: apply, rate'
           type: DEPENDENT
           key: consul.kvs.apply.rate
           delay: '0'
@@ -534,7 +534,7 @@ zabbix_export:
             - tag: component
               value: kvs
         - uuid: 1b21a53ce7144350af8b50e57c3acf6b
-          name: 'Consul: Memberlist: degraded'
+          name: 'Memberlist: degraded'
           type: DEPENDENT
           key: consul.memberlist.degraded
           delay: '0'
@@ -556,7 +556,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 0a3b25abf7de4212bda5c92c13341593
-          name: 'Consul: Memberlist: gossip, p90'
+          name: 'Memberlist: gossip, p90'
           type: DEPENDENT
           key: consul.memberlist.dispatch_log.p90
           delay: '0'
@@ -579,7 +579,7 @@ zabbix_export:
             - tag: component
               value: gossip
         - uuid: 592fb528d5c14491892c496f7ce9a60b
-          name: 'Consul: Memberlist: gossip, p50'
+          name: 'Memberlist: gossip, p50'
           type: DEPENDENT
           key: consul.memberlist.gossip.p50
           delay: '0'
@@ -603,7 +603,7 @@ zabbix_export:
             - tag: component
               value: gossip
         - uuid: 32259a799f6949e4be4f7d8722a2dbbe
-          name: 'Consul: Memberlist: health score'
+          name: 'Memberlist: health score'
           type: DEPENDENT
           key: consul.memberlist.health_score
           delay: '0'
@@ -626,8 +626,8 @@ zabbix_export:
           triggers:
             - uuid: f964a907c55148bf80991352c7f2ae83
               expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
-              name: 'Consul: Node''s health score is critical'
-              event_name: 'Consul: Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+              name: 'Node''s health score is critical'
+              event_name: 'Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
               priority: AVERAGE
               description: |
                 This metric ranges from 0 to 8, where 0 indicates "totally healthy".
@@ -638,21 +638,21 @@ zabbix_export:
                   value: availability
             - uuid: 1fedc58f33ed4b9797fb37acfceba192
               expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}'
-              name: 'Consul: Node''s health score is warning'
-              event_name: 'Consul: Node''s health score is too high (over {$CONSUL.NODE.HEALTH_SCORE.MAX.WARN} for 3m)'
+              name: 'Node''s health score is warning'
+              event_name: 'Node''s health score is too high (over {$CONSUL.NODE.HEALTH_SCORE.MAX.WARN} for 3m)'
               priority: WARNING
               description: |
                 This metric ranges from 0 to 8, where 0 indicates "totally healthy".
                 This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.
                 For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf
               dependencies:
-                - name: 'Consul: Node''s health score is critical'
+                - name: 'Node''s health score is critical'
                   expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 1ebba76d809b415488fb0591afeaef6f
-          name: 'Consul: Memberlist: msg alive'
+          name: 'Memberlist: msg alive'
           type: DEPENDENT
           key: consul.memberlist.msg.alive
           delay: '0'
@@ -671,7 +671,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 9768a2ce01de4bfe92a17935791b4da4
-          name: 'Consul: Memberlist: msg dead'
+          name: 'Memberlist: msg dead'
           type: DEPENDENT
           key: consul.memberlist.msg.dead
           delay: '0'
@@ -690,7 +690,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 43ea04dd91ba4c208e9ad09bbc0016af
-          name: 'Consul: Memberlist: msg suspect'
+          name: 'Memberlist: msg suspect'
           type: DEPENDENT
           key: consul.memberlist.msg.suspect
           delay: '0'
@@ -709,7 +709,7 @@ zabbix_export:
             - tag: component
               value: health
         - uuid: 8b3ee806fcf34a46aa61cbfee460d9f7
-          name: 'Consul: Memberlist: probe node, p50'
+          name: 'Memberlist: probe node, p50'
           type: DEPENDENT
           key: consul.memberlist.probe_node.p50
           delay: '0'
@@ -733,7 +733,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: 9a178ba5f7fa4d9a8ecfddfe84257ab6
-          name: 'Consul: Memberlist: probe node, p90'
+          name: 'Memberlist: probe node, p90'
           type: DEPENDENT
           key: consul.memberlist.probe_node.p90
           delay: '0'
@@ -757,7 +757,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: ef688e2ad7494a08a535c019fe19c0a9
-          name: 'Consul: Memberlist: push pull node, p50'
+          name: 'Memberlist: push pull node, p50'
           type: DEPENDENT
           key: consul.memberlist.push_pull_node.p50
           delay: '0'
@@ -780,7 +780,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: ae085470652242ba8a2077bebee7a2c7
-          name: 'Consul: Memberlist: push pull node, p90'
+          name: 'Memberlist: push pull node, p90'
           type: DEPENDENT
           key: consul.memberlist.push_pull_node.p90
           delay: '0'
@@ -804,7 +804,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: a5d4e2e589564cc9898537c0a8c6a21a
-          name: 'Consul: TCP connections, accepted per second'
+          name: 'TCP connections, accepted per second'
           type: DEPENDENT
           key: consul.memberlist.tcp_accept
           delay: '0'
@@ -828,7 +828,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: df0a553d811444d1ab767563a1d513a3
-          name: 'Consul: TCP connections, per second'
+          name: 'TCP connections, per second'
           type: DEPENDENT
           key: consul.memberlist.tcp_connect
           delay: '0'
@@ -852,7 +852,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: ba12a6464199443d8d73164a8dd87f4f
-          name: 'Consul: TCP send bytes, per second'
+          name: 'TCP send bytes, per second'
           type: DEPENDENT
           key: consul.memberlist.tcp_sent
           delay: '0'
@@ -876,7 +876,7 @@ zabbix_export:
             - tag: component
               value: tcp
         - uuid: dde5f5c5c7d44f1dbbcddb4a541f41cc
-          name: 'Consul: UDP received bytes, per second'
+          name: 'UDP received bytes, per second'
           type: DEPENDENT
           key: consul.memberlist.udp_received
           delay: '0'
@@ -900,7 +900,7 @@ zabbix_export:
             - tag: component
               value: udp
         - uuid: fa79687f332f4136881577838476c329
-          name: 'Consul: UDP sent bytes, per second'
+          name: 'UDP sent bytes, per second'
           type: DEPENDENT
           key: consul.memberlist.udp_sent
           delay: '0'
@@ -924,7 +924,7 @@ zabbix_export:
             - tag: component
               value: udp
         - uuid: 59b28123e8154318aca6a283a1b18391
-          name: 'Consul: Open file descriptors, max'
+          name: 'Open file descriptors, max'
           type: DEPENDENT
           key: consul.process_max_fds
           delay: '0'
@@ -943,7 +943,7 @@ zabbix_export:
             - tag: component
               value: fds
         - uuid: 38ad7b5d43004865bd823f1dae61395a
-          name: 'Consul: Open file descriptors'
+          name: 'Open file descriptors'
           type: DEPENDENT
           key: consul.process_open_fds
           delay: '0'
@@ -962,7 +962,7 @@ zabbix_export:
             - tag: component
               value: fds
         - uuid: 8cb242ddeb7f4a0685c706a24f1f85c5
-          name: 'Consul: RSS memory usage'
+          name: 'RSS memory usage'
           type: DEPENDENT
           key: consul.resident_memory_bytes
           delay: '0'
@@ -982,7 +982,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: ee52c7cd8a4d452d85564a47c44198a6
-          name: 'Consul: Role'
+          name: Role
           type: DEPENDENT
           key: consul.role
           delay: '0'
@@ -1006,7 +1006,7 @@ zabbix_export:
             - tag: component
               value: consul
         - uuid: e311c5bdba3e45b68887bc924c7dc206
-          name: 'Consul: Serf member: failed, rate'
+          name: 'Serf member: failed, rate'
           type: DEPENDENT
           key: consul.serf.member.failed.rate
           delay: '0'
@@ -1032,7 +1032,7 @@ zabbix_export:
             - tag: component
               value: serf
         - uuid: 11ba84beb3494504bd514500ef663cff
-          name: 'Consul: Serf member: flap, rate'
+          name: 'Serf member: flap, rate'
           type: DEPENDENT
           key: consul.serf.member.flap.rate
           delay: '0'
@@ -1058,7 +1058,7 @@ zabbix_export:
             - tag: component
               value: serf
         - uuid: f4c224ffb17d49029fef6647dde22c90
-          name: 'Consul: Serf member: join, rate'
+          name: 'Serf member: join, rate'
           type: DEPENDENT
           key: consul.serf.member.join.rate
           delay: '0'
@@ -1083,7 +1083,7 @@ zabbix_export:
             - tag: component
               value: serf
         - uuid: 3264823eb6774c2092b4ffe4638b61a5
-          name: 'Consul: Serf member: left, rate'
+          name: 'Serf member: left, rate'
           type: DEPENDENT
           key: consul.serf.member.left.rate
           delay: '0'
@@ -1106,7 +1106,7 @@ zabbix_export:
             - tag: component
               value: serf
         - uuid: 53bb4e76cd1840e8ae9a129d592e202e
-          name: 'Consul: Serf member: update, rate'
+          name: 'Serf member: update, rate'
           type: DEPENDENT
           key: consul.serf.member.update.rate
           delay: '0'
@@ -1129,7 +1129,7 @@ zabbix_export:
             - tag: component
               value: serf
         - uuid: 614e63c6eb254b45a5fb3dbb985c5c3c
-          name: 'Consul: Number of services'
+          name: 'Number of services'
           type: DEPENDENT
           key: consul.services_number
           delay: '0'
@@ -1148,7 +1148,7 @@ zabbix_export:
             - tag: component
               value: consul
         - uuid: d9988aeda27f4fb09ececcde13efc71a
-          name: 'Consul: Snapshot: append line, p50'
+          name: 'Snapshot: append line, p50'
           type: DEPENDENT
           key: consul.snapshot.append_line.p50
           delay: '0'
@@ -1172,7 +1172,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: 0b701ec082e64eb19e60650c13cd44fd
-          name: 'Consul: Snapshot: append line, p90'
+          name: 'Snapshot: append line, p90'
           type: DEPENDENT
           key: consul.snapshot.append_line.p90
           delay: '0'
@@ -1196,7 +1196,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: d56de8b09978421c9703fe327d03a32b
-          name: 'Consul: Snapshot: append line, rate'
+          name: 'Snapshot: append line, rate'
           type: DEPENDENT
           key: consul.snapshot.append_line.rate
           delay: '0'
@@ -1219,7 +1219,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: 12e1a4538f124c4281106b9033b1592d
-          name: 'Consul: Snapshot: compact, p50'
+          name: 'Snapshot: compact, p50'
           type: DEPENDENT
           key: consul.snapshot.compact.p50
           delay: '0'
@@ -1245,7 +1245,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: c55de444dd30484eb116abfd6f28a9a0
-          name: 'Consul: Snapshot: compact, p90'
+          name: 'Snapshot: compact, p90'
           type: DEPENDENT
           key: consul.snapshot.compact.p90
           delay: '0'
@@ -1271,7 +1271,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: 586be345685b4f0dbbb31f2062bebc01
-          name: 'Consul: Snapshot: compact, rate'
+          name: 'Snapshot: compact, rate'
           type: DEPENDENT
           key: consul.snapshot.compact.rate
           delay: '0'
@@ -1294,7 +1294,7 @@ zabbix_export:
             - tag: component
               value: snapshot
         - uuid: 777e8cdd1cfc4f4bba613ef08320f1bb
-          name: 'Consul: Version'
+          name: Version
           type: DEPENDENT
           key: consul.version
           delay: '0'
@@ -1317,8 +1317,8 @@ zabbix_export:
           triggers:
             - uuid: fa78d269c01548a083085a3a98e5a59b
               expression: 'last(/HashiCorp Consul Node by HTTP/consul.version,#1)<>last(/HashiCorp Consul Node by HTTP/consul.version,#2) and length(last(/HashiCorp Consul Node by HTTP/consul.version))>0'
-              name: 'Consul: Version has been changed'
-              event_name: 'Consul: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has been changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Consul version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1326,7 +1326,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 62c0bb503c084f9da10f1be3c716608b
-          name: 'Consul: Virtual memory size'
+          name: 'Virtual memory size'
           type: DEPENDENT
           key: consul.virtual_memory_bytes
           delay: '0'
@@ -1354,7 +1354,7 @@ zabbix_export:
           description: 'Discovery HTTP API methods specific metrics.'
           item_prototypes:
             - uuid: 4bdb2007bada4840aa453630e701059c
-              name: 'Consul: HTTP request: ["{#HTTP_METHOD}"], p50'
+              name: 'HTTP request: ["{#HTTP_METHOD}"], p50'
               type: DEPENDENT
               key: 'consul.http.api.p50["{#HTTP_METHOD}"]'
               delay: '0'
@@ -1377,7 +1377,7 @@ zabbix_export:
                 - tag: verb
                   value: '{#HTTP_METHOD}'
             - uuid: 537b455889d54deab7ada216a89f1cb2
-              name: 'Consul: HTTP request: ["{#HTTP_METHOD}"], p90'
+              name: 'HTTP request: ["{#HTTP_METHOD}"], p90'
               type: DEPENDENT
               key: 'consul.http.api.p90["{#HTTP_METHOD}"]'
               delay: '0'
@@ -1400,7 +1400,7 @@ zabbix_export:
                 - tag: verb
                   value: '{#HTTP_METHOD}'
             - uuid: 53cdb47018df434381f7fc3e401a4dee
-              name: 'Consul: HTTP request: ["{#HTTP_METHOD}"], rate'
+              name: 'HTTP request: ["{#HTTP_METHOD}"], rate'
               type: DEPENDENT
               key: 'consul.http.api.rate["{#HTTP_METHOD}"]'
               delay: '0'
@@ -1457,24 +1457,24 @@ zabbix_export:
           delay: '0'
           filter:
             conditions:
-              - macro: '{#SERVICE_NAMESPACE}'
-                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}'
-                formulaid: A
-              - macro: '{#SERVICE_NAMESPACE}'
-                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SERVICE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}'
-                formulaid: C
+                formulaid: A
               - macro: '{#SERVICE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#SERVICE_NAMESPACE}'
+                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}'
+                formulaid: C
+              - macro: '{#SERVICE_NAMESPACE}'
+                value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
           description: 'Discover metrics for services that are registered with the local agent.'
           item_prototypes:
             - uuid: 44b0f82769d244d6a20b9ce0b5cc5cb6
-              name: 'Consul: ["{#SERVICE_NAME}"]: Aggregated status'
+              name: '["{#SERVICE_NAME}"]: Aggregated status'
               type: DEPENDENT
               key: 'consul.service.aggregated_state["{#SERVICE_ID}"]'
               delay: '0'
@@ -1508,8 +1508,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 661551e1e9e94b25b7bd6ea876640b6d
                   expression: 'last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 2'
-                  name: 'Consul: Aggregated status is ''critical'''
-                  event_name: 'Consul: Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+                  name: 'Aggregated status is ''critical'''
+                  event_name: 'Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
                   priority: AVERAGE
                   description: 'Aggregated state of service on the local agent is ''critical''.'
                   tags:
@@ -1517,14 +1517,14 @@ zabbix_export:
                       value: availability
                 - uuid: 724f6a5e16f64a779a71ad9a9378fb60
                   expression: 'last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 1'
-                  name: 'Consul: Aggregated status is ''warning'''
+                  name: 'Aggregated status is ''warning'''
                   priority: WARNING
                   description: 'Aggregated state of service on the local agent is ''warning''.'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 20a0ec9e059548a192c9c37bd7aeaaed
-              name: 'Consul: ["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Output'
+              name: '["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Output'
               type: DEPENDENT
               key: 'consul.service.check.output["{#SERVICE_ID}/{#SERVICE_CHECK_ID}"]'
               delay: '0'
@@ -1554,7 +1554,7 @@ zabbix_export:
                 - tag: service
                   value: '{#SERVICE_NAME}'
             - uuid: 3b67eb4df3dc4d9b9f4ab4c35a592367
-              name: 'Consul: ["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Status'
+              name: '["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Status'
               type: DEPENDENT
               key: 'consul.service.check.state["{#SERVICE_ID}/{#SERVICE_CHECK_ID}"]'
               delay: '0'
@@ -1664,7 +1664,7 @@ zabbix_export:
           description: 'Discover raft metrics for leader nodes.'
           item_prototypes:
             - uuid: 440e2a259cd64b918ebfb607961da2c8
-              name: 'Consul: Autopilot healthy'
+              name: 'Autopilot healthy'
               type: DEPENDENT
               key: 'consul.autopilot.healthy[{#SINGLETON}]'
               delay: '0'
@@ -1686,7 +1686,7 @@ zabbix_export:
                 - tag: component
                   value: health
             - uuid: 2e4fd6c5aac84054aef867fc9d8cb3c5
-              name: 'Consul: Raft state: commit time, p50'
+              name: 'Raft state: commit time, p50'
               type: DEPENDENT
               key: 'consul.raft.commit_time.p50[{#SINGLETON}]'
               delay: '0'
@@ -1710,7 +1710,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 9428c07a23364967aef060cf3303b996
-              name: 'Consul: Raft state: commit time, p90'
+              name: 'Raft state: commit time, p90'
               type: DEPENDENT
               key: 'consul.raft.commit_time.p90[{#SINGLETON}]'
               delay: '0'
@@ -1734,7 +1734,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: d54c97e8c4204f8c9f79911440f1bd13
-              name: 'Consul: Raft state: commit, rate'
+              name: 'Raft state: commit, rate'
               type: DEPENDENT
               key: 'consul.raft.commit_time.rate[{#SINGLETON}]'
               delay: '0'
@@ -1758,7 +1758,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 3c56ebe6e022430e861488873ac6f716
-              name: 'Consul: Raft state: dispatch log, p50'
+              name: 'Raft state: dispatch log, p50'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.p50[{#SINGLETON}]'
               delay: '0'
@@ -1782,7 +1782,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: fd1e6c33254b467f8355491dc96889eb
-              name: 'Consul: Raft state: dispatch log, p90'
+              name: 'Raft state: dispatch log, p90'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.p90[{#SINGLETON}]'
               delay: '0'
@@ -1806,7 +1806,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: bc73aeda20a543ac957d1531f25fd5a9
-              name: 'Consul: Raft state: dispatch log, rate'
+              name: 'Raft state: dispatch log, rate'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.rate[{#SINGLETON}]'
               delay: '0'
@@ -1829,7 +1829,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 526a787732224555adde561ec86844fb
-              name: 'Consul: Raft state: leader last contact, p50'
+              name: 'Raft state: leader last contact, p50'
               type: DEPENDENT
               key: 'consul.raft.leader_last_contact.p50[{#SINGLETON}]'
               delay: '0'
@@ -1853,7 +1853,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 1ae3d9e4647b4972b1572946a2794715
-              name: 'Consul: Raft state: leader last contact, p90'
+              name: 'Raft state: leader last contact, p90'
               type: DEPENDENT
               key: 'consul.raft.leader_last_contact.p90[{#SINGLETON}]'
               delay: '0'
@@ -1895,7 +1895,7 @@ zabbix_export:
           description: 'Discover raft metrics for server nodes.'
           item_prototypes:
             - uuid: 428f1d7924634383aabcd5b37f561a41
-              name: 'Consul: Raft: apply, rate'
+              name: 'Raft: apply, rate'
               type: DEPENDENT
               key: 'consul.raft.apply.rate[{#SINGLETON}]'
               delay: '0'
@@ -1921,7 +1921,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 25dd098b98124fa8a9518963c8b4e5ce
-              name: 'Consul: Raft state'
+              name: 'Raft state'
               type: DEPENDENT
               key: 'consul.raft.state[{#SINGLETON}]'
               delay: '0'
@@ -1942,7 +1942,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 7b030c4eac68464e8c454577ab0f0f53
-              name: 'Consul: Raft state: candidate'
+              name: 'Raft state: candidate'
               type: DEPENDENT
               key: 'consul.raft.state_candidate[{#SINGLETON}]'
               delay: '0'
@@ -1961,7 +1961,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: e89157e341d8409c96e31a9d541a7fe8
-              name: 'Consul: Raft state: leader'
+              name: 'Raft state: leader'
               type: DEPENDENT
               key: 'consul.raft.state_leader[{#SINGLETON}]'
               delay: '0'
@@ -2052,8 +2052,8 @@ zabbix_export:
   triggers:
     - uuid: 9e1a0b7f49844d1db525d00d5f1060f0
       expression: 'min(/HashiCorp Consul Node by HTTP/consul.process_open_fds,5m)/last(/HashiCorp Consul Node by HTTP/consul.process_max_fds)*100>{$CONSUL.OPEN.FDS.MAX.WARN}'
-      name: 'Consul: Current number of open files is too high'
-      event_name: 'Consul: Current number of open files is too high (over {$CONSUL.OPEN.FDS.MAX.WARN}% for 5m)'
+      name: 'Current number of open files is too high'
+      event_name: 'Current number of open files is too high (over {$CONSUL.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
       description: '"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue."'
       tags:

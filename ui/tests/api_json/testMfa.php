@@ -1,30 +1,25 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 require_once dirname(__FILE__) . '/../include/CAPITest.php';
 
 /**
- * @backup mfa, config, usrgrp, users
+ * @backup mfa, config, usrgrp, users, mfa_totp_secret
  *
- * @onBefore  prepareTestData
+ * @onBefore prepareTestData
  *
  * @onAfter cleanTestData
  */
@@ -83,16 +78,17 @@ class testMfa extends CAPITest {
 			'passwd' => 'Z@bb1x1234',
 			'usrgrps' => [
 				['usrgrpid' => 7]
-			],
-			'mfa_totp_secrets' => [
-				[
-					'mfaid' => self::$data['mfaids']['TOTP test case 1'],
-					'totp_secret' => '123asdf123asdf13asdf123asdf123as'
-				]
 			]
 		]);
 		$this->assertArrayHasKey('userids', $userids);
 		self::$data['userids'] = array_combine(['User with MFA TOTP method'], $userids['userids']);
+
+		DB::insert('mfa_totp_secret', [[
+			'mfaid' => self::$data['mfaids']['TOTP test case 1'],
+			'userid' => self::$data['userids']['User with MFA TOTP method'],
+			'totp_secret' => '123asdf123asdf13asdf123asdf123as',
+			'status' => TOTP_SECRET_CONFIRMED
+		]]);
 	}
 
 	public function resolveids($mfas) {
