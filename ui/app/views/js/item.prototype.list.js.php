@@ -195,7 +195,7 @@
 				.then((response) => this.elementSuccess({detail: response}))
 				.catch(() => {
 					clearMessages();
-					addMessage(makeMessageBox('bad', [t('Unexpected server error.')]));
+					addMessage(makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]));
 				});
 		}
 

@@ -186,7 +186,7 @@ window.item_edit_form = new class {
 		node.classList.add(ZBX_STYLE_BTN_GREY);
 		node.setAttribute('name', 'master-item-prototype');
 		node.disabled = this.form_readonly;
-		node.textContent = t('Select prototype');
+		node.textContent = <?= json_encode(_('Select prototype')) ?>;
 		master_item.append(node);
 	}
 
@@ -404,11 +404,11 @@ window.item_edit_form = new class {
 
 	#showErrorDialog(body, trigger_element) {
 		overlayDialogue({
-			title: t('Error'),
+			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup position-middle',
 			content: jQuery('<span>').html(body),
 			buttons: [{
-				title: t('Ok'),
+				title: <?= json_encode(_('Ok')) ?>,
 				class: 'btn-alt',
 				focused: true,
 				action: function() {}
@@ -559,7 +559,7 @@ window.item_edit_form = new class {
 	}
 
 	#isConfirmed() {
-		return window.confirm(t('Any changes made in the current form will be lost.'));
+		return window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	#updateActionButtons() {
