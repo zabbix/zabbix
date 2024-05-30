@@ -423,7 +423,7 @@ class testDashboardCopyWidgets extends CWebTest {
 					'name' => 'Discovery status widget',
 					'copy to' => 'another template'
 				]
-			]
+			],
 			[
 				[
 					'name' => 'Gauge widget',
