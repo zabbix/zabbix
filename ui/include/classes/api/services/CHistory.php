@@ -27,7 +27,7 @@ class CHistory extends CApiService {
 
 	protected $tableName;
 	protected $tableAlias = 'h';
-	protected $sortColumns = ['itemid', 'clock'];
+	protected $sortColumns = ['itemid', 'clock', 'ns'];
 
 	public function __construct() {
 		// considering the quirky nature of the history API,

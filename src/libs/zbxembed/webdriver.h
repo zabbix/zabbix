@@ -10,7 +10,6 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #ifndef ZABBIX_WEBDRIVER_H
@@ -99,6 +98,10 @@ int	webdriver_accept_alert(zbx_webdriver_t *wd, char **error);
 int	webdriver_dismiss_alert(zbx_webdriver_t *wd, char **error);
 
 int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char **error);
+int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error);
+int	webdriver_get_raw_perf_data(zbx_webdriver_t *wd, const char *type, struct zbx_json_parse *jp, char **error);
+int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, struct zbx_json_parse *jp,
+		char **error);
 
 #endif
 

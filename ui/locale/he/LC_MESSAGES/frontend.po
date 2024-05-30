@@ -7541,6 +7541,10 @@ msgstr "פרמטר הקלט ריק."
 msgid "Empty map ID."
 msgstr "מזהה המפה ריק."
 
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
+
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
 #: app/views/configuration.discovery.list.php:121
@@ -10172,6 +10176,10 @@ msgstr "נמחקה תמונה"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "סוג תווית תמונה"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format

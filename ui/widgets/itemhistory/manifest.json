@@ -10,10 +10,15 @@
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/item_history",
 	"widget": {
 		"size": {
-			"width": 6,
-			"height": 3
+			"width": 18,
+			"height": 6
 		},
 		"js_class": "CWidgetItemHistory",
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		},
 		"out": [
 			{
 				"type": "_itemid"
@@ -30,6 +35,10 @@
 		"widget.itemhistory.column.edit": {
 			"class": "ColumnEdit",
 			"view": "column.edit",
+			"layout": "layout.json"
+		},
+		"widget.itemhistory.value.check": {
+			"class": "ValueCheck",
 			"layout": "layout.json"
 		},
 		"widget.itemhistory.binary_value.get": {

@@ -4227,10 +4227,6 @@ static int	DBpatch_6050301(void)
 	return ret;
 }
 
-#undef ZBX_WIDGET_FIELD_TYPE_ITEM
-#undef ZBX_WIDGET_FIELD_TYPE_STR
-#undef ZBX_WIDGET_FIELD_TYPE_INT32
-
 static int	DBpatch_6050302(void)
 {
 	zbx_db_result_t		result;
@@ -4308,6 +4304,41 @@ static int	DBpatch_6050304(void)
 
 static int	DBpatch_6050305(void)
 {
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name",
+			"value_str", NULL);
+
+	result = zbx_db_select("select widgetid from widget where type='itemhistory'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, ZBX_WIDGET_FIELD_TYPE_STR,
+				"time_period.from", "now-1y");
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, ZBX_WIDGET_FIELD_TYPE_STR,
+				"time_period.to", "now");
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050306(void)
+{
 	int		i;
 	const char	*values[] = {
 			"web.avail_report.filter.active", "web.availabilityreport.filter.active",
@@ -4333,6 +4364,10 @@ static int	DBpatch_6050305(void)
 
 	return SUCCEED;
 }
+
+#undef ZBX_WIDGET_FIELD_TYPE_ITEM
+#undef ZBX_WIDGET_FIELD_TYPE_STR
+#undef ZBX_WIDGET_FIELD_TYPE_INT32
 
 #endif
 
@@ -4644,5 +4679,6 @@ DBPATCH_ADD(6050302, 0, 1)
 DBPATCH_ADD(6050303, 0, 1)
 DBPATCH_ADD(6050304, 0, 1)
 DBPATCH_ADD(6050305, 0, 1)
+DBPATCH_ADD(6050306, 0, 1)
 
 DBPATCH_END()
