@@ -18,6 +18,7 @@
 #include "zbxembed.h"
 #include "duktape.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 #define ZBX_ES_LOG_MSG_LIMIT	8000
@@ -58,6 +59,9 @@ struct zbx_es_env
 
 	int		browser_objects;
 	int		constructor_chain;
+
+	zbx_hashset_t	ptrmap;
+	uintptr_t	ptrmap_nextid;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
@@ -66,5 +70,15 @@ int	es_duktape_string_decode(const char *duk_str, char **out_str);
 
 duk_ret_t	es_super(duk_context *ctx, const char *base, int args);
 int	es_is_chained_constructor_call(duk_context *ctx);
+typedef enum
+{
+	ES_OBJ_HTTPREQUEST = 1,
+
+}
+zbx_es_obj_type_t;
+
+void	*es_put_ptr(zbx_es_env_t *env, void *ptr, zbx_es_obj_type_t type);
+void	*es_get_ptr(zbx_es_env_t *env, void *ref, zbx_es_obj_type_t type);
+void	es_remove_ptr(zbx_es_env_t *env, void *ref);
 
 #endif /* ZABBIX_EMBED_H */

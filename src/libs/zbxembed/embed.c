@@ -31,6 +31,16 @@
 #define ZBX_ES_SCRIPT_HEADER	"function(value){"
 #define ZBX_ES_SCRIPT_FOOTER	"\n}"
 
+typedef struct
+{
+	void			*ref;	/* memory block reference, kept as pointer property in duktape */
+					/* because it's closest to uint64 value                        */
+
+	void			*ptr;
+	zbx_es_obj_type_t	type;
+}
+zbx_es_ptr_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: fatal error handler                                               *
@@ -344,6 +354,10 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 		goto out;
 
 	es->env->timeout = ZBX_ES_TIMEOUT;
+
+	zbx_hashset_create(&es->env->ptrmap, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	es->env->ptrmap_nextid = 1;
+
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
@@ -382,6 +396,8 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 		*error = zbx_strdup(*error, es->env->error);
 		goto out;
 	}
+
+	zbx_hashset_destroy(&es->env->ptrmap);
 
 	duk_destroy_heap(es->env->ctx);
 	zbx_es_debug_disable(es);
@@ -860,3 +876,56 @@ int	es_is_chained_constructor_call(duk_context *ctx)
 	return constructor_chain || duk_is_constructor_call(env->ctx);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: store pointer in cache                                            *
+ *                                                                            *
+ * Return value: pointer reference, used to locate pointer in cache           *
+ *                                                                            *
+ ******************************************************************************/
+void	*es_put_ptr(zbx_es_env_t *env, void *ptr, zbx_es_obj_type_t type)
+{
+	zbx_es_ptr_t	ptr_local = {
+			.ref = (void *)env->ptrmap_nextid++,
+			.type = type,
+			.ptr = ptr
+	};
+
+	zbx_hashset_insert(&env->ptrmap, &ptr_local, sizeof(ptr_local));
+
+	return ptr_local.ref;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get pointer from cache                                            *
+ *                                                                            *
+ * Parameters: env  - [IN]                                                    *
+ *             ref  - [IN] pointer reference, returned by es_put_ptr()        *
+ *             type - [IN] pointer type                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	*es_get_ptr(zbx_es_env_t *env, void *ref, zbx_es_obj_type_t type)
+{
+	zbx_es_ptr_t	ptr_local = {.ref = ref}, *ptr;
+
+	if (NULL != (ptr = zbx_hashset_search(&env->ptrmap, &ptr_local)) && ptr->type == type)
+		return ptr->ptr;
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove pointer from cache                                         *
+ *                                                                            *
+ * Parameters: env - [IN]                                                     *
+ *             ref - [IN] pointer reference, returned by es_put_ptr()         *
+ *                                                                            *
+ ******************************************************************************/
+void	es_remove_ptr(zbx_es_env_t *env, void *ref)
+{
+	zbx_es_ptr_t	ptr_local = {.ref = ref};
+
+	zbx_hashset_remove(&env->ptrmap, &ptr_local);
+}
