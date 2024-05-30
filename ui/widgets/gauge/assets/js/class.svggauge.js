@@ -703,8 +703,8 @@ class CSVGGauge {
 		const max_font_size = Math.max(font_sizes.value.font_size, font_sizes.units.font_size);
 		const max_line_height = Math.max(font_sizes.value.line_height, font_sizes.units.line_height);
 
-		let arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
-			&& this.#config.angle === 270)
+		let arcs_height = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
+				&& this.#config.angle === 270
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
@@ -726,12 +726,7 @@ class CSVGGauge {
 
 			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BEFORE
 					|| this.#config.units.position === CSVGGauge.UNITS_POSITION_AFTER) {
-				if (units_text !== null) {
-					this.#elements.value_and_units.space.container.style.display = '';
-				}
-				else {
-					this.#elements.value_and_units.space.container.style.display = 'none';
-				}
+				this.#elements.value_and_units.space.container.style.display = units_text !== null ? '' : 'none';
 			}
 
 			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_ABOVE
@@ -745,24 +740,21 @@ class CSVGGauge {
 					? [font_sizes.value.font_size, font_sizes.units.font_size]
 					: [font_sizes.units.font_size, font_sizes.value.font_size];
 
+				let container_y = 0;
+
 				if (is_aligned_to_bottom) {
 					if (units_text !== null) {
-						this.#elements.value_and_units.container.setAttribute('y', `${arcs_height
-							- parts_font_size[0] / CSVGGauge.TEXT_BASELINE
-							- parts_font_size[1]}`
-						);
+						container_y = arcs_height - parts_font_size[0] / CSVGGauge.TEXT_BASELINE - parts_font_size[1];
 					}
 					else {
-						this.#elements.value_and_units.container.setAttribute('y', `${arcs_height
-							- font_sizes.value.font_size}`
-						);
+						container_y = arcs_height - font_sizes.value.font_size;
 					}
 				}
 				else {
-					this.#elements.value_and_units.container.setAttribute('y', `${arcs_height
-						+ CSVGGauge.NEEDLE_RADIUS * correction_font * 2}`
-					);
+					container_y = arcs_height + CSVGGauge.NEEDLE_RADIUS * correction_font * 2;
 				}
+
+				this.#elements.value_and_units.container.setAttribute('y', container_y);
 			}
 		}
 
@@ -811,7 +803,7 @@ class CSVGGauge {
 			units_line_height = units_font_size / CSVGGauge.TEXT_BASELINE;
 
 			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BEFORE
-				|| this.#config.units.position === CSVGGauge.UNITS_POSITION_AFTER) {
+					|| this.#config.units.position === CSVGGauge.UNITS_POSITION_AFTER) {
 				if (value_line_height > units_line_height) {
 					value_line_height += value_line_height / baseline_offset;
 				}
@@ -860,8 +852,8 @@ class CSVGGauge {
 			container.style.fontWeight = 'bold';
 		}
 
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
-				&& this.#config.angle === 270)
+		const arcs_height = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
+				&& this.#config.angle === 270
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
@@ -927,8 +919,8 @@ class CSVGGauge {
 	 * Adjust X, Y position and scale of scalable group.
 	 */
 	#adjustScalableGroup() {
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
-				&& this.#config.angle === 270)
+		const arcs_height = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
+				&& this.#config.angle === 270
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
