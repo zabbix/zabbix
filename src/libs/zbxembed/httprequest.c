@@ -101,16 +101,15 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 
 	duk_push_this(ctx);
 	duk_get_global_string(ctx, "HttpRequest");
-	duk_get_global_string(ctx, "CurlHttpRequest");
 
-	if (0 == duk_instanceof(ctx, -3, -2) && 0 == duk_instanceof(ctx, -3, -1))
+	if (0 == duk_instanceof(ctx, -2, -1))
 	{
-		(void)duk_error(ctx, DUK_RET_TYPE_ERROR, "object is not an instance of HttpRequest or CurlHttpRequest");
+		(void)duk_error(ctx, DUK_RET_TYPE_ERROR, "object is not an instance of HttpRequest");
 
 		return NULL;
 	}
 
-	duk_pop_2(ctx);
+	duk_pop(ctx);
 
 	duk_get_prop_string(ctx, -1, "\xff""\xff""d");
 	ref = duk_to_pointer(ctx, -1);
