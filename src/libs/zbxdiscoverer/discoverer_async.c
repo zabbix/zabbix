@@ -51,7 +51,7 @@ static int	discovery_async_poller_dns_init(discovery_poller_config_t *poller_con
 		if (0 != (ret = evdns_base_resolv_conf_parse(poller_config->dnsbase, DNS_OPTIONS_ALL,
 				ZBX_RES_CONF_FILE)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result:%s", zbx_resolv_conf_errstr(ret));
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s", zbx_resolv_conf_errstr(ret));
 		}
 	}
 
