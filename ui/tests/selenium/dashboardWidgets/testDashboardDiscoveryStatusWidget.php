@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -31,7 +26,6 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @dataSource Proxies
  */
-
 class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 	/**
@@ -137,7 +131,6 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for testing layout of discovery status widget',
-				'display_period' => 60,
 				'auto_start' => 0,
 				'pages' => [
 					[
@@ -147,7 +140,6 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 			],
 			[
 				'name' => 'Dashboard for testing actions with discovery status widget',
-				'display_period' => 60,
 				'auto_start' => 0,
 				'pages' => [
 					[
@@ -175,7 +167,6 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 			],
 			[
 				'name' => 'Dashboard for testing cancel button for discovery status widget',
-				'display_period' => 60,
 				'auto_start' => 0,
 				'pages' => [
 					[
@@ -195,7 +186,6 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 			],
 			[
 				'name' => 'Dashboard for testing widgets table data',
-				'display_period' => 60,
 				'auto_start' => 0,
 				'pages' => [
 					[
@@ -216,6 +206,18 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		]);
 
 		self::$dashboardid = CDataHelper::getIds('name');
+
+		// Insert data into the database (dhosts table), to imitate the host discovery.
+		for ($i = 0; $i < 5; $i++) {
+			DBexecute('INSERT INTO dhosts (dhostid, druleid, status) VALUES ('.get_dbid('dhosts', 'dhostid').', '.
+					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_3]).', '.DHOST_STATUS_ACTIVE.')');
+			DBexecute('INSERT INTO dhosts (dhostid, druleid, status) VALUES ('.get_dbid('dhosts', 'dhostid').', '.
+					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_5]).', '.DHOST_STATUS_DISABLED.')');
+			DBexecute('INSERT INTO dhosts (dhostid, druleid, status) VALUES ('.get_dbid('dhosts', 'dhostid').', '.
+					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_4]).', '.DHOST_STATUS_ACTIVE.')');
+			DBexecute('INSERT INTO dhosts (dhostid, druleid, status) VALUES ('.get_dbid('dhosts', 'dhostid').', '.
+					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_4]).', '.DHOST_STATUS_DISABLED.')');
+		}
 	}
 
 	/**
@@ -237,7 +239,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 		$this->assertTrue($form->getField('Name')->isAttributePresent(['maxlength' => '255', 'placeholder' => 'default']));
 
-		$this->assertEquals($form->getField('Refresh interval')->asDropdown()->getOptions()->asText(), [
+		$this->assertEquals($form->getField('Refresh interval')->getOptions()->asText(), [
 				'Default (1 minute)',
 				'No refresh',
 				'10 seconds',
@@ -505,18 +507,18 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 					],
 					[
 						'Discovery rule' => self::DISCOVERY_RULE_3,
-						'Up' => ['text' => '100', 'selector' => 'class:green'],
+						'Up' => ['text' => '5', 'selector' => 'class:green'],
 						'Down' => ''
 					],
 					[
 						'Discovery rule' => self::DISCOVERY_RULE_4,
-						'Up' => ['text' => '100', 'selector' => 'class:green'],
-						'Down' => ['text' => '100', 'selector' => 'class:red']
+						'Up' => ['text' => '5', 'selector' => 'class:green'],
+						'Down' => ['text' => '5', 'selector' => 'class:red']
 					],
 					[
 						'Discovery rule' => self::DISCOVERY_RULE_5,
 						'Up' => '',
-						'Down' => ['text' => '100', 'selector' => 'class:red']
+						'Down' => ['text' => '5', 'selector' => 'class:red']
 					]
 				]
 			]
@@ -527,22 +529,6 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 	 * @dataProvider getWidgetTableData
 	 */
 	public function testDashboardDiscoveryStatusWidget_checkWidgetTableData($data) {
-
-		// Insert data into the database (dhosts table), to imitate the host discovery.
-		for ($i = 1, $j = 101; $i + $j <= 301; $i++, $j++) {
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".zbx_dbstr($j).", ".
-					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_3]).", ".DHOST_STATUS_ACTIVE.")");
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".zbx_dbstr($i).", ".
-					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_5]).", ".DHOST_STATUS_DISABLED.")");
-		}
-
-		for ($i = 201, $j = 302; $i + $j <= 702; $i++, $j++) {
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".zbx_dbstr($j).", ".
-					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_4]).", ".DHOST_STATUS_ACTIVE.")");
-			DBexecute("INSERT INTO dhosts (dhostid, druleid, status) VALUES (".zbx_dbstr($i).", ".
-					zbx_dbstr(self::$druleids[self::DISCOVERY_RULE_4]).", ".DHOST_STATUS_DISABLED.")");
-		}
-
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for testing widgets table data']);
 		$dashboard = CDashboardElement::find()->one();
@@ -563,32 +549,14 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 	public function testDashboardDiscoveryStatusWidget_checkEmptyWidget() {
 
 		// Disable discovery rules to check the content of the empty widget.
-		CDataHelper::call('drule.update', [
-			[
-				'druleid' => self::$druleids[self::DISCOVERY_RULE_1],
+		$drule_data = [];
+		foreach (self::$druleids as $id) {
+			$drule_data[] = [
+				'druleid' => $id,
 				'status' => DRULE_STATUS_DISABLED
-			],
-			[
-				'druleid' => self::$druleids[self::DISCOVERY_RULE_2],
-				'status' => DRULE_STATUS_DISABLED
-			],
-			[
-				'druleid' => self::$druleids[self::DISCOVERY_RULE_3],
-				'status' => DRULE_STATUS_DISABLED
-			],
-			[
-				'druleid' => self::$druleids[self::DISCOVERY_RULE_4],
-				'status' => DRULE_STATUS_DISABLED
-			],
-			[
-				'druleid' => self::$druleids[self::DISCOVERY_RULE_5],
-				'status' => DRULE_STATUS_DISABLED
-			],
-			[
-				'druleid' => self::$druleids['Discovery rule for proxy delete test'],
-				'status' => DRULE_STATUS_DISABLED
-			]
-		]);
+			];
+		}
+		CDataHelper::call('drule.update', $drule_data);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for testing widgets table data']);
@@ -597,7 +565,8 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 		// Check the table content.
 		$this->assertEquals($widget_data->getHeadersText(), ['Discovery rule', 'Up', 'Down']);
-		$this->assertEquals('No data found.', $widget_data->query('class:nothing-to-show')->one()->getText());
+		$this->assertEquals('No data found', $widget_data->query('xpath:.//div[@class="no-data-message zi-search-large"]')
+				->one()->getText());
 	}
 
 	protected function checkWidgetForm($data, $update = false) {
@@ -633,7 +602,6 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		}
 
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		// Trim leading and trailing spaces from expected results if necessary.
 		if (array_key_exists('trim', $data)) {
@@ -657,20 +625,19 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		// Check widgets count.
 		$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 
-		// Check new widget form fields and values in frontend.
-		$saved_form = $widget->edit();
-		$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
-		$saved_form->checkValue($data['fields']);
-		$saved_form->submit();
-		COverlayDialogElement::ensureNotPresent();
-		$dashboard->save();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
 		// Check new widget update interval.
 		$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
 			? '1 minute'
 			: CTestArrayHelper::get($data['fields'], 'Refresh interval');
 		$this->assertEquals($refresh, $widget->getRefreshInterval());
+
+		// Check new widget form fields and values in frontend.
+		$saved_form = $widget->edit();
+		$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
+		$saved_form->checkValue($data['fields']);
+		COverlayDialogElement::find()->one()->close();
+		$dashboard->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 }
