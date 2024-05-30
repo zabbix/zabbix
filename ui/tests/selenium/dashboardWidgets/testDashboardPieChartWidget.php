@@ -1122,7 +1122,6 @@ class testDashboardPieChartWidget extends testWidgets {
 				]
 			],
 			// Five items, host and item pattern, custom colors, hide legend and header.
-			// ToDo: Commented out while investigating a possible bug, where this test fails only on MySQL.
 			[
 				[
 					'widget_name' => 'five-items',
