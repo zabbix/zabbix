@@ -89,12 +89,13 @@ static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdat
  ******************************************************************************/
 static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 {
-	void		*ref;
-	zbx_es_env_t	*env;
+	void			*ref;
+	zbx_es_env_t		*env;
+	zbx_es_httprequest_t	*request;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
-		(void)duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
 
 		return NULL;
 	}
@@ -104,7 +105,7 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 
 	if (0 == duk_instanceof(ctx, -2, -1))
 	{
-		(void)duk_error(ctx, DUK_RET_TYPE_ERROR, "object is not an instance of HttpRequest");
+		(void)duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "object is not an instance of HttpRequest");
 
 		return NULL;
 	}
@@ -115,7 +116,10 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 	ref = duk_to_pointer(ctx, -1);
 	duk_pop_2(ctx);
 
-	return (zbx_es_httprequest_t *)es_get_ptr(env, ref, ES_OBJ_HTTPREQUEST);
+	if (NULL == (request = (zbx_es_httprequest_t *)es_get_ptr(env, ref, ES_OBJ_HTTPREQUEST)))
+		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find embedded native data");
+
+	return request;
 }
 
 /******************************************************************************
@@ -239,7 +243,7 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 	size_t			header_sz;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+		return duk_throw(ctx);
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &utf8))
 	{
@@ -281,7 +285,7 @@ static duk_ret_t	es_httprequest_clear_header(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+		return duk_throw(ctx);
 
 	curl_slist_free_all(request->headers);
 	request->headers = NULL;
@@ -338,7 +342,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (NULL == (request = es_httprequest(ctx)))
 	{
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+		err_index = duk_get_top_index(ctx);
 		goto out;
 	}
 
@@ -526,7 +530,7 @@ static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
 	int			err_index = -1;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+		return duk_throw(ctx);
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_to_string(ctx, 0), err);
 out:
@@ -548,7 +552,7 @@ static duk_ret_t	es_httprequest_status(duk_context *ctx)
 	CURLcode		err;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+		return duk_throw(ctx);
 
 	if (CURLE_OK != (err = curl_easy_getinfo(request->handle, CURLINFO_RESPONSE_CODE, &response_code)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot obtain request status: %s", curl_easy_strerror(err));
@@ -737,7 +741,7 @@ static duk_ret_t	es_httprequest_get_headers(duk_context *ctx)
 	zbx_es_httprequest_t	*request;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+		return duk_throw(ctx);
 
 	if (0 == duk_is_null_or_undefined(ctx, 0))
 	{
@@ -765,7 +769,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 	CURLcode		err;
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
+		return duk_throw(ctx);
 
 	mask = duk_to_int32(ctx, 0);
 
