@@ -36,12 +36,35 @@
  ******************************************************************************/
 static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 {
-	zbx_webdriver_t	*wd;
+	zbx_webdriver_t		*wd;
+	void			*ref;
+	zbx_es_env_t		*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+	{
+		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
+
+		return NULL;
+	}
 
 	duk_push_this(ctx);
+	duk_get_global_string(ctx, "Browser");
+
+	if (0 == duk_instanceof(ctx, -2, -1))
+	{
+		(void)duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "object is not an instance of Browser");
+
+		return NULL;
+	}
+
+	duk_pop(ctx);
+
 	duk_get_prop_string(ctx, -1, "\xff""\xff""d");
-	wd = (zbx_webdriver_t *)duk_to_pointer(ctx, -1);
+	ref = duk_to_pointer(ctx, -1);
 	duk_pop_2(ctx);
+
+	if (NULL == (wd = (zbx_webdriver_t *)es_get_ptr(env, ref, ES_OBJ_BROWSER)))
+		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find embedded native data");
 
 	return wd;
 }
@@ -54,19 +77,23 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 static duk_ret_t	es_browser_dtor(duk_context *ctx)
 {
 	zbx_webdriver_t	*wd;
+	void		*ref;
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
 
 	zabbix_log(LOG_LEVEL_TRACE, "Browser::~Browser()");
 
 	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
+	ref = duk_to_pointer(ctx, -1);
 
-	if (NULL != (wd = (zbx_webdriver_t *)duk_to_pointer(ctx, -1)))
+	if (NULL != (wd = (zbx_webdriver_t *)es_get_ptr(env, ref, ES_OBJ_BROWSER)))
 	{
-		zbx_es_env_t	*env;
-
 		webdriver_release(wd);
+		es_remove_ptr(env, ref);
 
-		if (NULL != (env = zbx_es_get_env(ctx)))
-			env->browser_objects--;
+		env->browser_objects--;
 	}
 
 	return 0;
@@ -85,6 +112,7 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	zbx_es_env_t	*env;
 	int		err_index = -1;
 	char		*error = NULL, *capabilities = NULL;
+	void		*ref = NULL;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
@@ -123,11 +151,13 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 		goto out;
 	}
 
+	ref = es_put_ptr(env, wd, ES_OBJ_BROWSER);
+
 	duk_push_this(ctx);
 	wd->browser = duk_get_heapptr(ctx, -1);
 
 	duk_push_string(ctx, "\xff""\xff""d");
-	duk_push_pointer(ctx, wd);
+	duk_push_pointer(ctx, ref);
 	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
 			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
@@ -141,7 +171,12 @@ out:
 	zbx_free(error);
 
 	if (-1 != err_index)
+	{
+		es_remove_ptr(env, ref);
+		webdriver_release(wd);
+
 		return duk_throw(ctx);
+	}
 	else
 		env->browser_objects++;
 
@@ -163,7 +198,8 @@ static duk_ret_t	es_browser_navigate(duk_context *ctx)
 	char		*error = NULL, *url = NULL;
 	int		ret;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &url))
 	{
@@ -198,7 +234,8 @@ static duk_ret_t	es_browser_get_url(duk_context *ctx)
 	zbx_webdriver_t	*wd;
 	char		*error = NULL, *url = NULL;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_get_url(wd, &url, &error))
 	{
@@ -230,7 +267,8 @@ static duk_ret_t	es_browser_find_element(duk_context *ctx)
 	char		*error = NULL, *strategy = NULL, *selector = NULL, *element = NULL;
 	int		err_index = -1;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &strategy))
 	{
@@ -288,7 +326,8 @@ static duk_ret_t	es_browser_find_elements(duk_context *ctx)
 
 	zbx_vector_str_create(&elements);
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &strategy))
 	{
@@ -437,7 +476,8 @@ static duk_ret_t	es_browser_get_result(duk_context *ctx)
 	zbx_webdriver_t	*wd;
 	duk_idx_t	idx_result, idx_perf, idx_details, idx_summary, idx_marks;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	idx_result = duk_push_object(ctx);
 
@@ -543,7 +583,8 @@ static duk_ret_t	es_browser_set_script_timeout(duk_context *ctx)
 	char		*error = NULL;
 	int		timeout;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	timeout = duk_get_int(ctx, 0);
 
@@ -569,7 +610,8 @@ static duk_ret_t	es_browser_set_session_timeout(duk_context *ctx)
 	char		*error = NULL;
 	int		timeout;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	timeout = duk_get_int(ctx, 0);
 
@@ -595,7 +637,8 @@ static duk_ret_t	es_browser_set_element_wait_timeout(duk_context *ctx)
 	char		*error = NULL;
 	int		timeout;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	timeout = duk_get_int(ctx, 0);
 
@@ -624,7 +667,8 @@ static duk_ret_t	es_browser_get_cookies(duk_context *ctx)
 	int		err_index = -1;
 	char		*cookies = NULL;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_get_cookies(wd, &cookies, &error))
 	{
@@ -658,7 +702,8 @@ static duk_ret_t	es_browser_add_cookie(duk_context *ctx)
 	char		*error = NULL,  *cookie_json = NULL;
 	int		err_index = -1;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	duk_get_global_string(ctx, "JSON");
 	duk_push_string(ctx, "stringify");
@@ -698,7 +743,9 @@ static duk_ret_t	es_browser_get_screenshot(duk_context *ctx)
 	zbx_webdriver_t	*wd;
 	char		*screenshot = NULL, *error = NULL;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
+
 	if (SUCCEED != webdriver_get_screenshot(wd, &screenshot, &error))
 	{
 		(void) browser_push_error(ctx, wd, "cannot capture screenshot: %s", error);
@@ -730,7 +777,8 @@ static duk_ret_t	es_browser_set_screen_size(duk_context *ctx)
 	width = duk_get_int(ctx, 0);
 	height = duk_get_int(ctx, 1);
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (0 > width || width > 8192 || 0 > height || height > 8192)
 	{
@@ -759,7 +807,8 @@ static duk_ret_t	es_browser_get_error(duk_context *ctx)
 {
 	zbx_webdriver_t	*wd;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED == webdriver_has_error(wd))
 		es_browser_push_error(ctx, wd);
@@ -778,7 +827,9 @@ static duk_ret_t	es_browser_discard_error(duk_context *ctx)
 {
 	zbx_webdriver_t	*wd;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
+
 	webdriver_discard_error(wd);
 
 	return 0;
@@ -796,7 +847,8 @@ static duk_ret_t	es_browser_set_error(duk_context *ctx)
 	zbx_webdriver_t	*wd;
 	char		*message = NULL;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &message))
 	{
@@ -822,7 +874,9 @@ static duk_ret_t	es_browser_get_page_source(duk_context *ctx)
 	zbx_webdriver_t	*wd;
 	char		*source = NULL, *error = NULL;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
+
 	if (SUCCEED != webdriver_get_page_source(wd, &source, &error))
 	{
 		(void) browser_push_error(ctx, wd, "cannot get page source: %s", error);
@@ -850,7 +904,8 @@ static duk_ret_t	es_browser_get_alert(duk_context *ctx)
 	char		*error = NULL, *alert = NULL;
 	int		err_index = -1;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_get_alert(wd, &alert, &error))
 	{
@@ -888,7 +943,8 @@ static duk_ret_t	es_browser_collect_perf_entries(duk_context *ctx)
 	zbx_webdriver_t	*wd;
 	char		*bookmark = NULL, *error = NULL;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
 	{
@@ -927,7 +983,8 @@ static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 	char			*error = NULL;
 	struct zbx_json_parse	jp;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_get_raw_perf_data(wd, NULL, &jp, &error))
 	{
@@ -962,7 +1019,8 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 	struct zbx_json_parse	jp;
 	int			err_index = -1;
 
-	wd = es_webdriver(ctx);
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
 
 	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
 	{

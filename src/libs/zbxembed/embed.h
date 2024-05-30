@@ -73,6 +73,7 @@ int	es_is_chained_constructor_call(duk_context *ctx);
 typedef enum
 {
 	ES_OBJ_HTTPREQUEST = 1,
+	ES_OBJ_BROWSER
 
 }
 zbx_es_obj_type_t;
