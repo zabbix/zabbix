@@ -79,7 +79,7 @@ function validateNumericBox(obj, allowempty, allownegative) {
 			}
 			else {
 				if (isNaN(parseInt(obj.value, 10))) {
-					obj.value = obj.dataset.currentValue !== undefined ? obj.dataset.currentValue : obj.defaultValue;
+					obj.value = 0;
 				}
 				else {
 					obj.value = parseInt(obj.value, 10);
@@ -88,20 +88,17 @@ function validateNumericBox(obj, allowempty, allownegative) {
 		}
 		else {
 			if (isNaN(parseInt(obj.value, 10))) {
-				obj.value = obj.dataset.currentValue !== undefined ? obj.dataset.currentValue : obj.defaultValue;
+				obj.value = 0;
 			}
 			else {
 				obj.value = parseInt(obj.value, 10);
 			}
 		}
-
-		if (!allownegative) {
-			if (obj.value < 0) {
-				obj.value = obj.value * -1;
-			}
+	}
+	if (!allownegative) {
+		if (obj.value < 0) {
+			obj.value = obj.value * -1;
 		}
-
-		obj.dataset.currentValue = obj.value;
 	}
 }
 
