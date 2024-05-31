@@ -127,9 +127,8 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 		goto out;
 	}
 
-	es_obj_attach_data(env, wd);
-
 	duk_push_this(ctx);
+	es_obj_attach_data(env, wd);
 	wd->browser = duk_get_heapptr(ctx, -1);
 
 	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))

@@ -876,16 +876,15 @@ int	es_is_chained_constructor_call(duk_context *ctx)
  *                                                                            *
  * Purpose: attach data pointer to current object                             *
  *                                                                            *
- * Comments: This function must be used only from object constructor          *
+ * Comments: The object must be on the top of the stack (-1)                  *
+ *           This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
 void	es_obj_attach_data(zbx_es_env_t *env, void *data)
 {
 	zbx_es_obj_data_t	obj_local;
 
-	duk_push_this(env->ctx);
 	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
-	duk_pop(env->ctx);
 
 	obj_local.data = data;
 	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
