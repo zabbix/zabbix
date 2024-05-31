@@ -22,21 +22,25 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @backup auditlog,changelog,config,ha_node
  */
 class testDiscoveryRules extends CIntegrationTest {
-	const DRULE_NAME = 'Test discovery rule';
-	const DACTION_NAME = 'Test discovery action';
+	const DRULE_WITH_SUCCESS_NAME = 'Test discovery rule';
+	const DRULE_WITH_ERR_NAME = 'Test discovery rule with error';
+	const ACTION_WITH_SUCCESS_NAME = 'Test discovery action';
+	const ACTION_WITH_ERR_NAME = 'Test discovery action with error';
 	const PROXY_NAME = 'Test proxy';
+	const VALID_OID = 'iso.3.6.1.2.1.1.1.0';
 	const INVALID_OID = 'invalid.OID';
 	const EXPECTED_INVALID_OID_ERR_MSG = "'SNMPv2c agent' checks failed: " . '"snmp_parse_oid(): cannot parse OID "' . self::INVALID_OID . '"."';
 	const SLEEP_TIME = 1;
-	const MAX_ATTEMPTS_DISCOVERY = 20;
-	const MAX_ATTEMPTS_DISCOVERY_ERR = 30;
+	const MAX_ATTEMPTS_DISCOVERY = 60;
 
-	private static $discoveryRuleId;
-	private static $discoveryActionId;
+	private static $druleWithSuccessId;
+	private static $druleWithErrId;
+	private static $actionWithSuccessId;
+	private static $actionWithWithErrId;
 	private static $discoveredHostId;
 	private static $proxyId;
 
-	private function waitForDiscovery($expectedTags, $notExpectedTags = []) {
+	private function waitForDiscoveryWithTags($expectedTags, $notExpectedTags = []) {
 		for ($i = 0; $i < self::MAX_ATTEMPTS_DISCOVERY; $i++) {
 			try {
 				$response = $this->call('host.get', [
@@ -72,12 +76,19 @@ class testDiscoveryRules extends CIntegrationTest {
 		}
 	}
 
+	private function waitForDiscovery($hostname) {
+		$response = $this->callUntilDataIsPresent('host.get', ['filter' => ['host' => $hostname]],
+				self::MAX_ATTEMPTS_DISCOVERY, self::SLEEP_TIME);
+		$this->assertArrayHasKey(0, $response['result'], 'Failed to discover host "' . $hostname . '" before timeout');
+		$this->assertArrayHasKey('host', $response['result'][0], 'Failed to discover host "' . $hostname . '" before timeout');
+	}
+
 	private function waitForDiscoveryErr($errStr) {
-		for ($i = 0; $i < self::MAX_ATTEMPTS_DISCOVERY_ERR; $i++) {
+		for ($i = 0; $i < self::MAX_ATTEMPTS_DISCOVERY; $i++) {
 			try {
 				$response = $this->call('drule.get', [
 					'filter' => [
-						'name' => self::DRULE_NAME,
+						'name' => self::DRULE_WITH_ERR_NAME,
 					],
 				]);
 
@@ -90,7 +101,7 @@ class testDiscoveryRules extends CIntegrationTest {
 
 				break;
 			} catch (Exception $e) {
-				if ($i == self::MAX_ATTEMPTS_DISCOVERY_ERR - 1)
+				if ($i == self::MAX_ATTEMPTS_DISCOVERY - 1)
 					throw $e;
 				else
 					sleep(self::SLEEP_TIME);
@@ -98,34 +109,30 @@ class testDiscoveryRules extends CIntegrationTest {
 		}
 	}
 
-	private function deleteAction() {
-		$response = $this->call('action.delete', [self::$discoveryActionId]);
-		$this->assertArrayHasKey('result', $response, "Failed to clear action '" . self::DACTION_NAME . "'");
-		$this->assertArrayHasKey('actionids', $response['result'], "Failed to clear action '" . self::DACTION_NAME . self::DACTION_NAME . "'");
-		$this->assertCount(1, $response['result']['actionids'], "Failed to clear action '" . self::DACTION_NAME . self::DACTION_NAME . "'");
-		$this->assertEquals(self::$discoveryActionId,  $response['result']['actionids'][0], "Failed to clear action '" . self::DACTION_NAME . "'");
-		self::$discoveryActionId = 0;
+	private function deleteActions($ids) {
+		$response = $this->call('action.delete', $ids);
+		$this->assertArrayHasKey('result', $response, "Failed to clear actions with IDs " . implode(', ', $ids));
+		$this->assertArrayHasKey('actionids', $response['result'], "Failed to clear actions with IDs " . implode(', ', $ids));
+		$this->assertCount(count($ids), $response['result']['actionids'], "Failed to clear actions with IDs " . implode(', ', $ids));
 	}
 
-	private function deleteDrule() {
-		$response = $this->call('drule.delete', [self::$discoveryRuleId]);
-		$this->assertArrayHasKey('result', $response, "Failed to network discovery rule '" . self::DRULE_NAME . "'");
-		$this->assertArrayHasKey('druleids', $response['result'], "Failed to network discovery rule '" . self::DRULE_NAME . "'");
-		$this->assertCount(1, $response['result']['druleids'], "Failed to network discovery rule '" . self::DRULE_NAME . "'");
-		$this->assertEquals(self::$discoveryRuleId, $response['result']['druleids'][0], "Failed to network discovery rule '" . self::DRULE_NAME . "'");
-		self::$discoveryRuleId = 0;
+	private function deleteDrules($ids) {
+		$response = $this->call('drule.delete', $ids);
+		$this->assertArrayHasKey('result', $response, "Failed to network discovery rules with IDs " . implode(', ', $ids));
+		$this->assertArrayHasKey('druleids', $response['result'], "Failed to network discovery rules with IDs " . implode(', ', $ids));
+		$this->assertCount(count($ids), $response['result']['druleids'],  "Failed to network discovery rules with IDs " . implode(', ', $ids));
 	}
 
-	private function createDruleSnmpv2($iprange, $proxyId=NULL) {
+	private function createDruleSnmpv2($name, $iprange, $oid, $proxyId) {
 		$drule = [
-			'name' => self::DRULE_NAME,
+			'name' => $name,
 			'delay' => '1s',
 			'iprange' => $iprange,
 			'concurrency_max' => ZBX_DISCOVERY_CHECKS_UNLIMITED,
 			'dchecks' => [
 				[
 					'type' => SVC_SNMPv2c,
-					'key_' => self::INVALID_OID,
+					'key_' => $oid,
 					'ports' => '161',
 					'snmp_community' => 'public',
 					'uniq' => 0,
@@ -142,12 +149,12 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->assertArrayHasKey('druleids', $response['result'], 'Failed to create a discovery rule');
 		$this->assertCount(1, $response['result'], 'Failed to create a discovery rule');
 
-		self::$discoveryRuleId = $response['result']['druleids'][0];
+		return $response['result']['druleids'][0];
 	}
 
-	private function createDactionHostAdd($druleId) {
+	private function createActionHostAdd($druleId, $actionName) {
 		$response = $this->call('action.create', [
-			'name' => self::DACTION_NAME,
+			'name' => $actionName,
 			'eventsource' => EVENT_SOURCE_DISCOVERY,
 			'status' => ACTION_STATUS_ENABLED,
 			'filter' => [
@@ -171,11 +178,11 @@ class testDiscoveryRules extends CIntegrationTest {
 				]
 			]
 		]);
-		$this->assertArrayHasKey('result', $response, 'Failed to create a discovery action');
-		$this->assertArrayHasKey('actionids', $response['result'], 'Failed to create a discovery action');
-		$this->assertCount(1, $response['result'], 'Failed to create a discovery action');
+		$this->assertArrayHasKey('result', $response, 'Failed to create a discovery action "' . $actionName . '"');
+		$this->assertArrayHasKey('actionids', $response['result'], 'Failed to create a discovery action "' . $actionName . '"');
+		$this->assertCount(1, $response['result'], 'Failed to create a discovery action "' . $actionName . '"');
 
-		self::$discoveryActionId = $this->getDactionIdByName(self::DACTION_NAME);
+		return $this->getActionIdByName($actionName);
 	}
 
 	private function createProxy() {
@@ -220,7 +227,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->assertCount(0, $response['result'], 'Failed to clear existing hosts');
 	}
 
-	private function getDactionIdByName($name) {
+	private function getActionIdByName($name) {
 		$response = $this->call('action.get', [
 			'filter' => [
 				'name' => $name
@@ -296,7 +303,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->deleteAllHosts();
 
 		$response = $this->call('drule.create', [
-			'name' => self::DRULE_NAME,
+			'name' => self::DRULE_WITH_SUCCESS_NAME,
 			'delay' => '1s',
 			'iprange' => '127.0.0.1',
 			'dchecks' => [
@@ -309,10 +316,10 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->assertArrayHasKey('result', $response, 'Failed to create a discovery rule');
 		$this->assertArrayHasKey('druleids', $response['result'], 'Failed to create a discovery rule');
 		$this->assertCount(1, $response['result'], 'Failed to create a discovery rule');
-		self::$discoveryRuleId = $response['result']['druleids'][0];
+		self::$druleWithSuccessId = $response['result']['druleids'][0];
 
 		$response = $this->call('action.create', [
-			'name' => self::DACTION_NAME,
+			'name' => self::ACTION_WITH_SUCCESS_NAME,
 			'eventsource' => EVENT_SOURCE_DISCOVERY,
 			'status' => ACTION_STATUS_ENABLED,
 			'filter' => [
@@ -320,7 +327,7 @@ class testDiscoveryRules extends CIntegrationTest {
 					[
 						'conditiontype' => ZBX_CONDITION_TYPE_DRULE,
 						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => self::$discoveryRuleId
+						'value' => self::$druleWithSuccessId
 					],
 					[
 						'conditiontype' => ZBX_CONDITION_TYPE_DSTATUS,
@@ -352,7 +359,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result'], 'Failed to create a discovery action');
 		$this->assertCount(1, $response['result'], 'Failed to create a discovery action');
 
-		self::$discoveryActionId = $this->getDactionIdByName(self::DACTION_NAME);
+		self::$actionWithSuccessId = $this->getActionIdByName(self::ACTION_WITH_SUCCESS_NAME);
 	}
 
 	/**
@@ -360,7 +367,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 */
 	public function testDiscoveryRules_opAddHostTags()
 	{
-		$this->waitForDiscovery([
+		$this->waitForDiscoveryWithTags([
 			['tag' => 'add_tag1', 'value' => 'add_value1'],
 			['tag' => 'add_tag2', 'value' => 'add_value2']
 		]);
@@ -391,7 +398,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$this->assertCount(1, $response['result']);
 
 		$response = $this->call('action.update', [
-			'actionid' => self::$discoveryActionId,
+			'actionid' => self::$actionWithSuccessId,
 			'operations' => [
 				[
 					'operationtype' => OPERATION_TYPE_HOST_TAGS_ADD,
@@ -423,7 +430,7 @@ class testDiscoveryRules extends CIntegrationTest {
 			]
 		]);
 
-		$this->waitForDiscovery([
+		$this->waitForDiscoveryWithTags([
 			['tag' => 'add_tag1', 'value' => 'add_value1'],
 			['tag' => 'add_tag2', 'value' => 'add_value2']
 		],
@@ -432,8 +439,8 @@ class testDiscoveryRules extends CIntegrationTest {
 			['tag' => 'del_tag4', 'value' => 'del_value4']
 		]);
 
-		$this->deleteAction();
-		$this->deleteDrule();
+		$this->deleteActions([self::$actionWithSuccessId]);
+		$this->deleteDrules([self::$druleWithSuccessId]);
 		$this->deleteAllHosts();
 	}
 
@@ -444,14 +451,39 @@ class testDiscoveryRules extends CIntegrationTest {
 	public function testDiscoveryRules_snmpErrorViaServer() {
 		/* Restarting Zabbix server is not mandatory. It just helps to speed the test up. */
 		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->createDruleSnmpv2('127.0.0.1');
-		$this->createDactionHostAdd(self::$discoveryRuleId);
+		self::$druleWithErrId =  $this->createDruleSnmpv2(self::DRULE_WITH_ERR_NAME, '127.0.0.1/16',
+				self::INVALID_OID, NULL);
+		self::$actionWithWithErrId = $this->createActionHostAdd(self::$druleWithErrId,
+				self::ACTION_WITH_ERR_NAME);
 
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->waitForDiscoveryErr(self::EXPECTED_INVALID_OID_ERR_MSG);
 
-		$this->deleteAction();
-		$this->deleteDrule();
+		$this->deleteActions([self::$actionWithWithErrId]);
+		$this->deleteDrules([self::$druleWithErrId]);
+	}
+
+	private function proxyTest() {
+		/* Restarting Zabbix server is not mandatory. It just helps to speed the test up. */
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->createProxy();
+		self::$druleWithSuccessId = $this->createDruleSnmpv2(self::DRULE_WITH_SUCCESS_NAME, '127.0.0.1/30',
+				self::VALID_OID, self::$proxyId);
+		self::$druleWithErrId = $this->createDruleSnmpv2(self::DRULE_WITH_ERR_NAME, '127.0.0.1/30',
+				self::INVALID_OID, self::$proxyId);
+		self::$actionWithSuccessId = $this->createActionHostAdd(self::$druleWithSuccessId,
+				self::ACTION_WITH_SUCCESS_NAME);
+		self::$actionWithWithErrId = $this->createActionHostAdd(self::$druleWithErrId,
+				self::ACTION_WITH_ERR_NAME);
+
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->waitForDiscoveryErr(self::EXPECTED_INVALID_OID_ERR_MSG);
+		$this->waitForDiscovery('localhost');
+
+		$this->deleteActions([self::$actionWithSuccessId, self::$actionWithWithErrId]);
+		$this->deleteDrules([self::$druleWithSuccessId, self::$druleWithErrId]);
+		$this->deleteAllHosts();
+		$this->deleteProxy();
 	}
 
 	/**
@@ -460,18 +492,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyDBModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyDBMode() {
-		/* Restarting Zabbix server is not mandatory. It just helps to speed the test up. */
-		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->createProxy();
-		$this->createDruleSnmpv2('127.0.0.1/16', self::$proxyId);
-		$this->createDactionHostAdd(self::$discoveryRuleId);
-
-		$this->startComponent(self::COMPONENT_SERVER);
-		$this->waitForDiscoveryErr(self::EXPECTED_INVALID_OID_ERR_MSG);
-
-		$this->deleteAction();
-		$this->deleteDrule();
-		$this->deleteProxy();
+		$this->proxyTest();
 	}
 
 	/**
@@ -480,18 +501,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyMemoryModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyMemoryMode() {
-		/* Restarting Zabbix server is not mandatory. It just helps to speed the test up. */
-		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->createProxy();
-		$this->createDruleSnmpv2('127.0.0.0/16', self::$proxyId);
-		$this->createDactionHostAdd(self::$discoveryRuleId);
-
-		$this->startComponent(self::COMPONENT_SERVER);
-		$this->waitForDiscoveryErr(self::EXPECTED_INVALID_OID_ERR_MSG);
-
-		$this->deleteAction();
-		$this->deleteDrule();
-		$this->deleteProxy();
+		$this->proxyTest();
 	}
 
 	/**
@@ -500,17 +510,6 @@ class testDiscoveryRules extends CIntegrationTest {
 	 * @configurationDataProvider proxyHybridModeconfigurationProvider
 	 */
 	public function testDiscoveryRules_snmpErrorViaProxyHybridMode() {
-		/* Restarting Zabbix server is not mandatory. It just helps to speed the test up. */
-		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->createProxy();
-		$this->createDruleSnmpv2('127.0.0.0/16', self::$proxyId);
-		$this->createDactionHostAdd(self::$discoveryRuleId);
-
-		$this->startComponent(self::COMPONENT_SERVER);
-		$this->waitForDiscoveryErr(self::EXPECTED_INVALID_OID_ERR_MSG);
-
-		$this->deleteAction();
-		$this->deleteDrule();
-		$this->deleteProxy();
+		$this->proxyTest();
 	}
 }
