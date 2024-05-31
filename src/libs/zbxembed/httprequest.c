@@ -166,7 +166,6 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 
 	request = (zbx_es_httprequest_t *)zbx_malloc(NULL, sizeof(zbx_es_httprequest_t));
 	memset(request, 0, sizeof(zbx_es_httprequest_t));
-
 	es_obj_attach_data(env, request);
 
 	if (NULL == (request->handle = curl_easy_init()))
