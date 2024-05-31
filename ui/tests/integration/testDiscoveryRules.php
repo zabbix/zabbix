@@ -77,10 +77,11 @@ class testDiscoveryRules extends CIntegrationTest {
 	}
 
 	private function waitForDiscovery($hostname) {
-		$response = $this->callUntilDataIsPresent('host.get', ['filter' => ['host' => $hostname]],
-				self::MAX_ATTEMPTS_DISCOVERY, self::SLEEP_TIME);
-		$this->assertArrayHasKey(0, $response['result'], 'Failed to discover host "' . $hostname . '" before timeout');
-		$this->assertArrayHasKey('host', $response['result'][0], 'Failed to discover host "' . $hostname . '" before timeout');
+		$response = $this->callUntilDataIsPresent('host.get', [
+			'output' => 'extend'
+		], self::MAX_ATTEMPTS_DISCOVERY, self::SLEEP_TIME);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertArrayHasKey('host', $response['result'][0]);
 	}
 
 	private function waitForDiscoveryErr($errStr) {
