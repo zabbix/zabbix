@@ -38,13 +38,10 @@
 
 typedef struct
 {
-	void			*ref;	/* memory block reference, kept as pointer property in duktape */
-					/* because it's closest to uint64 value                        */
-
-	void			*ptr;
-	zbx_es_obj_type_t	type;
+	void	*heapptr;	/* js object heap ptr */
+	void	*data;
 }
-zbx_es_ptr_t;
+zbx_es_obj_data_t;
 
 /******************************************************************************
  *                                                                            *
@@ -357,8 +354,7 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	es->env->timeout = ZBX_ES_TIMEOUT;
 
-	zbx_hashset_create(&es->env->ptrmap, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-	es->env->ptrmap_nextid = 1;
+	zbx_hashset_create(&es->env->objmap, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 	ret = SUCCEED;
 out:
@@ -399,7 +395,7 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 		goto out;
 	}
 
-	zbx_hashset_destroy(&es->env->ptrmap);
+	zbx_hashset_destroy(&es->env->objmap);
 
 	duk_destroy_heap(es->env->ctx);
 	zbx_es_debug_disable(es);
@@ -806,61 +802,89 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
 		return NULL;
 
 	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
+	duk_pop_2(ctx);
 
 	return env;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: store pointer in cache                                            *
+ * Purpose: attach data pointer to current object                             *
  *                                                                            *
- * Return value: pointer reference, used to locate pointer in cache           *
+ * Comments: This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
-void	*es_put_ptr(zbx_es_env_t *env, void *ptr, zbx_es_obj_type_t type)
+void	es_obj_attach_data(zbx_es_env_t *env, void *data)
 {
-	zbx_es_ptr_t	ptr_local = {
-			.ref = (void *)env->ptrmap_nextid++,
-			.type = type,
-			.ptr = ptr
-	};
+	zbx_es_obj_data_t	obj_local;
 
-	zbx_hashset_insert(&env->ptrmap, &ptr_local, sizeof(ptr_local));
+	duk_push_this(env->ctx);
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	duk_pop(env->ctx);
 
-	return ptr_local.ref;
+	obj_local.data = data;
+	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
+
+	printf("+ %p\n", data);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get pointer from cache                                            *
+ * Purpose: get data pointer attached to current object                       *
  *                                                                            *
  * Parameters: env  - [IN]                                                    *
  *             ref  - [IN] pointer reference, returned by es_put_ptr()        *
  *             type - [IN] pointer type                                       *
  *                                                                            *
+ * Comments: This function must be used only from object methods.             *
+ *                                                                            *
  ******************************************************************************/
-void	*es_get_ptr(zbx_es_env_t *env, void *ref, zbx_es_obj_type_t type)
+void	*es_obj_get_data(zbx_es_env_t *env)
 {
-	zbx_es_ptr_t	ptr_local = {.ref = ref}, *ptr;
+	zbx_es_obj_data_t	obj_local, *obj;
 
-	if (NULL != (ptr = zbx_hashset_search(&env->ptrmap, &ptr_local)) && ptr->type == type)
-		return ptr->ptr;
+	duk_push_this(env->ctx);
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	duk_pop(env->ctx);
+
+	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+	{
+		printf(". %p\n", obj->data);
+		return obj->data;
+	}
 
 	return NULL;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remove pointer from cache                                         *
+ * Purpose: detach data pointer from current object                           *
  *                                                                            *
  * Parameters: env - [IN]                                                     *
  *             ref - [IN] pointer reference, returned by es_put_ptr()         *
  *                                                                            *
+ * Return value: detached data pointer                                        *
+ *                                                                            *
+ * Comments: The finalizing object must be on the top of the stack (-1).      *
+ *           If the pointer contains allocated data it must be freed by the   *
+ *           caller.                                                          *
+ *           This function must be used only from object destructor.          *
+ *                                                                            *
  ******************************************************************************/
-void	es_remove_ptr(zbx_es_env_t *env, void *ref)
+void	*es_obj_detach_data(zbx_es_env_t *env)
 {
-	zbx_es_ptr_t	ptr_local = {.ref = ref};
+	zbx_es_obj_data_t	obj_local, *obj;
+	void			*data;
 
-	zbx_hashset_remove(&env->ptrmap, &ptr_local);
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+
+	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+		return NULL;
+
+	data = obj->data;
+	zbx_hashset_remove_direct(&env->objmap, obj);
+
+	printf("- %p\n", data);
+
+	return data;
 }

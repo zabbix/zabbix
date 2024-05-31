@@ -55,23 +55,15 @@ struct zbx_es_env
 	int		http_req_objects;
 	int		logged_msgs;
 
-	zbx_hashset_t	ptrmap;
-	uintptr_t	ptrmap_nextid;
+	zbx_hashset_t	objmap;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
 
 int	es_duktape_string_decode(const char *duk_str, char **out_str);
 
-typedef enum
-{
-	ES_OBJ_HTTPREQUEST = 1,
-
-}
-zbx_es_obj_type_t;
-
-void	*es_put_ptr(zbx_es_env_t *env, void *ptr, zbx_es_obj_type_t type);
-void	*es_get_ptr(zbx_es_env_t *env, void *ref, zbx_es_obj_type_t type);
-void	es_remove_ptr(zbx_es_env_t *env, void *ref);
+void	es_obj_attach_data(zbx_es_env_t *env, void *data);
+void	*es_obj_get_data(zbx_es_env_t *env);
+void	*es_obj_detach_data(zbx_es_env_t *env);
 
 #endif /* ZABBIX_EMBED_H */

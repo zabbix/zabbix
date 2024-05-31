@@ -95,7 +95,6 @@ static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdat
  ******************************************************************************/
 static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 {
-	void			*ref;
 	zbx_es_env_t		*env;
 	zbx_es_httprequest_t	*request;
 
@@ -106,26 +105,8 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 		return NULL;
 	}
 
-	duk_push_this(ctx);
-	duk_get_global_string(ctx, "HttpRequest");
-	duk_get_global_string(ctx, "CurlHttpRequest");
-
-	if (0 == duk_instanceof(ctx, -3, -2) && 0 == duk_instanceof(ctx, -3, -1))
-	{
-		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,
-				"object is not an instance of HttpRequest or CurlHttpRequest");
-
-		return NULL;
-	}
-
-	duk_pop_2(ctx);
-
-	duk_get_prop_string(ctx, -1, "\xff""\xff""d");
-	ref = duk_to_pointer(ctx, -1);
-	duk_pop_2(ctx);
-
-	if (NULL == (request = (zbx_es_httprequest_t *)es_get_ptr(env, ref, ES_OBJ_HTTPREQUEST)))
-		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find embedded native data");
+	if (NULL == (request = (zbx_es_httprequest_t *)es_obj_get_data(env)))
+		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return request;
 }
@@ -138,16 +119,12 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 {
 	zbx_es_httprequest_t	*request;
-	void			*ref;
 	zbx_es_env_t		*env;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
 
-	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
-	ref = duk_to_pointer(ctx, -1);
-
-	if (NULL != (request = (zbx_es_httprequest_t *)es_get_ptr(env, ref, ES_OBJ_HTTPREQUEST)))
+	if (NULL != (request = (zbx_es_httprequest_t *)es_obj_detach_data(env)))
 	{
 		env->http_req_objects--;
 
@@ -158,8 +135,6 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 		zbx_free(request->data);
 		zbx_free(request->headers_in);
 		zbx_free(request);
-
-		es_remove_ptr(env, ref);
 	}
 
 	return 0;
@@ -177,7 +152,6 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	CURLcode		err;
 	zbx_es_env_t		*env;
 	int			err_index = -1;
-	void			*ref = NULL;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
@@ -192,7 +166,8 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 
 	request = (zbx_es_httprequest_t *)zbx_malloc(NULL, sizeof(zbx_es_httprequest_t));
 	memset(request, 0, sizeof(zbx_es_httprequest_t));
-	ref = es_put_ptr(env, request, ES_OBJ_HTTPREQUEST);
+
+	es_obj_attach_data(env, request);
 
 	if (NULL == (request->handle = curl_easy_init()))
 	{
@@ -211,17 +186,12 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP, err);
 
-	duk_push_string(ctx, "\xff""\xff""d");
-	duk_push_pointer(ctx, ref);
-	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);
-
 	duk_push_c_function(ctx, es_httprequest_dtor, 1);
 	duk_set_finalizer(ctx, -2);
 out:
 	if (-1 != err_index)
 	{
-		es_remove_ptr(env, ref);
+		es_obj_detach_data(env);
 
 		if (NULL != request->handle)
 			curl_easy_cleanup(request->handle);
