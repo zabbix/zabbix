@@ -4454,29 +4454,36 @@ div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
   vertical-align: middle; }
 div.dashboard-widget-itemhistory .list-table .has-broadcast-data {
   cursor: pointer; }
-div.dashboard-widget-itemhistory .binary-thumbnail .btn {
+div.dashboard-widget-itemhistory .btn-thumbnail {
   overflow: hidden; }
-  div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link) {
+  div.dashboard-widget-itemhistory .btn-thumbnail:not(.btn-link) {
     width: 100px;
     height: 56px;
-    background: transparent var(--thumbnail) no-repeat center top;
+    background: transparent var(--thumbnail) no-repeat center;
     background-size: cover;
     border-color: transparent;
     text-indent: -9999px; }
-    div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link):not(.is-loading) {
+    div.dashboard-widget-itemhistory .btn-thumbnail:not(.btn-link):not(.is-loading) {
       border: 1px solid #9f9f9f;
       border-radius: 3px; }
 div.dashboard-widget-itemhistory z-bar-gauge {
   min-width: 64px;
   height: 20px; }
 
-.dashboard-widget-itemhistory-hintbox {
-  max-height: 90vh;
-  overflow: auto; }
-  .dashboard-widget-itemhistory-hintbox img {
-    display: block;
-    max-width: 80vw;
-    max-height: 80vh; }
+.dashboard-widget-itemhistory-hintbox-image .dashboard-widget-itemhistory-hintbox {
+  overflow: hidden; }
+.dashboard-widget-itemhistory-hintbox-image.is-loading {
+  min-width: 100px;
+  min-height: 56px; }
+  .dashboard-widget-itemhistory-hintbox-image.is-loading::before {
+    content: ' '; }
+  .dashboard-widget-itemhistory-hintbox-image.is-loading img {
+    opacity: 0; }
+.dashboard-widget-itemhistory-hintbox-image img {
+  display: block;
+  max-width: 50vw;
+  max-height: 50vh;
+  opacity: 1; }
 
 form.dashboard-widget-itemnavigator .item-grouping {
   line-height: 1.4em; }
@@ -6696,7 +6703,7 @@ div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-wi
   .is-loading::before {
     background-color: rgba(255, 255, 255, 0.8);
     content: 'loading';
-    text-indent: 200%;
+    text-indent: -9999px;
     overflow: hidden;
     position: absolute;
     top: 0;

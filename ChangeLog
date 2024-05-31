@@ -1,3 +1,16 @@
+Changes for 7.0.0rc3
+
+New features:
+A.F.I..... [ZBXNEXT-9193] implemented time period selector for Item history widget (ddauksa, Sasha)
+
+Bug fixes:
+..F....... [ZBX-24490] fixed and improved the Item history widget with binary type items (ashubin)
+.......PS. [ZBX-24523] fixed circular reference errors when collecting performance data (wiper)
+..F....... [ZBX-24535] fixed history period calculation in Item value widget when override trend period is active (averza)
+...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
+.........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0rc2
 
 New features:
@@ -84,7 +97,6 @@ A......... [ZBX-24258] fixed issue causing error when removing the old MFA metho
 .......PS. [ZBX-24354] fixed item status flapping (vso)
 ........S. [ZBX-24363] fixed proxyid being ignored in item test (kprutkovs)
 ....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
-........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta3
@@ -227,6 +239,7 @@ A.F....... [ZBX-19918] prevented redundant audit log entries of failed logins wh
 .........T [ZBX-23684] fixed transactions query file for PostgreSQL by Zabbix agent template (drasikhov)
 ..F....... [ZBX-23659] fixed incorrect calculation of bar graph polygon in SVG graph widget for negative values (solonkins)
 A.F....... [ZBX-22433] fixed web scenario and web scenario step configuration field trimming and field sorting (ddauksa, Ivo, Sasha)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta1
@@ -735,6 +748,13 @@ Changes for 6.4.16rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-24481] fixed inability to unset value map from existing item or item prototype by passing a version without valuemap parameter into configuration.import (vmaksimovs)
+...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
+........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
+.......PS. [ZBX-24453] implemented socket file cleanup when shutting down, added blocking of signals during important stages of startup (dgoloscapov)
+..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
+.........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
+....I..... [ZBX-24482] fixed the presence of the http_proxy field in the initial data (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.15
@@ -781,7 +801,6 @@ A......... [ZBX-23407] improved performance of retrieving last history values wh
 ........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
 .........T [ZBX-24275] fixed item prototype JSONPath preprocessing, added missing volume health metric and triggers in HPE MSA templates (drasikhov)
 .........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
-........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.14
@@ -872,6 +891,7 @@ A.F....... [ZBX-19918] prevented redundant audit log entries of failed logins wh
 .......PS. [ZBX-24095] improved data fetch performance for PostgreSQL (vso)
 ...G...... [ZBX-18859] fixed error event 5858 with ResultCode = 0x80041032 after WMI queries (mprihodko)
 ..F....... [ZBX-23818] fixed clock, graph and graph prototype widget form reloading and field focus when changing values (esekace)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.12
@@ -2528,8 +2548,15 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.31rc1
 
 New features:
+..F.....S. [ZBXNEXT-8682] introduced a length limit of 512KB for item test values that server returns to Zabbix frontend (jfreibergs, kprutkovs)
 
 Bug fixes:
+A......... [ZBX-24481] fixed inability to unset value map from existing item or item prototype by passing a version without valuemap parameter into configuration.import (vmaksimovs)
+...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
+.......PS. [ZBX-24453] implemented socket file cleanup when shutting down, added blocking of signals during important stages of startup (dgoloscapov)
+..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
+.........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
+....I..... [ZBX-24482] fixed the presence of the http_proxy field in the initial data (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.30
@@ -2572,7 +2599,6 @@ A......... [ZBX-23407] improved performance of retrieving last history values wh
 ........S. [ZBX-24241] fixed Zabbix server issue with random order of host groups for a host during real-time export (sboidenko)
 .........T [ZBX-24275] fixed item prototype JSONPath preprocessing, added missing volume health metric and triggers in HPE MSA templates (drasikhov)
 .........T [ZBX-24316] fixed username macro in GridGain by JMX template (drasikhov)
-........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.29
@@ -2651,6 +2677,7 @@ A.F....... [ZBX-19918] prevented redundant audit log entries of failed logins wh
 ...G...... [ZBX-18859] fixed error event 5858 with ResultCode = 0x80041032 after WMI queries (mprihodko)
 .......PS. [ZBX-24095] improved data fetch performance for PostgreSQL (vso)
 ..F....... [ZBX-23818] fixed clock, graph and graph prototype widget form reloading and field focus when changing values (esekace)
+........S. [ZBX-24505] fixed possible injection when adding audit log entry of a global script execution (dimir)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.27

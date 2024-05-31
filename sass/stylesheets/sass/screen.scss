@@ -2706,15 +2706,15 @@ td.inactive-bg {
 
 	&::before {
 		background-color: rgba($ui-bg-color, .8);
-		content: 'loading'; // For screen-reader
-		text-indent: 200%;  // For screen-reader, for IE 200% instead of 100%
+		content: 'loading';
+		text-indent: -9999px;
 		overflow: hidden;
 		position: absolute;
 		top: 0;
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 5; // More than z-index of .msg-*.
+		z-index: 5;
 	}
 
 	&::after {

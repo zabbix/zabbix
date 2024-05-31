@@ -101,8 +101,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'navtree',
-								// TODO: Uncomment the below line when ZBX-22245 will be resolved.
-//								'name' => 'Awesome map tree',
+								'name' => 'Awesome map tree',
 								'x' => 0,
 								'y' => 0,
 								'width' => 36,
@@ -232,8 +231,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'clock',
-								// TODO: Uncomment the below line when ZBX-22245 will be resolved.
-//								'name' => 'Default clock',
+								'name' => 'Default clock',
 								'width' => 18,
 								'height' => 4
 							],
@@ -927,9 +925,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			[
 				[
 					'module_name' => 'Map navigation tree',
-					// TODO: Uncomment the below line and delete the line after it when ZBX-22245 will be resolved.
-//					'widget_name' => 'Awesome map tree',
-					'widget_name' => 'Map navigation tree',
+					'widget_name' => 'Awesome map tree',
 					'dependent_widget' => 'Map',
 					'page' => 'Map page'
 				]
@@ -947,9 +943,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			[
 				[
 					'module_name' => 'Clock',
-					// TODO: Uncomment the below line and delete the line after it when ZBX-22245 will be resolved.
-//					'widget_name' => 'Default clock',
-					'widget_name' => 'Local',
+					'widget_name' => 'Default clock',
 					'template' => true,
 					'page' => 'Default clock page'
 				]
@@ -1221,14 +1215,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			$inaccessible_widget = $dashboard->getWidget('Inaccessible widget');
 			$this->assertEquals(self::INACCESSIBLE_TEXT, $inaccessible_widget->getContent()->getText());
 
-			// Check that withget of the disabled module is not present on the dashboard.
+			// Check that widget of the disabled module is not present on the dashboard.
 			$this->assertFalse($dashboard->getWidget($module['widget_name'], false)->isValid());
 
 			// Check that the dependent widget is still there, but its contents is not displayed.
 			if (array_key_exists('dependent_widget', $module)) {
 				$dependent_widget = $dashboard->getWidget($module['dependent_widget']);
 				$this->assertTrue($dependent_widget->isValid());
-				$this->assertEquals(self::INACCESSIBLE_TEXT, $dependent_widget->getContent()->getText());
+				$this->assertEquals('Awaiting data', $dependent_widget->getContent()->getText());
 			}
 
 			/**
