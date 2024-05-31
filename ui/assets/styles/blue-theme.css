@@ -6797,6 +6797,8 @@ button.is-loading {
   position: relative;
   color: transparent !important;
   border-bottom-color: transparent; }
+  .link-action.is-loading::before {
+    background-color: transparent; }
   .link-action.is-loading::after {
     box-shadow: none;
     background: none;
