@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-30T11:32:34Z'
+  date: '2024-05-31T13:15:09Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1652,6 +1652,7 @@ zabbix_export:
             key: 'jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numItems,name=value",Value]'
         - sortorder: '1'
           color: FF0000
+          yaxisside: RIGHT
           item:
             host: 'Jira Data Center by JMX'
             key: 'jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numErrors,name=value",Value]'
