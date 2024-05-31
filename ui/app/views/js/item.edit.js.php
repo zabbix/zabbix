@@ -768,10 +768,10 @@ window.item_edit_form = new class {
 	#typeChangeHandler(e) {
 		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value] || '';
 
-		if (this.field.timeout.value === '') {
-			if (this.form.querySelector('[name="custom_timeout"]:checked').value != ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
-				this.field.timeout.value = this.field.inherited_timeout.value;
-			}
+		const custom_timeout_value = [...this.field.custom_timeout].filter(element => element.checked)[0].value;
+
+		if (this.field.timeout.value === '' && custom_timeout_value != ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+			this.field.timeout.value = this.field.inherited_timeout.value;
 		}
 
 		this.updateFieldsVisibility();
