@@ -46,6 +46,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'Hosts',
+					'empty_check' => 'Templates',
 					'checked_multiselects' => [
 						['Host groups' => 'Host groups'],
 						['Templates' => 'Templates', 'Template group' => 'Template groups'],
@@ -103,6 +104,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'Templates',
+					'empty_check' => 'Linked templates',
 					'checked_multiselects' => [
 						['Template groups' => 'Template groups'],
 						['Linked templates' => 'Templates', 'Template group' => 'Template groups']
@@ -185,6 +187,15 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 		}
 
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+
+		// Check empty filter popup.
+		if (CTestArrayHelper::get($data, 'empty_check')) {
+			$empty_dialog = $filter_form->getField($data['empty_check'])->edit();
+			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+					explode("\n", $empty_dialog->query('class:no-data-message')->one()->getText())
+			);
+			$empty_dialog->close();
+		}
 
 		// Fill filter to enable dependent multiselects.
 		if (array_key_exists('filter', $data)) {

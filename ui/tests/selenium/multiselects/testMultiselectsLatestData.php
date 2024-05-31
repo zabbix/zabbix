@@ -18,6 +18,8 @@ require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 
 /**
  * Test for checking that multiselects' dialogs do not contain any errors before and after filling.
+ *
+ * @backup profiles
  */
 class testMultiselectsLatestData extends testMultiselectDialogs {
 
@@ -28,7 +30,8 @@ class testMultiselectsLatestData extends testMultiselectDialogs {
 				[
 					'fields' => [
 						'Host groups' => 'Zabbix servers'
-					]
+					],
+					'check_empty' => true
 				]
 			],
 			// #1.
@@ -48,6 +51,16 @@ class testMultiselectsLatestData extends testMultiselectDialogs {
 	public function testMultiselectsLatestData_CheckDialogs($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view');
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+
+		// Check empty filter popup.
+		if (CTestArrayHelper::get($data, 'check_empty', false)) {
+			$empty_dialog = $filter_form->getField('Hosts')->edit();
+			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+					explode("\n", $empty_dialog->query('class:no-data-message')->one()->getText())
+			);
+			$empty_dialog->close();
+		}
+
 		$multiselects = [['Host groups' => 'Host groups'], ['Hosts' => 'Hosts', 'Host group' => 'Host groups']];
 
 		// Check all multiselects in filter before the first multiselect is filled.
