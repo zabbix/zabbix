@@ -595,17 +595,19 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 							'Second host for Item navigator widget'
 						],
 						'Host tags' => 'Or',
-						'id:host_tags_0_tag' => STRING_255,
-						'id:host_tags_0_operator' => 'Does not contain',
-						'id:host_tags_0_value' => STRING_255,
 						'Item patterns' => 'memory*',
 						'Item tags' => 'Or',
-						'id:item_tags_0_tag' => STRING_255,
-						'id:item_tags_0_operator' => 'Does not equal',
-						'id:item_tags_0_value' => STRING_255,
 						'State' => 'All',
 						'Show problems' => 'Unsuppressed',
 						'Item limit' => '111'
+					],
+					'tags' => [
+						'host' => [
+							['name' => STRING_255, 'operator' => 'Does not contain', 'value' => STRING_255]
+						],
+						'item' => [
+							['name' => STRING_255, 'operator' => 'Does not equal', 'value' => STRING_255]
+						]
 					]
 				]
 			],
@@ -616,13 +618,15 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					'fields' => [
 						'Name' => '  Test trailing spaces  ',
 						'Item limit' => ' 1 ',
-						'id:host_tags_0_tag' => '  Host  ',
-						'id:host_tags_0_operator' => 'Does not equal',
-						'id:host_tags_0_value' => '  test  ',
-						'id:item_tags_0_tag' => '  Item  ',
-						'id:item_tags_0_operator' => 'Does not contain',
-						'id:item_tags_0_value' => '  test  ',
 						'Item tags' => 'And/Or'
+					],
+					'tags' => [
+						'host' => [
+							['name' => '  Host  ', 'operator' => 'Does not equal', 'value' => '  test  ']
+						],
+						'item' => [
+							['name' => '  Item  ', 'operator' => 'Does not contain', 'value' => '  test  ']
+						]
 					],
 					'trim' => ['Name', 'Item limit', 'id:host_tags_0_tag', 'id:host_tags_0_value', 'id:item_tags_0_tag', 'id:item_tags_0_value']
 				]
@@ -747,7 +751,6 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 			: $dashboard->edit()->addWidget()->asForm();
 
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item navigator')]);
-		$form->fill($data['fields']);
 
 		if (array_key_exists('tags', $data)) {
 			foreach ($data['tags'] as $entity => $values) {
@@ -755,6 +758,8 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 				$this->setTags($values);
 			}
 		}
+
+		$form->fill($data['fields']);
 
 		if (array_key_exists('group_by', $data)) {
 			$this->getGroupByTable()->fill($data['group_by']);

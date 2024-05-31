@@ -618,10 +618,10 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						'Average' => true,
 						'Show hosts in maintenance' => true,
 						'Show problems' => 'All',
-						'id:host_tags_0_tag' => STRING_255,
-						'id:host_tags_0_operator' => 'Does not contain',
-						'id:host_tags_0_value' => STRING_255,
 						'Host limit' => '9999'
+					],
+					'tags' => [
+						['name' => STRING_255, 'operator' => 'Does not contain', 'value' => STRING_255]
 					]
 				]
 			],
@@ -632,10 +632,10 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'fields' => [
 						'Name' => '  Test trailing spaces  ',
 						'Host limit' => ' 1 ',
-						'id:host_tags_0_tag' => '  Host  ',
-						'id:host_tags_0_operator' => 'Does not equal',
-						'id:host_tags_0_value' => '  test  ',
 						'Host tags' => 'And/Or'
+					],
+					'tags' => [
+						['name' => '  Host  ', 'operator' => 'Does not equal', 'value' => '  test  ']
 					],
 					'trim' => ['Name', 'Host limit', 'id:host_tags_0_tag', 'id:host_tags_0_value']
 				]
@@ -737,11 +737,12 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			: $dashboard->edit()->addWidget()->asForm();
 
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host navigator')]);
-		$form->fill($data['fields']);
 
 		if (array_key_exists('tags', $data)) {
 			$this->setTags($data['tags']);
 		}
+
+		$form->fill($data['fields']);
 
 		if (array_key_exists('group_by', $data)) {
 			$this->getGroupByTable()->fill($data['group_by']);
