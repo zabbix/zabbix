@@ -824,8 +824,6 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *data)
 
 	obj_local.data = data;
 	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
-
-	printf("+ %p\n", data);
 }
 
 /******************************************************************************
@@ -848,10 +846,7 @@ void	*es_obj_get_data(zbx_es_env_t *env)
 	duk_pop(env->ctx);
 
 	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)))
-	{
-		printf(". %p\n", obj->data);
 		return obj->data;
-	}
 
 	return NULL;
 }
@@ -883,8 +878,6 @@ void	*es_obj_detach_data(zbx_es_env_t *env)
 
 	data = obj->data;
 	zbx_hashset_remove_direct(&env->objmap, obj);
-
-	printf("- %p\n", data);
 
 	return data;
 }
