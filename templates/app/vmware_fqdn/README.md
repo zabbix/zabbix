@@ -46,6 +46,8 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to allow in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore space utilization.</p>|`90`|
+|{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore space utilization.</p>|`80`|
 
 ### Items
 
@@ -88,6 +90,13 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 |VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore space in percentage from total.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]|
 |VMware: Total size of datastore {#DATASTORE}|<p>VMware datastore space in bytes.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]|
 |VMware: Average write latency of the datastore {#DATASTORE}|<p>Amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]|
+
+### Trigger prototypes for Discover VMware datastores
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|VMware: {#DATASTORE}: Disk space is critically low|<p>Datastore space exceeded critical threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])>{$VMWARE.DATASTORE.SPACE.CRIT}`|High||
+|VMware: {#DATASTORE}: Disk space is low|<p>Datastore space exceeded warning threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])>{$VMWARE.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware: {#DATASTORE}: Disk space is critically low</li></ul>|
 
 ### LLD rule Discover VMware hypervisors
 
@@ -211,6 +220,8 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to allow in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore space utilization.</p>|`90`|
+|{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore space utilization.</p>|`80`|
 
 ### Items
 
@@ -272,6 +283,8 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
+|VMware: {#DATASTORE}: Disk space is critically low|<p>Datastore space exceeded critical threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])>{$VMWARE.HV.DATASTORE.SPACE.CRIT}`|High||
+|VMware: {#DATASTORE}: Disk space is low|<p>Datastore space exceeded warning threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])>{$VMWARE.HV.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware: {#DATASTORE}: Disk space is critically low</li></ul>|
 |VMware: The multipath count has been changed|<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p>|`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}`|Average|**Manual close**: Yes|
 
 ### LLD rule Healthcheck discovery
