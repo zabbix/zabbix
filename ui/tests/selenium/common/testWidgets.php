@@ -141,6 +141,7 @@ class testWidgets extends CWebTest {
 	 * Check if row with entity name is highlighted on click.
 	 *
 	 * @param string		$widget_name		widget name
+	 * @param string		$entity_name		name of item or host
 	 * @param boolean 		$edit				edit is performed
 	 */
 	public function checkRowHighlight($widget_name, $entity_name, $edit = false) {
