@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  *
  * @onBefore prepareData
  */
-class testDashboardHostNavigatorWidget extends CWebTest {
+class testDashboardHostNavigatorWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
@@ -45,20 +45,6 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	const DELETE_WIDGET = 'Widget for delete';
 	const DEFAULT_DASHBOARD = 'Dashboard for Host navigator widget test';
 	const DASHBOARD_FOR_WIDGET_CREATE = 'Dashboard for Host navigator widget create/update test';
-
-
-	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid'.
-			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid';
 
 	/**
 	 * Get 'Group by' table element with mapping set.
@@ -719,12 +705,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 
 	public function testDashboardHostNavigatorWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE])->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
-		$dashboard->getWidget(self::$update_widget)->edit()->submit();
-		$dashboard->save();
+		$this->setWidgetConfiguration(self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE], self::$update_widget);
+		CDashboardElement::find()->one()->save();
 		$this->page->waitUntilReady();
 
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -963,41 +945,8 @@ class testDashboardHostNavigatorWidget extends CWebTest {
 	public function testDashboardHostNavigatorWidget_RowHighlight() {
 		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
 				['Host patterns' => 'Second host for host navigator widget']);
-		$this->checkRowHighlight(self::DEFAULT_WIDGET, true);
+		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Second host for host navigator widget', true);
 		CDashboardElement::find()->one()->save();
-		$this->checkRowHighlight(self::DEFAULT_WIDGET);
-	}
-
-	/**
-	 * Check if row with host is highlighted on click.
-	 *
-	 * @param string		$widget_name		widget name
-	 * @param boolean 		$edit				edit is performed
-	 */
-	protected function checkRowHighlight($widget_name, $edit = false) {
-		$widget = $edit
-			? CDashboardElement::find()->one()->edit()->getWidget($widget_name)
-			: CDashboardElement::find()->one()->getWidget($widget_name);
-
-		$widget->waitUntilReady();
-		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
-		$this->assertFalse($widget->query($locator)->one(false)->isValid());
-		$widget->query('xpath://span[@title="Second host for host navigator widget"]')->waitUntilReady()->one()->click();
-		$this->assertTrue($widget->query($locator)->one()->isVisible());
-	}
-
-	/**
-	 * Opens widget edit form and fills in data.
-	 *
-	 * @param string		$dashboardid		dashboard id
-	 * @param string		$widget_name		widget name
-	 * @param array			$configuration    	widget parameter(s)
-	 */
-	protected function setWidgetConfiguration($dashboardid, $widget_name, $configuration) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->edit();
-		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
-		$form->fill($configuration);
-		$form->submit();
+		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Second host for host navigator widget');
 	}
 }

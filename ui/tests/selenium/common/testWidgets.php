@@ -136,4 +136,37 @@ class testWidgets extends CWebTest {
 
 		return $data;
 	}
+
+	/**
+	 * Check if row with entity name is highlighted on click.
+	 *
+	 * @param string		$widget_name		widget name
+	 * @param boolean 		$edit				edit is performed
+	 */
+	public function checkRowHighlight($widget_name, $entity_name, $edit = false) {
+		$widget = $edit
+			? CDashboardElement::find()->one()->edit()->getWidget($widget_name)
+			: CDashboardElement::find()->one()->getWidget($widget_name);
+
+		$widget->waitUntilReady();
+		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
+		$this->assertFalse($widget->query($locator)->one(false)->isValid());
+		$widget->query('xpath://span[@title="'.$entity_name.'"]')->waitUntilReady()->one()->click();
+		$this->assertTrue($widget->query($locator)->one()->isVisible());
+	}
+
+	/**
+	 * Opens widget edit form and fills in data.
+	 *
+	 * @param string		$dashboardid		dashboard id
+	 * @param string		$widget_name		widget name
+	 * @param array			$configuration    	widget parameter(s)
+	 */
+	public function setWidgetConfiguration($dashboardid, $widget_name, $configuration = []) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
+		$form->fill($configuration);
+		$form->submit();
+	}
 }

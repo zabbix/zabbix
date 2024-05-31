@@ -715,12 +715,8 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 
 	public function testDashboardItemNavigatorWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE])->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
-		$dashboard->getWidget(self::$update_widget)->edit()->submit();
-		$dashboard->save();
+		$this->setWidgetConfiguration(self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE], self::$update_widget);
+		CDashboardElement::find()->one()->save();
 		$this->page->waitUntilReady();
 
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -951,41 +947,8 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 	public function testDashboardItemNavigatorWidget_RowHighlight() {
 		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
 				['Item patterns' => '*memory in*']);
-		$this->checkRowHighlight(self::DEFAULT_WIDGET, true);
+		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Available memory in %', true);
 		CDashboardElement::find()->one()->save();
-		$this->checkRowHighlight(self::DEFAULT_WIDGET);
-	}
-
-	/**
-	 * Check if row with item is highlighted on click.
-	 *
-	 * @param string		$widget_name		widget name
-	 * @param boolean 		$edit				edit is performed
-	 */
-	protected function checkRowHighlight($widget_name, $edit = false) {
-		$widget = $edit
-			? CDashboardElement::find()->one()->edit()->getWidget($widget_name)
-			: CDashboardElement::find()->one()->getWidget($widget_name);
-
-		$widget->waitUntilReady();
-		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
-		$this->assertFalse($widget->query($locator)->one(false)->isValid());
-		$widget->query('xpath://span[@title="Available memory in %"]')->waitUntilReady()->one()->click();
-		$this->assertTrue($widget->query($locator)->one()->isVisible());
-	}
-
-	/**
-	 * Opens widget edit form and fills in data.
-	 *
-	 * @param string		$dashboardid		dashboard id
-	 * @param string		$widget_name		widget name
-	 * @param array			$configuration    	widget parameter(s)
-	 */
-	protected function setWidgetConfiguration($dashboardid, $widget_name, $configuration) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->edit();
-		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
-		$form->fill($configuration);
-		$form->submit();
+		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Available memory in %');
 	}
 }
