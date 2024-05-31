@@ -37,7 +37,6 @@
 static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 {
 	zbx_webdriver_t		*wd;
-	void			*ref;
 	zbx_es_env_t		*env;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
@@ -47,24 +46,8 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 		return NULL;
 	}
 
-	duk_push_this(ctx);
-	duk_get_global_string(ctx, "Browser");
-
-	if (0 == duk_instanceof(ctx, -2, -1))
-	{
-		(void)duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "object is not an instance of Browser");
-
-		return NULL;
-	}
-
-	duk_pop(ctx);
-
-	duk_get_prop_string(ctx, -1, "\xff""\xff""d");
-	ref = duk_to_pointer(ctx, -1);
-	duk_pop_2(ctx);
-
-	if (NULL == (wd = (zbx_webdriver_t *)es_get_ptr(env, ref, ES_OBJ_BROWSER)))
-		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find embedded native data");
+	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env)))
+		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return wd;
 }
@@ -77,7 +60,6 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 static duk_ret_t	es_browser_dtor(duk_context *ctx)
 {
 	zbx_webdriver_t	*wd;
-	void		*ref;
 	zbx_es_env_t	*env;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
@@ -85,14 +67,9 @@ static duk_ret_t	es_browser_dtor(duk_context *ctx)
 
 	zabbix_log(LOG_LEVEL_TRACE, "Browser::~Browser()");
 
-	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
-	ref = duk_to_pointer(ctx, -1);
-
-	if (NULL != (wd = (zbx_webdriver_t *)es_get_ptr(env, ref, ES_OBJ_BROWSER)))
+	if (NULL != (wd = (zbx_webdriver_t *)es_obj_detach_data(env)))
 	{
 		webdriver_release(wd);
-		es_remove_ptr(env, ref);
-
 		env->browser_objects--;
 	}
 
@@ -112,7 +89,6 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	zbx_es_env_t	*env;
 	int		err_index = -1;
 	char		*error = NULL, *capabilities = NULL;
-	void		*ref = NULL;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
@@ -151,29 +127,30 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 		goto out;
 	}
 
-	ref = es_put_ptr(env, wd, ES_OBJ_BROWSER);
+	es_obj_attach_data(env, wd);
 
 	duk_push_this(ctx);
 	wd->browser = duk_get_heapptr(ctx, -1);
 
-	duk_push_string(ctx, "\xff""\xff""d");
-	duk_push_pointer(ctx, ref);
-	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);
+	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot open webriver session: %s", error);
+		goto out;
+	}
 
 	duk_push_c_function(ctx, es_browser_dtor, 1);
 	duk_set_finalizer(ctx, -2);
-
-	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))
-		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot open webriver session: %s", error);
 out:
 	zbx_free(capabilities);
 	zbx_free(error);
 
 	if (-1 != err_index)
 	{
-		es_remove_ptr(env, ref);
-		webdriver_release(wd);
+		if (NULL != wd)
+		{
+			(void)es_obj_detach_data(env);
+			webdriver_release(wd);
+		}
 
 		return duk_throw(ctx);
 	}
