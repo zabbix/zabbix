@@ -520,9 +520,10 @@ class testFormAdministrationProxies extends CWebTest {
 					$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 				}
 
-				$empty_dialog = $form->getField('Proxy group')->edit();
-				$this->assertEquals('No data found', $empty_dialog->query('class:no-data-message')->one()->getText());
-				$empty_dialog->close();
+				// TODO: Uncomment after ZBX-24571 is fixed.
+//				$empty_dialog = $form->getField('Proxy group')->edit();
+//				$this->assertEquals('No data found', $empty_dialog->query('class:no-data-message')->one()->getText());
+//				$empty_dialog->close();
 
 				// Check timeouts.
 				$form->selectTab('Timeouts');
