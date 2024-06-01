@@ -512,7 +512,8 @@ class testPageMonitoringLatestData extends CWebTest {
 					'result' => [
 						['Name' => 'tag_item_1'],
 						['Name' => 'tag_item_2']
-					]
+					],
+					'check_after_clear' => true
 				]
 			],
 			// Tag values and Data.
@@ -579,6 +580,22 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->assertHeader('Latest data');
 
 		$this->assertTableData($data['result'], $this->getTableSelector());
+
+		// Check that subfilter remains selected after main field is cleared.
+		if (CTestArrayHelper::get($data, 'check_after_clear', false)) {
+			$table = $this->getTable();
+			$filter_form = $this->query('name:zbx_filter')->asForm()->one()->waitUntilVisible();
+			$filter_form->fill(['Name' => '']);
+			$filter_form->submit();
+			$table->waitUntilReloaded();
+
+			foreach ($data['subfilter']['Tag values'] as $subfilter) {
+				$this->assertTrue($this->query('xpath://a[text()='.CXPathHelper::escapeQuotes($subfilter).']/..')
+						->one()->isAttributePresent(['class' => 'subfilter subfilter-enabled'])
+				);
+			}
+		}
+
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 	}
 
