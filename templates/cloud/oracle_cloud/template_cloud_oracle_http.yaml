@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-04-26T13:37:38Z'
+  date: '2024-06-03T15:27:49Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -7723,7 +7723,7 @@ zabbix_export:
         - macro: '{$OCI.API.AUTONOMOUS.DB.HOST}'
           description: 'Host for OCI Autonomous Database API endpoint.'
         - macro: '{$OCI.API.COMPARTMENT.AUTONOMOUS.DB}'
-          description: 'Compartment OCIDs for object storage buckets. Can be a single value or a comma separated list of values.'
+          description: 'Compartment OCIDs for autonomous databases. Can be a single value or a comma separated list of values.'
         - macro: '{$OCI.API.COMPARTMENT.COMPUTE}'
           description: 'Compartment OCIDs for compute instances. Can be a single value or a comma separated list of values.'
         - macro: '{$OCI.API.COMPARTMENT.OBJECT.STORAGE}'

@@ -184,7 +184,7 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.API.COMPARTMENT.VOLUME.BLOCK}|<p>Compartment OCIDs for block volumes. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.COMPARTMENT.VOLUME.BOOT}|<p>Compartment OCIDs for boot volumes. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.COMPARTMENT.OBJECT.STORAGE}|<p>Compartment OCIDs for object storage buckets. Can be a single value or a comma separated list of values.</p>||
-|{$OCI.API.COMPARTMENT.AUTONOMOUS.DB}|<p>Compartment OCIDs for object storage buckets. Can be a single value or a comma separated list of values.</p>||
+|{$OCI.API.COMPARTMENT.AUTONOMOUS.DB}|<p>Compartment OCIDs for autonomous databases. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.TENANCY}|<p>OCID of tenancy.</p>||
 |{$OCI.API.USER}|<p>OCID of user.</p>||
 |{$OCI.API.PRIVATE.KEY}|<p>Entire private key for API access.</p>||
