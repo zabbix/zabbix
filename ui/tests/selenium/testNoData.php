@@ -27,6 +27,7 @@ class testNoData extends CWebTest {
 
 	const EMPTY_HOST = 'Empty host for multiselects test';
 	const EMPTY_TEMPLATE = 'Empty template for multiselects test';
+	public static $empty_hostid;
 
 	public function prepareEmptyData() {
 		$hostgroups = CDataHelper::call('hostgroup.create', [
@@ -35,10 +36,11 @@ class testNoData extends CWebTest {
 
 		$host_groupid = $hostgroups['groupids'][0];
 
-		CDataHelper::call('host.create', [
+		$hosts = CDataHelper::call('host.create', [
 			'host' => self::EMPTY_HOST,
 			'groups' => [['groupid' => $host_groupid]]
 		]);
+		self::$empty_hostid = $hosts['hostids'][0];
 
 		$template_groups = CDataHelper::call('templategroup.create', [
 			['name' => 'Template group for empty template']
@@ -353,5 +355,111 @@ class testNoData extends CWebTest {
 		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
 			$template_overlay->close();
 		}
+	}
+
+	public static function getCheckEmptyItemsData() {
+		return [
+			[
+				[
+					'object' => 'item',
+					'overlay_form' => true,
+					'form' => 'id:item-form',
+					'fields' => [
+						'Type' => 'Dependent item'
+					]
+				]
+			],
+			[
+				[
+					'object' => 'discovery rule',
+					'form' => 'id:host-discovery-form',
+					'fields' => [
+						'Type' => 'Dependent item'
+					]
+				]
+			],
+			[
+				[
+					'object' => 'trigger',
+					'overlay_form' => true,
+					'form' => 'id:trigger-form'
+				]
+			],
+			[
+				[
+					'object' => 'graph',
+					'form' => 'name:graphForm'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCheckEmptyItemsData
+	 */
+	public function testNoData_CheckEmptyItems($data) {
+		switch ($data['object']) {
+			case 'item':
+				$url = 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='.self::$empty_hostid;
+				break;
+
+			case 'discovery rule':
+				$url = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.self::$empty_hostid;
+				break;
+
+			case 'trigger':
+				$url = 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids%5B0%5D='.self::$empty_hostid;
+				break;
+
+			case 'graph':
+				$url = 'graphs.php?filter_set=1&context=host&filter_hostids%5B0%5D='.self::$empty_hostid;
+				break;
+		}
+
+		$this->page->login()->open($url);
+		$this->query('button:Create '.$data['object'])->one()->waitUntilClickable()->click();
+
+		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
+			COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		}
+
+		$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
+
+		switch ($data['object']) {
+			case 'item':
+			case 'discovery rule':
+				$form->fill(['Type' => 'Dependent item']);
+				$overlay = $form->getField('Master item')->edit();
+
+				$this->checkEmptyOverlay($overlay);
+				break;
+
+			case 'trigger':
+				$form->query('xpath:.//button[@id="insert-expression"]')->one()->waitUntilCLickable()->click();
+				$expression_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$expression_overlay->query('button:Select')->one()->waitUntilCLickable()->click();
+				$items_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$this->checkEmptyOverlay($items_overlay);
+				break;
+
+			case 'graph':
+				$form->getFieldContainer('Items')->query('button:Add')->one()->waitUntilCLickable()->click();
+				$items_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$this->checkEmptyOverlay($items_overlay);
+				break;
+		}
+	}
+
+	/**
+	 * Function for testing opened overlay's title and contents.
+	 *
+	 * @param COverlayDialogElement    $overlay    tested overlay
+	 */
+	protected function checkEmptyOverlay($overlay) {
+		$this->assertEquals('Items', $overlay->getTitle());
+		$this->assertEquals([self::EMPTY_HOST],
+				$overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect()->one()->getValue()
+		);
+		$this->assertEquals('No data found', $overlay->query('class:no-data-message')->one()->getText());
 	}
 }
