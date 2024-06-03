@@ -557,6 +557,8 @@ class testUserRolesPermissions extends CWebTest {
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 		$this->query('button:Scan directory')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Modules updated');
+		CMessageElement::find()->one()->close();
 		$this->query('class:list-table')->asTable()->one()->findRows('Name', '5th Module')->select();
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
