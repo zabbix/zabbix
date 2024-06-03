@@ -126,7 +126,7 @@ class CRadioButtonList extends CList {
 			}
 
 			$radio = (new CInput('radio', $this->name, $value['value']))
-				->setEnabled($this->enabled)
+				->setEnabled($this->enabled && !$value['disabled'])
 				->onChange($value['on_change'])
 				->setId($value['id']);
 
