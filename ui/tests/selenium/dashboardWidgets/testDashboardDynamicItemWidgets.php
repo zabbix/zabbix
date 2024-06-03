@@ -16,9 +16,402 @@
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
- * @backup profiles
+ * @backup profiles, dashboard
+ *
+ * @onBefore prepareData
+
  */
 class testDashboardDynamicItemWidgets extends CWebTest {
+
+	protected static $dashboardid;
+
+	public static function prepareData() {
+		CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for Dynamic item',
+				'pages' => [
+					[
+						'name' => 'Page with dynamic widgets',
+						'widgets' => [
+							[
+								'type' => 'graph',
+								'x' => 0,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => '99104' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'x' => 24,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => '99103' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1I1'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'x' => 48,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => '99104' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'x' => 0,
+								'y' => 5,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
+										'name' => 'graphid',
+										'value' => '700027' // Graph name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'x' => 24,
+								'y' => 5,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
+										'name' => 'graphid',
+										'value' => '700026' // Graph name in widget Dynamic widgets H1: Dynamic widgets H1 G1 (I1).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'x' => 48,
+								'y' => 5,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
+										'name' => 'graphid',
+										'value' => '700027' // Graph name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'x' => 0,
+								'y' => 10,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
+										'name' => 'graphid',
+										'value' => '700028' // Graph name in widget 'Dynamic widgets H1: Dynamic widgets H1 G3 (I1 and I2)'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'x' => 24,
+								'y' => 10,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
+										'name' => 'graphid',
+										'value' => '700031' // Graph name in widget 'Dynamic widgets H1: Dynamic widgets H1 G4 (H1I1 and H3I1)'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'x' => 0,
+								'y' => 15,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => '99104' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'x' => 24,
+								'y' => 15,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => '99103' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I1'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'url',
+								'name' => 'Dynamic URL',
+								'x' => 0,
+								'y' => 20,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'url',
+										'value' => 'iframe.php?name={HOST.NAME}'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'x' => 0,
+								'y' => 25,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
+										'name' => 'itemid',
+										'value' => '99109' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1IP2'.
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'x' => 24,
+								'y' => 25,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
+										'name' => 'itemid',
+										'value' => '99108' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1IP1'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'x' => 48,
+								'y' => 25,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
+										'name' => 'itemid',
+										'value' => '99109' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1IP2'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'x' => 0,
+								'y' => 30,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
+										'name' => 'graphid',
+										'value' => '700032' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'.
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'x' => 24,
+								'y' => 30,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
+										'name' => 'graphid',
+										'value' => '700032' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'x' => 48,
+								'y' => 30,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
+										'name' => 'graphid',
+										'value' => '700033' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'x' => 0,
+								'y' => 35,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
+										'name' => 'graphid',
+										'value' => '700034' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'x' => 24,
+								'y' => 35,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
+										'name' => 'graphid',
+										'value' => '700035' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
+		self::$dashboardid = CDataHelper::getIds('name');
+	}
 
 	public static function getWidgetsData() {
 		return [
@@ -290,7 +683,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	 * @dataProvider getWidgetsData
 	 */
 	public function testDashboardDynamicItemWidgets_Layout($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1050');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Dynamic item']);
 		$dashboard = CDashboardElement::find()->one();
 
 		if (CTestArrayHelper::get($data, 'host_filter', false)) {
