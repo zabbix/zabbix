@@ -730,7 +730,9 @@ class CConfigurationImport {
 					$item['interfaceid'] = $interfaceid;
 				}
 
-				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
+				$item['valuemapid'] = 0;
+
+				if ($item['valuemap']) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $item['valuemap']['name']);
 
 					if ($valuemapid === null) {
@@ -743,8 +745,8 @@ class CConfigurationImport {
 					}
 
 					$item['valuemapid'] = $valuemapid;
-					unset($item['valuemap']);
 				}
+				unset($item['valuemap']);
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 					if (!array_key_exists('key', $item[$master_item_key])) {
@@ -1171,6 +1173,8 @@ class CConfigurationImport {
 						}
 					}
 
+					$item_prototype['valuemapid'] = 0;
+
 					if ($item_prototype['valuemap']) {
 						$valuemapid = $this->referencer->findValuemapidByName($hostid,
 							$item_prototype['valuemap']['name']
@@ -1187,8 +1191,8 @@ class CConfigurationImport {
 						}
 
 						$item_prototype['valuemapid'] = $valuemapid;
-						unset($item_prototype['valuemap']);
 					}
+					unset($item_prototype['valuemap']);
 
 					if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
 						if (!array_key_exists('key', $item_prototype[$master_item_key])) {

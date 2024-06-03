@@ -304,7 +304,7 @@ class testPageServicesSla extends CWebTest {
 			if (array_key_exists('rows', $schedule)) {
 				// Find the corresponding row and open the Custom schedule dialog.
 				$table->findRow('Name', $schedule['name'])->query('class:icon-description')->one()->click();
-				$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilReady()->one();
+				$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
 				$schedule_table = $overlay->query('class:list-table')->asTable()->one();
 				$displayed_days = $schedule_table->getRows()->asText();
 

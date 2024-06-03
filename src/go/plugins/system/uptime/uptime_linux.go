@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/std"
+	"golang.zabbix.com/sdk/std"
 )
 
 func getUptime() (uptime int, err error) {

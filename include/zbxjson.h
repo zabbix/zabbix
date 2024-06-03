@@ -190,6 +190,8 @@
 #define ZBX_PROTO_TAG_PROCESS_NAME		"process_name"
 #define ZBX_PROTO_TAG_PROCESS_NUM		"process_num"
 #define ZBX_PROTO_TAG_SCOPE			"scope"
+#define ZBX_PROTO_TAG_TRUNCATED			"truncated"
+#define ZBX_PROTO_TAG_ORIGINAL_SIZE		"original_size"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -249,6 +251,7 @@ typedef enum
 zbx_json_status_t;
 
 #define ZBX_JSON_STAT_BUF_LEN 4096
+#define ZBX_JSON_TEST_DATA_MAX_SIZE (512 * ZBX_KIBIBYTE)
 
 struct zbx_json
 {
@@ -277,6 +280,8 @@ void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
 void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
+size_t	zbx_json_addstring_limit( struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type,
+		size_t max_size);
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value);
 void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value);
 void	zbx_json_addraw(struct zbx_json *j, const char *name, const char *data);

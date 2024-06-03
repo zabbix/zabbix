@@ -436,6 +436,7 @@ class CWebTest extends CTest {
 
 		try {
 			$name = md5($function.$id).'.png';
+			$this->page->updateViewport();
 			$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element),
 					$this->getNormalizedRegions($element, $regions)
 			);

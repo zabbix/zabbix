@@ -28,12 +28,12 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/tlsconfig"
-	"git.zabbix.com/ap/plugin-support/uri"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/go-sql-driver/mysql"
 	"github.com/omeid/go-yarn"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/tlsconfig"
+	"golang.zabbix.com/sdk/uri"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (

@@ -24,7 +24,7 @@ import (
 	"net"
 
 	"github.com/Microsoft/go-winio"
-	"zabbix.com/plugins/external"
+	"golang.zabbix.com/agent2/plugins/external"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {

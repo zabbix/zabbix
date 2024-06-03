@@ -20,8 +20,8 @@
 package mysql
 
 import (
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 // Session is a general structure for storing sessions' configuration.

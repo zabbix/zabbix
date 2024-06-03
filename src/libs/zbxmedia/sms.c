@@ -24,6 +24,9 @@
 
 #include <termios.h>
 
+#define	ZBX_AT_ESC	"\x1B"
+#define ZBX_AT_CTRL_Z	"\x1A"
+
 static int	write_gsm(int fd, const char *str, char *error, int max_error_len)
 {
 	int	i, wlen, len, ret = SUCCEED;
@@ -88,7 +91,11 @@ static int	check_modem_result(char *buffer, char **ebuf, char **sbuf, const char
 	while (*sbuf < *ebuf && FAIL == ret);
 
 	if (FAIL == ret && NULL != error)
-		zbx_snprintf(error, max_error_len, "Expected [%s] received [%s]", expect, rcv);
+	{
+		zbx_snprintf(error, (size_t)max_error_len, "modem communication error");
+		zabbix_log(LOG_LEVEL_WARNING, "modem communication error: expected [%s] received [%s]",
+				expect, rcv);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -210,11 +217,34 @@ typedef struct
 }
 zbx_sms_scenario;
 
+static int	check_phone_number(const char *number)
+{
+	const char *ptr;
+
+	for (ptr = number; '\0' != *ptr; ptr++)
+	{
+		if (0 == isprint(*ptr) || '"' == *ptr)
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	check_sms_message(const char *message)
+{
+	const char *ptr;
+
+	for (ptr = message; '\0' != *ptr; ptr++)
+	{
+		if (*ZBX_AT_CTRL_Z == *ptr)
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	send_sms(const char *device, const char *number, const char *message, char *error, int max_error_len)
 {
-#define	ZBX_AT_ESC	"\x1B"
-#define ZBX_AT_CTRL_Z	"\x1A"
-
 	zbx_sms_scenario scenario[] =
 	{
 		{ZBX_AT_ESC	, NULL		, 0},	/* Send <ESC> */
@@ -236,12 +266,32 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	int			f, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	if (SUCCEED != check_phone_number(number))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid phone number \"%s\"", number);
+		if (NULL != error)
+			zbx_snprintf(error, max_error_len, "Invalid phone number \"%s\"", number);
+
+		return FAIL;
+	}
+
+	if (SUCCEED != check_sms_message(message))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "invalid message \"%s\"", message);
+		if (NULL != error)
+			zbx_snprintf(error, max_error_len, "Invalid message \"%s\"", message);
+
+		return FAIL;
+	}
 
 	if (-1 == (f = open(device, O_RDWR | O_NOCTTY | O_NDELAY)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "error in open(%s): %s", device, zbx_strerror(errno));
 		if (NULL != error)
-			zbx_snprintf(error, max_error_len, "error in open(%s): %s", device, zbx_strerror(errno));
+		{
+			zbx_snprintf(error, max_error_len, "Cannot open device \"%s\": %s", device,
+					zbx_strerror(errno));
+		}
 		return FAIL;
 	}
 
@@ -252,13 +302,29 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 
 		if (NULL != error)
 		{
-			zbx_snprintf(error, max_error_len, "error in setting the status flag to 0 (for %s): %s", device,
-					zbx_strerror(errno));
+			zbx_snprintf(error, (size_t)max_error_len,
+					"Cannot set device \"%s\" status flag to 0: %s",
+					device, zbx_strerror(errno));
 		}
+		ret = FAIL;
+		goto out;
 	}
 
-	/* set ta parameters */
-	tcgetattr(f, &old_options);
+	/* get ta parameters */
+	if (0 != tcgetattr(f, &old_options))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "error in getting modem attributes (for %s): %s", device,
+					zbx_strerror(errno));
+
+		if (NULL != error)
+		{
+			zbx_snprintf(error, (size_t)max_error_len,
+					"error in getting modem attributes (for %s): %s",
+					device, zbx_strerror(errno));
+		}
+		ret = FAIL;
+		goto out;
+	}
 
 	memset(&options, 0, sizeof(options));
 
@@ -309,6 +375,7 @@ int	send_sms(const char *device, const char *number, const char *message, char *
 	}
 
 	tcsetattr(f, TCSANOW, &old_options);
+out:
 	close(f);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
