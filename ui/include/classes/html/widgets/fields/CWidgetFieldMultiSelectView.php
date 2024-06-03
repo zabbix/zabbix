@@ -37,14 +37,8 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 		return $this->getMultiselect()->getId();
 	}
 
-	public function getLabel(): ?CLabel {
-		$label = parent::getLabel();
-
-		if ($label !== null) {
-			$label->setFor($this->getId().'_ms');
-		}
-
-		return $label;
+	public function getFocusableElementId(): string {
+		return $this->getId().'_ms';
 	}
 
 	public function getView(): CMultiSelect {

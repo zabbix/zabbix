@@ -24,8 +24,6 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 
 	protected string $placeholder = '';
 
-	protected bool $wildcard_allowed = false;
-
 	public function __construct(CWidgetFieldPatternSelect $field) {
 		$this->field = $field;
 		$this->placeholder = _('patterns');
@@ -37,14 +35,8 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 		return zbx_formatDomId($this->getName().'[]');
 	}
 
-	public function getLabel(): ?CLabel {
-		$label = parent::getLabel();
-
-		if ($label !== null) {
-			$label->setFor($this->getId().'_ms');
-		}
-
-		return $label;
+	public function getFocusableElementId(): string {
+		return $this->getId().'_ms';
 	}
 
 	public function getView(): CPatternSelect {
@@ -54,6 +46,7 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 			'data' => $this->field->getValue(),
 			'disabled' => $this->isDisabled(),
 			'placeholder' => $this->placeholder,
+			'wildcard_allowed' => true,
 			'popup' => [
 				'parameters' => [
 					'dstfrm' => $this->form_name,
@@ -65,10 +58,6 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 
 		if ($this->filter_preselect) {
 			$options['popup']['filter_preselect'] = $this->filter_preselect;
-		}
-
-		if ($this->wildcard_allowed) {
-			$options['wildcard_allowed'] = true;
 		}
 
 		return (new CPatternSelect($options))
@@ -98,12 +87,6 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 
 	public function setPlaceholder(string $placeholder): self {
 		$this->placeholder = $placeholder;
-
-		return $this;
-	}
-
-	public function setWildcardAllowed(bool $wildcard_allowed = true): self {
-		$this->wildcard_allowed = $wildcard_allowed;
 
 		return $this;
 	}
