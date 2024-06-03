@@ -597,7 +597,9 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
 		for (const input of document.querySelectorAll('[name=tls_connect]')) {
 			input.addEventListener('click', () => {
-				this.addAttributes();
+				if (!input.readOnly) {
+					this.addAttributes();
+				}
 			});
 		}
 	}
