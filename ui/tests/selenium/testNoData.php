@@ -188,7 +188,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Triggers' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms',
+						'Templates' => 'popup_template_group_ms'
 					]
 				]
 			],
@@ -199,7 +199,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Graphs' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms',
+						'Templates' => 'popup_template_group_ms'
 					]
 				]
 			],
@@ -219,7 +219,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Discovery',
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms',
+						'Templates' => 'popup_template_group_ms'
 					]
 				]
 			],
@@ -230,7 +230,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Web',
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms',
+						'Templates' => 'popup_template_group_ms'
 					]
 				]
 			],
@@ -240,7 +240,7 @@ class testNoData extends CWebTest {
 					'page' => 'Discovery',
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Discovery rule' => null,
+						'Discovery rule' => null
 					]
 				]
 			],
