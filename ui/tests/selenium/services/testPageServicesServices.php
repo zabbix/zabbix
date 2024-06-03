@@ -940,6 +940,7 @@ class testPageServicesServices extends CWebTest {
 			$form->submit();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Service updated');
+			CMessageElement::find()->one()->close();
 		}
 
 		$this->assertTableDataColumn(['3', '1', '2']);
