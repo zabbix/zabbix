@@ -90,6 +90,8 @@ class CControllerAvailabilityReportList extends CController {
 				'hosts' => CProfile::getArray($prefix.'.hosts', $this->getInput('filter_hosts', []))
 			];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+
 		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 			$data['filter']['template_groups'] = $data['filter']['template_groups']
 				? $this->prepareDataForMultiselect($data['filter']['template_groups'], 'template_groups')
@@ -107,69 +109,27 @@ class CControllerAvailabilityReportList extends CController {
 				? $this->prepareDataForMultiselect($data['filter']['host_groups'], 'host_groups')
 				: [];
 
-			$no_data = false;
+			$template_groupids = $data['filter']['template_groups']
+				? getTemplateSubGroups(array_keys($data['filter']['template_groups']))
+				: null;
 
-			if ($data['filter']['template_groups'] && $data['filter']['templates']) {
-				$template_count = API::Template()->get([
-					'countOutput' => true,
-					'groupids' => array_keys($data['filter']['template_groups']),
-					'templateids' => array_keys($data['filter']['templates'])
-				]);
+			$triggers = API::Trigger()->get([
+				'output' => ['description'],
+				'selectHosts' => ['name'],
+				'selectItems' => ['status'],
+				'triggerids' => $data['filter']['triggers'] ? array_keys($data['filter']['triggers']) : null,
+				'templateids' => $data['filter']['templates'] ? array_keys($data['filter']['templates']) : null,
+				'groupids' => $template_groupids,
+				'templated' => true,
+				'filter' => [
+					'status' => TRIGGER_STATUS_ENABLED,
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
+				],
+				'sortfield' => 'description',
+				'preservekeys' => true
+			]);
 
-				if (!$template_count) {
-					$no_data = true;
-				}
-			}
-
-			if ($data['filter']['templates'] && $data['filter']['triggers']) {
-				$trigger_count = API::Trigger()->get([
-					'countOutput' => true,
-					'triggerids' => array_keys($data['filter']['triggers']),
-					'templateids' => array_keys($data['filter']['templates'])
-				]);
-
-				if (!$trigger_count) {
-					$no_data = true;
-				}
-			}
-
-			if ($data['filter']['template_groups'] && $data['filter']['triggers']) {
-				$templated_triggers = API::Trigger()->get([
-					'output' => [],
-					'triggerids' => array_keys($data['filter']['triggers']),
-					'selectTemplateGroups' => ['groupid']
-				]);
-
-				$groupids = array_map(function($trigger) {
-					return array_column($trigger['templategroups'], 'groupid');
-				}, $templated_triggers);
-
-				if (!in_array(array_key_first($data['filter']['template_groups']), array_merge(...$groupids))) {
-					$no_data = true;
-				}
-			}
-
-			if ($no_data) {
-				$triggers = [];
-			}
-			else {
-				$triggers = API::Trigger()->get([
-					'output' => ['description'],
-					'selectHosts' => ['name'],
-					'selectItems' => ['status'],
-					'templateids' => $data['filter']['templates'] ? array_keys($data['filter']['templates']) : null,
-					'groupids' => $data['filter']['template_groups']
-						? array_keys($data['filter']['template_groups'])
-						: null,
-					'templated' => true,
-					'filter' => [
-						'status' => TRIGGER_STATUS_ENABLED,
-						'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
-					],
-					'sortfield' => 'description',
-					'preservekeys' => true
-				]);
-
+			if ($triggers) {
 				foreach ($triggers as $id => $trigger) {
 					foreach ($trigger['items'] as $item) {
 						if ($item['status'] != ITEM_STATUS_ACTIVE) {
@@ -180,19 +140,24 @@ class CControllerAvailabilityReportList extends CController {
 					}
 				}
 
-				$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-				$triggers = API::Trigger()->get([
-					'output' => ['triggerid', 'description', 'expression', 'value'],
-					'selectHosts' => ['name'],
-					'expandDescription' => true,
-					'monitored' => true,
-					'groupids' => $data['filter']['host_groups'] ? array_keys($data['filter']['host_groups']) : null,
-					'filter' => ['templateid' => array_keys($triggers)],
-					'limit' => $limit
-				]);
+				if ($triggers) {
+					$host_groupids = $data['filter']['host_groups']
+						? getSubGroups(array_keys($data['filter']['host_groups']))
+						: null;
 
-				if (!$triggers) {
-					$triggers = [];
+					$triggers = API::Trigger()->get([
+						'output' => ['triggerid', 'description', 'expression', 'value'],
+						'selectHosts' => ['name'],
+						'expandDescription' => true,
+						'monitored' => true,
+						'groupids' => $host_groupids,
+						'filter' => ['templateid' => array_keys($triggers)],
+						'limit' => $limit
+					]);
+
+					if (!$triggers) {
+						$triggers = [];
+					}
 				}
 			}
 		}
@@ -205,12 +170,14 @@ class CControllerAvailabilityReportList extends CController {
 				? $this->prepareDataForMultiselect($data['filter']['hosts'], 'hosts')
 				: [];
 
-			$host_groups = enrichParentGroups($data['filter']['host_groups']);
-			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+			$host_groupids = $data['filter']['host_groups']
+				? getSubGroups(array_keys($data['filter']['host_groups']))
+				: null;
+
 			$triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'expression', 'value'],
 				'selectHosts' => ['name'],
-				'groupids' => $host_groups ? array_keys($host_groups) : null,
+				'groupids' => $host_groupids,
 				'hostids' => $data['filter']['hosts'] ? array_keys($data['filter']['hosts']) : null,
 				'expandDescription' => true,
 				'monitored' => true,
