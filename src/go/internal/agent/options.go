@@ -28,8 +28,8 @@ import (
 	"strings"
 	"unicode"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 var Options AgentOptions

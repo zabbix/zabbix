@@ -29,9 +29,10 @@ package file
 import "C"
 
 import (
-	"git.zabbix.com/ap/plugin-support/log"
 	"syscall"
 	"unsafe"
+
+	"golang.zabbix.com/sdk/log"
 )
 
 func findEncodingFromBOM(encoding string, inbuf []byte, bytecount int) string {

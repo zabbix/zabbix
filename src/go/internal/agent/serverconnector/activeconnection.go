@@ -26,8 +26,8 @@ import (
 	"net"
 	"time"
 
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/zbxcomms"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
 )
 
 type activeConnection struct {

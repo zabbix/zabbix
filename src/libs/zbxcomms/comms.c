@@ -1177,8 +1177,9 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 
 	if (0 == s->num_socks)
 	{
-		zbx_set_socket_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				NULL != listen_ip ? listen_ip : "-", listen_port);
+		zbx_set_socket_strerror("zbx_tcp_listen(): "
+				"failed to create listening socket for [[%s]:%hu]: %s",
+				NULL != listen_ip ? listen_ip : "-", listen_port, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -1342,8 +1343,9 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 
 	if (0 == s->num_socks)
 	{
-		zbx_set_socket_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				NULL != listen_ip ? listen_ip : "-", listen_port);
+		zbx_set_socket_strerror("zbx_tcp_listen(): "
+				"failed to create listening socket for [[%s]:%hu]: %s",
+				NULL != listen_ip ? listen_ip : "-", listen_port, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -1368,6 +1370,8 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
 
 	for (i = 0; i < s->num_socks; i++)
 		zbx_socket_close(s->sockets[i]);
+
+	zbx_socket_clean(s);
 }
 
 /******************************************************************************

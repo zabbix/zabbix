@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-13T12:40:33Z'
+  date: '2024-05-13T13:54:54Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -25,7 +25,7 @@ zabbix_export:
         - uuid: 4d142a571991482da0560cb2faa8f673
           name: 'Network interfaces discovery'
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFNAME},1.3.6.1.2.1.2.2.1.2,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
           key: net.if.discovery
           delay: 1h
           filter:
@@ -38,38 +38,45 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
+              - macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: C
+                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
+                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: E
+                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
+                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: G
+                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
-                formulaid: I
+                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: J
+                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 018d93910eef44388fcd1eb1de63262b
-              name: 'Interface {#IFDESCR}: Inbound packets discarded'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
@@ -94,7 +101,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: f97ed0e4b7b3473a988f27a60e5d79ef
-              name: 'Interface {#IFDESCR}: Inbound packets with errors'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
@@ -115,7 +122,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 3a971825c99e476aa2c18b1a792ec19d
-              name: 'Interface {#IFDESCR}: Bits received'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
               key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
@@ -140,7 +147,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 2395b3a694474b9894e64f759dbe805e
-              name: 'Interface {#IFDESCR}: Outbound packets discarded'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
@@ -165,7 +172,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: f6872ed88b464c37800738fd5e492896
-              name: 'Interface {#IFDESCR}: Outbound packets with errors'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
@@ -186,7 +193,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 2a7b5b7e48444c8c8cf38f89a1a1091e
-              name: 'Interface {#IFDESCR}: Bits sent'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}'
               key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
@@ -211,7 +218,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: b93b4164db1c4c838ecfd5c2b261acfb
-              name: 'Interface {#IFDESCR}: Speed'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.5.{#SNMPINDEX}'
               key: 'net.if.speed[ifSpeed.{#SNMPINDEX}]'
@@ -235,7 +242,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
             - uuid: 43d9d7883a1b4f6dbe4e118ef12d731e
-              name: 'Interface {#IFDESCR}: Operational status'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
@@ -264,7 +271,7 @@ zabbix_export:
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
-                  name: 'Interface {#IFDESCR}: Link down'
+                  name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -279,7 +286,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 9470d6a01c4e4ea2a007582ac1c0ce64
-              name: 'Interface {#IFDESCR}: Interface type'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
@@ -322,13 +329,13 @@ zabbix_export:
               recovery_expression: |
                 (change(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
                 (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
-              name: 'Interface {#IFDESCR}: Ethernet has changed to lower speed than it was before'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Interface {#IFDESCR}: Link down'
+                - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
@@ -343,14 +350,14 @@ zabbix_export:
               recovery_expression: |
                 avg(/Interfaces Simple by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
                 avg(/Interfaces Simple by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Interfaces Simple by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFDESCR}: High bandwidth usage'
-              event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Interface {#IFDESCR}: Link down'
+                - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
@@ -364,14 +371,14 @@ zabbix_export:
               recovery_expression: |
                 max(/Interfaces Simple by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Interfaces Simple by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFDESCR}: High error rate'
-              event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
+              event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Interface {#IFDESCR}: Link down'
+                - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_expression: 'last(/Interfaces Simple by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
@@ -379,7 +386,7 @@ zabbix_export:
                   value: performance
           graph_prototypes:
             - uuid: 80ae528968304d06a676f69c4e321c07
-              name: 'Interface {#IFDESCR}: Network traffic'
+              name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
@@ -416,6 +423,10 @@ zabbix_export:
                   item:
                     host: 'Interfaces Simple by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 4h
       macros:
         - macro: '{$IF.ERRORS.WARN}'
           value: '2'
@@ -428,6 +439,10 @@ zabbix_export:
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
+        - macro: '{$NET.IF.IFALIAS.MATCHES}'
+          value: '.*'
+        - macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
         - macro: '{$NET.IF.IFDESCR.MATCHES}'
           value: '.*'
         - macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
@@ -462,7 +477,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Interfaces Simple by SNMP'
-                        name: 'Interface {#IFDESCR}: Network traffic'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         - uuid: 4578589110ec40e19297e1d35d17c82f
           name: 'IF-MIB::ifOperStatus'

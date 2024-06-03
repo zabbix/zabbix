@@ -1,0 +1,25 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 3],
+    "svn_revision": "5338",
+    "platform_info": "x86_64-w64-mingw32-2016-1607",
+    "build_info": "(sf-7.3-1)",
+    "argv": ["smartctl", "-a", "/dev/sda", "-d", "areca,2", "-j"],
+    "messages": [
+      {
+        "string": "/dev/sda: Option -d areca,N/E requires device name /dev/arcmsrX",
+        "severity": "error"
+      },
+      {
+        "string": "=======> VALID ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], sat[,auto][,N][+TYPE], usbcypress[,X], usbjmicron[,p][,x][,N], usbprolific, usbsunplus, sntasmedia, sntjmicron[,NSID], sntrealtek, intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], auto, test <=======",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  },
+  "local_time": {
+    "time_t": 1663357979,
+    "asctime": "Fri Sep 16 22:52:59 2022 BST"
+  }
+}

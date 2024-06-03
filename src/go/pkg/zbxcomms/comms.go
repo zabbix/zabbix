@@ -29,8 +29,8 @@ import (
 	"net"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (

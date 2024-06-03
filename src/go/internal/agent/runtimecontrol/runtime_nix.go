@@ -30,7 +30,7 @@ import (
 	"syscall"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 func New(path string, timeout time.Duration) (conn *Conn, err error) {

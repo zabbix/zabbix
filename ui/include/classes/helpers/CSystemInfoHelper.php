@@ -106,6 +106,7 @@ class CSystemInfoHelper {
 		}
 
 		$setup = new CFrontendSetup();
+		$setup->setDefaultLang(CWebUser::$data['lang']);
 		$requirements = $setup->checkRequirements();
 		$requirements[] = $setup->checkSslFiles();
 
@@ -140,7 +141,7 @@ class CSystemInfoHelper {
 
 		$status['is_running'] = $server->isRunning(CSessionHelper::getId());
 
-		if ($status['is_running'] === false) {
+		if ($status['is_running'] === false || CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			return $status;
 		}
 

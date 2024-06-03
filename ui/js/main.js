@@ -387,7 +387,7 @@ var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
+			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak'),
 			appendTo = appendTo || '.wrapper';
 
 		if (styles) {
@@ -474,6 +474,8 @@ var hintBox = {
 				});
 			}
 		}
+
+		addEventListener('resize', target.resizeHandler = e => hintBox.onResize(e, target));
 	},
 
 	showHint: function(e, target, hintText, className, isStatic, styles) {
@@ -520,15 +522,23 @@ var hintBox = {
 				than the width of window when horizontal scrolling is active.
 			*/
 			css = {
-				width: $elem.width(),
-				height: $elem.height()
+				width: null,
+				height: null,
+				top: null,
+				right: null,
+				left: null
 			};
+
+		if ($host[0].clientWidth > hint_width) {
+			css.width = $elem.width();
+			css.height = $elem.height();
+		}
 
 		if (event_x + event_offset + hint_width <= host_x_max) {
 			css.left = event_x + event_offset;
 		}
 		else {
-			css.right = -$host.scrollLeft();
+			css.right = -$host.scrollLeft() || 0;
 		}
 
 		if (event_y + event_offset + hint_height <= host_y_max) {
@@ -540,8 +550,8 @@ var hintBox = {
 		else {
 			css.top = Math.max(host_y_min, Math.min(host_y_max - hint_height, event_y + event_offset));
 
-			if (css.right !== undefined) {
-				delete css.right;
+			if (css.right !== null) {
+				css.right = null;
 
 				css.left = ((event_x - event_offset - hint_width >= host_x_min)
 					? event_x - event_offset - hint_width
@@ -550,7 +560,9 @@ var hintBox = {
 			}
 		}
 
-		$elem.css(css);
+		for (const [key, value] of Object.entries(css)) {
+			$elem[0].style[key] = value !== null ? `${value}px` : null;
+		}
 	},
 
 	hideHint: function(target, hideStatic) {
@@ -585,6 +597,8 @@ var hintBox = {
 
 			delete target.observer;
 		}
+
+		removeEventListener('resize', target.resizeHandler);
 	},
 
 	deleteAll: () => {
@@ -604,6 +618,12 @@ var hintBox = {
 		}
 
 		return hintboxid;
+	},
+
+	onResize: function(e, target) {
+		if (target && target.hintBoxItem) {
+			hintBox.positionElement(e, target, target.hintBoxItem);
+		}
 	}
 };
 

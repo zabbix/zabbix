@@ -21,7 +21,6 @@ package smart
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"runtime"
 	"sort"
@@ -30,7 +29,8 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
@@ -221,6 +221,13 @@ type runner struct {
 	jsonDevices  map[string]jsonDevice
 }
 
+func init() {
+	cpuCount = runtime.NumCPU()
+	if cpuCount < 1 {
+		cpuCount = 1
+	}
+}
+
 // execute returns the smartctl runner with all devices data returned by smartctl.
 // If jsonRunner is 'true' the returned data is in json format in 'jsonDevices' field.
 // If jsonRunner is 'false' the returned data is 'devices' field.
@@ -257,16 +264,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	r.parseOutput(jsonRunner)
 
 	return r, err
-}
-
-// executeSingle returns device data for single device from smartctl based on provided path.
-func (p *Plugin) executeSingle(path string) (device []byte, err error) {
-	device, err = p.executeSmartctl(fmt.Sprintf("-a %s -j", path), false)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to execute smartctl: %w.", err)
-	}
-
-	return
 }
 
 // executeBase executed runners for basic devices retrieved from smartctl.
@@ -377,19 +374,20 @@ func (r *runner) waitForRaidExecution(done chan struct{}) {
 // Currently supported versions are 7.1 and above.
 // It returns an error if there is an issue with getting or parsing results from smartctl.
 func (p *Plugin) checkVersion() error {
-	var smartctl smartctl
-
 	if !versionCheckNeeded() {
 		return nil
 	}
 
-	info, err := p.executeSmartctl("-j -V", true)
+	out, err := p.ctl.Execute("-j", "-V")
 	if err != nil {
-		return fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
+		return errs.Wrap(err, "failed to execute smartctl")
 	}
 
-	if err = json.Unmarshal(info, &smartctl); err != nil {
-		return zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	var smartctl smartctl
+
+	err = json.Unmarshal(out, &smartctl)
+	if err != nil {
+		return errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	return evaluateVersion(smartctl.Smartctl.Version)
@@ -401,7 +399,8 @@ func versionCheckNeeded() bool {
 	versionMux.Lock()
 	defer versionMux.Unlock()
 
-	if lastVerCheck.IsZero() || time.Now().After(lastVerCheck.Add(24*time.Hour)) {
+	if lastVerCheck.IsZero() ||
+		time.Now().After(lastVerCheck.Add(24*time.Hour)) {
 		lastVerCheck = time.Now()
 
 		return true
@@ -413,7 +412,7 @@ func versionCheckNeeded() bool {
 // evaluateVersion checks version digits if they match the current allowed version or higher.
 func evaluateVersion(versionDigits []int) error {
 	if len(versionDigits) < 1 {
-		return fmt.Errorf("Invalid smartctl version")
+		return errs.Errorf("invalid smartctl version")
 	}
 
 	var version string
@@ -425,11 +424,14 @@ func evaluateVersion(versionDigits []int) error {
 
 	v, err := strconv.ParseFloat(version, 64)
 	if err != nil {
-		return zbxerr.ErrorCannotParseResult.Wrap(err)
+		return errs.WrapConst(err, zbxerr.ErrorCannotParseResult)
 	}
 
 	if v < supportedSmartctl {
-		return fmt.Errorf("Incorrect smartctl version, must be %v or higher", supportedSmartctl)
+		return errs.Errorf(
+			"Incorrect smartctl version, must be %v or higher",
+			supportedSmartctl,
+		)
 	}
 
 	return nil
@@ -448,23 +450,16 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 	defer r.wg.Done()
 
 	for name := range r.names {
-		err := clearString(name)
+		devices, err := r.plugin.ctl.Execute("-a", name, "-j")
 		if err != nil {
-			r.err <- zbxerr.ErrorCannotFetchData.Wrap(err)
-
-			return
-		}
-
-		devices, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j", name), false)
-		if err != nil {
-			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
+			r.err <- errs.Wrap(err, "failed to execute smartctl")
 			return
 		}
 
 		var dp deviceParser
 
 		if err = json.Unmarshal(devices, &dp); err != nil {
-			r.err <- zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+			r.err <- errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 			return
 		}
 
@@ -509,25 +504,21 @@ runner:
 		}
 
 		for {
-			var name string
+			args := []string{
+				"-a", raid.name,
+				"-d", fmt.Sprintf("%s,%d", raid.rType, i),
+				"-j",
+			}
 
 			if raid.rType == satType {
-				name = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
-			} else {
-				name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
+				args = []string{
+					"-a", raid.name,
+					"-d", raid.rType,
+					"-j",
+				}
 			}
 
-			err := clearString(name)
-			if err != nil {
-				r.plugin.Tracef(
-					"stopped looking for RAID devices of %s type, err: %s",
-					raid.rType, fmt.Errorf("failed to parse RAID disk data from smartctl: %s", err.Error()),
-				)
-
-				continue runner
-			}
-
-			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
+			device, err := r.plugin.ctl.Execute(args...)
 			if err != nil {
 				r.plugin.Tracef(
 					"stopped looking for RAID devices of %s type, err: %s",
@@ -596,22 +587,12 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 			return
 		}
 
-		name := fmt.Sprintf("%s -d %s", raid.name, raid.rType)
-
-		err := clearString(name)
+		device, err := r.plugin.ctl.Execute(
+			"-a", raid.name, "-d", raid.rType, "-j",
+		)
 		if err != nil {
 			r.plugin.Tracef(
-				"stopped looking for RAID devices of %s type, err: %s",
-				raid.rType, fmt.Errorf("failed to parse RAID disk data from smartctl: %s", err.Error()),
-			)
-
-			continue
-		}
-
-		device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
-		if err != nil {
-			r.plugin.Tracef(
-				"failed to get megaraid device with name %s, %s", name, err.Error(),
+				"failed to get megaraid device with name %s, %s", raid.name, err.Error(),
 			)
 
 			continue
@@ -619,9 +600,7 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 
 		var dp deviceParser
 		if err = json.Unmarshal(device, &dp); err != nil {
-			r.plugin.Tracef(
-				"failed to unmarshal megaraid device with name %s, %s", name, err.Error(),
-			)
+			r.plugin.Tracef("failed to unmarshal megaraid device with name %s, %s", raid.name, err.Error())
 
 			continue
 		}
@@ -630,7 +609,7 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 		if err != nil {
 			r.plugin.Tracef(
 				"got error from smartctl for megaraid devices with name %s, %s",
-				name, err.Error(),
+				raid.name, err.Error(),
 			)
 
 			continue
@@ -651,12 +630,20 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 // setRaidDevices sets device data to runner.
 // If json runner then raw byte data is set, else sets parsed data
 // Returns true if the runner should go to next raid value.
-func (r *runner) setRaidDevices(dp deviceParser, device []byte, raidType string, json bool) bool {
+func (r *runner) setRaidDevices(
+	dp deviceParser,
+	device []byte,
+	raidType string,
+	json bool,
+) bool {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
 	if json {
-		r.jsonDevices[dp.Info.Name] = jsonDevice{dp.SerialNumber, string(device)}
+		r.jsonDevices[dp.Info.Name] = jsonDevice{
+			dp.SerialNumber,
+			string(device),
+		}
 	} else {
 		r.devices[dp.Info.Name] = dp
 	}
@@ -711,40 +698,40 @@ func (r *runner) parseOutput(jsonRunner bool) {
 	}
 }
 
-func (dp *deviceParser) checkErr() (err error) {
+func (dp *deviceParser) checkErr() error {
 	if (parseError|openError)&dp.Smartctl.ExitStatus == 0 {
-		return
+		return nil
 	}
 
-	for _, m := range dp.Smartctl.Messages {
-		if err == nil {
-			err = errors.New(m.Str)
+	messages := make([]string, 0, len(dp.Smartctl.Messages))
 
+	for _, m := range dp.Smartctl.Messages {
+		if m.Str == "" {
 			continue
 		}
 
-		err = fmt.Errorf("%s, %s", err.Error(), m.Str)
+		messages = append(messages, m.Str)
 	}
 
-	if err == nil {
-		err = errors.New("unknown error from smartctl")
+	if len(messages) == 0 {
+		return errs.New("unknown error from smartctl")
 	}
 
-	return
+	return errs.New(strings.Join(messages, ", "))
 }
 
 // getDevices returns a parsed slices of all devices returned by smartctl scan.
 // Returns a separate slice for both normal and raid devices.
 // It returns an error if there is an issue with getting or parsing results from smartctl.
 func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
-	basicTmp, err := p.scanDevices("--scan -j")
+	basicTmp, err := p.scanDevices("--scan", "-j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %w.", err)
+		return nil, nil, nil, errs.Wrap(err, "failed to scan for devices")
 	}
 
-	raidTmp, err := p.scanDevices("--scan -d sat -j")
+	raidTmp, err := p.scanDevices("--scan", "-d", "sat", "-j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %w.", err)
+		return nil, nil, nil, errs.Wrap(err, "failed to scan for sat devices")
 	}
 
 	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)
@@ -754,7 +741,9 @@ func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
 
 // formatDeviceOutput removes raid devices from basic device list and separates megaraid devices from the rest of raid
 // devices.
-func formatDeviceOutput(basic, raid []deviceInfo) (basicDev, raidDev, megaraidDev []deviceInfo) {
+func formatDeviceOutput(
+	basic, raid []deviceInfo,
+) (basicDev, raidDev, megaraidDev []deviceInfo) {
 loop:
 	for _, tmp := range basic {
 		for _, r := range raid {
@@ -783,44 +772,25 @@ loop:
 // It parses the smartctl data into a slice with deviceInfo.
 // The data is sorted based on device name in alphabet order.
 // It returns an error if there is an issue with getting or parsing results from smartctl.
-func (p *Plugin) scanDevices(args string) ([]deviceInfo, error) {
-	var d devices
-
-	devices, err := p.executeSmartctl(args, false)
+func (p *Plugin) scanDevices(args ...string) ([]deviceInfo, error) {
+	out, err := p.ctl.Execute(args...)
 	if err != nil {
 		return nil, err
 	}
 
-	if err = json.Unmarshal(devices, &d); err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+	var d devices
+
+	err = json.Unmarshal(out, &d)
+	if err != nil {
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
-	var names []string
-	for _, info := range d.Info {
-		names = append(names, info.InfoName)
-	}
+	sort.SliceStable(
+		d.Info,
+		func(i, j int) bool {
+			return d.Info[i].Name < d.Info[j].Name
+		},
+	)
 
-	sort.Strings(names)
-
-	var out []deviceInfo
-
-names:
-	for _, name := range names {
-		for _, info := range d.Info {
-			if name == info.InfoName {
-				out = append(out, info)
-
-				continue names
-			}
-		}
-	}
-
-	return out, nil
-}
-
-func init() {
-	cpuCount = runtime.NumCPU()
-	if cpuCount < 1 {
-		cpuCount = 1
-	}
+	return d.Info, nil
 }
