@@ -1,0 +1,357 @@
+<?php
+/*
+** Copyright (C) 2001-2024 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+
+require_once dirname(__FILE__).'/../include/CWebTest.php';
+
+/**
+ * Test for checking empty pages, overlays and tables.
+ *
+ * @onBefore prepareEmptyData
+ *
+ * @backup profiles, hstgrp
+ */
+class testNoData extends CWebTest {
+
+	const EMPTY_HOST = 'Empty host for multiselects test';
+	const EMPTY_TEMPLATE = 'Empty template for multiselects test';
+
+	public function prepareEmptyData() {
+		$hostgroups = CDataHelper::call('hostgroup.create', [
+			['name' => 'Group for empty host']
+		]);
+
+		$host_groupid = $hostgroups['groupids'][0];
+
+		CDataHelper::call('host.create', [
+			'host' => self::EMPTY_HOST,
+			'groups' => [['groupid' => $host_groupid]]
+		]);
+
+		$template_groups = CDataHelper::call('templategroup.create', [
+			['name' => 'Template group for empty template']
+		]);
+
+		$template_groupid = $template_groups['groupids'][0];
+
+		CDataHelper::call('template.create', [
+			'host' => self::EMPTY_TEMPLATE,
+			'groups' => [['groupid' => $template_groupid]]
+		]);
+	}
+
+	public static function getCheckEmptyStudData() {
+		return [
+			// #0 No filter selected, Proxy field check.
+			[
+				[
+					'page' => 'Hosts',
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group',
+						'Proxies' => null
+					],
+					// Fill this filter to enable 'Proxy' multiselect.
+					'filter' => ['Monitored by' => 'Proxy']
+				]
+			],
+			// #1 No filter selected, Proxy group field check.
+			[
+				[
+					'page' => 'Hosts',
+					'checked_multiselects' => [
+						'Proxy groups' => null
+					],
+					// Fill this filter to enable 'Proxy groups' multiselect.
+					'filter' => ['Monitored by' => 'Proxy group']
+				]
+			],
+			// #2 Host's Items page.
+			[
+				[
+					'page' => 'Hosts',
+					'sub_object' => 'Items' ,
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Hosts' => 'popup_host_group_ms',
+						'Value mapping' => null
+					]
+				]
+			],
+			// #3 Host's Triggers page.
+			[
+				[
+					'page' => 'Hosts',
+					'sub_object' => 'Triggers' ,
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Hosts' => 'popup_host_group_ms'
+					]
+				]
+			],
+			// #4 Host's Graphs page.
+			[
+				[
+					'page' => 'Hosts',
+					'sub_object' => 'Graphs' ,
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Hosts' => 'popup_host_group_ms'
+					]
+				]
+			],
+			// #5 Host's LLDs page.
+			[
+				[
+					'page' => 'Hosts',
+					'sub_object' => 'Discovery' ,
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Hosts' => 'popup_host_group_ms'
+					]
+				]
+			],
+			// #6 Host's Web scenarios page.
+			[
+				[
+					'page' => 'Hosts',
+					'sub_object' => 'Web',
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Hosts' => 'popup_host_group_ms'
+					]
+				]
+			],
+			// #7 Non-existing host filtered.
+			[
+				[
+					'page' => 'Hosts',
+					'filter' => [
+						'Name' => 'zzz',
+						'Monitored by' => 'Proxy group'
+					],
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group',
+						'Proxy groups' => null
+					]
+				]
+			],
+			// #8 Templates: No filter selected.
+			[
+				[
+					'page' => 'Templates',
+					'checked_multiselects' => [
+						'Linked templates' => 'popup_template_group_ms'
+					]
+				]
+			],
+			// #9 Templates: Non-existing Template filtered.
+			[
+				[
+					'page' => 'Templates',
+					'filter' => ['Name' => 'zzz'],
+					'checked_multiselects' => [
+						'Linked templates' => 'popup_template_group_ms'
+					]
+				]
+			],
+			// #10 Templated Items page.
+			[
+				[
+					'page' => 'Templates',
+					'sub_object' => 'Items' ,
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group_ms',
+						'Value mapping' => null
+					]
+				]
+			],
+			// #11 Templated Triggers page.
+			[
+				[
+					'page' => 'Templates',
+					'sub_object' => 'Triggers' ,
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group_ms',
+					]
+				]
+			],
+			// #12 Templated Graphs page.
+			[
+				[
+					'page' => 'Templates',
+					'sub_object' => 'Graphs' ,
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group_ms',
+					]
+				]
+			],
+			// #13 Templated Dashboards page.
+			[
+				[
+					'page' => 'Templates',
+					'sub_object' => 'Dashboards',
+					'check_table' => true,
+					'no_filter' => true
+				]
+			],
+			// #14 Templated LLD page.
+			[
+				[
+					'page' => 'Templates',
+					'sub_object' => 'Discovery',
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group_ms',
+					]
+				]
+			],
+			// #15 Templated Web scenarios rules page.
+			[
+				[
+					'page' => 'Templates',
+					'sub_object' => 'Web',
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group_ms',
+					]
+				]
+			],
+			// #16 Discovery rules page.
+			[
+				[
+					'page' => 'Discovery',
+					'check_table' => true,
+					'checked_multiselects' => [
+						'Discovery rule' => null,
+					]
+				]
+			],
+			// #17 Host form overlay.
+			[
+				[
+					'page' => 'Host',
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group_ms'
+					],
+					'overlay_form' => true,
+					'no_filter' => true
+				]
+			],
+			// #18 Template form overlay.
+			[
+				[
+					'page' => 'Template',
+					'checked_multiselects' => [
+						'Templates' => 'popup_template_group_ms'
+					],
+					'overlay_form' => true,
+					'no_filter' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCheckEmptyStudData
+	 */
+	public function testNoData_CheckEmptyStud($data) {
+		switch ($data['page']) {
+			case 'Hosts':
+			case 'Host':
+				$url = 'zabbix.php?action=host.list';
+				break;
+
+			case 'Templates':
+			case 'Template':
+				$url = 'zabbix.php?action=template.list';
+				break;
+
+			case 'Discovery':
+				$url = 'zabbix.php?action=discovery.view';
+				break;
+		}
+
+		$this->page->login()->open($url);
+
+		if (array_key_exists('sub_object', $data)) {
+			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
+					->findRow('Name', ($data['page'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
+					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+		}
+
+		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
+			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
+					->query('link', ($data['page'] === 'Host') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
+					->waitUntilClickable()->one()->click();
+			$template_overlay = COverlayDialogElement::find()->waitUntilReady()->one();
+			$form = $template_overlay->asForm();
+		}
+
+		if (!CTestArrayHelper::get($data, 'no_filter', false)) {
+			$form = $this->query('name:zbx_filter')->asForm()->one();
+		}
+
+		// Fill filter to enable dependent multiselects.
+		if (array_key_exists('filter', $data)) {
+			$form->fill($data['filter']);
+			$form->submit();
+		}
+
+		if (CTestArrayHelper::get($data, 'check_table', false)) {
+			$this->assertEquals('No data found', $this->query('xpath://table['.
+					CXPathHelper::fromClass('list-table').']//div['.
+					CXPathHelper::fromClass('no-data-message').']')->one()->getText()
+			);
+		}
+
+		if (array_key_exists('checked_multiselects', $data)) {
+			foreach ($data['checked_multiselects'] as $field => $filter) {
+				$overlay = $form->getField($field)->edit();
+
+				$title = ($field === 'Linked templates')
+					? 'Templates'
+					: ($field === 'Discovery rule' ? 'Discovery rules' : $field) ;
+
+				$this->assertEquals($title, $overlay->getTitle());
+
+				if ($filter !== null) {
+					$this->assertEquals('', $overlay->query('id', $filter)->one()->getValue());
+					$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+							explode("\n", $overlay->query('class:no-data-message')->one()->getText())
+					);
+				}
+				else {
+					$this->assertEquals('No data found', $overlay->query('class:no-data-message')->one()->getText());
+				}
+
+				$overlay->close();
+			}
+		}
+
+		if (!CTestArrayHelper::get($data, 'no_filter', false)) {
+			$form->query('button:Reset')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+		}
+
+		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
+			$template_overlay->close();
+		}
+	}
+}

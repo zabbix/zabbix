@@ -324,6 +324,7 @@ require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testLanguage.php';
+require_once dirname(__FILE__).'/testNoData.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
@@ -649,6 +650,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testLanguage');
+		$suite->addTestSuite('testNoData');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageSearch');
