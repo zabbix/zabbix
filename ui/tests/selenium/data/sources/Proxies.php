@@ -93,7 +93,7 @@ class Proxies {
 	];
 
 	/**
-	 * Preparing proxies and hosts.
+	 * Preparing proxies, proxy groups and hosts.
 	 */
 	public static function load() {
 		// Create host group.
@@ -262,5 +262,138 @@ class Proxies {
 		DBexecute('UPDATE proxy_rtdata SET version=0, compatibility=0 WHERE proxyid='.zbx_dbstr($active_proxyids['active_unknown']));
 		DBexecute('UPDATE proxy_rtdata SET version=50401, compatibility=3 WHERE proxyid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
 		DBexecute('UPDATE config SET server_status='.zbx_dbstr('{"version": "6.4.0alpha1"}'));
+
+				// Create Proxy groups.
+		CDataHelper::call('proxygroup.create', [
+			[
+				'name' => 'Online proxy group',
+				'failover_delay' => '10',
+				'min_online' => '1',
+				'description' => 'Online proxy group that includes multiple proxies'
+			],
+			[
+				'name' => '2nd Online proxy group',
+				'failover_delay' => '666',
+				'min_online' => '666',
+				'description' => 'Another online proxy group that includes two proxies'
+			],
+			[
+				'name' => 'Degrading proxy group',
+				'failover_delay' => '15m',
+				'min_online' => '100',
+				'description' => 'Degrading proxy group that includes passive proxies'
+			],
+			[
+				'name' => 'Offline group',
+				'failover_delay' => '900s',
+				'min_online' => '1',
+				'description' => 'Offline proxy group that includes a proxy'
+			],
+			[
+				'name' => 'Default values - recovering'
+			],
+			[
+				'name' => '⭐️😀⭐Smiley प्रॉक्सी 团体⭐️😀⭐ - unknown',
+				'failover_delay' => '123s',
+				'min_online' => '123',
+				'description' => 'Proxy group that has special utf8mb4 simbols in its name and has unknown state'
+			],
+			[
+				'name' => 'Group without proxies',
+				'failover_delay' => '899',
+				'min_online' => '999',
+				'description' => 'Group without proxies - state should not be displayed'
+			],
+			[
+				'name' => 'Group without proxies with linked host',
+				'failover_delay' => '10',
+				'min_online' => '1',
+				'description' => 'Group without proxies, but with a linked host - should not be possible to delete'
+			],
+			[
+				'name' => 'Delete me 1',
+				'failover_delay' => '10',
+				'min_online' => '1',
+				'description' => 'Group for mass delete scenario'
+			],
+			[
+				'name' => 'Delete me 2',
+				'failover_delay' => '10',
+				'min_online' => '1',
+				'description' => '2nd group for mass delete scenario'
+			]
+		]);
+		$proxy_groupids = CDataHelper::getIds('name');
+
+		$proxyids = array_merge($active_proxyids, $passive_proxyids);
+		$group_parameters = [
+			'Online proxy group' => [
+				'state' => 3,
+				'proxies' => ['Active proxy 1', 'Active proxy 2', 'Active proxy 3', 'Active proxy to delete',
+						'Proxy_1 for filter', 'Proxy_2 for filter'],
+				'active_proxies' => ['Active proxy 1', 'Active proxy 2', 'Active proxy 3']
+			],
+			'2nd Online proxy group' => [
+				'state' => 3,
+				'proxies' => ['active_proxy3', 'active_proxy5'],
+				'active_proxies' => ['active_proxy3']
+			],
+			'Degrading proxy group' => [
+				'state' => 4,
+				'proxies' => ['Passive proxy 1', 'passive_proxy1', 'passive_unsupported']
+			],
+			'Offline group' => [
+				'state' => 1,
+				'proxies' => ['active_proxy7']
+			],
+			'Default values - recovering' => [
+				'state' => 2,
+				'proxies' => ['passive_proxy7']
+			],
+			'⭐️😀⭐Smiley प्रॉक्सी 团体⭐️😀⭐ - unknown' => [
+				'state' => 0,
+				'proxies' => ['passive_outdated']
+			]
+		];
+		foreach ($group_parameters as $group => $params) {
+			DBexecute('UPDATE proxy_group_rtdata SET state='.zbx_dbstr($params['state']).' WHERE proxy_groupid='.
+					zbx_dbstr($proxy_groupids[$group])
+			);
+
+			if (array_key_exists('proxies', $params)) {
+				foreach ($params['proxies'] as $proxy_name) {
+					$proxy_update_data[] = [
+						'proxyid' => $proxyids[$proxy_name],
+						'proxy_groupid' => $proxy_groupids[$group],
+						'local_address' => '127.0.0.1',
+						'local_port' => '10055'
+					];
+				}
+
+				CDataHelper::call('proxy.update', $proxy_update_data);
+			}
+
+			if (array_key_exists('active_proxies', $params)) {
+				foreach ($params['active_proxies'] as $active_proxy) {
+					DBexecute('UPDATE proxy_rtdata SET state=2 WHERE proxyid='.zbx_dbstr($proxyids[$active_proxy]));
+				}
+			}
+		}
+
+		// Link a host directly to a proxy group without proxies.
+		CDataHelper::call('host.create', [
+			[
+				'host' => 'Host linked to proxy group',
+				'groups' => [['groupid' => $hostgroupid]],
+				'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+				'proxy_groupid' => $proxy_groupids['Group without proxies with linked host']
+			],
+			[
+				'host' => 'Host linked to proxy group 2',
+				'groups' => [['groupid' => $hostgroupid]],
+				'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+				'proxy_groupid' => $proxy_groupids['Online proxy group']
+			]
+		]);
 	}
 }

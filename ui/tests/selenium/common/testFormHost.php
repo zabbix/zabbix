@@ -323,6 +323,26 @@ class testFormHost extends CWebTest {
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
+		// Check the value of the "Monitored by" field and the present/absence of the corresponding mulitselect.
+		$monitored_by = $form->getField('Monitored by');
+		$this->assertEquals('Proxy', $monitored_by->getValue());
+		$this->assertEquals(['Test Host Proxy'], $monitored_by->query('xpath:./../following-sibling::div')->asMultiselect()->one()->getValue());
+
+		$id_mapping = [
+			'Server' => ['proxyid' => false, 'proxy_groupid' => false],
+			'Proxy' => ['proxyid' => true, 'proxy_groupid' => false],
+			'Proxy group' => ['proxyid' => false, 'proxy_groupid' => true]
+		];
+		foreach (array_keys($id_mapping) as $monitored_by_value) {
+			$monitored_by->select($monitored_by_value);
+
+			foreach ($id_mapping[$monitored_by_value] as $id => $displayed) {
+				$this->assertTrue($form->query('xpath:.//div[@id='.CXPathHelper::escapeQuotes($id).']/../..')->one()
+						->isDisplayed($displayed)
+				);
+			}
+		}
+
 		// Close host form popup to avoid unexpected alert in further cases.
 		if (!$this->standalone) {
 			COverlayDialogElement::find()->one()->close();
@@ -650,7 +670,33 @@ class testFormHost extends CWebTest {
 					'error' => 'Incorrect arguments passed to function.'
 				]
 			],
-			// #20 Host without interface.
+			// #20 Empty proxy multiselect.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty proxy multiselect',
+						'Host groups' => 'Zabbix servers',
+						'Monitored by' => 'Proxy'
+					],
+					'error_title' => 'Cannot add host',
+					'error' => 'Invalid parameter "/1/proxyid": cannot be empty.'
+				]
+			],
+			// #21 Empty proxy group multiselect.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty proxy multiselect',
+						'Host groups' => 'Zabbix servers',
+						'Monitored by' => 'Proxy group'
+					],
+					'error_title' => 'Cannot add host',
+					'error' => 'Invalid parameter "/1/proxy_groupid": cannot be empty.'
+				]
+			],
+			// #22 Host without interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -660,7 +706,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #21 UTF8MB4 check.
+			// #23 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -672,7 +718,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #22 Default values of all interfaces.
+			// #24 Default values of all interfaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -700,7 +746,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #23 Change default host interface.
+			// #25 Change default host interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -726,13 +772,15 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #24 Different versions of SNMP interface and encryption.
+			// #26 Different versions of SNMP interface and encryption.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'host_fields' => [
 						'Host name' => 'Host with different versions of SNMP interface',
-						'Host groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers',
+						'Monitored by' => 'Proxy group',
+						'xpath:.//div[@id="proxy_groupid"]/..' => 'Group without proxies'
 					],
 					'interfaces' => [
 						[
@@ -782,7 +830,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #25 All interfaces and all fields in form.
+			// #27 All interfaces and all fields in form.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1262,6 +1310,31 @@ class testFormHost extends CWebTest {
 					'error_title' => 'Cannot update host',
 					'error' => 'Incorrect arguments passed to function.'
 				]
+			],
+			// Empty proxy.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty proxy',
+						'Monitored by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => ''
+					],
+					'error_title' => 'Cannot update host',
+					'error' => 'Invalid parameter "/1/proxyid": cannot be empty.'
+				]
+			],
+			// Empty proxy group.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Empty proxy',
+						'Monitored by' => 'Proxy group'
+					],
+					'error_title' => 'Cannot update host',
+					'error' => 'Invalid parameter "/1/proxy_groupid": cannot be empty.'
+				]
 			]
 		];
 	}
@@ -1366,8 +1439,8 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'Update host with all interfaces visible name',
 						'Host groups' => 'Linux servers',
 						'Description' => 'Update description',
-						'id:monitored_by' => 'Proxy',
-						'xpath:.//div[@id="proxyid"]/..' => 'Active proxy 1',
+						'Monitored by' => 'Proxy group',
+						'xpath:.//div[@id="proxy_groupid"]/..' => 'Group without proxies',
 						'Enabled' => false
 					],
 					'interfaces' => [
@@ -1419,7 +1492,9 @@ class testFormHost extends CWebTest {
 						'Host name' => 'Update host with utf8 visible name',
 						'Host groups' => 'Linux servers',
 						'Visible name' => '😀😀',
-						'Description' => '😀😀😀😀😀😀😀'
+						'Description' => '😀😀😀😀😀😀😀',
+						'Monitored by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => 'Active proxy 1'
 					],
 					'interfaces' => [
 						[
@@ -1522,7 +1597,7 @@ class testFormHost extends CWebTest {
 				'Visible name' => 'testFormHost_Update Visible name',
 				'Host groups' => 'Zabbix servers',
 				'Description' => 'Created host via API to test update functionality in host form and interfaces',
-				'id:monitored_by' => 'Proxy',
+				'Monitored by' => 'Proxy',
 				'xpath:.//div[@id="proxyid"]/..' => 'Test Host Proxy',
 				'Enabled' => true
 			],
@@ -1594,6 +1669,11 @@ class testFormHost extends CWebTest {
 				// Update or add new source data from host data.
 				foreach (CTestArrayHelper::get($data, 'host_fields', []) as $key => $value) {
 					$source['host_fields'][$key] = $value;
+				}
+
+				// If Monitored y is set to proxy group, then the proxy multiselect is replaced with proxy group multiselect.
+				if (CTestArrayHelper::get($data, 'host_fields.Monitored by') === 'Proxy group') {
+					unset($source['host_fields']['xpath:.//div[@id="proxyid"]/..']);
 				}
 
 				// Check host fields.
