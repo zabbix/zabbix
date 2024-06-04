@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/dbConditionIdTest.php';
 require_once dirname(__FILE__).'/dbConditionStringTest.php';
 require_once dirname(__FILE__).'/testHistoryManager.php';
 require_once dirname(__FILE__).'/urlParamTest.php';
+require_once dirname(__FILE__).'/CApiTagHelperTest.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -44,6 +45,7 @@ class GeneralTests {
 		$suite->addTestSuite('dbConditionStringTest');
 		$suite->addTestSuite('testHistoryManager');
 		$suite->addTestSuite('urlParamTest');
+		$suite->addTestSuite('CApiTagHelperTest');
 
 		return $suite;
 	}
