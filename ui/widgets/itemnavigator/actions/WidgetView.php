@@ -125,16 +125,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return $no_data;
 		}
 
+		$resolve_macros = $override_hostid !== '' || !$this->isTemplateDashboard();
+
 		$options = [
-			'output' => ['itemid', 'hostid'],
+			'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name'],
 			'webitems' => true,
 			'evaltype' => $this->fields_values['item_tags_evaltype'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
 			'filter' => [
 				'state' => $this->fields_values['state'] == WidgetForm::STATE_ALL ? null : $this->fields_values['state']
-			],
-			'search' => [
-				'name' => in_array('*', $this->fields_values['items'], true) ? null : $this->fields_values['items']
 			],
 			'searchWildcardsEnabled' => true,
 			'searchByAny' => true,
@@ -144,9 +143,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'sortorder' => ZBX_SORT_UP
 		];
 
-		$resolve_macros = $override_hostid !== '' || !$this->isTemplateDashboard();
-
-		$options['output'][] = $resolve_macros ? 'name_resolved' : 'name';
+		if (!$this->isTemplateDashboard()) {
+			$options['search']['name_resolved'] = in_array('*', $this->fields_values['items'], true)
+				? null
+				: $this->fields_values['items'];
+		}
+		elseif ($override_hostid !== '') {
+			$options['search']['name'] = in_array('*', $this->fields_values['items'], true)
+				? null
+				: $this->fields_values['items'];
+		}
+		else {
+			$options['search']['name'] = in_array('*', $this->fields_values['items'], true)
+				? null
+				: $this->fields_values['items'];
+		}
 
 		$limit_extended = $this->fields_values['show_lines'] + 1;
 		$selected_items_cnt = 0;

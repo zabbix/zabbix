@@ -88,23 +88,33 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [];
 		}
 
-		$items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'units', 'value_type'],
+		$search_field = $this->isTemplateDashboard() ? 'name' : 'name_resolved';
+
+		$options = [
+			'output' => ['itemid', 'hostid', 'units', 'value_type', $search_field],
 			'selectHosts' => ['name'],
 			'webitems' => true,
 			'hostids' => array_keys($hosts),
 			'evaltype' => $this->fields_values['evaltype_item'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
 			'selectValueMap' => ['mappings'],
-			'search' => [
-				'name' => in_array('*', $this->fields_values['items']) ? null : $this->fields_values['items']
-			],
 			'searchWildcardsEnabled' => true,
-			'searchByAny' => true
-		]);
+			'searchByAny' => true,
+			'search' => [
+				$search_field => in_array('*', $this->fields_values['items'], true)
+					? null
+					: $this->fields_values['items']
+			]
+		];
+
+		$items = API::Item()->get($options);
 
 		if (!$items) {
 			return [];
+		}
+
+		if (!$this->isTemplateDashboard()) {
+			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 		}
 
 		foreach ($items as &$item) {
