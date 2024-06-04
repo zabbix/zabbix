@@ -41,7 +41,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 7db240f752294b2eb86537d6c06cac5e
-          name: 'Openweathermap: Get data'
+          name: 'Get data'
           type: SCRIPT
           key: openweathermap.get.data
           delay: 10m
@@ -176,7 +176,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2eb0520627084f2596743f53552c3744
-          name: 'Openweathermap: Get data collection errors'
+          name: 'Get data collection errors'
           type: DEPENDENT
           key: openweathermap.get.errors
           delay: '0'
@@ -201,7 +201,7 @@ zabbix_export:
           triggers:
             - uuid: 8c2c6f81e1e74f97a28538e714eee474
               expression: 'length(last(/OpenWeatherMap by HTTP/openweathermap.get.errors))>0'
-              name: 'Openweathermap: There are errors in requests to OpenWeatherMap API'
+              name: 'There are errors in requests to OpenWeatherMap API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in requests to OpenWeatherMap API.'

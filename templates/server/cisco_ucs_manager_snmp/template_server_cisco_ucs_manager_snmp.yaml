@@ -30,7 +30,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: ad342e11ce9f4f79bf9b0182c3f83488
-          name: 'Cisco UCS Manager: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'cisco.ucs.contact[sysContact.0]'
@@ -52,7 +52,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 286fdb0fa49a4b378a6219a5ed76aac4
-          name: 'Cisco UCS Manager: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'cisco.ucs.descr[sysDescr.0]'
@@ -73,7 +73,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5af56ed99d09489aafc2d08d4bd4903a
-          name: 'Cisco UCS Manager: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'cisco.ucs.hw.uptime[hrSystemUptime.0]'
@@ -100,7 +100,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 88bd32f8520144858a8ddb03dd200638
-          name: 'Cisco UCS Manager: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'cisco.ucs.location[sysLocation.0]'
@@ -121,7 +121,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 8bd3a60e4c70450492432c6abfa7b5f9
-          name: 'Cisco UCS Manager: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'cisco.ucs.name[sysName.0]'
@@ -145,8 +145,8 @@ zabbix_export:
           triggers:
             - uuid: 622ac72c0e534bba94bb93636e4dc103
               expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.name[sysName.0],#1)<>last(/Cisco UCS Manager by SNMP/cisco.ucs.name[sysName.0],#2) and length(last(/Cisco UCS Manager by SNMP/cisco.ucs.name[sysName.0]))>0'
-              name: 'Cisco UCS Manager: System name has changed'
-              event_name: 'Cisco UCS Manager: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -154,7 +154,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: b87e425f1bdf404a8e53ff277c0ff0c0
-          name: 'Cisco UCS Manager: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'cisco.ucs.net.uptime[sysUpTime.0]'
@@ -174,7 +174,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 10d22e53318347658b2418ff33c26e0d
-          name: 'Cisco UCS Manager: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'cisco.ucs.objectid[sysObjectID.0]'
@@ -198,7 +198,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5d839f68b6534dc8bd1fb5db7a757f02
-          name: 'Cisco UCS Manager: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -211,7 +211,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 0926417e279a4e52a7f12587e9422e92
-          name: 'Cisco UCS Manager: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -235,7 +235,7 @@ zabbix_export:
           triggers:
             - uuid: 010a749e3a3242cd8e3ea30459fae5a4
               expression: 'max(/Cisco UCS Manager by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Cisco UCS Manager: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -2629,13 +2629,13 @@ zabbix_export:
   triggers:
     - uuid: 9026e680b409424e8fa29934878cb771
       expression: '(last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS Manager by SNMP/cisco.ucs.net.uptime[sysUpTime.0])<10m)'
-      name: 'Cisco UCS Manager: Host has been restarted'
-      event_name: 'Cisco UCS Manager: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Cisco UCS Manager: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Cisco UCS Manager by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

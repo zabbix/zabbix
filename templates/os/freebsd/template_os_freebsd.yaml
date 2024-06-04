@@ -27,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: 74bc1a15ef314d5f9b26332531885c0d
-          name: 'FreeBSD: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: da59d099f7614653b37b8eaaa518ebd2
-          name: 'FreeBSD: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
@@ -51,7 +51,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e2b84269401e41acb973bc29666b9e7a
-          name: 'FreeBSD: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -65,7 +65,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: d1b2d3cc2b7e44af8f9bfee11e04bf21
-          name: 'FreeBSD: Maximum number of opened files'
+          name: 'Maximum number of opened files'
           key: kernel.maxfiles
           delay: 1h
           history: 7d
@@ -76,7 +76,7 @@ zabbix_export:
           triggers:
             - uuid: 00f035b7890d4227a84a942ba5730df3
               expression: 'last(/FreeBSD by Zabbix agent/kernel.maxfiles)<1024'
-              name: 'FreeBSD: Configured max number of opened files is too low on {HOST.NAME}'
+              name: 'Configured max number of opened files is too low on {HOST.NAME}'
               priority: INFO
               tags:
                 - tag: scope
@@ -84,7 +84,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 58244a8e72694ffcbba5a78a910ae818
-          name: 'FreeBSD: Maximum number of processes'
+          name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
           history: 7d
@@ -97,7 +97,7 @@ zabbix_export:
           triggers:
             - uuid: 0d2417112c1e4ef38a4b763872cbb18b
               expression: 'last(/FreeBSD by Zabbix agent/kernel.maxproc)<256'
-              name: 'FreeBSD: Configured max number of processes is too low on {HOST.NAME}'
+              name: 'Configured max number of processes is too low on {HOST.NAME}'
               priority: INFO
               tags:
                 - tag: scope
@@ -105,7 +105,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 448c6de07b244281a4b1defe2e811773
-          name: 'FreeBSD: Number of running processes'
+          name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
           description: 'Number of processes in a running state.'
@@ -117,7 +117,7 @@ zabbix_export:
           triggers:
             - uuid: 837fdc71174246d987a6f7f277d65f6c
               expression: 'avg(/FreeBSD by Zabbix agent/proc.num[,,run],5m)>30'
-              name: 'FreeBSD: Too many processes running on {HOST.NAME}'
+              name: 'Too many processes running on {HOST.NAME}'
               priority: WARNING
               tags:
                 - tag: scope
@@ -125,7 +125,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 5fd5b351d8214eac8f4f4649594c27eb
-          name: 'FreeBSD: Number of processes'
+          name: 'Number of processes'
           key: 'proc.num[]'
           history: 7d
           description: 'Total number of processes in any state.'
@@ -137,7 +137,7 @@ zabbix_export:
           triggers:
             - uuid: 0d5ac85120734fa98d3eef01b6f4033b
               expression: 'avg(/FreeBSD by Zabbix agent/proc.num[],5m)>300'
-              name: 'FreeBSD: Too many processes on {HOST.NAME}'
+              name: 'Too many processes on {HOST.NAME}'
               priority: WARNING
               tags:
                 - tag: scope
@@ -145,7 +145,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 4a533b30c43e42fb8c9eabada0817186
-          name: 'FreeBSD: Host boot time'
+          name: 'Host boot time'
           key: system.boottime
           delay: 10m
           history: 7d
@@ -154,7 +154,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: db555e8318cf4e7aa7beb85aa0250697
-          name: 'FreeBSD: Interrupts per second'
+          name: 'Interrupts per second'
           key: system.cpu.intr
           history: 7d
           units: ips
@@ -167,7 +167,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 2336b2ec03a846f3bed1e64384b2532e
-          name: 'FreeBSD: Processor load (1 min average per core)'
+          name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
@@ -178,7 +178,7 @@ zabbix_export:
           triggers:
             - uuid: 8c339065ecc54b7d8c2e4405f2149f27
               expression: 'avg(/FreeBSD by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
-              name: 'FreeBSD: Processor load is too high on {HOST.NAME}'
+              name: 'Processor load is too high on {HOST.NAME}'
               priority: WARNING
               tags:
                 - tag: scope
@@ -186,7 +186,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: de68f40fc96648c0925c1f6a4ca6776e
-          name: 'FreeBSD: Processor load (5 min average per core)'
+          name: 'Processor load (5 min average per core)'
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
@@ -195,7 +195,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: ad9ebf859f7346ca885c1edcb7333d78
-          name: 'FreeBSD: Processor load (15 min average per core)'
+          name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
@@ -204,7 +204,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 0a140185a5114dd29451bfac68abdde5
-          name: 'FreeBSD: Context switches per second'
+          name: 'Context switches per second'
           key: system.cpu.switches
           history: 7d
           units: sps
@@ -217,7 +217,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 7612803821c845889bda84b7f1ac9ae5
-          name: 'FreeBSD: CPU idle time'
+          name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
           history: 7d
           value_type: FLOAT
@@ -227,7 +227,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f2acc3cd432546e5a223095a0ea2f096
-          name: 'FreeBSD: CPU interrupt time'
+          name: 'CPU interrupt time'
           key: 'system.cpu.util[,interrupt]'
           history: 7d
           value_type: FLOAT
@@ -237,7 +237,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: efa92492bec0437ba74f47d694500cab
-          name: 'FreeBSD: CPU nice time'
+          name: 'CPU nice time'
           key: 'system.cpu.util[,nice]'
           history: 7d
           value_type: FLOAT
@@ -247,7 +247,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: c9479b02b04141128b1ce7c8f3726c09
-          name: 'FreeBSD: CPU system time'
+          name: 'CPU system time'
           key: 'system.cpu.util[,system]'
           history: 7d
           value_type: FLOAT
@@ -257,7 +257,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 1f3bc82009e04b59845a0e15004637ad
-          name: 'FreeBSD: CPU user time'
+          name: 'CPU user time'
           key: 'system.cpu.util[,user]'
           history: 7d
           value_type: FLOAT
@@ -267,7 +267,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: c17d001bd20a4732b8ef487366c6aa42
-          name: 'FreeBSD: Host name'
+          name: 'Host name'
           key: system.hostname
           delay: 1h
           history: 7d
@@ -285,13 +285,13 @@ zabbix_export:
           triggers:
             - uuid: f48fb8ce1229492dae62de362c8c9539
               expression: 'last(/FreeBSD by Zabbix agent/system.hostname,#1)<>last(/FreeBSD by Zabbix agent/system.hostname,#2)'
-              name: 'FreeBSD: Hostname was changed on {HOST.NAME}'
+              name: 'Hostname was changed on {HOST.NAME}'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 4095ed7d606a47439294097a98af2c4f
-          name: 'FreeBSD: Host local time'
+          name: 'Host local time'
           key: system.localtime
           history: 7d
           units: unixtime
@@ -300,7 +300,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 63fc1259011f4250901889979cdf472c
-          name: 'FreeBSD: Free swap space'
+          name: 'Free swap space'
           key: 'system.swap.size[,free]'
           history: 7d
           units: B
@@ -309,7 +309,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 187d11e610b94b468d18b88ca38f2c32
-          name: 'FreeBSD: Free swap space in %'
+          name: 'Free swap space in %'
           key: 'system.swap.size[,pfree]'
           history: 7d
           value_type: FLOAT
@@ -321,7 +321,7 @@ zabbix_export:
           triggers:
             - uuid: a125b6786d55426eb19afe284cee1f76
               expression: 'last(/FreeBSD by Zabbix agent/system.swap.size[,pfree])<50'
-              name: 'FreeBSD: Lack of free swap space on {HOST.NAME}'
+              name: 'Lack of free swap space on {HOST.NAME}'
               priority: WARNING
               description: 'The system might need more physical memory.'
               tags:
@@ -330,7 +330,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9647b0b857074c4b9c14f15bb04af096
-          name: 'FreeBSD: Total swap space'
+          name: 'Total swap space'
           key: 'system.swap.size[,total]'
           delay: 1h
           history: 7d
@@ -340,7 +340,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 4523ae069e0b4e16bcb5182c6dbf63f2
-          name: 'FreeBSD: System information'
+          name: 'System information'
           key: system.uname
           delay: 1h
           history: 7d
@@ -358,13 +358,13 @@ zabbix_export:
           triggers:
             - uuid: ea2f9c186798420da781bd835fa0eaed
               expression: 'last(/FreeBSD by Zabbix agent/system.uname,#1)<>last(/FreeBSD by Zabbix agent/system.uname,#2)'
-              name: 'FreeBSD: Host information was changed on {HOST.NAME}'
+              name: 'Host information was changed on {HOST.NAME}'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: a49b956d592c4e2ba41caac3671e009f
-          name: 'FreeBSD: System uptime'
+          name: 'System uptime'
           key: system.uptime
           delay: 10m
           history: 7d
@@ -375,13 +375,13 @@ zabbix_export:
           triggers:
             - uuid: 809e57eb897b43fb8538e76ec7dd6602
               expression: 'change(/FreeBSD by Zabbix agent/system.uptime)<0'
-              name: 'FreeBSD: {HOST.NAME} has just been restarted'
+              name: '{HOST.NAME} has just been restarted'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: fec3e877764e4bfd98e77da9d8c73606
-          name: 'FreeBSD: Number of logged in users'
+          name: 'Number of logged in users'
           key: system.users.num
           history: 7d
           description: 'The number of users who are currently logged in.'
@@ -389,7 +389,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 2bb327cd5f8c49d9b680142825b9c030
-          name: 'FreeBSD: Checksum of /etc/passwd'
+          name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
           history: 7d
@@ -405,13 +405,13 @@ zabbix_export:
           triggers:
             - uuid: 27b4e5de411949a4befa7171a2af6441
               expression: 'last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
-              name: 'FreeBSD: /etc/passwd has been changed on {HOST.NAME}'
+              name: '/etc/passwd has been changed on {HOST.NAME}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: security
         - uuid: 9695b40b38f74bb3bb5d127af1ba13ce
-          name: 'FreeBSD: Get filesystems'
+          name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
           trends: '0'
@@ -421,7 +421,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 561c7a383b944bca9ec5f7c44e322fed
-          name: 'FreeBSD: Available memory'
+          name: 'Available memory'
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
@@ -432,7 +432,7 @@ zabbix_export:
           triggers:
             - uuid: f8fcce1904ab46088fa80433b85f2e83
               expression: 'last(/FreeBSD by Zabbix agent/vm.memory.size[available])<20M'
-              name: 'FreeBSD: Lack of available memory on server {HOST.NAME}'
+              name: 'Lack of available memory on server {HOST.NAME}'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -440,7 +440,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: ffa54e82b7914672a3f7134134ac2638
-          name: 'FreeBSD: Total memory'
+          name: 'Total memory'
           key: 'vm.memory.size[total]'
           delay: 1h
           history: 7d
@@ -450,7 +450,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: cbfaa94dc7bc4606a792aaf357054075
-          name: 'FreeBSD: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
@@ -463,8 +463,8 @@ zabbix_export:
           triggers:
             - uuid: fd9d36aaedff45f59017b1e714a5db69
               expression: 'max(/FreeBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'FreeBSD: Zabbix agent is not available'
-              event_name: 'FreeBSD: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive checks only. The availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.'
               manual_close: 'YES'
@@ -934,7 +934,7 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -950,7 +950,7 @@ zabbix_export:
                       value: AAAEB
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -995,7 +995,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

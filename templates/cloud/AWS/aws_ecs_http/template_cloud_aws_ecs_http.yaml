@@ -21,7 +21,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 9c4a894d46174d679c58c9a1339dec2f
-          name: 'AWS ECS Cluster: Get alarms check'
+          name: 'Get alarms check'
           type: DEPENDENT
           key: aws.ecs.alarms.check
           delay: '0'
@@ -45,14 +45,14 @@ zabbix_export:
           triggers:
             - uuid: f8ff542b35a345e490910323d5dee19c
               expression: 'length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarms.check))>0'
-              name: 'AWS ECS Cluster: Failed to get alarms data'
+              name: 'Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: c9d2dff2619d41c1a0d1a528fecab461
-          name: 'AWS ECS Cluster: Container Instance Count'
+          name: 'Container Instance Count'
           type: DEPENDENT
           key: aws.ecs.container_instance_count
           delay: '0'
@@ -70,7 +70,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 161886f00f91479597db4bfaae27db46
-          name: 'AWS ECS Cluster: CPU Reserved'
+          name: 'CPU Reserved'
           type: DEPENDENT
           key: aws.ecs.cpu_reserved
           delay: '0'
@@ -92,7 +92,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: fc4c44d533304ac3a4f59773c7424324
-          name: 'AWS ECS Cluster: CPU Utilization'
+          name: 'CPU Utilization'
           type: DEPENDENT
           key: aws.ecs.cpu_utilization
           delay: '0'
@@ -113,8 +113,8 @@ zabbix_export:
           triggers:
             - uuid: 5395c1d6d27c495a8972d2ea8ca8b02a
               expression: 'min(/AWS ECS Cluster by HTTP/aws.ecs.cpu_utilization,15m)>{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}'
-              name: 'AWS ECS Cluster: High CPU utilization'
-              event_name: 'AWS ECS Cluster: High CPU utilization (over {$AWS.ECS.CLUSTER.CPU.UTIL.WARN}% for 15m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$AWS.ECS.CLUSTER.CPU.UTIL.WARN}% for 15m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -124,7 +124,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 9aefed8b23ee41a7941e41f33fc95ebe
-          name: 'AWS ECS Cluster: Get alarms data'
+          name: 'Get alarms data'
           type: SCRIPT
           key: aws.ecs.get_alarms
           delay: 0s;m/1
@@ -375,7 +375,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: fa8f1dc24615438e98cbad686d40eaf7
-          name: 'AWS ECS Cluster: Get cluster services'
+          name: 'Get cluster services'
           type: SCRIPT
           key: aws.ecs.get_cluster_services
           delay: 5m
@@ -641,7 +641,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f45389a638c645f8905dc69d6cafb8b3
-          name: 'AWS ECS Cluster: Get cluster metrics'
+          name: 'Get cluster metrics'
           type: SCRIPT
           key: aws.ecs.get_metrics
           delay: 0s;m/1
@@ -947,7 +947,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0e1c53da0225410ea835f5d471afac13
-          name: 'AWS ECS Cluster: Memory Utilization'
+          name: 'Memory Utilization'
           type: DEPENDENT
           key: aws.ecs.memory_utilization
           delay: '0'
@@ -970,8 +970,8 @@ zabbix_export:
           triggers:
             - uuid: a7df755466704f339e5479aeeca3fe30
               expression: 'min(/AWS ECS Cluster by HTTP/aws.ecs.memory_utilization,15m)>{$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}'
-              name: 'AWS ECS Cluster: High memory utilization'
-              event_name: 'AWS ECS Cluster: High memory utilization (over {$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}% for 15m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (over {$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}% for 15m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The system is running out of free memory.'
@@ -981,7 +981,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: a214cef0377b4901afc2cb90186e5e46
-          name: 'AWS ECS Cluster: Get metrics check'
+          name: 'Get metrics check'
           type: DEPENDENT
           key: aws.ecs.metrics.check
           delay: '0'
@@ -1005,14 +1005,14 @@ zabbix_export:
           triggers:
             - uuid: b475c468dbe0477f92b40122321235b0
               expression: 'length(last(/AWS ECS Cluster by HTTP/aws.ecs.metrics.check))>0'
-              name: 'AWS ECS Cluster: Failed to get metrics data'
+              name: 'Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
                 - tag: scope
                   value: availability
         - uuid: 4daa5e7b1bc64b3cbd54d9addea571cd
-          name: 'AWS ECS Cluster: Network rx bytes'
+          name: 'Network rx bytes'
           type: DEPENDENT
           key: aws.ecs.network.rx
           delay: '0'
@@ -1033,7 +1033,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 59882985019d42009a1993bf8bfd1a31
-          name: 'AWS ECS Cluster: Network tx bytes'
+          name: 'Network tx bytes'
           type: DEPENDENT
           key: aws.ecs.network.tx
           delay: '0'
@@ -1054,7 +1054,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 26970ea823294cf2b87a158d8feee872
-          name: 'AWS ECS Cluster: Service Count'
+          name: 'Service Count'
           type: DEPENDENT
           key: aws.ecs.service_count
           delay: '0'
@@ -1072,7 +1072,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3cc6d826052c4da49bd8891a99ec2816
-          name: 'AWS ECS Cluster: Task Count'
+          name: 'Task Count'
           type: DEPENDENT
           key: aws.ecs.task_count
           delay: '0'
@@ -1115,7 +1115,7 @@ zabbix_export:
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: 98d3f64416f746639055abdda6dfc374
-              name: 'AWS ECS Cluster Alarms: [{#ALARM_NAME}]: Get metrics'
+              name: '[{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.ecs.alarm.get_metrics["{#ALARM_NAME}"]'
               delay: '0'
@@ -1134,7 +1134,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 8a862dd5444f459b88f91a9fdb2ddc5e
-              name: 'AWS ECS Cluster Alarms: [{#ALARM_NAME}]: State'
+              name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.ecs.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -1165,13 +1165,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 50061fea24e744298732167898c34e5f
                   expression: 'last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS ECS Cluster Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
+                  name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: eacb27b638924fa289e7c119f97879d8
-              name: 'AWS ECS Cluster Alarms: [{#ALARM_NAME}]: State reason'
+              name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.ecs.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -1198,7 +1198,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 25d14cc75ade4f7881825d5ab7864ca0
               expression: 'last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS ECS Cluster Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
+              name: '[{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -1248,7 +1248,7 @@ zabbix_export:
           description: 'Discovery {$AWS.ECS.CLUSTER.NAME} services.'
           item_prototypes:
             - uuid: 51de81c8bdcb4359b347e9d9226fcb4b
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: CPU Utilization'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: CPU Utilization'
               type: DEPENDENT
               key: 'aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1275,8 +1275,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 3e8d8d35d5ad4f70ad792fe943a499d2
                   expression: 'min(/AWS ECS Cluster by HTTP/aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.CPU.UTIL.WARN}'
-                  name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: High CPU utilization'
-                  event_name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: High CPU utilization (over {$AWS.ECS.CLUSTER.SERVICE.CPU.UTIL.WARN}% for 15m)'
+                  name: '[{#AWS.ECS.SERVICE.NAME}]: High CPU utilization'
+                  event_name: '[{#AWS.ECS.SERVICE.NAME}]: High CPU utilization (over {$AWS.ECS.CLUSTER.SERVICE.CPU.UTIL.WARN}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -1288,7 +1288,7 @@ zabbix_export:
                     - tag: service
                       value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: ba01726f96354fe681fb4d916d461460
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: CPU Reserved'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: CPU Reserved'
               type: DEPENDENT
               key: 'aws.ecs.services.cpu_reserved["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1314,7 +1314,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 785fd19ab3344e749ce486e4601f4d8e
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Desired Task'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Desired Task'
               type: DEPENDENT
               key: 'aws.ecs.services.desired.task["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1337,7 +1337,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: d12aae43f0f3446d96e2141a0bf303b8
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Get metrics'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Get metrics'
               type: SCRIPT
               key: 'aws.ecs.services.get_metrics["{#AWS.ECS.SERVICE.NAME}"]'
               delay: 0s;m/5
@@ -1645,7 +1645,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 685671b8a8c34f35ada959c2c6aca1e3
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Memory utilization'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Memory utilization'
               type: DEPENDENT
               key: 'aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1672,8 +1672,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: a1116a5e75f24b50864a0fb5ea7ad99d
                   expression: 'min(/AWS ECS Cluster by HTTP/aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.MEMORY.UTIL.WARN}'
-                  name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: High memory utilization'
-                  event_name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: High memory utilization (over {$AWS.ECS.CLUSTER.SERVICE.MEMORY.UTIL.WARN}% for 15m)'
+                  name: '[{#AWS.ECS.SERVICE.NAME}]: High memory utilization'
+                  event_name: '[{#AWS.ECS.SERVICE.NAME}]: High memory utilization (over {$AWS.ECS.CLUSTER.SERVICE.MEMORY.UTIL.WARN}% for 15m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'The system is running out of free memory.'
@@ -1685,7 +1685,7 @@ zabbix_export:
                     - tag: service
                       value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 538e0157704e40ffa124d6b74208f71b
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Memory reserved'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Memory reserved'
               type: DEPENDENT
               key: 'aws.ecs.services.memory_reserved["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1713,7 +1713,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 80471d41639f4e7a87174cad13f7f3a4
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Memory utilized'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Memory utilized'
               type: DEPENDENT
               key: 'aws.ecs.services.memory_utilized["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1741,7 +1741,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 52c14dd824174368acc0918d1c4670e4
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Network rx bytes'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Network rx bytes'
               type: DEPENDENT
               key: 'aws.ecs.services.network.rx["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1766,7 +1766,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 598337e977b2460ca3ce0844061a619c
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Network tx bytes'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Network tx bytes'
               type: DEPENDENT
               key: 'aws.ecs.services.network.tx["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1791,7 +1791,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 38d4200dad444b42b77e3fd1fe355007
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Pending Task'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Pending Task'
               type: DEPENDENT
               key: 'aws.ecs.services.pending.task["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1814,7 +1814,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 3e1538ea18d7417889536bfce39bc22c
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Running Task'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Running Task'
               type: DEPENDENT
               key: 'aws.ecs.services.running.task["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'
@@ -1837,7 +1837,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
             - uuid: 46b30a391af44cc5b9a70832189ffb2b
-              name: 'AWS ECS Cluster Service: [{#AWS.ECS.SERVICE.NAME}]: Task Set'
+              name: '[{#AWS.ECS.SERVICE.NAME}]: Task Set'
               type: DEPENDENT
               key: 'aws.ecs.services.task.set["{#AWS.ECS.SERVICE.NAME}"]'
               delay: '0'

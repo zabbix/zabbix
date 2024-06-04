@@ -23,7 +23,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: e06043e05d5a4c1da6b851bd43d66bda
-          name: 'Dell iDRAC: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -37,14 +37,14 @@ zabbix_export:
           triggers:
             - uuid: a6e3c67a99104c6f8672e3826cba009f
               expression: 'max(/Dell iDRAC by SNMP/icmpping,#3)=0'
-              name: 'Dell iDRAC: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 98ab999f96db4eceb4f347baf2df80a9
-          name: 'Dell iDRAC: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -58,11 +58,11 @@ zabbix_export:
           triggers:
             - uuid: 145ea57d03d3460cb86272493e99356a
               expression: 'min(/Dell iDRAC by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell iDRAC by SNMP/icmppingloss,5m)<100'
-              name: 'Dell iDRAC: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Dell iDRAC: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell iDRAC by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -70,7 +70,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 52b385efc0a54f5590f55716e4a179bf
-          name: 'Dell iDRAC: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -84,14 +84,14 @@ zabbix_export:
           triggers:
             - uuid: cd49c04001c74051b585f519503861d0
               expression: 'avg(/Dell iDRAC by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Dell iDRAC: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'Dell iDRAC: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Dell iDRAC by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Dell iDRAC by SNMP/icmppingloss,5m)<100'
-                - name: 'Dell iDRAC: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell iDRAC by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -99,7 +99,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 2f3d32242b0740e7830a4dff872308ac
-          name: 'Dell iDRAC: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -112,7 +112,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: ca82831e78f74372bb9be8f2c97ee9ac
-          name: 'Dell iDRAC: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -132,7 +132,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 13bd109b9a814ba4837eb98b8daf98a5
-          name: 'Dell iDRAC: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -153,7 +153,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e49f14d4a51f4018b17bd200d4819975
-          name: 'Dell iDRAC: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
           key: system.hw.firmware
@@ -174,7 +174,7 @@ zabbix_export:
           triggers:
             - uuid: e816b86474e6471eb48cbda563dfddd6
               expression: 'last(/Dell iDRAC by SNMP/system.hw.firmware,#1)<>last(/Dell iDRAC by SNMP/system.hw.firmware,#2) and length(last(/Dell iDRAC by SNMP/system.hw.firmware))>0'
-              name: 'Dell iDRAC: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -183,7 +183,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 9fc4348dc3c641dcbd0bb04b58145c91
-          name: 'Dell iDRAC: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
           key: system.hw.model
@@ -203,7 +203,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 4951ab6260b145ccb0c21abdcf5bb361
-          name: 'Dell iDRAC: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
           key: system.hw.serialnumber
@@ -225,8 +225,8 @@ zabbix_export:
           triggers:
             - uuid: 6f5b00a889804fbeb41c4246b29bd5f1
               expression: 'last(/Dell iDRAC by SNMP/system.hw.serialnumber,#1)<>last(/Dell iDRAC by SNMP/system.hw.serialnumber,#2) and length(last(/Dell iDRAC by SNMP/system.hw.serialnumber))>0'
-              name: 'Dell iDRAC: Device has been replaced'
-              event_name: 'Dell iDRAC: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -234,7 +234,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 935e3509834844d38a3a8df4d5f698d8
-          name: 'Dell iDRAC: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -258,7 +258,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 59a77e7fe66f4412bb117f8283216ce3
-          name: 'Dell iDRAC: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -278,7 +278,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2f76314dc3204e898df338f238f7d407
-          name: 'Dell iDRAC: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -300,8 +300,8 @@ zabbix_export:
           triggers:
             - uuid: ce1b064b2a07450d9b51b6b12bd752a9
               expression: 'last(/Dell iDRAC by SNMP/system.name,#1)<>last(/Dell iDRAC by SNMP/system.name,#2) and length(last(/Dell iDRAC by SNMP/system.name))>0'
-              name: 'Dell iDRAC: System name has changed'
-              event_name: 'Dell iDRAC: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -311,7 +311,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 522c04c2c624478b8de4287f863ea67a
-          name: 'Dell iDRAC: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -330,7 +330,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 737d790ef008450b81a69559ed1ee963
-          name: 'Dell iDRAC: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -349,7 +349,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9750f3ffa5d648ce9e99adea1d92b54c
-          name: 'Dell iDRAC: Overall system health status'
+          name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
           key: 'system.status[globalSystemStatus.0]'
@@ -367,7 +367,7 @@ zabbix_export:
           triggers:
             - uuid: 6d07848a4ded4e4fb0383ff12234ed25
               expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
-              name: 'Dell iDRAC: System is in unrecoverable state!'
+              name: 'System is in unrecoverable state!'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults'
@@ -378,12 +378,12 @@ zabbix_export:
                   value: performance
             - uuid: b47601a02003409896d79e3c99093aca
               expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
-              name: 'Dell iDRAC: System status is in critical state'
+              name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors'
               dependencies:
-                - name: 'Dell iDRAC: System is in unrecoverable state!'
+                - name: 'System is in unrecoverable state!'
                   expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
               tags:
                 - tag: scope
@@ -392,14 +392,14 @@ zabbix_export:
                   value: performance
             - uuid: a323c8f5ca8d4517b0451677bd43c4db
               expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1'
-              name: 'Dell iDRAC: System status is in warning state'
+              name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings'
               dependencies:
-                - name: 'Dell iDRAC: System is in unrecoverable state!'
+                - name: 'System is in unrecoverable state!'
                   expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_DISASTER_STATUS}")=1'
-                - name: 'Dell iDRAC: System status is in critical state'
+                - name: 'System status is in critical state'
                   expression: 'count(/Dell iDRAC by SNMP/system.status[globalSystemStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               tags:
                 - tag: scope
@@ -407,7 +407,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 83ebf3d38c92457a9d0462e3849d83ce
-          name: 'Dell iDRAC: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
           key: 'system.sw.os[systemOSName]'
@@ -429,18 +429,18 @@ zabbix_export:
           triggers:
             - uuid: fba72cbc4f12495b9f35d0f77a9330b8
               expression: 'last(/Dell iDRAC by SNMP/system.sw.os[systemOSName],#1)<>last(/Dell iDRAC by SNMP/system.sw.os[systemOSName],#2) and length(last(/Dell iDRAC by SNMP/system.sw.os[systemOSName]))>0'
-              name: 'Dell iDRAC: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Dell iDRAC: System name has changed'
+                - name: 'System name has changed'
                   expression: 'last(/Dell iDRAC by SNMP/system.name,#1)<>last(/Dell iDRAC by SNMP/system.name,#2) and length(last(/Dell iDRAC by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 6bcba0816ea942f6a87078070c82e7c3
-          name: 'Dell iDRAC: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -460,12 +460,12 @@ zabbix_export:
           triggers:
             - uuid: 22ae441fffdd48919be0041e1507a479
               expression: 'max(/Dell iDRAC by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Dell iDRAC: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'Dell iDRAC: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Dell iDRAC by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -1600,13 +1600,13 @@ zabbix_export:
   triggers:
     - uuid: c0efbe61effc494a970e0e02b9ce8f55
       expression: '(last(/Dell iDRAC by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Dell iDRAC by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Dell iDRAC by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Dell iDRAC by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'Dell iDRAC: Host has been restarted'
-      event_name: 'Dell iDRAC: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'Dell iDRAC: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/Dell iDRAC by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

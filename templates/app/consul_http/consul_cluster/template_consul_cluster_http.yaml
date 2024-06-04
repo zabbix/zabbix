@@ -27,7 +27,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: fd087c72bb7842c6b84b0b70788506b0
-          name: 'Consul cluster: Get services'
+          name: 'Get services'
           type: HTTP_AGENT
           key: consul.get_catalog_services
           history: '0'
@@ -49,7 +49,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: cad23435cc454f01b47034bd8427931d
-          name: 'Consul cluster: Get nodes Serf health status'
+          name: 'Get nodes Serf health status'
           type: HTTP_AGENT
           key: consul.get_cluster_serf
           history: '0'
@@ -73,7 +73,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e52fcc1af52e4df5b18118355260a8d6
-          name: 'Consul cluster: Cluster leader'
+          name: 'Cluster leader'
           type: HTTP_AGENT
           key: consul.get_leader
           history: 7d
@@ -103,8 +103,8 @@ zabbix_export:
           triggers:
             - uuid: 8f612c3cfbb74f55a7defed05039e2a5
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#1)<>last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#2) and length(last(/HashiCorp Consul Cluster by HTTP/consul.get_leader))>0'
-              name: 'Consul cluster: Leader has been changed'
-              event_name: 'Consul cluster: Leader has been changed (new value received: {ITEM.VALUE})'
+              name: 'Leader has been changed'
+              event_name: 'Leader has been changed (new value received: {ITEM.VALUE})'
               priority: INFO
               description: 'Consul cluster version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -112,7 +112,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 859451004516499e9636d96cde023d21
-          name: 'Consul cluster: Get nodes'
+          name: 'Get nodes'
           type: HTTP_AGENT
           key: consul.get_nodes
           history: '0'
@@ -132,7 +132,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2400f78a5ada4a59b63fc049b6e3b3bf
-          name: 'Consul cluster: Nodes: peers'
+          name: 'Nodes: peers'
           type: HTTP_AGENT
           key: consul.get_peers
           history: 7d
@@ -156,7 +156,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 31be2fd640a141279d41871df877a42c
-          name: 'Consul: Nodes: critical'
+          name: 'Nodes: critical'
           type: DEPENDENT
           key: consul.nodes_critical
           delay: '0'
@@ -177,14 +177,14 @@ zabbix_export:
           triggers:
             - uuid: 8660702ae3674eb083d6dacb81ec3a4d
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_critical)>0'
-              name: 'Consul: One or more nodes in cluster in ''critical'' state'
+              name: 'One or more nodes in cluster in ''critical'' state'
               priority: AVERAGE
               description: 'One or more agents on current dc with serf health status ''critical''.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 6303f2b128f64bec9760bc3807bb9a34
-          name: 'Consul: Nodes: passing'
+          name: 'Nodes: passing'
           type: DEPENDENT
           key: consul.nodes_passing
           delay: '0'
@@ -203,7 +203,7 @@ zabbix_export:
             - tag: component
               value: consul
         - uuid: 3eef4079f15d4db8852822ebda6d36fe
-          name: 'Consul: Nodes: total'
+          name: 'Nodes: total'
           type: DEPENDENT
           key: consul.nodes_total
           delay: '0'
@@ -222,7 +222,7 @@ zabbix_export:
             - tag: component
               value: consul
         - uuid: b02337cc9a6b4c34a85d85a231c4e51f
-          name: 'Consul: Nodes: warning'
+          name: 'Nodes: warning'
           type: DEPENDENT
           key: consul.nodes_warning
           delay: '0'
@@ -243,14 +243,14 @@ zabbix_export:
           triggers:
             - uuid: 92136d6ee73b4bb5b88b9f1da1afe740
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_warning)>0'
-              name: 'Consul: One or more nodes in cluster in ''warning'' state'
+              name: 'One or more nodes in cluster in ''warning'' state'
               priority: WARNING
               description: 'One or more agents on current dc with serf health status ''warning''.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 30101e37fce144bdacce0a58b4c9de0e
-          name: 'Consul: Services: total'
+          name: 'Services: total'
           type: DEPENDENT
           key: consul.services_total
           delay: '0'
@@ -285,7 +285,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             - uuid: ddb71b90bde94760a4a456c15e647917
-              name: 'Consul: Node ["{#NODE_NAME}"]: Serf Health'
+              name: 'Node ["{#NODE_NAME}"]: Serf Health'
               type: DEPENDENT
               key: 'consul.serf.health["{#NODE_NAME}"]'
               delay: '0'
@@ -376,7 +376,7 @@ zabbix_export:
                 formulaid: B
           item_prototypes:
             - uuid: 38576dd458a94259ab273204ffe9aebd
-              name: 'Consul cluster: ["{#SERVICE_NAME}"]: Get raw service state'
+              name: '["{#SERVICE_NAME}"]: Get raw service state'
               type: HTTP_AGENT
               key: 'consul.get_service_stats["{#SERVICE_NAME}"]'
               history: '0'
@@ -401,7 +401,7 @@ zabbix_export:
                 - tag: service
                   value: '{#SERVICE_NAME}'
             - uuid: 70a37e9934fa47f3bd7d553c70179d10
-              name: 'Consul: Service ["{#SERVICE_NAME}"]: Nodes critical'
+              name: 'Service ["{#SERVICE_NAME}"]: Nodes critical'
               type: DEPENDENT
               key: 'consul.service.nodes_critical["{#SERVICE_NAME}"]'
               delay: '0'
@@ -424,15 +424,15 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 60919b58bd484597aa7ec03f308eb614
                   expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.service.nodes_critical["{#SERVICE_NAME}"])>{$CONSUL.CLUSTER.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"}'
-                  name: 'Consul: Service ["{#SERVICE_NAME}"]: Too many nodes with service status ''critical'''
-                  event_name: 'Consul: Service ["{#SERVICE_NAME}"]: Too many nodes with service status ''critical'' (over {$CONSUL.CLUSTER.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"})'
+                  name: 'Service ["{#SERVICE_NAME}"]: Too many nodes with service status ''critical'''
+                  event_name: 'Service ["{#SERVICE_NAME}"]: Too many nodes with service status ''critical'' (over {$CONSUL.CLUSTER.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"})'
                   priority: AVERAGE
                   description: 'One or more nodes with service status ''critical''.'
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 3807bd01fda5425694eb8e4169eb4078
-              name: 'Consul: Service ["{#SERVICE_NAME}"]: Nodes passing'
+              name: 'Service ["{#SERVICE_NAME}"]: Nodes passing'
               type: DEPENDENT
               key: 'consul.service.nodes_passing["{#SERVICE_NAME}"]'
               delay: '0'
@@ -453,7 +453,7 @@ zabbix_export:
                 - tag: service
                   value: '{#SERVICE_NAME}'
             - uuid: 8a23dbb1d28c472291c06e0da572424a
-              name: 'Consul: Service ["{#SERVICE_NAME}"]: Nodes warning'
+              name: 'Service ["{#SERVICE_NAME}"]: Nodes warning'
               type: DEPENDENT
               key: 'consul.service.nodes_warning["{#SERVICE_NAME}"]'
               delay: '0'

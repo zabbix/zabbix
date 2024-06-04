@@ -64,23 +64,23 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam Manager: Get metrics|<p>The result of API requests is expressed in the JSON.</p>|Script|veeam.manager.get.metrics|
-|Veeam Manager: Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.manager.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Veeam Manager: Running Jobs|<p>Informs about the running jobs.</p>|Dependent item|veeam.manager.running.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.RunningJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Veeam Manager: Scheduled Jobs|<p>Informs about the scheduled jobs.</p>|Dependent item|veeam.manager.scheduled.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Veeam Manager: Scheduled Backup Jobs|<p>Informs about the scheduled backup jobs.</p>|Dependent item|veeam.manager.scheduled.backup.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledBackupJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Veeam Manager: Scheduled Replica Jobs|<p>Informs about the scheduled replica jobs.</p>|Dependent item|veeam.manager.scheduled.replica.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledReplicaJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Veeam Manager: Total Job Runs|<p>Informs about the total job runs.</p>|Dependent item|veeam.manager.scheduled.total.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.TotalJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Veeam Manager: Warnings Job Runs|<p>Informs about the warning job runs.</p>|Dependent item|veeam.manager.warning.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.WarningsJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Veeam Manager: Failed Job Runs|<p>Informs about the failed job runs.</p>|Dependent item|veeam.manager.failed.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.FailedJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get metrics|<p>The result of API requests is expressed in the JSON.</p>|Script|veeam.manager.get.metrics|
+|Get errors|<p>The errors from API requests.</p>|Dependent item|veeam.manager.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Running Jobs|<p>Informs about the running jobs.</p>|Dependent item|veeam.manager.running.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.RunningJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Scheduled Jobs|<p>Informs about the scheduled jobs.</p>|Dependent item|veeam.manager.scheduled.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Scheduled Backup Jobs|<p>Informs about the scheduled backup jobs.</p>|Dependent item|veeam.manager.scheduled.backup.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledBackupJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Scheduled Replica Jobs|<p>Informs about the scheduled replica jobs.</p>|Dependent item|veeam.manager.scheduled.replica.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.ScheduledReplicaJobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Total Job Runs|<p>Informs about the total job runs.</p>|Dependent item|veeam.manager.scheduled.total.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.TotalJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Warnings Job Runs|<p>Informs about the warning job runs.</p>|Dependent item|veeam.manager.warning.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.WarningsJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Failed Job Runs|<p>Informs about the failed job runs.</p>|Dependent item|veeam.manager.failed.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.JobStatistics.FailedJobRuns`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Veeam Manager: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0`|Average||
-|Veeam Manager: Warning job runs is too high||`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.warning.jobs)>{$VEEAM.MANAGER.JOB.MAX.WARN}`|Warning|**Manual close**: Yes|
-|Veeam Manager: Failed job runs is too high||`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.failed.jobs)>{$VEEAM.MANAGER.JOB.MAX.FAIL}`|Average|**Manual close**: Yes|
+|There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0`|Average||
+|Warning job runs is too high||`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.warning.jobs)>{$VEEAM.MANAGER.JOB.MAX.WARN}`|Warning|**Manual close**: Yes|
+|Failed job runs is too high||`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.failed.jobs)>{$VEEAM.MANAGER.JOB.MAX.FAIL}`|Average|**Manual close**: Yes|
 
 ### LLD rule Backup Files discovery
 
@@ -92,10 +92,10 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Veeam Manager: Backup Size [{#NAME}]|<p>Gets the backup size with the name `[{#NAME}]`.</p>|Dependent item|veeam.backup.file.size[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['{#NAME}'].BackupFile.BackupSize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Veeam Manager: Data Size [{#NAME}]|<p>Gets the data size with the name `[{#NAME}]`.</p>|Dependent item|veeam.backup.data.size[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['{#NAME}'].BackupFile.DataSize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Veeam Manager: Compression ratio [{#NAME}]|<p>Gets the data compression ratio with the name `[{#NAME}]`.</p>|Dependent item|veeam.backup.compress.ratio[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['{#NAME}'].BackupFile.CompressRatio`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Veeam Manager: Deduplication Ratio [{#NAME}]|<p>Gets the data deduplication ratio with the name `[{#NAME}]`.</p>|Dependent item|veeam.backup.deduplication.ratio[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['{#NAME}'].BackupFile.DeduplicationRatio`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Backup Size [{#NAME}]|<p>Gets the backup size with the name `[{#NAME}]`.</p>|Dependent item|veeam.backup.file.size[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['{#NAME}'].BackupFile.BackupSize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data Size [{#NAME}]|<p>Gets the data size with the name `[{#NAME}]`.</p>|Dependent item|veeam.backup.data.size[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['{#NAME}'].BackupFile.DataSize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Compression ratio [{#NAME}]|<p>Gets the data compression ratio with the name `[{#NAME}]`.</p>|Dependent item|veeam.backup.compress.ratio[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['{#NAME}'].BackupFile.CompressRatio`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Deduplication Ratio [{#NAME}]|<p>Gets the data deduplication ratio with the name `[{#NAME}]`.</p>|Dependent item|veeam.backup.deduplication.ratio[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['{#NAME}'].BackupFile.DeduplicationRatio`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ## Feedback
 

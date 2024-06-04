@@ -44,7 +44,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 9440208c49134347809eff39109c644f
-          name: 'PostgreSQL: Get archive'
+          name: 'Get archive'
           type: ODBC
           key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: '0'
@@ -76,7 +76,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: dd79edeb2d65420fb58d587e411c440f
-          name: 'PostgreSQL: Count of autovacuum workers'
+          name: 'Count of autovacuum workers'
           type: ODBC
           key: 'db.odbc.select[pgsql.autovacuum.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -94,7 +94,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ec6e574448804ed5bb71fa6dafa3b3f8
-          name: 'PostgreSQL: Get bgwriter'
+          name: 'Get bgwriter'
           type: ODBC
           key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: '0'
@@ -122,7 +122,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1d267b6aed064d03b4f464b27c1e897e
-          name: 'PostgreSQL: Get connections sum'
+          name: 'Get connections sum'
           type: ODBC
           key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: '0'
@@ -152,7 +152,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 0f93764d56574a288467ad16dce11a17
-          name: 'PostgreSQL: Get dbstat'
+          name: 'Get dbstat'
           type: ODBC
           key: 'db.odbc.select[pgsql.dbstat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: '0'
@@ -187,7 +187,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 6ea1a17fad8b4ef3aba8b49a0922a77d
-          name: 'PostgreSQL: Get dbstat sum'
+          name: 'Get dbstat sum'
           type: ODBC
           key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: '0'
@@ -221,7 +221,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: efa015e294684fdeb711a0fde1256cf9
-          name: 'PostgreSQL: Get locks'
+          name: 'Get locks'
           type: ODBC
           key: 'db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: '0'
@@ -283,7 +283,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 266a9b5c1e604d97ac5a74ccdb598c97
-          name: 'PostgreSQL: Age of oldest xid'
+          name: 'Age of oldest xid'
           type: ODBC
           key: 'db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -300,13 +300,13 @@ zabbix_export:
           triggers:
             - uuid: 4d32971898d441fb94d5f029649dddfa
               expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) > 18000000'
-              name: 'PostgreSQL: Oldest xid is too big'
+              name: 'Oldest xid is too big'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: availability
         - uuid: 3c16a3c2db7641c2b6958649d7b4809e
-          name: 'PostgreSQL: Ping'
+          name: Ping
           type: ODBC
           key: 'db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -333,14 +333,14 @@ zabbix_export:
           triggers:
             - uuid: 758e569b51954fcf82c7cb3fa391c882
               expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"])=0'
-              name: 'PostgreSQL: Service is down'
+              name: 'Service is down'
               priority: HIGH
               description: 'Last test of a connection was unsuccessful.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: ee6b3f64e07d4acd875dbd83dccd51d0
-          name: 'PostgreSQL: Get queries'
+          name: 'Get queries'
           type: ODBC
           key: 'db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: '0'
@@ -385,7 +385,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: d156db3cb35049a88179060583961156
-          name: 'PostgreSQL: Replication: Standby count'
+          name: 'Replication: Standby count'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -397,7 +397,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 669d87ebf9324d6eaa26c3cb44efc850
-          name: 'PostgreSQL: Replication: Lag in bytes'
+          name: 'Replication: Lag in bytes'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.lag.b,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -415,7 +415,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: bb87b83d35784d3ea5be2263fa3722b0
-          name: 'PostgreSQL: Replication: Lag in seconds'
+          name: 'Replication: Lag in seconds'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.lag.sec,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -433,7 +433,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 3f2b5c02a6be40d4837205f68aaacabb
-          name: 'PostgreSQL: Get replication'
+          name: 'Get replication'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: '0'
@@ -460,7 +460,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: f8205cdd902a4a688b5bcb7f65d8e41d
-          name: 'PostgreSQL: Replication: Recovery role'
+          name: 'Replication: Recovery role'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.recovery_role,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -474,7 +474,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 6cc8c748f6174d3dba9aa9b39570b006
-          name: 'PostgreSQL: Replication: Status'
+          name: 'Replication: Status'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.status,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -493,7 +493,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 817c494132044fff88ea4c9fcaacb60a
-          name: 'PostgreSQL: Uptime'
+          name: Uptime
           type: ODBC
           key: 'db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           history: 7d
@@ -509,15 +509,15 @@ zabbix_export:
           triggers:
             - uuid: 22077f0b0ee54becb43ef9ab808c3e43
               expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) < 10m'
-              name: 'PostgreSQL: Service has been restarted'
-              event_name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
+              name: 'Service has been restarted'
+              event_name: 'Service has been restarted (uptime < 10m)'
               priority: AVERAGE
               description: 'PostgreSQL uptime is less than 10 minutes.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 4bfb0c1697f043d9acf640b84cc8d945
-          name: 'PostgreSQL: Version'
+          name: Version
           type: ODBC
           key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           delay: 15m
@@ -538,14 +538,14 @@ zabbix_export:
           triggers:
             - uuid: fd409b64f83943edaf43845a12bf8ace
               expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]))>0'
-              name: 'PostgreSQL: Version has changed'
-              event_name: 'PostgreSQL: Version has changed (new version value received: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 8af13c6154744e9596a0f96dfbf09d8b
-          name: 'PostgreSQL: Get WAL'
+          name: 'Get WAL'
           type: ODBC
           key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           delay: 5m
@@ -850,7 +850,7 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 6444043a810b4b2f89740c1c794a47c0
-          name: 'PostgreSQL: Cache hit ratio, %'
+          name: 'Cache hit ratio, %'
           type: CALCULATED
           key: pgsql.cache.hit
           history: 7d
@@ -1011,8 +1011,8 @@ zabbix_export:
           triggers:
             - uuid: 3b6662191c3b46ac930af02797a7162b
               expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
-              name: 'PostgreSQL: Total number of connections is too high'
-              event_name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN}% in 5m)'
+              name: 'Total number of connections is too high'
+              event_name: 'Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN}% in 5m)'
               priority: AVERAGE
               description: 'Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).'
               tags:

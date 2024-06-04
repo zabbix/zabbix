@@ -32,7 +32,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 8eff7e6fc12c45f6b98a4fb89c44f03d
-          name: 'Cisco Nexus 9000 Series: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -46,14 +46,14 @@ zabbix_export:
           triggers:
             - uuid: 2b9b678cb9fc407cb485136ddcf5953c
               expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
-              name: 'Cisco Nexus 9000 Series: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'The last three attempts returned a timeout. Check the connectivity of a device.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: cb04f67d7ea04894a9f143a7d27db09a
-          name: 'Cisco Nexus 9000 Series: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -67,11 +67,11 @@ zabbix_export:
           triggers:
             - uuid: d32cffe7dcef4873ac8bb4d86119ddaa
               expression: 'min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)<100'
-              name: 'Cisco Nexus 9000 Series: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Cisco Nexus 9000 Series: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -79,7 +79,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: be862a0f8625484ebccb8a4e5255b683
-          name: 'Cisco Nexus 9000 Series: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -93,13 +93,13 @@ zabbix_export:
           triggers:
             - uuid: a51dc1f61eec4709b8f52b3df65eae86
               expression: 'avg(/Cisco Nexus 9000 Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'Cisco Nexus 9000 Series: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'Cisco Nexus 9000 Series: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)<100'
-                - name: 'Cisco Nexus 9000 Series: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -107,7 +107,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 027bb218006e46238392afbb12d96ec6
-          name: 'Cisco Nexus 9000 Series: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -120,7 +120,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 566c78f548bc4d1c9157b4a3f41f083b
-          name: 'Cisco Nexus 9000 Series: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: system.contact
@@ -140,7 +140,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: bc245084de0047aaa7bc62234970e827
-          name: 'Cisco Nexus 9000 Series: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.descr
@@ -159,7 +159,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 34022f907faa4a3e8a02c5e5f5c8c43a
-          name: 'Cisco Nexus 9000 Series: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.149
           key: system.hw.model
@@ -177,7 +177,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9d42a842c591489bb984faad26cd7e63
-          name: 'Cisco Nexus 9000 Series: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.149
           key: system.hw.serialnumber
@@ -197,8 +197,8 @@ zabbix_export:
           triggers:
             - uuid: b813bf6448fe4974911106e36b2d8888
               expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber))>0'
-              name: 'Cisco Nexus 9000 Series: Device has been replaced'
-              event_name: 'Cisco Nexus 9000 Series: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'The serial number of a device has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -206,7 +206,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 5f109dce62c942f794fecaf7038d691e
-          name: 'Cisco Nexus 9000 Series: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: system.location
@@ -227,7 +227,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 31ff1ef55d69461bbc5b4416c7a040be
-          name: 'Cisco Nexus 9000 Series: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -249,8 +249,8 @@ zabbix_export:
           triggers:
             - uuid: cf98bf1ffe854a758f0006aaeb5096ab
               expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.name))>0'
-              name: 'Cisco Nexus 9000 Series: System name has changed'
-              event_name: 'Cisco Nexus 9000 Series: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The system name has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -258,7 +258,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: a60cce9cf0464d6292d6b7934e9cfcd6
-          name: 'Cisco Nexus 9000 Series: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: system.objectid
@@ -277,7 +277,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: e02a0a8de70547e4895b395b616919dd
-          name: 'Cisco Nexus 9000 Series: Operating system'
+          name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.9.9.25.1.1.1.2.5
           key: system.sw.os
@@ -302,18 +302,18 @@ zabbix_export:
             - uuid: 749b4c4b8f4e49caa6b239b15953ffb9
               expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.sw.os)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.sw.os))>0'
               recovery_mode: NONE
-              name: 'Cisco Nexus 9000 Series: Operating system description has changed'
+              name: 'Operating system description has changed'
               priority: INFO
               description: 'The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               dependencies:
-                - name: 'Cisco Nexus 9000 Series: System name has changed'
+                - name: 'System name has changed'
                   expression: 'change(/Cisco Nexus 9000 Series by SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.name))>0'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 83405503b84d4af292e6846ccbd8a877
-          name: 'Cisco Nexus 9000 Series: Uptime (snmp)'
+          name: 'Uptime (snmp)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.6.3.10.2.1.3.0
           key: system.uptime
@@ -331,8 +331,8 @@ zabbix_export:
           triggers:
             - uuid: fc80a45e361842f09dfe9b047e1c6b5f
               expression: 'last(/Cisco Nexus 9000 Series by SNMP/system.uptime)<10m'
-              name: 'Cisco Nexus 9000 Series: Device has been restarted or reinitialized'
-              event_name: 'Cisco Nexus 9000 Series: {HOST.NAME} has been restarted or reinitialized (uptime < 10m)'
+              name: 'Device has been restarted or reinitialized'
+              event_name: '{HOST.NAME} has been restarted or reinitialized (uptime < 10m)'
               priority: WARNING
               description: 'The record of SNMP Boots has changed in less than 10 minutes. The restart of a device also counts.'
               manual_close: 'YES'
@@ -340,7 +340,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: edb1d93d5fda47928dcb62223ada8b16
-          name: 'Cisco Nexus 9000 Series: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -352,7 +352,7 @@ zabbix_export:
           triggers:
             - uuid: b60bca40b3b14f2384332103af74bd23
               expression: 'max(/Cisco Nexus 9000 Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'Cisco Nexus 9000 Series: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Check the connectivity of a device and SNMP settings.'

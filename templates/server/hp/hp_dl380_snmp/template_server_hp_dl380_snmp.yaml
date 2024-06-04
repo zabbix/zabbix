@@ -26,7 +26,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 19ed955aeefa493883a151ddb550b8ff
-          name: 'HPE ProLiant DL380: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'hp.server.contact[sysContact]'
@@ -46,7 +46,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7b9fc7a143c74d1b812d14413c1f53b0
-          name: 'HPE ProLiant DL380: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'hp.server.descr[sysDescr]'
@@ -67,7 +67,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d2cad986747643658bee67492d90d106
-          name: 'HPE ProLiant DL380: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
           key: 'hp.server.hw.model[cpqSiProductName]'
@@ -86,7 +86,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6cdacf190c584227b822fee9c112b849
-          name: 'HPE ProLiant DL380: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
           key: 'hp.server.hw.serialnumber[cpqSiSysSerialNum]'
@@ -107,8 +107,8 @@ zabbix_export:
           triggers:
             - uuid: bd81b8c420904f0bafa4fbf90d195967
               expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0'
-              name: 'HPE ProLiant DL380: Device has been replaced'
-              event_name: 'HPE ProLiant DL380: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -116,7 +116,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 437a251079a44869ba9b11b2184d85e7
-          name: 'HPE ProLiant DL380: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'hp.server.hw.uptime[hrSystemUptime]'
@@ -139,7 +139,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 622dd9bef33b4db7bf5899a6f6ccb7b3
-          name: 'HPE ProLiant DL380: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'hp.server.location[sysLocation]'
@@ -159,7 +159,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 2726dcd682d340b681f5dfa8d1e3ef07
-          name: 'HPE ProLiant DL380: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'hp.server.name[sysName]'
@@ -181,8 +181,8 @@ zabbix_export:
           triggers:
             - uuid: 168b1742abc340558631a577a1a3c4d9
               expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName]))>0'
-              name: 'HPE ProLiant DL380: System name has changed'
-              event_name: 'HPE ProLiant DL380: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -190,7 +190,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 5576766f3a004fd3894ff22da515aedc
-          name: 'HPE ProLiant DL380: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'hp.server.net.uptime[sysUpTime]'
@@ -208,7 +208,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 1394f5cfccb64c53abd8cff0f095906f
-          name: 'HPE ProLiant DL380: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'hp.server.objectid[sysObjectID]'
@@ -227,7 +227,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 09930c5b67d44de49bedfe7465697d40
-          name: 'HPE ProLiant DL380: System temperature status'
+          name: 'System temperature status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
           key: 'hp.server.sensor.temp.status[cpqHeThermalCondition]'
@@ -251,7 +251,7 @@ zabbix_export:
             - tag: component
               value: temperature
         - uuid: e980a83b24bd4bdb9d2b7369d41c9aea
-          name: 'HPE ProLiant DL380: Overall system health status'
+          name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
           key: 'hp.server.status[cpqHeMibCondition]'
@@ -274,7 +274,7 @@ zabbix_export:
           triggers:
             - uuid: e9bf032edb2e45f0b64cb904bf8d8403
               expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
-              name: 'HPE ProLiant DL380: System status is in critical state'
+              name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for errors.'
@@ -283,18 +283,18 @@ zabbix_export:
                   value: available
             - uuid: 537c411a3d454a8b9dc64378e0e9a6cd
               expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}'
-              name: 'HPE ProLiant DL380: System status is in warning state'
+              name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings.'
               dependencies:
-                - name: 'HPE ProLiant DL380: System status is in critical state'
+                - name: 'System status is in critical state'
                   expression: 'last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}'
               tags:
                 - tag: scope
                   value: available
         - uuid: 1170728f4f534d19acfa001d1b00dcc4
-          name: 'HPE ProLiant DL380: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -307,7 +307,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 53bf83d6a797436da2d1d8498410a113
-          name: 'HPE ProLiant DL380: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -325,7 +325,7 @@ zabbix_export:
           triggers:
             - uuid: 97c3665497ae46eb91d81c14c5f4ac06
               expression: 'max(/HPE ProLiant DL380 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'HPE ProLiant DL380: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -2240,8 +2240,8 @@ zabbix_export:
   triggers:
     - uuid: 9612f37005e5420582d499d7cb84a24e
       expression: '(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant DL380 by SNMP/hp.server.net.uptime[sysUpTime])<10m)'
-      name: 'HPE ProLiant DL380: Host has been restarted'
-      event_name: 'HPE ProLiant DL380: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

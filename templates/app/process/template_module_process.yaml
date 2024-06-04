@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: 803390429cf949d3b8439dd5dd71c706
-          name: 'OS: Get process summary'
+          name: 'Get process summary'
           key: 'proc.get[,,,summary]'
           history: '0'
           trends: '0'

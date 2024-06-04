@@ -25,7 +25,7 @@ zabbix_export:
         - name: Templates/Power
       items:
         - uuid: e8257d78c2e24e3cb152886d39bca4fe
-          name: 'APC UPS Symmetra RM: Battery capacity'
+          name: 'Battery capacity'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.1.0
           key: 'battery.capacity[upsHighPrecBatteryCapacity]'
@@ -49,15 +49,15 @@ zabbix_export:
           triggers:
             - uuid: dbfdc4e6eaca4d65adcde13b0682c1c2
               expression: 'last(/APC UPS Symmetra RM by SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}'
-              name: 'APC UPS Symmetra RM: Battery has low capacity'
-              event_name: 'APC UPS Symmetra RM: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
+              name: 'Battery has low capacity'
+              event_name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
               opdata: 'Current capacity: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: capacity
         - uuid: d26227e3d5754d8493ddaa9c3f5f2b5a
-          name: 'APC UPS Symmetra RM: External battery packs count'
+          name: 'External battery packs count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.5.0
           key: 'battery.external_packs_count[upsAdvBatteryNumOfBattPacks]'
@@ -76,7 +76,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 138afef586634623974c1cefd45281e9
-          name: 'APC UPS Symmetra RM: Battery last replace date'
+          name: 'Battery last replace date'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.3.0
           key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
@@ -99,7 +99,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: abb901813d91481baef234496ddece33
-          name: 'APC UPS Symmetra RM: Battery replace indicator'
+          name: 'Battery replace indicator'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.4.0
           key: 'battery.replace_indicator[upsAdvBatteryReplaceIndicator]'
@@ -119,14 +119,14 @@ zabbix_export:
           triggers:
             - uuid: 0af287bae1ee44ba997a02ae585bdd4b
               expression: 'last(/APC UPS Symmetra RM by SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2'
-              name: 'APC UPS Symmetra RM: Battery needs replacement'
+              name: 'Battery needs replacement'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 80a4e6cf09a147a7b166755aa182fdcd
-          name: 'APC UPS Symmetra RM: Battery runtime remaining'
+          name: 'Battery runtime remaining'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.3.0
           key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 322c3b48bcb74fa5829ef41015308d97
-          name: 'APC UPS Symmetra RM: Battery status'
+          name: 'Battery status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.1.0
           key: 'battery.status[upsBasicBatteryStatus]'
@@ -176,7 +176,7 @@ zabbix_export:
           triggers:
             - uuid: aedb557acbe44390809a27b95919e10f
               expression: 'last(/APC UPS Symmetra RM by SNMP/battery.status[upsBasicBatteryStatus])=4'
-              name: 'APC UPS Symmetra RM: Battery has an internal error condition'
+              name: 'Battery has an internal error condition'
               priority: AVERAGE
               description: 'A battery installed has an internal error condition.'
               tags:
@@ -184,14 +184,14 @@ zabbix_export:
                   value: notice
             - uuid: 1afe1859563f481faa623781028a38ca
               expression: 'last(/APC UPS Symmetra RM by SNMP/battery.status[upsBasicBatteryStatus])=3'
-              name: 'APC UPS Symmetra RM: Battery is Low'
+              name: 'Battery is Low'
               priority: AVERAGE
               description: 'The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 17ffb34351da46e59d2288cd291a7912
-          name: 'APC UPS Symmetra RM: Battery temperature'
+          name: 'Battery temperature'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.2.0
           key: 'battery.temperature[upsHighPrecBatteryTemperature]'
@@ -215,15 +215,15 @@ zabbix_export:
           triggers:
             - uuid: 0b4490eaaf964fdabf228d34d2992d30
               expression: 'min(/APC UPS Symmetra RM by SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
-              name: 'APC UPS Symmetra RM: Battery has high temperature'
-              event_name: 'APC UPS Symmetra RM: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+              name: 'Battery has high temperature'
+              event_name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: 9ab2309be6cc4eea8697f17e80b015d8
-          name: 'APC UPS Symmetra RM: Battery voltage'
+          name: 'Battery voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.4.0
           key: 'battery.voltage[upsHighPrecBatteryActualVoltage]'
@@ -244,7 +244,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 439c87539027462c9b8210a056887885
-          name: 'APC UPS Symmetra RM: Input fail cause'
+          name: 'Input fail cause'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.2.5.0
           key: 'input.fail[upsAdvInputLineFailCause]'
@@ -285,7 +285,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: e16be6095dc24b48bc541325b1675dd0
-          name: 'APC UPS Symmetra RM: Input frequency'
+          name: 'Input frequency'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.4.0
           key: 'input.frequency[upsHighPrecInputFrequency]'
@@ -308,15 +308,15 @@ zabbix_export:
           triggers:
             - uuid: af166242e3674f2da489a232c7bba6f1
               expression: 'min(/APC UPS Symmetra RM by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC UPS Symmetra RM by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC UPS Symmetra RM by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
-              name: 'APC UPS Symmetra RM: Unacceptable input frequency'
-              event_name: 'APC UPS Symmetra RM: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
+              name: 'Unacceptable input frequency'
+              event_name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: c658b02eea284fcf8e302c20a2256cf0
-          name: 'APC UPS Symmetra RM: Input voltage'
+          name: 'Input voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.1.0
           key: 'input.voltage[upsHighPrecInputLineVoltage]'
@@ -339,15 +339,15 @@ zabbix_export:
           triggers:
             - uuid: 3b51bbae66914b19a93e7a2da289b056
               expression: 'min(/APC UPS Symmetra RM by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC UPS Symmetra RM by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS Symmetra RM by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
-              name: 'APC UPS Symmetra RM: Unacceptable input voltage'
-              event_name: 'APC UPS Symmetra RM: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+              name: 'Unacceptable input voltage'
+              event_name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: 9bcae00165414f4aa15a40bc078aa44d
-          name: 'APC UPS Symmetra RM: Output current'
+          name: 'Output current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.4.0
           key: 'output.current[upsHighPrecOutputCurrent]'
@@ -368,7 +368,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 0e5240e578d043609fba4024db8c8df1
-          name: 'APC UPS Symmetra RM: Output load'
+          name: 'Output load'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.3.0
           key: 'output.load[upsHighPrecOutputLoad]'
@@ -392,8 +392,8 @@ zabbix_export:
           triggers:
             - uuid: a25499c49d0043cda248136eb6307ef9
               expression: 'min(/APC UPS Symmetra RM by SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
-              name: 'APC UPS Symmetra RM: Output load is high'
-              event_name: 'APC UPS Symmetra RM: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
+              name: 'Output load is high'
+              event_name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
@@ -401,7 +401,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 7655b8ff3d5e41f0a5409fcfd646933a
-          name: 'APC UPS Symmetra RM: Output status'
+          name: 'Output status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.1.1.0
           key: 'output.status[upsBasicOutputStatus]'
@@ -429,83 +429,83 @@ zabbix_export:
           triggers:
             - uuid: f7b0e2f05c9b4b14916f99ecb89fcd49
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=16'
-              name: 'APC UPS Symmetra RM: UPS is Emergency Static Bypass'
+              name: 'UPS is Emergency Static Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 77081726414047a5a1c698fcfbf19e73
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=10'
-              name: 'APC UPS Symmetra RM: UPS is Hardware Failure Bypass'
+              name: 'UPS is Hardware Failure Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 87beb54ac57848e3896fd715a5918a88
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=7'
-              name: 'APC UPS Symmetra RM: UPS is Off'
+              name: 'UPS is Off'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 5f46c436fab741ec86cb32339e8bd7b4
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=3'
-              name: 'APC UPS Symmetra RM: UPS is on battery'
+              name: 'UPS is on battery'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: a7457e3d6c6f4e99a3ccc08a1436d34a
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=4'
-              name: 'APC UPS Symmetra RM: UPS is on Smart Boost'
+              name: 'UPS is on Smart Boost'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 976395b6acea4f5cb4f7f3d4f0bc67af
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=12'
-              name: 'APC UPS Symmetra RM: UPS is On Smart Trim'
+              name: 'UPS is On Smart Trim'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 72c9677a2157412ebd14004a5e024a3a
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=8'
-              name: 'APC UPS Symmetra RM: UPS is Rebooting'
+              name: 'UPS is Rebooting'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 75d189cd8b5944c4b7987931c834e949
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=11'
-              name: 'APC UPS Symmetra RM: UPS is Sleeping Until Power Return'
+              name: 'UPS is Sleeping Until Power Return'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 24e1cfde22da48b0bf28ca2cdf8cd917
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=6'
-              name: 'APC UPS Symmetra RM: UPS is Software Bypass'
+              name: 'UPS is Software Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 4fff7b4a29b84cdea245b2704e357f5d
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=9'
-              name: 'APC UPS Symmetra RM: UPS is Switched Bypass'
+              name: 'UPS is Switched Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 647178a4cb674815a65517c073b4adee
               expression: 'last(/APC UPS Symmetra RM by SNMP/output.status[upsBasicOutputStatus])=5'
-              name: 'APC UPS Symmetra RM: UPS is Timed Sleeping'
+              name: 'UPS is Timed Sleeping'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
         - uuid: 8d93b482d7c549f593c41abb9380ce2f
-          name: 'APC UPS Symmetra RM: Output voltage'
+          name: 'Output voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.1.0
           key: 'output.voltage[upsHighPrecOutputVoltage]'
@@ -526,7 +526,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 39dd21c0f2194acaa9fddbdfccde05dd
-          name: 'APC UPS Symmetra RM: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -539,7 +539,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 2d22b58a5c9f4fedbd03862398113546
-          name: 'APC UPS Symmetra RM: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -561,7 +561,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 251cc61592f543e3929aef3cb46f1b34
-          name: 'APC UPS Symmetra RM: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -582,7 +582,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b3021bc8a0324d4d9683f676131bf136
-          name: 'APC UPS Symmetra RM: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -606,7 +606,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 49b8ef5ff3a3400d8f412d4440040461
-          name: 'APC UPS Symmetra RM: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -626,7 +626,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: bd0dc104ded94e4cbba3a8557e642caf
-          name: 'APC UPS Symmetra RM: Model'
+          name: Model
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.1.1.0
           key: 'system.model[upsBasicIdentModel]'
@@ -645,7 +645,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 155feccece4a4625b98efa206ad5e0b1
-          name: 'APC UPS Symmetra RM: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'system.name[sysName.0]'
@@ -667,8 +667,8 @@ zabbix_export:
           triggers:
             - uuid: e3cf119c19b54dddb3d26d9b789ea4f5
               expression: 'last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0],#1)<>last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0],#2) and length(last(/APC UPS Symmetra RM by SNMP/system.name[sysName.0]))>0'
-              name: 'APC UPS Symmetra RM: System name has changed'
-              event_name: 'APC UPS Symmetra RM: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -678,7 +678,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: b4ca2f993709413b9a00fa1389ec9e3c
-          name: 'APC UPS Symmetra RM: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -697,7 +697,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f6bd69ea5df144c996f050ded122521e
-          name: 'APC UPS Symmetra RM: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -716,7 +716,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 64ab7fd8a79448d580ad24ecf488241c
-          name: 'APC UPS Symmetra RM: Serial number'
+          name: 'Serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.2.3.0
           key: 'system.sn[upsAdvIdentSerialNumber]'
@@ -738,7 +738,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: d69889a19b564ed384fc96e8a70971a5
-          name: 'APC UPS Symmetra RM: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -762,7 +762,7 @@ zabbix_export:
           triggers:
             - uuid: 56f25581382a43efbddd4aba44aa86b3
               expression: 'max(/APC UPS Symmetra RM by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'APC UPS Symmetra RM: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -1549,13 +1549,13 @@ zabbix_export:
       expression: |
         (last(/APC UPS Symmetra RM by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC UPS Symmetra RM by SNMP/system.hw.uptime[hrSystemUptime.0])<10m)
         or (last(/APC UPS Symmetra RM by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC UPS Symmetra RM by SNMP/system.net.uptime[sysUpTime.0])<10m)
-      name: 'APC UPS Symmetra RM: Host has been restarted'
-      event_name: 'APC UPS Symmetra RM: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'APC UPS Symmetra RM: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/APC UPS Symmetra RM by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

@@ -27,7 +27,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: bce642c2c6e743ccb618c96f6ca533da
-          name: 'Acronis CPC: Get access token'
+          name: 'Get access token'
           type: HTTP_AGENT
           key: acronis.cpc.account_manager.get_token
           delay: '{$ACRONIS.CPC.AUTH.INTERVAL}'
@@ -134,7 +134,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: dba9a02767be47819f7012f316723fff
-          name: 'Acronis CPC: Get alerts'
+          name: 'Get alerts'
           type: HTTP_AGENT
           key: acronis.cpc.alerts.get
           delay: 5m
@@ -161,7 +161,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 483f9e040091476ba3857ae2957d83bf
-          name: 'Acronis CPC: Alerts with "critical" severity'
+          name: 'Alerts with "critical" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.crit
           delay: '0'
@@ -182,7 +182,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 4fcefc1b66fe4c56b68cf5712aa727e5
-          name: 'Acronis CPC: Alerts with "error" severity'
+          name: 'Alerts with "error" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.err
           delay: '0'
@@ -203,7 +203,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 06003951452f4687bd0f1c0a395e7a77
-          name: 'Acronis CPC: Alerts with "information" severity'
+          name: 'Alerts with "information" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.info
           delay: '0'
@@ -224,7 +224,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: ca3a1c7649874dfdaf191c7063022498
-          name: 'Acronis CPC: Alerts with "ok" severity'
+          name: 'Alerts with "ok" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.ok
           delay: '0'
@@ -245,7 +245,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: a4516d8961b3426f859511e1614c4403
-          name: 'Acronis CPC: Alerts with "warning" severity'
+          name: 'Alerts with "warning" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.warn
           delay: '0'
@@ -266,7 +266,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 77f25dbbd477458a88f1850701dccc69
-          name: 'Acronis CPC: Get customers'
+          name: 'Get customers'
           type: HTTP_AGENT
           key: acronis.cpc.customers.get
           delay: 5m
@@ -296,7 +296,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 81b3d23d30964b88aeb3a0911ba0e487
-          name: 'Acronis CPC: Get devices'
+          name: 'Get devices'
           type: HTTP_AGENT
           key: acronis.cpc.devices.get
           history: '0'
@@ -325,7 +325,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3697d34ebbb74b90aa7318321ecc27e5
-          name: 'Acronis CPC: Register integration'
+          name: 'Register integration'
           type: SCRIPT
           key: acronis.cpc.register.integration
           delay: 24h

@@ -28,7 +28,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 78db5504896649198605e140abb942be
-          name: 'MongoDB cluster: Configserver heartbeat'
+          name: 'Configserver heartbeat'
           type: DEPENDENT
           key: mongodb.config_server_heartbeat
           delay: '0'
@@ -47,7 +47,7 @@ zabbix_export:
             - tag: component
               value: configserver
         - uuid: fccb23cdee01483cabe6ef14a532664b
-          name: 'MongoDB cluster: Connections, active'
+          name: 'Connections, active'
           type: DEPENDENT
           key: mongodb.connections.active
           delay: '0'
@@ -68,7 +68,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 1f881cbd515d462eb5839fe4e1e21ee1
-          name: 'MongoDB cluster: Connections, available'
+          name: 'Connections, available'
           type: DEPENDENT
           key: mongodb.connections.available
           delay: '0'
@@ -86,8 +86,8 @@ zabbix_export:
           triggers:
             - uuid: eae86b6f98db49099259a466b78d1c59
               expression: 'max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
-              name: 'MongoDB cluster: Available connections is low'
-              event_name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+              name: 'Available connections is low'
+              event_name: 'Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               priority: WARNING
               description: |
                 Too few available connections.
@@ -96,7 +96,7 @@ zabbix_export:
                 - tag: scope
                   value: capacity
         - uuid: 087d1a405b7a456692a52b0d20c43eb3
-          name: 'MongoDB cluster: Connections, current'
+          name: 'Connections, current'
           type: DEPENDENT
           key: mongodb.connections.current
           delay: '0'
@@ -114,7 +114,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 18ed07f0efb54f55970483d15613d320
-          name: 'MongoDB cluster: New connections, rate'
+          name: 'New connections, rate'
           type: DEPENDENT
           key: mongodb.connections.rate
           delay: '0'
@@ -134,7 +134,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 281e5a1a19dc402a992331252b27ee63
-          name: 'MongoDB cluster: Connection pool: available'
+          name: 'Connection pool: available'
           type: DEPENDENT
           key: mongodb.connection_pool.available
           delay: '0'
@@ -150,7 +150,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 58522550e8bc4f479681d961ba789b92
-          name: 'MongoDB cluster: Connection pool: client connections'
+          name: 'Connection pool: client connections'
           type: DEPENDENT
           key: mongodb.connection_pool.client
           delay: '0'
@@ -166,7 +166,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 9b9d601d2d5c4d8da5d97c2785d8e0fa
-          name: 'MongoDB cluster: Connection pool: created, rate'
+          name: 'Connection pool: created, rate'
           type: DEPENDENT
           key: mongodb.connection_pool.created.rate
           delay: '0'
@@ -186,7 +186,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 9394a15a25e342688335b7d83db25b2d
-          name: 'MongoDB cluster: Connection pool: in use'
+          name: 'Connection pool: in use'
           type: DEPENDENT
           key: mongodb.connection_pool.in_use
           delay: '0'
@@ -202,7 +202,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 22c66363ffae4ae2b436a26b8ecca3ab
-          name: 'MongoDB cluster: Connection pool: refreshing'
+          name: 'Connection pool: refreshing'
           type: DEPENDENT
           key: mongodb.connection_pool.refreshing
           delay: '0'
@@ -218,7 +218,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: 55dbfe5d52c44954b9e5669a043f10b4
-          name: 'MongoDB cluster: Connection pool: scoped'
+          name: 'Connection pool: scoped'
           type: DEPENDENT
           key: mongodb.connection_pool.scoped
           delay: '0'
@@ -234,7 +234,7 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: f34fcc3866b446748b7a8d11311edd82
-          name: 'MongoDB cluster: Get mongodb.connpool.stats'
+          name: 'Get mongodb.connpool.stats'
           key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -246,7 +246,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 22ca0c06006b49009f25fcd829f1b5bf
-          name: 'MongoDB cluster: Cursor: open pinned'
+          name: 'Cursor: open pinned'
           type: DEPENDENT
           key: mongodb.cursor.open.pinned
           delay: '0'
@@ -262,7 +262,7 @@ zabbix_export:
             - tag: component
               value: cursors
         - uuid: 45bfa997dab9498e8e3851de750e21a2
-          name: 'MongoDB cluster: Cursor: open total'
+          name: 'Cursor: open total'
           type: DEPENDENT
           key: mongodb.cursor.open.total
           delay: '0'
@@ -280,14 +280,14 @@ zabbix_export:
           triggers:
             - uuid: 67db1f543818476ca0b07e2cc1709452
               expression: 'min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
-              name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients'
-              event_name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
+              name: 'Too many cursors opened by MongoDB for clients'
+              event_name: 'Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 5d3a3c724a6a45fb99a0af5330bf9cf2
-          name: 'MongoDB cluster: Cursor: timed out, rate'
+          name: 'Cursor: timed out, rate'
           type: DEPENDENT
           key: mongodb.cursor.timed_out.rate
           delay: '0'
@@ -309,14 +309,14 @@ zabbix_export:
           triggers:
             - uuid: 5ea8cf9c955940a6a580cd6f4bb2cc78
               expression: 'min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
-              name: 'MongoDB cluster: Too many cursors are timing out'
-              event_name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
+              name: 'Too many cursors are timing out'
+              event_name: 'Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 110685e463e141ca800b2638e3532d51
-          name: 'MongoDB cluster: Jumbo chunks'
+          name: 'Jumbo chunks'
           key: 'mongodb.jumbo_chunks.count["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           history: 7d
           description: 'Total number of ''jumbo'' chunks in the mongo cluster.'
@@ -324,7 +324,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: fa28a98992e74cdf8c54b4faa01de89a
-          name: 'MongoDB cluster: Last seen configserver'
+          name: 'Last seen configserver'
           type: DEPENDENT
           key: mongodb.last_seen_config_server
           delay: '0'
@@ -341,7 +341,7 @@ zabbix_export:
             - tag: component
               value: configserver
         - uuid: df2423ff36e24357809c7a7211144898
-          name: 'MongoDB cluster: Architecture'
+          name: Architecture
           type: DEPENDENT
           key: mongodb.mem.bits
           delay: '0'
@@ -361,7 +361,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: f6a06e0d7cf84cc1a40d8d2dcde7b01a
-          name: 'MongoDB cluster: Memory: resident'
+          name: 'Memory: resident'
           type: DEPENDENT
           key: mongodb.mem.resident
           delay: '0'
@@ -381,7 +381,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 2c5548ae9c614efb81e58a2e4ec3d3e4
-          name: 'MongoDB cluster: Memory: virtual'
+          name: 'Memory: virtual'
           type: DEPENDENT
           key: mongodb.mem.virtual
           delay: '0'
@@ -401,7 +401,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 16925e0ca40747d1818e512962d31a83
-          name: 'MongoDB cluster: Cursor: open no timeout'
+          name: 'Cursor: open no timeout'
           type: DEPENDENT
           key: mongodb.metrics.cursor.open.no_timeout
           delay: '0'
@@ -418,7 +418,7 @@ zabbix_export:
             - tag: component
               value: cursors
         - uuid: 59481dcb9b5a487985297e2f41f72dd1
-          name: 'MongoDB cluster: Bytes in, rate'
+          name: 'Bytes in, rate'
           type: DEPENDENT
           key: mongodb.network.bytes_in.rate
           delay: '0'
@@ -438,7 +438,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 13cba18ba344440bba4371585fd8e4c0
-          name: 'MongoDB cluster: Bytes out, rate'
+          name: 'Bytes out, rate'
           type: DEPENDENT
           key: mongodb.network.bytes_out.rate
           delay: '0'
@@ -459,7 +459,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: eb821875b59c4bf8bc98f9afec146e88
-          name: 'MongoDB cluster: Requests, rate'
+          name: 'Requests, rate'
           type: DEPENDENT
           key: mongodb.network.numRequests.rate
           delay: '0'
@@ -480,7 +480,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: b98fb6d98b9a4282ba0b2d9770722035
-          name: 'MongoDB cluster: Operations: command'
+          name: 'Operations: command'
           type: DEPENDENT
           key: mongodb.opcounters.command.rate
           delay: '0'
@@ -502,7 +502,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: f4e917e9cdd3439abbe6ea7b9a9034b7
-          name: 'MongoDB cluster: Operations: delete'
+          name: 'Operations: delete'
           type: DEPENDENT
           key: mongodb.opcounters.delete.rate
           delay: '0'
@@ -522,7 +522,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 165d5a180ed541ba9a19916134962368
-          name: 'MongoDB cluster: Operations: getmore, rate'
+          name: 'Operations: getmore, rate'
           type: DEPENDENT
           key: mongodb.opcounters.getmore.rate
           delay: '0'
@@ -544,7 +544,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 021a00004efe434a9b2f316c0d25c175
-          name: 'MongoDB cluster: Operations: insert, rate'
+          name: 'Operations: insert, rate'
           type: DEPENDENT
           key: mongodb.opcounters.insert.rate
           delay: '0'
@@ -564,7 +564,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 0866b3b6bc1748a98e8bfd9308152304
-          name: 'MongoDB cluster: Operations: query, rate'
+          name: 'Operations: query, rate'
           type: DEPENDENT
           key: mongodb.opcounters.query.rate
           delay: '0'
@@ -584,7 +584,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: 329e6d41de1c47dba8f3f9d287c93eda
-          name: 'MongoDB cluster: Operations: update, rate'
+          name: 'Operations: update, rate'
           type: DEPENDENT
           key: mongodb.opcounters.update.rate
           delay: '0'
@@ -604,7 +604,7 @@ zabbix_export:
             - tag: component
               value: operations
         - uuid: ff979eb9ba4a4420a753913df5431219
-          name: 'MongoDB cluster: Ping'
+          name: Ping
           key: 'mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           delay: 30s
           history: 7d
@@ -621,14 +621,14 @@ zabbix_export:
           triggers:
             - uuid: cd74289970204ca281c5bc7d5c695e95
               expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
-              name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
+              name: 'Connection to mongos proxy is unavailable'
               priority: HIGH
               description: 'Connection to mongos proxy instance is currently unavailable.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: b8c6dadff060447e9718b49fdc796d8d
-          name: 'MongoDB cluster: Get server status'
+          name: 'Get server status'
           key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           history: '0'
           trends: '0'
@@ -638,7 +638,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e88da2ca6ccc4fdfa256fa51e050792d
-          name: 'MongoDB cluster: Uptime'
+          name: Uptime
           type: DEPENDENT
           key: mongodb.uptime
           delay: '0'
@@ -657,21 +657,21 @@ zabbix_export:
           triggers:
             - uuid: ee70d6da232a4068b574c9c147c622c9
               expression: 'nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1'
-              name: 'MongoDB cluster: Failed to fetch info data'
-              event_name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
+              name: 'Failed to fetch info data'
+              event_name: 'Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
               manual_close: 'YES'
               dependencies:
-                - name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
+                - name: 'Connection to mongos proxy is unavailable'
                   expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
               tags:
                 - tag: scope
                   value: notice
             - uuid: 99ff438a7e3e4b0a8190b2ab9f41f076
               expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m'
-              name: 'MongoDB cluster: Mongos server has been restarted'
-              event_name: 'MongoDB cluster: Mongos server has been restarted (uptime < 10m)'
+              name: 'Mongos server has been restarted'
+              event_name: 'Mongos server has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -679,7 +679,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: dda1722d6e6b4189978fd44ace0f8f86
-          name: 'MongoDB cluster: Mongos version'
+          name: 'Mongos version'
           type: DEPENDENT
           key: mongodb.version
           delay: '0'
@@ -702,8 +702,8 @@ zabbix_export:
           triggers:
             - uuid: 921ee489887943838d69558f103ad646
               expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0'
-              name: 'MongoDB cluster: Version has changed'
-              event_name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Version has changed'
+              event_name: 'Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB cluster version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'

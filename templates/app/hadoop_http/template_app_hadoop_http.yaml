@@ -20,7 +20,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: d2d19ac9d1eb434c98a55cbf76c27850
-          name: 'Hadoop: Get DataNodes states'
+          name: 'Get DataNodes states'
           type: HTTP_AGENT
           key: hadoop.datanodes.get
           history: '0'
@@ -141,7 +141,7 @@ zabbix_export:
             - tag: component
               value: namenode
         - uuid: 687406d06ce94a8291b2e72bb2f8bec4
-          name: 'Hadoop: Get NameNode stats'
+          name: 'Get NameNode stats'
           type: HTTP_AGENT
           key: hadoop.namenode.get
           history: '0'
@@ -444,7 +444,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 6d7546c5d15d4e478b2e87e35d5306b0
-          name: 'Hadoop: Get NodeManagers states'
+          name: 'Get NodeManagers states'
           type: HTTP_AGENT
           key: hadoop.nodemanagers.get
           history: '0'
@@ -459,7 +459,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: e693cff98ec74cc198ec6b5e973f116c
-          name: 'Hadoop: Get ResourceManager stats'
+          name: 'Get ResourceManager stats'
           type: HTTP_AGENT
           key: hadoop.resourcemanager.get
           history: '0'

@@ -32,7 +32,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 1ec18d9656654a9e9114ba2b5ff965b1
-          name: 'ZYXEL MES3500-10: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -48,7 +48,7 @@ zabbix_export:
           triggers:
             - uuid: c33a4bffd5464934b4b9f1e7160806e1
               expression: 'max(/ZYXEL MES3500-10 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'ZYXEL MES3500-10: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -56,7 +56,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 84a1eb118ad2453ca5a5ccca6111516b
-          name: 'ZYXEL MES3500-10: Contact'
+          name: Contact
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.3500_10.contact
@@ -78,7 +78,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: dd6585221297476885e900c54a820ae7
-          name: 'ZYXEL MES3500-10: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.80.12.7.0
           key: zyxel.3500_10.cpuusage
@@ -95,8 +95,8 @@ zabbix_export:
           triggers:
             - uuid: 0d31c154f8f34ed18a99558f7839bbb6
               expression: 'min(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL MES3500-10: High CPU utilization'
-              event_name: 'ZYXEL MES3500-10: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -104,7 +104,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 144931a31b2a4a52978679a6a029fc8e
-          name: 'ZYXEL MES3500-10: ZyNOS F/W Version'
+          name: 'ZyNOS F/W Version'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.80.1]'
           key: zyxel.3500_10.fwversion
@@ -136,7 +136,7 @@ zabbix_export:
           triggers:
             - uuid: db567c7693b6437e89ef7a5b78c889f9
               expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion,#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion,#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.fwversion))>0'
-              name: 'ZYXEL MES3500-10: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -145,7 +145,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: d0d33209ea1249e588f2e81807ae6403
-          name: 'ZYXEL MES3500-10: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.25.1.1.0
           key: zyxel.3500_10.hw.uptime
@@ -172,7 +172,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 0005f568cd384734b9f21e846648cd5f
-          name: 'ZYXEL MES3500-10: Location'
+          name: Location
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.3500_10.location
@@ -193,7 +193,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 3bc8285eebad410996c4697022038345
-          name: 'ZYXEL MES3500-10: MAC address'
+          name: 'MAC address'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.3500_10.mac
@@ -217,7 +217,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: b270937507f345f88421cf1825c29917
-          name: 'ZYXEL MES3500-10: Hardware model name'
+          name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.3500_10.model
@@ -244,14 +244,14 @@ zabbix_export:
           triggers:
             - uuid: 27f1cb5a297c4b1eafd4056317a37f01
               expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.model)<>"MES3500-10"'
-              name: 'ZYXEL MES3500-10: Template does not match hardware'
+              name: 'Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel MES3500-10, but connected to {ITEM.VALUE}'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 831783fc67ab49b1be0ae5132fb2d8df
-          name: 'ZYXEL MES3500-10: Host name'
+          name: 'Host name'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.3500_10.name
@@ -273,7 +273,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: d581384242074b07a4c5cd03a562827c
-          name: 'ZYXEL MES3500-10: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
           key: zyxel.3500_10.net.uptime
@@ -294,7 +294,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a0d17f11a5624f4e8520ee5e583ad322
-          name: 'ZYXEL MES3500-10: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.80.1.10.0
           key: zyxel.3500_10.serialnumber
@@ -316,8 +316,8 @@ zabbix_export:
           triggers:
             - uuid: ee14abdf61b04a90adf6e2afcc3d73f4
               expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber,#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber,#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.serialnumber))>0'
-              name: 'ZYXEL MES3500-10: Device has been replaced'
-              event_name: 'ZYXEL MES3500-10: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -333,7 +333,7 @@ zabbix_export:
           delay: 1h
           item_prototypes:
             - uuid: 20c3127430534c049073c43a039fd29d
-              name: 'ZYXEL MES3500-10: Memory "{#ZYXEL.MEMORY.NAME}" utilization'
+              name: 'Memory "{#ZYXEL.MEMORY.NAME}" utilization'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.124.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3500_10.memory[{#SNMPINDEX}]'
@@ -352,8 +352,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 91609e57df4941faa9fee17051f8ac24
                   expression: 'min(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: 'ZYXEL MES3500-10: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
-                  event_name: 'ZYXEL MES3500-10: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  name: 'High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
+                  event_name: 'High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
                   description: 'The system is running out of free memory.'
                   tags:
@@ -384,7 +384,7 @@ zabbix_export:
                 formulaid: D
           item_prototypes:
             - uuid: d300b380e4bc44f89ac7a40083d424ed
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Administrative status'
+              name: 'Port {#SNMPINDEX}: Administrative status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.adminstatus[{#SNMPINDEX}]'
@@ -408,7 +408,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 5a4b1c62b5834ecea8a90b71cb7c5f2e
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Interface name'
+              name: 'Port {#SNMPINDEX}: Interface name'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.descr[{#SNMPINDEX}]'
@@ -430,7 +430,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: bba418acc01d4732891c775c68bad518
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Link speed'
+              name: 'Port {#SNMPINDEX}: Link speed'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.highspeed[{#SNMPINDEX}]'
@@ -454,7 +454,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 7c6f62ebe1ec48e080c0edb36cf2304c
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming broadcast packages'
+              name: 'Port {#SNMPINDEX}: Incoming broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.in.broadcastpkts[{#SNMPINDEX}]'
@@ -477,7 +477,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 846dfcfcdd974d1e9f8ec71f54f8933b
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming multicast packages'
+              name: 'Port {#SNMPINDEX}: Incoming multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.in.multicastpkts[{#SNMPINDEX}]'
@@ -501,7 +501,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: b1843c913e6d4f638e43da1c92807a4f
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming traffic'
+              name: 'Port {#SNMPINDEX}: Incoming traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.in.traffic[{#SNMPINDEX}]'
@@ -526,7 +526,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 31e8e47755804816882d2070ecfca130
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming unicast packages'
+              name: 'Port {#SNMPINDEX}: Incoming unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.in.ucastpkts[{#SNMPINDEX}]'
@@ -549,7 +549,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: e4963aa170554edebb356515c04aaafb
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Incoming utilization'
+              name: 'Port {#SNMPINDEX}: Incoming utilization'
               type: CALCULATED
               key: 'zyxel.3500_10.net.if.in.util[{#SNMPINDEX}]'
               history: 7d
@@ -574,7 +574,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 66572368d798449baa945b3985156e07
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Link type'
+              name: 'Port {#SNMPINDEX}: Link type'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.24.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.link_type[{#SNMPINDEX}]'
@@ -596,7 +596,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 4c45f11441f4450e9f310ffb1d999a68
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Interface description'
+              name: 'Port {#SNMPINDEX}: Interface description'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.24.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.name[{#SNMPINDEX}]'
@@ -618,7 +618,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: a2269b48020a46c193830f8cc1ef3595
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Operational status'
+              name: 'Port {#SNMPINDEX}: Operational status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}]'
@@ -646,7 +646,7 @@ zabbix_export:
                   expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.if.operstatus[{#SNMPINDEX}])<>2'
-                  name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Link down'
+                  name: 'Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -661,7 +661,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 521a2ac2ff0c42c282380c45bd12706f
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing broadcast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing broadcast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.out.broadcastpkts[{#SNMPINDEX}]'
@@ -685,7 +685,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 7638a07162bd4668b086f0d07d4a6513
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing multicast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing multicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.out.multicastpkts[{#SNMPINDEX}]'
@@ -710,7 +710,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: f563a76ec9ae4f62ad1601f1d91549d2
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing traffic'
+              name: 'Port {#SNMPINDEX}: Outgoing traffic'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.out.traffic[{#SNMPINDEX}]'
@@ -736,7 +736,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 8888c9da5191443facfec4c865181d18
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing unicast packages'
+              name: 'Port {#SNMPINDEX}: Outgoing unicast packages'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.out.ucastpkts[{#SNMPINDEX}]'
@@ -760,7 +760,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: dffcc1796e8b4a3c84f9d925b3644215
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Outgoing utilization'
+              name: 'Port {#SNMPINDEX}: Outgoing utilization'
               type: CALCULATED
               key: 'zyxel.3500_10.net.if.out.util[{#SNMPINDEX}]'
               history: 7d
@@ -785,7 +785,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: a54d1c46a1c842b88854be651c4e4caa
-              name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Speed Duplex'
+              name: 'Port {#SNMPINDEX}: Speed Duplex'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.24.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.3500_10.net.if.speed_duplex[{#SNMPINDEX}]'
@@ -898,7 +898,7 @@ zabbix_export:
           description: 'SFP DDM module discovery.'
           item_prototypes:
             - uuid: 13ddb64324c4401da5e742a93698e2f6
-              name: 'ZYXEL MES3500-10: SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
+              name: 'SFP {#ZYXEL.SFP.PORT}: {#ZYXEL.SFP.DESCRIPTION}'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.117.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.3500_10.sfp.ddm[{#SNMPINDEX}]'
@@ -926,8 +926,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: bc09d6c1771d4d04afe86f49dbd98852
                   expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL MES3500-10: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
-                  event_name: 'ZYXEL MES3500-10: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
                   tags:
@@ -935,8 +935,8 @@ zabbix_export:
                       value: notice
                 - uuid: d05ae92b624347cc9a8fe1154995f3f9
                   expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL MES3500-10: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
-                  event_name: 'ZYXEL MES3500-10: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
                   tags:
@@ -990,7 +990,7 @@ zabbix_export:
           description: 'SFP module discovery.'
           item_prototypes:
             - uuid: aab3e0e09bc64de0a2e7322cfb4da68e
-              name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX}: Date code'
+              name: 'SFP {#SNMPINDEX}: Date code'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.117.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3500_10.sfp.datecode[{#SNMPINDEX}]'
@@ -1013,7 +1013,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 2f338f7f29464e0b88ebe7d3ec69050a
-              name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX}: Part number'
+              name: 'SFP {#SNMPINDEX}: Part number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.117.1.1.4.{#SNMPINDEX}'
               key: 'zyxel.3500_10.sfp.part[{#SNMPINDEX}]'
@@ -1036,7 +1036,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 53582950f20e474ba4b6f46c42bc3216
-              name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX}: Revision'
+              name: 'SFP {#SNMPINDEX}: Revision'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.117.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3500_10.sfp.revision[{#SNMPINDEX}]'
@@ -1059,7 +1059,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: cecd4ba3b9014400a2d5d5b1b98f5463
-              name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX}: Serial number'
+              name: 'SFP {#SNMPINDEX}: Serial number'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.117.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}]'
@@ -1084,8 +1084,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 8832e1fa622449f582218cf5a7bf6b75
                   expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX} has been replaced'
-                  event_name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
@@ -1093,7 +1093,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: b09aad7939cb4897bff413ef956bebfe
-              name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX}: Status'
+              name: 'SFP {#SNMPINDEX}: Status'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.117.1.1.2.{#SNMPINDEX}'
               key: 'zyxel.3500_10.sfp.status[{#SNMPINDEX}]'
@@ -1116,7 +1116,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 3878fecf990d4cb6aba13225b2bbfa59
-              name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX}: Transceiver'
+              name: 'SFP {#SNMPINDEX}: Transceiver'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.117.1.1.8.{#SNMPINDEX}'
               key: 'zyxel.3500_10.sfp.transceiver[{#SNMPINDEX}]'
@@ -1139,7 +1139,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#SNMPINDEX}'
             - uuid: 3c8dfe57cab242c2ade6139e8666e621
-              name: 'ZYXEL MES3500-10: SFP {#SNMPINDEX}: Vendor'
+              name: 'SFP {#SNMPINDEX}: Vendor'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.117.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3500_10.sfp.vendor[{#SNMPINDEX}]'
@@ -1172,7 +1172,7 @@ zabbix_export:
             Index of temperature unit. 1:MAC, 2:CPU, 3:PHY
           item_prototypes:
             - uuid: 60f580a757814d2a9b320b6810a8f65d
-              name: 'ZYXEL MES3500-10: Temperature "{#ZYXEL.TEMP.ID}"'
+              name: 'Temperature "{#ZYXEL.TEMP.ID}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.9.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.3500_10.temp[{#SNMPINDEX}]'
@@ -1193,7 +1193,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6970c577993343dfaa97f4317acf0f08
                   expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
-                  name: 'ZYXEL MES3500-10: Temperature {#ZYXEL.TEMP.ID} is in critical state'
+                  name: 'Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
@@ -1229,7 +1229,7 @@ zabbix_export:
           description: 'An entry in voltageTable.'
           item_prototypes:
             - uuid: 2f842775bf27436ab28278754594e5b9
-              name: 'ZYXEL MES3500-10: Nominal "{#ZYXEL.VOLT.NOMINAL}"'
+              name: 'Nominal "{#ZYXEL.VOLT.NOMINAL}"'
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.80.9.3.1.2.{#SNMPINDEX}'
               key: 'zyxel.3500_10.volt[{#SNMPINDEX}]'
@@ -1254,7 +1254,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: c86b60bc2d0842e28f0718314db4cde0
                   expression: 'last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
-                  name: 'ZYXEL MES3500-10: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
+                  name: 'Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
@@ -1431,8 +1431,8 @@ zabbix_export:
   triggers:
     - uuid: 9899ada82b0e4507948a8a0068e5640d
       expression: '(last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.hw.uptime)>0 and last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.hw.uptime)<10m) or (last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.hw.uptime)=0 and last(/ZYXEL MES3500-10 by SNMP/zyxel.3500_10.net.uptime)<10m)'
-      name: 'ZYXEL MES3500-10: Host has been restarted'
-      event_name: 'ZYXEL MES3500-10: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'

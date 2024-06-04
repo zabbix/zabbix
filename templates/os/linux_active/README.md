@@ -65,70 +65,70 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Linux: Version of Zabbix agent running||Zabbix agent (active)|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Linux: Host name of Zabbix agent running||Zabbix agent (active)|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Linux: Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent (active)|agent.ping|
-|Linux: Active agent availability|<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p>|Zabbix internal|zabbix[host,active_agent,available]|
-|Linux: Number of CPUs||Zabbix agent (active)|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Linux: Load average (1m avg)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent (active)|system.cpu.load[all,avg1]|
-|Linux: Load average (5m avg)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent (active)|system.cpu.load[all,avg5]|
-|Linux: Load average (15m avg)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent (active)|system.cpu.load[all,avg15]|
-|Linux: CPU utilization|<p>CPU utilization expressed in %.</p>|Dependent item|system.cpu.util<p>**Preprocessing**</p><ul><li><p>JavaScript: `//Calculate utilization<br>return (100 - value)`</p></li></ul>|
-|Linux: CPU idle time|<p>Time the CPU has spent doing nothing.</p>|Zabbix agent (active)|system.cpu.util[,idle]|
-|Linux: CPU system time|<p>Time the CPU has spent running the kernel and its processes.</p>|Zabbix agent (active)|system.cpu.util[,system]|
-|Linux: CPU user time|<p>Time the CPU has spent running users' processes that are not niced.</p>|Zabbix agent (active)|system.cpu.util[,user]|
-|Linux: CPU nice time|<p>Time the CPU has spent running users' processes that have been niced.</p>|Zabbix agent (active)|system.cpu.util[,nice]|
-|Linux: CPU iowait time|<p>Time the CPU has been waiting for I/O to complete.</p>|Zabbix agent (active)|system.cpu.util[,iowait]|
-|Linux: CPU steal time|<p>The amount of "stolen" CPU from this virtual machine by the hypervisor for other tasks, such as running another virtual machine.</p>|Zabbix agent (active)|system.cpu.util[,steal]|
-|Linux: CPU interrupt time|<p>Time the CPU has spent servicing hardware interrupts.</p>|Zabbix agent (active)|system.cpu.util[,interrupt]|
-|Linux: CPU softirq time|<p>Time the CPU has been servicing software interrupts.</p>|Zabbix agent (active)|system.cpu.util[,softirq]|
-|Linux: CPU guest time|<p>Time spent on running a virtual CPU for a guest operating system.</p>|Zabbix agent (active)|system.cpu.util[,guest]|
-|Linux: CPU guest nice time|<p>Time spent on running a niced guest (a virtual CPU for guest operating systems under the control of the Linux kernel).</p>|Zabbix agent (active)|system.cpu.util[,guest_nice]|
-|Linux: Context switches per second|<p>The combined rate at which all processors on the computer are switched from one thread to another.</p>|Zabbix agent (active)|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Linux: Interrupts per second|<p>Number of interrupts processed.</p>|Zabbix agent (active)|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Linux: Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent (active)|vfs.fs.get|
-|Linux: Memory utilization|<p>The percentage of used memory is calculated as `100-pavailable`.</p>|Dependent item|vm.memory.utilization<p>**Preprocessing**</p><ul><li><p>JavaScript: `return (100-value);`</p></li></ul>|
-|Linux: Available memory in %|<p>The available memory as percentage of the total. See also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.</p>|Zabbix agent (active)|vm.memory.size[pavailable]|
-|Linux: Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent (active)|vm.memory.size[total]|
-|Linux: Available memory|<p>The available memory:</p><p>- in Linux = free + buffers + cache;</p><p>- on other platforms calculation may vary.</p><p></p><p>See also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.</p>|Zabbix agent (active)|vm.memory.size[available]|
-|Linux: Total swap space|<p>The total space of the swap volume/file expressed in bytes.</p>|Zabbix agent (active)|system.swap.size[,total]|
-|Linux: Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Zabbix agent (active)|system.swap.size[,free]|
-|Linux: Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Zabbix agent (active)|system.swap.size[,pfree]|
-|Linux: System uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Zabbix agent (active)|system.uptime|
-|Linux: System boot time||Zabbix agent (active)|system.boottime<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Linux: System local time|<p>The local system time of the host.</p>|Zabbix agent (active)|system.localtime|
-|Linux: System name|<p>The host name of the system.</p>|Zabbix agent (active)|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Linux: System description|<p>The information as normally returned by `uname -a`.</p>|Zabbix agent (active)|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Linux: Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent (active)|system.users.num|
-|Linux: Maximum number of open file descriptors|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent (active)|kernel.maxfiles<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Linux: Maximum number of processes|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent (active)|kernel.maxproc<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Linux: Number of processes||Zabbix agent (active)|proc.num|
-|Linux: Number of running processes||Zabbix agent (active)|proc.num[,,run]|
-|Linux: Checksum of /etc/passwd||Zabbix agent (active)|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Linux: Operating system||Zabbix agent (active)|system.sw.os<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Linux: Operating system architecture|<p>The architecture of the operating system.</p>|Zabbix agent (active)|system.sw.arch<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Linux: Number of installed packages||Zabbix agent (active)|system.sw.packages.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Version of Zabbix agent running||Zabbix agent (active)|agent.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Host name of Zabbix agent running||Zabbix agent (active)|agent.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Zabbix agent ping|<p>The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.</p>|Zabbix agent (active)|agent.ping|
+|Active agent availability|<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p>|Zabbix internal|zabbix[host,active_agent,available]|
+|Number of CPUs||Zabbix agent (active)|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Load average (1m avg)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent (active)|system.cpu.load[all,avg1]|
+|Load average (5m avg)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent (active)|system.cpu.load[all,avg5]|
+|Load average (15m avg)|<p>Calculated as the system CPU load divided by the number of CPU cores.</p>|Zabbix agent (active)|system.cpu.load[all,avg15]|
+|CPU utilization|<p>CPU utilization expressed in %.</p>|Dependent item|system.cpu.util<p>**Preprocessing**</p><ul><li><p>JavaScript: `//Calculate utilization<br>return (100 - value)`</p></li></ul>|
+|CPU idle time|<p>Time the CPU has spent doing nothing.</p>|Zabbix agent (active)|system.cpu.util[,idle]|
+|CPU system time|<p>Time the CPU has spent running the kernel and its processes.</p>|Zabbix agent (active)|system.cpu.util[,system]|
+|CPU user time|<p>Time the CPU has spent running users' processes that are not niced.</p>|Zabbix agent (active)|system.cpu.util[,user]|
+|CPU nice time|<p>Time the CPU has spent running users' processes that have been niced.</p>|Zabbix agent (active)|system.cpu.util[,nice]|
+|CPU iowait time|<p>Time the CPU has been waiting for I/O to complete.</p>|Zabbix agent (active)|system.cpu.util[,iowait]|
+|CPU steal time|<p>The amount of "stolen" CPU from this virtual machine by the hypervisor for other tasks, such as running another virtual machine.</p>|Zabbix agent (active)|system.cpu.util[,steal]|
+|CPU interrupt time|<p>Time the CPU has spent servicing hardware interrupts.</p>|Zabbix agent (active)|system.cpu.util[,interrupt]|
+|CPU softirq time|<p>Time the CPU has been servicing software interrupts.</p>|Zabbix agent (active)|system.cpu.util[,softirq]|
+|CPU guest time|<p>Time spent on running a virtual CPU for a guest operating system.</p>|Zabbix agent (active)|system.cpu.util[,guest]|
+|CPU guest nice time|<p>Time spent on running a niced guest (a virtual CPU for guest operating systems under the control of the Linux kernel).</p>|Zabbix agent (active)|system.cpu.util[,guest_nice]|
+|Context switches per second|<p>The combined rate at which all processors on the computer are switched from one thread to another.</p>|Zabbix agent (active)|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Interrupts per second|<p>Number of interrupts processed.</p>|Zabbix agent (active)|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Get filesystems|<p>The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.</p>|Zabbix agent (active)|vfs.fs.get|
+|Memory utilization|<p>The percentage of used memory is calculated as `100-pavailable`.</p>|Dependent item|vm.memory.utilization<p>**Preprocessing**</p><ul><li><p>JavaScript: `return (100-value);`</p></li></ul>|
+|Available memory in %|<p>The available memory as percentage of the total. See also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.</p>|Zabbix agent (active)|vm.memory.size[pavailable]|
+|Total memory|<p>Total memory expressed in bytes.</p>|Zabbix agent (active)|vm.memory.size[total]|
+|Available memory|<p>The available memory:</p><p>- in Linux = free + buffers + cache;</p><p>- on other platforms calculation may vary.</p><p></p><p>See also Appendixes in Zabbix Documentation about parameters of the `vm.memory.size` item.</p>|Zabbix agent (active)|vm.memory.size[available]|
+|Total swap space|<p>The total space of the swap volume/file expressed in bytes.</p>|Zabbix agent (active)|system.swap.size[,total]|
+|Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Zabbix agent (active)|system.swap.size[,free]|
+|Free swap space in %|<p>The free space of the swap volume/file expressed in %.</p>|Zabbix agent (active)|system.swap.size[,pfree]|
+|System uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Zabbix agent (active)|system.uptime|
+|System boot time||Zabbix agent (active)|system.boottime<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|System local time|<p>The local system time of the host.</p>|Zabbix agent (active)|system.localtime|
+|System name|<p>The host name of the system.</p>|Zabbix agent (active)|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System description|<p>The information as normally returned by `uname -a`.</p>|Zabbix agent (active)|system.uname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Number of logged in users|<p>The number of users who are currently logged in.</p>|Zabbix agent (active)|system.users.num|
+|Maximum number of open file descriptors|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent (active)|kernel.maxfiles<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Maximum number of processes|<p>May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.</p>|Zabbix agent (active)|kernel.maxproc<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Number of processes||Zabbix agent (active)|proc.num|
+|Number of running processes||Zabbix agent (active)|proc.num[,,run]|
+|Checksum of /etc/passwd||Zabbix agent (active)|vfs.file.cksum[/etc/passwd,sha256]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Operating system||Zabbix agent (active)|system.sw.os<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Operating system architecture|<p>The architecture of the operating system.</p>|Zabbix agent (active)|system.sw.arch<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Number of installed packages||Zabbix agent (active)|system.sw.packages.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Linux: Zabbix agent is not available|<p>For active agents, `nodata()` with `agent.ping` is used with `{$AGENT.NODATA_TIMEOUT}` as a time threshold.</p>|`nodata(/Linux by Zabbix agent active/agent.ping,{$AGENT.NODATA_TIMEOUT})=1`|Average|**Manual close**: Yes|
-|Linux: Active checks are not available|<p>Active checks are considered unavailable. Agent has not sent a heartbeat for a prolonged time.</p>|`min(/Linux by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2`|High||
-|Linux: Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/Linux by Zabbix agent active/system.cpu.load[all,avg1],5m)/last(/Linux by Zabbix agent active/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/Linux by Zabbix agent active/system.cpu.load[all,avg5])>0 and last(/Linux by Zabbix agent active/system.cpu.load[all,avg15])>0`|Average||
-|Linux: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Linux by Zabbix agent active/system.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning|**Depends on**:<br><ul><li>Linux: Load average is too high</li></ul>|
-|Linux: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Linux by Zabbix agent active/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}`|Average|**Depends on**:<br><ul><li>Linux: Lack of available memory</li></ul>|
-|Linux: Lack of available memory|<p>The system is running out of memory.</p>|`max(/Linux by Zabbix agent active/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent active/vm.memory.size[total])>0`|Average||
-|Linux: High swap space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`max(/Linux by Zabbix agent active/system.swap.size[,pfree],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Zabbix agent active/system.swap.size[,total])>0`|Warning|**Depends on**:<br><ul><li>Linux: Lack of available memory</li><li>Linux: High memory utilization</li></ul>|
-|Linux: {HOST.NAME} has been restarted|<p>The host uptime is less than 10 minutes.</p>|`last(/Linux by Zabbix agent active/system.uptime)<10m`|Warning|**Manual close**: Yes|
-|Linux: System time is out of sync|<p>The host's system time is different from Zabbix server time.</p>|`fuzzytime(/Linux by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0`|Warning|**Manual close**: Yes|
-|Linux: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0`|Info|**Manual close**: Yes|
-|Linux: Configured max number of open filedescriptors is too low||`last(/Linux by Zabbix agent active/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}`|Info||
-|Linux: Configured max number of processes is too low||`last(/Linux by Zabbix agent active/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}`|Info|**Depends on**:<br><ul><li>Linux: Getting closer to process limit</li></ul>|
-|Linux: Getting closer to process limit||`last(/Linux by Zabbix agent active/proc.num)/last(/Linux by Zabbix agent active/kernel.maxproc)*100>80`|Warning||
-|Linux: /etc/passwd has been changed||`last(/Linux by Zabbix agent active/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Linux by Zabbix agent active/vfs.file.cksum[/etc/passwd,sha256],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Linux: System name has changed</li><li>Linux: Operating system description has changed</li></ul>|
-|Linux: Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`change(/Linux by Zabbix agent active/system.sw.os) and length(last(/Linux by Zabbix agent active/system.sw.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Linux: System name has changed</li></ul>|
-|Linux: Number of installed packages has been changed||`change(/Linux by Zabbix agent active/system.sw.packages.get)<>0`|Warning|**Manual close**: Yes|
+|Zabbix agent is not available|<p>For active agents, `nodata()` with `agent.ping` is used with `{$AGENT.NODATA_TIMEOUT}` as a time threshold.</p>|`nodata(/Linux by Zabbix agent active/agent.ping,{$AGENT.NODATA_TIMEOUT})=1`|Average|**Manual close**: Yes|
+|Active checks are not available|<p>Active checks are considered unavailable. Agent has not sent a heartbeat for a prolonged time.</p>|`min(/Linux by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2`|High||
+|Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/Linux by Zabbix agent active/system.cpu.load[all,avg1],5m)/last(/Linux by Zabbix agent active/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/Linux by Zabbix agent active/system.cpu.load[all,avg5])>0 and last(/Linux by Zabbix agent active/system.cpu.load[all,avg15])>0`|Average||
+|High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Linux by Zabbix agent active/system.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning|**Depends on**:<br><ul><li>Load average is too high</li></ul>|
+|High memory utilization|<p>The system is running out of free memory.</p>|`min(/Linux by Zabbix agent active/vm.memory.utilization,5m)>{$MEMORY.UTIL.MAX}`|Average|**Depends on**:<br><ul><li>Lack of available memory</li></ul>|
+|Lack of available memory|<p>The system is running out of memory.</p>|`max(/Linux by Zabbix agent active/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent active/vm.memory.size[total])>0`|Average||
+|High swap space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`max(/Linux by Zabbix agent active/system.swap.size[,pfree],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Zabbix agent active/system.swap.size[,total])>0`|Warning|**Depends on**:<br><ul><li>Lack of available memory</li><li>High memory utilization</li></ul>|
+|{HOST.NAME} has been restarted|<p>The host uptime is less than 10 minutes.</p>|`last(/Linux by Zabbix agent active/system.uptime)<10m`|Warning|**Manual close**: Yes|
+|System time is out of sync|<p>The host's system time is different from Zabbix server time.</p>|`fuzzytime(/Linux by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0`|Warning|**Manual close**: Yes|
+|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0`|Info|**Manual close**: Yes|
+|Configured max number of open filedescriptors is too low||`last(/Linux by Zabbix agent active/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}`|Info||
+|Configured max number of processes is too low||`last(/Linux by Zabbix agent active/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}`|Info|**Depends on**:<br><ul><li>Getting closer to process limit</li></ul>|
+|Getting closer to process limit||`last(/Linux by Zabbix agent active/proc.num)/last(/Linux by Zabbix agent active/kernel.maxproc)*100>80`|Warning||
+|/etc/passwd has been changed||`last(/Linux by Zabbix agent active/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Linux by Zabbix agent active/vfs.file.cksum[/etc/passwd,sha256],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>System name has changed</li><li>Operating system description has changed</li></ul>|
+|Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`change(/Linux by Zabbix agent active/system.sw.os) and length(last(/Linux by Zabbix agent active/system.sw.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>System name has changed</li></ul>|
+|Number of installed packages has been changed||`change(/Linux by Zabbix agent active/system.sw.packages.get)<>0`|Warning|**Manual close**: Yes|
 
 ### LLD rule Mounted filesystem discovery
 

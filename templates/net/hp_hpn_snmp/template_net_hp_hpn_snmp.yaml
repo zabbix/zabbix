@@ -30,7 +30,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: eb35864dcdc142d1a136e47fabe5f017
-          name: 'HP Enterprise Switch: ICMP ping'
+          name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
           history: 7d
@@ -44,14 +44,14 @@ zabbix_export:
           triggers:
             - uuid: 8fb33a256deb49a096b287493285e300
               expression: 'max(/HP Enterprise Switch by SNMP/icmpping,#3)=0'
-              name: 'HP Enterprise Switch: Unavailable by ICMP ping'
+              name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
               tags:
                 - tag: scope
                   value: availability
         - uuid: 722e38d7a1bd433192616664cc2824f8
-          name: 'HP Enterprise Switch: ICMP loss'
+          name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
           history: 7d
@@ -65,11 +65,11 @@ zabbix_export:
           triggers:
             - uuid: 589e13a6ab084dd4b7d1456f7707f44d
               expression: 'min(/HP Enterprise Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Enterprise Switch by SNMP/icmppingloss,5m)<100'
-              name: 'HP Enterprise Switch: High ICMP ping loss'
+              name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
-                - name: 'HP Enterprise Switch: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Enterprise Switch by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -77,7 +77,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 93f693245d3848afb6c89881cede42c1
-          name: 'HP Enterprise Switch: ICMP response time'
+          name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
           history: 7d
@@ -91,14 +91,14 @@ zabbix_export:
           triggers:
             - uuid: 75bdd8a0cd664815aa3e4fa54d4f0b97
               expression: 'avg(/HP Enterprise Switch by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
-              name: 'HP Enterprise Switch: High ICMP ping response time'
+              name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Average ICMP response time is too high.'
               dependencies:
-                - name: 'HP Enterprise Switch: High ICMP ping loss'
+                - name: 'High ICMP ping loss'
                   expression: 'min(/HP Enterprise Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Enterprise Switch by SNMP/icmppingloss,5m)<100'
-                - name: 'HP Enterprise Switch: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Enterprise Switch by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -106,7 +106,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: b7530ee6104342319b0cad986a3a4daf
-          name: 'HP Enterprise Switch: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -119,7 +119,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 1397f0fc832e47daa39308585f260152
-          name: 'HP Enterprise Switch: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -139,7 +139,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 083172af308e401a99a662f615a5b450
-          name: 'HP Enterprise Switch: CPU utilization'
+          name: 'CPU utilization'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0
           key: 'system.cpu.util[hpSwitchCpuStat.0]'
@@ -156,8 +156,8 @@ zabbix_export:
           triggers:
             - uuid: 883e49e933bd4cfda0e7dde774604a0a
               expression: 'min(/HP Enterprise Switch by SNMP/system.cpu.util[hpSwitchCpuStat.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'HP Enterprise Switch: High CPU utilization'
-              event_name: 'HP Enterprise Switch: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -165,7 +165,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 31211351783648bc9c727205c0273a4b
-          name: 'HP Enterprise Switch: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -186,7 +186,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: dadf12eb4c0a42bf9504e15bc4fe6d7c
-          name: 'HP Enterprise Switch: Firmware version'
+          name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11.2.14.11.5.1.1.3.0
           key: system.hw.firmware
@@ -211,7 +211,7 @@ zabbix_export:
           triggers:
             - uuid: a9dcdf4129d041eca8dadc8bfbc455ee
               expression: 'last(/HP Enterprise Switch by SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch by SNMP/system.hw.firmware,#2) and length(last(/HP Enterprise Switch by SNMP/system.hw.firmware))>0'
-              name: 'HP Enterprise Switch: Firmware has changed'
+              name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -220,7 +220,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 12d7d4a915714166b2c0a48733235ac1
-          name: 'HP Enterprise Switch: Hardware serial number'
+          name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.11.2.36.1.1.2.9.0
           key: system.hw.serialnumber
@@ -240,8 +240,8 @@ zabbix_export:
           triggers:
             - uuid: 6b9b9b0d1ff24074bb344d04efe53444
               expression: 'last(/HP Enterprise Switch by SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch by SNMP/system.hw.serialnumber,#2) and length(last(/HP Enterprise Switch by SNMP/system.hw.serialnumber))>0'
-              name: 'HP Enterprise Switch: Device has been replaced'
-              event_name: 'HP Enterprise Switch: Device has been replaced (new serial number received)'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
               description: 'The device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -249,7 +249,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: a0659dadbef14fb1ac9be45d47388aa2
-          name: 'HP Enterprise Switch: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -273,7 +273,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ad2dc1149eb546309657928b944c49fb
-          name: 'HP Enterprise Switch: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -293,7 +293,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ba7fd7afad3f4b76bdfedc8c6c3a24ac
-          name: 'HP Enterprise Switch: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
@@ -315,8 +315,8 @@ zabbix_export:
           triggers:
             - uuid: 63f6f85bfed94821a8339c46544dde0e
               expression: 'last(/HP Enterprise Switch by SNMP/system.name,#1)<>last(/HP Enterprise Switch by SNMP/system.name,#2) and length(last(/HP Enterprise Switch by SNMP/system.name))>0'
-              name: 'HP Enterprise Switch: System name has changed'
-              event_name: 'HP Enterprise Switch: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -326,7 +326,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 02e67b092ccf478ba13537ba6471f3fd
-          name: 'HP Enterprise Switch: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -345,7 +345,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 74fd9c1bd546497aa20b9af09b951e98
-          name: 'HP Enterprise Switch: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -364,7 +364,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: af855c1e75304c26b11a86c2a86f08f2
-          name: 'HP Enterprise Switch: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -384,12 +384,12 @@ zabbix_export:
           triggers:
             - uuid: d64df6c48ce44bbcafcdd60a3102b41c
               expression: 'max(/HP Enterprise Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'HP Enterprise Switch: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
               dependencies:
-                - name: 'HP Enterprise Switch: Unavailable by ICMP ping'
+                - name: 'Unavailable by ICMP ping'
                   expression: 'max(/HP Enterprise Switch by SNMP/icmpping,#3)=0'
               tags:
                 - tag: scope
@@ -2028,13 +2028,13 @@ zabbix_export:
   triggers:
     - uuid: 1395e02bc63e48daa779b8b685e91868
       expression: '(last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Enterprise Switch by SNMP/system.net.uptime[sysUpTime.0])<10m)'
-      name: 'HP Enterprise Switch: Host has been restarted'
-      event_name: 'HP Enterprise Switch: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'HP Enterprise Switch: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/HP Enterprise Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

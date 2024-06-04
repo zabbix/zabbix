@@ -27,7 +27,7 @@ zabbix_export:
         - name: 'Templates/Operating systems'
       items:
         - uuid: 0a64ce48b94b4886af4bd97beab5f93d
-          name: 'Solaris: Host name of Zabbix agent running'
+          name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
           history: 7d
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d708ce58ad214d19a740824512e8be6a
-          name: 'Solaris: Zabbix agent ping'
+          name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
@@ -51,7 +51,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 633a1d74569f4f61892dabf7e0acf6c1
-          name: 'Solaris: Version of Zabbix agent running'
+          name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
           history: 7d
@@ -65,7 +65,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 2fa6d58a5c7d48da90b1caf521e867cd
-          name: 'Solaris: Maximum number of processes'
+          name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
           history: 7d
@@ -76,7 +76,7 @@ zabbix_export:
           triggers:
             - uuid: 2a567bc9d5584dfea986b5b70c89fc65
               expression: 'last(/Solaris by Zabbix agent/kernel.maxproc)<256'
-              name: 'Solaris: Configured max number of processes is too low'
+              name: 'Configured max number of processes is too low'
               priority: INFO
               tags:
                 - tag: scope
@@ -84,7 +84,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 7c8c8421fb514e67bc9f14cefe4018f3
-          name: 'Solaris: Number of running processes'
+          name: 'Number of running processes'
           key: 'proc.num[,,run]'
           history: 7d
           description: 'The number of processes in a running state.'
@@ -94,7 +94,7 @@ zabbix_export:
           triggers:
             - uuid: 6504ba0f7fa445ea9083af008d52c525
               expression: 'avg(/Solaris by Zabbix agent/proc.num[,,run],5m)>30'
-              name: 'Solaris: Too many processes running'
+              name: 'Too many processes running'
               priority: WARNING
               tags:
                 - tag: scope
@@ -102,7 +102,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 74c805e8bfd947348b206a0d33bfc461
-          name: 'Solaris: Number of processes'
+          name: 'Number of processes'
           key: 'proc.num[]'
           history: 7d
           description: 'The total number of processes in any state.'
@@ -112,7 +112,7 @@ zabbix_export:
           triggers:
             - uuid: cc2731add899436ca2c12fff13c838fb
               expression: 'avg(/Solaris by Zabbix agent/proc.num[],5m)>300'
-              name: 'Solaris: Too many processes'
+              name: 'Too many processes'
               priority: WARNING
               tags:
                 - tag: scope
@@ -120,7 +120,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 1812e26de9ad4a36abb5498154e6ea3c
-          name: 'Solaris: Host boot time'
+          name: 'Host boot time'
           key: system.boottime
           delay: 10m
           history: 7d
@@ -129,7 +129,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 8186ed95ed8c4d6eb52ea2e718984170
-          name: 'Solaris: Interrupts per second'
+          name: 'Interrupts per second'
           key: system.cpu.intr
           history: 7d
           units: ips
@@ -142,7 +142,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 1a7cc53a5497427da28f882b1b185fad
-          name: 'Solaris: Processor load (1 min average per core)'
+          name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
@@ -153,13 +153,13 @@ zabbix_export:
           triggers:
             - uuid: e7ef1c2b702440a3a7a20a544446a068
               expression: 'avg(/Solaris by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
-              name: 'Solaris: Processor load is too high'
+              name: 'Processor load is too high'
               priority: WARNING
               tags:
                 - tag: scope
                   value: performance
         - uuid: 5b053b6c00464f8b8f5fc49fffda1394
-          name: 'Solaris: Processor load (5 min average per core)'
+          name: 'Processor load (5 min average per core)'
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
@@ -168,7 +168,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: c13c2ff556594c5d985420dc974659cf
-          name: 'Solaris: Processor load (15 min average per core)'
+          name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
@@ -177,7 +177,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 320f8803624f4ad2b9e66f1a08f5a145
-          name: 'Solaris: Context switches per second'
+          name: 'Context switches per second'
           key: system.cpu.switches
           history: 7d
           units: sps
@@ -190,7 +190,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: a653205d5ce4462089da4ed4d6f97f3a
-          name: 'Solaris: CPU idle time'
+          name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
           history: 7d
           value_type: FLOAT
@@ -200,7 +200,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 9bee92be803c48489509e41c19718abc
-          name: 'Solaris: CPU iowait time'
+          name: 'CPU iowait time'
           key: 'system.cpu.util[,iowait]'
           history: 7d
           value_type: FLOAT
@@ -212,14 +212,14 @@ zabbix_export:
           triggers:
             - uuid: 280634a65c9d4702a4913c9c2cd5869c
               expression: 'avg(/Solaris by Zabbix agent/system.cpu.util[,iowait],5m)>20'
-              name: 'Solaris: Disk I/O is overloaded'
+              name: 'Disk I/O is overloaded'
               priority: WARNING
               description: 'Extended OS wait times for I/O operations may signal potential performance issues with the storage system.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: bb32808bf73f489399ecb3e02bc18194
-          name: 'Solaris: CPU system time'
+          name: 'CPU system time'
           key: 'system.cpu.util[,system]'
           history: 7d
           value_type: FLOAT
@@ -229,7 +229,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: d30ad6a457df4e39819b76fc1be7a562
-          name: 'Solaris: CPU user time'
+          name: 'CPU user time'
           key: 'system.cpu.util[,user]'
           history: 7d
           value_type: FLOAT
@@ -239,7 +239,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: 1945e624e1864f2ba543f9438b1733f1
-          name: 'Solaris: Host name'
+          name: 'Host name'
           key: system.hostname
           delay: 1h
           history: 7d
@@ -257,13 +257,13 @@ zabbix_export:
           triggers:
             - uuid: cc5a9c97827f4091b83af8be33d58560
               expression: 'last(/Solaris by Zabbix agent/system.hostname,#1)<>last(/Solaris by Zabbix agent/system.hostname,#2)'
-              name: 'Solaris: Hostname was changed'
+              name: 'Hostname was changed'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: 0a0a8ab7047b400aaffe99917349291e
-          name: 'Solaris: Host local time'
+          name: 'Host local time'
           key: system.localtime
           history: 7d
           units: unixtime
@@ -272,7 +272,7 @@ zabbix_export:
             - tag: component
               value: os
         - uuid: 71597a2dfdeb4c63acf7505ffb7f4f08
-          name: 'Solaris: Free swap space'
+          name: 'Free swap space'
           key: 'system.swap.size[,free]'
           history: 7d
           units: B
@@ -281,7 +281,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: b2ee2b52a64841e282915d6de3c7f739
-          name: 'Solaris: Free swap space in %'
+          name: 'Free swap space in %'
           key: 'system.swap.size[,pfree]'
           history: 7d
           value_type: FLOAT
@@ -293,7 +293,7 @@ zabbix_export:
           triggers:
             - uuid: 7be6856162ca445388b13e524f01a3c2
               expression: 'last(/Solaris by Zabbix agent/system.swap.size[,pfree])<50'
-              name: 'Solaris: Lack of free swap space'
+              name: 'Lack of free swap space'
               priority: WARNING
               description: 'It probably means that the systems requires more physical memory.'
               tags:
@@ -302,7 +302,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 0e7ea1fd204c44f3b0a7880eac21a0df
-          name: 'Solaris: Total swap space'
+          name: 'Total swap space'
           key: 'system.swap.size[,total]'
           delay: 1h
           history: 7d
@@ -312,7 +312,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 034f7934cdb54cc6b99194fac9197bfb
-          name: 'Solaris: System information'
+          name: 'System information'
           key: system.uname
           delay: 1h
           history: 7d
@@ -330,13 +330,13 @@ zabbix_export:
           triggers:
             - uuid: dc293e688ac54ac0aee61e398d8bc5c5
               expression: 'last(/Solaris by Zabbix agent/system.uname,#1)<>last(/Solaris by Zabbix agent/system.uname,#2)'
-              name: 'Solaris: Host information was changed'
+              name: 'Host information was changed'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: c15a8b1b6cbd446bad669ead64a172a1
-          name: 'Solaris: System uptime'
+          name: 'System uptime'
           key: system.uptime
           delay: 10m
           history: 7d
@@ -347,13 +347,13 @@ zabbix_export:
           triggers:
             - uuid: 56284beb4a464017b3aa2f4c00bc271f
               expression: 'change(/Solaris by Zabbix agent/system.uptime)<0'
-              name: 'Solaris: Server has just been restarted'
+              name: 'Server has just been restarted'
               priority: INFO
               tags:
                 - tag: scope
                   value: notice
         - uuid: a2c0d69124424e49aa4fc1f2416ffc37
-          name: 'Solaris: Number of logged in users'
+          name: 'Number of logged in users'
           key: system.users.num
           history: 7d
           description: 'The number of users who are currently logged in.'
@@ -361,7 +361,7 @@ zabbix_export:
             - tag: component
               value: security
         - uuid: 5dd55b892d1b4828bfc570d6bf48251d
-          name: 'Solaris: Checksum of /etc/passwd'
+          name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
           history: 7d
@@ -377,13 +377,13 @@ zabbix_export:
           triggers:
             - uuid: 50e5be0acabb41658ec82772d9ec234e
               expression: 'last(/Solaris by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
-              name: 'Solaris: /etc/passwd has been changed'
+              name: '/etc/passwd has been changed'
               priority: WARNING
               tags:
                 - tag: scope
                   value: security
         - uuid: 897f991e6f8f433bbd52a958f4f54c08
-          name: 'Solaris: Get filesystems'
+          name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
           trends: '0'
@@ -393,7 +393,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 6888f0dd6b2e418f8c28a0ee59648fa3
-          name: 'Solaris: Available memory'
+          name: 'Available memory'
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
@@ -404,7 +404,7 @@ zabbix_export:
           triggers:
             - uuid: a0769befcb4e4c649557926824d7dbf3
               expression: 'last(/Solaris by Zabbix agent/vm.memory.size[available])<20M'
-              name: 'Solaris: Lack of available memory on server'
+              name: 'Lack of available memory on server'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -412,7 +412,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: d96d5ebfa074428e957335b5fa58189b
-          name: 'Solaris: Total memory'
+          name: 'Total memory'
           key: 'vm.memory.size[total]'
           delay: 1h
           history: 7d
@@ -422,7 +422,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 46dc8d0138314f41962dc357d1e4af20
-          name: 'Solaris: Zabbix agent availability'
+          name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
@@ -435,8 +435,8 @@ zabbix_export:
           triggers:
             - uuid: 4ca39fa4a86c45e19e03eff89edd239b
               expression: 'max(/Solaris by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'Solaris: Zabbix agent is not available'
-              event_name: 'Solaris: Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive checks only; the availability of the agent(s) and a host is used with `{$AGENT.TIMEOUT}` as the time threshold.'
               manual_close: 'YES'
@@ -906,7 +906,7 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: graphprototype
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -922,7 +922,7 @@ zabbix_export:
                       value: AAAEB
                 - type: graphprototype
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER
@@ -967,7 +967,7 @@ zabbix_export:
                       value: AAAAC
                 - type: graphprototype
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: INTEGER

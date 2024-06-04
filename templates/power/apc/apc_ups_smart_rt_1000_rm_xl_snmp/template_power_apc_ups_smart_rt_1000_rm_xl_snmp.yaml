@@ -25,7 +25,7 @@ zabbix_export:
         - name: Templates/Power
       items:
         - uuid: 94c5c76b7e09402bb221827ee1fea5bc
-          name: 'APC Smart-UPS RT 1000 RM XL: Battery capacity'
+          name: 'Battery capacity'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.1.0
           key: 'battery.capacity[upsHighPrecBatteryCapacity]'
@@ -49,15 +49,15 @@ zabbix_export:
           triggers:
             - uuid: 8ab182b26a0443539a1a114767d8acd7
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}'
-              name: 'APC Smart-UPS RT 1000 RM XL: Battery has low capacity'
-              event_name: 'APC Smart-UPS RT 1000 RM XL: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
+              name: 'Battery has low capacity'
+              event_name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
               opdata: 'Current capacity: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 1a52452353b443d6b965293fda3b16b9
-          name: 'APC Smart-UPS RT 1000 RM XL: External battery packs count'
+          name: 'External battery packs count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.5.0
           key: 'battery.external_packs_count[upsAdvBatteryNumOfBattPacks]'
@@ -76,7 +76,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 7a887ae254b04b19bac605bb36141767
-          name: 'APC Smart-UPS RT 1000 RM XL: Battery last replace date'
+          name: 'Battery last replace date'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.3.0
           key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
@@ -99,7 +99,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 8f4351d23be04a3abee1e6edb746a9ec
-          name: 'APC Smart-UPS RT 1000 RM XL: Battery replace indicator'
+          name: 'Battery replace indicator'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.4.0
           key: 'battery.replace_indicator[upsAdvBatteryReplaceIndicator]'
@@ -119,14 +119,14 @@ zabbix_export:
           triggers:
             - uuid: ab0db1327cf04a9c9a9ee757f0869603
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2'
-              name: 'APC Smart-UPS RT 1000 RM XL: Battery needs replacement'
+              name: 'Battery needs replacement'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: f151210b9cd749b2b3e5af2145733c82
-          name: 'APC Smart-UPS RT 1000 RM XL: Battery runtime remaining'
+          name: 'Battery runtime remaining'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.3.0
           key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: a631704123c2498aa8ce973e36c13698
-          name: 'APC Smart-UPS RT 1000 RM XL: Battery status'
+          name: 'Battery status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.1.0
           key: 'battery.status[upsBasicBatteryStatus]'
@@ -176,7 +176,7 @@ zabbix_export:
           triggers:
             - uuid: c8787a09c2ea4aeb977b868ae0a3218b
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.status[upsBasicBatteryStatus])=4'
-              name: 'APC Smart-UPS RT 1000 RM XL: Battery has an internal error condition'
+              name: 'Battery has an internal error condition'
               priority: AVERAGE
               description: 'A battery installed has an internal error condition.'
               tags:
@@ -184,14 +184,14 @@ zabbix_export:
                   value: notice
             - uuid: 40d1fdcec63d4c3785b5ba77fbd14ee7
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.status[upsBasicBatteryStatus])=3'
-              name: 'APC Smart-UPS RT 1000 RM XL: Battery is Low'
+              name: 'Battery is Low'
               priority: AVERAGE
               description: 'The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: c03e15aaf58f4056b88677c44c5d7d87
-          name: 'APC Smart-UPS RT 1000 RM XL: Battery temperature'
+          name: 'Battery temperature'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.2.0
           key: 'battery.temperature[upsHighPrecBatteryTemperature]'
@@ -215,15 +215,15 @@ zabbix_export:
           triggers:
             - uuid: e2debe06675d4d4584b60b768633887b
               expression: 'min(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
-              name: 'APC Smart-UPS RT 1000 RM XL: Battery has high temperature'
-              event_name: 'APC Smart-UPS RT 1000 RM XL: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+              name: 'Battery has high temperature'
+              event_name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: 4b456cb5c0224b31a2f8b4bb40d8203b
-          name: 'APC Smart-UPS RT 1000 RM XL: Battery voltage'
+          name: 'Battery voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.4.0
           key: 'battery.voltage[upsHighPrecBatteryActualVoltage]'
@@ -244,7 +244,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 0a12f157ae844129a35084b5ab0a8eab
-          name: 'APC Smart-UPS RT 1000 RM XL: Input fail cause'
+          name: 'Input fail cause'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.2.5.0
           key: 'input.fail[upsAdvInputLineFailCause]'
@@ -285,7 +285,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 0ceb5a6d71f440fcbd2da06b0cc1bbb3
-          name: 'APC Smart-UPS RT 1000 RM XL: Input frequency'
+          name: 'Input frequency'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.4.0
           key: 'input.frequency[upsHighPrecInputFrequency]'
@@ -308,15 +308,15 @@ zabbix_export:
           triggers:
             - uuid: b29cd7e33c1e4e16b10fe436c1f7e6d6
               expression: 'min(/APC Smart-UPS RT 1000 RM XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS RT 1000 RM XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS RT 1000 RM XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
-              name: 'APC Smart-UPS RT 1000 RM XL: Unacceptable input frequency'
-              event_name: 'APC Smart-UPS RT 1000 RM XL: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
+              name: 'Unacceptable input frequency'
+              event_name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: d7281586af02462a9a2f511c0a5741eb
-          name: 'APC Smart-UPS RT 1000 RM XL: Input voltage'
+          name: 'Input voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.1.0
           key: 'input.voltage[upsHighPrecInputLineVoltage]'
@@ -339,15 +339,15 @@ zabbix_export:
           triggers:
             - uuid: d38f2151f0eb486e8d44b72a2e361a5f
               expression: 'min(/APC Smart-UPS RT 1000 RM XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS RT 1000 RM XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 RM XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
-              name: 'APC Smart-UPS RT 1000 RM XL: Unacceptable input voltage'
-              event_name: 'APC Smart-UPS RT 1000 RM XL: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+              name: 'Unacceptable input voltage'
+              event_name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: 145d3bf81b00427aad5563a4feb7aea1
-          name: 'APC Smart-UPS RT 1000 RM XL: Output current'
+          name: 'Output current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.4.0
           key: 'output.current[upsHighPrecOutputCurrent]'
@@ -368,7 +368,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: cd7b2c1b12df4fd19f37485aa380b295
-          name: 'APC Smart-UPS RT 1000 RM XL: Output load'
+          name: 'Output load'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.3.0
           key: 'output.load[upsHighPrecOutputLoad]'
@@ -392,8 +392,8 @@ zabbix_export:
           triggers:
             - uuid: 57197c601f8a433d8ccdcb040d047f6f
               expression: 'min(/APC Smart-UPS RT 1000 RM XL by SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
-              name: 'APC Smart-UPS RT 1000 RM XL: Output load is high'
-              event_name: 'APC Smart-UPS RT 1000 RM XL: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
+              name: 'Output load is high'
+              event_name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
@@ -401,7 +401,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 3170d441ede24494b9570b6d318cc05f
-          name: 'APC Smart-UPS RT 1000 RM XL: Output status'
+          name: 'Output status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.1.1.0
           key: 'output.status[upsBasicOutputStatus]'
@@ -429,83 +429,83 @@ zabbix_export:
           triggers:
             - uuid: e9289d8f4e124097990e2af98e916368
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=16'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is Emergency Static Bypass'
+              name: 'UPS is Emergency Static Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 13735964f51d4d1bb17e6b0587a43020
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=10'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is Hardware Failure Bypass'
+              name: 'UPS is Hardware Failure Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: d74ae82199884a7fb4a20b48f3c7ff1f
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=7'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is Off'
+              name: 'UPS is Off'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 4df5271075904c228a0372d5f667530e
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=3'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is on battery'
+              name: 'UPS is on battery'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 3f02d9cb7f5142599e59e7781808e5c3
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=4'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is on Smart Boost'
+              name: 'UPS is on Smart Boost'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 515ad03892694fd4a2f2350a6bb8af6f
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=12'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is On Smart Trim'
+              name: 'UPS is On Smart Trim'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 2a2d35e4e4674b6aa49068a7970caa03
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=8'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is Rebooting'
+              name: 'UPS is Rebooting'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: ef1ddb8869074847b70e8f669883c56b
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=11'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is Sleeping Until Power Return'
+              name: 'UPS is Sleeping Until Power Return'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 0d6e4e664ddf425e8c03155802fe45be
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=6'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is Software Bypass'
+              name: 'UPS is Software Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 12a3a33152824ffe863a8d79c1372195
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=9'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is Switched Bypass'
+              name: 'UPS is Switched Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 273c561c2afb4d78be86218e370c9a1f
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/output.status[upsBasicOutputStatus])=5'
-              name: 'APC Smart-UPS RT 1000 RM XL: UPS is Timed Sleeping'
+              name: 'UPS is Timed Sleeping'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
         - uuid: 6c7d7d803647478c8f2a79875457110c
-          name: 'APC Smart-UPS RT 1000 RM XL: Output voltage'
+          name: 'Output voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.1.0
           key: 'output.voltage[upsHighPrecOutputVoltage]'
@@ -526,7 +526,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: d08fb7e3fae84d2cbae64ab9771ffcdc
-          name: 'APC Smart-UPS RT 1000 RM XL: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -539,7 +539,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: da60acc731a64257a90512b5c70d1e92
-          name: 'APC Smart-UPS RT 1000 RM XL: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -561,7 +561,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 01302a36cafd421c90d746f785c83f3f
-          name: 'APC Smart-UPS RT 1000 RM XL: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -582,7 +582,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 60bef30ff568425eb5e4c5e6dc861e79
-          name: 'APC Smart-UPS RT 1000 RM XL: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -606,7 +606,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d0351d1bc1dc4f1b853fe64d456b3570
-          name: 'APC Smart-UPS RT 1000 RM XL: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -626,7 +626,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 866889bb71e949c18520bf8fefd3e7ea
-          name: 'APC Smart-UPS RT 1000 RM XL: Model'
+          name: Model
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.1.1.0
           key: 'system.model[upsBasicIdentModel]'
@@ -645,7 +645,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 482bec6573f249abbb721f2ec90def3b
-          name: 'APC Smart-UPS RT 1000 RM XL: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'system.name[sysName.0]'
@@ -667,8 +667,8 @@ zabbix_export:
           triggers:
             - uuid: b13b087b9828426aac82a281071ceb8b
               expression: 'last(/APC Smart-UPS RT 1000 RM XL by SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS RT 1000 RM XL by SNMP/system.name[sysName.0],#2) and length(last(/APC Smart-UPS RT 1000 RM XL by SNMP/system.name[sysName.0]))>0'
-              name: 'APC Smart-UPS RT 1000 RM XL: System name has changed'
-              event_name: 'APC Smart-UPS RT 1000 RM XL: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -678,7 +678,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: 336ef2166914449fafa13ab08fe7c7a1
-          name: 'APC Smart-UPS RT 1000 RM XL: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -697,7 +697,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 1c00c980ff284fb2bafb8358cc477d13
-          name: 'APC Smart-UPS RT 1000 RM XL: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -716,7 +716,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 269ce166bb904fa8b11fc2fdf1f67d76
-          name: 'APC Smart-UPS RT 1000 RM XL: Serial number'
+          name: 'Serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.2.3.0
           key: 'system.sn[upsAdvIdentSerialNumber]'
@@ -738,7 +738,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: f4f9ebb1e55b41a5a6e470a541e136bc
-          name: 'APC Smart-UPS RT 1000 RM XL: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -762,7 +762,7 @@ zabbix_export:
           triggers:
             - uuid: 53263bf0536d479785b45883b9b7ab21
               expression: 'max(/APC Smart-UPS RT 1000 RM XL by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'APC Smart-UPS RT 1000 RM XL: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -1549,13 +1549,13 @@ zabbix_export:
       expression: |
         (last(/APC Smart-UPS RT 1000 RM XL by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC Smart-UPS RT 1000 RM XL by SNMP/system.hw.uptime[hrSystemUptime.0])<10m)
         or (last(/APC Smart-UPS RT 1000 RM XL by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC Smart-UPS RT 1000 RM XL by SNMP/system.net.uptime[sysUpTime.0])<10m)
-      name: 'APC Smart-UPS RT 1000 RM XL: Host has been restarted'
-      event_name: 'APC Smart-UPS RT 1000 RM XL: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'APC Smart-UPS RT 1000 RM XL: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/APC Smart-UPS RT 1000 RM XL by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -100,7 +95,8 @@ function item_type2str($type = null) {
 		ITEM_TYPE_CALCULATED => _('Calculated'),
 		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
 		ITEM_TYPE_DEPENDENT => _('Dependent item'),
-		ITEM_TYPE_SCRIPT => _('Script')
+		ITEM_TYPE_SCRIPT => _('Script'),
+		ITEM_TYPE_BROWSER => _('Browser')
 	];
 
 	if ($type === null) {
@@ -1883,7 +1879,8 @@ function checkNowAllowedTypes() {
 		ITEM_TYPE_DEPENDENT,
 		ITEM_TYPE_HTTPAGENT,
 		ITEM_TYPE_SNMP,
-		ITEM_TYPE_SCRIPT
+		ITEM_TYPE_SCRIPT,
+		ITEM_TYPE_BROWSER
 	];
 }
 
@@ -2468,6 +2465,11 @@ function getTypeItemFieldNames(array $input): array {
 			return $input['templateid'] == 0
 				? ['parameters', 'params', 'timeout', 'delay']
 				: ['delay'];
+
+		case ITEM_TYPE_BROWSER:
+			return $input['templateid'] == 0
+				? ['parameters', 'params', 'timeout', 'delay']
+				: ['delay'];
 	}
 }
 
@@ -2553,7 +2555,7 @@ function getInheritedTimeouts(string $proxyid): array {
 		$db_proxies = API::Proxy()->get([
 			'output' => ['custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script'
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			],
 			'proxyids' => $proxyid,
 			'nopermissions' => true
@@ -2574,7 +2576,8 @@ function getInheritedTimeouts(string $proxyid): array {
 					ITEM_TYPE_TELNET => $db_proxy['timeout_telnet_agent'],
 					ITEM_TYPE_HTTPAGENT => $db_proxy['timeout_http_agent'],
 					ITEM_TYPE_SNMP => $db_proxy['timeout_snmp_agent'],
-					ITEM_TYPE_SCRIPT => $db_proxy['timeout_script']
+					ITEM_TYPE_SCRIPT => $db_proxy['timeout_script'],
+					ITEM_TYPE_BROWSER => $db_proxy['timeout_browser']
 				]
 			];
 		}
@@ -2593,7 +2596,8 @@ function getInheritedTimeouts(string $proxyid): array {
 			ITEM_TYPE_TELNET => CSettingsHelper::get(CSettingsHelper::TIMEOUT_TELNET_AGENT),
 			ITEM_TYPE_HTTPAGENT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_HTTP_AGENT),
 			ITEM_TYPE_SNMP => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SNMP_AGENT),
-			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT)
+			ITEM_TYPE_SCRIPT => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SCRIPT),
+			ITEM_TYPE_BROWSER => CSettingsHelper::get(CSettingsHelper::TIMEOUT_BROWSER)
 		]
 	];
 }

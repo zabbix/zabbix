@@ -25,7 +25,7 @@ zabbix_export:
         - name: Templates/Power
       items:
         - uuid: 70ebcb1dee674a60a1410895d60e8245
-          name: 'APC UPS Galaxy 3500: Battery capacity'
+          name: 'Battery capacity'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.1.0
           key: 'battery.capacity[upsHighPrecBatteryCapacity]'
@@ -49,15 +49,15 @@ zabbix_export:
           triggers:
             - uuid: 1800690ba0504df9940a4e667c846132
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}'
-              name: 'APC UPS Galaxy 3500: Battery has low capacity'
-              event_name: 'APC UPS Galaxy 3500: Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
+              name: 'Battery has low capacity'
+              event_name: 'Battery has low capacity (below {$BATTERY.CAPACITY.MIN.WARN}%)'
               opdata: 'Current capacity: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 2b417eadc988460a89db04efdaca4ffc
-          name: 'APC UPS Galaxy 3500: External battery packs count'
+          name: 'External battery packs count'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.5.0
           key: 'battery.external_packs_count[upsAdvBatteryNumOfBattPacks]'
@@ -76,7 +76,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: 98af792142464656b925a452e5ebf1cc
-          name: 'APC UPS Galaxy 3500: Battery last replace date'
+          name: 'Battery last replace date'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.3.0
           key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
@@ -99,7 +99,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: b7614652ff6f4e0890f366b8e0831b80
-          name: 'APC UPS Galaxy 3500: Battery replace indicator'
+          name: 'Battery replace indicator'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.4.0
           key: 'battery.replace_indicator[upsAdvBatteryReplaceIndicator]'
@@ -119,14 +119,14 @@ zabbix_export:
           triggers:
             - uuid: b4d10f8908f4473facde6d2db1520e0f
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2'
-              name: 'APC UPS Galaxy 3500: Battery needs replacement'
+              name: 'Battery needs replacement'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
               tags:
                 - tag: scope
                   value: notice
         - uuid: 89cca909c60745fe824d02aa0d4bc3d7
-          name: 'APC UPS Galaxy 3500: Battery runtime remaining'
+          name: 'Battery runtime remaining'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.2.3.0
           key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 22a95e447ad74d43a191f368346fde59
-          name: 'APC UPS Galaxy 3500: Battery status'
+          name: 'Battery status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.1.0
           key: 'battery.status[upsBasicBatteryStatus]'
@@ -176,7 +176,7 @@ zabbix_export:
           triggers:
             - uuid: d84ec0d0b8d84e3294cbe7ffaed0c83e
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/battery.status[upsBasicBatteryStatus])=4'
-              name: 'APC UPS Galaxy 3500: Battery has an internal error condition'
+              name: 'Battery has an internal error condition'
               priority: AVERAGE
               description: 'A battery installed has an internal error condition.'
               tags:
@@ -184,14 +184,14 @@ zabbix_export:
                   value: notice
             - uuid: 8f569ce6c916456581e1cb2cdd8d4dba
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/battery.status[upsBasicBatteryStatus])=3'
-              name: 'APC UPS Galaxy 3500: Battery is Low'
+              name: 'Battery is Low'
               priority: AVERAGE
               description: 'The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.'
               tags:
                 - tag: scope
                   value: capacity
         - uuid: 7a0a2b5e702f473fa1144eaf499367b2
-          name: 'APC UPS Galaxy 3500: Battery temperature'
+          name: 'Battery temperature'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.2.0
           key: 'battery.temperature[upsHighPrecBatteryTemperature]'
@@ -215,15 +215,15 @@ zabbix_export:
           triggers:
             - uuid: 0e1f47f0604d4b1b8769e497d7f328b9
               expression: 'min(/APC UPS Galaxy 3500 by SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}'
-              name: 'APC UPS Galaxy 3500: Battery has high temperature'
-              event_name: 'APC UPS Galaxy 3500: Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
+              name: 'Battery has high temperature'
+              event_name: 'Battery has high temperature (over {$BATTERY.TEMP.MAX.WARN}℃ for {$TIME.PERIOD})'
               opdata: 'Current temperature: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: 756f727fe8374aeba9d1afd7bbe77f02
-          name: 'APC UPS Galaxy 3500: Battery voltage'
+          name: 'Battery voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.3.4.0
           key: 'battery.voltage[upsHighPrecBatteryActualVoltage]'
@@ -244,7 +244,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 9069a1c0d9304e7fa5f2df133dbb46cd
-          name: 'APC UPS Galaxy 3500: Input fail cause'
+          name: 'Input fail cause'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.2.5.0
           key: 'input.fail[upsAdvInputLineFailCause]'
@@ -285,7 +285,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 3a64740655ca455ab0280592b5f0055f
-          name: 'APC UPS Galaxy 3500: Input frequency'
+          name: 'Input frequency'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.4.0
           key: 'input.frequency[upsHighPrecInputFrequency]'
@@ -308,15 +308,15 @@ zabbix_export:
           triggers:
             - uuid: 786d9928356e41ad9b6b2de3b4f3a96f
               expression: 'min(/APC UPS Galaxy 3500 by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC UPS Galaxy 3500 by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC UPS Galaxy 3500 by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})'
-              name: 'APC UPS Galaxy 3500: Unacceptable input frequency'
-              event_name: 'APC UPS Galaxy 3500: Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
+              name: 'Unacceptable input frequency'
+              event_name: 'Unacceptable input frequency (out of range {$UPS.INPUT_FREQ.MIN.WARN}-{$UPS.INPUT_FREQ.MAX.WARN}Hz for {$TIME.PERIOD})'
               opdata: 'Current frequency: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: 89bb663e356c4420bcbe2a9470ae3195
-          name: 'APC UPS Galaxy 3500: Input voltage'
+          name: 'Input voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.3.3.1.0
           key: 'input.voltage[upsHighPrecInputLineVoltage]'
@@ -339,15 +339,15 @@ zabbix_export:
           triggers:
             - uuid: de88ed3b64644d3f9ad1cc3f965757bc
               expression: 'min(/APC UPS Galaxy 3500 by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC UPS Galaxy 3500 by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC UPS Galaxy 3500 by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})'
-              name: 'APC UPS Galaxy 3500: Unacceptable input voltage'
-              event_name: 'APC UPS Galaxy 3500: Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
+              name: 'Unacceptable input voltage'
+              event_name: 'Unacceptable input voltage (out of range {$UPS.INPUT_VOLT.MIN.WARN}-{$UPS.INPUT_VOLT.MAX.WARN}V for {$TIME.PERIOD})'
               opdata: 'Current voltage: {ITEM.LASTVALUE1}'
               priority: HIGH
               tags:
                 - tag: scope
                   value: notice
         - uuid: a6737781029b422ca7a8bbfa0ed80b56
-          name: 'APC UPS Galaxy 3500: Output current'
+          name: 'Output current'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.4.0
           key: 'output.current[upsHighPrecOutputCurrent]'
@@ -368,7 +368,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 5774ead79e8b4d63a4a31bc091d1c52a
-          name: 'APC UPS Galaxy 3500: Output load'
+          name: 'Output load'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.3.0
           key: 'output.load[upsHighPrecOutputLoad]'
@@ -392,8 +392,8 @@ zabbix_export:
           triggers:
             - uuid: fb7ca4b92e714fda95152b698cf1aa92
               expression: 'min(/APC UPS Galaxy 3500 by SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}'
-              name: 'APC UPS Galaxy 3500: Output load is high'
-              event_name: 'APC UPS Galaxy 3500: Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
+              name: 'Output load is high'
+              event_name: 'Output load is high (over {$UPS.OUTPUT.MAX.WARN}% for {$TIME.PERIOD})'
               opdata: 'Current load: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'A battery installed has an internal error condition.'
@@ -401,7 +401,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 8a6c9b134ebc4fd19876cf5d50dfc17b
-          name: 'APC UPS Galaxy 3500: Output status'
+          name: 'Output status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.1.1.0
           key: 'output.status[upsBasicOutputStatus]'
@@ -429,83 +429,83 @@ zabbix_export:
           triggers:
             - uuid: efed1ccf301740c1a29e71cd89e5659f
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=16'
-              name: 'APC UPS Galaxy 3500: UPS is Emergency Static Bypass'
+              name: 'UPS is Emergency Static Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 44394841911641c4972165b59b8f6a5b
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=10'
-              name: 'APC UPS Galaxy 3500: UPS is Hardware Failure Bypass'
+              name: 'UPS is Hardware Failure Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: d60b075bfaaa4aeea2398d058fb79c92
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=7'
-              name: 'APC UPS Galaxy 3500: UPS is Off'
+              name: 'UPS is Off'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 4d54e6e979f94801a3c1e9d6080886bb
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=3'
-              name: 'APC UPS Galaxy 3500: UPS is on battery'
+              name: 'UPS is on battery'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: eb430f5409a24f89b0a9e56fb28087c4
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=4'
-              name: 'APC UPS Galaxy 3500: UPS is on Smart Boost'
+              name: 'UPS is on Smart Boost'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 77dbd58283b542cfbca9a9255344e97e
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=12'
-              name: 'APC UPS Galaxy 3500: UPS is On Smart Trim'
+              name: 'UPS is On Smart Trim'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 3856ff4ac1d64f8e80c4e0cbb1e04c1a
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=8'
-              name: 'APC UPS Galaxy 3500: UPS is Rebooting'
+              name: 'UPS is Rebooting'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 10d8d392f93a492b9be767c7ccdf06ed
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=11'
-              name: 'APC UPS Galaxy 3500: UPS is Sleeping Until Power Return'
+              name: 'UPS is Sleeping Until Power Return'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 2ab92cb281754de6ad5245509c20056d
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=6'
-              name: 'APC UPS Galaxy 3500: UPS is Software Bypass'
+              name: 'UPS is Software Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 8fabe8958cfd4dbbabd70648dff1be06
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=9'
-              name: 'APC UPS Galaxy 3500: UPS is Switched Bypass'
+              name: 'UPS is Switched Bypass'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
             - uuid: 9846ac1bbf024e63a05a83e2c02de7ba
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/output.status[upsBasicOutputStatus])=5'
-              name: 'APC UPS Galaxy 3500: UPS is Timed Sleeping'
+              name: 'UPS is Timed Sleeping'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: notice
         - uuid: 4ec893da7b8540548d60a91ee7e2df83
-          name: 'APC UPS Galaxy 3500: Output voltage'
+          name: 'Output voltage'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.4.3.1.0
           key: 'output.voltage[upsHighPrecOutputVoltage]'
@@ -526,7 +526,7 @@ zabbix_export:
             - tag: component
               value: power
         - uuid: 7d20aa252c5143c98de837dbd2f0cd53
-          name: 'APC UPS Galaxy 3500: SNMP traps (fallback)'
+          name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
@@ -539,7 +539,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: aa5e85ef78504fc080b97342baf6cb35
-          name: 'APC UPS Galaxy 3500: System contact details'
+          name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
@@ -561,7 +561,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f1df592a2b114677a1beabec33ce01f9
-          name: 'APC UPS Galaxy 3500: System description'
+          name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
@@ -582,7 +582,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b73fb48b4da84a53b7a4b7e81d6037aa
-          name: 'APC UPS Galaxy 3500: Uptime (hardware)'
+          name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
@@ -606,7 +606,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b109475e72e74e76846aa478e9937101
-          name: 'APC UPS Galaxy 3500: System location'
+          name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
@@ -626,7 +626,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 93b6e128e95a4a96bde38ef15d74d510
-          name: 'APC UPS Galaxy 3500: Model'
+          name: Model
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.1.1.0
           key: 'system.model[upsBasicIdentModel]'
@@ -645,7 +645,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: d6f2c9770c28487d9fa6af2b63917958
-          name: 'APC UPS Galaxy 3500: System name'
+          name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'system.name[sysName.0]'
@@ -667,8 +667,8 @@ zabbix_export:
           triggers:
             - uuid: 811ff6e90d904c8c98feadc89a18e733
               expression: 'last(/APC UPS Galaxy 3500 by SNMP/system.name[sysName.0],#1)<>last(/APC UPS Galaxy 3500 by SNMP/system.name[sysName.0],#2) and length(last(/APC UPS Galaxy 3500 by SNMP/system.name[sysName.0]))>0'
-              name: 'APC UPS Galaxy 3500: System name has changed'
-              event_name: 'APC UPS Galaxy 3500: System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -678,7 +678,7 @@ zabbix_export:
                 - tag: scope
                   value: security
         - uuid: fc207a1df4324fcf99ba1da262527fe3
-          name: 'APC UPS Galaxy 3500: Uptime (network)'
+          name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
@@ -697,7 +697,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 5497f3649b9348dca290c55e94f48597
-          name: 'APC UPS Galaxy 3500: System object ID'
+          name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
@@ -716,7 +716,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ef25b1e818534420920ff6260fa2932e
-          name: 'APC UPS Galaxy 3500: Serial number'
+          name: 'Serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.2.3.0
           key: 'system.sn[upsAdvIdentSerialNumber]'
@@ -738,7 +738,7 @@ zabbix_export:
             - tag: component
               value: inventory
         - uuid: efad5c028c0d4c11b57a19dc04830ea7
-          name: 'APC UPS Galaxy 3500: SNMP agent availability'
+          name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -762,7 +762,7 @@ zabbix_export:
           triggers:
             - uuid: e12b11324a634eeba56db1aec1834d5f
               expression: 'max(/APC UPS Galaxy 3500 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              name: 'APC UPS Galaxy 3500: No SNMP data collection'
+              name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -1549,13 +1549,13 @@ zabbix_export:
       expression: |
         (last(/APC UPS Galaxy 3500 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC UPS Galaxy 3500 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m)
         or (last(/APC UPS Galaxy 3500 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC UPS Galaxy 3500 by SNMP/system.net.uptime[sysUpTime.0])<10m)
-      name: 'APC UPS Galaxy 3500: Host has been restarted'
-      event_name: 'APC UPS Galaxy 3500: {HOST.NAME} has been restarted (uptime < 10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
       dependencies:
-        - name: 'APC UPS Galaxy 3500: No SNMP data collection'
+        - name: 'No SNMP data collection'
           expression: 'max(/APC UPS Galaxy 3500 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         - tag: scope
