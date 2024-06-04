@@ -248,7 +248,7 @@ try
 
 		browser2.navigate(parameters.url);
 
-		browser2.setElementWaitTimeout(3000);		
+		browser2.setElementWaitTimeout(3000);
 		el = browser2.findElement("xpath", "//div[@class='dashboard is-ready']");
 		if (el === null)
 		{
@@ -331,7 +331,7 @@ try
 
 	try
 	{
-		bypass.navigate('test'); 
+		bypass.navigate('test');
 	}
 	catch (error)
 	{
@@ -344,7 +344,7 @@ try
 
 	try
 	{
-		bypass_alert.dismiss(); 
+		bypass_alert.dismiss();
 	}
 	catch (error)
 	{
