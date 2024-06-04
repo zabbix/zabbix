@@ -50,6 +50,10 @@ foreach (array_values($data['tags']) as $index  => $tag) {
 		$tag += ['automatic' => ZBX_TAG_MANUAL];
 	}
 
+	if ($show_inherited_tags) {
+		$tag += ['type' => ZBX_PROPERTY_OWN];
+	}
+
 	$options['readonly'] = $data['readonly']
 		|| ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED)
 		|| ($with_automatic && $tag['automatic'] == ZBX_TAG_AUTOMATIC);
