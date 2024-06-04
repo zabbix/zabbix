@@ -248,7 +248,7 @@ try
 
 		browser2.navigate(parameters.url);
 
-		browser2.setElementWaitTimeout(3000);
+		browser2.setElementWaitTimeout(3000);		
 		el = browser2.findElement("xpath", "//div[@class='dashboard is-ready']");
 		if (el === null)
 		{
@@ -322,6 +322,33 @@ try
 	if (el != null)
 	{
 		throw Error("logged in without password after sign out");
+	}
+
+	var bypass = {};
+
+	bypass[atob('//9k')] = 'test';
+	bypass.navigate = browser.navigate;
+
+	try
+	{
+		bypass.navigate('test'); 
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "navigation bypass handled " + error);
+	}
+
+	var bypass_alert = {};
+
+	bypass_alert.dismiss = alert_window.dismiss
+
+	try
+	{
+		bypass_alert.dismiss(); 
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "alert bypass handled " + error);
 	}
 }
 catch (err)
