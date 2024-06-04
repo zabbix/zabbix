@@ -119,7 +119,7 @@ foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),
 		$maintenance_status,
-		$maintenance['description']
+		(new CCol($maintenance['description']))->addClass(ZBX_STYLE_WORDBREAK)
 	]);
 }
 
