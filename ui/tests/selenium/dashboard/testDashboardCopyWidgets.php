@@ -288,12 +288,6 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Discovery status widget',
-					'copy to' => 'same page'
-				]
-			],
-			[
-				[
 					'name' => 'Graph (classic) widget',
 					'copy to' => 'same page'
 				]
@@ -324,12 +318,6 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Discovery status widget',
-					'copy to' => 'another page'
-				]
-			],
-			[
-				[
 					'name' => 'Graph (classic) widget',
 					'copy to' => 'another page'
 				]
@@ -355,12 +343,6 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Clock widget',
-					'copy to' => 'another dashboard'
-				]
-			],
-			[
-				[
-					'name' => 'Discovery status widget',
 					'copy to' => 'another dashboard'
 				]
 			],
