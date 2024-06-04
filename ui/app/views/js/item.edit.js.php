@@ -749,7 +749,7 @@ window.item_edit_form = new class {
 	#intervalTypeChangeHandler(e) {
 		const target = e.target;
 
-		if (!target.matches('[name$="[type]"]')) {
+		if (!target.matches('[name$="[type]"]') || target.hasAttribute('readonly')) {
 			return;
 		}
 
