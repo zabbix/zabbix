@@ -932,7 +932,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	$textarea_options = array_intersect_key($options, array_flip(['readonly', 'add_post_js']));
 
 	$tag += [
-		'type' => $options['show_inherited_tags'] ? ZBX_PROPERTY_INHERITED : ZBX_PROPERTY_OWN,
+		'type' => ZBX_PROPERTY_OWN,
 		'parent_templates' => []
 	];
 
