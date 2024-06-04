@@ -395,10 +395,9 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 		goto out;
 	}
 
-	zbx_hashset_destroy(&es->env->objmap);
-
 	duk_destroy_heap(es->env->ctx);
 	zbx_es_debug_disable(es);
+	zbx_hashset_destroy(&es->env->objmap);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
