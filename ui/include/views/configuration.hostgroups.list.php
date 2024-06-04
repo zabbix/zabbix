@@ -201,7 +201,7 @@ foreach ($this->data['groups'] as $group) {
 				: _('Templates'),
 			CViewHelper::showNum($templateCount)
 		],
-		empty($hostsOutput) ? '' : $hostsOutput,
+		empty($hostsOutput) ? '' : (new CCol($hostsOutput))->addClass(ZBX_STYLE_WORDBREAK),
 		makeInformationList($info_icons)
 	]);
 }
