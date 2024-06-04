@@ -1242,13 +1242,6 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Not enough shared memory to store VMware events."));
 		goto unlock;
 	}
-	else if (request->lastlogsize < service->eventlog.last_key && 0 != request->lastlogsize)
-	{
-		/* This may happen if there are multiple vmware.eventlog items for the same service URL or item has   */
-		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet. */
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too old events requested."));
-		goto unlock;
-	}
 	else if (NULL != service->eventlog.data->error)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, service->eventlog.data->error));
@@ -1256,6 +1249,9 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	}
 	else if (0 < service->eventlog.data->events.values_num)
 	{
+		/* Some times request->lastlogsize value gets stuck due to concurrent update of history cache */
+		/* thereby we can rely to value of the request->lastlogsize and have to return events based on */
+		/* internal state of the service->eventlog */
 		vmware_get_events(&service->eventlog.data->events, &service->eventlog, item, add_results);
 		service->eventlog.last_key = service->eventlog.data->events.values[0]->key;
 		service->eventlog.last_ts = service->eventlog.data->events.values[0]->timestamp;
