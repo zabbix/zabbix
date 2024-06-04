@@ -212,8 +212,8 @@ class CControllerAvailabilityReportList extends CController {
 		$prefix = 'web.availabilityreport.filter.'.$report_mode;
 
 		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-			CProfile::updateArray($prefix.'.template_groups',
-				$this->getInput('filter_template_groups', []), PROFILE_TYPE_ID
+			CProfile::updateArray($prefix.'.template_groups', $this->getInput('filter_template_groups', []),
+				PROFILE_TYPE_ID
 			);
 			CProfile::updateArray($prefix.'.templates', $this->getInput('filter_templates', []), PROFILE_TYPE_ID);
 			CProfile::updateArray($prefix.'.triggers', $this->getInput('filter_triggers', []), PROFILE_TYPE_ID);
@@ -302,7 +302,6 @@ class CControllerAvailabilityReportList extends CController {
 				}
 
 				break;
-
 			case 'triggers':
 				$triggers = API::Trigger()->get([
 					'output' => ['triggerid', 'description'],

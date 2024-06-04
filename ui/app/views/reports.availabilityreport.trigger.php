@@ -19,21 +19,31 @@
  * @var array $data
  */
 
-(new CHtmlPage())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Availability report graph'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AVAILABILITYREPORT))
 	->setNavigation((new CList())->addItem(new CBreadcrumbs([
 		(new CSpan())->addItem(new CLink(_('Availability report'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'availabilityreport.list')
 		)),
-		(new CSpan())
-			->addItem($data['host']['name'])
-			->addClass('wide'),
-		(new CSpan())
-			->addItem($data['trigger']['description'])
-			->addClass('wide')
-	])))
-	->addItem((new CTableInfo())
-		->addRow(new CImg('chart4.php?triggerid='.$data['trigger']['triggerid']))
-	)
+		$data
+			? (new CSpan())
+				->addItem($data['host']['name'])
+				->addClass('wide')
+			: null,
+		$data
+			? (new CSpan())
+				->addItem($data['trigger']['description'])
+				->addClass('wide')
+			: null
+	])));
+
+$table = (new CTableInfo());
+
+if ($data) {
+	$table->addRow(new CImg('chart4.php?triggerid='.$data['trigger']['triggerid']));
+}
+
+$html_page
+	->addItem($table)
 	->show();
