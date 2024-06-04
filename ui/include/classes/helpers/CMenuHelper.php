@@ -131,7 +131,9 @@ class CMenuHelper {
 					->setAliases(['scheduledreport.edit'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)
-				? (new CMenuItem(_('Availability report')))->setAction('availabilityreport.list')
+				? (new CMenuItem(_('Availability report')))
+					->setAction('availabilityreport.list')
+					->setAliases(['availabilityreport.trigger'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_TOP_TRIGGERS)
 				? (new CMenuItem(_('Top 100 triggers')))->setAction('toptriggers.list')
