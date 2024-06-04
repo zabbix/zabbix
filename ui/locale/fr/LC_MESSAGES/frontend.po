@@ -1,10 +1,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 6.0\n"
+"Project-Id-Version: Zabbix 7.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-26 17:09+0000\n"
+"PO-Revision-Date: 2024-05-28 19:22+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -7528,7 +7528,7 @@ msgstr "Identifiant de carte vide."
 
 #: widgets/itemhistory/Widget.php:32
 msgid "Empty value."
-msgstr ""
+msgstr "Valeur vide."
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -10159,7 +10159,7 @@ msgstr "Type d'étiquette d'image"
 
 #: widgets/itemhistory/Widget.php:33
 msgid "Image loading error."
-msgstr ""
+msgstr "Erreur de chargement de l'image."
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format

@@ -12,17 +12,25 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package com.zabbix.gateway;
+#include "dbupgrade.h"
 
-class GeneralInformation
+/*
+ * 7.0 maintenance database patches
+ */
+
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_7000000(void)
 {
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "28 May 2024";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "7.0.0rc3";
-
-	static void printVersion()
-	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
-	}
+	return SUCCEED;
 }
+
+#endif
+
+DBPATCH_START(7000)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(7000000, 0, 1)
+
+DBPATCH_END()

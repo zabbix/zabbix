@@ -1,3 +1,8 @@
+Changes for 7.0.0
+
+7.0.0rc3 was released as 7.0.0 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0rc3
 
 New features:
@@ -746,8 +751,11 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.16rc1
 
 New features:
+..F.....S. [ZBXNEXT-8682] introduced a length limit of 512KB for item test values that server returns to Zabbix frontend (jfreibergs, kprutkovs)
 
 Bug fixes:
+..F....... [ZBX-18094] fixed multiple pie graph issues related with calculation of item angles (miks)
+...G...PS. [ZBX-20766] fixed confusing port binding error message (dgoloscapov)
 A......... [ZBX-24481] fixed inability to unset value map from existing item or item prototype by passing a version without valuemap parameter into configuration.import (vmaksimovs)
 ...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
 ........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
@@ -2551,6 +2559,8 @@ New features:
 ..F.....S. [ZBXNEXT-8682] introduced a length limit of 512KB for item test values that server returns to Zabbix frontend (jfreibergs, kprutkovs)
 
 Bug fixes:
+..F....... [ZBX-18094] fixed multiple pie graph issues related with calculation of item angles (miks)
+...G...PS. [ZBX-20766] fixed confusing port binding error message (dgoloscapov)
 A......... [ZBX-24481] fixed inability to unset value map from existing item or item prototype by passing a version without valuemap parameter into configuration.import (vmaksimovs)
 ...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
 .......PS. [ZBX-24453] implemented socket file cleanup when shutting down, added blocking of signals during important stages of startup (dgoloscapov)
