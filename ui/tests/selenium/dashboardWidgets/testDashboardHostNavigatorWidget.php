@@ -304,6 +304,23 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		// Check Host groups popup menu options.
+		$selector = $form->getField('Host groups');
+		$popup_menu = $selector->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
+
+		foreach ([$selector->query('button:Select')->one(), $popup_menu] as $button) {
+			$this->assertTrue($button->isClickable());
+		}
+
+		$options = ['Host groups', 'Widget'];
+		foreach ($options as $title) {
+			$this->assertEquals($options, $popup_menu->asPopupButton()->getMenu()->getItems()->asText());
+			$popup_menu->asPopupButton()->getMenu()->select($title);
+			$dialogs = COverlayDialogElement::find()->all()->waitUntilReady();
+			$this->assertEquals($title, $dialogs->last()->getTitle());
+			$dialogs->last()->close();
+		}
 	}
 
 	public static function getWidgetData() {

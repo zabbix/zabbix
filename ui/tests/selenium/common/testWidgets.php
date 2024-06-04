@@ -47,14 +47,9 @@ class testWidgets extends CWebTest {
 		$select_dialog = $widget_dialog;
 
 		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
-		$item_types = [
-			'Character item',
-			'Float item',
-			'Log item',
-			'Text item',
-			'Unsigned item',
-			'Unsigned_dependent item'
-		];
+		$item_types = ($widget === 'Item navigator')
+			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
+			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
 
 		switch ($widget) {
 			case 'Top hosts':
@@ -86,9 +81,15 @@ class testWidgets extends CWebTest {
 				break;
 		}
 
-		$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
-			? 'xpath:(.//button[text()="Select"])[2]'
-			: 'button:Select';
+		if ($widget === 'Item navigator') {
+			$select_button = 'xpath:(.//button[text()="Select"])[3]';
+		}
+		else {
+			$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
+				? 'xpath:(.//button[text()="Select"])[2]'
+				: 'button:Select';
+		}
+
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
@@ -142,10 +143,10 @@ class testWidgets extends CWebTest {
 	 *
 	 * @param string		$widget_name		widget name
 	 * @param string		$entity_name		name of item or host
-	 * @param boolean 		$edit				edit is performed
+	 * @param boolean 		$dashboard_edit		true if dashboard is in edit mode
 	 */
-	public function checkRowHighlight($widget_name, $entity_name, $edit = false) {
-		$widget = $edit
+	public function checkRowHighlight($widget_name, $entity_name, $dashboard_edit = false) {
+		$widget = $dashboard_edit
 			? CDashboardElement::find()->one()->edit()->getWidget($widget_name)
 			: CDashboardElement::find()->one()->getWidget($widget_name);
 

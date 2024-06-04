@@ -17,6 +17,8 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
+ * @dataSource AllItemValueTypes
+ *
  * @backup dashboard
  *
  * @onBefore prepareData
@@ -284,6 +286,35 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		// Check Hosts and Host groups popup menu options.
+		foreach (['Hosts', 'Host groups'] as $label) {
+			$selector = $form->getField($label);
+			$popup_menu = $selector->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
+
+			foreach ([$selector->query('button:Select')->one(), $popup_menu] as $button) {
+				$this->assertTrue($button->isClickable());
+			}
+
+			$options = ($label === 'Hosts') ? ['Hosts', 'Widget', 'Dashboard'] : ['Host groups', 'Widget'];
+			$this->assertEquals($options, $popup_menu->asPopupButton()->getMenu()->getItems()->asText());
+
+			foreach ($options as $title) {
+				$popup_menu->asPopupButton()->getMenu()->select($title);
+
+				if ($title === 'Dashboard') {
+					$form->checkValue([$label => 'Dashboard']);
+					$this->assertTrue($selector->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+							->one()->isVisible()
+					);
+				}
+				else {
+					$dialogs = COverlayDialogElement::find()->all()->waitUntilReady();
+					$this->assertEquals($title, $dialogs->last()->getTitle());
+					$dialogs->last()->close();
+				}
+			}
+		}
 	}
 
 	public static function getWidgetData() {
@@ -955,5 +986,14 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Available memory in %', true);
 		CDashboardElement::find()->one()->save();
 		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Available memory in %');
+	}
+
+	/**
+	 * Test function for assuring that all types of items are available in Item navigator widget.
+	 */
+	public function testDashboardItemNavigatorWidget_CheckAvailableItems() {
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid[self::DEFAULT_DASHBOARD],
+				'Item navigator'
+		);
 	}
 }
