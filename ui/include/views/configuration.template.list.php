@@ -259,8 +259,8 @@ foreach ($data['templates'] as $template) {
 			),
 			CViewHelper::showNum($template['httpTests'])
 		],
-		$linked_templates_output,
-		$linked_to_output,
+		(new CCol($linked_templates_output))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($linked_to_output))->addClass(ZBX_STYLE_WORDBREAK),
 		$data['tags'][$template['templateid']]
 	]);
 }

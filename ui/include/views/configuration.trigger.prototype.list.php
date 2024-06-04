@@ -178,8 +178,8 @@ foreach ($data['triggers'] as $trigger) {
 	$triggersTable->addRow([
 		$checkBox,
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
-		$description,
-		$trigger['opdata'],
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 		$status,
 		$discover,
