@@ -1353,7 +1353,7 @@ class testFormTags extends CWebTest {
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			}
 
-			$this->query('link', $this->remove_name)->waitUntilPresent()->one()->forceClick();
+			$this->query('link', $this->remove_name)->waitUntilClickable()->one()->click();
 		}
 
 		$locators = [
