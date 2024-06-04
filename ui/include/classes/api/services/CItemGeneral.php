@@ -2474,7 +2474,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Remove NCLOB value type fields from resulting query SELECT part if DISTINCT will be used.
+	 * Remove text fields from resulting query SELECT part if DISTINCT will be used.
 	 *
 	 * @param string $table_name     Table name.
 	 * @param string $table_alias    Table alias value.
@@ -2484,7 +2484,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array    The resulting SQL parts array.
 	 */
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
-		$this->unsetNclobFieldsFromOutput($options, $sql_parts);
+		$this->unsetTextFieldsFromOutput($options, $sql_parts);
 
 		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 	}

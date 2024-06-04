@@ -260,18 +260,6 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		);
 	}
 
-	foreach ($data['system_info']['dbversion_status'] as $dbversion ) {
-		if ($dbversion['database'] === 'Oracle') {
-			$db_error = _(
-				'Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions.'
-			);
-
-			$info_table->addRow(
-				(new CRow([$dbversion['database'], '', $db_error]))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
-			);
-		}
-	}
-
 	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data['system_info'])) {
 		$info_table->addRow((new CRow([
 			_('Housekeeping'),

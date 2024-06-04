@@ -527,7 +527,6 @@ class CSetupWizard extends CForm {
 
 	private function stageDbConnection(): array {
 		$DB['TYPE'] = $this->getConfig('DB_TYPE', key(CFrontendSetup::getSupportedDatabases()));
-		$db_warning = _('Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions.');
 
 		$table = (new CFormList())
 			->addItem([
@@ -535,14 +534,13 @@ class CSetupWizard extends CForm {
 				(new CVar('verify_certificate', 0))->removeId(),
 				(new CVar('verify_host', 0))->removeId()
 			])
-			->addRow(new CLabel(_('Database type'), 'label-type'), [
+			->addRow(new CLabel(_('Database type'), 'label-type'),
 				(new CSelect('type'))
 					->setId('type')
 					->setFocusableElementId('label-type')
 					->setValue($DB['TYPE'])
-					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases())),
-				makeWarningIcon($db_warning)->setId('db_warning')
-			])
+					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
+			)
 			->addRow(_('Database host'),
 				(new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -1172,7 +1170,7 @@ class CSetupWizard extends CForm {
 		$error = '';
 
 		// Check certificate files exists.
-		if ($DB['ENCRYPTION'] && ($DB['TYPE'] === ZBX_DB_MYSQL || $DB['TYPE'] === ZBX_DB_POSTGRESQL)) {
+		if ($DB['ENCRYPTION']) {
 			if (($this->getConfig('DB_ENCRYPTION_ADVANCED') || $DB['CA_FILE'] !== '') && !file_exists($DB['CA_FILE'])) {
 				error(_s('Incorrect file path for "%1$s": %2$s.', _('Database TLS CA file'), $DB['CA_FILE']));
 

@@ -556,67 +556,64 @@ class CApiService {
 	}
 
 	/**
-	 * Unset the NCLOB fields from output of the given options, if SQL query contains DISTINCT statement. Replace the
+	 * Remove text fields from output of the given options if SQL query contains DISTINCT keyword. Replace the
 	 * API_OUTPUT_EXTEND value in output of the given options to self::OUTPUT_FIELDS (if defined) or to all fields that
 	 * are specified in table schema.
 	 *
 	 * @param array $options
 	 * @param array $sql_parts
 	 */
-	protected function unsetNclobFieldsFromOutput(array &$options, array $sql_parts): void {
+	protected function unsetTextFieldsFromOutput(array &$options, array $sql_parts): void {
 		if ($options['countOutput'] || !self::dbDistinct($sql_parts)) {
 			return;
 		}
 
 		$schema = $this->getTableSchema();
-		$nclob_fields = [];
+		$text_fields = [];
 
 		foreach ($schema['fields'] as $field_name => $field) {
-			if ($field['type'] == DB::FIELD_TYPE_NCLOB
-					&& $this->outputIsRequested($field_name, $options['output'])) {
-				$nclob_fields[] = $field_name;
+			if ($field['type'] === DB::FIELD_TYPE_TEXT && $this->outputIsRequested($field_name, $options['output'])) {
+				$text_fields[] = $field_name;
 			}
 		}
 
-		if ($nclob_fields) {
+		if ($text_fields) {
 			if ($options['output'] === API_OUTPUT_EXTEND) {
-				$output = self::OUTPUT_FIELDS
-					? self::OUTPUT_FIELDS
-					: array_keys($schema['fields']);
+				$output = self::OUTPUT_FIELDS ?: array_keys($schema['fields']);
 			}
 			else {
 				$output = $options['output'];
 			}
 
-			$options['output'] = array_diff($output, $nclob_fields);
+			$options['output'] = array_diff($output, $text_fields);
 		}
 	}
 
 	/**
-	 * Add NCLOB type fields if there was DISTINCT in query.
+	 * Add text fields if there was DISTINCT in query.
 	 *
 	 * @param array $options    Array of query options.
 	 * @param array $result     Query results.
 	 *
-	 * @return array    The result array with added NCLOB fields.
+	 * @return array    The result array with added text fields.
 	 */
-	protected function addNclobFieldValues(array $options, array $result): array {
+	protected function addTextFieldValues(array $options, array $result): array {
 		$schema = $this->getTableSchema();
-		$nclob_fields = [];
+		$text_fields = [];
 
 		foreach ($schema['fields'] as $field_name => $field) {
-			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
-				$nclob_fields[] = $field_name;
+			if ($field['type'] === DB::FIELD_TYPE_TEXT && $this->outputIsRequested($field_name, $options['output'])) {
+				$text_fields[] = $field_name;
 			}
 		}
 
-		if (!$nclob_fields) {
+		if (!$text_fields) {
 			return $result;
 		}
 
 		$pk = $schema['key'];
 		$options = [
-			'output' => $nclob_fields,
+			'output' => $text_fields,
 			'filter' => [$pk => array_keys($result)]
 		];
 
@@ -1026,10 +1023,8 @@ class CApiService {
 
 		$filter = [];
 		foreach ($options['filter'] as $field => $value) {
-			// skip missing fields and text fields (not supported by Oracle)
-			// skip empty values
+			// Skip missing fields, text fields and empty values.
 			if (!isset($tableSchema['fields'][$field]) || $tableSchema['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT
-					|| $tableSchema['fields'][$field]['type'] == DB::FIELD_TYPE_NCLOB
 					|| zbx_empty($value)) {
 				continue;
 			}

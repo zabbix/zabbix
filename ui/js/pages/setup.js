@@ -17,7 +17,6 @@ const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
 const ZBX_DB_MYSQL		= 'MYSQL';
 const ZBX_DB_POSTGRESQL	= 'POSTGRESQL';
-const ZBX_DB_ORACLE		= 'ORACLE';
 
 const DB_STORE_CREDS_VAULT_HASHICORP	= 1;
 const DB_STORE_CREDS_VAULT_CYBERARK		= 2;
@@ -156,7 +155,5 @@ const view = new class {
 		else if (encryption_customizable) {
 			verify_host.removeAttribute('disabled');
 		}
-
-		db_warning.style.display = db_type === ZBX_DB_ORACLE ? '' : 'none';
 	}
 };

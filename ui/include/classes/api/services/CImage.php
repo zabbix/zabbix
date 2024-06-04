@@ -170,34 +170,14 @@ class CImage extends CApiService {
 	 * @return array
 	 */
 	public function create($images) {
-		global $DB;
-
 		self::validateCreate($images);
-
-		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
-			$upd_images_data = [];
-
-			foreach ($images as $index => &$image) {
-				$upd_images_data[$index]['image'] = $image['image'];
-				unset($image['image']);
-			}
-			unset($image);
-		}
 
 		$imageids = DB::insert('images', $images);
 
 		foreach ($images as $index => &$image) {
-			if ($DB['TYPE'] === ZBX_DB_ORACLE) {
-				$upd_images_data[$index]['imageid'] = $imageids[$index];
-				$image['image'] = $upd_images_data[$index]['image'];
-			}
 			$image['imageid'] = $imageids[$index];
 		}
 		unset($image);
-
-		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
-			self::updateOracleImagesData($upd_images_data);
-		}
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_IMAGE, $images);
 
@@ -234,21 +214,7 @@ class CImage extends CApiService {
 	 * @return array (updated images)
 	 */
 	public function update($images) {
-		global $DB;
-
 		self::validateUpdate($images, $db_images);
-
-		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
-			$upd_images_data = [];
-
-			foreach ($images as $index => &$image) {
-				if (array_key_exists('image', $image)) {
-					$upd_images_data[$index] = array_intersect_key($image, array_flip(['imageid', 'image']));
-					unset($image['image']);
-				}
-			}
-			unset($image);
-		}
 
 		$upd_images = [];
 
@@ -267,64 +233,9 @@ class CImage extends CApiService {
 			DB::update('images', $upd_images);
 		}
 
-		if ($DB['TYPE'] === ZBX_DB_ORACLE) {
-			foreach ($images as $index => &$image) {
-				if (array_key_exists($index, $upd_images_data)) {
-					$image['image'] = $upd_images_data[$index]['image'];
-				}
-			}
-			unset($image);
-
-			if ($upd_images_data) {
-				self::updateOracleImagesData($upd_images_data, $db_images);
-			}
-		}
-
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_IMAGE, $images, $db_images);
 
 		return ['imageids' => array_column($images, 'imageid')];
-	}
-
-	/**
-	 * Saving image data to ORACLE database.
-	 *
-	 * @static
-	 *
-	 * @param array      $images
-	 * @param string     $images[]['image']
-	 * @param array|null $db_images
-	 */
-	private static function updateOracleImagesData(array $images, array $db_images = null): void {
-		global $DB;
-
-		foreach ($images as $image) {
-			if ($db_images !== null && $image['image'] === $db_images[$image['imageid']]['image']) {
-				continue;
-			}
-
-			$options = [
-				'output' => ['image'],
-				'imageids' => $image['imageid']
-			];
-
-			if (!$stmt = oci_parse($DB['DB'], DB::makeSql('images', $options).' FOR UPDATE')) {
-				$e = oci_error($DB['DB']);
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-			}
-
-			if (!oci_execute($stmt, OCI_DEFAULT)) {
-				$e = oci_error($stmt);
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-			}
-
-			if (false === ($row = oci_fetch_assoc($stmt))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-			}
-
-			$row['IMAGE']->truncate();
-			$row['IMAGE']->save($image['image']);
-			$row['IMAGE']->free();
-		}
 	}
 
 	/**

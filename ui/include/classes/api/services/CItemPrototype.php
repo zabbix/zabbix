@@ -285,7 +285,7 @@ class CItemPrototype extends CItemGeneral {
 
 		if ($result) {
 			if (self::dbDistinct($sqlParts)) {
-				$result = $this->addNclobFieldValues($options, $result);
+				$result = $this->addTextFieldValues($options, $result);
 			}
 
 			self::prepareItemsForApi($result, false);
