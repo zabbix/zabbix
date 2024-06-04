@@ -337,7 +337,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								]
 							],
 							[
-								'type' => 'plaintext',
+								'type' => 'itemhistory',
 								'name' => 'Item history widget',
 								'x' => 36,
 								'y' => 8,
