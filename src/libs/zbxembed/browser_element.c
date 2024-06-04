@@ -120,7 +120,8 @@ static duk_ret_t	wd_element_send_keys(duk_context *ctx)
 	char			*error = NULL, *keys = NULL;
 	int			err_index = -1;
 
-	el = wd_element(ctx);
+	if (NULL == (el = wd_element(ctx)))
+		return duk_throw(ctx);
 
 	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
 	{
@@ -161,7 +162,8 @@ static duk_ret_t	wd_element_click(duk_context *ctx)
 	char			*error = NULL;
 	int			err_index = -1;
 
-	el = wd_element(ctx);
+	if (NULL == (el = wd_element(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_click_element(el->wd, el->id, &error))
 	{
@@ -186,7 +188,8 @@ static duk_ret_t	wd_element_clear(duk_context *ctx)
 	char			*error = NULL;
 	int			err_index = -1;
 
-	el = wd_element(ctx);
+	if (NULL == (el = wd_element(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_clear_element(el->wd, el->id, &error))
 	{
@@ -213,7 +216,8 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
 
-	el = wd_element(ctx);
+	if (NULL == (el = wd_element(ctx)))
+		return duk_throw(ctx);
 
 	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
 	{
@@ -261,7 +265,8 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
 
-	el = wd_element(ctx);
+	if (NULL == (el = wd_element(ctx)))
+		return duk_throw(ctx);
 
 	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
 	{
@@ -307,7 +312,8 @@ static duk_ret_t	wd_element_get_text(duk_context *ctx)
 	char			*error = NULL, *value = NULL;
 	int			err_index = -1;
 
-	el = wd_element(ctx);
+	if (NULL == (el = wd_element(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_get_element_info(el->wd, el->id, "text", NULL, &value, &error))
 	{
