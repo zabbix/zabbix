@@ -333,7 +333,7 @@ static int	DBpatch_2030031(void)
 
 static int	DBpatch_2030032(void)
 {
-	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
@@ -1229,7 +1229,7 @@ static int	DBpatch_2030100(void)
 
 static int	DBpatch_2030101(void)
 {
-	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("httptest", &field);
 }
@@ -1257,7 +1257,7 @@ static int	DBpatch_2030104(void)
 
 static int	DBpatch_2030105(void)
 {
-	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("httpstep", &field);
 }

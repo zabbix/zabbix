@@ -406,7 +406,7 @@ static int	DBpatch_6050034(void)
 				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"operating_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 				{"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -941,7 +941,7 @@ static int	DBpatch_6050087(void)
 
 static int	DBpatch_6050090(void)
 {
-	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("task_remote_command_result", &field, &old_field);
@@ -3612,7 +3612,7 @@ static int	DBpatch_6050257(void)
 			{
 				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 				{"failover_delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"min_online", "1", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
@@ -3817,7 +3817,7 @@ static int	DBpatch_6050284(void)
 
 static int	DBpatch_6050285(void)
 {
-	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT,
+	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_TEXT,
 			ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);

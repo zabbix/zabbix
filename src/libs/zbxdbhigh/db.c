@@ -515,14 +515,13 @@ zbx_db_result_t	zbx_db_select_n(const char *query, int n)
 #ifdef HAVE_MYSQL
 static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
-	switch(field->type)
+	switch (field->type)
 	{
 		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
-		case ZBX_TYPE_SHORTTEXT:
 			return 65535u;
 		case ZBX_TYPE_CUID:
 			return CUID_LEN - 1;
@@ -2159,7 +2158,6 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 			{
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
-				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 				case ZBX_TYPE_BLOB:
@@ -2306,7 +2304,6 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
@@ -2362,7 +2359,6 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 		{
 			case ZBX_TYPE_CHAR:
 			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
@@ -2495,7 +2491,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 		{
 			case ZBX_TYPE_BLOB:
 			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
 				if (FAIL != zbx_vector_db_field_ptr_search(&self->fields, (void *)field,
@@ -2535,7 +2530,6 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 			{
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
-				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 					if (0 != (field->flags & ZBX_UPPER))

@@ -28,7 +28,7 @@ my %table_types;	# for making sure that table types aren't duplicated
 my %c = (
 	"type"		=>	"code",
 	"database"	=>	"",
-	"after"		=>	"\t{0}\n};\n\n#undef ZBX_TYPE_LONGTEXT_LEN\n#undef ZBX_TYPE_SHORTTEXT_LEN\n",
+	"after"		=>	"\t{0}\n};\n\n#undef ZBX_TYPE_LONGTEXT_LEN\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
 	"t_double"	=>	"ZBX_TYPE_FLOAT",
@@ -61,7 +61,6 @@ $c{"before"} = "/*
 #include \"zbxdbschema.h\"
 #include \"zbxcommon.h\"
 
-#define ZBX_TYPE_SHORTTEXT_LEN	65535
 #define ZBX_TYPE_LONGTEXT_LEN	0
 #define ZBX_TYPE_TEXT_LEN	65535
 
@@ -246,10 +245,6 @@ sub process_field($)
 		elsif ($type eq "ZBX_TYPE_TEXT")
 		{
 			$length = "ZBX_TYPE_TEXT_LEN";
-		}
-		elsif ($type eq "ZBX_TYPE_SHORTTEXT")
-		{
-			$length = "ZBX_TYPE_SHORTTEXT_LEN";
 		}
 		elsif ($type eq "ZBX_TYPE_LONGTEXT")
 		{

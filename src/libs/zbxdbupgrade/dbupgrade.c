@@ -62,7 +62,6 @@
 
 #define ZBX_TYPE_INT_STR	"integer"
 #define ZBX_TYPE_CHAR_STR	"varchar"
-#define ZBX_TYPE_SHORTTEXT_STR	"text"
 #define ZBX_TYPE_TEXT_STR	"text"
 
 #define ZBX_FIRST_DB_VERSION		2010000
@@ -89,9 +88,6 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			break;
 		case ZBX_TYPE_LONGTEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_LONGTEXT_STR);
-			break;
-		case ZBX_TYPE_SHORTTEXT:
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SHORTTEXT_STR);
 			break;
 		case ZBX_TYPE_TEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
@@ -121,7 +117,6 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 		case ZBX_TYPE_FLOAT:
 		case ZBX_TYPE_UINT:
 		case ZBX_TYPE_LONGTEXT:
-		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_CUID:
@@ -148,7 +143,6 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 		{
 			case ZBX_TYPE_BLOB:
 			case ZBX_TYPE_TEXT:
-			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 				/* MySQL: BLOB and TEXT columns cannot be assigned a default value */
 				break;

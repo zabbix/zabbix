@@ -708,7 +708,7 @@ static int	DBpatch_5050068(void)
 
 static int	DBpatch_5050070(void)
 {
-	const zbx_db_field_t	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("item_preproc", &field, &old_field);
@@ -717,14 +717,14 @@ static int	DBpatch_5050070(void)
 static int	DBpatch_5050071(void)
 {
 	const zbx_db_field_t	old_field = {"description", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("triggers", &field, &old_field);
 }
 
 static int	DBpatch_5050072(void)
 {
-	const zbx_db_field_t	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("media_type_message", &field, &old_field);
@@ -1081,7 +1081,7 @@ static int	DBpatch_5050103(void)
 static int	DBpatch_5050104(void)
 {
 	const zbx_db_field_t	old_field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const zbx_db_field_t	new_field = {"dbversion_status", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	new_field = {"dbversion_status", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("config", &new_field, &old_field);
 }
@@ -1224,7 +1224,7 @@ static int	DBpatch_5050115(void)
 					{"effective_date", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"timezone", "UTC", NULL, NULL, 50, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -1332,7 +1332,7 @@ static int	DBpatch_5050125(void)
 
 static int	DBpatch_5050126(void)
 {
-	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
@@ -1860,7 +1860,7 @@ static int	DBpatch_5050142(void)
 
 static int	DBpatch_5050143(void)
 {
-	const zbx_db_field_t	old_field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("alerts", &field, &old_field);
