@@ -13,6 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+// This test should be run first.
+require_once dirname(__FILE__).'/testNoData.php';
 
 // Actions.
 require_once dirname(__FILE__).'/actions/testFormAction.php';
@@ -324,7 +326,6 @@ require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testLanguage.php';
-require_once dirname(__FILE__).'/testNoData.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
@@ -339,6 +340,9 @@ use PHPUnit\Framework\TestSuite;
 class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
+
+		// This test should be run first.
+		$suite->addTestSuite('testNoData');
 
 		// Actions.
 		$suite->addTestSuite('testFormAction');
@@ -650,7 +654,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testLanguage');
-		$suite->addTestSuite('testNoData');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageSearch');
