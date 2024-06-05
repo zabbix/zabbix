@@ -115,7 +115,7 @@
 				return;
 			}
 
-			var rowNum = $(this).attr('id').split('_')[2];
+			const rowNum = $(this).attr('id').split('_')[2];
 
 			if ($(this).val() == <?= ITEM_DELAY_FLEXIBLE; ?>) {
 				$('#delay_flex_' + rowNum + '_schedule').hide();
