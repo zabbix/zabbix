@@ -383,6 +383,7 @@ typedef struct
 	time_t		last_ts;	/* timestamp of last vmware.eventlog[] item */
 	time_t		lastaccess;	/* timestamp when vmware.eventlog[] item was polled last time */
 	time_t		interval;	/* last interval of vmware.eventlog[] item */
+	zbx_uint64_t	owner_itemid;	/* single item that will receive all events */
 
 	/* service event log data object that is swapped with new one during service event log update */
 	zbx_vmware_eventlog_data_t	*data;
