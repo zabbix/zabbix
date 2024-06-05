@@ -912,15 +912,22 @@ class CWidgetNavTree extends CWidget {
 											}
 
 											const add_child_level = (sysmapid, itemid, depth) => {
+												const root = this._target
+													.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
+
+												if (root === null) {
+													return;
+												}
+
+												const tree_item = root.closest('.tree-item');
+
+												if (tree_item.classList.contains('is-parent')) {
+													tree_item.classList.remove('closed');
+													tree_item.classList.add('opened');
+												}
+
 												if (resp.hierarchy[sysmapid] !== undefined && itemid !== undefined
 														&& depth <= this._max_depth) {
-													const root = this._target
-														.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
-
-													if (root === null) {
-														return;
-													}
-
 													$.each(resp.hierarchy[sysmapid], (i, submapid) => {
 														if (resp.submaps[submapid] === undefined) {
 															return;
@@ -955,8 +962,7 @@ class CWidgetNavTree extends CWidget {
 														add_child_level(submapid, submap_itemid, depth + 1);
 													});
 
-													root.closest('.tree-item').classList.remove('closed');
-													root.closest('.tree-item').classList.add('opened', 'is-parent');
+													tree_item.classList.add('is-parent');
 												}
 											};
 
