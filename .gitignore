@@ -75,6 +75,7 @@ etc/zabbix_agent2.d/plugins.d/docker.conf
 etc/zabbix_agent2.d/plugins.d/memcached.conf
 etc/zabbix_agent2.d/plugins.d/mongodb.conf
 etc/zabbix_agent2.d/plugins.d/mysql.conf
+etc/zabbix_agent2.d/plugins.d/oracle.conf
 etc/zabbix_agent2.d/plugins.d/postgres.conf
 etc/zabbix_agent2.d/plugins.d/redis.conf
 etc/zabbix_agent2.d/plugins.d/smart.conf
