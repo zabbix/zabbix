@@ -1,1 +1,1 @@
-...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait]; thanks to Maksym Buz for the patch (asestakovs)
+...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait] (asestakovs)
