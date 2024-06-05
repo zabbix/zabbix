@@ -111,6 +111,10 @@
 
 	jQuery(document).ready(function($) {
 		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
+			if ($(this).prop('readonly')) {
+				return;
+			}
+
 			var rowNum = $(this).attr('id').split('_')[2];
 
 			if ($(this).val() == <?= ITEM_DELAY_FLEXIBLE; ?>) {
