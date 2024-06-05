@@ -192,8 +192,11 @@
 				}
 				else {
 					if ($obj.length) {
+						if ($obj.is(':checked')) {
+							jQuery('#' + key + '_' + param[0]).prop('checked', true);
+						}
+
 						$obj.remove();
-						jQuery('#' + key + '_' + param[0]).prop('checked', true);
 					}
 				}
 			});
