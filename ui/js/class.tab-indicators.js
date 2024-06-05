@@ -510,7 +510,9 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 	initObserver() {
 		for (const input of document.querySelectorAll('[name=inventory_mode]')) {
 			input.addEventListener('click', () => {
-				this.addAttributes();
+				if (!input.readOnly) {
+					this.addAttributes();
+				}
 			});
 		}
 	}
