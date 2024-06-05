@@ -91,7 +91,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$search_field = $this->isTemplateDashboard() ? 'name' : 'name_resolved';
 
 		$options = [
-			'output' => ['itemid', 'hostid', 'units', 'value_type', $search_field],
+			'output' => ['itemid', 'hostid', 'units', 'value_type', 'name_resolved'],
 			'selectHosts' => ['name'],
 			'webitems' => true,
 			'hostids' => array_keys($hosts),
@@ -113,9 +113,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [];
 		}
 
-		if (!$this->isTemplateDashboard()) {
-			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
-		}
+		$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 
 		foreach ($items as &$item) {
 			$item['hostname'] = $item['hosts'][0]['name'];
