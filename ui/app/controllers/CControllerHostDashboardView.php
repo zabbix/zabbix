@@ -50,13 +50,13 @@ class CControllerHostDashboardView extends CController {
 			'hostids' => [$this->getInput('hostid')]
 		]);
 
-		if ($db_hosts) {
-			$this->host = $db_hosts[0];
-
-			return true;
+		if (!$db_hosts) {
+			return false;
 		}
 
-		return false;
+		$this->host = $db_hosts[0];
+
+		return true;
 	}
 
 	protected function doAction() {
