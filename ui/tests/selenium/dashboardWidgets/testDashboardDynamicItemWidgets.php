@@ -404,6 +404,151 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 										'value' => 'DASHBOARD._hostid'
 									]
 								]
+							],
+							[
+								'type' => 'itemhistory',
+								'x' => 0,
+								'y' => 40,
+								'width' => 24,
+								'height' => 5,
+								'name' => 'Test 1',
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Test 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => '1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => '99104' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EDXAQ'
+									]
+								]
+							],
+							[
+								'type' => 'itemhistory',
+								'x' => 24,
+								'y' => 40,
+								'width' => 24,
+								'height' => 5,
+								'name' => 'Test 2',
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Test 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => '1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => '99103' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I1'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EDXAW'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'itemhistory',
+								'x' => 48,
+								'y' => 40,
+								'width' => 24,
+								'height' => 5,
+								'name' => 'Test 3',
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Test 3'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => '1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => '99104' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EDXAE'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'itemhistory',
+								'x' => 0,
+								'y' => 45,
+								'width' => 24,
+								'height' => 5,
+								'name' => 'Test two items',
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Test 4'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => '2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => '99103' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I1'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.1.name',
+										'value' => 'Test 5'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.1.itemid',
+										'value' => '99104' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EDXAR'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
 							]
 						]
 					]
@@ -415,6 +560,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 
 	public static function getWidgetsData() {
 		return [
+			// #0.
 			[
 				[
 					'widgets' => [
@@ -426,30 +572,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1 G4 (H1I1 and H3I1)'],
-						// TODO: will be fixed in terms of DEV-3728.
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-//							'expected' => ['Dynamic widgets H1I2' => '12']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I1',
-//							'expected' => ['Dynamic widgets H1I1' => '11']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-//							'expected' => ['Dynamic widgets H1I2' => '12']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: 2 items',
-//							'expected' => [
-//								'Dynamic widgets H1I1' => '11',
-//								'Dynamic widgets H1I2' => '12'
-//							]
-//						],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I1'],
 						[
@@ -464,10 +586,46 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)'],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 1',
+							'expected' => ['Test 1' => '12']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 2',
+							'expected' => ['Test 2' => '11']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 3',
+							'expected' => ['Test 3' => '12']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test two items',
+							'expected' => [
+								'Test 4' => '11',
+								'Test 5' => '12'
+							]
+						]
+					],
+					'item_data' => [
+						[
+							'item' => '99104', // Dynamic widgets H1I2.
+							'value' => '12',
+							'time' => 'now'
+						],
+						[
+							'item' => '99103', // Dynamic widgets H1I1.
+							'value' => '11',
+							'time' => 'now'
+						]
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'host_filter' => [
@@ -483,30 +641,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G2 (I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
-						// TODO: will be fixed in terms of DEV-3728.
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-//							'expected' => ['Dynamic widgets H1I2' => '12']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I1',
-//							'expected' => ['Dynamic widgets H1I1' => '11']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-//							'expected' => ['Dynamic widgets H1I2' => '12']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: 2 items',
-//							'expected' => [
-//								'Dynamic widgets H1I1' => '11',
-//								'Dynamic widgets H1I2' => '12'
-//							]
-//						],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I1'],
 						[
@@ -521,10 +655,46 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)'],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 1',
+							'expected' => ['Test 1' => '12']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 2',
+							'expected' => ['Test 2' => '11']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 3',
+							'expected' => ['Test 3' => '12']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test two items',
+							'expected' => [
+								'Test 4' => '11',
+								'Test 5' => '12'
+							]
+						]
+					],
+					'item_data' => [
+						[
+							'item' => '99104', // Dynamic widgets H1I2.
+							'value' => '12',
+							'time' => 'now'
+						],
+						[
+							'item' => '99103', // Dynamic widgets H1I1.
+							'value' => '11',
+							'time' => 'now'
+						]
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'host_filter' => 'Dynamic widgets H2',
@@ -537,26 +707,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H2: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
-						// TODO: will be fixed in terms of DEV-3728.
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-//							'expected' => ['Dynamic widgets H1I2' => '12']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H2: Dynamic widgets H2I1',
-//							'expected' => ['Dynamic widgets H2I1' => '21']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Plain text'
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H2: Dynamic widgets H2I1',
-//							'expected' => ['Dynamic widgets H2I1' => '21']
-//						],
 						['type' => 'Gauge', 'header' => 'Gauge'],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H2: Dynamic widgets H2I1'],
 						[
@@ -571,10 +721,42 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
-						['type' => 'Graph prototype', 'header' => 'Graph prototype']
+						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 1',
+							'expected' => ['Test 1' => '12']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 2',
+							'expected' => ['Test 2' => '21']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 3'
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test two items',
+							'expected' => ['Test 4' => '21']
+						]
+					],
+					'item_data' => [
+						[
+							'item' => '99104', // Dynamic widgets H1I2.
+							'value' => '12',
+							'time' => 'now'
+						],
+						[
+							'item' => '99105', // Dynamic widgets H2I1.
+							'value' => '21',
+							'time' => 'now'
+						]
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'host_filter' => 'Dynamic widgets H3',
@@ -587,26 +769,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G3 (I1 and I2)'],
 						['type' => 'Graph (classic)', 'header' => 'Dynamic widgets H3: Dynamic widgets H1 G4 (H1I1 and H3I1)'],
-						// TODO: will be fixed in terms of DEV-3728.
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-//							'expected' => ['Dynamic widgets H1I2' => '12']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H3: Dynamic widgets H3I1',
-//							'expected' => ['Dynamic widgets H3I1' => '31']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Plain text'
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H3: Dynamic widgets H3I1',
-//							'expected' => ['Dynamic widgets H3I1' => '31']
-//						],
 						['type' => 'Gauge', 'header' => 'Gauge'],
 						['type' => 'Gauge', 'header' => 'Dynamic widgets H3: Dynamic widgets H3I1'],
 						[
@@ -621,10 +783,42 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
-						['type' => 'Graph prototype', 'header' => 'Graph prototype']
+						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 1',
+							'expected' => ['Test 1' => '12']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 2',
+							'expected' => ['Test 2' => '31']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 3'
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test two items',
+							'expected' => ['Test 4' => '31']
+						]
+					],
+					'item_data' => [
+						[
+							'item' => '99104', // Dynamic widgets H1I2.
+							'value' => '12',
+							'time' => 'now'
+						],
+						[
+							'item' => '99106', // Dynamic widgets H3I1.
+							'value' => '31',
+							'time' => 'now'
+						]
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'host_filter' => 'Host for suppression',
@@ -637,24 +831,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
 						['type' => 'Graph (classic)', 'header' => 'Graph (classic)'],
-						// TODO: will be fixed in terms of DEV-3728.
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Dynamic widgets H1: Dynamic widgets H1I2',
-//							'expected' => ['Dynamic widgets H1I2' => '12']
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Plain text'
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Plain text'
-//						],
-//						[
-//							'type' => 'Plain text',
-//							'header' => 'Plain text'
-//						],
 						['type' => 'Gauge', 'header' => 'Gauge'],
 						['type' => 'Gauge', 'header' => 'Gauge'],
 						[
@@ -669,7 +845,31 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
-						['type' => 'Graph prototype', 'header' => 'Graph prototype']
+						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 1',
+							'expected' => ['Test 1' => '12']
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 2'
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test 3'
+						],
+						[
+							'type' => 'Item history',
+							'header' => 'Test two items'
+						]
+					],
+					'item_data' => [
+						[
+							'item' => '99104', // Dynamic widgets H1I2.
+							'value' => '12',
+							'time' => 'now'
+						]
 					]
 				]
 			]
@@ -686,6 +886,13 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for Dynamic item']);
 		$dashboard = CDashboardElement::find()->one();
+
+		if (array_key_exists('item_data', $data)) {
+			foreach ($data['item_data'] as $params) {
+				$params['time'] = strtotime($params['time']);
+				CDataHelper::addItemData($params['item'], $params['value'], $params['time']);
+			}
+		}
 
 		if (CTestArrayHelper::get($data, 'host_filter', false)) {
 			$filter = $dashboard->getControls()->waitUntilVisible();
@@ -725,31 +932,45 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 
 			// Check widget empty content, because the host doesn't match dynamic option criteria.
 			if ($expected['header'] === '' || $expected['header'] === $expected['type']
-					|| CTestArrayHelper::get($expected, 'empty', false)) {
+						|| CTestArrayHelper::get($expected, 'empty', false)) {
 				$content = $widget_content->query('class:no-data-message')->one()->getText();
 				$message = ($expected['type'] === 'URL')
-						? 'No host selected.'
-						: 'No permissions to referred object or it does not exist!';
+					? 'No host selected.'
+					: 'No permissions to referred object or it does not exist!';
 				$this->assertEquals($message, $content);
 				continue;
 			}
 
 			// Check widget content when the host match dynamic option criteria.
-			$this->assertFalse($widget_content->query('class:no-data-message')->one(false)->isValid());
+			if ($expected['type'] !== 'Item history') {
+				$this->assertFalse($widget_content->query('class:no-data-message')->one(false)->isValid());
+			}
 
-			if ($expected['type'] === 'URL') {
-				// TODO: will be fixed in terms of DEV-3728.
-//				case 'Plain text':
-//					$data = $widget_content->asTable()->index('Name');
-//					foreach ($expected['expected'] as $item => $value) {
-//						$row = $data[$item];
-//						$this->assertEquals($value, $row['Value']);
-//					}
-//					break;
-				$this->page->switchTo($widget_content->query('id:iframe')->one());
-				$params = json_decode($this->query('xpath://body')->one()->getText(), true);
-				$this->assertEquals($expected['host'], $params['name']);
-				$this->page->switchTo();
+			if ($expected['type'] === 'Item history') {
+				switch ($expected['type']) {
+					case 'Item history':
+
+						if (!array_key_exists('expected', $expected)) {
+							$this->assertEquals('No data.', $widget_content->query('class:no-data-message')->one()->getText());
+						}
+						else {
+							$data = $widget_content->asTable()->index('Name');
+
+							foreach ($expected['expected'] as $item => $value) {
+								$row = $data[$item];
+								$this->assertEquals($value, $row['Value']);
+							}
+						}
+
+						break;
+
+					case 'URL':
+						$this->page->switchTo($widget_content->query('id:iframe')->one());
+						$params = json_decode($this->query('xpath://body')->one()->getText(), true);
+						$this->assertEquals($expected['host'], $params['name']);
+						$this->page->switchTo();
+						break;
+				}
 			}
 		}
 	}
