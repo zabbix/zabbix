@@ -727,12 +727,21 @@ static void	wd_perf_dump(zbx_wd_perf_t *perf)
  * Purpose: collect performance entries from json data                        *
  *                                                                            *
  ******************************************************************************/
-void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp)
+int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp, char **error)
 {
+#define WD_PERF_MAX_ENTRY_COUNT	2000
 	const char		*p = NULL;
 	zbx_wd_perf_entry_t	*entry, *resource;
 	zbx_wd_perf_details_t	details = {0};
 	zbx_wd_attr_t	attr;
+
+	if (WD_PERF_MAX_ENTRY_COUNT < perf->details.values_num)
+	{
+		*error = zbx_dsprintf(*error, "maximum count of performance entries has been reached (%i)",
+				WD_PERF_MAX_ENTRY_COUNT);
+
+		return FAIL;
+	}
 
 	zbx_vector_wd_perf_entry_ptr_create(&details.user);
 
@@ -801,15 +810,21 @@ void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struc
 
 	if (NULL != bookmark_name)
 	{
+		char			name[MAX_STRING_LEN];
 		zbx_wd_perf_bookmark_t	bookmark;
 
-		bookmark.name = zbx_strdup(NULL, bookmark_name);
+		zbx_strlcpy(name, bookmark_name, sizeof(name));
+
+		bookmark.name = zbx_strdup(NULL, name);
 		bookmark.details = &perf->details.values[perf->details.values_num - 1];
 		zbx_vector_wd_perf_bookmark_append(&perf->bookmarks, bookmark);
 	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		wd_perf_dump(perf);
+
+	return SUCCEED;
+#undef WD_PERF_MAX_ENTRY_COUNT
 }
 
 /******************************************************************************
