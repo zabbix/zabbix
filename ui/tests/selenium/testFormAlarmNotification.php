@@ -334,7 +334,7 @@ class testFormAlarmNotification extends CWebTest {
 
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item',
 				'Show unacknowledged only' => true])->submit();
-		sleep(1);
+		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
 
 		// In case some scenarios failed and problems didn't closed at the end.
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
@@ -465,8 +465,7 @@ class testFormAlarmNotification extends CWebTest {
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item'])->submit();
-		$this->query('xpath:(//tbody//a[text()="Host for alarm item"])[1]')->one()->waitUntilClickable();
-		sleep(1);
+		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($this->all_triggers, 'Problem');
@@ -480,7 +479,7 @@ class testFormAlarmNotification extends CWebTest {
 
 			// Find appeared Alarm notification overlay dialog.
 			$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
-			waitUntilPresent()->one();
+					waitUntilPresent()->one();
 
 			foreach ($new_severity as $trigger_name) {
 				$this->assertTrue($alarm_dialog->query('link', $trigger_name)->one()->isClickable());
@@ -499,16 +498,78 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
+	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
+	 */
+	public function testFormAlarmNotification_checkColorChange() {
+		$severity_names = [
+			'Disaster' => '00FF00',
+			'High' => '00FF00',
+			'Average' => '00FFFF',
+			'Warning' => '00FFFF',
+			'Information' => 'FF0080',
+			'Not classified' => 'FF0080'
+		];
+
+		$this->page->login()->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+				self::$hostid)->waitUntilReady();
+
+		// In case some scenarios failed and problems didn't closed at the end.
+		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
+			$this->closeProblem();
+		}
+
+		// Open Trigger displaying options page for color check and change.
+		$this->page->open('zabbix.php?action=trigdisplay.edit')->waitUntilReady();
+		$form = $this->query('id:trigdisplay-form')->asForm()->one();
+
+		// Find actual colors for all severity levels. They are in HEXA format.
+		$default_colors = [];
+		foreach ($severity_names as $severity_name => $hexa_color) {
+			$field = $form->getField($severity_name);
+			$color_value = $field->query('xpath:./following::div[@class="color-picker"]')->asColorPicker()->one()->getText();
+			$default_colors[] = '#'.$color_value;
+		}
+
+		// Trigger problem.
+		foreach ($this->all_triggers as $trigger_name) {
+			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE);
+		}
+
+		// Refresh page for alarm overlay to appear.
+		$this->page->refresh()->waitUntilReady();
+		$form->invalidate();
+
+		// Compare colors in alarm and in form.
+		$hexa_alarm_colors = $this->getAlarmColorsAndConvert();
+		$this->assertEquals($default_colors, $hexa_alarm_colors);
+
+		// Change color for every severity.
+		$changed_colors = [];
+		foreach ($severity_names as $severity_name => $hexa_color) {
+			$field = $form->getField($severity_name);
+			$field->query('xpath:./following::div[@class="color-picker"]')->asColorPicker()->one()->fill($hexa_color);
+			$changed_colors[] = '#'.$hexa_color;
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		// Compare colors in alarm and in form after change.
+		$hexa_alarm_colors_changed = $this->getAlarmColorsAndConvert();
+		$this->assertEquals($changed_colors, $hexa_alarm_colors_changed);
+	}
+
+	/**
 	 * Update Problems severity display.
 	 */
 	protected function updateSeverity($parameters) {
 		$all_severity = [
-				'Not classified' => true,
-				'Information' => true,
-				'Warning' => true,
-				'Average' => true,
-				'High' => true,
-				'Disaster' => true
+			'Not classified' => true,
+			'Information' => true,
+			'Warning' => true,
+			'Average' => true,
+			'High' => true,
+			'Disaster' => true
 		];
 
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
@@ -534,5 +595,46 @@ class testFormAlarmNotification extends CWebTest {
 		$problem_form->fill(['Close problem' => true, 'Acknowledge' => true])->submit();
 
 		COverlayDialogElement::ensureNotPresent();
+	}
+
+	/**
+	 * Get color value from alarm notification overlay. Values collected as array and are in RGBA format. After collecting
+	 * values convert them to HEX and save again as array.
+	 *
+	 * @return array
+	 */
+	protected function getAlarmColorsAndConvert() {
+		$notification_color_class = [
+			'disaster-bg',
+			'high-bg',
+			'average-bg',
+			'warning-bg',
+			'info-bg',
+			'na-bg'
+		];
+
+		// Find appeared Alarm notification overlay dialog.
+		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
+				waitUntilPresent()->one();
+
+		// Get alarm color codes. It will be in RGBA format.
+		$rgba_alarm_colors = [];
+		foreach ($notification_color_class as $color_class) {
+			$bg_color = $alarm_dialog->query('xpath:.//div[contains(@class, '.CXPathHelper::escapeQuotes($color_class).')]')->
+			one()->getCSSValue('background-color');
+			$rgba_alarm_colors[] = $bg_color;
+		}
+
+		// Convert RGBA colors to hexa
+		$hexa_alarm_colors = [];
+		foreach ($rgba_alarm_colors as $rgba_color) {
+			if (preg_match('/^rgba?\((\d+),[ ]*(\d+),[ ]*(\d+)[, )]+/', $rgba_color, $matches) === 1) {
+				$rgba_color = sprintf('#%02X%02X%02X', $matches[1], $matches[2], $matches[3]);
+			}
+
+			$hexa_alarm_colors[] = $rgba_color;
+		}
+
+		return $hexa_alarm_colors;
 	}
 }
