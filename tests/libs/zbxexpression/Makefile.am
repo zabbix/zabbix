@@ -2,7 +2,7 @@ if SERVER
 SERVER_tests = \
 	evaluate \
 	evaluate_unknown \
-	evaluate_function \
+	zbx_evaluate_function \
 	evaluate_stl \
 	evaluate_percentage_deviations_in_remainder \
 	substitute_lld_macros \
@@ -187,18 +187,19 @@ macro_functions_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxexpression
 
-evaluate_function_SOURCES = \
-	evaluate_function.c \
+zbx_evaluate_function_SOURCES = \
+	zbx_evaluate_function.c \
 	$(COMMON_SRC_FILES)
 
-evaluate_function_LDADD = \
+zbx_evaluate_function_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-evaluate_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+zbx_evaluate_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-evaluate_function_LDADD += @SERVER_LIBS@
+zbx_evaluate_function_LDADD += @SERVER_LIBS@
 
-evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
+	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 evaluate_stl_SOURCES = \
 	evaluate_stl.c \
@@ -256,7 +257,7 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_dc_get_data_expected_from \
 	-Wl,--wrap=zbx_timespec
 
-evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+zbx_evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \

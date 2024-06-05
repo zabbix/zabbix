@@ -72,7 +72,10 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 	size_t			data_alloc, data_len;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:EMPTY", __func__);
 		return res;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
 
@@ -116,6 +119,7 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 					(*data)[p.token.loc.r + 1] = '\0';
 				}
 				break;
+			case ZBX_TOKEN_USER_FUNC_MACRO:
 			case ZBX_TOKEN_FUNC_MACRO:
 				p.raw_value = 1;
 				p.indexed = zbx_is_indexed_macro(*data, &p.token);
@@ -132,15 +136,17 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 				break;
 			case ZBX_TOKEN_USER_MACRO:
 				/* To avoid *data modification user macro resolver should be replaced with a function */
-				/* that takes initial *data string and token.data.user_macro instead of m as params.  */
+				/* that takes initial *data string and token.data.user_macro instead of p.macro as    */
+				/* params.                                                                            */
 				p.macro = *data + p.token.loc.l;
 				c = (*data)[p.token.loc.r + 1];
 				(*data)[p.token.loc.r + 1] = '\0';
 				break;
 			case ZBX_TOKEN_REFERENCE:
 			case ZBX_TOKEN_EXPRESSION_MACRO:
-				/* These macros (and probably all other in the future) must be resolved using only */
-				/* information stored in token.data union. For now, force crash if they rely on m. */
+				/* These macros (and probably all other in the future) must be resolved using only    */
+				/* information stored in token.data union. For now, force crash if they rely on       */
+				/* p.macro.                                                                           */
 				p.macro = NULL;
 				break;
 			default:
@@ -217,7 +223,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitutes simple macros                                         *
+ * Purpose: substitutes macros                                                *
  *                                                                            *
  * Parameters: data      - [IN/OUT] pointer to data where macros should be    *
  *                                  resolved                                  *

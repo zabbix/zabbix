@@ -217,7 +217,7 @@ out:
   result: "user macro value 1"
   return: SUCCEED
 ---
-test case: "Expression macros {?} are being ignoreed by basic search"
+test case: "Expression macros {?} are being ignored by basic search"
 in:
   expression: "user macro {?abc}"
 out:

@@ -43,7 +43,7 @@ int	zbx_is_indexed_macro(const char *str, const zbx_token_t *token)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if a macro in string is one of list and extract index.     *
+ * Purpose: checks if a macro in string is one of list and extracts index.    *
  *                                                                            *
  * Parameters: str          - [IN] string containing potential macro          *
  *             strloc       - [IN] part of the string to check                *

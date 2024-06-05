@@ -191,7 +191,7 @@ tests/libs/zbxexpr/macro_fmttime
 tests/libs/zbxexpr/zbx_substitute_macros
 tests/libs/zbxexpression/evaluate
 tests/libs/zbxexpression/evaluate_unknown
-tests/libs/zbxexpression/evaluate_function
+tests/libs/zbxexpression/zbx_evaluate_function
 tests/libs/zbxexpression/evaluate_percentage_deviations_in_remainder
 tests/libs/zbxexpression/evaluate_stl
 tests/libs/zbxexpression/get_trigger_expression_constant

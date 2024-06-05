@@ -57,7 +57,8 @@ static int	macro_resolv_func(zbx_macro_resolv_data_t *p, va_list args, char **re
 				index++;
 				if (index != p->index) continue;
 
-				if (p->raw_value) {
+				if (p->raw_value)
+				{
 					// Remove @ at the beginning
 					if ('@' == value[0])
 					{
