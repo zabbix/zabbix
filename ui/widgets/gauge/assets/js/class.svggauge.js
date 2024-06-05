@@ -260,7 +260,7 @@ class CSVGGauge {
 	 * @param {string|null} units_text  Text representation of the units of the value.
 	 */
 	setValue({value, value_text, units_text}) {
-		if (this.#config.value.show) {
+		if (this.#config.value.show && value !== null) {
 			this.#drawValueAndUnits({value, value_text, units_text});
 		}
 
@@ -721,17 +721,15 @@ class CSVGGauge {
 			: `${arcs_height + CSVGGauge.NEEDLE_RADIUS * correction_font * 2}`
 		);
 
-		if (this.#config.units.show) {
+		if (this.#config.units.show && units_text !== null) {
 			this.#elements.value_and_units.units.container.textContent = value !== null ? units_text : '';
 
-			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BEFORE
-					|| this.#config.units.position === CSVGGauge.UNITS_POSITION_AFTER) {
-				this.#elements.value_and_units.space.container.style.display = units_text !== null ? '' : 'none';
+			if (this.#elements.value_and_units.space !== undefined) {
+				this.#elements.value_and_units.space.container.style.display = '';
 			}
 
 			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_ABOVE
 					|| this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW) {
-
 				this.#elements.value_and_units.container.setAttribute('height',
 					`${font_sizes.value.line_height + font_sizes.units.line_height}`
 				);
@@ -740,22 +738,14 @@ class CSVGGauge {
 					? [font_sizes.value.font_size, font_sizes.units.font_size]
 					: [font_sizes.units.font_size, font_sizes.value.font_size];
 
-				let container_y = 0;
-
-				if (is_aligned_to_bottom) {
-					if (units_text !== null) {
-						container_y = arcs_height - parts_font_size[0] / CSVGGauge.TEXT_BASELINE - parts_font_size[1];
-					}
-					else {
-						container_y = arcs_height - font_sizes.value.font_size;
-					}
-				}
-				else {
-					container_y = arcs_height + CSVGGauge.NEEDLE_RADIUS * correction_font * 2;
-				}
-
-				this.#elements.value_and_units.container.setAttribute('y', container_y);
+				this.#elements.value_and_units.container.setAttribute('y', is_aligned_to_bottom
+					? arcs_height - parts_font_size[0] / CSVGGauge.TEXT_BASELINE - parts_font_size[1]
+					: arcs_height + CSVGGauge.NEEDLE_RADIUS * correction_font * 2
+				);
 			}
+		}
+		else if (this.#elements.value_and_units.space !== undefined) {
+			this.#elements.value_and_units.space.container.style.display = 'none';
 		}
 
 		let tooltip = '';
