@@ -118,4 +118,6 @@ void	zbx_vc_get_mem_stats(zbx_mem_stats_t *mem);
 void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats);
 void	zbx_vc_flush_stats(void);
 
+void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items);
+
 #endif	/* ZABBIX_VALUECACHE_H */

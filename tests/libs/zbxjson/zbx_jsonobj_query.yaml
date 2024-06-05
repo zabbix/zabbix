@@ -877,7 +877,6 @@ in:
 out:
   return: SUCCEED
   value: 'C'
-
 ---
 test case: Query identical keys - path (first)
 in:
@@ -885,6 +884,12 @@ in:
   path: $[?(@.id==1)].value.first() 
 out:
   return: SUCCEED
+---
+test case: Query by comparing with null value
+in:
+  data: '{"a":{"id":1, "value":null}, "b":{"id":2, "value":"B"}, "a":{"id":3, "value":"C"}}'
+  path: $[?(@.value>'')].id 
+out:
+  return: SUCCEED
+  value: '[2, 3]'
 ...
-
-

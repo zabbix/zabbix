@@ -21,7 +21,7 @@ package webcertificate
 import (
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/uri"
+	"golang.zabbix.com/sdk/uri"
 )
 
 func Test_getParameters(t *testing.T) {

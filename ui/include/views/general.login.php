@@ -71,7 +71,10 @@ global $ZBX_SERVER_NAME;
 							(new CTextBox('name'))->setAttribute('autofocus', 'autofocus'),
 							$error
 						])
-						->addItem([new CLabel(_('Password'), 'password'), new CPassBox('password')])
+						->addItem([
+							new CLabel(_('Password'), 'password'),
+							(new CPassBox('password'))->setAttribute('autocomplete', 'off')
+						])
 						->addItem(
 							(new CCheckBox('autologin'))
 								->setLabel(_('Remember me for 30 days'))

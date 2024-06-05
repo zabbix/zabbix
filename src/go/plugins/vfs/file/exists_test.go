@@ -25,7 +25,7 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/std"
+	"golang.zabbix.com/sdk/std"
 )
 
 func TestFileExists(t *testing.T) {

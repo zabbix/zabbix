@@ -84,13 +84,13 @@ Note that this solution supports https and redirects.
 |Nginx: Connections reading|<p>The current number of connections where Nginx is reading the request header.</p>|Dependent item|nginx.connections.reading<p>**Preprocessing**</p><ul><li><p>Regular expression: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \1`</p></li></ul>|
 |Nginx: Connections waiting|<p>The current number of idle client connections waiting for a request.</p>|Dependent item|nginx.connections.waiting<p>**Preprocessing**</p><ul><li><p>Regular expression: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \3`</p></li></ul>|
 |Nginx: Connections writing|<p>The current number of connections where Nginx is writing a response back to the client.</p>|Dependent item|nginx.connections.writing<p>**Preprocessing**</p><ul><li><p>Regular expression: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \2`</p></li></ul>|
-|Nginx: Version||Dependent item|nginx.version<p>**Preprocessing**</p><ul><li><p>Regular expression: `Server: nginx\/(.+(?<!\r)) \1`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Nginx: Version||Dependent item|nginx.version<p>**Preprocessing**</p><ul><li><p>Regular expression: `(?i)Server: nginx\/(.+(?<!\r)) \1`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Nginx: Failed to fetch stub status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`find(/Nginx by HTTP/nginx.get_stub_status,,"regexp","HTTP\/[\d.]+\s+200")=0 or nodata(/Nginx by HTTP/nginx.get_stub_status,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Nginx: Service is down</li></ul>|
+|Nginx: Failed to fetch stub status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`find(/Nginx by HTTP/nginx.get_stub_status,,"iregexp","HTTP\/[\d.]+\s+200")=0 or nodata(/Nginx by HTTP/nginx.get_stub_status,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Nginx: Service is down</li></ul>|
 |Nginx: Service is down||`last(/Nginx by HTTP/net.tcp.service[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"])=0`|Average|**Manual close**: Yes|
 |Nginx: Service response time is too high||`min(/Nginx by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Nginx: Service is down</li></ul>|
 |Nginx: High connections drop rate|<p>The rate of dropping connections has been greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p>|`min(/Nginx by HTTP/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Nginx: Service is down</li></ul>|

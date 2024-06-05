@@ -29,19 +29,19 @@ This guide describes how to integrate your Zabbix 6.0 installation with PagerDut
 
     *   Set name and description for new service.
 
-    [![](images/tn_1.1.png?raw=true)](images/1.png)
+    [![](images/tn_1.1.png?raw=true)](images/1.1.png)
 
     *   Assign required an Escalation Policy.
 
-    [![](images/tn_1.2.png?raw=true)](images/1.png)
+    [![](images/tn_1.2.png?raw=true)](images/1.2.png)
 
     *  Select Alert Grouping.
 
-    [![](images/tn_1.3.png?raw=true)](images/1.png)
+    [![](images/tn_1.3.png?raw=true)](images/1.3.png)
 
     *  In integration section select Zabbix Webhook using search field and click **Create service**.
 
-    [![](images/tn_1.4.png?raw=true)](images/1.png)
+    [![](images/tn_1.4.png?raw=true)](images/1.4.png)
 
 * If you are adding your integration to an existing service, click the name of the service you want to add the integration to. Then click the **Integrations** tab and click the **+Add an Integration** button, select Zabbix Webhook using search field and click **Add**.
 
@@ -49,7 +49,7 @@ This guide describes how to integrate your Zabbix 6.0 installation with PagerDut
 
 * After successfully added integration use **Integration Key** from it in **token** macros for PagerDuty zabbix media type.
 
-    [![](images/tn_3.png?raw=true)](images/2.png)
+    [![](images/tn_3.png?raw=true)](images/3.png)
 
 ## In Zabbix
 

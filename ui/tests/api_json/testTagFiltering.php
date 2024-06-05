@@ -149,7 +149,7 @@ class testTagFiltering extends CAPITest {
 				],
 				'expected' => [
 					'Host Browser', 'Host Browser - Chrome', 'Host Browser - Firefox', 'Host Browser - IE',
-					'Host without tags', 'Host with very general tags only'
+					'Host OS - Android', 'Host without tags', 'Host with very general tags only'
 				]
 			],
 			'test-two-not-exists-with-exception' => [

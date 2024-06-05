@@ -163,6 +163,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	static ZBX_THREAD_LOCAL LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
+	int					sec_diff;
 #else
 	struct timeval	tv;
 	int		rc = -1;
@@ -250,8 +251,10 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #endif	/* not _WINDOWS */
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
-			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
+	sec_diff = ts->sec - last_ts.sec;
+
+	/* correction window is 1 sec before the corrected last _ftime clock reading */
+	if ((0 == sec_diff && ts->ns <= last_ts.ns) || (-1 == sec_diff && ts->ns > last_ts.ns))
 #else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
 #endif
@@ -447,6 +450,29 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 	ZBX_UNUSED(tz);
 	return localtime(time);
 #endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get broken-down representation of the time and cache result       *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
+ *                                                                            *
+ * Return value: broken-down representation of the time                       *
+ *                                                                            *
+ ******************************************************************************/
+const struct tm	*zbx_localtime_now(const time_t *time)
+{
+	static ZBX_THREAD_LOCAL struct tm	tm_last;
+	static ZBX_THREAD_LOCAL time_t		time_last;
+
+	if (time_last != *time)
+	{
+		time_last = *time;
+		localtime_r(time, &tm_last);
+	}
+
+	return &tm_last;
 }
 
 /******************************************************************************
@@ -703,7 +729,7 @@ void	zbx_setproctitle(const char *fmt, ...)
  * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
  ******************************************************************************/
-static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
+static int	check_time_period(const zbx_time_period_t period, const struct tm *tm)
 {
 	int		day, time;
 
@@ -733,7 +759,7 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
 	while (NULL != flex_intervals)
 	{
 		if ((-1 == current_delay || flex_intervals->delay < current_delay) &&
-				SUCCEED == check_time_period(flex_intervals->period, localtime(&now)))
+				SUCCEED == check_time_period(flex_intervals->period, zbx_localtime_now(&now)))
 		{
 			current_delay = flex_intervals->delay;
 		}
@@ -759,12 +785,12 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
 static int	get_next_delay_interval(const zbx_flexible_interval_t *flex_intervals, time_t now, time_t *next_interval)
 {
 	int		day, time, next = 0, candidate;
-	struct tm	*tm;
+	const struct tm	*tm;
 
 	if (NULL == flex_intervals)
 		return FAIL;
 
-	tm = localtime(&now);
+	tm = zbx_localtime_now(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
 	time = SEC_PER_HOUR * tm->tm_hour + SEC_PER_MIN * tm->tm_min + tm->tm_sec;
 
@@ -1407,7 +1433,7 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
 	tm->tm_mday += value_next - value_now;
 
 	/* check if the resulting month day is valid */
-	return (tm->tm_mday <= zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1) ? SUCCEED : FAIL);
+	return (tm->tm_mday <= zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1) ? SUCCEED : FAIL);
 }
 
 /******************************************************************************
@@ -1482,7 +1508,7 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 	while (SUCCEED == scheduler_get_nearest_filter_value(interval->mdays, &tm->tm_mday))
 	{
 		/* check if the date is still valid - we haven't run out of month days */
-		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
+		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1))
 			break;
 
 		if (SUCCEED == scheduler_validate_wday_filter(interval, tm))
@@ -1491,7 +1517,7 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
 		tm->tm_mday++;
 
 		/* check if the date is still valid - we haven't run out of month days */
-		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1970, tm->tm_mon + 1))
+		if (tm->tm_mday > zbx_day_in_month(tm->tm_year + 1900, tm->tm_mon + 1))
 			break;
 	}
 
@@ -1770,7 +1796,7 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 	struct tm	tm_start, tm, tm_dst;
 	time_t		nextcheck = 0, current_nextcheck;
 
-	tm_start = *(localtime(&now));
+	tm_start = *(zbx_localtime_now(&now));
 
 	for (; NULL != interval; interval = interval->next)
 	{
@@ -2146,7 +2172,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interv
 		time_t	next_interval, t, tmax, scheduled_check = 0;
 
 		/* first try to parse out and calculate scheduled intervals */
-		if (NULL != custom_intervals)
+		if (NULL != custom_intervals && NULL != custom_intervals->scheduling)
 			scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, now);
 
 		/* Try to find the nearest 'nextcheck' value with condition */
@@ -2223,7 +2249,7 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 	time_t	next_interval, tmax, scheduled_check = 0;
 
 	/* first try to parse out and calculate scheduled intervals */
-	if (NULL != custom_intervals)
+	if (NULL != custom_intervals && NULL != custom_intervals->scheduling)
 		scheduled_check = scheduler_get_nextcheck(custom_intervals->scheduling, disable_until);
 
 	/* Try to find the nearest 'nextcheck' value with condition */

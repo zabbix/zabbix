@@ -22,7 +22,7 @@ package scheduler
 import (
 	"container/heap"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 // pluginAgent manages plugin usage

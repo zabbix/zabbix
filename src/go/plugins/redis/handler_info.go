@@ -25,9 +25,8 @@ import (
 	"regexp"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type infoSection string

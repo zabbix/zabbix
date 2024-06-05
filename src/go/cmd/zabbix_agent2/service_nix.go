@@ -22,7 +22,7 @@
 
 package main
 
-import "git.zabbix.com/ap/plugin-support/zbxflag"
+import "golang.zabbix.com/sdk/zbxflag"
 
 const usageMessageExampleConfPath = `/etc/zabbix/zabbix_agent2.conf`
 

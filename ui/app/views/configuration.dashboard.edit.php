@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -42,6 +42,7 @@ $this->addJsFile('class.widget.problems.js');
 $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');
 $this->addJsFile('class.widget.trigerover.js');
+$this->addJsFile('class.widget.url.js');
 $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('configuration.dashboard.edit.js.php');

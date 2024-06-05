@@ -1119,12 +1119,12 @@ function getTriggerSeverityCss() {
 	$css = '';
 
 	$severities = [
-		ZBX_STYLE_NA_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_0),
-		ZBX_STYLE_INFO_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_1),
-		ZBX_STYLE_WARNING_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_2),
-		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_3),
-		ZBX_STYLE_HIGH_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_4),
-		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getGlobal(CSettingsHelper::SEVERITY_COLOR_5)
+		ZBX_STYLE_NA_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_0),
+		ZBX_STYLE_INFO_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_1),
+		ZBX_STYLE_WARNING_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_2),
+		ZBX_STYLE_AVERAGE_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_3),
+		ZBX_STYLE_HIGH_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_4),
+		ZBX_STYLE_DISASTER_BG => CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_COLOR_5)
 	];
 
 	$css .= ':root {'."\n";
@@ -1149,12 +1149,12 @@ function getTriggerSeverityCss() {
 function getTriggerStatusCss() {
 	$css = '';
 
-	if (CSettingsHelper::getGlobal(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
+	if (CSettingsHelper::getPublic(CSettingsHelper::CUSTOM_COLOR) == EVENT_CUSTOM_COLOR_ENABLED) {
 		$event_statuses = [
-			ZBX_STYLE_PROBLEM_UNACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_UNACK_COLOR),
-			ZBX_STYLE_PROBLEM_ACK_FG => CSettingsHelper::get(CSettingsHelper::PROBLEM_ACK_COLOR),
-			ZBX_STYLE_OK_UNACK_FG => CSettingsHelper::get(CSettingsHelper::OK_UNACK_COLOR),
-			ZBX_STYLE_OK_ACK_FG => CSettingsHelper::get(CSettingsHelper::OK_ACK_COLOR)
+			ZBX_STYLE_PROBLEM_UNACK_FG => CSettingsHelper::getPublic(CSettingsHelper::PROBLEM_UNACK_COLOR),
+			ZBX_STYLE_PROBLEM_ACK_FG => CSettingsHelper::getPublic(CSettingsHelper::PROBLEM_ACK_COLOR),
+			ZBX_STYLE_OK_UNACK_FG => CSettingsHelper::getPublic(CSettingsHelper::OK_UNACK_COLOR),
+			ZBX_STYLE_OK_ACK_FG => CSettingsHelper::getPublic(CSettingsHelper::OK_ACK_COLOR)
 		];
 
 		foreach ($event_statuses as $class => $color) {

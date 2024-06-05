@@ -1957,7 +1957,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'From' => 'now-1d-1w-1y',
+						'From' => 'now-1y-1w-1d',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Daily',
@@ -2037,7 +2037,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => 'now-1d-1w-1y',
+						'To' => 'now-1y-1w-1d',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Daily',

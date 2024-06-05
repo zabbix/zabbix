@@ -697,7 +697,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with empty item',
-						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
+						'Source' => 'Simple graph',
 						'Item' => []
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
@@ -721,7 +721,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Simple graph without legend',
-						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
+						'Source' => 'Simple graph',
 						'Item' => ['Item ZBX6663 Second'],
 						'Show legend' => false
 					]
@@ -747,7 +747,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with empty item prototype',
-						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
+						'Source' => 'Simple graph prototype',
 						'Item prototype' => []
 					],
 					'error_message' => 'Invalid parameter "Item prototype": cannot be empty.'
@@ -857,7 +857,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Simple Graph prototype without legend',
-						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
+						'Source' => 'Simple graph prototype',
 						'Item prototype' => ['ItemProto ZBX6663 Second'],
 						'Show legend' => false,
 						'Columns' => 1,
@@ -1011,7 +1011,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 		// Trimming is only triggered together with an on-change event which is generated once focus is removed.
 		$this->page->removeFocus();
-		$old_values = $form->getFields()->asValues();
+		$old_values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		$form->submit();
 
 		// In case of the scenario with identical widgets the same widget needs to be added once again.
@@ -1039,7 +1039,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$form->fill($data['fields']);
 		$this->page->removeFocus();
 		COverlayDialogElement::find()->waitUntilReady();
-		$old_values = $form->getFields()->asValues();
+		$old_values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		$form->submit();
 
 		$this->checkSettings($data, $old_values, 'updated', 'widget update');
@@ -1169,7 +1169,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$old_values[$data['trim']] = trim($old_values[$data['trim']]);
 				}
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-				$this->assertEquals($old_values, $form->getFields()->asValues());
+				$this->assertEquals($old_values, $form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 			}
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			$this->closeDialogue();
@@ -1214,7 +1214,7 @@ class testFormTemplateDashboards extends CWebTest {
 				$reopened_form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 
-			$this->assertEquals($created_values, $reopened_form->getFields()->asValues());
+			$this->assertEquals($created_values, $reopened_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 
 			$this->closeDialogue();
 		}

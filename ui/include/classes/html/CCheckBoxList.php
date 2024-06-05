@@ -23,6 +23,7 @@ class CCheckBoxList extends CList {
 
 	private const ZBX_STYLE_CLASS = 'checkbox-list';
 
+	private const ZBX_STYLE_LAYOUT_FIXED = 'fixed';
 	private const ZBX_STYLE_VERTICAL = 'vertical';
 
 	/**
@@ -36,14 +37,19 @@ class CCheckBoxList extends CList {
 	protected $name;
 
 	/**
+	 * Checkboxes id unique suffix.
+	 */
+	protected $uniqid = '';
+
+	/**
 	 * @var bool $enabled
 	 */
 	protected $enabled = true;
 
 	/**
-	 * Checkboxes id unique suffix.
+	 * @var bool $layout_fixed
 	 */
-	protected $uniqid = '';
+	protected $layout_fixed = false;
 
 	/**
 	 * @var bool $vertical
@@ -136,6 +142,19 @@ class CCheckBoxList extends CList {
 	}
 
 	/**
+	 * Make columns the same size.
+	 *
+	 * @param bool $layout_fixed
+	 *
+	 * @return CCheckBoxList
+	 */
+	public function setLayoutFixed(bool $layout_fixed = true): CCheckBoxList {
+		$this->layout_fixed = $layout_fixed;
+
+		return $this;
+	}
+
+	/**
 	 * Display checkboxes in vertical order.
 	 *
 	 * @param bool $vertical
@@ -169,9 +188,12 @@ class CCheckBoxList extends CList {
 	public function toString($destroy = true) {
 		$this->addStyle('--columns: '.$this->columns.';');
 
+		if ($this->layout_fixed) {
+			$this->addClass(self::ZBX_STYLE_LAYOUT_FIXED);
+		}
+
 		if ($this->vertical) {
-			$values_count = count($this->values);
-			$max_rows = (int) ceil($values_count / $this->columns);
+			$max_rows = (int) ceil(count($this->values) / $this->columns);
 
 			$this->addClass(self::ZBX_STYLE_VERTICAL);
 			$this->addStyle('--rows: '.$max_rows.';');

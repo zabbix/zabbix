@@ -35,62 +35,65 @@ $info_table = (new CTableInfo())
 		(new CSpan($status['is_running'] ? _('Yes') : _('No')))
 			->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
 		$data['system_info']['server_details']
-	])
-	->addRow([
-		_('Number of hosts (enabled/disabled)'),
-		$status['has_status'] ? $status['hosts_count'] : '',
-		$status['has_status']
-			? [
-				(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-				(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED)
-			]
-			: ''
-	])
-	->addRow([
-		_('Number of templates'),
-		$status['has_status'] ? $status['hosts_count_template'] : '',
-		''
-	])
-	->addRow([
-		(new CSpan(_('Number of items (enabled/disabled/not supported)')))
-			->setTitle(_('Only items assigned to enabled hosts are counted')),
-		$status['has_status'] ? $status['items_count'] : '',
-		$status['has_status']
-			? [
-				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
-				(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
-			]
-			: ''
-	])
-	->addRow([
-		(new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
-			->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted')),
-		$status['has_status'] ? $status['triggers_count'] : '',
-		$status['has_status']
-			? [
-				$status['triggers_count_enabled'],
-				' / ',
-				$status['triggers_count_disabled'],
-				' [',
-				(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED),
-				' / ',
-				(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN),
-				']'
-			]
-			: ''
-	])
-	->addRow([
-		_('Number of users (online)'),
-		$status['has_status'] ? $status['users_count'] : '',
-		$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
 	]);
 
 if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-	$info_table->addRow([
-		_('Required server performance, new values per second'),
-		($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '',
-		''
+	$info_table
+		->addRow([
+			_('Number of hosts (enabled/disabled)'),
+			$status['has_status'] ? $status['hosts_count'] : '',
+			$status['has_status']
+				? [
+					(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
+					(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED)
+				]
+				: ''
+		])
+		->addRow([
+			_('Number of templates'),
+			$status['has_status'] ? $status['hosts_count_template'] : '',
+			''
+		])
+		->addRow([
+			(new CSpan(_('Number of items (enabled/disabled/not supported)')))
+				->setTitle(_('Only items assigned to enabled hosts are counted')),
+			$status['has_status'] ? $status['items_count'] : '',
+			$status['has_status']
+				? [
+					(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN),
+					' / ',
+					(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED),
+					' / ',
+					(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
+				]
+				: ''
+		])
+		->addRow([
+			(new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
+				->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted')),
+			$status['has_status'] ? $status['triggers_count'] : '',
+			$status['has_status']
+				? [
+					$status['triggers_count_enabled'],
+					' / ',
+					$status['triggers_count_disabled'],
+					' [',
+					(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED),
+					' / ',
+					(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN),
+					']'
+				]
+				: ''
+		])
+		->addRow([
+			_('Number of users (online)'),
+			$status['has_status'] ? $status['users_count'] : '',
+			$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
+		])
+		->addRow([
+			_('Required server performance, new values per second'),
+			($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '',
+			''
 	]);
 
 	// Check requirements.
@@ -113,27 +116,25 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 			))->addClass(ZBX_STYLE_RED)
 		);
 	}
-}
 
-// Warn if database history tables have not been upgraded.
-if (!$data['system_info']['float_double_precision']) {
-	$info_table->addRow([
-		_('Database history tables upgraded'),
-		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
-		''
-	]);
-}
+	// Warn if database history tables have not been upgraded.
+	if (!$data['system_info']['float_double_precision']) {
+		$info_table->addRow([
+			_('Database history tables upgraded'),
+			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+			''
+		]);
+	}
 
-if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
-	$info_table->addRow([
-		_('Database history tables use primary key'),
-		(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
-		''
-	]);
-}
+	if (array_key_exists('history_pk', $data['system_info']) && !$data['system_info']['history_pk']) {
+		$info_table->addRow([
+			_('Database history tables use primary key'),
+			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
+			''
+		]);
+	}
 
-// Check DB version.
-if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+	// Check DB version.
 	foreach ($data['system_info']['dbversion_status'] as $dbversion) {
 		switch ($dbversion['flag']) {
 			case DB_VERSION_LOWER_THAN_MINIMUM:

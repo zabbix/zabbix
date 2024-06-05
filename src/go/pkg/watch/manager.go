@@ -27,7 +27,7 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 // EventSource generates events by calling Manager.Notify() method and passing arbitrary

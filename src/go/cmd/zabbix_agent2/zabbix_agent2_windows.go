@@ -26,8 +26,8 @@ import (
 	"strings"
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/pkg/pdh"
+	"golang.zabbix.com/agent2/pkg/pdh"
+	"golang.zabbix.com/sdk/log"
 )
 
 func loadOSDependentItems() error {

@@ -20,8 +20,8 @@
 package ceph
 
 import (
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 type Session struct {

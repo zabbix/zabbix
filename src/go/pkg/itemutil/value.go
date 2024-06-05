@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 const StateNotSupported = 1

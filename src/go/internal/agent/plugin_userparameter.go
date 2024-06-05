@@ -26,10 +26,10 @@ import (
 	"time"
 	"unicode"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/zbxcmd"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 type parameterInfo struct {

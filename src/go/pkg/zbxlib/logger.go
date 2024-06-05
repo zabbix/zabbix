@@ -22,7 +22,7 @@ package zbxlib
 import (
 	"C"
 )
-import "git.zabbix.com/ap/plugin-support/log"
+import "golang.zabbix.com/sdk/log"
 
 const c_info = 127
 

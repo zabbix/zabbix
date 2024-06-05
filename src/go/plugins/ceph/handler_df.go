@@ -22,7 +22,7 @@ package ceph
 import (
 	"encoding/json"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type cephDf struct {

@@ -41,17 +41,23 @@ static const char	*read_utf8(const char *path_str, const char *path_hex)
 		zbx_mock_binary(hdata, &data, &len);
 	}
 	else
+	{
+		data = NULL;
 		fail_msg("cannot read %s/%s parameter", path_str, path_hex);
+	}
 
 	return data;
 }
 
 void	zbx_mock_test_entry_common_trim_utf8(void **state, int trim_utf8_func)
 {
+	char		*in;
+	const char	*charlist, *expected;
+
 	ZBX_UNUSED(state);
 
-	char		*in = zbx_strdup(NULL, read_utf8("in.text.str", "in.text.hex"));
-	const char	*charlist = read_utf8("in.charlist.str", "in.charlist.hex");
+	in = zbx_strdup(NULL, read_utf8("in.text.str", "in.text.hex"));
+	charlist = read_utf8("in.charlist.str", "in.charlist.hex");
 
 	if (ZABBIX_MOCK_LTRIM_UTF8 == trim_utf8_func)
 		zbx_ltrim_utf8(in, charlist);
@@ -60,7 +66,7 @@ void	zbx_mock_test_entry_common_trim_utf8(void **state, int trim_utf8_func)
 	else
 		fail_msg("Invalid trim_utf8_func");
 
-	const char	*expected = read_utf8("out.str", "out.hex");
+	expected = read_utf8("out.str", "out.hex");
 
 	zbx_mock_assert_str_eq("trimmed value", expected, in);
 	zbx_free(in);

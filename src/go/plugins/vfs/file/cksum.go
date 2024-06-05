@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/std"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/std"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 type checkSum func(file std.File, start time.Time, timeout int) (result interface{}, err error)
