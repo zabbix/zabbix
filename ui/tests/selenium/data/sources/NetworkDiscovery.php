@@ -34,7 +34,7 @@ class NetworkDiscovery {
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 				],
 				[
-					'name' => 'Proxy for Network discovery cloning',
+					'name' => 'Proxy for cloning Network discovery',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 				]
 			]

@@ -405,6 +405,11 @@ class testFormAdministrationProxyGroups extends CWebTest {
 		$form->fill($data['fields']);
 		$filled_data = $form->getFields()->asValues();
 
+		// Proxies field doesn't have a value attribute, so getFields always returns NULL, so field text is checked instead.
+		if ($update) {
+			$filled_data['Proxies'] = $form->getField('Proxies')->getText();
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -433,7 +438,14 @@ class testFormAdministrationProxyGroups extends CWebTest {
 			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
 
-			$this->assertEquals($filled_data, $form->getFields()->asValues());
+			// Proxies field doesn't have a value attribute, so getFields always returns NULL, so field text is checked instead.
+			$all_updated_fields = $form->getFields()->asValues();
+
+			if ($update) {
+				$all_updated_fields['Proxies'] = $form->getField('Proxies')->getText();
+			}
+
+			$this->assertEquals($filled_data, $all_updated_fields);
 			$form->checkValue($data['fields']);
 			$dialog->close();
 
