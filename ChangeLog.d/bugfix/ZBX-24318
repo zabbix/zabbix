@@ -1,0 +1,1 @@
+........S. [ZBX-24318] fixed slow LLD of hosts due to reduntant iteration through many hosts (vso)
