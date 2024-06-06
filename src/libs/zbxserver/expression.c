@@ -2676,7 +2676,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 	if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY | MACRO_TYPE_MESSAGE_UPDATE |
 			MACRO_TYPE_EVENT_NAME)))
 	{
-		token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
+
+		const DB_EVENT	*c_event;
+
+		c_event = ((NULL != r_event) ? r_event : event);
+
+		if (NULL != c_event && EVENT_SOURCE_TRIGGERS == c_event->source)
+			token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 	}
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
