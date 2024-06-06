@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -28,11 +23,11 @@ class CWidgetHostNavigator extends CWidget {
 	#host_navigator = null;
 
 	/**
-	 * Events of host navigator widget.
+	 * Listeners of host navigator widget.
 	 *
 	 * @type {Object}
 	 */
-	#events = {};
+	#listeners = {};
 
 	/**
 	 * Scroll amount of contents.
@@ -61,13 +56,24 @@ class CWidgetHostNavigator extends CWidget {
 	}
 
 	setContents(response) {
-		if (this.#host_navigator === null) {
-			this.#host_navigator = new CHostNavigator(response.config);
+		if (response.hosts.length === 0) {
+			this.clearContents();
+			this.setCoverMessage({
+				message: t('No data found'),
+				icon: ZBX_ICON_SEARCH_LARGE
+			});
 
+			return;
+		}
+
+		if (this.#host_navigator === null) {
+			this.clearContents();
+
+			this.#host_navigator = new CHostNavigator(response.config);
 			this._body.appendChild(this.#host_navigator.getContainer());
 
-			this.#registerEvents();
-			this.#activateEvents();
+			this.#registerListeners();
+			this.#activateListeners();
 		}
 
 		this.#host_navigator.setValue({
@@ -77,10 +83,13 @@ class CWidgetHostNavigator extends CWidget {
 		});
 	}
 
-	#registerEvents() {
-		this.#events = {
+	#registerListeners() {
+		this.#listeners = {
 			hostSelect: e => {
-				this.broadcast({_hostid: e.detail._hostid});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_HOST_ID]: [e.detail.hostid],
+					[CWidgetsData.DATA_TYPE_HOST_IDS]: [e.detail.hostid]
+				});
 			},
 
 			groupToggle: e => {
@@ -91,12 +100,12 @@ class CWidgetHostNavigator extends CWidget {
 		};
 	}
 
-	#activateEvents() {
+	#activateListeners() {
 		this.#host_navigator.getContainer().addEventListener(CHostNavigator.EVENT_HOST_SELECT,
-			this.#events.hostSelect
+			this.#listeners.hostSelect
 		);
 		this.#host_navigator.getContainer().addEventListener(CHostNavigator.EVENT_GROUP_TOGGLE,
-			this.#events.groupToggle
+			this.#listeners.groupToggle
 		);
 	}
 
@@ -115,11 +124,7 @@ class CWidgetHostNavigator extends CWidget {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				is_open: is_open,
-				group_identifier: group_identifier,
-				widgetid: widgetid
-			})
+			body: JSON.stringify({is_open, group_identifier, widgetid})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -147,5 +152,12 @@ class CWidgetHostNavigator extends CWidget {
 
 	hasPadding() {
 		return false;
+	}
+
+	onClearContents() {
+		if (this.#host_navigator !== null) {
+			this.#host_navigator.destroy();
+			this.#host_navigator = null;
+		}
 	}
 }

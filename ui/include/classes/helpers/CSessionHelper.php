@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -27,8 +22,6 @@ class CSessionHelper {
 	/**
 	 * Clear session data.
 	 *
-	 * @static
-	 *
 	 * @return boolean
 	 */
 	public static function clear(): bool {
@@ -37,8 +30,6 @@ class CSessionHelper {
 
 	/**
 	 * Check has this key in session.
-	 *
-	 * @static
 	 *
 	 * @param string $key
 	 *
@@ -51,8 +42,6 @@ class CSessionHelper {
 	/**
 	 * Get session data.
 	 *
-	 * @static
-	 *
 	 * @param string $key
 	 *
 	 * @return mixed
@@ -64,8 +53,6 @@ class CSessionHelper {
 	/**
 	 * Add to session.
 	 *
-	 * @static
-	 *
 	 * @param string $key
 	 * @param mixed $value
 	 */
@@ -75,8 +62,6 @@ class CSessionHelper {
 
 	/**
 	 * Delete from session.
-	 *
-	 * @static
 	 *
 	 * @param array $keys
 	 */
@@ -89,8 +74,6 @@ class CSessionHelper {
 	/**
 	 * Get session id.
 	 *
-	 * @static
-	 *
 	 * @return string
 	 */
 	public static function getId(): string {
@@ -99,8 +82,6 @@ class CSessionHelper {
 
 	/**
 	 * Get all session data.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */

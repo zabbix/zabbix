@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	"zabbix.com/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/win32"
 )
 
 func BenchmarkCreateQuery(b *testing.B) {

@@ -12,8 +12,8 @@ class Module extends CModule {
 		/** @var CMenu $menu */
 		$menu = APP::Component()->get('menu.main');
 		$menu
-			->find(_('Administration'))
+			->find('Administration')
 			->getSubMenu()
-				->add((new CMenuItem(_('CSRF test')))->setAction('csrftoken.form'));
+				->add((new CMenuItem('CSRF test'))->setAction('csrftoken.form'));
 	}
 }

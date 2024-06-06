@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -52,14 +47,9 @@ class testWidgets extends CWebTest {
 		$select_dialog = $widget_dialog;
 
 		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
-		$item_types = [
-			'Character item',
-			'Float item',
-			'Log item',
-			'Text item',
-			'Unsigned item',
-			'Unsigned_dependent item'
-		];
+		$item_types = ($widget === 'Item navigator')
+			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
+			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
 
 		switch ($widget) {
 			case 'Top hosts':
@@ -91,9 +81,15 @@ class testWidgets extends CWebTest {
 				break;
 		}
 
-		$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
-			? 'xpath:(.//button[text()="Select"])[2]'
-			: 'button:Select';
+		if ($widget === 'Item navigator') {
+			$select_button = 'xpath:(.//button[text()="Select"])[3]';
+		}
+		else {
+			$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
+				? 'xpath:(.//button[text()="Select"])[2]'
+				: 'button:Select';
+		}
+
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
@@ -140,5 +136,39 @@ class testWidgets extends CWebTest {
 		unset($item_value);
 
 		return $data;
+	}
+
+	/**
+	 * Check if row with entity name is highlighted on click.
+	 *
+	 * @param string		$widget_name		widget name
+	 * @param string		$entity_name		name of item or host
+	 * @param boolean 		$dashboard_edit		true if dashboard is in edit mode
+	 */
+	public function checkRowHighlight($widget_name, $entity_name, $dashboard_edit = false) {
+		$widget = $dashboard_edit
+			? CDashboardElement::find()->one()->edit()->getWidget($widget_name)
+			: CDashboardElement::find()->one()->getWidget($widget_name);
+
+		$widget->waitUntilReady();
+		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
+		$this->assertFalse($widget->query($locator)->one(false)->isValid());
+		$widget->query('xpath://span[@title="'.$entity_name.'"]')->waitUntilReady()->one()->click();
+		$this->assertTrue($widget->query($locator)->one()->isVisible());
+	}
+
+	/**
+	 * Opens widget edit form and fills in data.
+	 *
+	 * @param string		$dashboardid		dashboard id
+	 * @param string		$widget_name		widget name
+	 * @param array			$configuration    	widget parameter(s)
+	 */
+	public function setWidgetConfiguration($dashboardid, $widget_name, $configuration = []) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
+		$form->fill($configuration);
+		$form->submit();
 	}
 }

@@ -1,22 +1,18 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "send_buffer.h"
 #include "zbxthreads.h"
 #include "zbxcommshigh.h"
 #include "zbxcfg.h"
@@ -29,9 +25,12 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxfile.h"
+#include "zbxbincommon.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
 #endif
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
@@ -41,11 +40,11 @@ static const char	syslog_app_name[] = "zabbix_sender";
 static const char	*usage_message[] = {
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "-k key", "-o value", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "[-T]", "[-N]", "[-r]",
-	"-i input-file", NULL,
+	"[-b]", "-i input-file", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "-k key",
 	"-o value", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]", "[-T]",
-	"[-N]", "[-r]", "-i input-file", NULL,
+	"[-N]", "[-r]", "-b]", "-i input-file", NULL,
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "--tls-connect cert",
 	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
@@ -66,7 +65,7 @@ static const char	*usage_message[] = {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"[--tls-cipher cipher-string]",
 #endif
-	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
+	"[-T]", "[-N]", "[-r]", "[-b]", "-i input-file", NULL,
 	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
 	"--tls-connect cert", "--tls-ca-file CA-file", "[--tls-crl-file CRL-file]",
 	"[--tls-server-cert-issuer cert-issuer]", "[--tls-server-cert-subject cert-subject]",
@@ -88,7 +87,7 @@ static const char	*usage_message[] = {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"[--tls-cipher cipher-string]",
 #endif
-	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
+	"[-T]", "[-N]", "[-r]", "[-b]", "-i input-file", NULL,
 	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-t timeout]", "-s host", "--tls-connect psk",
 	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
@@ -106,7 +105,7 @@ static const char	*usage_message[] = {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"[--tls-cipher cipher-string]",
 #endif
-	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
+	"[-T]", "[-N]", "[-r]", "[-b]", "-i input-file", NULL,
 	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-t timeout]", "[-s host]",
 	"--tls-connect psk", "--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file",
 #if defined(HAVE_OPENSSL)
@@ -124,7 +123,7 @@ static const char	*usage_message[] = {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"[--tls-cipher cipher-string]",
 #endif
-	"[-T]", "[-N]", "[-r]", "-i input-file", NULL,
+	"[-T]", "[-N]", "[-r]", "[-b]", "-i input-file", NULL,
 #endif
 	"-h", NULL,
 	"-V", NULL,
@@ -200,6 +199,9 @@ static const char	*help_message[] = {
 	"  -r --real-time             Send metrics one by one as soon as they are",
 	"                             received. This can be used when reading from",
 	"                             standard input",
+	"",
+	"  -g --group                 Group values by hosts and send to each host in",
+	"                             a separate batch",
 	"",
 	"  -v --verbose               Verbose mode, -vv for more details",
 	"",
@@ -296,6 +298,7 @@ static struct zbx_option	longopts[] =
 	{"with-timestamps",		0,	NULL,	'T'},
 	{"with-ns",			0,	NULL,	'N'},
 	{"real-time",			0,	NULL,	'r'},
+	{"group",			0,	NULL,	'g'},
 	{"verbose",			0,	NULL,	'v'},
 	{"help",			0,	NULL,	'h'},
 	{"version",			0,	NULL,	'V'},
@@ -314,7 +317,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:I:t:z:p:s:k:o:TNi:rvhV";
+static char	shortopts[] = "c:I:t:z:p:s:k:o:TNi:rvhVgl";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -333,6 +336,8 @@ static char	*ZABBIX_KEY = NULL;
 static char	*ZABBIX_KEY_VALUE = NULL;
 
 static char	*config_file = NULL;
+
+static int	config_group_mode = ZBX_SEND_GROUP_NONE;
 
 typedef struct
 {
@@ -393,7 +398,7 @@ static void	main_signal_handler(int sig)
 typedef struct
 {
 	zbx_vector_addr_ptr_t		*addrs;
-	struct zbx_json			json;
+	struct zbx_json			*json;
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
 #endif
@@ -404,8 +409,6 @@ typedef struct
 	zbx_config_tls_t		*zbx_config_tls;
 }
 zbx_thread_sendval_args;
-
-#define SUCCEED_PARTIAL	2
 
 #if !defined(_WINDOWS)
 static void	zbx_thread_handle_pipe_response(zbx_thread_sendval_args *sendval_args)
@@ -514,104 +517,6 @@ static int	sender_threads_wait(ZBX_THREAD_HANDLE *threads, zbx_thread_args_t *th
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get current string from the quoted or unquoted string list,       *
- *          delimited by blanks                                               *
- *                                                                            *
- * Parameters:                                                                *
- *      p       - [IN] parameter list, delimited by blanks (' ' or '\t')      *
- *      buf     - [OUT] output buffer                                         *
- *      bufsize - [IN] output buffer size                                     *
- *                                                                            *
- * Return value: pointer to the next string                                   *
- *                                                                            *
- ******************************************************************************/
-static const char	*get_string(const char *p, char *buf, size_t bufsize)
-{
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state;
-	size_t	buf_i = 0;
-
-	bufsize--;	/* '\0' */
-
-	for (state = 0; '\0' != *p; p++)
-	{
-		switch (state)
-		{
-			/* init state */
-			case 0:
-				if (' ' == *p || '\t' == *p)
-				{
-					/* skipping the leading spaces */
-				}
-				else if ('"' == *p)
-				{
-					state = 1;
-				}
-				else
-				{
-					state = 2;
-					p--;
-				}
-				break;
-			/* quoted */
-			case 1:
-				if ('"' == *p)
-				{
-					if (' ' != p[1] && '\t' != p[1] && '\0' != p[1])
-						return NULL;	/* incorrect syntax */
-
-					while (' ' == p[1] || '\t' == p[1])
-						p++;
-
-					buf[buf_i] = '\0';
-					return ++p;
-				}
-				else if ('\\' == *p && ('"' == p[1] || '\\' == p[1]))
-				{
-					p++;
-					if (buf_i < bufsize)
-						buf[buf_i++] = *p;
-				}
-				else if ('\\' == *p && 'n' == p[1])
-				{
-					p++;
-					if (buf_i < bufsize)
-						buf[buf_i++] = '\n';
-				}
-				else if (buf_i < bufsize)
-				{
-					buf[buf_i++] = *p;
-				}
-				break;
-			/* unquoted */
-			case 2:
-				if (' ' == *p || '\t' == *p)
-				{
-					while (' ' == *p || '\t' == *p)
-						p++;
-
-					buf[buf_i] = '\0';
-					return p;
-				}
-				else if (buf_i < bufsize)
-				{
-					buf[buf_i++] = *p;
-				}
-				break;
-		}
-	}
-
-	/* missing terminating '"' character */
-	if (1 == state)
-		return NULL;
-
-	buf[buf_i] = '\0';
-
-	return p;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: Check whether JSON response is SUCCEED                            *
  *                                                                            *
  * Parameters: JSON response from Zabbix trapper                              *
@@ -627,9 +532,11 @@ static const char	*get_string(const char *p, char *buf, size_t bufsize)
 static int	check_response(char *response, const char *server, unsigned short port)
 {
 	struct zbx_json_parse	jp;
-	char			value[MAX_STRING_LEN];
-	char			info[MAX_STRING_LEN];
+	char			value[MAX_STRING_LEN], info[MAX_STRING_LEN], *rhost = NULL;
 	int			ret;
+	unsigned short		redirect_port;
+	unsigned char		redirect_reset;
+	zbx_uint64_t		redirect_revision;
 
 	ret = zbx_json_open(response, &jp);
 
@@ -648,6 +555,21 @@ static int	check_response(char *response, const char *server, unsigned short por
 
 		if (1 == sscanf(info, "processed: %*d; failed: %d", &failed) && 0 < failed)
 			ret = SUCCEED_PARTIAL;
+	}
+
+	if (FAIL == ret && SUCCEED == zbx_parse_redirect_response(&jp, &rhost, &redirect_port, &redirect_revision,
+			&redirect_reset))
+	{
+		if (0 == redirect_reset)
+		{
+			printf("Response from \"%s:%hu\": \"Redirect to \"%s:%hu\"\n", server, port, rhost,
+					redirect_port);
+		}
+		else
+			printf("Response from \"%s:%hu\": \"Redirect reset\n", server, port);
+
+		fflush(stdout);
+		zbx_free(rhost);
 	}
 
 	return ret;
@@ -680,14 +602,28 @@ static void	zbx_set_sender_signal_handlers(void)
 }
 #endif
 
+static char	*connect_callback(void *data)
+{
+	zbx_json_t	*json = (zbx_json_t *)data;
+
+	zbx_timespec_t	ts;
+
+	zbx_timespec(&ts);
+
+	zbx_json_addint64(json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+	zbx_json_addint64(json, ZBX_PROTO_TAG_NS, ts.ns);
+
+	return json->buffer;
+}
+
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
-	zbx_thread_sendval_args		*sendval_args = (zbx_thread_sendval_args *)((zbx_thread_args_t *)args)->args;
-	int				ret = FAIL;
-	zbx_socket_t			sock;
+	zbx_thread_sendval_args	*sendval_args = (zbx_thread_sendval_args *)((zbx_thread_args_t *)args)->args;
+	int			ret;
+	char			*data = NULL;
 #if !defined(_WINDOWS)
-	int				i;
-	zbx_addr_t			*last_addr;
+	zbx_addr_t		*last_addr;
+	int			i;
 
 	last_addr = (zbx_addr_t *)sendval_args->addrs->values[0];
 
@@ -700,53 +636,24 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	if (SUCCEED == zbx_connect_to_server(&sock, config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
-			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
+
+	ret = zbx_comms_exchange_with_redirect(config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
+			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls, sendval_args->json->buffer,
+			connect_callback, sendval_args->json, &data, NULL);
+
+	if (SUCCEED == ret)
 	{
-		if (1 == sendval_args->sync_timestamp)
+		if (FAIL == check_response(data, sendval_args->addrs->values[0]->ip,
+				sendval_args->addrs->values[0]->port))
 		{
-			zbx_timespec_t	ts;
-
-			zbx_timespec(&ts);
-
-			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_CLOCK, ts.sec);
-			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_NS, ts.ns);
+			zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
+					sendval_args->addrs->values[0]->ip, sendval_args->addrs->values[0]->port,
+					data);
 		}
 
-		if (SUCCEED == zbx_tcp_send(&sock, sendval_args->json.buffer))
-		{
-			if (SUCCEED == zbx_tcp_recv(&sock))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", sock.buffer);
-
-				if (FAIL == (ret = check_response(sock.buffer,
-						((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
-						((zbx_addr_t *)sendval_args->addrs->values[0])->port)))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
-							((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
-							((zbx_addr_t *)sendval_args->addrs->values[0])->port,
-							sock.buffer);
-				}
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Unable to receive from [%s]:%d [%s]",
-						((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
-						((zbx_addr_t *)sendval_args->addrs->values[0])->port,
-						zbx_socket_strerror());
-			}
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Unable to send to [%s]:%d [%s]",
-					((zbx_addr_t *)sendval_args->addrs->values[0])->ip,
-					((zbx_addr_t *)sendval_args->addrs->values[0])->port,
-					zbx_socket_strerror());
-		}
-
-		zbx_tcp_close(&sock);
+		zbx_free(data);
 	}
+
 #if !defined(_WINDOWS)
 	for (i = sendval_args->addrs->values_num - 1; i >= 0; i--)
 	{
@@ -805,7 +712,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 
 		if (0 != i)
 		{
-			sendval_args[i].json = sendval_args[0].json;
+			sendval_args[i].json = zbx_json_clone(sendval_args[0].json);
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
 #endif
@@ -1018,7 +925,7 @@ static void	parse_commandline(int argc, char **argv)
 					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_print_version(title_message);
@@ -1073,6 +980,9 @@ static void	parse_commandline(int argc, char **argv)
 							CONFIG_SENDER_TIMEOUT_MIN, CONFIG_SENDER_TIMEOUT_MAX);
 					exit(EXIT_FAILURE);
 				}
+				break;
+			case 'g':
+				config_group_mode = 1;
 				break;
 			case 'v':
 				if (LOG_LEVEL_WARNING > CONFIG_LOG_LEVEL)
@@ -1140,7 +1050,7 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #endif
 			default:
-				zbx_print_usage(usage_message, zbx_progname);
+				zbx_print_usage(zbx_progname, usage_message);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -1378,7 +1288,7 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		printf("Try '%s --help' for more information.\n", zbx_progname);
 		exit(EXIT_FAILURE);
 	}
@@ -1427,10 +1337,12 @@ static void	parse_commandline(int argc, char **argv)
 					!((0x4c0 <= opt_mask && opt_mask <= 0x4c3) ||
 					(0x5c0 <= opt_mask && opt_mask <= 0x5c3) ||
 					(0x6c0 <= opt_mask && opt_mask <= 0x6c3) ||
-					(0x7c0 <= opt_mask && opt_mask <= 0x7c3))))
+					(0x7c0 <= opt_mask && opt_mask <= 0x7c3))) ||
+					(1 == opt_count['g'] && 0 == opt_count['i'])
+					)
 	{
 		zbx_error("too few or mutually exclusive options used");
-		zbx_print_usage(usage_message, zbx_progname);
+		zbx_print_usage(zbx_progname, usage_message);
 		exit(EXIT_FAILURE);
 	}
 
@@ -1486,20 +1398,42 @@ static char	*zbx_fgets_alloc(char **buffer, size_t *buffer_alloc, FILE *fp)
 	return *buffer;
 }
 
-/* sending a huge amount of values in a single connection is likely to */
-/* take long and hit timeout, so we limit values to 250 per connection */
-#define VALUES_MAX	250
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send json buffer                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	send_data(zbx_thread_sendval_args *sendval_args, int ret, struct zbx_json **json, double *last_send,
+		int *buffer_count)
+{
+	zbx_json_close(*json);
+	sendval_args->json = *json;
+
+	*last_send = zbx_time();
+
+	ret = perform_data_sending(sendval_args, ret);
+	sendval_args->json = NULL;
+
+	*buffer_count = 0;
+	zbx_json_clean(*json);
+	zbx_free(*json);
+
+	return ret;
+}
 
 int	main(int argc, char **argv)
 {
 	char			*error = NULL;
-	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
+	int			total_count = 0, succeed_count = 0, ret = FAIL;
 	zbx_thread_sendval_args	*sendval_args = NULL;
 	zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 0};
+	zbx_send_buffer_t	send_buffer;
+	struct zbx_json		*out;
+
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
@@ -1599,17 +1533,16 @@ int	main(int argc, char **argv)
 	}
 #endif
 	sendval_args->zbx_config_tls = zbx_config_tls;
-	zbx_json_init(&sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
-			ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
+	sendval_args->json = NULL;
+
+	sb_init(&send_buffer, config_group_mode, ZABBIX_HOSTNAME, WITH_TIMESTAMPS, WITH_NS);
 
 	if (INPUT_FILE)
 	{
 		FILE	*in;
-		char	*in_line = NULL, *key = NULL, *key_value = NULL;
+		char	*in_line = NULL;
 		int	buffer_count = 0;
-		size_t	key_alloc = 0, in_line_alloc = MAX_BUFFER_LEN;
+		size_t	in_line_alloc = MAX_BUFFER_LEN;
 		double	last_send = 0;
 
 		if (0 == strcmp(INPUT_FILE, "-"))
@@ -1635,132 +1568,12 @@ int	main(int argc, char **argv)
 		while (0 == sig_exiting && (SUCCEED == ret || SUCCEED_PARTIAL == ret) &&
 				NULL != zbx_fgets_alloc(&in_line, &in_line_alloc, in))
 		{
-			char		hostname[MAX_STRING_LEN], clock[32];
+			int		send_mode = ZBX_SEND_BATCHED;
 			int		read_more = 0;
-			size_t		key_value_alloc = 0;
-			const char	*p;
-
-			/* line format: <hostname> <key> [<timestamp>] [<ns>] <value> */
 
 			total_count++; /* also used as inputline */
 
 			zbx_rtrim(in_line, "\r\n");
-
-			p = in_line;
-
-			if ('\0' == *p || NULL == (p = get_string(p, hostname, sizeof(hostname))) || '\0' == *hostname)
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Hostname' required", total_count);
-				ret = FAIL;
-				break;
-			}
-
-			if (0 == strcmp(hostname, "-"))
-			{
-				if (NULL == ZABBIX_HOSTNAME)
-				{
-					zabbix_log(LOG_LEVEL_CRIT, "[line %d] '-' encountered as 'Hostname',"
-							" but no default hostname was specified", total_count);
-					ret = FAIL;
-					break;
-				}
-				else
-					zbx_strlcpy(hostname, ZABBIX_HOSTNAME, sizeof(hostname));
-			}
-
-			if (key_alloc != in_line_alloc)
-			{
-				key_alloc = in_line_alloc;
-				key = (char *)zbx_realloc(key, key_alloc);
-			}
-
-			if ('\0' == *p || NULL == (p = get_string(p, key, key_alloc)) || '\0' == *key)
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Key' required", total_count);
-				ret = FAIL;
-				break;
-			}
-
-			if (1 == WITH_TIMESTAMPS)
-			{
-				if ('\0' == *p || NULL == (p = get_string(p, clock, sizeof(clock))) || '\0' == *clock)
-				{
-					zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Timestamp' required", total_count);
-					ret = FAIL;
-					break;
-				}
-
-				if (FAIL == zbx_is_uint31(clock, &timestamp))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "[line %d] invalid 'Timestamp' value detected",
-							total_count);
-					ret = FAIL;
-					break;
-				}
-
-				if (1 == WITH_NS)
-				{
-					if ('\0' == *p || NULL == (p = get_string(p, clock, sizeof(clock))) ||
-							'\0' == *clock)
-					{
-						zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Nanoseconds' required",
-								total_count);
-						ret = FAIL;
-						break;
-					}
-
-					if (FAIL == zbx_is_uint_n_range(clock, sizeof(clock), &ns, sizeof(ns),
-							0LL, 999999999LL))
-					{
-						zabbix_log(LOG_LEVEL_WARNING,
-								"[line %d] invalid 'Nanoseconds' value detected",
-								total_count);
-						ret = FAIL;
-						break;
-					}
-				}
-			}
-
-			if (key_value_alloc != in_line_alloc)
-			{
-				key_value_alloc = in_line_alloc;
-				key_value = (char *)zbx_realloc(key_value, key_value_alloc);
-			}
-
-			if ('\0' != *p && '"' != *p)
-			{
-				zbx_strlcpy(key_value, p, key_value_alloc);
-			}
-			else if ('\0' == *p || NULL == (p = get_string(p, key_value, key_value_alloc)))
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "[line %d] 'Key value' required", total_count);
-				ret = FAIL;
-				break;
-			}
-			else if ('\0' != *p)
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "[line %d] too many parameters", total_count);
-				ret = FAIL;
-				break;
-			}
-
-			zbx_json_addobject(&sendval_args->json, NULL);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
-
-			if (1 == WITH_TIMESTAMPS)
-			{
-				zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_CLOCK, timestamp);
-
-				if (1 == WITH_NS)
-					zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_NS, ns);
-			}
-
-			zbx_json_close(&sendval_args->json);
-
-			succeed_count++;
-			buffer_count++;
 
 			if (stdin == in && 1 == REAL_TIME)
 			{
@@ -1787,35 +1600,31 @@ int	main(int argc, char **argv)
 					else if (zbx_time() - last_send >= 1)
 						read_more = 0;
 				}
+
+				if (0 >= read_more)
+					send_mode = ZBX_SEND_IMMEDIATE;
 			}
 
-			if (VALUES_MAX == buffer_count || (stdin == in && 1 == REAL_TIME && 0 >= read_more))
+			if (FAIL == sb_parse_line(&send_buffer, in_line, in_line_alloc, send_mode, &out, &error))
 			{
-				zbx_json_close(&sendval_args->json);
-
-				last_send = zbx_time();
-
-				ret = perform_data_sending(sendval_args, ret);
-
-				buffer_count = 0;
-				zbx_json_clean(&sendval_args->json);
-				zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST,
-						ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
-				zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
+				zabbix_log(LOG_LEVEL_CRIT, "[line %d] %s", total_count, error);
+				zbx_free(error);
+				break;
 			}
+
+			succeed_count++;
+			buffer_count++;
+
+			if (NULL != out)
+				ret = send_data(sendval_args, ret, &out, &last_send, &buffer_count);
 		}
 
-		if (FAIL != ret && 0 != buffer_count)
-		{
-			zbx_json_close(&sendval_args->json);
-			ret = perform_data_sending(sendval_args, ret);
-		}
+		while (FAIL != ret && NULL != (out = sb_pop(&send_buffer)))
+			ret = send_data(sendval_args, ret, &out, &last_send, &buffer_count);
 
 		if (in != stdin)
 			fclose(in);
 
-		zbx_free(key);
-		zbx_free(key_value);
 		zbx_free(in_line);
 	}
 	else
@@ -1843,13 +1652,21 @@ int	main(int argc, char **argv)
 
 			ret = SUCCEED;
 
-			zbx_json_addobject(&sendval_args->json, NULL);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME,
+			sendval_args->json = (struct zbx_json *)zbx_malloc(NULL, sizeof(struct zbx_json));
+			zbx_json_init(sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
+			zbx_json_addstring(sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
 					ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE,
+			zbx_json_addarray(sendval_args->json, ZBX_PROTO_TAG_DATA);
+
+			zbx_json_addobject(sendval_args->json, NULL);
+			zbx_json_addstring(sendval_args->json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME,
 					ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&sendval_args->json);
+			zbx_json_addstring(sendval_args->json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(sendval_args->json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE,
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_close(sendval_args->json);
+
+			zbx_json_close(sendval_args->json);
 
 			succeed_count++;
 
@@ -1858,7 +1675,13 @@ int	main(int argc, char **argv)
 		while (0); /* try block simulation */
 	}
 free:
-	zbx_json_free(&sendval_args->json);
+	sb_destroy(&send_buffer);
+
+	if (NULL != sendval_args->json)
+	{
+		zbx_json_free(sendval_args->json);
+		zbx_free(sendval_args->json);
+	}
 	zbx_free(sendval_args);
 exit:
 	if (FAIL != ret)

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -98,10 +93,6 @@ class CControllerPopupLldOverride extends CController {
 				'conditions' => $page_options['overrides_filters']
 			]);
 
-			$overrides_filter['conditions'] = sortLldRuleFilterConditions($overrides_filter['conditions'],
-				$overrides_filter['evaltype']
-			);
-
 			if ($overrides_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
 					&& $overrides_filter['formula'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
@@ -133,10 +124,6 @@ class CControllerPopupLldOverride extends CController {
 			);
 		}
 		else {
-			$page_options['overrides_filters'] = sortLldRuleFilterConditions($page_options['overrides_filters'],
-				$page_options['overrides_evaltype']
-			);
-
 			$data = [
 				'title' => _('Override'),
 				'options' => $page_options,

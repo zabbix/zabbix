@@ -110,7 +110,7 @@ $max_levels: 10;
 		}
 	}
 
-	.navigation-tree-node:not(.navigation-tree-node-is-group) {
+	.navigation-tree-node-is-item {
 		> .navigation-tree-node-info {
 			cursor: pointer;
 

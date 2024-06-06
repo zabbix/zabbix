@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_DBCONFIG_H
@@ -224,6 +219,13 @@ typedef struct
 }
 ZBX_DC_SCRIPTITEM;
 
+typedef struct
+{
+	const char		*script;
+	zbx_vector_ptr_t	params;
+}
+ZBX_DC_BROWSERITEM;
+
 typedef union
 {
 	ZBX_DC_TRAPITEM		*trapitem;
@@ -238,6 +240,7 @@ typedef union
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
+	ZBX_DC_BROWSERITEM	*browseritem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -381,6 +384,7 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxyid;
+	zbx_uint64_t	proxy_groupid;
 	zbx_uint64_t	items_active_normal;		/* On enabled hosts these two fields store number of enabled */
 	zbx_uint64_t	items_active_notsupported;	/* and supported items and enabled and not supported items.  */
 	zbx_uint64_t	maintenanceid;
@@ -394,6 +398,7 @@ typedef struct
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	unsigned char	status;
+	unsigned char	monitored_by;
 
 	/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 	unsigned char	tls_connect;
@@ -453,6 +458,7 @@ ZBX_VECTOR_DECL(host_rev, zbx_host_rev_t)
 typedef struct
 {
 	zbx_uint64_t			proxyid;
+	zbx_uint64_t			proxy_groupid;
 	const char			*name;
 	unsigned char			mode;
 	zbx_uint64_t			hosts_monitored;	/* number of enabled hosts assigned to proxy */
@@ -489,6 +495,8 @@ typedef struct
 #endif
 	const char			*address;
 	const char			*port;
+	const char			*local_address;
+	const char			*local_port;
 
 	unsigned char			custom_timeouts;
 	zbx_config_item_type_timeouts_t	item_timeouts;
@@ -758,6 +766,10 @@ typedef struct
 }
 zbx_dc_corr_condition_t;
 
+ZBX_PTR_VECTOR_DECL(dc_corr_condition_ptr, zbx_dc_corr_condition_t *)
+
+int     zbx_dc_corr_condition_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
 	zbx_uint64_t	corr_operationid;
@@ -766,15 +778,19 @@ typedef struct
 }
 zbx_dc_corr_operation_t;
 
+ZBX_PTR_VECTOR_DECL(dc_corr_operation_ptr, zbx_dc_corr_operation_t *)
+
+int     zbx_dc_corr_operation_compare_func(const void *d1, const void *d2);
+
 typedef struct
 {
-	zbx_uint64_t		correlationid;
-	const char		*name;
-	const char		*formula;
-	unsigned char		evaltype;
+	zbx_uint64_t				correlationid;
+	const char				*name;
+	const char				*formula;
+	unsigned char				evaltype;
 
-	zbx_vector_ptr_t	conditions;
-	zbx_vector_ptr_t	operations;
+	zbx_vector_dc_corr_condition_ptr_t	conditions;
+	zbx_vector_dc_corr_operation_ptr_t	operations;
 }
 zbx_dc_correlation_t;
 
@@ -811,7 +827,7 @@ typedef struct
 	const char	*name;
 	const char	*value;
 }
-zbx_dc_scriptitem_param_t;
+zbx_dc_item_param_t;
 
 typedef struct
 {
@@ -912,6 +928,41 @@ zbx_dc_connector_t;
 
 typedef struct
 {
+	zbx_uint64_t	proxy_groupid;
+	const char 	*failover_delay;
+	const char	*min_online;
+	const char	*name;
+
+	zbx_uint64_t	revision;
+}
+zbx_dc_proxy_group_t;
+
+typedef struct
+{
+	zbx_uint64_t	hostproxyid;
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	proxyid;
+	zbx_uint64_t	revision;
+	const char	*host;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char	*tls_subject;
+	const char	*tls_issuer;
+	ZBX_DC_PSK	*tls_dc_psk;
+#endif
+	unsigned char	tls_accept;
+}
+zbx_dc_host_proxy_t;
+
+typedef struct
+{
+	const char		*host;
+	zbx_dc_host_proxy_t	*host_proxy;
+	int			lastreset;
+}
+zbx_dc_host_proxy_index_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -973,7 +1024,7 @@ typedef struct
 	zbx_hashset_t		gmacro_kv;
 	zbx_hashset_t		hmacro_kv;
 	zbx_hashset_t		preprocops;
-	zbx_hashset_t		itemscript_params;
+	zbx_hashset_t		items_params;
 	zbx_hashset_t		maintenances;
 	zbx_hashset_t		maintenance_periods;
 	zbx_hashset_t		maintenance_tags;
@@ -990,6 +1041,9 @@ typedef struct
 	zbx_hashset_t		httpstep_fields;
 	zbx_hashset_t		connectors;
 	zbx_hashset_t		connector_tags;
+	zbx_hashset_t		proxy_groups;
+	zbx_hashset_t		host_proxy;
+	zbx_hashset_t		host_proxy_index;
 	zbx_hashset_t		sessions[ZBX_SESSION_TYPE_COUNT];
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
@@ -1003,6 +1057,13 @@ typedef struct
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 	zbx_vps_monitor_t	vps_monitor;
+	char			*proxy_hostname;	/* hostname - proxy only */
+	int			proxy_failover_delay;		/* proxy group failover delay - proxy only    */
+	const char		*proxy_failover_delay_raw;	/* raw failover delay value - proxy only      */
+								/* the raw value contains data sent by server */
+								/* until it is parsed/converted to integer    */
+								/* value during next configuration sync	      */
+	int			proxy_lastonline;	/* last server connection timestamp - proxy only */
 }
 zbx_dc_config_t;
 
@@ -1088,7 +1149,19 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_
 		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault,
 		unsigned char program_type);
 
+void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);
+void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);
+
+void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff);
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+void	dc_psk_unlink(ZBX_DC_PSK *tls_dc_psk);
+ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name, int found,
+		zbx_hashset_t *psk_owners, ZBX_DC_PSK *tls_dc_psk);
+#endif
+
 void	dbconfig_shmem_free_func(void *ptr);
 void	*dbconfig_shmem_realloc_func(void *old, size_t size);
 void	*dbconfig_shmem_malloc_func(void *old, size_t size);
+
 #endif

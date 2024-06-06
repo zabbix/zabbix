@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -73,47 +68,47 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'actionlog',
 								'name' => 'Action log widget',
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'clock',
 								'name' => 'Clock widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'discovery',
 								'name' => 'Discovery status widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'favgraphs',
 								'name' => 'Favorite graphs widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'favmaps',
 								'name' => 'Favorite maps widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'gauge',
 								'name' => 'Gauge widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -138,15 +133,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Geomap widget',
 								'x' => 0,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'graph',
 								'name' => 'Graph (classic) widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -164,9 +159,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'graphprototype',
 								'name' => 'Graph prototype widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -179,9 +174,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'Graph widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -204,17 +199,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'hostavail',
 								'name' => 'Host availability widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'item',
 								'name' => 'Item value widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -244,7 +239,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Map widget',
 								'x' => 0,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -257,9 +252,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'navtree',
 								'name' => 'Map navigation tree widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -272,9 +267,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'piechart',
 								'name' => 'Pie chart widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
@@ -284,15 +279,20 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							],
 							[
 								'type' => 'plaintext',
-								'name' => 'Plain text widget',
-								'x' => 12,
+								'name' => 'Item history widget',
+								'x' => 36,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 4,
-										'name' => 'itemids',
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Column_1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
 										'value' => self::TEMPLATE_ITEM_ID
 									]
 								]
@@ -300,17 +300,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'problems',
 								'name' => 'Problems widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -318,15 +318,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Problems by severity widget',
 								'x' => 0,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'slareport',
 								'name' => 'SLA report widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -344,17 +344,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info details widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info HA nodes widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -367,9 +367,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -417,9 +417,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -427,15 +427,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Trigger overview widget',
 								'x' => 0,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -448,17 +448,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'dataover',
 								'name' => 'Data overview widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							]
 						]
@@ -477,7 +477,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Empty navtree widget',
 								'x' => 0,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
@@ -506,15 +506,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Widget for update',
 								'x' => 0,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'clock',
 								'name' => 'Widget 4 duplicate check',
-								'x' => 4,
+								'x' => 12,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -522,7 +522,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Empty navtree widget',
 								'x' => 0,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
@@ -1031,7 +1031,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									],
 									'value' => 'After value'
 								],
-
 								[
 									'field' => 'Colour',
 									'field_locator' => 'id:lbl_units_color',
@@ -1645,23 +1644,18 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #13 Plain text widget.
+			// #13 Item history widget.
 			[
 				[
-					'type' => CFormElement::RELOADABLE_FILL('Plain text'),
+					'type' => CFormElement::RELOADABLE_FILL('Item history'),
 					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
-						[
-							'field' => 'Items',
-							'type' => 'multiselect',
-							'mandatory' => true
-						],
-						[
-							'field' => 'Items location',
-							'type' => 'radio_button',
-							'possible_values' => ['Left', 'Top'],
-							'value' => 'Left'
-						],
+						// TODO: fix with DEV-3721.
+//						[
+//							'field' => 'Columns',
+//							'type' => 'complex',
+//							'mandatory' => true
+//						],
 						[
 							'field' => 'Show lines',
 							'value' => 25,
@@ -1669,11 +1663,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'maxlength' => 3
 							],
 							'mandatory' => true
-						],
-						[
-							'field' => 'Show text as HTML',
-							'type' => 'checkbox',
-							'value' => false
 						]
 					]
 				]
@@ -3223,8 +3212,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -3250,15 +3239,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Graph prototype widget with too much Columns',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
-						'Columns' => 55,
-						'Rows' => 55
+						'Columns' => 73,
+						'Rows' => 65
 					],
 					'swap_expected' => [
 						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -3278,8 +3267,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -3592,86 +3581,87 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #56 Plain text widget with empty Items parameter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with empty Items',
-						'Items' => '',
-						'Show lines' => ''
-					],
-					'error_message' => [
-						'Invalid parameter "Items": cannot be empty.',
-						'Invalid parameter "Show lines": value must be one of 1-100.'
-					]
-				]
-			],
-			// #57 Plain text widget with too high value of Show lines parameter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with too much lines',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => 999
-					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
-					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
-				]
-			],
-			// #58 Plain text widget with negative Show lines parameter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with negative Show lines',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => -9
-					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
-					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
-				]
-			],
-			// #59 Plain text widget with Items location = top and text shown as HTML.
-			[
-				[
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget top location HTML',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => 9,
-						'Items location' => 'Top',
-						'Show text as HTML' => true
-					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
-					]
-				]
-			],
-			// #60 Plain text widget with Items location = left and text shown as plain text.
-			[
-				[
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget left location no HTML',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => 9,
-						'Items location' => 'Left',
-						'Show text as HTML' => false
-					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
-					]
-				]
-			],
+			// TODO: fix with DEV-3721.
+			// #56 Item history widget with empty Items parameter.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget with empty Items',
+//						'Items' => '',
+//						'Show lines' => ''
+//					],
+//					'error_message' => [
+//						'Invalid parameter "Items": cannot be empty.',
+//						'Invalid parameter "Show lines": value must be one of 1-100.'
+//					]
+//				]
+//			],
+//			// #57 Item history widget with too high value of Show lines parameter.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget with too much lines',
+//						'Items' => self::TEMPLATE_ITEM,
+//						'Show lines' => 999
+//					],
+//					'swap_expected' => [
+//						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+//					],
+//					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+//				]
+//			],
+//			// #58 Item history widget with negative Show lines parameter.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget with negative Show lines',
+//						'Items' => self::TEMPLATE_ITEM,
+//						'Show lines' => -9
+//					],
+//					'swap_expected' => [
+//						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+//					],
+//					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+//				]
+//			],
+//			// #59 Item history widget with Items location = top and text shown as HTML.
+//			[
+//				[
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget top location HTML',
+//						'Items' => self::TEMPLATE_ITEM,
+//						'Show lines' => 9,
+//						'Items location' => 'Top',
+//						'Show text as HTML' => true
+//					],
+//					'swap_expected' => [
+//						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+//					]
+//				]
+//			],
+//			// #60 Item history widget with Items location = left and text shown as Item history.
+//			[
+//				[
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget left location no HTML',
+//						'Items' => self::TEMPLATE_ITEM,
+//						'Show lines' => 9,
+//						'Items location' => 'Left',
+//						'Show text as HTML' => false
+//					],
+//					'swap_expected' => [
+//						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+//					]
+//				]
+//			],
 			// #61 Problem hosts widget with default parameters.
 			[
 				[
@@ -4394,10 +4384,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
-				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator',
-				'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Plain text', 'Problem hosts', 'Problems',
-				'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers', 'Trigger overview',
-				'URL', 'Web monitoring', 'Data overview'
+				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator', 'Item history',
+				'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Problem hosts',
+				'Problems', 'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers',
+				'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}

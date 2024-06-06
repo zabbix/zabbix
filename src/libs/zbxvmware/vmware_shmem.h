@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 #ifndef ZABBIX_VMWARE_SHMEM_H
 #define ZABBIX_VMWARE_SHMEM_H
@@ -58,6 +53,7 @@ void	vmware_shmem_diskinfo_free(zbx_vmware_diskinfo_t *di);
 void	vmware_shmem_cluster_free(zbx_vmware_cluster_t *cluster);
 void	vmware_shmem_event_free(zbx_vmware_event_t *event);
 void	vmware_shmem_data_free(zbx_vmware_data_t *data);
+void	vmware_shmem_eventlog_data_free(zbx_vmware_eventlog_data_t *data_eventlog);
 void	vmware_shmem_cust_query_clean(zbx_vmware_cust_query_t *cust_query);
 void	vmware_shared_tag_free(zbx_vmware_tag_t *value);
 void	vmware_shared_entity_tags_free(zbx_vmware_entity_tags_t *value);
@@ -74,6 +70,7 @@ zbx_vmware_custom_attr_t		*vmware_shmem_attr_dup(const zbx_vmware_custom_attr_t 
 zbx_vmware_dev_t			*vmware_shmem_dev_dup(const zbx_vmware_dev_t *src);
 zbx_vmware_vm_t				*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src);
 zbx_vmware_data_t			*vmware_shmem_data_dup(zbx_vmware_data_t *src);
+zbx_vmware_eventlog_data_t		*vmware_shmem_eventlog_data_dup(zbx_vmware_eventlog_data_t *src);
 zbx_vmware_service_t			*vmware_shmem_vmware_service_malloc(void);
 void					vmware_shmem_service_hashset_create(zbx_vmware_service_t *service);
 zbx_vector_custquery_param_t		*vmware_shmem_custquery_malloc(void);

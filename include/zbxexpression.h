@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_ZBXEXPRESSION_H
@@ -34,6 +29,7 @@
 #define ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION	0x00000010	/* name */
 #define ZBX_MACRO_TYPE_TRIGGER_COMMENTS		0x00000020	/* description */
 #define ZBX_MACRO_TYPE_ITEM_KEY			0x00000040
+#define ZBX_MACRO_TYPE_ALERT_EMAIL		0x00000080
 #define ZBX_MACRO_TYPE_COMMON			0x00000100
 #define ZBX_MACRO_TYPE_PARAMS_FIELD		0x00000200
 #define ZBX_MACRO_TYPE_SCRIPT			0x00000400

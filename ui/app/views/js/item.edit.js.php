@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -78,6 +73,10 @@ window.item_edit_form = new class {
 			else {
 				this.type_interfaceids[host_interface.type] = [host_interface.interfaceid];
 			}
+		}
+
+		if (form_data.timeout !== '') {
+			this.override_timeout = form_data.timeout;
 		}
 
 		this.overlay = overlays_stack.end();
@@ -204,6 +203,7 @@ window.item_edit_form = new class {
 		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
+		this.field.timeout.addEventListener('keyup', () => this.override_timeout = this.field.timeout.value);
 		this.form.addEventListener('click', e => {
 			const target = e.target;
 
@@ -646,6 +646,7 @@ window.item_edit_form = new class {
 		const custom_timeout = [].filter.call(this.field.custom_timeout, e => e.matches(':checked')).pop();
 		const inherited_hidden = custom_timeout.value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 
+		this.field.timeout.value = inherited_hidden ? this.override_timeout : this.field.inherited_timeout.value;
 		this.form.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
 		this.form.timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
 	}
@@ -771,7 +772,13 @@ window.item_edit_form = new class {
 	}
 
 	#typeChangeHandler(e) {
-		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value]||'';
+		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value] || '';
+
+		if (this.field.timeout.value === '' || this.override_timeout === undefined
+				|| this.form.querySelector('[name=custom_timeout]:checked').value != ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+			this.override_timeout = this.field.inherited_timeout.value;
+		}
+
 		this.updateFieldsVisibility();
 	}
 

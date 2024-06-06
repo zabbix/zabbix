@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -104,19 +99,55 @@ $host_tab->addRow(
 		->setMaxlength(DB::getFieldLength('hosts', 'description'))
 );
 
-// append proxy to form list
-$proxy_select = (new CSelect('proxyid'))
-	->setId('proxyid')
-	->setValue(0)
-	->addOption(new CSelectOption(0, _('(no proxy)')));
-
-foreach ($data['proxies'] as $proxy) {
-	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['name']));
-}
-
+// Append "Monitored by" to form list.
 $host_tab->addRow(
-	(new CVisibilityBox('visible[proxyid]', 'proxyid', _('Original')))->setLabel(_('Monitored by proxy')),
-	$proxy_select
+	(new CVisibilityBox('visible[monitored_by]', 'monitored-by-field', _('Original')))->setLabel(_('Monitored by')),
+	(new CDiv([
+		(new CRadioButtonList('monitored_by', ZBX_MONITORED_BY_SERVER))
+			->addValue(_('Server'), ZBX_MONITORED_BY_SERVER)
+			->addValue(_('Proxy'), ZBX_MONITORED_BY_PROXY)
+			->addValue(_('Proxy group'), ZBX_MONITORED_BY_PROXY_GROUP)
+			->setModern(),
+		(new CDiv(
+			(new CMultiSelect([
+				'name' => 'proxyid',
+				'object_name' => 'proxies',
+				'multiple' => false,
+				'data' => [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxies',
+						'srcfld1' => 'proxyid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxyid'
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		))
+			->addClass('js-field-proxy')
+			->addStyle('margin-top: 5px;'),
+		(new CDiv(
+			(new CMultiSelect([
+				'name' => 'proxy_groupid',
+				'object_name' => 'proxy_groups',
+				'multiple' => false,
+				'data' => [],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'proxy_groups',
+						'srcfld1' => 'proxy_groupid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'proxy_groupid'
+					]
+				]
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))
+			->addClass('js-field-proxy-group')
+			->addStyle('margin-top: 5px;')
+	]))->setId('monitored-by-field')
 );
 
 // append status to form list
@@ -151,13 +182,13 @@ $ipmi_tab->addRow(
 )
 ->addRow(
 	(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))->setLabel(_('Username')),
-	(new CTextBox('ipmi_username', ''))
+	(new CTextBox('ipmi_username', '', false, DB::getFieldLength('hosts', 'ipmi_username')))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->disableAutocomplete()
 )
 ->addRow(
 	(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))->setLabel(_('Password')),
-	(new CTextBox('ipmi_password', ''))
+	(new CTextBox('ipmi_password', '', false, DB::getFieldLength('hosts', 'ipmi_password')))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->disableAutocomplete()
 );

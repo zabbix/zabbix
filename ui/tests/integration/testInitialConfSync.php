@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
@@ -30,7 +25,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @backup host_tag, hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
  * @backup item_tag, lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
  * @backup lld_override_opstatus, operations, opgroup, opmessage, opmessage_grp, optemplate, proxy, proxy_rtdata
- * @backup auditlog, changelog, expressions, ha_node, regexps
+ * @backup auditlog, changelog, expressions, ha_node, regexps, proxy_group
  */
 class testInitialConfSync extends CIntegrationTest
 {
@@ -337,6 +332,22 @@ class testInitialConfSync extends CIntegrationTest
 			'proxy' =>
 			[
 				'insert' => '2',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'proxy_group' =>
+			[
+				'insert' => '1',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'host_proxy' =>
+			[
+				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -726,6 +737,22 @@ class testInitialConfSync extends CIntegrationTest
 				'delete' =>
 				'0'
 			]
+		],
+		[
+			'proxy_group' =>
+			[
+				'insert' => '0',
+				'update' => '1',
+				'delete' => '0'
+			]
+		],
+		[
+			'host_proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -1096,11 +1123,28 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '2'
 			]
+		],
+		[
+			'proxy_group' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '1'
+			]
+		],
+		[
+			'host_proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
 	private static $proxyid_active;
 	private static $proxyid_passive;
+	private static $proxy_groupid;
 	private static $actionid;
 	private static $triggerid;
 	private static $correlationid;
@@ -1549,6 +1593,15 @@ class testInitialConfSync extends CIntegrationTest
 		]);
 		$this->assertArrayHasKey('proxyids', $response['result']);
 		self::$proxyid_passive = $response['result']['proxyids'][0];
+
+		$response = $this->call('proxygroup.create', [
+			'name' => 'Proxy group 1',
+			'failover_delay' => '10',
+			'min_online' => '1'
+		]);
+		$this->assertArrayHasKey('proxy_groupids', $response['result']);
+		$this->assertCount(1, $response['result']['proxy_groupids']);
+		self::$proxy_groupid = $response['result']['proxy_groupids'][0];
 	}
 
 	private function updateProxies()
@@ -1566,6 +1619,12 @@ class testInitialConfSync extends CIntegrationTest
 			'port' => '10299'
 		]);
 		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$response = $this->call('proxygroup.update', [
+			'proxy_groupid' => self::$proxy_groupid,
+			'failover_delay' => '20'
+		]);
+		$this->assertArrayHasKey('proxy_groupids', $response['result']);
 	}
 
 	private function createGlobalMacros()
@@ -1866,6 +1925,7 @@ class testInitialConfSync extends CIntegrationTest
 	{
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
+		$this->purgeExisting('proxygroup', 'extend');
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeExisting('trigger', 'triggerids');
@@ -1891,6 +1951,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->purgeExisting('maintenance', 'maintenanceids');
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
+		$this->purgeExisting('proxygroup', 'extend');
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeExisting('action', 'actionid');
@@ -1989,6 +2050,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->purgeExisting('maintenance', 'maintenanceids');
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
+		$this->purgeExisting('proxygroup', 'extend');
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('regexp', 'extend');

@@ -1,26 +1,22 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $html_page = (new CHtmlPage())
@@ -83,17 +79,18 @@ $url = (new CUrl('hostinventories.php'))->getUrl();
 
 $table = (new CTableInfo())
 	->setHeader([
-		make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder'], $url),
+		make_sorting_header(_('Host'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Group'),
-		make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder'], $url),
-		make_sorting_header(_('Type'), 'pr_type', $this->data['sort'], $this->data['sortorder'], $url),
-		make_sorting_header(_('OS'), 'pr_os', $this->data['sort'], $this->data['sortorder'], $url),
-		make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder'], $url),
-		make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder'], $url),
-		make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'], $url)
-	]);
+		make_sorting_header(_('Name'), 'pr_name', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Type'), 'pr_type', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('OS'), 'pr_os', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Serial number A'), 'pr_serialno_a', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('Tag'), 'pr_tag', $data['sort'], $data['sortorder'], $url),
+		make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $data['sort'], $data['sortorder'], $url)
+	])
+	->setPageNavigation($data['paging']);
 
-foreach ($this->data['hosts'] as $host) {
+foreach ($data['hosts'] as $host) {
 	$hostgroups = array_column($host['hostgroups'], 'name');
 	natsort($hostgroups);
 
@@ -113,5 +110,5 @@ foreach ($this->data['hosts'] as $host) {
 }
 
 $html_page
-	->addItem([$table, $this->data['paging']])
+	->addItem($table)
 	->show();

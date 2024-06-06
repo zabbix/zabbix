@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 #ifndef ZABBIX_VMWARE_INTERNAL_H
 #define ZABBIX_VMWARE_INTERNAL_H
@@ -25,24 +20,11 @@
 #	include "zbxxml.h"
 #endif
 
-typedef struct
-{
-	time_t			nextcheck;
-#define ZBX_VMWARE_UPDATE_CONF		1
-#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
-#define ZBX_VMWARE_UPDATE_REST_TAGS	3
-	int			type;
-	int			expired;
-	zbx_vmware_service_t	*service;
-}
-zbx_vmware_job_t;
-
 zbx_vmware_t			*zbx_vmware_get_vmware(void);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
-
 
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 
@@ -82,6 +64,9 @@ void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t 
 void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *src, zbx_vmware_data_tags_t *dst);
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error);
+
+void		vmware_eventlog_data_shared_free(zbx_vmware_eventlog_data_t *data_eventlog);
+zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void);
 
 #define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)		\
 						xmlFreeDoc(xdoc)
@@ -208,6 +193,7 @@ ZBX_HTTPPAGE;
 
 int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
 		const char *config_source_ip, int config_vmware_timeout, char **error);
+int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_slist **headers, char **error);
 
 typedef struct
 {
@@ -218,7 +204,12 @@ zbx_vmware_key_value_t;
 ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t)
 void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
 
+#define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
+
+int	vmware_shared_strsearch(const char *str);
+char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len);
 char	*vmware_shared_strdup(const char *str);
+void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool, zbx_uint64_t *len);
 void	vmware_shared_strfree(char *str);
 int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error);
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

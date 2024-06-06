@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcachevalue.h"
@@ -48,6 +43,13 @@
  * The low memory mode can't be turned off - it will persist until server is rebooted.
  * In low memory mode a warning message is written into log every 5 minutes.
  */
+
+ZBX_PTR_VECTOR_IMPL(vc_item_stats_ptr, zbx_vc_item_stats_t *)
+
+void	zbx_vc_item_stats_free(zbx_vc_item_stats_t * vc_item_stats)
+{
+	zbx_free(vc_item_stats);
+}
 
 /* the period of low memory warning messages */
 #define ZBX_VC_LOW_MEMORY_WARNING_PERIOD	(5 * SEC_PER_MIN)
@@ -2511,7 +2513,7 @@ void	zbx_vc_reset(void)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
+int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int config_history_storage_pipelines)
 {
 	zbx_vc_item_t		*item;
 	int			i;
@@ -2527,7 +2529,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush, int config_hist
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (zbx_dc_history_t *)history->values[i];
+		h = history->values[i];
 
 		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
 
@@ -2802,7 +2804,7 @@ void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem)
  * Purpose: get statistics of cached items                                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
+void	zbx_vc_get_item_stats(zbx_vector_vc_item_stats_ptr_t *stats)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vc_item_t		*item;
@@ -2813,7 +2815,7 @@ void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
 
 	RDLOCK_CACHE;
 
-	zbx_vector_ptr_reserve(stats, (size_t)vc_cache->items.num_data);
+	zbx_vector_vc_item_stats_ptr_reserve(stats, (size_t)vc_cache->items.num_data);
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
@@ -2822,7 +2824,7 @@ void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
 		item_stats->itemid = item->itemid;
 		item_stats->values_num = item->values_total;
 		item_stats->hourly_num = item->last_hourly_num;
-		zbx_vector_ptr_append(stats, item_stats);
+		zbx_vector_vc_item_stats_ptr_append(stats, item_stats);
 	}
 
 	UNLOCK_CACHE;

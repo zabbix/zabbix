@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the envied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxembed.h"
@@ -35,6 +30,13 @@
 
 #define ZBX_ES_SCRIPT_HEADER	"function(value){"
 #define ZBX_ES_SCRIPT_FOOTER	"\n}"
+
+typedef struct
+{
+	void	*heapptr;	/* js object heap ptr */
+	void	*data;
+}
+zbx_es_obj_data_t;
 
 /******************************************************************************
  *                                                                            *
@@ -349,6 +351,9 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 		goto out;
 
 	es->env->timeout = ZBX_ES_TIMEOUT;
+
+	zbx_hashset_create(&es->env->objmap, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
@@ -390,6 +395,8 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 
 	duk_destroy_heap(es->env->ctx);
 	zbx_es_debug_disable(es);
+	zbx_free(es->env->browser_endpoint);
+	zbx_hashset_destroy(&es->env->objmap);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
@@ -627,7 +634,17 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 					*error = zbx_strdup(*error, "could not convert return value to utf8");
 				}
 				else
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
+				{
+					if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%.*s'", __func__, 512,
+								output);
+					}
+				}
 
 				if (SUCCEED == ret && NULL != script_ret)
 					*script_ret = output;
@@ -662,8 +679,9 @@ out:
 	duk_gc(es->env->ctx, 0);
 	duk_gc(es->env->ctx, 0);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated or requested "
-			"memory: " ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T
+			" max allocated or requested memory: " ZBX_FS_SIZE_T " max allowed memory: %d",
+			__func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error), (zbx_fs_size_t)es->env->total_alloc,
 			(zbx_fs_size_t)es->env->max_total_alloc, ZBX_ES_MEMORY_LIMIT);
 	es->env->max_total_alloc = 0;
@@ -794,7 +812,135 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
 		return NULL;
 
 	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
+	duk_pop_2(ctx);
 
 	return env;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: call base class prototype with arguments                          *
+ *                                                                            *
+ * Parameters: ctx  - [IN] duktape context                                    *
+ *             base - [IN] base class name                                    *
+ *             args - [IN] number of prototype arguments on stack             *
+ *                                                                            *
+ * Return value: 0                                                            *
+ *                                                                            *
+ ******************************************************************************/
+duk_ret_t	es_super(duk_context *ctx, const char *base, int args)
+{
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	duk_get_global_string(ctx, base);
+	duk_push_this(ctx);
+
+	for (int i = 0; i < args; i++)
+		duk_dup(ctx, i);
+
+	env->constructor_chain = 1;
+	duk_call_method(ctx, args);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the method is called from constructor chain              *
+ *                                                                            *
+ * Parameters: ctx  - [IN] duktape context                                    *
+ *                                                                            *
+ * Return value: !0 - method is called from constructor chain                 *
+ *                0 - otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	es_is_chained_constructor_call(duk_context *ctx)
+{
+	zbx_es_env_t	*env;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+
+	int	constructor_chain = env->constructor_chain;
+
+	env->constructor_chain = 0;
+
+	return constructor_chain || duk_is_constructor_call(env->ctx);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: attach data pointer to current object                             *
+ *                                                                            *
+ * Comments: The object must be on the top of the stack (-1)                  *
+ *           This function must be used only from object constructor          *
+ *                                                                            *
+ ******************************************************************************/
+void	es_obj_attach_data(zbx_es_env_t *env, void *data)
+{
+	zbx_es_obj_data_t	obj_local;
+
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+
+	obj_local.data = data;
+	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get data pointer attached to current object                       *
+ *                                                                            *
+ * Parameters: env  - [IN]                                                    *
+ *             ref  - [IN] pointer reference, returned by es_put_ptr()        *
+ *             type - [IN] pointer type                                       *
+ *                                                                            *
+ * Comments: This function must be used only from object methods.             *
+ *                                                                            *
+ ******************************************************************************/
+void	*es_obj_get_data(zbx_es_env_t *env)
+{
+	zbx_es_obj_data_t	obj_local, *obj;
+
+	duk_push_this(env->ctx);
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	duk_pop(env->ctx);
+
+	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+		return obj->data;
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: detach data pointer from current object                           *
+ *                                                                            *
+ * Parameters: env - [IN]                                                     *
+ *             ref - [IN] pointer reference, returned by es_put_ptr()         *
+ *                                                                            *
+ * Return value: detached data pointer                                        *
+ *                                                                            *
+ * Comments: The finalizing object must be on the top of the stack (-1).      *
+ *           If the pointer contains allocated data it must be freed by the   *
+ *           caller.                                                          *
+ *           This function must be used only from object destructor.          *
+ *                                                                            *
+ ******************************************************************************/
+void	*es_obj_detach_data(zbx_es_env_t *env)
+{
+	zbx_es_obj_data_t	obj_local, *obj;
+	void			*data;
+
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+
+	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+		return NULL;
+
+	data = obj->data;
+	zbx_hashset_remove_direct(&env->objmap, obj);
+
+	return data;
 }

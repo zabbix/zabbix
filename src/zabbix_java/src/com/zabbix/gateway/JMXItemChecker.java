@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package com.zabbix.gateway;
@@ -81,25 +76,9 @@ class JMXItemChecker extends ItemChecker
 			jmxc = null;
 			mbsc = null;
 
-			// "rmi" is the only JNDI service provider we support, for security reasons
-			// e. g. the second "rmi" in service:jmx:rmi:///jndi/rmi://
-			String[] parts = url.getURLPath().split(":", 2);
-
-			if (0 != parts.length && !parts[0].equals(""))
-			{
-				parts = parts[0].split("/", 0);
-
-				if (0 != parts.length && !parts[parts.length - 1].equals(""))
-				{
-					String serviceProvider = parts[parts.length - 1];
-
-					if (!serviceProvider.equals("rmi"))
-					{
-						throw new ZabbixException("unsupported JNDI service provider, \"%s\"",
-								serviceProvider);
-					}
-				}
-			}
+			// We used to disallow other JNDI service providers than "rmi" here for security
+			// reasonse but then we decided Zabbix shouldn't interfere this way and it's the
+			// task of admin to ensure security when using different JNDI service providers.
 
 			username = request.optString(JSON_TAG_USERNAME, null);
 			password = request.optString(JSON_TAG_PASSWORD, null);

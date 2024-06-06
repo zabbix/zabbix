@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -94,6 +89,8 @@ class CWidgetBase {
 
 	#ready_promise = null;
 
+	#is_awaiting_data = false;
+
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
 	 *
@@ -131,7 +128,6 @@ class CWidgetBase {
 	 *
 	 * @param {number}      cell_width          Dashboard page cell width in percentage.
 	 * @param {number}      cell_height         Dashboard page cell height in pixels.
-	 * @param {number}      min_rows            Minimum number of dashboard cell rows per single widget.
 	 * @param {boolean}     is_editable         Whether to display the "Edit" button.
 	 * @param {boolean}     is_edit_mode        Whether the widget is being created in the editing mode.
 	 * @param {string|null} csrf_token          CSRF token for AJAX requests.
@@ -151,7 +147,6 @@ class CWidgetBase {
 		dashboard_page,
 		cell_width,
 		cell_height,
-		min_rows,
 		is_editable,
 		is_edit_mode,
 		csrf_token = null,
@@ -188,7 +183,6 @@ class CWidgetBase {
 
 		this._cell_width = cell_width;
 		this._cell_height = cell_height;
-		this._min_rows = min_rows;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._csrf_token = csrf_token;
@@ -430,14 +424,18 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Broadcast default data (nulls) to dependent widgets. Invoked to ensure that all the declared data is broadcast.
+	 * Get default (empty) broadcast values.
+	 *
+	 * @returns {Object}
 	 */
-	#broadcastDefaults() {
-		for (const {type} of this._defaults.out) {
-			if (!this.hasBroadcast(type)) {
-				this.broadcast({[type]: null});
-			}
+	getBroadcastDefaults() {
+		const broadcast_defaults = {};
+
+		for (const parameter of this._defaults.out) {
+			broadcast_defaults[parameter.type] = CWidgetsData.getDefault(parameter.type);
 		}
+
+		return broadcast_defaults;
 	}
 
 	/**
@@ -621,10 +619,43 @@ class CWidgetBase {
 	/**
 	 * Check whether the referred fields data has been updated since the last update cycle.
 	 *
+	 * @param   {string|null} path  Null will match any updated referred fields data.
+	 *
 	 * @returns {boolean}
 	 */
-	isFieldsReferredDataUpdated(path) {
+	isFieldsReferredDataUpdated(path = null) {
+		if (path === null) {
+			return this.#fields_referred_data_updated.size > 0;
+		}
+
 		return this.#fields_referred_data_updated.has(path);
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	isFieldsReferredDataValid() {
+	}
+
+	/**
+	 * Check if the referred fields marked as required are having non-default (non-empty) values.
+	 *
+	 * @returns {boolean}
+	 */
+	isFieldsReferredDataRequirementFulfilled() {
+		const fields_referred_data = this.getFieldsReferredData();
+
+		for (const [name, parameters] of Object.entries(this._defaults.in)) {
+			if (!parameters.required || !fields_referred_data.has(name)) {
+				continue;
+			}
+
+			if (CWidgetsData.isDefault(parameters.type, fields_referred_data.get(name).value)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1241,6 +1272,35 @@ class CWidgetBase {
 			return;
 		}
 
+		if (!this.isFieldsReferredDataValid()) {
+			if (!this.#is_awaiting_data) {
+				this.#is_awaiting_data = true;
+
+				this._hidePreloader();
+				this._show_preloader_asap = true;
+
+				this.clearContents();
+				this.setCoverMessage({
+					message: t('Awaiting data'),
+					icon: ZBX_ICON_WIDGET_AWAITING_DATA_LARGE
+				});
+
+				this.broadcast(this.getBroadcastDefaults());
+
+				if (this.#ready_promise === null) {
+					this.#ready_promise = Promise.resolve();
+					this.fire(CWidgetBase.EVENT_READY);
+				}
+			}
+
+			return;
+		}
+
+		if (this.#is_awaiting_data) {
+			this.#is_awaiting_data = false;
+			this.clearContents();
+		}
+
 		this._contents_size = this._getContentsSize();
 
 		this._update_abort_controller = new AbortController();
@@ -1260,7 +1320,11 @@ class CWidgetBase {
 
 				this.#fields_referred_data_updated.clear();
 
-				this.#broadcastDefaults();
+				for (const [type, value] of Object.entries(this.getBroadcastDefaults())) {
+					if (!this.hasBroadcast(type)) {
+						this.broadcast({[type]: value});
+					}
+				}
 
 				if (this.#ready_promise === null) {
 					this.#ready_promise = this.promiseReady();
@@ -1492,6 +1556,52 @@ class CWidgetBase {
 	 */
 	_updateDebug(debug = '') {
 		this._debug.innerHTML = debug;
+	}
+
+	/**
+	 * Clear widget contents, messages and debug info.
+	 */
+	clearContents() {
+		this.onClearContents();
+
+		this._updateMessages();
+		this._updateDebug();
+		this._body.innerHTML = '';
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	onClearContents() {
+	}
+
+	/**
+	 * Set cover message if standard view can't be displayed.
+	 *
+	 * @param {string}      message
+	 * @param {string|null} description
+	 * @param {string|null} icon
+	 */
+	setCoverMessage({message, description = null, icon = null} = {}) {
+		const container = document.createElement('div');
+
+		container.classList.add(ZBX_STYLE_NO_DATA_MESSAGE);
+		container.innerText = message;
+
+		if (icon !== null) {
+			container.classList.add(icon);
+		}
+
+		if (description !== null) {
+			const description_container = document.createElement('div');
+
+			description_container.classList.add(ZBX_STYLE_NO_DATA_DESCRIPTION);
+			description_container.innerText = description;
+
+			container.appendChild(description_container);
+		}
+
+		this._body.appendChild(container);
 	}
 
 	/**

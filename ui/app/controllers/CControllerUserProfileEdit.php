@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -56,13 +51,43 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			];
 		}
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateMedias();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
+	}
+
+	protected function validateMedias(): bool {
+		$validation_rules = [
+			'mediaid' =>		'id',
+			'mediatypeid' =>	'required|db media_type.mediatypeid',
+			'sendto' =>			'required',
+			'period' =>			'required|time_periods',
+			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
+			'severity' =>		'int32|ge 0|le '.(pow(2, TRIGGER_SEVERITY_COUNT) - 1)
+		];
+
+		foreach ($this->getInput('medias', []) as $media) {
+			$validator = new CNewValidator($media, $validation_rules);
+
+			if ($validator->isError()) {
+				return false;
+			}
+		}
+
+		$new_media = $this->getInput('new_media', []);
+
+		if (!$new_media) {
+			return true;
+		}
+
+		unset($validation_rules['mediaid']);
+		$validator = new CNewValidator($new_media, $validation_rules);
+
+		return !$validator->isError();
 	}
 
 	protected function checkPermissions() {
@@ -75,7 +100,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 				'rows_per_page', 'url', 'timezone', 'userdirectoryid'
 			],
 			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
-				? ['mediatypeid', 'period', 'sendto', 'severity', 'active']
+				? ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active', 'userdirectory_mediaid']
 				: null,
 			'userids' => CWebUser::$data['userid'],
 			'selectUsrgrps' => ['userdirectoryid'],

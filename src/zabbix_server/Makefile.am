@@ -27,7 +27,8 @@ SUBDIRS = \
 	trapper \
 	rtc \
 	ha \
-	proxyconfigread
+	proxyconfigread \
+	pgmanager
 
 sbin_PROGRAMS = zabbix_server
 
@@ -75,6 +76,7 @@ zabbix_server_LDADD = \
 	operations/libzbxoperations.a \
 	stats/libzbxstats_server.a \
 	ha/libzbxha.a \
+	pgmanager/libzbxpgmanager.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -84,6 +86,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_builddir)/src/libs/zbxexpression/libzbxexpression.a \
@@ -158,7 +161,8 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
 	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
-	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a
+	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
+	$(top_builddir)/src/libs/zbxbincommon/libzbxbincommon.a
 
 if HAVE_IPMI
 zabbix_server_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a

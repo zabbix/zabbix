@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -268,13 +263,13 @@ $mediatype_form_grid
 		(new CFormField($passwd_field))->setId('passwd_field')
 	])
 	->addItem([
-		(new CLabel(_('Message format'), 'content_type'))->setId('content_type_label'),
+		(new CLabel(_('Message format'), 'message_format'))->setId('message_format_label'),
 		(new CFormField(
-			(new CRadioButtonList('content_type', (int) $data['content_type']))
-				->addValue(_('HTML'), SMTP_MESSAGE_FORMAT_HTML)
-				->addValue(_('Plain text'), SMTP_MESSAGE_FORMAT_PLAIN_TEXT)
+			(new CRadioButtonList('message_format', (int) $data['message_format']))
+				->addValue(_('HTML'), ZBX_MEDIA_MESSAGE_FORMAT_HTML)
+				->addValue(_('Plain text'), ZBX_MEDIA_MESSAGE_FORMAT_TEXT)
 				->setModern()
-		))->setId('content_type_field')
+		))->setId('message_format_field')
 	])
 	->addItem([
 		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('webhook_parameters_label'),

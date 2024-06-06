@@ -1,0 +1,1 @@
+.......PS. [ZBX-17382] improved get[oid] and walk[oid] to display UTF-8 text instead of hex if MIB files are not installed (vso)
