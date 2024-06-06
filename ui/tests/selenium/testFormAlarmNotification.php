@@ -279,7 +279,7 @@ class testFormAlarmNotification extends CWebTest {
 		];
 
 		$this->page->login()->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
-			self::$hostid)->waitUntilReady();
+				self::$hostid)->waitUntilReady();
 
 		// In case some scenarios failed and problems didn't closed at the end.
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
@@ -383,28 +383,36 @@ class testFormAlarmNotification extends CWebTest {
 			[
 				[
 					'trigger_name' => [
-						'Not_classified_trigger',
-						'Information_trigger',
-						'Warning_trigger',
 						'Average_trigger',
+						'Disaster_trigger',
 						'High_trigger',
-						'Disaster_trigger'
+						'Information_trigger',
+						'Not_classified_trigger',
+						'Warning_trigger',
 					]
+				]
+			],
+			//#8 Multiple same error for one trigger.
+			[
+				[
+					'trigger_name' => [
+						'Disaster_trigger',
+						'Disaster_trigger',
+						'Disaster_trigger',
+						'Disaster_trigger'
+					],
+					'multiple_check' => true
 				]
 			]
 		];
 	}
 
-
 	/**
 	 * @dataProvider getDisplayedAlarmsData
 	 */
 	public function testFormAlarmNotification_DisplayedAlarms($data) {
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
-
-		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item',
-				'Show unacknowledged only' => true])->submit();
-		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
+		$this->page->login()->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+				self::$hostid)->waitUntilReady();
 
 		// In case some scenarios failed and problems didn't closed at the end.
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
@@ -421,14 +429,20 @@ class testFormAlarmNotification extends CWebTest {
 		$this->query('xpath:(//tbody//a[text()="Host for alarm item"])[1]')->one()->waitUntilClickable();
 
 		// Check that problems displayed in table.
-		$this->assertTableHasDataColumn($data['trigger_name'], 'Problem');
+		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
 
 		// Find appeared Alarm notification overlay dialog.
 		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
 				waitUntilPresent()->one();
 
-		foreach ($data['trigger_name'] as $trigger_name) {
-			$this->assertTrue($alarm_dialog->query('link', $trigger_name)->one()->isClickable());
+		if (array_key_exists('multiple_check', $data)) {
+			for ($i = 1; $i <= 4; $i++) {
+				$this->assertTrue($alarm_dialog->query('xpath:(//p/a[text()="Disaster_trigger"])['.$i.']')->one()->isClickable());
+			}
+		} else {
+			foreach ($data['trigger_name'] as $trigger_name) {
+				$this->assertTrue($alarm_dialog->query('link', $trigger_name)->one()->isClickable());
+			}
 		}
 
 		// Check close button.
