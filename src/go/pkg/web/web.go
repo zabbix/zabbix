@@ -29,11 +29,11 @@ import (
 	"net/http/httputil"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/transform"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/version"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/sdk/log"
 )
 
 // Get makes a GET request to the provided web page url, using an http client, provides a response dump if dump

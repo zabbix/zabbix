@@ -24,7 +24,7 @@ import (
 	"io/fs"
 	"syscall"
 
-	"zabbix.com/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/win32"
 )
 
 func (sp *sizeParams) handleHomeDir(path string, d fs.DirEntry) (int64, error) {

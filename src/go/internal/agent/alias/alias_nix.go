@@ -23,7 +23,7 @@
 package alias
 
 import (
-	"zabbix.com/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent"
 )
 
 func (m *Manager) initialize(options *agent.AgentOptions) (err error) {

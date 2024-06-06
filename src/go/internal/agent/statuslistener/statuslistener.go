@@ -26,11 +26,11 @@ import (
 	"net/http"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/version"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/sdk/log"
 )
 
 var srv http.Server

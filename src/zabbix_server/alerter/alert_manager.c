@@ -117,8 +117,12 @@ typedef struct
 	unsigned char		content_type;
 	int			status;
 	int			retries;
+	char			*expression;
+	char			*recovery_expression;
 
-	int			objectid;
+	zbx_uint64_t		objectid;
+	int			object;
+	int			source;
 }
 zbx_am_alert_t;
 
@@ -752,6 +756,10 @@ static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediat
 	alert->status = status;
 	alert->retries = retries;
 	alert->nextsend = nextsend;
+	alert->expression = NULL;
+	alert->recovery_expression = NULL;
+	alert->object = object;
+	alert->source = source;
 
 	return alert;
 }
@@ -779,6 +787,9 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	alert->objectid = db_alert->objectid;
 	alert->eventid = db_alert->eventid;
 	alert->p_eventid = db_alert->p_eventid;
+	alert->objectid = db_alert->objectid;
+	alert->object = db_alert->object;
+	alert->source = db_alert->source;
 	alert->content_type = ZBX_MEDIA_CONTENT_TYPE_DEFAULT;
 
 	alert->sendto = db_alert->sendto;
@@ -788,6 +799,8 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	zbx_free(db_alert->message);
 
 	alert->params = db_alert->params;
+	alert->expression = db_alert->expression;
+	alert->recovery_expression = db_alert->recovery_expression;
 
 	alert->status = db_alert->status;
 	alert->retries = db_alert->retries;
@@ -811,6 +824,8 @@ static void	am_alert_free(zbx_am_alert_t *alert)
 	zbx_free(alert->subject);
 	shared_str_release(alert->message);
 	zbx_free(alert->params);
+	zbx_free(alert->expression);
+	zbx_free(alert->recovery_expression);
 	zbx_free(alert);
 }
 
@@ -1472,11 +1487,12 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 				content_type = mediatype->content_type;
 
 			data_len = zbx_alerter_serialize_email(&data, alert->alertid, alert->mediatypeid,
-					p_eventid, alert->sendto, alert->subject, alert->message,
-					mediatype->smtp_server, mediatype->smtp_port, mediatype->smtp_helo,
-					mediatype->smtp_email, mediatype->smtp_security, mediatype->smtp_verify_peer,
-					mediatype->smtp_verify_host, mediatype->smtp_authentication,
-					mediatype->username, mediatype->passwd, content_type);
+					p_eventid, alert->source, alert->object, alert->objectid, alert->sendto,
+					alert->subject, alert->message, mediatype->smtp_server, mediatype->smtp_port,
+					mediatype->smtp_helo, mediatype->smtp_email, mediatype->smtp_security,
+					mediatype->smtp_verify_peer, mediatype->smtp_verify_host,
+					mediatype->smtp_authentication, mediatype->username, mediatype->passwd,
+					content_type, alert->expression, alert->recovery_expression);
 			break;
 		case MEDIA_TYPE_SMS:
 			command = ZBX_IPC_ALERTER_SMS;

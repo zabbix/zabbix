@@ -26,10 +26,10 @@ import (
 	"net"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/win32"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (

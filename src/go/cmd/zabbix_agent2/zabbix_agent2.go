@@ -25,29 +25,31 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin/comms"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"git.zabbix.com/ap/plugin-support/zbxflag"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/agent/runtimecontrol"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/agent/serverconnector"
-	"zabbix.com/internal/agent/serverlistener"
-	"zabbix.com/internal/agent/statuslistener"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/pidfile"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxlib"
-	_ "zabbix.com/plugins"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/agent/runtimecontrol"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/agent/serverconnector"
+	"golang.zabbix.com/agent2/internal/agent/serverlistener"
+	"golang.zabbix.com/agent2/internal/agent/statuslistener"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/pidfile"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	_ "golang.zabbix.com/agent2/plugins"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin/comms"
+	"golang.zabbix.com/sdk/zbxerr"
+	"golang.zabbix.com/sdk/zbxflag"
 )
 
 const runtimeCommandSendingTimeout = time.Second
@@ -87,11 +89,18 @@ Zabbix home page: <https://www.zabbix.com>
 Documentation: <https://www.zabbix.com/documentation>
 `
 
+//nolint:gochecknoglobals
 var (
 	manager          *scheduler.Manager
 	listeners        []*serverlistener.ServerListener
 	serverConnectors []*serverconnector.Connector
 	closeChan        = make(chan bool)
+
+	confDefault     string
+	applicationName string
+	pluginSocket    string
+
+	argConfig, argTest, argPrint, argVersion, argVerbose bool
 )
 
 type AgentUserParamOption struct {
@@ -221,7 +230,8 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 var pidFile *pidfile.File
 
 func run() error {
-	sigs := createSigsChan()
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
 	if err != nil {
@@ -235,10 +245,10 @@ func run() error {
 
 	for {
 		select {
-		case sig := <-sigs:
-			if !handleSig(sig) {
-				return nil
-			}
+		case <-sigs:
+			sendServiceStop()
+
+			return nil
 		case client := <-control.Client():
 			err := processRemoteCommand(client)
 			if err != nil {
@@ -257,19 +267,12 @@ func run() error {
 	}
 }
 
-var (
-	confDefault     string
-	applicationName string
-	pluginsocket    string
-
-	argConfig  bool
-	argTest    bool
-	argPrint   bool
-	argVersion bool
-	argVerbose bool
-)
-
 func main() {
+	err := log.Open(log.Console, log.Warning, "", 0)
+	if err != nil {
+		fatalExit("cannot initialize default logger", err)
+	}
+
 	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
 
 	flagsUsage, fs, args, err := parseArgs()
@@ -286,8 +289,6 @@ func main() {
 	}
 
 	setServiceRun(args.foreground)
-
-	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
@@ -350,10 +351,6 @@ func main() {
 		fatalExit("", err)
 	}
 
-	if err = log.Open(log.Console, log.Warning, "", 0); err != nil {
-		fatalExit("cannot initialize logger", err)
-	}
-
 	if args.runtimeCommand != "" {
 		if agent.Options.ControlSocket == "" {
 			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
@@ -372,9 +369,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
+	pluginSocket, err = initExternalPlugins(&agent.Options)
+	if err != nil {
 		fatalExit("cannot register plugins", err)
 	}
+
 	defer cleanUpExternal()
 
 	if argTest || argPrint {
@@ -743,7 +742,7 @@ func helpMessage(flagsUsage string) string {
 func fatalExit(message string, err error) {
 	fatalCloseOSItems()
 
-	if pluginsocket != "" {
+	if pluginSocket != "" {
 		cleanUpExternal()
 	}
 

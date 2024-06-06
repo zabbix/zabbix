@@ -27,11 +27,11 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/errs"
 	"github.com/google/go-cmp/cmp"
-	"zabbix.com/plugins/smart/mock"
+	"golang.zabbix.com/agent2/plugins/smart/mock"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 //nolint:paralleltest,tparallel

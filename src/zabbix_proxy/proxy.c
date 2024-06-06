@@ -168,6 +168,7 @@ unsigned char			program_type	= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
 ZBX_THREAD_LOCAL int		process_num	= 0;
 ZBX_THREAD_LOCAL int		server_num	= 0;
+static sigset_t			orig_mask;
 
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
@@ -1103,6 +1104,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
+	zbx_block_signals(&orig_mask);
+
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
 		zbx_error("cannot initialize IPC services: %s", error);
@@ -1207,6 +1210,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	exit_args.rtc = &rtc;
 	zbx_set_on_exit_args(&exit_args);
 
+	zbx_unblock_signals(&orig_mask);
+
 	if (SUCCEED != init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
@@ -1302,11 +1307,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		exit_args.listen_sock = &listen_sock;
 
+		zbx_block_signals(&orig_mask);
+
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_unblock_signals(&orig_mask);
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

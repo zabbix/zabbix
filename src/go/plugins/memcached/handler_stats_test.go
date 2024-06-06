@@ -24,9 +24,8 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-
 	"github.com/memcachier/mc/v3"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func TestPlugin_statsHandler(t *testing.T) {
