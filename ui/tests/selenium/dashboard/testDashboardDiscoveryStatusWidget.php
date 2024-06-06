@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  * @backup widget
  *
  * @onBefore prepareDiscoveryStatusWidgetData
+ *
+ * @dataSource NetworkDiscovery
  */
 class testDashboardDiscoveryStatusWidget extends CWebTest {
 
@@ -128,8 +130,14 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		]);
 
 		self::$druleids = CDataHelper::getIds('name');
-//		$id = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr('Discovery rule for proxy delete test'));
-//		self::$druleids += ['Discovery rule for proxy delete test' => $id];
+		$id_1 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr('External network'));
+		$id_2 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr('Discovery rule for update'));
+		$id_3 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr('Discovery rule for cancelling scenario'));
+		self::$druleids += [
+			'External network' => $id_1,
+			'Discovery rule for update' => $id_2,
+			'Discovery rule for cancelling scenario' => $id_3
+		];
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -499,6 +507,16 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 						'Down' => ''
 					],
 					[
+						'Discovery rule' => 'Discovery rule for cancelling scenario',
+						'Up' => '',
+						'Down' => ''
+					],
+					[
+						'Discovery rule' => 'Discovery rule for update',
+						'Up' => '',
+						'Down' => ''
+					],
+					[
 						'Discovery rule' => self::DISCOVERY_RULE_2,
 						'Up' => '',
 						'Down' => ''
@@ -512,6 +530,11 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 						'Discovery rule' => self::DISCOVERY_RULE_4,
 						'Up' => ['text' => '5', 'selector' => 'class:green'],
 						'Down' => ['text' => '5', 'selector' => 'class:red']
+					],
+					[
+						'Discovery rule' => 'External network',
+						'Up' => '',
+						'Down' => ''
 					],
 					[
 						'Discovery rule' => self::DISCOVERY_RULE_5,
