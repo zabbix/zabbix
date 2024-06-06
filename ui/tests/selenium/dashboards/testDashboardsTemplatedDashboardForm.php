@@ -58,7 +58,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	public static function prepareTemplateDashboardsData() {
 		$hosts = CDataHelper::call('host.create', [
 			'host' => 'Empty host for template',
-			'groups' => [['groupid' => 4]], //Zabbix servers.
+			'groups' => [['groupid' => 4]] //Zabbix servers.
 		]);
 		self::$hostid_for_template = $hosts['hostids'][0];
 
@@ -4388,8 +4388,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
 			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-			$column_overlay_form = $column_overlay->asForm();
-			$column_overlay_form->fill($data['Column']);
+			$column_overlay->asForm()->fill($data['Column']);
 			$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 			$column_overlay->waitUntilNotVisible();
 			$form->waitUntilReloaded();

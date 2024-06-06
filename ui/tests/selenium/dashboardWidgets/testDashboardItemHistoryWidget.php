@@ -156,31 +156,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						'name' => 'Page with created/updated widgets',
 						'widgets' => [
 							[
-								'type' => 'graph',
-								'name' => 'Classic graph for time period reference',
-								'x' => 12,
-								'y' => 0,
-								'width' => 24,
-								'height' => 5,
-								'fields' => [
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'source_type',
-										'value' => 1
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-										'name' => 'itemid.0',
-										'value' => $itemids['Test Item history']
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'reference',
-										'value' => 'FEDCB'
-									]
-								]
-							],
-							[
 								'type' => 'itemhistory',
 								'name' => self::$update_widget,
 								'x' => 0,
@@ -202,6 +177,31 @@ class testDashboardItemHistoryWidget extends testWidgets {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'EDCBA'
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'name' => 'Classic graph for time period reference',
+								'x' => 12,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => $itemids['Test Item history']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'FEDCB'
 									]
 								]
 							]
@@ -374,7 +374,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			'id:time_period_to' => [
 				'maxlength' => '255',
 				'placeholder' => 'YYYY-MM-DD hh:mm:ss'
-			],
+			]
 		];
 
 		foreach ($inputs as $field => $attributes) {
@@ -427,12 +427,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$field = $column_form->getField($label);
 			$this->assertEquals($attributes['value'], $field->getValue());
 
-			if (array_key_exists('maxlength', $attributes)) {
-				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
-			}
-
-			if (array_key_exists('placeholder', $attributes)) {
-				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
+			foreach (['maxlength', 'placeholder'] as $attribute) {
+				if (array_key_exists($attribute, $attributes)) {
+					$this->assertEquals($attributes[$attribute], $field->getAttribute($attribute));
+				}
 			}
 
 			if (array_key_exists('labels', $attributes)) {
@@ -476,12 +474,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'Single line - result will be displayed in a single line and truncated to specified length.'
 			);
 
-			$display = [
+			$display_maxlength_dependencies = [
 				'As is' => false,
 				'HTML' => false,
 				'Single line' => true
 			];
-			foreach ($display as $label => $status) {
+			foreach ($display_maxlength_dependencies as $label => $status) {
 				$column_form->fill(['Display' => $label]);
 				$max_length = $column_form->getField('id:max_length');
 				$this->assertTrue($max_length->isEnabled($status));
@@ -489,8 +487,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			}
 
 			if ($item === 'Log item') {
-				$this->checkHint($column_form, 'Display local time', 'This setting will display local time '.
-						'instead of the timestamp. "Show timestamp" must also be checked in the advanced configuration.'
+				$this->checkHint($column_form, 'Display local time', 'This setting will display local time'.
+						' instead of the timestamp. "Show timestamp" must also be checked in the advanced configuration.'
 				);
 			}
 		}
@@ -1512,7 +1510,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Float with  negative Thresholds'
+						'Name' => 'Float with negative Thresholds'
 					],
 					'Columns' => [
 						[
@@ -1913,10 +1911,13 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	/**
 	 * Perform Item history widget creation or update and verify the result.
 	 *
-	 * @param boolean $update	updating is performed
+	 * @param array   $data      data provider
+	 * @param boolean $update    updating is performed
 	 */
 	protected function checkWidgetForm($data, $update = false) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+
+		if ($expected === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
@@ -1942,7 +1943,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 
 		// Reset custom period fields to defaults, because they are saved from previous cases.
-		if ($update && CTestArrayHelper::get($data, 'clear_custom', false)) {
+		if ($update && CTestArrayHelper::get($data, 'clear_custom')) {
 			$form->fill([
 				'Advanced configuration' => true,
 				'Time period' => 'Custom',
@@ -1993,19 +1994,13 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				$column_overlay_form = $column_overlay->asForm();
 				$column_overlay_form->fill($column['fields']);
 
-				if (array_key_exists('Highlights', $column)) {
-					foreach ($column['Highlights'] as $highlight) {
-						$column_overlay_form->getFieldContainer('Highlights')->query('button:Add')->one()
+				foreach (['Highlights', 'Thresholds'] as $table_field) {
+					if (array_key_exists($table_field, $column)) {
+						foreach ($column[$table_field] as $highlight) {
+							$column_overlay_form->getFieldContainer($table_field)->query('button:Add')->one()
 								->waitUntilClickable()->click();
-						$column_overlay_form->fill($highlight);
-					}
-				}
-
-				if (array_key_exists('Thresholds', $column)) {
-					foreach ($column['Thresholds'] as $threshold) {
-						$column_overlay_form->getFieldContainer('Thresholds')->query('button:Add')->one()
-								->waitUntilClickable()->click();
-						$column_overlay_form->fill($threshold);
+							$column_overlay_form->fill($highlight);
+						}
 					}
 				}
 
@@ -2032,7 +2027,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			}
 		}
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			if (array_key_exists('column_error', $data)) {
 				$data['error'] = $data['column_error'];
 			}
@@ -2062,6 +2057,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				$header = $update ? self::$update_widget : 'Item history';
 			}
 
+			if ($update) {
+				self::$update_widget = $header;
+			}
+
 			COverlayDialogElement::ensureNotPresent();
 			$widget = $dashboard->getWidget($header);
 
@@ -2077,9 +2076,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			}
 
 			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'Default (1 minute)')
+					=== 'Default (1 minute)')
 				? '1 minute'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
+				: $data['fields']['Refresh interval'];
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
 
 			// Check new widget form fields and values in frontend.
@@ -2114,10 +2114,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// Close widget window and cancel editing the dashboard.
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->cancelEditing();
-
-			if ($update) {
-				self::$update_widget = $header;
-			}
 		}
 	}
 
@@ -2264,7 +2260,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Host name',
-							'Value'=> 'Zabbix Item history'
+							'Value' => 'Zabbix Item history'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 minute')),
@@ -2296,7 +2292,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-30 seconds')),
 							'Name' => 'Available memory in %',
-							'Value'=> '82.0618 %' // value rounding is expected.
+							'Value' => '82.0618 %' // value rounding is expected.
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 minute')),
@@ -2311,7 +2307,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
 							'Name' => 'Available memory',
-							'Value'=> '7.51 GB' // value rounding is expected.
+							'Value' => '7.51 GB' // value rounding is expected.
 						]
 					],
 					'item_data' => [
@@ -2333,12 +2329,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'Available memory',
-							'Value'=> '9.37 GB' // Value rounding is expected.
+							'Value' => '9.37 GB' // Value rounding is expected.
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
 							'Name' => 'Available memory',
-							'Value'=> '8.44 GB' // Value rounding is expected.
+							'Value' => '8.44 GB' // Value rounding is expected.
 						]
 					],
 					'result' => [
@@ -2460,7 +2456,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Name' => 'Master item',
 							'Value' => '1' // Value rounding is expected.
-						],
+						]
 					],
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
@@ -2477,7 +2473,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				[
 					'host_select' => [
 						'without_data' => 'Simple host with item for Item history widget',
-						'with_data' =>'ЗАББИКС Сервер'
+						'with_data' => 'ЗАББИКС Сервер'
 					],
 					'initial_data' => [
 						[
@@ -2504,7 +2500,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Name' =>  'Host name',
+							'Name' => 'Host name',
 							'Value' => 'Zabbix Item history'
 						],
 						[
@@ -2514,7 +2510,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-							'Name' =>  'Available memory in %',
+							'Name' => 'Available memory in %',
 							'Value' => '82.0618 %' // Value rounding is expected.
 						]
 					],
@@ -2619,7 +2615,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Name' =>  'Host name',
+							'Name' => 'Host name',
 							'Value' => 'Zabbix Item history'
 						],
 						[
