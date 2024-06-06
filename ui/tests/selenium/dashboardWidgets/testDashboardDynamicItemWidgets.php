@@ -16,7 +16,7 @@
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 
 /**
- * @backup profiles, dashboard
+ * @backup profiles, dashboard, hosts
  *
  * @onBefore prepareData
 
@@ -24,8 +24,301 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 class testDashboardDynamicItemWidgets extends CWebTest {
 
 	protected static $dashboardid;
+	protected static $graphids;
+	protected static $groupids;
+	protected static $itemids;
+	protected static $discoveryruleids;
+	protected static $prototype_itemids;
+	protected static $prototype_graphids;
 
 	public static function prepareData() {
+		// Create hostgroups for hosts.
+		CDataHelper::call('hostgroup.create', [
+			['name' => 'Dynamic widgets HG1 (H1 and H2)'],
+			['name' => 'Dynamic widgets HG2 (H3)']
+		]);
+		self::$groupids = CDataHelper::getIds('name');
+
+		$hosts = CDataHelper::createHosts([
+			[
+				'host' => 'Dynamic widgets H1',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
+					]
+				],
+				'groups' => [
+					'groupid' => self::$groupids['Dynamic widgets HG1 (H1 and H2)']
+				],
+				'items' => [
+					[
+						'name' => 'Dynamic widgets H1I1',
+						'key_' => 'dynamic[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Dynamic widgets H1I2',
+						'key_' => 'dynamic[2]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
+			],
+			[
+				'host' => 'Dynamic widgets H2',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
+					]
+				],
+				'groups' => [
+					'groupid' => self::$groupids['Dynamic widgets HG1 (H1 and H2)']
+				],
+				'items' => [
+					[
+						'name' => 'Dynamic widgets H2I1',
+						'key_' => 'dynamic[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
+			],
+			[
+				'host' => 'Dynamic widgets H3',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
+					]
+				],
+				'groups' => [
+					'groupid' => self::$groupids['Dynamic widgets HG2 (H3)']
+				],
+				'items' => [
+					[
+						'name' => 'Dynamic widgets H3I1',
+						'key_' => 'dynamic[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
+			]
+		]);
+		self::$itemids = CDataHelper::getIds('name');
+
+		// Create graphs.
+		$graphs = CDataHelper::call('graph.create', [
+			[
+				'name' => 'Dynamic widgets H1 G1 (I1)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$itemids['Dynamic widgets H1I1'],
+						'color' => '009600'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets H1 G2 (I2)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$itemids['Dynamic widgets H1I2'],
+						'color' => '009601'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets H1 G3 (I1 and I2)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$itemids['Dynamic widgets H1I1'],
+						'color' => '009600'
+					],
+					[
+						'itemid' => self::$itemids['Dynamic widgets H1I2'],
+						'color' => '009600'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets H1 G4 (H1I1 and H3I1)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$itemids['Dynamic widgets H1I2'],
+						'color' => '009600'
+					],
+					[
+						'itemid' => self::$itemids['Dynamic widgets H3I1'],
+						'color' => '009600'
+					]
+				]
+			]
+		]);
+		self::$graphids = CDataHelper::getIds('name');
+
+		CDataHelper::call('discoveryrule.create', [
+			[
+				'hostid' => $hosts['hostids']['Dynamic widgets H1'],
+				'name' => 'Dynamic widgets H1D1',
+				'key_' => 'dynamic.lld[1]',
+				'type' => ITEM_TYPE_TRAPPER
+			],
+			[
+				'hostid' => $hosts['hostids']['Dynamic widgets H2'],
+				'name' => 'Dynamic widgets H2D1',
+				'key_' => 'dynamic.lld[1]',
+				'type' => ITEM_TYPE_TRAPPER
+			]
+		]);
+		self::$discoveryruleids = CDataHelper::getIds('name');
+
+		CDataHelper::call('itemprototype.create', [
+			[
+				'name' => 'Dynamic widgets H1IP1',
+				'key_' => 'dynamic.ip1[{#ID}]',
+				'hostid' => $hosts['hostids']['Dynamic widgets H1'],
+				'ruleid' => self::$discoveryruleids['Dynamic widgets H1D1'],
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			[
+				'name' => 'Dynamic widgets H1IP2',
+				'key_' => 'dynamic.ip2[{#ID}]',
+				'hostid' => $hosts['hostids']['Dynamic widgets H1'],
+				'ruleid' => self::$discoveryruleids['Dynamic widgets H1D1'],
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			[
+				'name' => 'Dynamic widgets H2IP1',
+				'key_' => 'dynamic.ip1[{#ID}]',
+				'hostid' => $hosts['hostids']['Dynamic widgets H2'],
+				'ruleid' => self::$discoveryruleids['Dynamic widgets H2D1'],
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			]
+		]);
+		self::$prototype_itemids = CDataHelper::getIds('name');
+
+		CDataHelper::call('graphprototype.create', [
+			[
+				'name' => 'Dynamic widgets GP1 (IP1)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$prototype_itemids['Dynamic widgets H1IP1'],
+						'color' => 'BF00FF'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets GP2 (I1, IP1, H1I2)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$prototype_itemids['Dynamic widgets H1IP1'],
+						'color' => 'BF00FF'
+					],
+					[
+						'itemid' => self::$itemids['Dynamic widgets H1I1'],
+						'color' => 'BF00FF'
+					],
+					[
+						'itemid' => self::$itemids['Dynamic widgets H1I2'],
+						'color' => '009600'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets H1 GP3 (H1IP1)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$prototype_itemids['Dynamic widgets H1IP1'],
+						'color' => 'BF00FF'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets H1 GP4 (H1IP1 and H2I1)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$prototype_itemids['Dynamic widgets H1IP1'],
+						'color' => 'BF00FF'
+					],
+					[
+						'itemid' => self::$itemids['Dynamic widgets H2I1'],
+						'color' => 'BF00FF'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets H2 GP1 (IP1)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$prototype_itemids['Dynamic widgets H2IP1'],
+						'color' => 'BF00FF'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets H2 GP2 (I1, IP1, H1I2)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$itemids['Dynamic widgets H2I1'],
+						'color' => 'BF00FF'
+					],
+					[
+						'itemid' => self::$prototype_itemids['Dynamic widgets H2IP1'],
+						'color' => 'BF00FF'
+					]
+				]
+			],
+			[
+				'name' => 'Dynamic widgets H2 GP3 (H2IP1)',
+				'width' => 900,
+				'height' => 200,
+				'gitems' => [
+					[
+						'itemid' => self::$prototype_itemids['Dynamic widgets H2IP1'],
+						'color' => 'BF00FF'
+					]
+				]
+			]
+		]);
+		self::$prototype_graphids = CDataHelper::getIds('name');
+
 		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for Dynamic item',
@@ -48,7 +341,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
-										'value' => '99104' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+										'value' => self::$itemids['Dynamic widgets H1I2']
 									]
 								]
 							],
@@ -67,7 +360,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
-										'value' => '99103' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1I1'.
+										'value' =>  self::$itemids['Dynamic widgets H1I1']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -91,7 +384,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
-										'value' => '99104' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+										'value' => self::$itemids['Dynamic widgets H1I2']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -110,7 +403,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid',
-										'value' => '700027' // Graph name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+										'value' => self::$graphids['Dynamic widgets H1 G2 (I2)']
 									]
 								]
 							],
@@ -124,7 +417,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid',
-										'value' => '700026' // Graph name in widget Dynamic widgets H1: Dynamic widgets H1 G1 (I1).
+										'value' => self::$graphids['Dynamic widgets H1 G1 (I1)']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -143,7 +436,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid',
-										'value' => '700027' // Graph name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+										'value' => self::$graphids['Dynamic widgets H1 G2 (I2)']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -162,7 +455,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid',
-										'value' => '700028' // Graph name in widget 'Dynamic widgets H1: Dynamic widgets H1 G3 (I1 and I2)'.
+										'value' => self::$graphids['Dynamic widgets H1 G3 (I1 and I2)']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -181,7 +474,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid',
-										'value' => '700031' // Graph name in widget 'Dynamic widgets H1: Dynamic widgets H1 G4 (H1I1 and H3I1)'.
+										'value' => self::$graphids['Dynamic widgets H1 G4 (H1I1 and H3I1)']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -200,7 +493,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
-										'value' => '99104' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+										'value' => self::$itemids['Dynamic widgets H1I2']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -219,7 +512,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
-										'value' => '99103' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I1'.
+										'value' =>  self::$itemids['Dynamic widgets H1I1']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -263,7 +556,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
 										'name' => 'itemid',
-										'value' => '99109' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1IP2'.
+										'value' => self::$prototype_itemids['Dynamic widgets H1IP2']
 									]
 								]
 							],
@@ -282,7 +575,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
 										'name' => 'itemid',
-										'value' => '99108' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1IP1'.
+										'value' => self::$prototype_itemids['Dynamic widgets H1IP1']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -306,7 +599,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
 										'name' => 'itemid',
-										'value' => '99109' // item name in widget 'Dynamic widgets H1: Dynamic widgets H1IP2'.
+										'value' => self::$prototype_itemids['Dynamic widgets H1IP2']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -325,7 +618,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => '700032' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'.
+										'value' => self::$prototype_graphids['Dynamic widgets GP1 (IP1)']
 									]
 								]
 							],
@@ -339,7 +632,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => '700032' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'.
+										'value' => self::$prototype_graphids['Dynamic widgets H2 GP1 (IP1)']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -358,7 +651,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => '700033' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'.
+										'value' => self::$prototype_graphids['Dynamic widgets GP2 (I1, IP1, H1I2)']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -377,7 +670,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => '700034' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'.
+										'value' => self::$prototype_graphids['Dynamic widgets H1 GP3 (H1IP1)']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -396,7 +689,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => '700035' // Graph prototype name in widget 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)'.
+										'value' => self::$prototype_graphids['Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -426,7 +719,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.0.itemid',
-										'value' => '99104' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+										'value' => self::$itemids['Dynamic widgets H1I2']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -456,7 +749,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.0.itemid',
-										'value' => '99103' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I1'.
+										'value' =>  self::$itemids['Dynamic widgets H1I1']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -491,7 +784,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.0.itemid',
-										'value' => '99104' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+										'value' => self::$itemids['Dynamic widgets H1I2']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -526,7 +819,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.0.itemid',
-										'value' => '99103' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I1'.
+										'value' =>  self::$itemids['Dynamic widgets H1I1']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -536,7 +829,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.1.itemid',
-										'value' => '99104' // Item name in widget 'Dynamic widgets H1: Dynamic widgets H1I2'.
+										'value' => self::$itemids['Dynamic widgets H1I2']
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -583,7 +876,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1IP1'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1IP2'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets H2 GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)'],
@@ -613,12 +906,12 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 					],
 					'item_data' => [
 						[
-							'item' => '99104', // Dynamic widgets H1I2.
+							'name' => 'Dynamic widgets H1I2', // Dynamic widgets H1I2.
 							'value' => '12',
 							'time' => 'now'
 						],
 						[
-							'item' => '99103', // Dynamic widgets H1I1.
+							'name' => 'Dynamic widgets H1I1', // Dynamic widgets H1I1.
 							'value' => '11',
 							'time' => 'now'
 						]
@@ -652,7 +945,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1IP1'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1IP2'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)'],
@@ -682,12 +975,12 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 					],
 					'item_data' => [
 						[
-							'item' => '99104', // Dynamic widgets H1I2.
+							'name' => 'Dynamic widgets H1I2',
 							'value' => '12',
 							'time' => 'now'
 						],
 						[
-							'item' => '99103', // Dynamic widgets H1I1.
+							'name' =>  'Dynamic widgets H1I1',
 							'value' => '11',
 							'time' => 'now'
 						]
@@ -718,8 +1011,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets H2IP1'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP1 (IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP2 (I1, IP1, H1I2)'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets H2 GP1 (IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						[
@@ -744,12 +1037,12 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 					],
 					'item_data' => [
 						[
-							'item' => '99104', // Dynamic widgets H1I2.
+							'name' => 'Dynamic widgets H1I2',
 							'value' => '12',
 							'time' => 'now'
 						],
 						[
-							'item' => '99105', // Dynamic widgets H2I1.
+							'name' => 'Dynamic widgets H2I1',
 							'value' => '21',
 							'time' => 'now'
 						]
@@ -806,12 +1099,12 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 					],
 					'item_data' => [
 						[
-							'item' => '99104', // Dynamic widgets H1I2.
+							'name' => 'Dynamic widgets H1I2',
 							'value' => '12',
 							'time' => 'now'
 						],
 						[
-							'item' => '99106', // Dynamic widgets H3I1.
+							'name' => 'Dynamic widgets H3I1',
 							'value' => '31',
 							'time' => 'now'
 						]
@@ -866,7 +1159,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 					],
 					'item_data' => [
 						[
-							'item' => '99104', // Dynamic widgets H1I2.
+							'name' => 'Dynamic widgets H1I2',
 							'value' => '12',
 							'time' => 'now'
 						]
@@ -883,16 +1176,16 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	 * @dataProvider getWidgetsData
 	 */
 	public function testDashboardDynamicItemWidgets_Layout($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for Dynamic item']);
-		$dashboard = CDashboardElement::find()->one();
-
 		if (array_key_exists('item_data', $data)) {
 			foreach ($data['item_data'] as $params) {
 				$params['time'] = strtotime($params['time']);
-				CDataHelper::addItemData($params['item'], $params['value'], $params['time']);
+				CDataHelper::addItemData(self::$itemids[$params['name']], $params['value'], $params['time']);
 			}
 		}
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for Dynamic item']);
+		$dashboard = CDashboardElement::find()->one();
 
 		if (CTestArrayHelper::get($data, 'host_filter', false)) {
 			$filter = $dashboard->getControls()->waitUntilVisible();
