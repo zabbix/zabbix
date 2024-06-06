@@ -49,19 +49,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	protected static $dashboard_data;
 	protected static $update_widget = 'Update Item history Widget';
 
-	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	protected $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-		' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-		' w.width, w.height'.
-		' FROM widget_field wf'.
-		' INNER JOIN widget w'.
-		' ON w.widgetid=wf.widgetid'.
-		' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-		' wf.value_itemid, wf.value_graphid';
-
 	public static function prepareData() {
 		// Create host for widget header and data tests.
 		CDataHelper::createHosts([
@@ -1889,7 +1876,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	}
 
 	public function testDashboardItemHistoryWidget_SimpleUpdate() {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
@@ -1898,7 +1885,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->page->waitUntilReady();
 
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -1918,7 +1905,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
 		if ($expected === TEST_BAD) {
-			$old_hash = CDBHelper::getHash($this->sql);
+			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
 		$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Item history widget '.microtime());
@@ -2033,7 +2020,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			}
 
 			$this->assertMessage($data['expected'], null, $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 
 			// Check that after error and cancellation of the widget, the widget is not available on dashboard.
 			$dialogs = COverlayDialogElement::find()->all();
@@ -2154,7 +2141,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	 * @dataProvider getCancelData
 	 */
 	public function testDashboardItemHistoryWidget_Cancel($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 		$new_name = 'Widget to be cancelled';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
@@ -2217,7 +2204,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 
 		// Check that no changes were made to the widget.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public function testDashboardItemHistoryWidget_Delete() {
