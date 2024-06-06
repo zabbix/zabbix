@@ -249,6 +249,7 @@ static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_event_suppres
 			query->eventid = eventid;
 			ZBX_STR2UINT64(query->triggerid, row[1]);
 			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
+			zbx_vector_uint64_create(&query->hostids);
 			zbx_vector_uint64_create(&query->functionids);
 			zbx_vector_tags_ptr_create(&query->tags);
 			zbx_vector_uint64_pair_create(&query->maintenances);

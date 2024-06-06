@@ -1367,29 +1367,26 @@ int	main(int argc, char **argv)
 			log_file_cfg.log_type, log_file_cfg.log_file_name, NULL, get_zbx_threads, get_zbx_threads_num);
 }
 
-static void	zbx_check_db(void)
+static int	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
+	int				ret;
 
-	if (FAIL == zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type))
-	{
-		zbx_free(db_version_info.friendly_current_version);
-		exit(EXIT_FAILURE);
-	}
-
+	ret = zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type);
 	zbx_free(db_version_info.friendly_current_version);
+	return ret;
 }
 
-static void	proxy_db_init(void)
+static int	proxy_db_init(void)
 {
 	char		*error = NULL;
-	int		db_type, version_check;
+	int		db_type, version_check, ret;
 
-	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error))
+	if (SUCCEED != (ret = zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	zbx_db_init_autoincrement_options();
@@ -1398,23 +1395,29 @@ static void	proxy_db_init(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 	else if (ZBX_DB_PROXY != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
 				" Zabbix server database", zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 	}
 
 	zbx_db_check_character_set();
-	zbx_check_db();
+	if (SUCCEED != (ret = zbx_check_db()))
+		goto out;
 
 	if (SUCCEED != (version_check = zbx_db_check_version_and_upgrade(ZBX_HA_MODE_STANDALONE)))
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
-			exit(EXIT_FAILURE);
+		{
+			ret = FAIL;
+			goto out;
+		}
 
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", zbx_config_dbhigh->config_dbname);
 		zbx_db_deinit();
@@ -1423,22 +1426,24 @@ static void	proxy_db_init(void)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file \"%s\": %s, exiting...",
 					zbx_config_dbhigh->config_dbname, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			ret = FAIL;
+			goto out;
 		}
 
-		proxy_db_init();
+		ret = proxy_db_init();
 #else
 		ZBX_UNUSED(version_check);
-		exit(EXIT_FAILURE);
+		ret = FAIL;
+		goto out;
 #endif
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
-	zbx_db_close();
 #endif
+out:
+	return ret;
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1709,11 +1714,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
-	proxy_db_init();
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+	if (SUCCEED != proxy_db_init())
+	{
+		zbx_db_close();
+		exit(EXIT_FAILURE);
+	}
 
 	zbx_pb_init();
-
+	zbx_db_close();
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 

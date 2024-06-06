@@ -213,7 +213,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		// Wait until widget is pasted and loading spinner disappeared.
 		sleep(1);
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$copied_widget = $dashboard->getWidgets()->last();
+		$copied_widget = $dashboard->getWidgets()->last()->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
