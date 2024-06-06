@@ -17,11 +17,13 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
+ * @dataSource AllItemValueTypes
+ *
  * @backup dashboard
  *
  * @onBefore prepareData
  */
-class testDashboardHostNavigatorWidget extends testWidgets {
+class testDashboardItemNavigatorWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
@@ -30,21 +32,17 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 		return [
 			CMessageBehavior::class,
 			CTableBehavior::class,
-			[
-				'class' => CTagBehavior::class,
-				'tag_selector' => 'id:tags_table_host_tags'
-			]
+			CTagBehavior::class
 		];
 	}
 
 	protected static $dashboardid;
 	protected static $groupids;
-	protected static $update_widget = 'Update Host navigator widget';
-	const MAINTENANCE_HOSTNAME = 'Host in maintenance';
-	const DEFAULT_WIDGET = 'Default Host navigator widget';
+	protected static $update_widget = 'Update Item navigator widget';
+	const DEFAULT_WIDGET = 'Default Item navigator widget';
 	const DELETE_WIDGET = 'Widget for delete';
-	const DEFAULT_DASHBOARD = 'Dashboard for Host navigator widget test';
-	const DASHBOARD_FOR_WIDGET_CREATE = 'Dashboard for Host navigator widget create/update test';
+	const DEFAULT_DASHBOARD = 'Dashboard for Item navigator widget test';
+	const DASHBOARD_FOR_WIDGET_CREATE = 'Dashboard for Item navigator widget create/update test';
 
 	/**
 	 * Get 'Group by' table element with mapping set.
@@ -77,7 +75,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						'name' => 'Page with default widgets',
 						'widgets' => [
 							[
-								'type' => 'hostnavigator',
+								'type' => 'itemnavigator',
 								'name' => self::DEFAULT_WIDGET,
 								'x' => 0,
 								'y' => 0,
@@ -85,7 +83,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 								'height' => 5
 							],
 							[
-								'type' => 'hostnavigator',
+								'type' => 'itemnavigator',
 								'name' => self::DELETE_WIDGET,
 								'x' => 36,
 								'y' => 0,
@@ -103,7 +101,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						'name' => 'Page with created/updated widgets',
 						'widgets' => [
 							[
-								'type' => 'hostnavigator',
+								'type' => 'itemnavigator',
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
@@ -113,7 +111,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
-										'value' => 'ZXCVB'
+										'value' => 'ZBXIN'
 									]
 								]
 							]
@@ -126,15 +124,15 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 
 		// Create hostgroups for hosts.
 		CDataHelper::call('hostgroup.create', [
-			['name' => 'First Group for Host navigator check'],
-			['name' => 'Second Group for Host navigator check']
+			['name' => 'First Group for Item navigator check'],
+			['name' => 'Second Group for Item navigator check']
 		]);
 		self::$groupids = CDataHelper::getIds('name');
 
 		// Create hosts.
-		$result = CDataHelper::createHosts([
+		CDataHelper::createHosts([
 			[
-				'host' => 'First host for host navigator widget',
+				'host' => 'First host for Item navigator widget',
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -142,15 +140,15 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						'useip' => INTERFACE_USE_IP,
 						'ip' => '127.0.7.1',
 						'dns' => '',
-						'port' => '10097'
+						'port' => '11197'
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['First Group for Host navigator check']
+					'groupid' => self::$groupids['First Group for Item navigator check']
 				]
 			],
 			[
-				'host' => 'Second host for host navigator widget',
+				'host' => 'Second host for Item navigator widget',
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -158,80 +156,50 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						'useip' => INTERFACE_USE_IP,
 						'ip' => '127.0.7.2',
 						'dns' => '',
-						'port' => '10098'
+						'port' => '11198'
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['Second Group for Host navigator check']
+					'groupid' => self::$groupids['Second Group for Item navigator check']
 				]
-			],
-			[
-				'host' => self::MAINTENANCE_HOSTNAME,
-				'groups' => ['groupid' => 4] // Zabbix servers.
 			]
 		]);
-
-		$maintenace_hostid = $result['hostids'][self::MAINTENANCE_HOSTNAME];
-
-		$maintenances = CDataHelper::call('maintenance.create', [
-			[
-				'name' => 'Maintenance for Host navigator widget',
-				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'description' => 'Maintenance for icon check in Host navigator widget',
-				'active_since' => time() - 100,
-				'active_till' => time() + 31536000,
-				'groups' => [['groupid' => 4]], // Zabbix servers.
-				'timeperiods' => [[]]
-			]
-		]);
-		$maintenanceid = $maintenances['maintenanceids'][0];
-
-		DBexecute("INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1000000, ".
-				zbx_dbstr($maintenanceid).",".zbx_dbstr($maintenace_hostid).")"
-		);
-
-		DBexecute("UPDATE hosts SET maintenanceid=".zbx_dbstr($maintenanceid).
-				", maintenance_status=1, maintenance_type=".MAINTENANCE_TYPE_NORMAL.", maintenance_from=".zbx_dbstr(time()-1000).
-				" WHERE hostid=".zbx_dbstr($maintenace_hostid)
-		);
 	}
 
-	public function testDashboardHostNavigatorWidget_Layout() {
+	public function testDashboardItemNavigatorWidget_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dialog = $dashboard->edit()->addWidget();
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form = $dialog->asForm();
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host navigator')]);
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item navigator')]);
 
 		// Check default state.
 		$default_state = [
-			'Type' => 'Host navigator',
+			'Type' => 'Item navigator',
 			'Name' => '',
 			'Show header' => true,
 			'Refresh interval' => 'Default (1 minute)',
 			'Host groups' => '',
-			'Host patterns' => '',
-			'Host status' => 'Any',
+			'Hosts' => '',
 			'Host tags' => 'And/Or',
 			'id:host_tags_0_tag' => '',
 			'id:host_tags_0_operator' => 'Contains',
 			'id:host_tags_0_value' => '',
-			'Not classified' => false,
-			'Information' => false,
-			'Warning' => false,
-			'Average' => false,
-			'High' => false,
-			'Disaster' => false,
-			'Show hosts in maintenance' => false,
+			'Item patterns' => '',
+			'Item tags' => 'And/Or',
+			'id:item_tags_0_tag' => '',
+			'id:item_tags_0_operator' => 'Contains',
+			'id:item_tags_0_value' => '',
+			'State' => 'All',
 			'Show problems' => 'Unsuppressed',
 			'Group by' => [],
-			'Host limit' => 100
+			'Item limit' => 100
 		];
 
 		$form->checkValue($default_state);
-		$this->assertEquals(['Host limit'], $form->getRequiredLabels());
+		$this->assertEquals(['Item limit'], $form->getRequiredLabels());
 
 		// Check dropdown options.
 		$this->getGroupByTable()->fill(['attribute' => 'Host group']);
@@ -243,7 +211,10 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			'id:host_tags_0_operator' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal',
 				'Does not contain'
 			],
-			'Group by' => ['Host group', 'Tag value', 'Severity']
+			'id:item_tags_0_operator' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal',
+				'Does not contain'
+			],
+			'Group by' => ['Host group', 'Host name', 'Host tag value', 'Item tag value']
 		];
 		foreach ($options as $field => $values) {
 			$this->assertEquals($values, $form->getField($field)->asDropdown()->getOptions()->asText());
@@ -257,8 +228,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			'id:groupids__ms' => [
 				'placeholder' => 'type here to search'
 			],
-			'id:hosts__ms' => [
-				'placeholder' => 'patterns'
+			'id:hostids__ms' => [
+				'placeholder' => 'type here to search'
 			],
 			'id:host_tags_0_tag' => [
 				'maxlength' => 255,
@@ -268,11 +239,22 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				'maxlength' => 255,
 				'placeholder' => 'value'
 			],
+			'id:items__ms' => [
+				'placeholder' => 'patterns'
+			],
+			'id:item_tags_0_tag' => [
+				'maxlength' => 255,
+				'placeholder' => 'tag'
+			],
+			'id:item_tags_0_value' => [
+				'maxlength' => 255,
+				'placeholder' => 'value'
+			],
 			'id:group_by_0_tag_name' => [
 				'maxlength' => 255,
 				'placeholder' => 'tag'
 			],
-			'Host limit' => [
+			'Item limit' => [
 				'maxlength' => 4
 			]
 		];
@@ -282,19 +264,19 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			}
 		}
 
-		// Check radio buttons and checkboxes.
+		// Check radio buttons.
 		$selection_elements = [
-			'Host status' => ['Any', 'Enabled', 'Disabled'],
 			'Host tags' => ['And/Or', 'Or'],
-			'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+			'Item tags' => ['And/Or', 'Or'],
+			'State' => ['All', 'Normal', 'Not supported'],
 			'Show problems' => ['All', 'Unsuppressed', 'None']
 		];
 		foreach ($selection_elements as $name => $labels) {
 			$this->assertEquals($labels, $form->getField($name)->getLabels()->asText());
 		}
 
-		// Check 'Host tags' and 'Group by' table buttons.
-		foreach (['id:tags_table_host_tags', 'id:group_by-table'] as $locator) {
+		// Check 'Host tags', 'Item tags' and 'Group by' table buttons.
+		foreach (['id:tags_table_host_tags', 'id:tags_table_item_tags', 'id:group_by-table'] as $locator) {
 			$this->assertEquals(2, $form->query($locator)->one()->query('button', ['Add', 'Remove'])->all()
 					->filter((CElementFilter::CLICKABLE))->count()
 			);
@@ -305,21 +287,33 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
 
-		// Check Host groups popup menu options.
-		$selector = $form->getField('Host groups');
-		$popup_menu = $selector->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
+		// Check Hosts and Host groups popup menu options.
+		foreach (['Hosts', 'Host groups'] as $label) {
+			$selector = $form->getField($label);
+			$popup_menu = $selector->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
 
-		foreach ([$selector->query('button:Select')->one(), $popup_menu] as $button) {
-			$this->assertTrue($button->isClickable());
-		}
+			foreach ([$selector->query('button:Select')->one(), $popup_menu] as $button) {
+				$this->assertTrue($button->isClickable());
+			}
 
-		$options = ['Host groups', 'Widget'];
-		foreach ($options as $title) {
+			$options = ($label === 'Hosts') ? ['Hosts', 'Widget', 'Dashboard'] : ['Host groups', 'Widget'];
 			$this->assertEquals($options, $popup_menu->asPopupButton()->getMenu()->getItems()->asText());
-			$popup_menu->asPopupButton()->getMenu()->select($title);
-			$dialogs = COverlayDialogElement::find()->all()->waitUntilReady();
-			$this->assertEquals($title, $dialogs->last()->getTitle());
-			$dialogs->last()->close();
+
+			foreach ($options as $title) {
+				$popup_menu->asPopupButton()->getMenu()->select($title);
+
+				if ($title === 'Dashboard') {
+					$form->checkValue([$label => 'Dashboard']);
+					$this->assertTrue($selector->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+							->one()->isVisible()
+					);
+				}
+				else {
+					$dialogs = COverlayDialogElement::find()->all()->waitUntilReady();
+					$this->assertEquals($title, $dialogs->last()->getTitle());
+					$dialogs->last()->close();
+				}
+			}
 		}
 	}
 
@@ -330,9 +324,9 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Host limit' => ''
+						'Item limit' => ''
 					],
-					'error' => 'Invalid parameter "Host limit": value must be one of 1-9999.'
+					'error' => 'Invalid parameter "Item limit": value must be one of 1-9999.'
 				]
 			],
 			// #1.
@@ -340,9 +334,9 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Host limit' => ' '
+						'Item limit' => ' '
 					],
-					'error' => 'Invalid parameter "Host limit": value must be one of 1-9999.'
+					'error' => 'Invalid parameter "Item limit": value must be one of 1-9999.'
 				]
 			],
 			// #2.
@@ -350,9 +344,9 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Host limit' => '0'
+						'Item limit' => '0'
 					],
-					'error' => 'Invalid parameter "Host limit": value must be one of 1-9999.'
+					'error' => 'Invalid parameter "Item limit": value must be one of 1-9999.'
 				]
 			],
 			// #3.
@@ -360,9 +354,9 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Host limit' => 'test'
+						'Item limit' => 'test'
 					],
-					'error' => 'Invalid parameter "Host limit": value must be one of 1-9999.'
+					'error' => 'Invalid parameter "Item limit": value must be one of 1-9999.'
 				]
 			],
 			// #4.
@@ -383,8 +377,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'fields' => [],
 					'group_by' => [
-						['attribute' => 'Severity'],
-						['attribute' => 'Severity']
+						['attribute' => 'Host name'],
+						['attribute' => 'Host name']
 					],
 					'error' => 'Invalid parameter "Group by": rows must be unique.'
 				]
@@ -396,7 +390,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'fields' => [],
 					'group_by' => [
 						['attribute' => 'Host group'],
-						['attribute' => 'Severity'],
+						['attribute' => 'Host name'],
 						['attribute' => 'Host group']
 					],
 					'error' => 'Invalid parameter "Group by": rows must be unique.'
@@ -408,7 +402,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'fields' => [],
 					'group_by' => [
-						['attribute' => 'Tag value']
+						['attribute' => 'Host tag value']
 					],
 					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
 				]
@@ -419,8 +413,19 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'fields' => [],
 					'group_by' => [
-						['attribute' => 'Tag value'],
-						['attribute' => 'Tag value']
+						['attribute' => 'Item tag value']
+					],
+					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
+				]
+			],
+			// #9.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host tag value'],
+						['attribute' => 'Host tag value']
 					],
 					'error' => [
 						'Invalid parameter "Group by": tag cannot be empty.',
@@ -428,32 +433,32 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #9.
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Host limit' => '0'
+						'Item limit' => '0'
 					],
 					'group_by' => [
-						['attribute' => 'Tag value'],
-						['attribute' => 'Tag value']
+						['attribute' => 'Item tag value'],
+						['attribute' => 'Item tag value']
 					],
 					'error' => [
 						'Invalid parameter "Group by": tag cannot be empty.',
 						'Invalid parameter "Group by": rows must be unique.',
-						'Invalid parameter "Host limit": value must be one of 1-9999.'
+						'Invalid parameter "Item limit": value must be one of 1-9999.'
 					]
 				]
 			],
-			// #10.
+			// #11.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => []
 				]
 			],
-			// #11.
+			// #12.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -463,26 +468,13 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #12.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Host groups' => 'Zabbix servers',
-						'Refresh interval' => '10 seconds'
-					]
-				]
-			],
 			// #13.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Host groups' => [
-							'Zabbix servers',
-							'First Group for Host navigator check'
-						],
-						'Refresh interval' => '30 seconds'
+						'Host groups' => 'First Group for Item navigator check',
+						'Refresh interval' => '10 seconds'
 					]
 				]
 			],
@@ -491,11 +483,11 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Host patterns' => [
-							'ЗАББИКС Сервер',
-							'First host for host navigator widget'
+						'Host groups' => [
+							'First Group for Item navigator check',
+							'Second Group for Item navigator check'
 						],
-						'Refresh interval' => '1 minute'
+						'Refresh interval' => '30 seconds'
 					]
 				]
 			],
@@ -504,9 +496,11 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Host status => Enabled',
-						'Host status' => 'Enabled',
-						'Refresh interval' => '2 minutes'
+						'Hosts' => [
+							'First host for Item navigator widget',
+							'Second host for Item navigator widget'
+						],
+						'Refresh interval' => '1 minute'
 					]
 				]
 			],
@@ -515,9 +509,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Host status => Disabled',
-						'Host status' => 'Disabled',
-						'Refresh interval' => '10 minutes'
+						'Host tags' => 'Or',
+						'Refresh interval' => '2 minutes'
 					]
 				]
 			],
@@ -526,9 +519,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Host status => Any',
-						'Host status' => 'Any',
-						'Refresh interval' => '15 minutes'
+						'Item patterns' => 'available*',
+						'Refresh interval' => '10 minutes'
 					]
 				]
 			],
@@ -537,9 +529,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Host tags' => 'Or',
-						'Host limit' => '1',
-						'Refresh interval' => 'Default (1 minute)'
+						'Item tags' => 'Or',
+						'Refresh interval' => '15 minutes'
 					]
 				]
 			],
@@ -549,7 +540,9 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host tags' => 'And/Or',
-						'Host limit' => '9999'
+						'Item tags' => 'And/Or',
+						'Item limit' => '1',
+						'Refresh interval' => 'Default (1 minute)'
 					]
 				]
 			],
@@ -558,10 +551,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Random severities check',
-						'Not classified' => true,
-						'Average' => true,
-						'Disaster' => true
+						'Item limit' => '9999'
 					]
 				]
 			],
@@ -570,13 +560,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => '📌 All severities check',
-						'Not classified' => true,
-						'Information' => true,
-						'Warning' => true,
-						'Average' => true,
-						'High' => true,
-						'Disaster' => true
+						'Name' => 'State => Normal',
+						'State' => 'Normal'
 					]
 				]
 			],
@@ -585,9 +570,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Maintenance check',
-						'Show hosts in maintenance' => true,
-						'Show problems' => 'All'
+						'Name' => 'State => Not supported',
+						'State' => 'Not supported'
 					]
 				]
 			],
@@ -596,8 +580,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Show hosts in maintenance' => false,
-						'Show problems' => 'None'
+						'Name' => 'Show problems => All',
+						'Show problems' => 'All'
 					]
 				]
 			],
@@ -606,12 +590,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Check all "Group by" attributes'
-					],
-					'group_by' => [
-						['attribute' => 'Tag value', 'tag' => 'linux'],
-						['attribute' => 'Host group'],
-						['attribute' => 'Severity']
+						'Name' => 'Show problems => None',
+						'Show problems' => 'None'
 					]
 				]
 			],
@@ -620,25 +600,13 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => STRING_255,
-						'Show header' => true,
-						'Host groups' => [
-							'Zabbix servers',
-							'First Group for Host navigator check'
-						],
-						'Host patterns' => [
-							'First host for host navigator widget',
-							'Second host for host navigator widget'
-						],
-						'Host status' => 'Enabled',
-						'Host tags' => 'Or',
-						'Average' => true,
-						'Show hosts in maintenance' => true,
-						'Show problems' => 'All',
-						'Host limit' => '9999'
+						'Name' => 'Check all "Group by" attributes'
 					],
-					'tags' => [
-						['name' => STRING_255, 'operator' => 'Does not contain', 'value' => STRING_255]
+					'group_by' => [
+						['attribute' => 'Host tag value', 'tag' => STRING_255],
+						['attribute' => 'Item tag value', 'tag' => STRING_255],
+						['attribute' => 'Host name'],
+						['attribute' => 'Host group']
 					]
 				]
 			],
@@ -647,14 +615,31 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => '  Test trailing spaces  ',
-						'Host limit' => ' 1 ',
-						'Host tags' => 'And/Or'
+						'Name' => STRING_255,
+						'Show header' => true,
+						'Host groups' => [
+							'First Group for Item navigator check',
+							'Second Group for Item navigator check'
+						],
+						'Hosts' => [
+							'First host for Item navigator widget',
+							'Second host for Item navigator widget'
+						],
+						'Host tags' => 'Or',
+						'Item patterns' => 'memory*',
+						'Item tags' => 'Or',
+						'State' => 'All',
+						'Show problems' => 'Unsuppressed',
+						'Item limit' => '111'
 					],
 					'tags' => [
-						['name' => '  Host  ', 'operator' => 'Does not equal', 'value' => '  test  ']
-					],
-					'trim' => ['Name', 'Host limit', 'id:host_tags_0_tag', 'id:host_tags_0_value']
+						'host' => [
+							['name' => STRING_255, 'operator' => 'Does not contain', 'value' => STRING_255]
+						],
+						'item' => [
+							['name' => STRING_255, 'operator' => 'Does not equal', 'value' => STRING_255]
+						]
+					]
 				]
 			],
 			// #27.
@@ -662,11 +647,19 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Empty tag and value'
+						'Name' => '  Test trailing spaces  ',
+						'Item limit' => ' 1 ',
+						'Item tags' => 'And/Or'
 					],
 					'tags' => [
-						['name' => '', 'operator' => 'Contains', 'value' => '']
-					]
+						'host' => [
+							['name' => '  Host  ', 'operator' => 'Does not equal', 'value' => '  test  ']
+						],
+						'item' => [
+							['name' => '  Item  ', 'operator' => 'Does not contain', 'value' => '  test  ']
+						]
+					],
+					'trim' => ['Name', 'Item limit', 'id:host_tags_0_tag', 'id:host_tags_0_value', 'id:item_tags_0_tag', 'id:item_tags_0_value']
 				]
 			],
 			// #28.
@@ -674,17 +667,40 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Different types of macro in input fields {$A}'
+						'Name' => 'Empty tag and value'
 					],
 					'tags' => [
-						['name' => '{HOST.NAME}', 'operator' => 'Does not contain', 'value' => '{ITEM.VALUE}']
-					],
-					'group_by' => [
-						['attribute' => 'Tag value', 'tag' => '{HOST.NAME}']
+						'host' => [
+							['name' => '', 'operator' => 'Contains', 'value' => '']
+						],
+						'item' => [
+							['name' => '', 'operator' => 'Contains', 'value' => '']
+						]
 					]
 				]
 			],
-			// #29 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
+			// #29.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Different types of macro in input fields {$A}'
+					],
+					'tags' => [
+						'host' => [
+							['name' => '{HOST.NAME}', 'operator' => 'Does not contain', 'value' => '{HOST.CONN}']
+						],
+						'item' => [
+							['name' => '{ITEM.NAME}', 'operator' => 'Does not contain', 'value' => '{ITEM.VALUE}']
+						]
+					],
+					'group_by' => [
+						['attribute' => 'Host tag value', 'tag' => '{HOST.NAME}'],
+						['attribute' => 'Item tag value', 'tag' => '{ITEM.NAME}']
+					]
+				]
+			],
+			// #30 Check that host and item tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -692,14 +708,26 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						'Name' => 'Check tags table'
 					],
 					'tags' => [
-						['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
-						['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag'],
-						['name' => 'Check tag with operator - Equals ⚠️', 'operator' => 'Equals', 'value' => 'Warning ⚠️'],
-						['name' => 'Check tag with operator - Exists', 'operator' => 'Exists'],
-						['name' => 'Check tag with operator - Contains ❌', 'operator' => 'Contains', 'value' => 'tag value ❌'],
-						['name' => 'Check tag with operator - Does not exist', 'operator' => 'Does not exist'],
-						['name' => 'Check tag with operator - Does not equal', 'operator' => 'Does not equal', 'value' => 'Average'],
-						['name' => 'Check tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
+						'host' => [
+							['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
+							['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag'],
+							['name' => 'Check host tag with operator - Equals ⚠️', 'operator' => 'Equals', 'value' => 'Warning ⚠️'],
+							['name' => 'Check host tag with operator - Exists', 'operator' => 'Exists'],
+							['name' => 'Check host tag with operator - Contains ❌', 'operator' => 'Contains', 'value' => 'tag value ❌'],
+							['name' => 'Check host tag with operator - Does not exist', 'operator' => 'Does not exist'],
+							['name' => 'Check host tag with operator - Does not equal', 'operator' => 'Does not equal', 'value' => 'Average'],
+							['name' => 'Check host tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
+						],
+						'item' => [
+							['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
+							['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag'],
+							['name' => 'Check item tag with operator - Equals 🌵', 'operator' => 'Equals', 'value' => 'Warning 🌵'],
+							['name' => 'Check item tag with operator - Exists', 'operator' => 'Exists'],
+							['name' => 'Check item tag with operator - Contains 🐙', 'operator' => 'Contains', 'value' => 'tag value 🐙'],
+							['name' => 'Check item tag with operator - Does not exist', 'operator' => 'Does not exist'],
+							['name' => 'Check item tag with operator - Does not equal', 'operator' => 'Does not equal', 'value' => 'Average'],
+							['name' => 'Check item tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
+						]
 					]
 				]
 			]
@@ -709,18 +737,18 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 	/**
 	 * @dataProvider getWidgetData
 	 */
-	public function testDashboardHostNavigatorWidget_Create($data) {
+	public function testDashboardItemNavigatorWidget_Create($data) {
 		$this->checkWidgetForm($data);
 	}
 
 	/**
 	 * @dataProvider getWidgetData
 	 */
-	public function testDashboardHostNavigatorWidget_Update($data) {
+	public function testDashboardItemNavigatorWidget_Update($data) {
 		$this->checkWidgetForm($data, true);
 	}
 
-	public function testDashboardHostNavigatorWidget_SimpleUpdate() {
+	public function testDashboardItemNavigatorWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$this->setWidgetConfiguration(self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE], self::$update_widget);
 		CDashboardElement::find()->one()->save();
@@ -731,7 +759,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 	}
 
 	/**
-	 * Perform Host navigator widget creation or update and verify the result.
+	 * Perform Item navigator widget creation or update and verify the result.
 	 *
 	 * @param boolean $update	updating is performed
 	 */
@@ -742,7 +770,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 
 		$data['fields']['Name'] = ($data['fields'] === [])
 			? ''
-			: CTestArrayHelper::get($data, 'fields.Name', 'Host navigator '.microtime());
+			: CTestArrayHelper::get($data, 'fields.Name', 'Item navigator '.microtime());
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid[self::DASHBOARD_FOR_WIDGET_CREATE])->waitUntilReady();
@@ -753,10 +781,13 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
 			: $dashboard->edit()->addWidget()->asForm();
 
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host navigator')]);
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item navigator')]);
 
 		if (array_key_exists('tags', $data)) {
-			$this->setTags($data['tags']);
+			foreach ($data['tags'] as $entity => $values) {
+				$this->setTagSelector('id:tags_table_'.$entity.'_tags');
+				$this->setTags($values);
+			}
 		}
 
 		$form->fill($data['fields']);
@@ -781,8 +812,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
-			// If name is empty string it is replaced by default widget name "Host navigator".
-			$header = ($data['fields']['Name'] === '') ? 'Host navigator' : $data['fields']['Name'];
+			// If name is empty string it is replaced by default widget name "Item navigator".
+			$header = ($data['fields']['Name'] === '') ? 'Item navigator' : $data['fields']['Name'];
 			if ($update) {
 				self::$update_widget = $header;
 			}
@@ -809,7 +840,10 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			$saved_form->checkValue($data['fields']);
 
 			if (array_key_exists('tags', $data)) {
-				$this->assertTags($data['tags']);
+				foreach ($data['tags'] as $entity => $values) {
+					$this->setTagSelector('id:tags_table_'.$entity.'_tags');
+					$this->assertTags($values);
+				}
 			}
 
 			// Close widget window and cancel editing the dashboard.
@@ -854,7 +888,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testDashboardHostNavigatorWidget_Cancel($data) {
+	public function testDashboardItemNavigatorWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$new_name = 'Widget to be cancelled';
 
@@ -869,23 +903,28 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host navigator')]);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item navigator')]);
 		}
 
 		$form->fill([
 			'Name' => $new_name,
 			'Refresh interval' => '15 minutes',
-			'Host status' => 'Enabled',
 			'Host tags' => 'Or',
-			'id:host_tags_0_tag' => 'trigger',
+			'id:host_tags_0_tag' => 'host',
 			'id:host_tags_0_operator' => 'Does not contain',
 			'id:host_tags_0_value' => 'cancel',
-			'Disaster' => true,
-			'Show hosts in maintenance' => true,
+			'Item patterns' => 'available*',
+			'id:item_tags_0_tag' => 'item',
+			'id:item_tags_0_operator' => 'Does not contain',
+			'id:item_tags_0_value' => 'cancel',
+			'State' => 'Normal',
 			'Show problems' => 'All',
-			'Host limit' => '50'
+			'Item limit' => '777'
 		]);
-		$this->getGroupByTable()->fill(['attribute' => 'Tag value', 'tag' => 'windows']);
+		$this->getGroupByTable()->fill([
+			['attribute' => 'Host tag value', 'tag' => 'windows'],
+			['attribute' => 'Item tag value', 'tag' => 'memory']
+		]);
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
@@ -919,7 +958,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
-	public function testDashboardHostNavigatorWidget_Delete() {
+	public function testDashboardItemNavigatorWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid[self::DEFAULT_DASHBOARD])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->edit();
@@ -939,32 +978,22 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 	}
 
 	/**
-	 * Maintenance icon hintbox check.
+	 * Row highlight check.
 	 */
-	public function testDashboardHostNavigatorWidget_MaintenanceIconHintbox() {
+	public function testDashboardItemNavigatorWidget_RowHighlight() {
 		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
-				['Host patterns' => self::MAINTENANCE_HOSTNAME, 'Show hosts in maintenance' => true]);
-		$dashboard = CDashboardElement::find()->one();
-		$dashboard->save();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-		$widget = $dashboard->getWidget(self::DEFAULT_WIDGET);
-		$widget->query('xpath://button['.CXPathHelper::fromClass('zi-wrench-alt-small').']')->waitUntilClickable()->one()->click();
-		$hint = $widget->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
-		$hint_text = "Maintenance for Host navigator widget [Maintenance with data collection]\n".
-				"Maintenance for icon check in Host navigator widget";
-		$this->assertEquals($hint_text, $hint);
+				['Item patterns' => '*memory in*']);
+		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Available memory in %', true);
+		CDashboardElement::find()->one()->save();
+		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Available memory in %');
 	}
 
 	/**
-	 * Row highlight check.
+	 * Test function for assuring that all types of items are available in Item navigator widget.
 	 */
-	public function testDashboardHostNavigatorWidget_RowHighlight() {
-		$this->setWidgetConfiguration(self::$dashboardid[self::DEFAULT_DASHBOARD], self::DEFAULT_WIDGET,
-				['Host patterns' => 'Second host for host navigator widget']);
-		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Second host for host navigator widget', true);
-		CDashboardElement::find()->one()->save();
-		$this->checkRowHighlight(self::DEFAULT_WIDGET, 'Second host for host navigator widget');
+	public function testDashboardItemNavigatorWidget_CheckAvailableItems() {
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid[self::DEFAULT_DASHBOARD],
+				'Item navigator'
+		);
 	}
 }
