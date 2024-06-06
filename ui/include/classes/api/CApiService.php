@@ -991,8 +991,6 @@ class CApiService {
 	/**
 	 * Throws an API exception.
 	 *
-	 * @static
-	 *
 	 * @param int    $code
 	 * @param string $error
 	 */
@@ -1356,8 +1354,6 @@ class CApiService {
 
 	/**
 	 * Check access to specific access rule.
-	 *
-	 * @static
 	 *
 	 * @param string $rule_name  Rule name.
 	 *

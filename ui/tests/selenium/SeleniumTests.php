@@ -73,6 +73,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelect
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemHistoryWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPieChartWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
@@ -398,6 +399,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
+		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPieChartWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');

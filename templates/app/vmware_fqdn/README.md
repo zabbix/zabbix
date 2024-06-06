@@ -6,11 +6,11 @@
 This template is designed for the effortless deployment of both VMware vCenter and ESX hypervisor monitoring and doesn't require any external scripts.
 
 The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
-For additional information please check https://www.zabbix.com/documentation/7.0/manual/vm_monitoring
+For additional information please check https://www.zabbix.com/documentation/7.2/manual/vm_monitoring
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -51,7 +51,7 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/7.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
+|Event log|<p>Collect VMware event log. See also: https://www.zabbix.com/documentation/7.2/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records</p>|Simple check|vmware.eventlog[{$VMWARE.URL},skip]|
 |Full name|<p>VMware service full name.</p>|Simple check|vmware.fullname[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Version|<p>VMware service version.</p>|Simple check|vmware.version[{$VMWARE.URL}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 

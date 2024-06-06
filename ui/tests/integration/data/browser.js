@@ -135,8 +135,7 @@ try
 
 	el.click();
 
-	el = browser.findElement("link text", "Data collection"); // animation
-	Zabbix.sleep(250); // animation
+	el = browser.findElement("link text", "Data collection");
 
 	if (el === null)
 	{
@@ -180,7 +179,6 @@ try
 	Zabbix.log(5, "Web length: " + el.length)
 
 	el = browser.findElement("link text", "Alerts");
-	Zabbix.sleep(250); // animation
 	if (el === null)
 	{
 		throw Error("cannot find Alerts");
@@ -193,8 +191,10 @@ try
 		throw Error("cannot find //li[@id='alerts' and contains(@class,'is-expanded')]");
 	}
 
+	Zabbix.sleep(250); // Alerts is clicked and Media Types slide up
+
 	el = browser.findElement("link text", "Media types");
-	Zabbix.sleep(500); // animation
+
 	if (el === null)
 	{
 		throw Error("cannot find Media types");
@@ -317,11 +317,50 @@ try
 	el.click();
 
 	browser2.navigate(parameters.url);
-	el = browser2.findElement("link text", "Sign out");
+	elSignOut = browser2.findElement("link text", "Sign out");
 
-	if (el != null)
+	if (elSignOut != null)
 	{
 		throw Error("logged in without password after sign out");
+	}
+
+	var bypass = {};
+
+	bypass[atob('//9k')] = 'test';
+	bypass.navigate = browser.navigate;
+
+	try
+	{
+		bypass.navigate('test');
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "navigation bypass handled " + error);
+	}
+
+	var bypass_alert = {};
+
+	bypass_alert.dismiss = alert_window.dismiss
+
+	try
+	{
+		bypass_alert.dismiss();
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "alert bypass handled " + error);
+	}
+
+	var bypass_el = {};
+
+	bypass_el.click = el.click;
+	try
+	{
+		bypass_el.click();
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "alert click handled " + error);
 	}
 }
 catch (err)

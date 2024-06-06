@@ -602,8 +602,6 @@ class CApiInputValidator {
 	/**
 	 * Returns unescaped array of "in" rules.
 	 *
-	 * @static
-	 *
 	 * @param string $in  A comma-delimited character string. For example, 'xml,json' or '\,,.,/'.
 	 *
 	 * @return array  An array of "in" rules. For example, ['xml', 'json'] or [',', '.', '/'].
@@ -1236,8 +1234,6 @@ class CApiInputValidator {
 	 * Validate integer ranges.
 	 * Example:
 	 *   -100-0,0-100,200,300-{$MACRO},{$MACRO},{#LLD},400-500
-	 *
-	 * @static
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO

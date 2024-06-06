@@ -1987,7 +1987,7 @@ static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, zbx_db_medi
 	{
 		if (MEDIA_TYPE_EMAIL == mt->type)
 		{
-			body = zbx_email_make_body(dispatch->message, mt->message_format, dispatch->message_format,
+			body = zbx_email_make_body(dispatch->message, mt->message_format, dispatch->content_name,
 					dispatch->message_format, dispatch->content, dispatch->content_size);
 			*message_format = ZBX_MEDIA_MESSAGE_FORMAT_MULTI;
 		}
