@@ -436,6 +436,8 @@ $formgrid = (new CFormGrid())
 	]);
 
 if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
+	$formgrid->addItem(new CVar('selectedInterfaceId', $item['interfaceid']));
+
 	$interface = array_key_exists($item['interfaceid'], $data['host']['interfaces'])
 		? $data['host']['interfaces'][$item['interfaceid']] : [];
 
