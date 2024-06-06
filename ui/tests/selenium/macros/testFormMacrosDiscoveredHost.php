@@ -24,19 +24,19 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
  * @backup hosts, config
  */
 class testFormMacrosDiscoveredHost extends testFormMacros {
-	protected static $hostid;
+
 	protected static $inherit_hostid;
 	protected static $hosts = [];
 
-	public $vault_object = 'host';
-	public $hashi_error_field = '/1/macros/4/value';
-	public $cyber_error_field = '/1/macros/4/value';
-	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
-	public $vault_macro_index = 2;
+	protected $vault_object = 'host';
+	protected $hashi_error_field = '/1/macros/4/value';
+	protected $cyber_error_field = '/1/macros/4/value';
+	protected $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
+	protected $vault_macro_index = 2;
 
-	public $revert_macro_1 = '{$SECRET_HOST_MACRO_REVERT}';
-	public $revert_macro_2 = '{$SECRET_HOST_MACRO_2_TEXT_REVERT}';
-	public $revert_macro_object = 'host';
+	protected $revert_macro_1 = '{$SECRET_HOST_MACRO_REVERT}';
+	protected $revert_macro_2 = '{$SECRET_HOST_MACRO_2_TEXT_REVERT}';
+	protected $revert_macro_object = 'host';
 
 	/**
 	 * Create new hosts for discovery rules and prototypes with macros.
@@ -298,15 +298,15 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			]
 		]);
 
-		self::$hostid = $hosts['hostids'][0];
+		$hostid = $hosts['hostids'][0];
 		self::$inherit_hostid = $hosts['hostids'][1];
 
-		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$hostid));
+		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr($hostid));
 		$inherit_interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$inherit_hostid));
 
 		// Create discovery rules.
 		$llds = [
-			'Test discovered hosts' => ['hostid' => self::$hostid, 'interface' => $interfaceid],
+			'Test discovered hosts' => ['hostid' => $hostid, 'interface' => $interfaceid],
 			'Test discovered macros inheritance' => ['hostid' => self::$inherit_hostid, 'interface' => $inherit_interfaceid]
 		];
 

@@ -27,8 +27,6 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	const HOSTMACROS_REMOVE = 'Host prototype for macros {#DELETE}';
 	protected static $lldid;
 	protected static $inherited_macros_prototypeid;
-	protected static $update_macros_prototypeid;
-	protected static $remove_macros_prototypeid;
 	protected static $create_secret_macros_prototypeid;
 	protected static $update_secret_macros_prototypeid;
 	protected static $vault_macros_validation_prototypeid;
@@ -215,8 +213,6 @@ class testFormMacrosHostPrototype extends testFormMacros {
 		$host_prototypes = CDataHelper::getIds('host');
 
 		self::$inherited_macros_prototypeid = $host_prototypes['Host prototype for Inherited {#MACROS} removing'];
-		self::$update_macros_prototypeid = $host_prototypes[self::HOSTMACROS_UPDATE];
-		self::$remove_macros_prototypeid = $host_prototypes[self::HOSTMACROS_REMOVE];
 		self::$create_secret_macros_prototypeid = $host_prototypes['Host prototype for {#SECRET_MACROS} create'];
 		self::$update_secret_macros_prototypeid = $host_prototypes['Host prototype for {#SECRET_MACROS} update'];
 		self::$vault_macros_validation_prototypeid = $host_prototypes['Host prototype for {#VAULT_MACROS} validation'];
