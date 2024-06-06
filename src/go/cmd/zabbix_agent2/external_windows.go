@@ -19,7 +19,6 @@ import (
 	"net"
 
 	"github.com/Microsoft/go-winio"
-	"golang.zabbix.com/agent2/plugins/external"
 )
 
 func getListener(socket string) (listener net.Listener, err error) {
@@ -36,13 +35,3 @@ func getListener(socket string) (listener net.Listener, err error) {
 }
 
 func cleanUpExternal() {}
-
-func checkExternalExits() error {
-	return nil
-}
-
-func checkExternalExit() error {
-	return nil
-}
-
-func listenOnPluginFail(p *external.Plugin, name string) {}
