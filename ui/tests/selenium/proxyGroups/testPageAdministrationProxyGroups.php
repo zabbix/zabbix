@@ -38,8 +38,6 @@ class testPageAdministrationProxyGroups extends CWebTest {
 		];
 	}
 
-//	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
-
 	public function testPageAdministrationProxyGroups_Layout() {
 		$this->page->login()->open('zabbix.php?action=proxygroup.list')->waitUntilReady();
 		$this->page->assertTitle('Configuration of proxy groups');
@@ -497,7 +495,9 @@ class testPageAdministrationProxyGroups extends CWebTest {
 			$this->assertMessage(TEST_GOOD, $title);
 
 			foreach ($data['groups'] as $deleted_group) {
-				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM proxy_group WHERE name='.zbx_dbstr($deleted_group)));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM proxy_group WHERE name='
+						.zbx_dbstr($deleted_group))
+				);
 				$this->assertFalse($this->query('link', $deleted_group)->exists());
 			}
 		}

@@ -263,7 +263,7 @@ class Proxies {
 		DBexecute('UPDATE proxy_rtdata SET version=50401, compatibility=3 WHERE proxyid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
 		DBexecute('UPDATE config SET server_status='.zbx_dbstr('{"version": "6.4.0alpha1"}'));
 
-				// Create Proxy groups.
+		// Create Proxy groups.
 		CDataHelper::call('proxygroup.create', [
 			[
 				'name' => 'Online proxy group',
@@ -330,7 +330,8 @@ class Proxies {
 			'Online proxy group' => [
 				'state' => 3,
 				'proxies' => ['Active proxy 1', 'Active proxy 2', 'Active proxy 3', 'Active proxy to delete',
-						'Proxy_1 for filter', 'Proxy_2 for filter'],
+						'Proxy_1 for filter', 'Proxy_2 for filter'
+				],
 				'active_proxies' => ['Active proxy 1', 'Active proxy 2', 'Active proxy 3']
 			],
 			'2nd Online proxy group' => [

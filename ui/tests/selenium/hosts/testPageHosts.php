@@ -103,9 +103,7 @@ class testPageHosts extends CLegacyWebTest {
 			$monitored_by->select($monitored_by_value);
 
 			foreach ($id_mapping[$monitored_by_value] as $id => $displayed) {
-				$this->assertTrue($filter->query('xpath:.//div[@id='.CXPathHelper::escapeQuotes($id).']/../..')->one()
-						->isDisplayed($displayed)
-				);
+				$this->assertTrue($filter->query('id', $id)->one()->isDisplayed($displayed));
 			}
 		}
 

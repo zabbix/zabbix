@@ -26,9 +26,10 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testFormAdministrationProxyGroups extends CWebTest {
 
-	protected $sql = 'SELECT * FROM proxy_group pg LEFT JOIN proxy_group_rtdata pgr ON pgr.proxy_groupid = pg.proxy_groupid';
+	CONST SQL = 'SELECT * FROM proxy_group pg LEFT JOIN proxy_group_rtdata pgr ON pgr.proxy_groupid = pg.proxy_groupid';
+	CONST CLONE_GROUP = '⭐️😀⭐Smiley प्रॉक्सी 团体⭐️😀⭐ - unknown';
+
 	protected static $update_group = '2nd Online proxy group';
-	protected static $clone_group = '⭐️😀⭐Smiley प्रॉक्सी 团体⭐️😀⭐ - unknown';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -380,7 +381,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		$trim = CTestArrayHelper::get($data, 'trim');
 		if ($expected === TEST_BAD) {
-			$old_hash = CDBHelper::getHash($this->sql);
+			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
 		$this->page->login()->open('zabbix.php?action=proxygroup.list')->waitUntilReady();
@@ -417,7 +418,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 			$this->assertMessage(TEST_BAD, ($update ? 'Cannot update proxy group' : 'Cannot add proxy group'), $data['error']);
 
 			// Check that DB hash is not changed.
-			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 			$dialog->close();
 		}
 		else {
@@ -458,14 +459,14 @@ class testFormAdministrationProxyGroups extends CWebTest {
 
 	public function testFormAdministrationProxyGroups_Clone() {
 		$this->page->login()->open('zabbix.php?action=proxygroup.list')->waitUntilReady();
-		$this->query('link', self::$clone_group)->one()->waitUntilClickable()->click();
+		$this->query('link', self::CLONE_GROUP)->one()->waitUntilClickable()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:proxy-group-form')->asForm()->one();
 		$original_fields = $form->getFields()->asValues();
 		unset($original_fields['Proxies']);
 
-		$new_name = 'Clone:'.self::$clone_group;
+		$new_name = 'Clone:'.self::CLONE_GROUP;
 
 		// Clone proxy group.
 		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
@@ -482,12 +483,16 @@ class testFormAdministrationProxyGroups extends CWebTest {
 		$this->assertEquals($original_fields, $form->getFields()->asValues());
 
 		$dialog->close();
+
+		foreach ([self::CLONE_GROUP, $new_name] as $proxy_group_name) {
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM proxy_group WHERE name='.zbx_dbstr($proxy_group_name)));
+		}
 	}
 
 	public function testFormAdministrationProxyGroups_SimpleUpdate() {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 		$this->page->login()->open('zabbix.php?action=proxygroup.list')->waitUntilReady();
-		$this->query('link', self::$clone_group)->one()->waitUntilClickable()->click();
+		$this->query('link', self::CLONE_GROUP)->one()->waitUntilClickable()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('button:Update')->waitUntilClickable()->one()->click();
 		$dialog->ensureNotPresent();
@@ -496,7 +501,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Proxy group updated');
 
 		// Check that DB hash is not changed.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public function getCancelData() {
@@ -528,7 +533,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 	 * @dataProvider getCancelData
 	 */
 	public function testFormAdministrationProxyGroups_Cancel($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 		$this->page->login()->open('zabbix.php?action=proxygroup.list');
 
 		$new_fields = [
@@ -542,7 +547,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 			$this->query('button:Create proxy group')->one()->waitUntilClickable()->click();
 		}
 		else {
-			$this->query('link', self::$clone_group)->one()->waitUntilClickable()->click();
+			$this->query('link', self::CLONE_GROUP)->one()->waitUntilClickable()->click();
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -566,10 +571,10 @@ class testFormAdministrationProxyGroups extends CWebTest {
 			$dialog->ensureNotPresent();
 		}
 
-		$this->assertTrue($this->query('link', self::$clone_group)->exists());
+		$this->assertTrue($this->query('link', self::CLONE_GROUP)->exists());
 
 		// Check that DB hash is not changed.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public static function getDeleteData() {
@@ -606,7 +611,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 	public function testFormAdministrationProxyGroups_Delete($data) {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		if ($expected === TEST_BAD) {
-			$old_hash = CDBHelper::getHash($this->sql);
+			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
 		$this->page->login()->open('zabbix.php?action=proxygroup.list')->waitUntilReady();
@@ -623,7 +628,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 			$this->assertMessage(TEST_BAD, 'Cannot delete proxy group', $data['error']);
 
 			// Check that DB hash is not changed.
-			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 
 			// Close dialog.
 			$dialog->close();

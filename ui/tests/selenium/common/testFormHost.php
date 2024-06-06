@@ -337,9 +337,7 @@ class testFormHost extends CWebTest {
 			$monitored_by->select($monitored_by_value);
 
 			foreach ($id_mapping[$monitored_by_value] as $id => $displayed) {
-				$this->assertTrue($form->query('xpath:.//div[@id='.CXPathHelper::escapeQuotes($id).']/../..')->one()
-						->isDisplayed($displayed)
-				);
+				$this->assertTrue($form->query('id', $id)->one()->isDisplayed($displayed));
 			}
 		}
 
