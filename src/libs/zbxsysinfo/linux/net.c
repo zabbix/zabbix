@@ -1130,7 +1130,7 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 
 #ifdef HAVE_IPV6
 	get_proc_net_count_ipv6(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp6" : "/proc/net/udp6",
-			state_num, &info_l, &info_r,  &count);
+			state_num, &info_l, &info_r, &count);
 #endif
 
 	SET_UI64_RESULT(result, count);
