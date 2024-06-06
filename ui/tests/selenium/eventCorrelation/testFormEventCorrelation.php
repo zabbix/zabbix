@@ -146,7 +146,7 @@ class testFormEventCorrelation extends CWebTest {
 
 		// Check Operations checkbox list.
 		$operations_checkbox_list = $form->getField('Operations')->asCheckboxList();
-		$this->assertEquals(['Close old events', 'Close new event'], $operations_checkbox_list->getLabels()->asText());
+		$this->assertEquals(['Close old events', 'Close new events'], $operations_checkbox_list->getLabels()->asText());
 		$this->assertEquals([], $operations_checkbox_list->getValue());
 		$this->assertTrue($operations_checkbox_list->isEnabled());
 
@@ -252,7 +252,7 @@ class testFormEventCorrelation extends CWebTest {
 						'Description' => 'Event correlation with description',
 						'Enabled' => false,
 						'Close old events' => true,
-						'Close new event' => true
+						'Close new events' => true
 					],
 					'update_name' => true,
 					'unique_name' => true,
@@ -347,7 +347,7 @@ class testFormEventCorrelation extends CWebTest {
 					'fields' => [
 						'Name' => 'Without operation',
 						'Close old events' => false,
-						'Close new event' => false
+						'Close new events' => false
 					],
 					'conditions' => [
 						[
@@ -1128,7 +1128,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->assertConditionsTable($conditions, $form);
 
 		// Assert 'Operations' checkboxes.
-		foreach (['Close old events' => true, 'Close new event' => false] as $operation => $expected_state) {
+		foreach (['Close old events' => true, 'Close new events' => false] as $operation => $expected_state) {
 			// Find checkbox by label.
 			$checkbox = $form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($operation).
 					']/parent::*//input[@type="checkbox"]'
@@ -1240,9 +1240,9 @@ class testFormEventCorrelation extends CWebTest {
 		if (array_key_exists('fields', $data)) {
 			// Set the default expected operations.
 			if (!array_key_exists('Close old events', $data['fields'])
-					&& !array_key_exists('Close new event', $data['fields'])) {
+					&& !array_key_exists('Close new events', $data['fields'])) {
 				$data['fields']['Close old events'] = true;
-				$data['fields']['Close new event'] = false;
+				$data['fields']['Close new events'] = false;
 			}
 
 			// Special cases when updating.
@@ -1267,7 +1267,7 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		// Fill Condition data.
-		$add_button = $form->getField('Conditions')->query('button:Add')->one();
+		$add_button = $this->page->query('id:condition_table')->one()->query('button:Add')->one();
 
 		foreach (CTestArrayHelper::get($data, 'conditions', []) as $condition) {
 			$add_button->click();
@@ -1294,7 +1294,7 @@ class testFormEventCorrelation extends CWebTest {
 
 			// Only check the expression if 'Type of calculation' not set to 'Custom expression'.
 			if (CTestArrayHelper::get($data, 'calculation') !== 'Custom expression') {
-				$expression_text = $form->query('id:expression')->waitUntilPresent()->one()->getText();
+				$expression_text = $form->query('id:condition_label')->waitUntilPresent()->one()->getText();
 
 				if (array_key_exists('expected_expression'.($update ? '_update' : ''), $data)) {
 					$this->assertEquals($data['expected_expression'.($update ? '_update' : '')], $expression_text);
@@ -1420,7 +1420,7 @@ class testFormEventCorrelation extends CWebTest {
 				'Name' => 'Test cancellation',
 				'Description' => 'Test cancellation description',
 				'Close old events' => false,
-				'Close new event' => true,
+				'Close new events' => true,
 				'Enabled' => true
 			]
 		);
@@ -1510,12 +1510,14 @@ class testFormEventCorrelation extends CWebTest {
 	protected function assertConditionsTable($conditions, $form, $custom_order = false) {
 		$expected_conditions = $this->getExpectedConditionsArray($conditions, $custom_order);
 
-		foreach ($form->query('id:condition_table')->asTable()->one()->getRows() as $i => $row) {
+		// On 6.0 the 'Add' button is placed inside a normal table row.
+		$rows = $form->query('id:condition_table')->asTable()->one()->getRows();
+		for ($i = 0; $i < $rows->count() - 1; $i++) {
 			// Assert the 'Label' column - chr(65) = 'A', 66 = 'B', 67 = 'C', etc.
-			$this->assertEquals(chr(65 + $i), $row->getColumn('Label')->getText());
+			$this->assertEquals(chr(65 + $i), $rows->get($i)->getColumn('Label')->getText());
 
 			// Ignore the order of conditions. The logic is not predetermined on 6.4 and lower.
-			$condition = $row->getColumn('Name')->getText();
+			$condition = $rows->get($i)->getColumn('Name')->getText();
 			$this->assertTrue(in_array($condition, $expected_conditions));
 			unset($expected_conditions[array_search($condition, $expected_conditions)]);
 		}
@@ -1589,15 +1591,16 @@ class testFormEventCorrelation extends CWebTest {
 		$fields = ($fields === null) ? [] : $fields;
 
 		// 'Close old events' is used as the default.
-		if (!array_key_exists('Close old events', $fields) && !array_key_exists('Close new event', $fields)) {
+		if (!array_key_exists('Close old events', $fields) && !array_key_exists('Close new events', $fields)) {
 			$fields['Close old events'] = true;
 		}
 
 		$result = '';
 
-		foreach (['Close old events', 'Close new event'] as $operation) {
+		foreach (['Close old events', 'Close new events'] as $operation) {
 			if (CTestArrayHelper::get($fields, $operation)) {
-				$result .= "\n".$operation;
+				// On 6.0 the "Close new events" field shows as "Close new event" in the table instead.
+				$result .= ($operation === 'Close new events' ? "\nClose new event" : "\nClose old events");
 			}
 		}
 
