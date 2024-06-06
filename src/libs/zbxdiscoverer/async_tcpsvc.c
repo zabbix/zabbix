@@ -145,8 +145,9 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 
 			return ZBX_ASYNC_TASK_WRITE;
 		case ZABBIX_TCPSVC_STEP_CONNECT_WAIT:
-			if (0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
-					0 != errnum)
+			/* sometimes error is not reported, so also validate that socket is writable */
+			if ((0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
+					0 != errnum) || SUCCEED != zbx_socket_pollout(&tcpsvc_context->s, 0, NULL))
 			{
 				SET_RESULT_FAIL("connect");
 				break;
