@@ -729,7 +729,8 @@ static void	wd_perf_dump(zbx_wd_perf_t *perf)
  ******************************************************************************/
 int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp, char **error)
 {
-#define WD_PERF_MAX_ENTRY_COUNT	1000
+#define WD_PERF_MAX_ENTRY_COUNT		1000
+#define WD_PERF_MAX_BOOKMARK_LENGTH	1000
 	const char		*p = NULL;
 	zbx_wd_perf_entry_t	*entry, *resource;
 	zbx_wd_perf_details_t	details = {0};
@@ -737,7 +738,7 @@ int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct
 
 	if (WD_PERF_MAX_ENTRY_COUNT < perf->details.values_num)
 	{
-		*error = zbx_dsprintf(*error, "maximum count of performance entries has been reached (%i)",
+		*error = zbx_dsprintf(*error, "maximum count of performance entries has been reached (%d)",
 				WD_PERF_MAX_ENTRY_COUNT);
 
 		return FAIL;
@@ -810,12 +811,16 @@ int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct
 
 	if (NULL != bookmark_name)
 	{
-		char			name[MAX_STRING_LEN];
 		zbx_wd_perf_bookmark_t	bookmark;
 
-		zbx_strlcpy(name, bookmark_name, sizeof(name));
+		if (WD_PERF_MAX_BOOKMARK_LENGTH < zbx_strlen_utf8(bookmark_name))
+		{
+			*error = zbx_dsprintf(*error, "maximum allowed mark string length exceeded (%d)",
+					WD_PERF_MAX_ENTRY_COUNT);
+			return FAIL;
+		}
 
-		bookmark.name = zbx_strdup(NULL, name);
+		bookmark.name = zbx_strdup(NULL, bookmark_name);
 		bookmark.details = &perf->details.values[perf->details.values_num - 1];
 		zbx_vector_wd_perf_bookmark_append(&perf->bookmarks, bookmark);
 	}
@@ -825,6 +830,7 @@ int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct
 
 	return SUCCEED;
 #undef WD_PERF_MAX_ENTRY_COUNT
+#undef WD_PERF_MAX_BOOKMARK_LENGTH
 }
 
 /******************************************************************************
