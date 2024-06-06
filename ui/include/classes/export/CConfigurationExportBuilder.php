@@ -476,8 +476,6 @@ class CConfigurationExportBuilder {
 	/**
 	 * Format media type parameters.
 	 *
-	 * @static
-	 *
 	 * @param array $media_type
 	 *
 	 * @return array|string
@@ -500,8 +498,6 @@ class CConfigurationExportBuilder {
 
 	/**
 	 * Format media type message templates.
-	 *
-	 * @static
 	 *
 	 * @param array $message_templates
 	 *
@@ -738,8 +734,6 @@ class CConfigurationExportBuilder {
 	 * Format preprocessing steps.
 	 *
 	 * @param array $preprocessing_steps
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
