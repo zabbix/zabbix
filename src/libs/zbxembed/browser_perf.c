@@ -729,7 +729,7 @@ static void	wd_perf_dump(zbx_wd_perf_t *perf)
  ******************************************************************************/
 int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp, char **error)
 {
-#define WD_PERF_MAX_ENTRY_COUNT	2000
+#define WD_PERF_MAX_ENTRY_COUNT	1000
 	const char		*p = NULL;
 	zbx_wd_perf_entry_t	*entry, *resource;
 	zbx_wd_perf_details_t	details = {0};
