@@ -24,14 +24,14 @@ require_once dirname(__FILE__) . '/../common/testFormMacros.php';
 class testFormMacrosTemplate extends testFormMacros {
 
 	const TEMPLATES_GROUP = 1;
-	public $vault_object = 'template';
-	public $hashi_error_field = '/1/macros/3/value';
-	public $cyber_error_field = '/1/macros/4/value';
-	public $update_vault_macro = '{$VAULT_TEMPLATE_MACRO_CHANGED}';
-	public $vault_macro_index = 0;
-	public $revert_macro_1 = '{$SECRET_TEMPLATE_MACRO_REVERT}';
-	public $revert_macro_2 = '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}';
-	public $revert_macro_object = 'template';
+	protected $vault_object = 'template';
+	protected $hashi_error_field = '/1/macros/4/value';
+	protected $cyber_error_field = '/1/macros/4/value';
+	protected $update_vault_macro = '{$VAULT_TEMPLATE_MACRO_CHANGED}';
+	protected $vault_macro_index = 0;
+	protected $revert_macro_1 = '{$SECRET_TEMPLATE_MACRO_REVERT}';
+	protected $revert_macro_2 = '{$SECRET_TEMPLATE_MACRO_2_TEXT_REVERT}';
+	protected $revert_macro_object = 'template';
 
 	protected static $templateid_remove_inherited;
 

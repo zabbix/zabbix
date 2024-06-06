@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
 class testFormMacrosHost extends testFormMacros {
 	protected $macro_resolve = '{$X_SECRET_HOST_MACRO_2_RESOLVE}';
 	protected $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
-	protected $hashi_error_field = '/1/macros/3/value';
+	protected $hashi_error_field = '/1/macros/4/value';
 	protected $cyber_error_field = '/1/macros/4/value';
 	protected $vault_macro_index = 2;
 	protected $vault_object = 'host';

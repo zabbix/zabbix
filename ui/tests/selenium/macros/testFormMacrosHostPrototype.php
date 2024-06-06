@@ -35,7 +35,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	protected static $vault_macros_update_prototypeid;
 
 	protected $vault_object = 'host prototype';
-	protected $hashi_error_field = '/1/macros/3/value';
+	protected $hashi_error_field = '/1/macros/4/value';
 	protected $cyber_error_field = '/1/macros/4/value';
 	protected $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
 	protected $vault_macro_index = 0;
