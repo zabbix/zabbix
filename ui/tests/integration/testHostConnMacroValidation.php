@@ -57,6 +57,22 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	const HOST_NAME = 'test_hostconn';
 
 	/**
+	 * Prematurely enable global scripts so prepareData wouldn't fail.
+	 *
+	 */
+	private function updateServerStatus() {
+		$server_status = [
+			"version" => ZABBIX_VERSION,
+			"configuration" => [
+				"enable_global_scripts" => true,
+				"allow_software_update_check" => true
+			]
+		];
+
+		DBexecute("update config set server_status='".json_encode($server_status)."'");
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function prepareData() {
@@ -155,6 +171,8 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['interfaceids']);
 		self::$interfaceid = $response['result']['interfaceids'][0];
 
+		$this->updateServerStatus();
+
 		$response = $this->call('script.create', [
 			'name' => 'inj test',
 			'command' => 'echo -n hello {HOST.CONN}',
@@ -174,6 +192,8 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$scriptid_action = $response['result']['scriptids'][0];
+
+		DBexecute("update config set server_status=''");
 
 		$response = $this->call('action.create', [
 			'esc_period' => '1m',
