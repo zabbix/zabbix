@@ -191,14 +191,14 @@ abstract class CControllerHost extends CController {
 			'symptom' => false
 		]);
 
-		$items = API::Item()->get([
+		$items_count = API::Item()->get([
 			'countOutput' => true,
 			'groupCount' => true,
 			'hostids' => array_keys($hosts),
 			'webitems' =>true,
 			'monitored' => true
 		]);
-		$items_count = array_combine(array_column($items, 'hostid'), array_column($items, 'rowscount'));
+		$items_count = $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
 
 		// Group all problems per host per severity.
 		$host_problems = [];
