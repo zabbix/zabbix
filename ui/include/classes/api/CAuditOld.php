@@ -77,7 +77,7 @@ class CAuditOld {
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		'hosts' => [
-			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true]
+			'fields' => ['tls_psk_identity' => true, 'tls_psk' => true, 'ipmi_password' => true]
 		],
 		'httptest' => [
 			'fields' => ['http_password' => true, 'ssl_key_password' => true]
