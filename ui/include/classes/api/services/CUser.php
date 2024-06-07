@@ -1166,8 +1166,6 @@ class CUser extends CApiService {
 	/**
 	 * Terminate all active sessions for user whose password was successfully updated.
 	 *
-	 * @static
-	 *
 	 * @param array      $users
 	 */
 	private static function terminateActiveSessionsOnPasswordUpdate(array $users): void {

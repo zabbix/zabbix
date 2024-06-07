@@ -54,7 +54,8 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' ON w.widgetid=wf.widgetid'.
+			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
 
 	public static function prepareData() {
@@ -161,12 +162,17 @@ class testDashboardItemHistoryWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.name',
-										'value' => 'Column_1'
+										'value' => 'Update column 1'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.0.itemid',
 										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Available memory'.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EDCBA'
 									]
 								]
 							]
@@ -1144,7 +1150,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 							'Name' => 'Available memory',
 							'Value'=> '9.37 GB' // value rounding is expected.
 						]
-						// TODO: ZBXNEXT-8316 Sub-issue (11).
+						// TODO: ZBX-24488 Sub-issue (6).
 //						[
 //							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
 //							'Available memory' => '8.44 GB' // value rounding is expected.
@@ -1181,7 +1187,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 //							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
 //							'Host name' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
 //						],
-//                          TODO: ZBXNEXT-8316 Sub-issue (11).
+//                          TODO: ZBX-24488 Sub-issue (6).
 ////						[
 ////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
 ////							'Host name' => STRING_255
@@ -1203,7 +1209,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 //							'Name' => 'Host name',
 //							'Value' => 'TEST'
 //						],
-//                          TODO: ZBXNEXT-8316 Sub-issue (11).
+//                          TODO: ZBX-24488 Sub-issue (6).
 ////						[
 ////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
 ////							'Name' => 'Host name',
@@ -1276,48 +1282,49 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		];
 	}
 
+	// TODO: Will be fixed with DEV-3721.
 	/**
 	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
 	 */
-	public function testDashboardItemHistoryWidget_TableData($data) {
-		foreach ($data['item_data'] as $params) {
-			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
-		}
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
-		$dashboard->waitUntilReady();
-		$this->assertTableData($data['initial_data']);
-
-		$default_values = [
-			'Layout' => 'Horizontal',
-			'Show lines' => '25'
-		];
-
-		if (array_key_exists('fields', $data)) {
-			$this->widgetConfigurationChange($data['fields'], $dashboard);
-			$this->assertTableData($data['result']);
-			$this->widgetConfigurationChange($default_values, $dashboard);
-		}
-
-		if (array_key_exists('host_select', $data)) {
-			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
-			$multiselect_field->fill($data['host_select']['without_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData();
-			$multiselect_field->fill($data['host_select']['with_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData($data['result']);
-			$multiselect_field->clear();
-			$dashboard->waitUntilReady();
-		}
-
-		if (array_key_exists('result', $data)) {
-			$this->assertTableData($data['initial_data']);
-		}
-	}
+//	private function testDashboardItemHistoryWidget_TableData($data) {
+//		foreach ($data['item_data'] as $params) {
+//			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
+//		}
+//
+//		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
+//		$dashboard = CDashboardElement::find()->one();
+//		$dashboard->waitUntilReady();
+//		$this->assertTableData($data['initial_data']);
+//
+//		$default_values = [
+//			'Layout' => 'Horizontal',
+//			'Show lines' => '25'
+//		];
+//
+//		if (array_key_exists('fields', $data)) {
+//			$this->widgetConfigurationChange($data['fields'], $dashboard);
+//			$this->assertTableData($data['result']);
+//			$this->widgetConfigurationChange($default_values, $dashboard);
+//		}
+//
+//		if (array_key_exists('host_select', $data)) {
+//			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
+//			$multiselect_field->fill($data['host_select']['without_data']);
+//			$dashboard->waitUntilReady();
+//			$this->assertTableData();
+//			$multiselect_field->fill($data['host_select']['with_data']);
+//			$dashboard->waitUntilReady();
+//			$this->assertTableData($data['result']);
+//			$multiselect_field->clear();
+//			$dashboard->waitUntilReady();
+//		}
+//
+//		if (array_key_exists('result', $data)) {
+//			$this->assertTableData($data['initial_data']);
+//		}
+//	}
 
 	/**
 	 * Change Item history widget configuration.

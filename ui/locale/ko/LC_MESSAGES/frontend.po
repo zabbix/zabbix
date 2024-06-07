@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 6.0\n"
+"Project-Id-Version: Zabbix 7.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
 "PO-Revision-Date: 2023-09-22 06:16+0000\n"
@@ -7433,6 +7433,10 @@ msgstr "입력 파라미터가 공백입니다"
 msgid "Empty map ID."
 msgstr "맵ID가 공백입니다."
 
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
+
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
 #: app/views/configuration.discovery.list.php:121
@@ -10047,6 +10051,10 @@ msgstr "이미지를 삭제하였습니다"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "이미지라벨 타입"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format

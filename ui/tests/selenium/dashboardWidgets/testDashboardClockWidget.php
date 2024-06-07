@@ -129,26 +129,26 @@ class testDashboardClockWidget extends testWidgets {
 							[
 								'type' => 'clock',
 								'name' => 'DeleteClock',
-								'x' => 5,
+								'x' => 12,
 								'y' => 0,
-								'width' => 5,
-								'height' => 5
+								'width' => 10,
+								'height' => 3
 							],
 							[
 								'type' => 'clock',
 								'name' => 'CancelClock',
 								'x' => 0,
 								'y' => 0,
-								'width' => 5,
-								'height' => 5
+								'width' => 12,
+								'height' => 3
 							],
 							[
 								'type' => 'clock',
 								'name' => 'LayoutClock',
-								'x' => 10,
+								'x' => 22,
 								'y' => 0,
-								'width' => 5,
-								'height' => 5,
+								'width' => 12,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => 4,
@@ -179,8 +179,8 @@ class testDashboardClockWidget extends testWidgets {
 								'name' => 'UpdateClock',
 								'x' => 0,
 								'y' => 0,
-								'width' => 5,
-								'height' => 5
+								'width' => 18,
+								'height' => 4
 							]
 						]
 					]

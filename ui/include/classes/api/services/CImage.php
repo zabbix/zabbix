@@ -185,8 +185,6 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $images
 	 *
 	 * @throws APIException if the input is invalid
@@ -239,8 +237,6 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $images
 	 * @param array|null $db_images
 	 *
@@ -294,8 +290,6 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $imageids
 	 * @param array|null $db_images
 	 *
@@ -352,8 +346,6 @@ class CImage extends CApiService {
 	/**
 	 * Convert image body to PNG.
 	 *
-	 * @static
-	 *
 	 * @param string $image  Base64 encoded body of image.
 	 *
 	 * @return string
@@ -372,8 +364,6 @@ class CImage extends CApiService {
 
 	/**
 	 * Check for unique image names.
-	 *
-	 * @static
 	 *
 	 * @param array      $images
 	 * @param array|null $db_images
@@ -411,8 +401,6 @@ class CImage extends CApiService {
 	/**
 	 * Preparing images before saving to the DB.
 	 *
-	 * @static
-	 *
 	 * @param array  $images
 	 * @param string $images[]['image']  (optional)
 	 *
@@ -435,8 +423,6 @@ class CImage extends CApiService {
 
 	/**
 	 * Validate image used in icon mapping.
-	 *
-	 * @static
 	 *
 	 * @param array $imageids
 	 *
@@ -466,8 +452,6 @@ class CImage extends CApiService {
 
 	/**
 	 * Validate image used in maps.
-	 *
-	 * @static
 	 *
 	 * @param array $imageids
 	 *

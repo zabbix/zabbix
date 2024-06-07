@@ -20,20 +20,12 @@
 	'use strict';
 
 	function update(e) {
-		const $textarea = $(this);
-
 		if (e.which === 13) {
-			// Simulate input behavior by submitting form on enter key.
-
-			var $form = $(this).closest('form'),
-				$submit = $form.find('button:submit:first');
-
-			if ($submit.length) {
-				$submit.click();
-			}
-			else {
-				$form.submit();
-			}
+			this.closest('form').dispatchEvent(new SubmitEvent('submit', {
+				bubbles: true,
+				cancelable: true,
+				submitter: this
+			}));
 
 			return false;
 		}
@@ -42,6 +34,8 @@
 		 * Simulate input behaviour by replacing newlines with space character.
 		 * NB! WebKit based browsers add a newline character to textarea when translating content to the next line.
 		 */
+		const $textarea = $(this);
+
 		var old_value = $textarea.val(),
 			new_value = old_value
 				.replace(/\r?\n+$/g, '')

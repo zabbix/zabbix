@@ -467,6 +467,7 @@ void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+zbx_db_result_t	zbx_db_select_once(const char *fmt, ...)__zbx_attr_format_printf(1, 2);
 zbx_db_result_t	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 zbx_db_result_t	zbx_db_select_n(const char *query, int n);
 zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result);

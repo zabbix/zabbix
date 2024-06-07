@@ -24,7 +24,6 @@ class CExportWriterFactory {
 	/**
 	 * Get the writer object for specified type.
 	 *
-	 * @static
 	 * @throws Exception
 	 *
 	 * @param string $type
@@ -53,7 +52,6 @@ class CExportWriterFactory {
 	/**
 	 * Get content mime-type for specified type.
 	 *
-	 * @static
 	 * @throws Exception
 	 *
 	 * @param string $type

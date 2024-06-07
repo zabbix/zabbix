@@ -72,8 +72,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 							[
 								'type' => 'slareport',
 								'name' => self::$update_widget,
-								'width' => 12,
-								'height' => 8,
+								'width' => 72,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => 10,
@@ -86,9 +86,9 @@ class testDashboardSlaReportWidget extends testSlaReport {
 								'type' => 'slareport',
 								'name' => self::$delete_widget,
 								'x' => 0,
-								'y' => 8,
-								'width' => 12,
-								'height' => 8,
+								'y' => 3,
+								'width' => 72,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => 10,

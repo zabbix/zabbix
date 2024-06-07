@@ -728,6 +728,36 @@ static void	lld_hosts_get(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static zbx_hash_t	lld_host_host_hash(const void *d)
+{
+	const zbx_lld_host_t	*host = *(const zbx_lld_host_t *const *)d;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(host->host);
+}
+
+static int	lld_host_host_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_host_t	*host1 = *(const zbx_lld_host_t * const *)d1;
+	const zbx_lld_host_t	*host2 = *(const zbx_lld_host_t * const *)d2;
+
+	return strcmp(host1->host, host2->host);
+}
+
+static zbx_hash_t	lld_host_name_hash(const void *d)
+{
+	const zbx_lld_host_t	*host = *(const zbx_lld_host_t * const *)d;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(host->name);
+}
+
+static int	lld_host_name_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_host_t	*host1 = *(const zbx_lld_host_t * const *)d1;
+	const zbx_lld_host_t	*host2 = *(const zbx_lld_host_t * const *)d2;
+
+	return strcmp(host1->name, host2->name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validates LLD hosts                                               *
@@ -740,11 +770,15 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_lld_host_t		*host, *host_b;
+	zbx_lld_host_t		*host;
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	tnames, vnames;
+	zbx_hashset_t		host_hosts, host_names;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_hashset_create(&host_hosts, hosts->values_num, lld_host_host_hash, lld_host_host_compare);
+	zbx_hashset_create(&host_names, hosts->values_num, lld_host_name_hash, lld_host_name_compare);
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_str_create(&tnames);		/* list of technical host names */
@@ -814,9 +848,26 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
+	/* index existing hosts */
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		host = hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
+			zbx_hashset_insert(&host_hosts, &host, sizeof(zbx_lld_host_t *));
+
+		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
+			zbx_hashset_insert(&host_names, &host, sizeof(zbx_lld_host_t *));
+	}
+
 	/* checking duplicated host names */
 	for (int i = 0; i < hosts->values_num; i++)
 	{
+		int	num_data = host_hosts.num_data;
+
 		host = hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
@@ -826,33 +877,29 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			continue;
 
-		for (int j = 0; j < hosts->values_num; j++)
+		zbx_hashset_insert(&host_hosts, &host, sizeof(zbx_lld_host_t *));
+
+		if (num_data != host_hosts.num_data)
+			continue;
+
+		*error = zbx_strdcatf(*error, "Cannot %s host:"
+				" host with the same name \"%s\" (\"%s\") already exists.\n",
+				(0 != host->hostid ? "update" : "create"), host->host, host->name);
+
+		if (0 != host->hostid)
 		{
-			host_b = (zbx_lld_host_t *)hosts->values[j];
-
-			if (0 == (host_b->flags & ZBX_FLAG_LLD_HOST_DISCOVERED) || i == j)
-				continue;
-
-			if (0 != strcmp(host->host, host_b->host))
-				continue;
-
-			*error = zbx_strdcatf(*error, "Cannot %s host:"
-					" host with the same name \"%s\" (\"%s\") already exists.\n",
-					(0 != host->hostid ? "update" : "create"), host->host, host->name);
-
-			if (0 != host->hostid)
-			{
-				lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
-						ZBX_FLAG_LLD_HOST_UPDATE_HOST);
-			}
-			else
-				host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+			lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
+					ZBX_FLAG_LLD_HOST_UPDATE_HOST);
 		}
+		else
+			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
 	/* checking duplicated visible host names */
 	for (int i = 0; i < hosts->values_num; i++)
 	{
+		int	num_data = host_names.num_data;
+
 		host = hosts->values[i];
 
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
@@ -862,28 +909,22 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 			continue;
 
-		for (int j = 0; j < hosts->values_num; j++)
+		zbx_hashset_insert(&host_names, &host, sizeof(zbx_lld_host_t *));
+
+		if (num_data != host_names.num_data)
+			continue;
+
+		*error = zbx_strdcatf(*error, "Cannot %s host:"
+				" host with the same visible name \"%s\" already exists.\n",
+				(0 != host->hostid ? "update" : "create"), host->name);
+
+		if (0 != host->hostid)
 		{
-			host_b = hosts->values[j];
-
-			if (0 == (host_b->flags & ZBX_FLAG_LLD_HOST_DISCOVERED) || i == j)
-				continue;
-
-			if (0 != strcmp(host->name, host_b->name))
-				continue;
-
-			*error = zbx_strdcatf(*error, "Cannot %s host:"
-					" host with the same visible name \"%s\" already exists.\n",
-					(0 != host->hostid ? "update" : "create"), host->name);
-
-			if (0 != host->hostid)
-			{
-				lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
-						ZBX_FLAG_LLD_HOST_UPDATE_NAME);
-			}
-			else
-				host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+			lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
+					ZBX_FLAG_LLD_HOST_UPDATE_NAME);
 		}
+		else
+			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
 	/* checking duplicated host names and visible host names in DB */
@@ -952,43 +993,42 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			for (int i = 0; i < hosts->values_num; i++)
+			zbx_lld_host_t	host_local = {.host = row[0], .name = row[1]}, *phost_local = &host_local,
+					**phost;
+
+			if (NULL != (phost = zbx_hashset_search(&host_hosts, &phost_local)))
 			{
-				host = hosts->values[i];
+				host = *phost;
 
-				if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
-					continue;
+				*error = zbx_strdcatf(*error, "Cannot %s host:"
+						" host with the same name \"%s\" (\"%s\") already exists.\n",
+						(0 != host->hostid ? "update" : "create"), host->host,
+						host->name);
 
-				if (0 == strcmp(host->host, row[0]))
+				if (0 != host->hostid)
 				{
-					*error = zbx_strdcatf(*error, "Cannot %s host:"
-							" host with the same name \"%s\" (\"%s\") already exists.\n",
-							(0 != host->hostid ? "update" : "create"), host->host,
-							host->name);
-
-					if (0 != host->hostid)
-					{
-						lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
-								ZBX_FLAG_LLD_HOST_UPDATE_HOST);
-					}
-					else
-						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+					lld_field_str_rollback(&host->host, &host->host_orig, &host->flags,
+							ZBX_FLAG_LLD_HOST_UPDATE_HOST);
 				}
+				else
+					host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+			}
 
-				if (0 == strcmp(host->name, row[1]))
+			if (NULL != (phost = zbx_hashset_search(&host_names, &phost_local)))
+			{
+				host = *phost;
+
+				*error = zbx_strdcatf(*error, "Cannot %s host:"
+						" host with the same visible name \"%s\" already exists.\n",
+						(0 != host->hostid ? "update" : "create"), host->name);
+
+				if (0 != host->hostid)
 				{
-					*error = zbx_strdcatf(*error, "Cannot %s host:"
-							" host with the same visible name \"%s\" already exists.\n",
-							(0 != host->hostid ? "update" : "create"), host->name);
-
-					if (0 != host->hostid)
-					{
-						lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
-								ZBX_FLAG_LLD_HOST_UPDATE_NAME);
-					}
-					else
-						host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+					lld_field_str_rollback(&host->name, &host->name_orig, &host->flags,
+							ZBX_FLAG_LLD_HOST_UPDATE_NAME);
 				}
+				else
+					host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 			}
 		}
 		zbx_db_free_result(result);
@@ -999,11 +1039,14 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 	zbx_vector_str_destroy(&vnames);
 	zbx_vector_str_destroy(&tnames);
 	zbx_vector_uint64_destroy(&hostids);
+	zbx_hashset_destroy(&host_hosts);
+	zbx_hashset_destroy(&host_names);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, const char *host_proto, const char *name_proto,
+static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vector_lld_host_ptr_t *hosts_old,
+		const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, unsigned char custom_iface, char **error)
@@ -1020,9 +1063,9 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, const cha
 	zbx_vector_uint64_create(&lnk_templateids);
 	zbx_vector_db_tag_ptr_create(&new_tags);
 
-	for (int i = 0; i < hosts->values_num; i++)
+	for (int i = 0; i < hosts_old->values_num; i++)
 	{
-		host = hosts->values[i];
+		host = hosts_old->values[i];
 
 		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
@@ -1036,6 +1079,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, const cha
 
 		if (0 == strcmp(host->host, buffer))
 		{
+			zbx_vector_lld_host_ptr_remove(hosts_old, i);
 			host_found = 1;
 			break;
 		}
@@ -5792,7 +5836,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 {
 	zbx_db_result_t				result;
 	zbx_db_row_t				row;
-	zbx_vector_lld_host_ptr_t		hosts;
+	zbx_vector_lld_host_ptr_t		hosts, hosts_old;
 	zbx_vector_lld_group_prototype_ptr_t	group_prototypes;
 	zbx_vector_lld_interface_ptr_t		interfaces;
 	zbx_vector_lld_hostmacro_ptr_t		masterhostmacros, hostmacros;
@@ -5854,6 +5898,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 	}
 
 	zbx_vector_lld_host_ptr_create(&hosts);
+	zbx_vector_lld_host_ptr_create(&hosts_old);
 	zbx_vector_uint64_create(&groupids);
 	zbx_vector_lld_group_prototype_ptr_create(&group_prototypes);
 	zbx_vector_lld_group_ptr_create(&groups);
@@ -5905,7 +5950,10 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 				tls_psk_identity, tls_psk);
 
 		if (0 != hosts.values_num)
+		{
 			lld_hosts_get_tags(&hosts);
+			zbx_vector_lld_host_ptr_append_array(&hosts_old, hosts.values, hosts.values_num);
+		}
 
 		lld_proto_tags_get(parent_hostid, &tags);
 
@@ -5921,7 +5969,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		{
 			const zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
-			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
+			if (NULL == (host = lld_host_make(&hosts, &hosts_old, host_proto, name_proto, inventory_mode_proto,
 					status, discover, &tags, lld_row, lld_macro_paths, use_custom_interfaces,
 					error)))
 			{
@@ -5981,6 +6029,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 		zbx_vector_lld_group_ptr_clear_ext(&groups_out, lld_group_free);
 		zbx_vector_lld_group_prototype_ptr_clear_ext(&group_prototypes, lld_group_prototype_free);
 		zbx_vector_lld_host_ptr_clear_ext(&hosts, lld_host_free);
+		zbx_vector_lld_host_ptr_clear(&hosts_old);
 
 		zbx_vector_uint64_clear(&groupids);
 		zbx_vector_uint64_clear(&del_hostgroupids);
@@ -6013,6 +6062,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 	zbx_vector_lld_group_prototype_ptr_destroy(&group_prototypes);
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_vector_lld_host_ptr_destroy(&hosts);
+	zbx_vector_lld_host_ptr_destroy(&hosts_old);
 
 	zbx_free(tls_psk);
 	zbx_free(tls_psk_identity);

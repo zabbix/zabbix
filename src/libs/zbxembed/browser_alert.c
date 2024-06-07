@@ -10,7 +10,6 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "browser_alert.h"
@@ -34,15 +33,25 @@ zbx_wd_alert_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return backing C structure embedded in alert object         *
+ * Purpose: return backing C structure embedded in alert object               *
  *                                                                            *
  ******************************************************************************/
 static zbx_wd_alert_t *wd_alert(duk_context *ctx)
 {
-	duk_push_this(ctx);
-	duk_get_prop_string(ctx, -1, "\xff""\xff""d");
+	zbx_wd_alert_t	*alert;
+	zbx_es_env_t	*env;
 
-	return (zbx_wd_alert_t *)duk_to_pointer(ctx, -1);
+	if (NULL == (env = zbx_es_get_env(ctx)))
+	{
+		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
+
+		return NULL;
+	}
+
+	if (NULL == (alert = (zbx_wd_alert_t *)es_obj_get_data(env)))
+		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
+
+	return alert;
 }
 
 /******************************************************************************
@@ -53,12 +62,14 @@ static zbx_wd_alert_t *wd_alert(duk_context *ctx)
 static duk_ret_t	wd_alert_dtor(duk_context *ctx)
 {
 	zbx_wd_alert_t	*alert;
+	zbx_es_env_t	*env;
 
 	zabbix_log(LOG_LEVEL_TRACE, "Alert::~Alert()");
 
-	duk_get_prop_string(ctx, 0, "\xff""\xff""d");
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
 
-	if (NULL != (alert = (zbx_wd_alert_t *)duk_to_pointer(ctx, -1)))
+	if (NULL != (alert = (zbx_wd_alert_t *)es_obj_detach_data(env)))
 	{
 		webdriver_release(alert->wd);
 		zbx_free(alert);
@@ -80,11 +91,7 @@ static duk_ret_t	wd_alert_ctor(duk_context *ctx, zbx_webdriver_t *wd, const char
 	zabbix_log(LOG_LEVEL_TRACE, "Alert::Alert()");
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
-	{
-		(void)browser_push_error(ctx, wd, "cannot access internal environment");
-
-		return duk_throw(ctx);
-	}
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
 
 	alert = (zbx_wd_alert_t *)zbx_malloc(NULL, sizeof(zbx_wd_alert_t));
 	alert->wd = webdriver_addref(wd);
@@ -93,10 +100,7 @@ static duk_ret_t	wd_alert_ctor(duk_context *ctx, zbx_webdriver_t *wd, const char
 	duk_push_string(ctx, text);
 	duk_put_prop_string(ctx, -2, "text");
 
-	duk_push_string(ctx, "\xff""\xff""d");
-	duk_push_pointer(ctx, alert);
-	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
-			DUK_DEFPROP_HAVE_CONFIGURABLE);
+	es_obj_attach_data(env, alert);
 
 	duk_push_c_function(ctx, wd_alert_dtor, 1);
 	duk_set_finalizer(ctx, -2);
@@ -115,7 +119,8 @@ static duk_ret_t	wd_alert_accept(duk_context *ctx)
 	char		*error = NULL;
 	int		err_index = -1;
 
-	alert = wd_alert(ctx);
+	if (NULL == (alert = wd_alert(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_accept_alert(alert->wd, &error))
 	{
@@ -140,7 +145,8 @@ static duk_ret_t	wd_alert_dismiss(duk_context *ctx)
 	char		*error = NULL;
 	int		err_index = -1;
 
-	alert = wd_alert(ctx);
+	if (NULL == (alert = wd_alert(ctx)))
+		return duk_throw(ctx);
 
 	if (SUCCEED != webdriver_dismiss_alert(alert->wd, &error))
 	{

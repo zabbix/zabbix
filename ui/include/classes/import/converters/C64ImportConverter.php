@@ -343,7 +343,7 @@ class C64ImportConverter extends CConverter {
 				continue;
 			}
 
-			$reference_index = 0;
+			$reference = 'AAAAA';
 
 			foreach ($dashboard['pages'] as &$dashboard_page) {
 				if (!array_key_exists('widgets', $dashboard_page)) {
@@ -351,6 +351,43 @@ class C64ImportConverter extends CConverter {
 				}
 
 				foreach ($dashboard_page['widgets'] as &$widget) {
+					if (array_key_exists('x', $widget) && is_numeric($widget['x'])) {
+						$widget['x'] = (string) ((int) $widget['x'] * 3);
+					}
+
+					if (array_key_exists('width', $widget)) {
+						if (is_numeric($widget['width'])) {
+							$widget['width'] = (string) ((int) $widget['width'] * 3);
+						}
+					}
+					else {
+						$widget['width'] = '3';
+					}
+
+					if (array_key_exists('fields', $widget)) {
+						foreach ($widget['fields'] as &$field) {
+							$field['name'] = preg_replace('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/',
+								'$1.$3.$2.$4', $field['name']
+							);
+							$field['name'] = preg_replace('/^([a-z]+)\.([a-z_]+)\.(\d+)$/',
+								'$1.$3.$2', $field['name']
+							);
+						}
+						unset($field);
+					}
+
+					if (in_array($widget['type'], ['graph', 'graphprototype'])) {
+						if (!array_key_exists('fields', $widget)) {
+							$widget['fields'] = [];
+						}
+
+						$widget['fields'][] = [
+							'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
+							'name' => 'reference',
+							'value' => $reference++
+						];
+					}
+
 					if ($widget['type'] === 'plaintext') {
 						$widget['type'] = 'itemhistory';
 
@@ -362,6 +399,11 @@ class C64ImportConverter extends CConverter {
 								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 								'name' => 'show_timestamp',
 								'value' => '1'
+							],
+							[
+								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
+								'name' => 'reference',
+								'value' => $reference++
 							]
 						];
 
@@ -422,49 +464,13 @@ class C64ImportConverter extends CConverter {
 						$widget['fields'] = $new_fields;
 					}
 
-					if (in_array($widget['type'], ['graph', 'graphprototype', 'itemhistory'])) {
-						$reference = self::createWidgetReference($reference_index++);
-
-						if (!array_key_exists('fields', $widget)) {
-							$widget['fields'] = [];
-						}
-
-						$widget['fields'][] = [
-							'type' => 'STRING',
-							'name' => 'reference',
-							'value' => $reference
-						];
-
+					if (array_key_exists('fields', $widget)) {
+						// Fields must be sorted not to trigger diff view.
 						usort($widget['fields'],
-							static function(array $widget_field_a, array $widget_field_b): int {
+							static function (array $widget_field_a, array $widget_field_b): int {
 								return strnatcasecmp($widget_field_a['name'], $widget_field_b['name']);
 							}
 						);
-					}
-
-					if (array_key_exists('fields', $widget)) {
-						foreach ($widget['fields'] as &$field) {
-							$field['name'] = preg_replace('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/',
-								'$1.$3.$2.$4', $field['name']
-							);
-							$field['name'] = preg_replace('/^([a-z]+)\.([a-z_]+)\.(\d+)$/',
-								'$1.$3.$2', $field['name']
-							);
-						}
-						unset($field);
-					}
-
-					if (array_key_exists('x', $widget) && is_numeric($widget['x'])) {
-						$widget['x'] = (string) ((int) $widget['x'] * 3);
-					}
-
-					if (array_key_exists('width', $widget)) {
-						if (is_numeric($widget['width'])) {
-							$widget['width'] = (string) ((int) $widget['width'] * 3);
-						}
-					}
-					else {
-						$widget['width'] = '3';
 					}
 				}
 				unset($widget);
@@ -632,23 +638,5 @@ class C64ImportConverter extends CConverter {
 		}
 
 		return $formula;
-	}
-
-	/**
-	 * Create a unique widget reference (required for broadcasting widgets).
-	 *
-	 * @param int $index  Unique reference index
-	 *
-	 * @return string
-	 */
-	private static function createWidgetReference(int $index): string {
-		$reference = '';
-
-		for ($i = 0; $i < 5; $i++) {
-			$reference = chr(65 + $index % 26).$reference;
-			$index = floor($index / 26);
-		}
-
-		return $reference;
 	}
 }

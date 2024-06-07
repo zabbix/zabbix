@@ -26,17 +26,17 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 
 	private static $hostid;
 	private static $triggerid;
-	private static $maint_start_tm;
 	private static $trigger_actionid;
 	private static $eventid;
 	private static $userid;
 	private static $scriptid;
 	private static $scriptid_recovery;
 	private static $macroid;
+	private static $interfaceid;
 
 	const ITEM_NAME_1 = 'trap1';
 	const ITEM_NAME_2 = 'trap2';
-	const HOST_NAME = 'test_actions';
+	const HOST_NAME = 'test_etmacros';
 
 	/**
 	 * @inheritdoc
@@ -75,17 +75,6 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['globalmacroids']);
 		self::$macroid =  $response['result']['globalmacroids'][0];
 
-
-		// Get host interface ids.
-		$response = $this->call('host.get', [
-			'output' => ['host'],
-			'hostids' => [self::$hostid],
-			'selectInterfaces' => ['interfaceid']
-		]);
-
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertArrayHasKey('interfaces', $response['result'][0]);
-		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
 
 		// Create trapper item
 		$response = $this->call('item.create', [

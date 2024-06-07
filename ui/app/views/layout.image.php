@@ -11,7 +11,6 @@
 **
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -20,11 +19,12 @@
  * @var array $data
  */
 
-header('Content-type: image/png');
+header('Content-Type: image/png');
+header('Cache-Control: max-age=86400');
 
-if ($data['image'] !== '') {
-	echo imagepng($data['image']);
+if (!$data['image']) {
+	http_response_code(404);
 }
-else {
-	echo $data['image'];
+elseif (!imagepng($data['image'])) {
+	http_response_code(500);
 }

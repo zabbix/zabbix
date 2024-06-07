@@ -242,7 +242,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
 		$this->assertEquals(71, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(2, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
+		$this->assertEquals(3, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
 	}
 
 	public function testFormTemplate_Delete() {
