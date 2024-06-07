@@ -2239,7 +2239,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	am_check_dbstatus()
+static int	am_check_dbstatus(void)
 {
 	int		ret = ZBX_DB_OK;
 	DB_RESULT	res;
