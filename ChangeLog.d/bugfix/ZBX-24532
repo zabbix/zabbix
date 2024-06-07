@@ -1,0 +1,1 @@
+........S. [ZBX-24532] fixed unexpected termination on start when DNS library initialization was not possible with broken resolv.conf (sboidenko)
