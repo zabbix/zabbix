@@ -19,8 +19,6 @@ class CScreenBuilder {
 	/**
 	 * Get particular screen object.
 	 *
-	 * @static
-	 *
 	 * @param array		$options
 	 * @param int		$options['resourcetype']
 	 * @param int		$options['screenitemid']
@@ -74,8 +72,6 @@ class CScreenBuilder {
 
 	/**
 	 * Insert javascript to start time control rendering.
-	 *
-	 * @static
 	 */
 	public static function insertProcessObjectsJs() {
 		zbx_add_post_js('timeControl.processObjects();');
@@ -85,8 +81,6 @@ class CScreenBuilder {
 	 * Insert javascript for standard screens.
 	 *
 	 * @param array $timeline
-	 *
-	 * @static
 	 */
 	public static function insertScreenStandardJs(array $timeline) {
 		CScreenBuilder::insertProcessObjectsJs();

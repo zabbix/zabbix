@@ -255,8 +255,6 @@ class C62ImportConverter extends CConverter {
 	/**
 	 * Convert media types.
 	 *
-	 * @static
-	 *
 	 * @param array $media_types
 	 *
 	 * @return array

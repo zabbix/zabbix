@@ -1,10 +1,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 6.0\n"
+"Project-Id-Version: Zabbix 7.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-15 14:48+0000\n"
+"PO-Revision-Date: 2024-05-28 20:55+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -6952,11 +6952,11 @@ msgstr "Crítica"
 
 #: include/items.inc.php:1630
 msgid "Discard unchanged"
-msgstr "Descartar no modificados"
+msgstr "Descartar sin cambios"
 
 #: include/items.inc.php:1634
 msgid "Discard unchanged with heartbeat"
-msgstr "Descartar sin cambios con el heartbeat"
+msgstr "Descartar sin cambios con heartbeat"
 
 #: app/views/js/popup.itemtestedit.view.js.php:377 include/forms.inc.php:1598
 #: include/views/js/item.preprocessing.js.php:66
@@ -7525,6 +7525,10 @@ msgstr "Vaciar parámetro de entrada."
 #: include/classes/api/services/CMap.php:1042
 msgid "Empty map ID."
 msgstr "Vaciar identificador de mapa."
+
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr "Valor vacío."
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -10152,6 +10156,10 @@ msgstr "Imágen eliminada"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "Tipo de etiqueta de imagen"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr "Error al cargar la imagen."
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -15490,7 +15498,7 @@ msgstr "Anular"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
 msgid "Override host"
-msgstr "Anular equipo"
+msgstr "Reemplazar equipo"
 
 #: app/partials/administration.system.info.php:210
 #: app/views/administration.housekeeping.edit.php:129

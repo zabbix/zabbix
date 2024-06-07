@@ -1,0 +1,1 @@
+..F....... [ZBX-24477] fixed item test result not getting shown when value type conversion is applied without preprocessing steps (jfreibergs)

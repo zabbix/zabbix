@@ -20,12 +20,11 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource ScheduledReports, ExecuteNowAction
+ * @dataSource ExecuteNowAction, LoginUsers, ScheduledReports, UserPermissions
  *
  * @backup role
  *
  * @onBefore prepareRoleData
- * @dataSource LoginUsers, ExecuteNowAction
  */
 class testPageUserRoles extends CWebTest {
 

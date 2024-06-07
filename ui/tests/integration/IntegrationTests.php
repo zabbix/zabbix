@@ -51,6 +51,7 @@ require_once dirname(__FILE__).'/testPermissions.php';
 require_once dirname(__FILE__).'/testFunctionChangeCount.php';
 require_once dirname(__FILE__).'/testProxyHa.php';
 require_once dirname(__FILE__).'/testBrowserMonitoring.php';
+require_once dirname(__FILE__).'/testHostConnMacroValidation.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -98,6 +99,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testFunctionChangeCount');
 		$suite->addTestSuite('testProxyHa');
 		$suite->addTestSuite('testBrowserMonitoring');
+		$suite->addTestSuite('testHostConnMacroValidation');
 
 		return $suite;
 	}

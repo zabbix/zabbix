@@ -353,7 +353,7 @@ class C64ImportConverter extends CConverter {
 				continue;
 			}
 
-			$reference_index = 0;
+			$reference = 'AAAAA';
 
 			foreach ($dashboard['pages'] as &$dashboard_page) {
 				if (!array_key_exists('widgets', $dashboard_page)) {
@@ -394,7 +394,7 @@ class C64ImportConverter extends CConverter {
 						$widget['fields'][] = [
 							'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 							'name' => 'reference',
-							'value' => self::createWidgetReference($reference_index++)
+							'value' => $reference++
 						];
 					}
 
@@ -413,7 +413,7 @@ class C64ImportConverter extends CConverter {
 							[
 								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 								'name' => 'reference',
-								'value' => self::createWidgetReference($reference_index++)
+								'value' => $reference++
 							]
 						];
 
@@ -666,23 +666,5 @@ class C64ImportConverter extends CConverter {
 		}
 
 		return $formula;
-	}
-
-	/**
-	 * Create a unique widget reference (required for broadcasting widgets).
-	 *
-	 * @param int $index  Unique reference index
-	 *
-	 * @return string
-	 */
-	private static function createWidgetReference(int $index): string {
-		$reference = '';
-
-		for ($i = 0; $i < 5; $i++) {
-			$reference = chr(65 + $index % 26).$reference;
-			$index = floor($index / 26);
-		}
-
-		return $reference;
 	}
 }

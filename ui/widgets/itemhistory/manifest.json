@@ -14,6 +14,11 @@
 			"height": 6
 		},
 		"js_class": "CWidgetItemHistory",
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		},
 		"out": [
 			{
 				"type": "_itemid"
@@ -30,6 +35,10 @@
 		"widget.itemhistory.column.edit": {
 			"class": "ColumnEdit",
 			"view": "column.edit",
+			"layout": "layout.json"
+		},
+		"widget.itemhistory.value.check": {
+			"class": "ValueCheck",
 			"layout": "layout.json"
 		},
 		"widget.itemhistory.binary_value.get": {

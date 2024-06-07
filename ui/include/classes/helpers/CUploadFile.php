@@ -26,8 +26,6 @@ class CUploadFile {
 	 * Get upload_max_filesize value in bytes defined in php.ini.
 	 * If value is not defined in php.ini, returns default 2M.
 	 *
-	 * @static
-	 *
 	 * @return int
 	 */
 	static public function getMaxUploadSize() {

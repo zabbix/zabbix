@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 6.0\n"
+"Project-Id-Version: Zabbix 7.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
 "PO-Revision-Date: 2023-09-22 06:31+0000\n"
@@ -7644,6 +7644,10 @@ msgstr "Golire parametru de intrare."
 msgid "Empty map ID."
 msgstr ""
 
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
+
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
 #: app/views/configuration.discovery.list.php:121
@@ -10292,6 +10296,10 @@ msgstr "Imagine ștearsă"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "Tipul etichetei imaginii"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format

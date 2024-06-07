@@ -1,0 +1,1 @@
+A......... [ZBX-24180] fixed inability to import existing host or template when its dependent item prototype, which is used in trigger prototypes or graph prototypes, would have a different master item (jfreibergs, vmaksimovs)
