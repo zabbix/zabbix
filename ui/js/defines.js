@@ -45,6 +45,13 @@ const ZBX_STYLE_ROW_SELECTED = 'row-selected';
 const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
 const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 
+const ZBX_STYLE_TOTALS_LIST = 'totals-list';
+const ZBX_STYLE_TOTALS_LIST_COUNT = 'count';
+const ZBX_STYLE_TOTALS_LIST_NUMBER = 'number';
+const ZBX_STYLE_TOTALS_LIST_OF = 'of';
+
+const ZBX_STYLE_LINK_ACTION = 'link-action';
+
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
 const ZBX_ICON_CHECK = 'zi-check';

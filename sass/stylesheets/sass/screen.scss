@@ -3388,6 +3388,7 @@ svg {
 		flex: 1;
 		align-items: center;
 		display: flex;
+		column-gap: 5px;
 		line-height: 18px;
 		overflow: hidden;
 		padding: 0 10px;
@@ -3396,6 +3397,14 @@ svg {
 
 	.count {
 		font-size: 16px;
+
+		.count-part {
+			@extend %overflow-ellipsis;
+		}
+	}
+
+	.name {
+		@extend %overflow-ellipsis;
 	}
 
 	&.totals-list-horizontal {
@@ -3404,6 +3413,15 @@ svg {
 			justify-content: center;
 			min-width: 55px;
 			text-align: center;
+		}
+
+		.count {
+			@extend %overflow-ellipsis;
+			width: 100%;
+		}
+
+		.name {
+			width: 100%;
 		}
 	}
 
@@ -3416,7 +3434,15 @@ svg {
 		}
 
 		.count {
-			margin-right: 5px;
+			flex-shrink: 0;
+
+			.count-part {
+				display: block;
+			}
+		}
+
+		.name {
+			flex-grow: 1;
 		}
 	}
 }

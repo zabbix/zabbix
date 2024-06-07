@@ -18,6 +18,9 @@ class CWidgetProblemsBySv extends CWidget {
 	static SHOW_GROUPS = 0;
 	static SHOW_TOTALS = 1;
 
+	static LAYOUT_HORIZONTAL = 0;
+	static LAYOUT_VERTICAL = 1;
+
 	/**
 	 * Table body of problems.
 	 *
@@ -55,8 +58,14 @@ class CWidgetProblemsBySv extends CWidget {
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
 	}
 
+	onResize() {
+		this.#adjustSize();
+	}
+
 	setContents(response) {
 		super.setContents(response);
+
+		this.#adjustSize();
 
 		if (this.getFields().show_type !== CWidgetProblemsBySv.SHOW_TOTALS) {
 			this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
@@ -75,6 +84,34 @@ class CWidgetProblemsBySv extends CWidget {
 				}
 
 				this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
+			}
+		}
+	}
+
+	#adjustSize() {
+		if (this.getFields().show_type === CWidgetProblemsBySv.SHOW_TOTALS
+				&& this.getFields().layout === CWidgetProblemsBySv.LAYOUT_VERTICAL) {
+			const number_elements = this._contents.querySelectorAll(
+				`.${ZBX_STYLE_TOTALS_LIST} .${ZBX_STYLE_TOTALS_LIST_COUNT} .${ZBX_STYLE_TOTALS_LIST_NUMBER},
+					.${ZBX_STYLE_TOTALS_LIST} .${ZBX_STYLE_TOTALS_LIST_COUNT} .${ZBX_STYLE_TOTALS_LIST_OF}`
+			);
+			const number_widths = [];
+
+			for (const number_element of number_elements) {
+				number_widths.push(number_element.getBoundingClientRect().width);
+			}
+
+			const cell_element = this._contents.querySelector(`.${ZBX_STYLE_TOTALS_LIST} > div`);
+			const cell_width = parseFloat(getComputedStyle(cell_element).width);
+			const min_name_width = 30;
+			const max_count_width = cell_width - min_name_width;
+			const count_elements = this._contents.querySelectorAll(
+				`.${ZBX_STYLE_TOTALS_LIST} .${ZBX_STYLE_TOTALS_LIST_COUNT}`
+			);
+			const count_width = Math.max(0, Math.min(Math.max(...number_widths), max_count_width));
+
+			for (const count_element of count_elements) {
+				count_element.style.width = `${count_width}px`;
 			}
 		}
 	}
