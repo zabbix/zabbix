@@ -2044,16 +2044,16 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				$header = $update ? self::$update_widget : 'Item history';
 			}
 
-			if ($update) {
-				self::$update_widget = $header;
-			}
-
 			COverlayDialogElement::ensureNotPresent();
 			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
 			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+			if ($update) {
+				self::$update_widget = $header;
+			}
 
 			// Check widgets count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
@@ -2063,8 +2063,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			}
 
 			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'Default (1 minute)')
-					=== 'Default (1 minute)')
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'Default (1 minute)') === 'Default (1 minute)')
 				? '1 minute'
 				: $data['fields']['Refresh interval'];
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
