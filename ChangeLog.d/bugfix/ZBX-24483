@@ -1,0 +1,1 @@
+.......PS. [ZBX-24483] improved memory usage in Zabbix server/proxy trappers and in proxy pollers when sending large configuration (vso)
