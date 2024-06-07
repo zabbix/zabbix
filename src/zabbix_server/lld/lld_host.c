@@ -3958,7 +3958,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 					d = ",";
 
 					zbx_audit_host_update_json_update_ipmi_password(ZBX_AUDIT_LLD_CONTEXT,
-							host->hostid, host->ipmi_password_orig, value_esc);
+							host->hostid, (0 == strcmp("", host->ipmi_password_orig) ?
+							"" : ZBX_MACRO_SECRET_MASK),
+							(0 == strcmp("", ipmi_password) ? "" : ZBX_MACRO_SECRET_MASK));
 
 					zbx_free(value_esc);
 				}
