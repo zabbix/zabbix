@@ -1012,8 +1012,6 @@ abstract class CGraphGeneral extends CApiService {
 	/**
 	 * Returns visible host name. Can be used for error reporting.
 	 *
-	 * @static
-	 *
 	 * @param string|int $hostid
 	 *
 	 * @return string
@@ -1027,8 +1025,6 @@ abstract class CGraphGeneral extends CApiService {
 
 	/**
 	 * Adding graph items for selected graphs.
-	 *
-	 * @static
 	 *
 	 * @param array $graphs
 	 * @param bool  $with_hostid

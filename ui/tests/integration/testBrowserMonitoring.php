@@ -18,11 +18,12 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * Test scenario to check browser monitoring.
  *
- * @backup hosts,items,history_text
+ * @onAfter clearData
  *
  */
 class testBrowserMonitoring extends CIntegrationTest {
 	private static $itemid;
+	private static $hostid;
 
 	/**
 	 * 1 host, 1 browser item.
@@ -37,12 +38,12 @@ class testBrowserMonitoring extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
-		$hostid = $response['result']['hostids'][0];
+		self::$hostid = $response['result']['hostids'][0];
 
 		$script = file_get_contents('integration/data/browser.js');
 
 		$response = $this->call('item.create', [
-			'hostid' => $hostid,
+			'hostid' => self::$hostid,
 			'type' => ITEM_TYPE_BROWSER,
 			'name' => 'WebMonItem',
 			'key_' => 'webmonitem',
@@ -85,6 +86,13 @@ class testBrowserMonitoring extends CIntegrationTest {
 	 * @required-components server
 	 */
 	public function testBrowserMonitoring_executeBrowserJs() {
+		$response = $this->call('task.create', [
+			'type' => ZBX_TM_TASK_CHECK_NOW,
+			'request' => [
+				'itemid' => self::$itemid
+			]
+		]);
+
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_TEXT,
 			'output' => 'extend',
@@ -104,5 +112,12 @@ class testBrowserMonitoring extends CIntegrationTest {
 		$this->assertArrayNotHasKey('error', $result['performance_data']);
 
 		return true;
+	}
+
+	/**
+	 * Delete all created data after test.
+	 */
+	public static function clearData(): void {
+		CDataHelper::call('host.delete', [self::$hostid]);
 	}
 }

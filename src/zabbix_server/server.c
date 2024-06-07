@@ -220,6 +220,9 @@ static int	*threads_flags;
 
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
+
+static sigset_t	orig_mask;
+
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_pid_file, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, problems_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, history_export, NULL)
@@ -375,6 +378,7 @@ static char	*config_file				= NULL;
 static int	config_allow_root			= 0;
 static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
+static char	*config_sms_devices			= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -1133,6 +1137,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{0}
 	};
 
@@ -1415,7 +1421,7 @@ int	main(int argc, char **argv)
 			log_file_cfg.log_type, log_file_cfg.log_file_name, NULL, get_zbx_threads, get_zbx_threads_num);
 }
 
-static void	zbx_check_db(void)
+static int	zbx_check_db(void)
 {
 	struct zbx_json	db_version_json;
 	int		ret;
@@ -1438,8 +1444,6 @@ static void	zbx_check_db(void)
 		if (SUCCEED != (ret = zbx_db_check_version_and_upgrade(ha_mode)))
 			goto out;
 	}
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (SUCCEED == zbx_db_field_exists("config", "dbversion_status"))
 	{
@@ -1473,16 +1477,14 @@ static void	zbx_check_db(void)
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
-
-	zbx_db_close();
 out:
 	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 				ZABBIX_VERSION, ZABBIX_REVISION);
 		zbx_db_version_info_clear(&db_version_info);
-		exit(EXIT_FAILURE);
 	}
+	return ret;
 }
 
 /******************************************************************************
@@ -1508,12 +1510,8 @@ static void	zbx_db_save_server_status(void)
 
 	zbx_json_close(&json);
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	if (ZBX_DB_OK > zbx_db_execute("update config set server_status='%s'", json.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to save server status to database");
-
-	zbx_db_close();
 
 	zbx_json_free(&json);
 }
@@ -1585,7 +1583,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_confsyncer_frequency, zbx_config_source_ip,
 							config_ssl_ca_location, config_ssl_cert_location,
 							config_ssl_key_location};
-	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location};
+	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location,
+							config_sms_devices};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
 						.workers_num = config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],
@@ -1671,6 +1670,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{
 		exit_args->listen_sock = listen_sock;
+		zbx_block_signals(&orig_mask);
 
 		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
@@ -1685,6 +1685,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			zbx_free(error);
 			return FAIL;
 		}
+		zbx_unblock_signals(&orig_mask);
 	}
 
 	for (zbx_threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
@@ -2117,6 +2118,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
+	zbx_block_signals(&orig_mask);
+
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
 		zbx_error("cannot initialize IPC services: %s", error);
@@ -2254,6 +2257,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_unblock_signals(&orig_mask);
+
 	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_config_dbhigh->config_dbuser,
 			&zbx_config_dbhigh->config_dbpassword, zbx_config_source_ip, config_ssl_ca_location,
 			config_ssl_cert_location, config_ssl_key_location, &error))
@@ -2269,18 +2274,19 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 	else if (ZBX_DB_SERVER != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": its \"users\" table is empty (is this the"
 				" Zabbix proxy database?)", zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
@@ -2288,22 +2294,25 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	zbx_db_check_character_set();
-	zbx_check_db();
+	if (SUCCEED != zbx_check_db())
+		goto out;
 
 	if (1 == config_allow_software_update_check)
 	{
 		if (SUCCEED != zbx_db_update_software_update_checkid())
-			exit(EXIT_FAILURE);
+			goto out;
 	}
 
 	zbx_db_save_server_status();
 
 	if (SUCCEED != zbx_db_check_instanceid())
-		exit(EXIT_FAILURE);
+		goto out;
+
+	zbx_db_close();
 
 	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))
 	{
@@ -2512,4 +2521,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
 	return SUCCEED;
+out:
+	zbx_db_close();
+	exit(EXIT_FAILURE);
 }

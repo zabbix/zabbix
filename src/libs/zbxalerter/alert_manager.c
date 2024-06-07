@@ -1987,7 +1987,7 @@ static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, zbx_db_medi
 	{
 		if (MEDIA_TYPE_EMAIL == mt->type)
 		{
-			body = zbx_email_make_body(dispatch->message, mt->message_format, dispatch->message_format,
+			body = zbx_email_make_body(dispatch->message, mt->message_format, dispatch->content_name,
 					dispatch->message_format, dispatch->content, dispatch->content_size);
 			*message_format = ZBX_MEDIA_MESSAGE_FORMAT_MULTI;
 		}
@@ -2275,6 +2275,28 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	am_check_dbstatus()
+{
+	int		ret = ZBX_DB_OK;
+	zbx_db_result_t	res;
+
+#ifdef HAVE_ORACLE
+	res = zbx_db_select_once("select null from dual");
+#else
+	res = zbx_db_select_once("select null");
+#endif
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == res || NULL == res)
+	{
+		zbx_db_close();
+		ret = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+	}
+	else
+		zbx_db_free_result(res);
+
+	return ret;
+}
+
 ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 {
 #define ZBX_DB_PING_FREQUENCY			SEC_PER_MIN
@@ -2304,7 +2326,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	manager.dbstatus = ZBX_DB_OK;
+	manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -2327,8 +2349,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
-			manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
-			zbx_db_close();
+			manager.dbstatus = am_check_dbstatus();
 			time_ping = now;
 		}
 		if (ZBX_DB_DOWN == manager.dbstatus)

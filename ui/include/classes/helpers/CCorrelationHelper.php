@@ -18,8 +18,6 @@ class CCorrelationHelper {
 	/**
 	 * Convert a correlation condition operator to string.
 	 *
-	 * @static
-	 *
 	 * @param int $operator
 	 *
 	 * @return string
@@ -38,8 +36,6 @@ class CCorrelationHelper {
 	/**
 	 * Returns correlation condition types or one type depending on input.
 	 *
-	 * @static
-	 *
 	 * @return array  Returns condition type and it's string translation as array key => value pair.
 	 */
 	public static function getConditionTypes(): array {
@@ -56,8 +52,6 @@ class CCorrelationHelper {
 	/**
 	 * Returns correlation operation types or one type depending on input.
 	 *
-	 * @static
-	 *
 	 * @return array  Returns operation type and it's string translation as array key => value pair.
 	 */
 	public static function getOperationTypes(): array {
@@ -69,8 +63,6 @@ class CCorrelationHelper {
 
 	/**
 	 * Return an array of operators supported by the given correlation condition.
-	 *
-	 * @static
 	 *
 	 * @param int $type  Correlation condition type.
 	 *
@@ -96,8 +88,6 @@ class CCorrelationHelper {
 
 	/**
 	 * Returns the HTML representation of a correlation condition.
-	 *
-	 * @static
 	 *
 	 * @param array $condition    Array of correlation condition data.
 	 * @param array $group_names  Host group names keyed by host group ID.
