@@ -110,7 +110,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 					'hosts' => [
 						[
 							'items' => $source_items,
-							'discovery_rules' => $source_lld_rules
+							'discovery_rules' => $source_lld_rules,
+							'inventory_mode' => CXmlConstantName::MANUAL
 						]
 					]
 				],
@@ -124,7 +125,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 					'hosts' => [
 						[
 							'items' => $expected_items,
-							'discovery_rules' => $expected_lld_rules
+							'discovery_rules' => $expected_lld_rules,
+							'inventory_mode' => CXmlConstantName::MANUAL
 						]
 					]
 				]
@@ -392,7 +394,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 					'hosts' => [
 						[
 							'items' => $expected_items,
-							'discovery_rules' => $expected_lld_rules
+							'discovery_rules' => $expected_lld_rules,
+							'inventory_mode' => CXmlConstantName::MANUAL
 						]
 					],
 					'triggers' => $expected_triggers,
@@ -509,7 +512,8 @@ class C64ImportConverterTest extends CImportConverterTest {
 									'lifetime' => '30d',
 									'enabled_lifetime_type' => CXmlConstantName::LLD_DISABLE_NEVER
 								]
-							]
+							],
+							'inventory_mode' => CXmlConstantName::MANUAL
 						]
 					]
 				]
