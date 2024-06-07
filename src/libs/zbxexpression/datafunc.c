@@ -306,7 +306,7 @@ int	expr_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char *
 	switch (request)
 	{
 		case ZBX_REQUEST_HOST_IP:
-			if (FAIL == zbx_is_ip(interface.ip_orig))
+			if ('\0' != *interface.ip_orig && FAIL == zbx_is_ip(interface.ip_orig))
 				return FAIL;
 
 			*replace_to = zbx_strdup(*replace_to, interface.ip_orig);
