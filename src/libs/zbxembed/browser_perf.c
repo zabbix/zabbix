@@ -744,6 +744,13 @@ int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct
 		return FAIL;
 	}
 
+	if (NULL != bookmark_name && WD_PERF_MAX_BOOKMARK_LENGTH < zbx_strlen_utf8(bookmark_name))
+	{
+		*error = zbx_dsprintf(*error, "maximum allowed mark string length exceeded (%d)",
+				WD_PERF_MAX_BOOKMARK_LENGTH);
+		return FAIL;
+	}
+
 	zbx_vector_wd_perf_entry_ptr_create(&details.user);
 
 	details.resource =  wd_perf_entry_create();
@@ -812,13 +819,6 @@ int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct
 	if (NULL != bookmark_name)
 	{
 		zbx_wd_perf_bookmark_t	bookmark;
-
-		if (WD_PERF_MAX_BOOKMARK_LENGTH < zbx_strlen_utf8(bookmark_name))
-		{
-			*error = zbx_dsprintf(*error, "maximum allowed mark string length exceeded (%d)",
-					WD_PERF_MAX_ENTRY_COUNT);
-			return FAIL;
-		}
 
 		bookmark.name = zbx_strdup(NULL, bookmark_name);
 		bookmark.details = &perf->details.values[perf->details.values_num - 1];
