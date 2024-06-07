@@ -18,6 +18,8 @@ use Zabbix\Widgets\Fields\CWidgetFieldPatternSelect;
 
 abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 
+	protected ?CPatternSelect $patternselect = null;
+
 	protected array $filter_preselect = [];
 
 	protected array $popup_parameters = [];
@@ -32,37 +34,47 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 	abstract protected function getObjectName(): string;
 
 	public function getId(): string {
-		return zbx_formatDomId($this->getName().'[]');
+		return $this->getPatternSelect()->getId();
 	}
 
 	public function getFocusableElementId(): string {
 		return $this->getId().'_ms';
 	}
 
-	public function getView(): CPatternSelect {
-		$options = [
-			'name' => $this->getName().'[]',
-			'object_name' => $this->getObjectName(),
-			'data' => $this->field->getValue(),
-			'disabled' => $this->isDisabled(),
-			'placeholder' => $this->placeholder,
-			'wildcard_allowed' => true,
-			'popup' => [
-				'parameters' => [
-					'dstfrm' => $this->form_name,
-					'dstfld1' => $this->getId()
-				] + $this->getPopupParameters()
-			],
-			'add_post_js' => false
-		];
+	public function getView(): CMultiSelect {
+		return $this->getPatternSelect();
+	}
 
-		if ($this->filter_preselect) {
-			$options['popup']['filter_preselect'] = $this->filter_preselect;
+	public function getPatternSelect(): CPatternSelect {
+		if ($this->patternselect === null) {
+			$patternselect_name = $this->getName().'[]';
+
+			$options = [
+				'name' => $patternselect_name,
+				'object_name' => $this->getObjectName(),
+				'data' => $this->field->getValue(),
+				'disabled' => $this->isDisabled(),
+				'placeholder' => $this->placeholder,
+				'wildcard_allowed' => true,
+				'popup' => [
+					'parameters' => [
+							'dstfrm' => $this->form_name,
+							'dstfld1' => zbx_formatDomId($patternselect_name)
+						] + $this->getPopupParameters()
+				],
+				'add_post_js' => false
+			];
+
+			if ($this->filter_preselect) {
+				$options['popup']['filter_preselect'] = $this->filter_preselect;
+			}
+
+			$this->patternselect = (new CPatternSelect($options))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired($this->isRequired());
 		}
 
-		return (new CPatternSelect($options))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired($this->isRequired());
+		return $this->patternselect;
 	}
 
 	public function getJavaScript(): string {

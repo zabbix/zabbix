@@ -34,7 +34,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 	abstract protected function getObjectLabels(): array;
 
 	public function getId(): string {
-		return $this->getMultiselect()->getId();
+		return $this->getMultiSelect()->getId();
 	}
 
 	public function getFocusableElementId(): string {
@@ -42,10 +42,10 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 	}
 
 	public function getView(): CMultiSelect {
-		return $this->getMultiselect();
+		return $this->getMultiSelect();
 	}
 
-	private function getMultiselect(): CMultiSelect {
+	private function getMultiSelect(): CMultiSelect {
 		if ($this->multiselect === null) {
 			$multiselect_name = $this->field->getName().($this->field->isMultiple() ? '[]' : '');
 
