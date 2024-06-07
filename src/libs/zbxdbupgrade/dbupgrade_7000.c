@@ -13,6 +13,7 @@
 **/
 
 #include "dbupgrade.h"
+#include "zbxdbhigh.h"
 
 /*
  * 7.0 maintenance database patches
@@ -21,6 +22,11 @@
 #ifndef HAVE_SQLITE3
 
 static int	DBpatch_7000000(void)
+{
+	return SUCCEED;
+}
+
+static int	DBpatch_7000001(void)
 {
 	int		i;
 	const char	*values[] = {
@@ -41,7 +47,7 @@ static int	DBpatch_7000000(void)
 
 	for (i = 0; i < (int)ARRSIZE(values); i += 2)
 	{
-		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
 			return FAIL;
 	}
 
@@ -55,5 +61,6 @@ DBPATCH_START(7000)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(7000000, 0, 1)
+DBPATCH_ADD(7000001, 0, 1)
 
 DBPATCH_END()

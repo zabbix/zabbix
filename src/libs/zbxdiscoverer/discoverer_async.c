@@ -38,8 +38,21 @@ static int	discovery_async_poller_dns_init(discovery_poller_config_t *poller_con
 
 	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
-		return FAIL;
+		int	ret;
+
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library with resolv.conf");
+
+		if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, 0)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
+			return FAIL;
+		}
+
+		if (0 != (ret = evdns_base_resolv_conf_parse(poller_config->dnsbase, DNS_OPTIONS_ALL,
+				ZBX_RES_CONF_FILE)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s", zbx_resolv_conf_errstr(ret));
+		}
 	}
 
 	timeout = zbx_dsprintf(NULL, "%d", poller_config->config_timeout);

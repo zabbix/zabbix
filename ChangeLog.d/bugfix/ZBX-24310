@@ -1,0 +1,1 @@
+..F....... [ZBX-24310] fixed issue with calculating item count for host availability status if user has no permissions (dfofanovs)

@@ -169,6 +169,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$row->query('button:Remove')->one()->click();
 		// Check that none of the rows are present after removing the previously added row.
 		$this->assertEquals(0, $templates_list->getRows()->count());
+
+		$overlay->close();
 	}
 
 	public function getDefaultMessageTemplateData() {
@@ -433,7 +435,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 	 */
 	public function testFormAdministrationMediaTypeMessageTemplates_DefaultMessageContent($data) {
 		// Open a new media type configuration form and switch to Message templates tab.
-		$this->openMediaTypeTemplates('new', $data['media_type']);
+		$overlay = $this->openMediaTypeTemplates('new', $data['media_type']);
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		// Add each type of message template and check the values of default messages.
 		$last = count($data['message_templates']) - 1;
@@ -474,6 +476,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				$message_overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 			}
 		}
+
+		$overlay->close();
 	}
 
 	public function getUpdateMessageTemplateData() {
