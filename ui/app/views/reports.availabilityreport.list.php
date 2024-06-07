@@ -132,7 +132,7 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 				)
 			])
 			->addItem([
-				(new CLabel(_('Host groups'), 'filter_host_groups__ms')),
+				(new CLabel(_('Host group'), 'filter_host_groups__ms')),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_host_groups[]',
