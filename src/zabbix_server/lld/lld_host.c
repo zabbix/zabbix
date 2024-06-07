@@ -2892,7 +2892,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					d = ",";
 
 					zbx_audit_host_update_json_update_ipmi_username(host->hostid,
-							host->ipmi_username_orig, value_esc);
+							(0 == strcmp("", host->ipmi_username_orig) ?
+							"" : ZBX_MACRO_SECRET_MASK), value_esc);
 
 					zbx_free(value_esc);
 				}
@@ -2905,7 +2906,8 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					d = ",";
 
 					zbx_audit_host_update_json_update_ipmi_password(host->hostid,
-							host->ipmi_password_orig, value_esc);
+							(0 == strcmp("", host->ipmi_password_orig) ?
+							"" : ZBX_MACRO_SECRET_MASK), value_esc);
 
 					zbx_free(value_esc);
 				}
