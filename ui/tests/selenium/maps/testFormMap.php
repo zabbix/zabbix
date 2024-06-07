@@ -53,6 +53,9 @@ class testFormMap extends CLegacyWebTest {
 		];
 	}
 
+	public static function allMaps() {
+		return CDBHelper::getDataProvider('SELECT * FROM sysmaps');
+	}
 
 	/**
 	 * Test setting of grid options for map
@@ -162,5 +165,72 @@ class testFormMap extends CLegacyWebTest {
 		// TODO: screenshot should be changed after fix ZBX-22528
 		$this->page->removeFocus();
 		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
+	}
+
+	/**
+	 * @dataProvider allMaps
+	 * @browsers chrome
+	 */
+	public function testFormMap_SimpleUpdateConstructor($map) {
+		$name = $map['name'];
+		$sysmapid = $map['sysmapid'];
+
+		$sqlMap = 'SELECT * FROM sysmaps WHERE name='.zbx_dbstr($name).' ORDER BY sysmapid';
+		$oldHashMap = CDBHelper::getHash($sqlMap);
+		$sqlElements = 'SELECT * FROM sysmaps_elements WHERE sysmapid='.zbx_dbstr($sysmapid).' ORDER BY selementid';
+		$oldHashElements = CDBHelper::getHash($sqlElements);
+		$sqlLinks = 'SELECT * FROM sysmaps_links WHERE sysmapid='.zbx_dbstr($sysmapid).' ORDER BY linkid';
+		$oldHashLinks = CDBHelper::getHash($sqlLinks);
+		$sqlLinkTriggers = 'SELECT slt.* FROM sysmaps_link_triggers slt, sysmaps_links sl WHERE slt.linkid = sl.linkid'.
+			' AND sl.sysmapid='.zbx_dbstr($sysmapid).' ORDER BY slt.linktriggerid';
+		$oldHashLinkTriggers = CDBHelper::getHash($sqlLinkTriggers);
+
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$this->assertTitleAndHeader();
+		$this->query('link', $name)->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertTitleAndHeader('Maps', 'Network maps');
+
+		$element = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
+				->waitUntilPresent()->one();
+
+		$this->assertScreenshotExcept($element, [
+			'query'	=> 'class:map-timestamp',
+			'color'	=> '#ffffff'
+		], 'view_'.$sysmapid);
+
+		$this->query('button:Edit map')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertTitleAndHeader('Network maps');
+
+		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
+
+		$this->query('button:Update')->one()->click();
+
+		if ($this->page->isAlertpresent() === false) {
+			sleep(1);
+		}
+
+		$this->assertEquals('Map is updated! Return to map list?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+
+		$this->assertTrue($this->query('link', $name)->one()->isPresent());
+		$this->assertTitleAndHeader();
+
+		$hash_data = [
+			$oldHashMap => $sqlMap,
+			$oldHashElements => $sqlElements,
+			$oldHashLinks => $sqlLinks,
+			$oldHashLinkTriggers => $sqlLinkTriggers
+		];
+
+		foreach ($hash_data as $old => $new) {
+			$this->assertEquals($old, CDBHelper::getHash($new));
+		}
+	}
+
+	protected function assertTitleAndHeader($header = 'Maps', $title = 'Configuration of network maps') {
+		$this->page->assertTitle($title);
+		$this->page->assertHeader($header);
 	}
 }
