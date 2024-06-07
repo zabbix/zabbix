@@ -8,8 +8,46 @@ Bug fixes:
 Changes for 7.0.1rc1
 
 New features:
+.........T [ZBXNEXT-9140] added support for custom compartments in Oracle Cloud by HTTP templates (knaglis)
+.........T [ZBXNEXT-9034] added Jira Data Center by JMX template (atocko)
+.......PS. [ZBXNEXT-9145] improved VMware event log retrieval (asestakovs, MVekslers)
+.......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+........S. [ZBX-24560] fixed {HOST.DNS} and {HOST.IP} not being resolved if empty (vso)
+.........T [ZBX-24415] added triggers for datastores in VMware templates (abrosimovs)
+..F....... [ZBX-23435] fixed alert message about unsaved changes appearance in nested modal forms (apoga)
+.......PS. [ZBX-24483] improved memory usage in Zabbix server/proxy trappers and in proxy pollers when sending large configuration (vso)
+........S. [ZBX-24574] fixed HA node flipping between standby and active states (wiper)
+........S. [ZBX-24532] fixed unexpected termination on start when DNS library initialization was not possible with broken resolv.conf (sboidenko)
+.......PS. [ZBX-7998] added VMware service username, password and URL check for empty values (asestakovs)
+.......PS. [ZBX-24402] reduced main process connects to database during startup (sboidenko)
+..F....... [ZBX-24310] fixed issue with calculating item count for host availability status if user has no permissions (dfofanovs)
+........S. [ZBX-24318] fixed slow LLD of hosts due to reduntant iteration through many hosts (vso)
+..F....... [ZBX-24477] fixed item test result not getting shown when value type conversion is applied without preprocessing steps (jfreibergs)
+..F....... [ZBX-24369] fixed monitoring list pages' filters behavior after deleting filter parameters (esekace)
+..F....... [ZBX-24484] fixed geomap widget console error when dragging map in widget edit mode (esekace)
+..F....... [ZBX-24233] fixed missing interval for active agent items on item list page (gcalenko)
+..F....... [ZBX-24370] fixed errors on LDAP configuration page when removing provision media mapping (gcalenko)
+.D........ [ZBX-23337] improved supported version documentation for Oracle Database plugin and both templates (knaglis)
+A......... [ZBX-24180] fixed inability to import existing host or template when its dependent item prototype, which is used in trigger prototypes or graph prototypes, would have a different master item (jfreibergs, vmaksimovs)
+.......PS. [ZBX-24242] fixed incorrectly discovered hosts by TCP check (asestakovs)
+...G...... [ZBX-24362] fix Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
+..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
+..F....... [ZBX-24276] fixed inconsistent map element URL opening behavior (esekace)
+..F....... [ZBX-24146] fixed update of item timeout value upon other form field changes (esekace)
+..F....... [ZBX-24253] fixed subfilter reset when navigating in items list page (esekace)
+........S. [ZBX-24503] fixed wrong attachment filename in scheduled reports (mprihodko)
+..F....... [ZBX-24344] fixed selected state sub-filter visibility in latest data page (esekace)
+..F....... [ZBX-24534] removed number of elements indicator in proxy groups page table footer when there are no results to show (dpetra)
+........S. [ZBX-24601] fixed log warning telling to upgrade TimescaleDB configuration (mprihodko)
+..F....... [ZBX-18094] fixed multiple pie graph issues related with calculation of item angles (miks)
+A......... [ZBX-24299] fixed possibility to alter read-only error fields with HostInterface and DRule API create/update operation (miks)
+..F....... [ZBX-23436] fixed broken template edit page being opened from breadcrumbs (agriscenko)
+.......PS. [ZBX-24470] fixed scale of VMware vmware.vm.memory.size.compressed key (MVekslers)
+.......PS. [ZBX-17382] improved get[oid] and walk[oid] to display UTF-8 text instead of hex if MIB files are not installed (vso)
+.......PS. [ZBX-24540] fixed crash when expanding host interface macros on main Zabbix agent interface (wiper)
+........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0
