@@ -1,0 +1,1 @@
+........S. [ZBX-24560] fixed {HOST.DNS} not being resolved if dns is empty on interface (vso)
