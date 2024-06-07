@@ -481,7 +481,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					'action' => $test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR
 						? _('Set error to')
 						: '',
-					'error' => $result_preproc['error'],
+					'error' => $result_preproc['error']
 				];
 			}
 
