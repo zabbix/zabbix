@@ -216,8 +216,8 @@ class testPageProblems extends CWebTest {
 		foreach (['Hosts', 'Triggers'] as $field) {
 			$overlay = $filter_form->getField($field)->edit();
 			$this->assertEquals($field, $overlay->getTitle());
-			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-					explode("\n", $overlay->query('class:no-data-message')->one()->getText())
+			$this->assertEquals("Filter is not set\nUse the filter to display results",
+					$overlay->query('class:no-data-message')->one()->getText()
 			);
 			$overlay->close();
 		}

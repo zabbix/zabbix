@@ -164,6 +164,7 @@ class testNoData extends CWebTest {
 				[
 					'page' => 'Templates',
 					'filter' => ['Name' => 'zzz'],
+					'check_table' => true,
 					'checked_multiselects' => [
 						'Linked templates' => 'popup_template_group_ms'
 					]
@@ -270,6 +271,8 @@ class testNoData extends CWebTest {
 	}
 
 	/**
+	 * Test function for checking empty list tables and empty multiselects' overlays, when there is no available data.
+	 *
 	 * @dataProvider getCheckEmptyStudData
 	 */
 	public function testNoData_CheckEmptyStud($data) {
@@ -291,6 +294,7 @@ class testNoData extends CWebTest {
 
 		$this->page->login()->open($url);
 
+		// Main objects are hosts and templates, but sub-objects are items, triggers, graphs, etc.
 		if (array_key_exists('sub_object', $data)) {
 			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
 					->findRow('Name', ($data['page'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
@@ -298,6 +302,7 @@ class testNoData extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 
+		// Some forms are opened in overlays, not on standalone pages.
 		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
 			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
 					->query('link', ($data['page'] === 'Host') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
@@ -306,6 +311,7 @@ class testNoData extends CWebTest {
 			$form = $template_overlay->asForm();
 		}
 
+		// Not every page has filter element.
 		if (!CTestArrayHelper::get($data, 'no_filter', false)) {
 			$form = $this->query('name:zbx_filter')->asForm()->one();
 		}
@@ -316,6 +322,7 @@ class testNoData extends CWebTest {
 			$form->submit();
 		}
 
+		// Code for checking empty list table.
 		if (CTestArrayHelper::get($data, 'check_table', false)) {
 			$this->assertEquals('No data found', $this->query('xpath://table['.
 					CXPathHelper::fromClass('list-table').']//div['.
@@ -323,6 +330,7 @@ class testNoData extends CWebTest {
 			);
 		}
 
+		// Code for checking empty multiselects' overlays.
 		if (array_key_exists('checked_multiselects', $data)) {
 			foreach ($data['checked_multiselects'] as $field => $filter) {
 				$overlay = $form->getField($field)->edit();
@@ -335,8 +343,8 @@ class testNoData extends CWebTest {
 
 				if ($filter !== null) {
 					$this->assertEquals('', $overlay->query('id', $filter)->one()->getValue());
-					$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-							explode("\n", $overlay->query('class:no-data-message')->one()->getText())
+					$this->assertEquals("Filter is not set\nUse the filter to display results",
+							$overlay->query('class:no-data-message')->one()->getText()
 					);
 				}
 				else {
@@ -347,11 +355,13 @@ class testNoData extends CWebTest {
 			}
 		}
 
+		// Not every page has filter element.
 		if (!CTestArrayHelper::get($data, 'no_filter', false)) {
 			$form->query('button:Reset')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 		}
 
+		// If form was opened in overlay it should be closed after test.
 		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
 			$template_overlay->close();
 		}
@@ -395,6 +405,8 @@ class testNoData extends CWebTest {
 	}
 
 	/**
+	 * Test function for checking the cases where no any item available for creating the entity like trigger, graph, etc.
+	 *
 	 * @dataProvider getCheckEmptyItemsData
 	 */
 	public function testNoData_CheckEmptyItems($data) {
@@ -430,7 +442,6 @@ class testNoData extends CWebTest {
 			case 'discovery rule':
 				$form->fill(['Type' => 'Dependent item']);
 				$overlay = $form->getField('Master item')->edit();
-
 				$this->checkEmptyOverlay($overlay);
 				break;
 
@@ -447,6 +458,14 @@ class testNoData extends CWebTest {
 				$items_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$this->checkEmptyOverlay($items_overlay);
 				break;
+		}
+
+		// Close all dialogs.
+		$dialogs = COverlayDialogElement::find()->all();
+		$dialog_count = $dialogs->count();
+
+		for ($i = $dialog_count - 1; $i >= 0; $i--) {
+			$dialogs->get($i)->close(true);
 		}
 	}
 

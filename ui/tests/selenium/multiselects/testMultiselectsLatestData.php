@@ -55,8 +55,8 @@ class testMultiselectsLatestData extends testMultiselectDialogs {
 		// Check empty filter popup.
 		if (CTestArrayHelper::get($data, 'check_empty', false)) {
 			$empty_dialog = $filter_form->getField('Hosts')->edit();
-			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-					explode("\n", $empty_dialog->query('class:no-data-message')->one()->getText())
+			$this->assertEquals("Filter is not set\nUse the filter to display results",
+					$empty_dialog->query('class:no-data-message')->one()->getText()
 			);
 			$empty_dialog->close();
 		}
