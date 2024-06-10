@@ -458,20 +458,17 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
  *          manager                                                           *
  *                                                                            *
  * Parameters: amdb         - [IN] alert manager cache                        *
- *             process_type - [IN]                                            *
  *                                                                            *
  * Return value: count of alerts                                              *
  *                                                                            *
  ******************************************************************************/
-static int	am_db_queue_alerts(zbx_am_db_t *amdb, unsigned char process_type)
+static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 {
 	zbx_vector_am_db_mediatype_ptr_t	mediatypes;
 	zbx_vector_am_db_alert_ptr_t		alerts;
 	int					alerts_num;
 	zbx_am_db_alert_t			*alert;
 	zbx_vector_uint64_t			mediatypeids, auth_email_mediatypeids;
-
-	zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 
 	zbx_vector_am_db_alert_ptr_create(&alerts);
 	zbx_vector_uint64_create(&mediatypeids);
@@ -1083,7 +1080,9 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_ALERTER_SYNC_ALERTS:
-					alerts_num = am_db_queue_alerts(&amdb, process_type);
+					zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
+
+					alerts_num = am_db_queue_alerts(&amdb);
 					break;
 				case ZBX_IPC_ALERTER_RESULTS:
 					results_num = am_db_flush_results(&amdb.mediatypes, message->data);
@@ -1098,11 +1097,18 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 		}
 		else if (0 == sleeptime_after_notify)
 		{
-			alerts_num = am_db_queue_alerts(&amdb, process_type);
+			zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 
-			if (FAIL == zbx_ipc_async_socket_send(&amdb.am, ZBX_IPC_ALERTER_RESULTS, NULL, 0))
-				zabbix_log(LOG_LEVEL_ERR, "failed to request alert results");
+			alerts_num = am_db_queue_alerts(&amdb);
 		}
+		else
+		{
+			/* ZBX_IS_RUNNING() is false */
+			break;
+		}
+
+		if (FAIL == zbx_ipc_async_socket_send(&amdb.am, ZBX_IPC_ALERTER_RESULTS, NULL, 0))
+				zabbix_log(LOG_LEVEL_ERR, "failed to request alert results");
 
 		if (time_cleanup + SEC_PER_HOUR < sec1)
 		{
