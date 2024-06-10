@@ -436,12 +436,12 @@ $formgrid = (new CFormGrid())
 	]);
 
 if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
-	$formgrid->addItem(new CVar('selectedInterfaceId', $item['interfaceid']));
-
 	$interface = array_key_exists($item['interfaceid'], $data['host']['interfaces'])
 		? $data['host']['interfaces'][$item['interfaceid']] : [];
 
 	if ($item['discovered']) {
+		$formgrid->addItem(new CVar('interfaceid', $item['interfaceid']));
+
 		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
 		$select_interface = (new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true))
 			->setAttribute('disabled', 'disabled');
