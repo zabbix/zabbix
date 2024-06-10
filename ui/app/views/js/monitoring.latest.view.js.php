@@ -38,7 +38,7 @@
 		_refresh_message_box: null,
 		_popup_message_box: null,
 		active_filter: null,
-		layout_mode: null;
+		layout_mode: null,
 
 		init({refresh_url, refresh_data, refresh_interval, filter_options, layout_mode}) {
 			this.refresh_url = new Curl(refresh_url, false);
