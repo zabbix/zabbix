@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/CAPITest.php';
  * @backup media_type, auditlog, config, profiles
  *
  * @onBefore deleteAuditlog
+ *
+ * @dataSource DynamicItemWidgets
  */
 class testPageReportsAudit extends CWebTest {
 
