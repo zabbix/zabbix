@@ -56,7 +56,7 @@ window.widget_pie_chart_form = new class {
 		for (const colorpicker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: '.overlay-dialogue-body',
-				use_default: !['ds', 'merge_color'].includes(colorpicker.name)
+				use_default: colorpicker.name === 'value_color'
 			});
 		}
 
@@ -179,19 +179,8 @@ window.widget_pie_chart_form = new class {
 	}
 
 	#displayingOptionsTabInit() {
-		const used_colors = [];
-
-		for (const color of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
-			if (color.value !== '') {
-				used_colors.push(color.value);
-			}
-		}
-
-		const merge_color_set = document.getElementById('merge_color').value !== '';
-
-		if (!merge_color_set) {
-			const merge_color = colorPalette.getNextColor(used_colors);
-			$.colorpicker('set_color_by_id', 'merge_color', merge_color);
+		if (document.getElementById('merge_color').value === '') {
+			$.colorpicker('set_color_by_id', 'merge_color', '<?= WidgetForm::MERGE_COLOR_DEFAULT ?>');
 		}
 	}
 
@@ -624,7 +613,9 @@ window.widget_pie_chart_form = new class {
 			.querySelector('[name="value_size_type"]:checked').value == <?= WidgetForm::VALUE_SIZE_CUSTOM ?>;
 		const is_units_visible = document.getElementById('units_show').checked;
 
-		for (const element of this.#form.querySelectorAll('#width_label, #width_range, #show_total_fields')) {
+		for (const element of this.#form.querySelectorAll('#width_label, #width_range, #stroke_label, #stroke_range,' +
+			'#show_total_fields'
+		)) {
 			element.style.display = is_doughnut ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
@@ -633,6 +624,7 @@ window.widget_pie_chart_form = new class {
 		}
 
 		jQuery('#width').rangeControl(is_doughnut ? 'enable' : 'disable');
+		jQuery('#stroke').rangeControl(is_doughnut ? 'enable' : 'disable');
 
 		document.getElementById('merge_percent').disabled = !do_merge_sectors;
 		document.getElementById('merge_color').disabled = !do_merge_sectors;

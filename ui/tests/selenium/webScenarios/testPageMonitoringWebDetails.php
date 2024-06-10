@@ -198,7 +198,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
 
 		// Test Kiosk mode.
-		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@title="Kiosk mode"]')->one()->hoverMouse()->click();
 		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent();
 		$this->page->waitUntilReady();
 

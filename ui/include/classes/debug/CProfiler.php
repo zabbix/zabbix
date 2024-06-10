@@ -94,8 +94,6 @@ class CProfiler {
 	private $root_dir;
 
 	/**
-	 * @static
-	 *
 	 * @return CProfiler
 	 */
 	public static function getInstance() {

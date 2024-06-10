@@ -118,11 +118,15 @@ class CControllerItemList extends CControllerItem {
 		[$items, $subfilter_fields] = $this->getItemsAndSubfilter($items, $this->getSubfilter($items, $filter));
 		$data['subfilter'] = static::sortSubfilter($subfilter_fields);
 		$items = $this->sortItems($items, ['sort' => $filter['sort'], 'sortorder' => $filter['sortorder']]);
-		$data['paging'] = CPagerHelper::paginate($page, $items, $filter['sortorder'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', $data['action'])
-				->setArgument('context', $data['context'])
-		);
+
+		$selected_filters = array_merge($filter, $this->getselectedSubfilters($subfilter_fields));
+		$view_url = new CUrl('zabbix.php');
+		$view_url_params = ['action' => $data['action'], 'context' => $data['context']] + $selected_filters;
+
+		array_map([$view_url, 'setArgument'], array_keys($view_url_params), $view_url_params);
+
+		$data['paging'] = CPagerHelper::paginate($page, $items, $filter['sortorder'], $view_url);
+
 		$triggers = $this->getItemsTriggers($items);
 
 		if (count($filter['filter_hostids']) == 1) {
@@ -148,6 +152,23 @@ class CControllerItemList extends CControllerItem {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of items'));
 		$this->setResponse($response);
+	}
+
+	/**
+	 * @param array $subfilters  Array of subfilter data.
+	 *
+	 * @return array
+	 */
+	private function getselectedSubfilters($subfilters): array {
+		$result = [];
+
+		foreach ($subfilters as $key => $subfilter) {
+			if ($subfilter['selected']) {
+				$result[$key] = array_keys($subfilter['selected']);
+			}
+		}
+
+		return $result;
 	}
 
 	/**

@@ -57,6 +57,22 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	const HOST_NAME = 'test_hostconn';
 
 	/**
+	 * Prematurely enable global scripts so prepareData wouldn't fail.
+	 *
+	 */
+	private function updateServerStatus() {
+		$server_status = [
+			"version" => ZABBIX_VERSION,
+			"configuration" => [
+				"enable_global_scripts" => true,
+				"allow_software_update_check" => true
+			]
+		];
+
+		DBexecute("update config set server_status='".json_encode($server_status)."'");
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function prepareData() {
@@ -153,6 +169,9 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('interfaceids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['interfaceids']);
+		self::$interfaceid = $response['result']['interfaceids'][0];
+
+		$this->updateServerStatus();
 
 		$response = $this->call('script.create', [
 			'name' => 'inj test',
@@ -173,6 +192,8 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$scriptid_action = $response['result']['scriptids'][0];
+
+		DBexecute("update config set server_status=''");
 
 		$response = $this->call('action.create', [
 			'esc_period' => '1m',
@@ -317,6 +338,20 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		self::$drule_actionid = $response['result']['actionids'][0];
 
 		return true;
+	}
+
+	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function traceConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
+			]
+		];
 	}
 
 	/**
@@ -596,6 +631,140 @@ class testHostConnMacroValidation extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'cannot process item "'.self::ITEM_TRAP2.'"',
 			true, 60, 1, true);
+	}
+
+
+	/**
+	 * Test circular {HOST.CONN} configuration
+	 *
+	 * @required-components server
+	 * @configurationDataProvider defaultConfigurationProvider
+	 */
+	public function testHostConnMacroValidation_testHostConnRecursion() {
+		$this->stopComponent(self::COMPONENT_SERVER);
+
+		$response = $this->call('hostinterface.update', [
+			'interfaceid' => self::$interfaceid,
+			'dns' => '{HOST.CONN}'
+		]);
+		$this->assertArrayHasKey('interfaceids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['interfaceids']);
+
+		$this->startComponent(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Test injection via running an action operation for discovery.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider traceConfigurationProvider
+	 */
+	public function testHostConnMacroValidation_testHostConnExpansionInSecondaryIf() {
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->clearLog(self::COMPONENT_SERVER);
+
+		$response = $this->call('hostinterface.update', [
+			'interfaceid' => self::$interfaceid,
+			'dns' => 'zabbix.com',
+			'main' => 1
+		]);
+		$this->assertArrayHasKey('interfaceids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['interfaceids']);
+
+		$response = $this->call('hostinterface.create', [
+			[
+				'hostid' => self::$hostid,
+				'useip' => INTERFACE_USE_DNS,
+				'ip' => '',
+				'dns' => 'zabbix.com',
+				'main' => 1,
+				'port' => '10163',
+				'type' => INTERFACE_TYPE_SNMP,
+				'details' => [
+					'version' => 3,
+					'bulk' => 1,
+					'max_repetitions' => 10,
+					'securityname' => 'zabbix',
+					'securitylevel' => 0,
+					'authprotocol' => 0,
+					'privprotocol' => 0,
+					'contextname' => 'zabbix'
+				]
+			],
+			[
+				'hostid' => self::$hostid,
+				'useip' => INTERFACE_USE_DNS,
+				'dns' => '{HOST.CONN}',
+				'main' => 0,
+				'ip' => '',
+				'port' => '10164',
+				'type' => INTERFACE_TYPE_SNMP,
+				'details' => [
+					'version' => 3,
+					'bulk' => 1,
+					'max_repetitions' => 10,
+					'securityname' => 'zabbix',
+					'securitylevel' => 0,
+					'authprotocol' => 0,
+					'privprotocol' => 0,
+					'contextname' => 'zabbix'
+				]
+			],
+			[
+				'hostid' => self::$hostid,
+				'type' => INTERFACE_TYPE_IPMI,
+				'useip' => INTERFACE_USE_DNS,
+				'ip' => '',
+				'dns' => 'zabbix.com',
+				'port' => '1023',
+				'main' => 1
+			],
+			[
+				'hostid' => self::$hostid,
+				'type' => INTERFACE_TYPE_IPMI,
+				'ip' => '',
+				'useip' => INTERFACE_USE_DNS,
+				'dns' => '{HOST.CONN}',
+				'port' => '10231',
+				'main' => 0
+			],
+			[
+				'hostid' => self::$hostid,
+				'type' => INTERFACE_TYPE_JMX,
+				'useip' => INTERFACE_USE_DNS,
+				'dns' => 'zabbix.com',
+				'port' => '1234',
+				'ip' => '',
+				'main' => 1
+			],
+			[
+				'hostid' => self::$hostid,
+				'type' => INTERFACE_TYPE_JMX,
+				'ip' => '',
+				'useip' => INTERFACE_USE_DNS,
+				'dns' => '{HOST.CONN}',
+				'port' => '12345',
+				'main' => 0
+			],
+			[
+				'hostid' => self::$hostid,
+				'ip' => '',
+				'dns' => '{HOST.CONN}',
+				'main' => 0,
+				'port' => '20000',
+				'type' => INTERFACE_TYPE_AGENT,
+				'useip' => INTERFACE_USE_DNS
+			]
+		]);
+		$this->assertArrayHasKey('interfaceids', $response['result']);
+		$this->assertCount(7, $response['result']['interfaceids']);
+
+		$this->startComponent(self::COMPONENT_SERVER);
+
+		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
+		$data = explode("\n", $log);
+		$synced_ifs = preg_grep("/interfaceid:[0-9]+ hostid:[0-9]+ ip:'' dns:'zabbix.com' /", $data);
+		$this->assertCount(8, $synced_ifs);
 	}
 
 	/**

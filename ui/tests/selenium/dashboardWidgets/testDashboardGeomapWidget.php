@@ -177,6 +177,8 @@ class testDashboardGeomapWidget extends CWebTest {
 		$this->assertEquals($hint_text, $hint->one()->getText());
 		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
+
+		$dialog->close();
 	}
 
 	public static function getWidgetCreateData() {
@@ -497,6 +499,8 @@ class testDashboardGeomapWidget extends CWebTest {
 				self::$update_geomap = $header;
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testDashboardGeomapWidget_SimpleUpdate() {
@@ -622,6 +626,7 @@ class testDashboardGeomapWidget extends CWebTest {
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
 			$this->assertEquals($values, $dashboard->getWidget(self::$update_geomap)->edit()->getFields()->asValues());
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		// Check that DB hash is not changed.

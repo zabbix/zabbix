@@ -12,6 +12,7 @@ SUBDIRS = \
 	zbxcacheconfig \
 	zbxdbhigh \
 	zbxhistory \
+	zbxicmpping \
 	zbxjson \
 	zbxmodules \
 	zbxpoller \
