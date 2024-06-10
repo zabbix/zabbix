@@ -16,6 +16,10 @@
 #include "zbxexpression.h"
 
 #include "zbxnum.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
+#include "zbxalgo.h"
 
 /******************************************************************************
  *                                                                            *

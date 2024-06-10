@@ -14,6 +14,9 @@
 
 #include "../sysinfo.h"
 
+#include <linux/sysinfo.h>
+#include <sys/sysinfo.h>
+
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct sysinfo	info;

@@ -22,6 +22,7 @@
 #include "zbxtime.h"
 #include "zbxeval.h"
 #include "zbxjson.h"
+#include "zbxvariant.h"
 
 static int	trapper_parse_expressions_evaluate(const struct zbx_json_parse *jp, zbx_vector_str_t *expressions,
 				char **error)

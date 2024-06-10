@@ -16,6 +16,7 @@
 #include "dbupgrade_macros.h"
 
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
 
 /*
  * 4.0 maintenance database patches

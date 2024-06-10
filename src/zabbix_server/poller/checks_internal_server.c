@@ -19,10 +19,10 @@
 
 #include "zbxcachevalue.h"
 #include "zbxcacheconfig.h"
-#include "zbxtime.h"
 #include "zbxconnector.h"
 #include "zbxproxybuffer.h"
 #include "zbxpgservice.h"
+#include "zbxalgo.h"
 #include "zbx_host_constants.h"
 
 static int	get_proxy_group_stat(const zbx_pg_stats_t *stats, const char *option, AGENT_RESULT *result)

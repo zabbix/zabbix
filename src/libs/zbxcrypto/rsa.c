@@ -12,16 +12,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
+
+#if defined(HAVE_OPENSSL)
 #include "zbxcrypto.h"
 #include "zbxstr.h"
 
-#if defined(HAVE_OPENSSL)
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
 #include <openssl/err.h>
 #include <openssl/bio.h>
 #include <openssl/pem.h>
 #elif defined(HAVE_GNUTLS)
+#include "zbxcrypto.h"
+#include "zbxstr.h"
+
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <gnutls/x509.h>

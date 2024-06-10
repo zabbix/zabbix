@@ -19,6 +19,7 @@
 #include "zbxjson.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxregexp.h"
 
 typedef struct
 {

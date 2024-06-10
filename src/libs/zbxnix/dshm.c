@@ -14,7 +14,7 @@
 
 #include "zbxnix.h"
 
-#include "zbxcommon.h"
+#include "zbxmutexs.h"
 
 /******************************************************************************
  *                                                                            *

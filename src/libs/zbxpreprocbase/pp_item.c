@@ -14,6 +14,8 @@
 
 #include "zbxpreprocbase.h"
 
+#include "zbxalgo.h"
+
 ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
 
 /******************************************************************************

@@ -12,11 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "checks_simple_vmware.h"
-
-#include "config.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#include "checks_simple_vmware.h"
 
 #include "zbxvmware.h"
 #include "zbxxml.h"
@@ -25,6 +25,7 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1

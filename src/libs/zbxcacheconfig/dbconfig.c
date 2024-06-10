@@ -58,6 +58,7 @@
 #include "zbxexpression.h"
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
+#include "zbxhistory.h"
 
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)

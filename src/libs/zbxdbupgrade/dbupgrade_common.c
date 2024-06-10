@@ -17,6 +17,8 @@
 
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
+#include "zbxalgo.h"
+#include "zbxnum.h"
 
 int	delete_problems_with_nonexistent_object(void)
 {

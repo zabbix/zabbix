@@ -18,7 +18,10 @@
 #include "zbxcomms.h"
 #include "zbxcrypto.h"
 #include "zbxalgo.h"
-#include "zbxcurl.h"
+
+#ifdef HAVE_LIBCURL
+#	include "zbxcurl.h"
+#endif
 
 /* number of characters per line when wrapping Base64 data in Email */
 #define ZBX_EMAIL_B64_MAXLINE			76

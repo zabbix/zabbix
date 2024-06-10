@@ -13,14 +13,13 @@
 **/
 
 #include "webdriver.h"
-#include "zbxcommon.h"
 #include "zbxjson.h"
-#include "zbxstr.h"
-#include "zbxtime.h"
-#include "zbxtypes.h"
-#include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxcurl.h"
 
 #define WEBDRIVER_INVALID_SESSIONID_ERROR	"invalid session id"
 

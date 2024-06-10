@@ -15,8 +15,9 @@
 #include "trapper_history_push.h"
 #include "trapper_server.h"
 
-#include "../proxyconfigread/proxyconfigread.h"
 #include "proxydata.h"
+
+#include "../proxyconfigread/proxyconfigread.h"
 #include "../reporter/reporter.h"
 
 #include "zbxtrapper.h"
@@ -25,6 +26,9 @@
 #include "zbxipcservice.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
+#include "zbxdb.h"
+#include "zbxstr.h"
+#include "zbxjson.h"
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
 		zbx_get_config_forks_f get_config_forks)
