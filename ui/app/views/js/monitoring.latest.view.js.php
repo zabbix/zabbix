@@ -33,6 +33,7 @@
 		_refresh_message_box: null,
 		_popup_message_box: null,
 		active_filter: null,
+		layout_mode: null,
 
 		checkbox_object: null,
 
