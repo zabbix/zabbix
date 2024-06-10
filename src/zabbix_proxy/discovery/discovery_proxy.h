@@ -16,6 +16,7 @@
 #define ZABBIX_DISCOVERY_PROXY_H
 
 #include "zbxdbhigh.h"
+#include "zbxalgo.h"
 
 void	*zbx_discovery_open_proxy(void);
 void	zbx_discovery_find_host_proxy(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost);

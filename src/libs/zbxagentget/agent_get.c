@@ -16,7 +16,8 @@
 
 #include "zbxversion.h"
 #include "zbxstr.h"
-#include "zbxtypes.h"
+#include "zbxjson.h"
+
 #include <stddef.h>
 
 int	zbx_get_agent_protocol_version_int(const char *version_str)

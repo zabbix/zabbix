@@ -506,6 +506,8 @@ class testFormAdministrationProxies extends CWebTest {
 				// Check fields lengths.
 				$field_maxlengths = [
 					'Proxy name' => 128,
+					'id:local_address' => 255,
+					'id:local_port' => 64,
 					'Proxy address' => 255,
 					'Description' => 65535,
 					'PSK identity' => 128,
@@ -516,14 +518,23 @@ class testFormAdministrationProxies extends CWebTest {
 
 				foreach ($field_maxlengths as $name => $maxlength) {
 					$field = $form->getField($name);
-					$this->assertEquals('', $field->getValue());
+					$this->assertEquals(($name === 'id:local_port' ? '10051' : ''), $field->getValue());
 					$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 				}
 
-				// TODO: Uncomment after ZBX-24571 is fixed.
+//				TODO: Uncomment after ZBX-24571 is fixed.
 //				$empty_dialog = $form->getField('Proxy group')->edit();
 //				$this->assertEquals('No data found', $empty_dialog->query('class:no-data-message')->one()->getText());
 //				$empty_dialog->close();
+
+				// Check that "Address for active agents" field and that it is displayed only when a proxy group is selected.
+				$address_field = $form->getField('Address for active agents');
+				$this->assertFalse($address_field->isDisplayed());
+				$form->fill(['Proxy group' => 'Online proxy group']);
+				$this->assertTrue($address_field->isDisplayed());
+
+				$this->assertEquals(['Address', 'Port'], $address_field->asTable()->getHeadersText());
+				$this->assertEquals(['Proxy name', 'Address for active agents'], $form->getRequiredLabels());
 
 				// Check timeouts.
 				$form->selectTab('Timeouts');
@@ -758,6 +769,154 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy name' => 'кириллица'
 					],
 					'error' => 'Invalid parameter "/1/name": invalid host name.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Empty local address',
+						'Proxy group' => 'Online proxy group'
+					],
+					'error' => 'Incorrect value for field "Address for active agents: Address": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Invalid symbols in local address',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '!@#$%^&*()_+'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Space in local address - IP',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0 .0.1'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Space in local address - DNS',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => 'zab bix'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'User macro in local address',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '{$MACRO}'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Built-in macro in local address',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '{TIME}'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'LLD macro in local address',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '{#MACRO}'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Empty local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => ''
+					],
+					'error' => 'Incorrect value for field "Address for active agents: Port": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Non-numeric value in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '3k'
+					],
+					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Too high number in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '65536'
+					],
+					'error' => 'Invalid parameter "/1/local_port": value must be one of 0-65535.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Negative number in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '-1'
+					],
+					'error' => 'Invalid parameter "/1/local_port": value must be one of 0-65535.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Built in macro in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '{TIME}'
+					],
+					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'LLD macro in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '{#PORT}'
+					],
+					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
 				]
 			],
 			[
@@ -1630,7 +1789,10 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'proxy_fields' => [
 						'Proxy name' => 'All fields Passive proxy No encryption',
-						'Proxy mode' => 'Passive'
+						'Proxy mode' => 'Passive',
+						'Proxy group' => 'Offline group',
+						'id:local_address' => 'zabbix.com',
+						'id:local_port' => '65535'
 					],
 					'encryption_fields' => [
 						'Connections to proxy' => 'No encryption'
@@ -1642,6 +1804,9 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '-All fields Active proxy 123',
 						'Proxy mode' => 'Active',
+						'Proxy group' => 'Offline group',
+						'id:local_address' => '192.168.0.1',
+						'id:local_port' => '{$PORT}',
 						'Proxy address' => '120.9.9.9',
 						'Description' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//"
 					],
@@ -1703,6 +1868,9 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'proxy_fields' => [
 						'Proxy name' => '      Selenium test proxy with spaces    ',
+						'Proxy group' => 'Offline group',
+						'id:local_address' => '   127.0.0.1   ',
+						'id:local_port' => '   11111   ',
 						'Description' => '       Test description with trailing spaces        ',
 						'Proxy mode' => 'Active'
 					],
@@ -1894,7 +2062,7 @@ class testFormAdministrationProxies extends CWebTest {
 			// Remove leading and trailing spaces from data for assertion.
 			if (CTestArrayHelper::get($data, 'trim', false)) {
 				$trimmed_fields = [
-					'proxy_fields' => ['Proxy name', 'Description'],
+					'proxy_fields' => ['Proxy name', 'Description', 'id:local_address', 'id:local_port'],
 					'encryption_fields' => ['Issuer', 'Subject']
 				];
 
@@ -2149,6 +2317,9 @@ class testFormAdministrationProxies extends CWebTest {
 			'proxy_fields' => [
 				'Proxy name' => 'Proxy for cancel',
 				'Proxy mode' => 'Passive',
+				'Proxy group' => 'Group without proxies',
+				'id:local_address' => '127.0.0.1',
+				'id:local_port' => 33333,
 				'id:address' => '192.8.8.8',
 				'id:port' => 222,
 				'Description' => 'Description for cancel'

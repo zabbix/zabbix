@@ -18,6 +18,8 @@
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "zbxprof.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 

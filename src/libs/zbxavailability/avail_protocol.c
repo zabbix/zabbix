@@ -15,6 +15,7 @@
 #include "zbxserialize.h"
 #include "zbxavailability.h"
 #include "zbxjson.h"
+#include "zbxalgo.h"
 
 void	zbx_availability_serialize_interface(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_interface_availability_t *interface_availability)

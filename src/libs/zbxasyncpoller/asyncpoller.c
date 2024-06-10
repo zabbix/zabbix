@@ -257,5 +257,25 @@ zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event)
 
 	return ZBX_ASYNC_TASK_STOP;
 }
+const char	*zbx_resolv_conf_errstr(const int error)
+{
+	switch (error)
+	{
+		case 1:
+			return "failed to open file";
+		case 2:
+			return "failed to stat file";
+		case 3:
+			return "file too large";
+		case 4:
+			return "out of memory";
+		case 5:
+			return "short read from file";
+		case 6:
+			return "no nameservers listed in the file";
+		default:
+			return "unknown";
+	}
+}
 
 #endif

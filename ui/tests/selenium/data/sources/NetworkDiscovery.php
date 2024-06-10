@@ -34,7 +34,7 @@ class NetworkDiscovery {
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 				],
 				[
-					'name' => 'Proxy for Network discovery cloning',
+					'name' => 'Proxy for cloning Network discovery',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 				]
 			]
@@ -310,7 +310,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule to check delete',
 				'iprange' => '192.168.3.1-255',
-				'proxy_hostid' => $proxyids['Test Proxy'],
+				'proxyid' => $proxyids['Test Proxy'],
 				'delay' => 600,
 				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
@@ -325,7 +325,7 @@ class NetworkDiscovery {
 			[
 				'name' => "<img src=\"x\" onerror=\"alert('UWAGA');\"/>",
 				'iprange' => '192.168.3.1-255',
-				'proxy_hostid' => $proxyids['Test Proxy'],
+				'proxyid' => $proxyids['Test Proxy'],
 				'delay' => 600,
 				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [

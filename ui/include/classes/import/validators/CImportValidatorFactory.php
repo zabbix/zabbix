@@ -62,6 +62,9 @@ class CImportValidatorFactory extends CRegistryFactory {
 			},
 			'7.0' => function() use ($format): CXmlValidatorGeneral {
 				return new C70XmlValidator($format);
+			},
+			'7.2' => function() use ($format): CXmlValidatorGeneral {
+				return new C72XmlValidator($format);
 			}
 		]);
 	}

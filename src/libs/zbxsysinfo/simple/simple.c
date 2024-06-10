@@ -22,21 +22,22 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxip.h"
 #include "zbxcomms.h"
-#include "zbxcurl.h"
-#include "zbxcfg.h"
 #include "zbx_discoverer_constants.h"
 
 #ifdef HAVE_LDAP
-#	include <ldap.h>
+
+#ifdef HAVE_LIBCURL
+#	include "zbxcurl.h"
+#	include "zbxip.h"
 #endif
+
+#include <ldap.h>
 
 #ifdef HAVE_LBER_H
 #	include <lber.h>
 #endif
 
-#ifdef HAVE_LDAP
 static int	check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	LDAP		*ldap	= NULL;

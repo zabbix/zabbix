@@ -13,7 +13,7 @@
 **/
 #include "zbxself.h"
 
-#include "zbxcommon.h"
+#include "zbxstats.h"
 #include "zbxtimekeeper.h"
 #include "zbxshmem.h"
 

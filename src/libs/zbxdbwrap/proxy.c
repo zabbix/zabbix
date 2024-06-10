@@ -40,6 +40,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxautoreg.h"
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)

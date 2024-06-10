@@ -13,13 +13,13 @@
 **/
 
 #include "browser_perf.h"
-#include "zbxalgo.h"
-#include "zbxcommon.h"
 #include "zbxjson.h"
-#include "zbxnum.h"
-#include "zbxstr.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "zbxalgo.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 #define WD_PERF_TAG_ENTRY_TYPE	"entryType"
 

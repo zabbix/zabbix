@@ -15,8 +15,9 @@
 #ifndef ZABBIX_PP_CACHE_H
 #define ZABBIX_PP_CACHE_H
 
-#include "zbxpreproc.h"
 #include "zbxvariant.h"
+#include "zbxpreprocbase.h"
+#include "zbxjson.h"
 
 typedef struct
 {

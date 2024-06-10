@@ -13,6 +13,11 @@
 **/
 
 #include "vmware_service_cfglists.h"
+
+#include "zbxcommon.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 #include "zbxvmware.h"
 
 #include "vmware_internal.h"
@@ -21,8 +26,6 @@
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 /******************************************************************************
  *                                                                            *

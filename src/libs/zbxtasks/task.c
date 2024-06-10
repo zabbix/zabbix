@@ -16,6 +16,10 @@
 
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 ZBX_PTR_VECTOR_IMPL(tm_task, zbx_tm_task_t *)
 

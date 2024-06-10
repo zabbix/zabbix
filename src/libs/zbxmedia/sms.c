@@ -17,6 +17,7 @@
 #include "zbxstr.h"
 
 #include <termios.h>
+#include <bits/termios-c_lflag.h>
 
 #define	ZBX_AT_ESC	"\x1B"
 #define ZBX_AT_CTRL_Z	"\x1A"

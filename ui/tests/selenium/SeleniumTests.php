@@ -75,6 +75,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelect
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemHistoryWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPieChartWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
@@ -215,6 +216,10 @@ require_once dirname(__FILE__).'/problems/testPageProblems.php';
 // Proxies.
 require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
 require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
+
+// Proxy Groups.
+require_once dirname(__FILE__).'/proxyGroups/testFormAdministrationProxyGroups.php';
+require_once dirname(__FILE__).'/proxyGroups/testPageAdministrationProxyGroups.php';
 
 // Queue.
 /*
@@ -403,6 +408,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
+		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPieChartWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
@@ -543,6 +549,10 @@ class SeleniumTests {
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
+
+		// Proxy groups.
+		$suite->addTestSuite('testFormAdministrationProxyGroups');
+		$suite->addTestSuite('testPageAdministrationProxyGroups');
 
 		// Queue.
 		/*
