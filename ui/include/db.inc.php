@@ -164,20 +164,20 @@ function DBrollback(): bool {
  * DBselect('select * from users')
  * DBselect('select * from users',50,200)
  *
- * @param string $query
- * @param int    $limit   Maximum number of records to return.
- * @param int    $offset  Return starting from $offset record.
+ * @param string   $query
+ * @param int|null $limit   Maximum number of records to return.
+ * @param int      $offset  Return starting from $offset record.
  *
  * @return resource|false
  */
-function DBselect(string $query, int $limit = 0, int $offset = 0) {
+function DBselect(string $query, ?int $limit = null, int $offset = 0) {
 	global $DB;
 
 	if (!array_key_exists('DB', $DB) || $DB['DB'] === null) {
 		return false;
 	}
 
-	if ($limit != 0) {
+	if ($limit !== null) {
 		$query .= ' LIMIT '.$limit;
 
 		if ($offset != 0) {
