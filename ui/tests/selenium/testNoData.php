@@ -15,6 +15,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * Test for checking empty pages, overlays and tables.
@@ -32,6 +33,14 @@ class testNoData extends CWebTest {
 	public static $lld_hostid;
 	public static $lldid;
 
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	public function prepareEmptyData() {
 		$hostgroups = CDataHelper::call('hostgroup.create', [
@@ -85,7 +94,8 @@ class testNoData extends CWebTest {
 						'Proxies' => null
 					],
 					// Fill this filter to enable 'Proxy' multiselect.
-					'filter' => ['Monitored by' => 'Proxy']
+					'filter' => ['Monitored by' => 'Proxy'],
+					'check_table' => true
 				]
 			],
 			// #1 No filter selected, Proxy group field check.
@@ -272,8 +282,7 @@ class testNoData extends CWebTest {
 					'checked_multiselects' => [
 						'Templates' => 'popup_template_group_ms'
 					],
-					'overlay_form' => true,
-					'no_filter' => true
+					'overlay_form' => true
 				]
 			],
 			// #18 Template form overlay.
@@ -283,8 +292,35 @@ class testNoData extends CWebTest {
 					'checked_multiselects' => [
 						'Templates' => 'popup_template_group_ms'
 					],
-					'overlay_form' => true,
-					'no_filter' => true
+					'overlay_form' => true
+				]
+			],
+			// #19 Item prototypes table.
+			[
+				[
+					'page' => 'Item prototypes',
+					'check_table' => true
+				]
+			],
+			// #20 Trigger prototypes table.
+			[
+				[
+					'page' => 'Trigger prototypes',
+					'check_table' => true
+				]
+			],
+			// #21 Graph prototypes table.
+			[
+				[
+					'page' => 'Graph prototypes',
+					'check_table' => true
+				]
+			],
+			// #22 Host prototypes table.
+			[
+				[
+					'page' => 'Host prototypes',
+					'check_table' => true
 				]
 			]
 		];
@@ -310,6 +346,22 @@ class testNoData extends CWebTest {
 			case 'Discovery':
 				$url = 'zabbix.php?action=discovery.view';
 				break;
+
+			case 'Item prototypes':
+				$url = 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid='.self::$lldid;
+				break;
+
+			case 'Trigger prototypes':
+				$url = 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.self::$lldid;
+				break;
+
+			case 'Graph prototypes':
+				$url = 'graphs.php?context=host&parent_discoveryid='.self::$lldid;
+				break;
+
+			case 'Host prototypes':
+				$url = 'host_prototypes.php?context=host&parent_discoveryid='.self::$lldid;
+				break;
 		}
 
 		$this->page->login()->open($url);
@@ -328,31 +380,30 @@ class testNoData extends CWebTest {
 					->query('link', ($data['page'] === 'Host') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
 					->waitUntilClickable()->one()->click();
 			$template_overlay = COverlayDialogElement::find()->waitUntilReady()->one();
-			$form = $template_overlay->asForm();
-		}
-
-		// Not every page has filter element.
-		if (!CTestArrayHelper::get($data, 'no_filter', false)) {
-			$form = $this->query('name:zbx_filter')->asForm()->one();
+			$overlay_form = $template_overlay->asForm();
 		}
 
 		// Fill filter to enable dependent multiselects.
 		if (array_key_exists('filter', $data)) {
+			$form = $this->query('name:zbx_filter')->asForm()->one();
 			$form->fill($data['filter']);
 			$form->submit();
 		}
 
 		// Code for checking empty list table.
 		if (CTestArrayHelper::get($data, 'check_table', false)) {
-			$this->assertEquals('No data found', $this->query('xpath://table['.
-					CXPathHelper::fromClass('list-table').']//div['.
-					CXPathHelper::fromClass('no-data-message').']')->one()->getText()
+			$this->assertEquals(['No data found'],
+					$this->getTable('xpath://table[@class="list-table no-data"]')->getRows()->asText()
 			);
 		}
 
 		// Code for checking empty multiselects' overlays.
 		if (array_key_exists('checked_multiselects', $data)) {
 			foreach ($data['checked_multiselects'] as $field => $filter) {
+				$form = (CTestArrayHelper::get($data, 'overlay_form'))
+					? $overlay_form
+					: $this->query('name:zbx_filter')->asForm()->one();
+
 				$overlay = $form->getField($field)->edit();
 
 				$title = ($field === 'Linked templates')
@@ -375,8 +426,7 @@ class testNoData extends CWebTest {
 			}
 		}
 
-		// Not every page has filter element.
-		if (!CTestArrayHelper::get($data, 'no_filter', false)) {
+		if (array_key_exists('filter', $data)) {
 			$form->query('button:Reset')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 		}
