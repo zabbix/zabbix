@@ -90,8 +90,8 @@ class testNoData extends CWebTest {
 				[
 					'page' => 'Hosts',
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group',
-						'Proxies' => null
+						'Templates',
+						'Proxies'
 					],
 					// Fill this filter to enable 'Proxy' multiselect.
 					'filter' => ['Monitored by' => 'Proxy'],
@@ -103,7 +103,7 @@ class testNoData extends CWebTest {
 				[
 					'page' => 'Hosts',
 					'checked_multiselects' => [
-						'Proxy groups' => null
+						'Proxy groups'
 					],
 					// Fill this filter to enable 'Proxy groups' multiselect.
 					'filter' => ['Monitored by' => 'Proxy group']
@@ -116,8 +116,8 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Items' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts' => 'popup_host_group_ms',
-						'Value mapping' => null
+						'Hosts',
+						'Value mapping'
 					]
 				]
 			],
@@ -128,7 +128,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Triggers' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts' => 'popup_host_group_ms'
+						'Hosts'
 					]
 				]
 			],
@@ -139,7 +139,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Graphs' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts' => 'popup_host_group_ms'
+						'Hosts'
 					]
 				]
 			],
@@ -150,7 +150,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Discovery' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts' => 'popup_host_group_ms'
+						'Hosts'
 					]
 				]
 			],
@@ -161,7 +161,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Web',
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts' => 'popup_host_group_ms'
+						'Hosts'
 					]
 				]
 			],
@@ -175,8 +175,8 @@ class testNoData extends CWebTest {
 					],
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group',
-						'Proxy groups' => null
+						'Templates',
+						'Proxy groups'
 					]
 				]
 			],
@@ -185,7 +185,7 @@ class testNoData extends CWebTest {
 				[
 					'page' => 'Templates',
 					'checked_multiselects' => [
-						'Linked templates' => 'popup_template_group_ms'
+						'Linked templates'
 					]
 				]
 			],
@@ -196,7 +196,7 @@ class testNoData extends CWebTest {
 					'filter' => ['Name' => 'zzz'],
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Linked templates' => 'popup_template_group_ms'
+						'Linked templates'
 					]
 				]
 			],
@@ -207,8 +207,8 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Items' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms',
-						'Value mapping' => null
+						'Templates',
+						'Value mapping'
 					]
 				]
 			],
@@ -219,7 +219,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Triggers' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms'
+						'Templates'
 					]
 				]
 			],
@@ -230,7 +230,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Graphs' ,
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms'
+						'Templates'
 					]
 				]
 			],
@@ -250,7 +250,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Discovery',
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms'
+						'Templates'
 					]
 				]
 			],
@@ -261,7 +261,7 @@ class testNoData extends CWebTest {
 					'sub_object' => 'Web',
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms'
+						'Templates'
 					]
 				]
 			],
@@ -271,7 +271,7 @@ class testNoData extends CWebTest {
 					'page' => 'Discovery',
 					'check_table' => true,
 					'checked_multiselects' => [
-						'Discovery rule' => null
+						'Discovery rule'
 					]
 				]
 			],
@@ -280,7 +280,7 @@ class testNoData extends CWebTest {
 				[
 					'page' => 'Host',
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms'
+						'Templates'
 					],
 					'overlay_form' => true
 				]
@@ -290,7 +290,7 @@ class testNoData extends CWebTest {
 				[
 					'page' => 'Template',
 					'checked_multiselects' => [
-						'Templates' => 'popup_template_group_ms'
+						'Templates'
 					],
 					'overlay_form' => true
 				]
@@ -321,6 +321,17 @@ class testNoData extends CWebTest {
 				[
 					'page' => 'Host prototypes',
 					'check_table' => true
+				]
+			],
+			// #23 SLA report page.
+			[
+				[
+					'page' => 'SLA report',
+					'check_table' => true,
+					'checked_multiselects' => [
+						'SLA',
+						'Service'
+					]
 				]
 			]
 		];
@@ -362,6 +373,10 @@ class testNoData extends CWebTest {
 			case 'Host prototypes':
 				$url = 'host_prototypes.php?context=host&parent_discoveryid='.self::$lldid;
 				break;
+
+			case 'SLA report':
+				$url = 'zabbix.php?action=slareport.list';
+				break;
 		}
 
 		$this->page->login()->open($url);
@@ -392,14 +407,21 @@ class testNoData extends CWebTest {
 
 		// Code for checking empty list table.
 		if (CTestArrayHelper::get($data, 'check_table', false)) {
-			$this->assertEquals(['No data found'],
+			if ($data['page'] === 'SLA report') {
+				$this->assertEquals('Select SLA to display SLA report.',
+						$this->query('xpath://div[@class="no-data-message"]')->one()->getText()
+				);
+			}
+			else {
+				$this->assertEquals(['No data found'],
 					$this->getTable('xpath://table[@class="list-table no-data"]')->getRows()->asText()
-			);
+				);
+			}
 		}
 
 		// Code for checking empty multiselects' overlays.
 		if (array_key_exists('checked_multiselects', $data)) {
-			foreach ($data['checked_multiselects'] as $field => $filter) {
+			foreach ($data['checked_multiselects'] as $field) {
 				$form = (CTestArrayHelper::get($data, 'overlay_form'))
 					? $overlay_form
 					: $this->query('name:zbx_filter')->asForm()->one();
@@ -408,20 +430,8 @@ class testNoData extends CWebTest {
 
 				$title = ($field === 'Linked templates')
 					? 'Templates'
-					: ($field === 'Discovery rule' ? 'Discovery rules' : $field) ;
-
-				$this->assertEquals($title, $overlay->getTitle());
-
-				if ($filter !== null) {
-					$this->assertEquals('', $overlay->query('id', $filter)->one()->getValue());
-					$this->assertEquals("Filter is not set\nUse the filter to display results",
-							$overlay->query('class:no-data-message')->one()->getText()
-					);
-				}
-				else {
-					$this->assertEquals('No data found', $overlay->query('class:no-data-message')->one()->getText());
-				}
-
+					: ($field === 'Discovery rule' ? 'Discovery rules' : $field);
+				$this->checkEmptyOverlay($overlay, $title, '');
 				$overlay->close();
 			}
 		}
@@ -626,17 +636,20 @@ class testNoData extends CWebTest {
 	protected function checkEmptyOverlay($overlay, $title, $host = null) {
 		$this->assertEquals($title, $overlay->getTitle());
 
-		// For prototypes overlay multiselect with selected host shouldn't present.
-		$filter_multiselect = $overlay->query('xpath:.//div[@class="multiselect-control"]');
+		// For SLA overlays filter is not multiselect, but input.
+		$filter = (in_array($title, ['SLA', 'Service']))
+			? $overlay->query('id:services-filter-name')
+			: $overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect();
 
-		if (str_contains($title, 'prototypes')) {
-			$this->assertFalse($filter_multiselect->exists());
+		// There are overlays where additional filter exists, and there are some - where it shouldn't exist.
+		if (in_array($title, ['Proxies', 'Proxy groups', 'Value mapping', 'Discovery rules', 'SLA', 'Item prototypes'])) {
+			$this->assertFalse($filter->exists());
 		}
 		else {
-			$this->assertEquals($host, $filter_multiselect->asMultiselect()->one()->getValue());
+			$this->assertEquals($host, $filter->one()->getValue());
 		}
 
-		$text = ($title === 'Templates')
+		$text = (in_array($title, ['Templates', 'Hosts']))
 			? "Filter is not set\nUse the filter to display results"
 			: 'No data found';
 		$this->assertEquals($text, $overlay->query('class:no-data-message')->one()->getText());
