@@ -94,6 +94,12 @@
 			graph.off('mouseup', makeHintboxStatic);
 			graph.removeData('hintbox');
 			hbox.remove();
+
+			if (graph.observer !== undefined) {
+				graph.observer.disconnect();
+
+				delete graph.observer;
+			}
 		}
 	}
 
