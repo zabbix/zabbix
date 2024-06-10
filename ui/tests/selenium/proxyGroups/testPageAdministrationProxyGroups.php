@@ -377,11 +377,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 
 		// Check filtered result.
 		$this->assertTableDataColumn($data['result']);
-
-		// TODO: Remove the condition below after ZBX-24568 is fixed.
-		if ($data['result'] !== []) {
-			$this->assertTableStats(count($data['result']));
-		}
+		$this->assertTableStats(count($data['result']));
 	}
 
 	public function testPageAdministrationProxyGroups_Sort() {
