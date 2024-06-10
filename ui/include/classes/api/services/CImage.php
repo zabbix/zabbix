@@ -169,7 +169,7 @@ class CImage extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function create($images) {
+	public function create(array $images): array {
 		self::validateCreate($images);
 
 		$imageids = DB::insert('images', $images);
@@ -211,7 +211,7 @@ class CImage extends CApiService {
 	 *
 	 * @return array (updated images)
 	 */
-	public function update($images) {
+	public function update(array $images): array {
 		self::validateUpdate($images, $db_images);
 
 		$upd_images = [];

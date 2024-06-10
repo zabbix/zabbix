@@ -75,7 +75,7 @@ function DBconnect(&$error) {
 	return true;
 }
 
-function DBclose() {
+function DBclose(): bool {
 	global $DB;
 
 	$result = false;
@@ -91,31 +91,27 @@ function DBclose() {
 		}
 	}
 	unset($DB['DB']);
+
 	return $result;
 }
 
-function DBstart() {
+function DBstart(): bool {
 	global $DB;
-
-	$result = false;
 
 	if ($DB['TRANSACTIONS'] != 0) {
 		info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
-		return $result;
+
+		return false;
 	}
 
 	$DB['TRANSACTIONS']++;
 	$DB['TRANSACTION_NO_FAILED_SQLS'] = true;
 
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
-		return $result;
+		return false;
 	}
 
-	if ($DB['TYPE'] === ZBX_DB_MYSQL || $DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-		$result = DBexecute('BEGIN');
-	}
-
-	return $result;
+	return DBexecute('BEGIN');
 }
 
 /**
@@ -153,28 +149,12 @@ function DBend($doCommit = true) {
 	return (!is_null($doCommit) && $DBresult) ? $doCommit : $DBresult;
 }
 
-function DBcommit() {
-	global $DB;
-
-	$result = false;
-
-	if ($DB['TYPE'] === ZBX_DB_MYSQL || $DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-		$result = DBexecute('COMMIT');
-	}
-
-	return $result;
+function DBcommit(): bool {
+	return DBexecute('COMMIT');
 }
 
-function DBrollback() {
-	global $DB;
-
-	$result = false;
-
-	if ($DB['TYPE'] === ZBX_DB_MYSQL || $DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-		$result = DBexecute('ROLLBACK');
-	}
-
-	return $result;
+function DBrollback(): bool {
+	return DBexecute('ROLLBACK');
 }
 
 /**
@@ -185,22 +165,24 @@ function DBrollback() {
  * DBselect('select * from users',50,200)
  *
  * @param string $query
- * @param int $limit    max number of record to return
- * @param int $offset   return starting from $offset record
+ * @param int    $limit   Maximum number of records to return.
+ * @param int    $offset  Return starting from $offset record.
  *
  * @return resource|false
  */
-function DBselect($query, $limit = null, $offset = 0) {
+function DBselect(string $query, int $limit = 0, int $offset = 0) {
 	global $DB;
 
 	if (!array_key_exists('DB', $DB) || $DB['DB'] === null) {
 		return false;
 	}
 
-	$query = DBaddLimit($query, $limit, $offset);
+	if ($limit != 0) {
+		$query .= ' LIMIT '.$limit;
 
-	if ($query === false) {
-		return false;
+		if ($offset != 0) {
+			$query .= ' OFFSET '.$offset;
+		}
 	}
 
 	$time_start = microtime(true);
@@ -238,51 +220,6 @@ function DBselect($query, $limit = null, $offset = 0) {
 	}
 
 	return $result;
-}
-
-/**
- * Add the LIMIT clause to the given query.
- *
- * NOTE:
- * LIMIT and OFFSET records
- *
- * Example: select 6-15 row.
- *
- * MySQL:
- * SELECT a FROM tbl LIMIT 5,10
- * SELECT a FROM tbl LIMIT 10 OFFSET 5
- *
- * PostgreSQL:
- * SELECT a FROM tbl LIMIT 10 OFFSET 5
- *
- * @param $query
- * @param int $limit    max number of record to return
- * @param int $offset   return starting from $offset record
- *
- * @return bool|string
- */
-function DBaddLimit($query, $limit = 0, $offset = 0) {
-	global $DB;
-
-	if ((isset($limit) && ($limit < 0 || !zbx_ctype_digit($limit))) || $offset < 0 || !zbx_ctype_digit($offset)) {
-		$moreDetails = isset($limit) ? ' Limit ['.$limit.'] Offset ['.$offset.']' : ' Offset ['.$offset.']';
-		error('Incorrect parameters for limit and/or offset. Query ['.$query.']'.$moreDetails, true);
-
-		return false;
-	}
-
-	// Process limit and offset
-	if (isset($limit)) {
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-			case ZBX_DB_POSTGRESQL:
-				$query .= ' LIMIT '.intval($limit);
-				$query .= $offset != 0 ? ' OFFSET '.intval($offset) : '';
-				break;
-		}
-	}
-
-	return $query;
 }
 
 /**
