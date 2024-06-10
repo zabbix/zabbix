@@ -639,7 +639,6 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_common_data(zbx_wd_perf_entr
 static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_navigation_data(zbx_wd_perf_entry_t *in)
 {
 	zbx_wd_perf_entry_t	*out;
-	zbx_wd_attr_t		attr;
 
 	out = wd_perf_entry_aggregate_common_data(in);
 	wd_perf_entry_copy_attr(out, WD_PERF_ATTR_TLS_NEGOTIATION_TIME, in, WD_PERF_ATTR_TLS_NEGOTIATION_TIME);
@@ -665,6 +664,9 @@ static void	wd_perf_dump_entry(const char *name, zbx_wd_perf_entry_t *entry)
 	zbx_hashset_iter_t		iter;
 	zbx_vector_wd_attr_ptr_t	attrs;
 	zbx_wd_attr_t			*attr;
+
+	if (NULL == entry)
+		return;
 
 	zbx_vector_wd_attr_ptr_create(&attrs);
 	zbx_hashset_iter_reset(&entry->attrs, &iter);

@@ -15,13 +15,17 @@
 
 class CWidgetItemHistory extends CWidget {
 
+	static VALUE_TYPE_IMAGE = 'image';
+	static VALUE_TYPE_RAW = 'raw';
+
 	#binary_data_cache = new Map();
+	#binary_buttons = new Map();
 
 	#abort_controller = null;
 
 	#thumbnail_loader = null;
 
-	#show_thumbnail = false;
+	#values_table;
 
 	#selected_itemid = null;
 	#selected_clock = null;
@@ -34,32 +38,21 @@ class CWidgetItemHistory extends CWidget {
 			this.#abort_controller = null;
 		}
 
-		const table = this._body.querySelector(`.${ZBX_STYLE_LIST_TABLE}`);
+		this.#values_table = this._body.querySelector(`.${ZBX_STYLE_LIST_TABLE}`);
 
-		if (table !== null) {
-			this.#show_thumbnail = table.classList.contains('show-thumbnail');
-
+		if (this.#values_table !== null) {
 			this.#loadThumbnails(this.#makeUrls());
 
-			table.querySelectorAll('.has-broadcast-data').forEach(element => {
-				const data = element.dataset;
+			this.#markSelected(this.#selected_itemid, this.#selected_clock);
 
-				if (data?.itemid === this.#selected_itemid && data?.clock === this.#selected_clock) {
-					element.classList.add('selected');
-				}
-			});
-
-			table.addEventListener('click', (e) => {
+			this.#values_table.addEventListener('click', (e) => {
 				const element = e.target.closest('.has-broadcast-data');
 
 				if (element !== null) {
-					table.querySelectorAll('.has-broadcast-data.selected').forEach(selected => {
-						selected.classList.remove('selected');
-					});
-
-					element.classList.add('selected');
 					this.#selected_itemid = element.dataset.itemid;
 					this.#selected_clock = element.dataset.clock;
+
+					this.#markSelected(this.#selected_itemid, this.#selected_clock);
 
 					this.broadcast({
 						[CWidgetsData.DATA_TYPE_ITEM_ID]: [element.dataset.itemid],
@@ -74,26 +67,45 @@ class CWidgetItemHistory extends CWidget {
 		return Promise.all([super.promiseReady(), this.#thumbnail_loader].filter(promise => promise));
 	}
 
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
+		}
+	}
+
+	#markSelected(itemid, clock) {
+		this.#values_table.querySelectorAll('.has-broadcast-data').forEach(element => {
+			const data = element.dataset;
+			element.classList.toggle('selected', data?.itemid === itemid && data?.clock === clock);
+		});
+	}
+
 	#makeUrls() {
 		const urls = [];
 
-		for (const thumbnail of this._body.querySelectorAll('.binary-thumbnail')) {
+		this.#binary_buttons = new Map();
+
+		for (const button of this.#values_table.querySelectorAll('.js-show-binary')) {
+			const cell = button.closest('td');
 			const curl = new Curl('zabbix.php');
 
-			curl.setArgument('action', 'widget.itemhistory.binary_value.get');
-			curl.setArgument('preview', 1);
-			curl.setArgument('itemid', thumbnail.dataset.itemid);
+			curl.setArgument('action', 'widget.itemhistory.value.check');
+			curl.setArgument('itemid', cell.dataset.itemid);
 
-			const [clock, ns] = thumbnail.dataset.clock.split('.');
+			if (button.classList.contains('btn-thumbnail')) {
+				curl.setArgument('show_thumbnail', 1);
+			}
+
+			const [clock, ns] = cell.dataset.clock.split('.');
 			curl.setArgument('clock', clock);
 			curl.setArgument('ns', ns);
 
 			const url = curl.getUrl();
 
-			this.#binary_data_cache.set(url, {
-				...(this.#binary_data_cache.get(url) || {}),
-				button: thumbnail.querySelector(`.${ZBX_STYLE_BTN}`),
-				itemid: thumbnail.dataset.itemid, clock, ns
+			this.#binary_buttons.set(button, {url, clock, ns,
+				itemid: cell.dataset.itemid,
+				alt: cell.dataset.alt
 			});
 
 			urls.push(url);
@@ -105,13 +117,16 @@ class CWidgetItemHistory extends CWidget {
 	#loadThumbnails(urls) {
 		const fetchValue = url => {
 			const binary_data = this.#binary_data_cache.get(url);
+			const buttons = [...this.#binary_buttons]
+				.filter(([_, value]) => value.url === url)
+				.map(([button]) => button);
 
 			return new Promise((resolve, reject) => {
-				if (binary_data.loaded) {
+				if (binary_data !== undefined) {
 					resolve(binary_data);
 				}
 				else {
-					binary_data.button.classList.add('is-loading', 'is-loading-fadein');
+					buttons.forEach(button => button.classList.add('is-loading', 'is-loading-fadein'));
 
 					fetch(url, {signal: this.#abort_controller.signal})
 						.then(response => response.json())
@@ -120,7 +135,7 @@ class CWidgetItemHistory extends CWidget {
 								throw {error: response.error};
 							}
 
-							resolve({...binary_data, ...response, loaded: true});
+							resolve(response);
 						})
 						.catch(exception => {
 							reject(exception);
@@ -130,18 +145,29 @@ class CWidgetItemHistory extends CWidget {
 				.then(binary_data => {
 					this.#binary_data_cache.set(url, binary_data);
 
-					if ('thumbnail' in binary_data && this.#show_thumbnail) {
-						this.#makeThumbnailButton(binary_data);
-					}
-					else {
-						this.#makeBinaryButton(binary_data);
+					switch (binary_data.type) {
+						case CWidgetItemHistory.VALUE_TYPE_IMAGE:
+							if ('thumbnail' in binary_data) {
+								this.#makeThumbnailButton(buttons, binary_data);
+							}
+							else {
+								this.#makeBinaryButton(buttons, binary_data);
+							}
+							break;
+
+						case CWidgetItemHistory.VALUE_TYPE_RAW:
+							this.#makeBinaryButton(buttons, binary_data);
+							break;
+
+						default:
+							buttons.forEach(button => button.disabled = true);
 					}
 				})
 				.catch(exception => {
 					console.log('Could not load thumbnail', exception);
 				})
 				.finally(() => {
-					binary_data.button.classList.remove('is-loading', 'is-loading-fadein');
+					buttons.forEach(button => button.classList.remove('is-loading', 'is-loading-fadein'));
 				});
 		}
 
@@ -156,55 +182,118 @@ class CWidgetItemHistory extends CWidget {
 		this.#thumbnail_loader = Promise.all(urls.map(url => fetchValue(url)));
 	}
 
-	#makeBinaryButton(binary_data) {
-		const button = binary_data.button;
-		button.classList.add(ZBX_STYLE_BTN_LINK);
+	#makeBinaryButton(buttons, binary_data) {
+		for (const button of buttons) {
+			button.classList.add(ZBX_STYLE_BTN_LINK);
 
-		const curl = this.#getHintboxContentCUrl(binary_data);
+			switch (binary_data.type) {
+				case CWidgetItemHistory.VALUE_TYPE_IMAGE:
+					const img = document.createElement('img');
+					img.alt = button.dataset.alt;
 
-		if ('thumbnail' in binary_data) {
-			curl.setArgument('action', 'widget.itemhistory.image_value.get');
-			this.#addHintbox(button, `<img src="${curl.getUrl()}">`);
-		}
-		else {
-			if (!binary_data.has_more) {
-				this.#addHintbox(button, binary_data.value);
-			}
-			else {
-				curl.setArgument('action', 'widget.itemhistory.binary_value.get');
-				this.#addHintbox(button, '', curl);
+					this.#addHintbox(button, img);
+					break;
+
+				case CWidgetItemHistory.VALUE_TYPE_RAW:
+					const curl = this.#getHintboxContentCUrl(button);
+					curl.setArgument('action', 'widget.itemhistory.binary_value.get');
+
+					this.#addHintbox(button, '', curl);
+					break;
+
+				default:
+					binary_data.button.disabled = true;
 			}
 		}
 	}
 
-	#makeThumbnailButton(binary_data) {
-		const button = binary_data.button;
-		button.style.setProperty('--thumbnail', `url(data:image/png;base64,${binary_data.thumbnail})`);
+	#makeThumbnailButton(buttons, binary_data) {
+		for (const button of buttons) {
+			button.style.setProperty('--thumbnail', `url(data:image/png;base64,${binary_data.thumbnail})`);
 
-		const curl = this.#getHintboxContentCUrl(binary_data);
-		curl.setArgument('action', 'widget.itemhistory.image_value.get');
+			const img = document.createElement('img');
+			img.alt = button.dataset.alt;
+			img.src = '#';
 
-		this.#addHintbox(button, `<img src="${curl.getUrl()}">`)
+			this.#addHintbox(button, img);
+		}
 	}
 
-	#getHintboxContentCUrl(binary_data) {
+	#getHintboxContentCUrl(button) {
 		const curl = new Curl('zabbix.php');
+		const value = this.#binary_buttons.get(button);
 
-		curl.setArgument('itemid', binary_data.itemid);
-		curl.setArgument('clock', binary_data.clock);
-		curl.setArgument('ns', binary_data.ns);
+		curl.setArgument('itemid', value.itemid);
+		curl.setArgument('clock', value.clock);
+		curl.setArgument('ns', value.ns);
 
 		return curl;
 	}
 
-	#addHintbox(button, content = '', curl = null) {
+	#addHintbox(button, content, curl = null) {
 		button.dataset.hintbox = '1';
 		button.dataset.hintboxStatic = '1';
-		button.dataset.hintboxClass = 'dashboard-widget-itemhistory-hintbox';
-		button.dataset.hintboxContents = content;
+		button.dataset.hintboxClass = 'dashboard-widget-itemhistory-hintbox' + (content === '' ? ' nowrap' : '');
 
-		if (curl !== null) {
-			button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
+		if (content instanceof HTMLImageElement) {
+			button.addEventListener('onShowHint.hintBox', e => {
+				const hint_box = e.target.hintBoxItem[0];
+				const container = hint_box.querySelector('.dashboard-widget-itemhistory-hintbox');
+
+				hint_box.classList.add('dashboard-widget-itemhistory-hintbox-image');
+
+				const curl = this.#getHintboxContentCUrl(button);
+
+				curl.setArgument('action', 'widget.itemhistory.image_value.get');
+				content.src = curl.getUrl();
+				container.innerHTML = '';
+				container.append(content);
+
+				if (!content.complete) {
+					hint_box.classList.add('is-loading');
+
+					content.addEventListener('load', () => {
+						hint_box.classList.remove('is-loading');
+						e.target.resize_observer = new ResizeObserver((entries) => {
+							entries.forEach(entry => {
+								if (entry.devicePixelContentBoxSize) {
+									const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
+									const size = entry.devicePixelContentBoxSize[0];
+
+									overlay.style.width = `${size.inlineSize}px`;
+									overlay.style.height = `${size.blockSize}px`;
+
+									requestAnimationFrame(() => hintBox.onResize(e, button));
+								}
+							})
+						});
+						e.target.resize_observer.observe(content);
+					});
+
+					content.addEventListener('error', () => {
+						hint_box.classList.remove('is-loading');
+
+						container.text = t('Image loading error.');
+					});
+				}
+			});
+
+			button.addEventListener('onHideHint.hintBox', e => {
+				if (e.target.resize_observer !== undefined) {
+					e.target.resize_observer.disconnect();
+
+					delete e.target.resize_observer;
+				}
+			})
+		}
+		else {
+			if (curl !== null) {
+				button.dataset.hintboxContents = '';
+				button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
+			}
+			else {
+				button.dataset.hintboxContents = content || t('Empty value.');
+			}
 		}
 	}
 }

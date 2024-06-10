@@ -571,7 +571,7 @@
 			}
 
 			if ('provision_media' in ldap) {
-				for (const [group_index, media] of ldap.provision_media.entries()) {
+				for (const [group_index, media] of Object.entries(ldap.provision_media)) {
 					for (const [name, value] of Object.entries(media)) {
 						if (name === 'mediatype_name') {
 							continue;

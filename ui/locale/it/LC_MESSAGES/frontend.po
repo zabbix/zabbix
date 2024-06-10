@@ -7534,6 +7534,10 @@ msgstr "Parametro di input vuoto."
 msgid "Empty map ID."
 msgstr "ID mappa assente."
 
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
+
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
 #: app/views/configuration.discovery.list.php:121
@@ -10166,6 +10170,10 @@ msgstr "Immagine rimossa"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "Tipo etichetta immagine"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -19489,6 +19497,10 @@ msgstr ""
 
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
 msgstr ""
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
