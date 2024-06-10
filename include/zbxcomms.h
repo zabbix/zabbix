@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_ZBXCOMMS_H
@@ -255,6 +250,7 @@ void	zbx_socket_clean(zbx_socket_t *s);
 char	*zbx_socket_detach_buffer(zbx_socket_t *s);
 int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout);
+int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error);
 
 int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		const char *server_name, short *event, char **error);

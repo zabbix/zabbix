@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -39,7 +34,7 @@ class CProxy extends CApiService {
 		'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
 		'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 		'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-		'timeout_telnet_agent', 'timeout_script', 'lastaccess', 'version', 'compatibility', 'state'
+		'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'lastaccess', 'version', 'compatibility', 'state'
 	];
 
 	/**
@@ -64,8 +59,8 @@ class CProxy extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'proxyids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'proxy_groupids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['proxyid', 'name', 'proxy_groupid', 'local_address', 'local_port', 'operating_mode', 'allowed_addresses', 'address', 'port', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'lastaccess', 'version', 'compatibility', 'state']],
-			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'local_address', 'local_port', 'allowed_addresses', 'address', 'port', 'description', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script']],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['proxyid', 'name', 'proxy_groupid', 'local_address', 'local_port', 'operating_mode', 'allowed_addresses', 'address', 'port', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'custom_timeouts', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'lastaccess', 'version', 'compatibility', 'state']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'local_address', 'local_port', 'allowed_addresses', 'address', 'port', 'description', 'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -645,6 +640,10 @@ class CProxy extends CApiService {
 											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_script')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_script')]
 			]],
+			'timeout_browser' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_browser')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_browser')]
+			]],
 			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
@@ -806,7 +805,7 @@ class CProxy extends CApiService {
 				'allowed_addresses', 'address', 'port', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'tls_psk_identity', 'tls_psk', 'custom_timeouts', 'timeout_zabbix_agent',
 				'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+				'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 			],
 			'proxyids' => array_column($proxies, 'proxyid'),
 			'preservekeys' => true
@@ -936,6 +935,10 @@ class CProxy extends CApiService {
 											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_script')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_script')]
 			]],
+			'timeout_browser' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'custom_timeouts', 'in' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => DB::getFieldLength('proxy', 'timeout_browser')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'timeout_browser')]
+			]],
 			'hosts' =>					['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
@@ -1026,7 +1029,8 @@ class CProxy extends CApiService {
 					&& $proxy['custom_timeouts'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
 				$proxy += array_intersect_key($db_proxies[$proxy['proxyid']], array_flip(['timeout_zabbix_agent',
 					'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script',
+					'timeout_browser'
 				]));
 			}
 		}
@@ -1107,7 +1111,7 @@ class CProxy extends CApiService {
 					&& $proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED) {
 				$proxy += array_intersect_key($db_defaults, array_flip(['timeout_zabbix_agent', 'timeout_simple_check',
 					'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
-					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+					'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 				]));
 			}
 		}

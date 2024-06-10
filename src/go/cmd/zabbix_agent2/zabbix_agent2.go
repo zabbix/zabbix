@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package main
@@ -25,8 +20,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
@@ -93,13 +90,14 @@ var (
 	applicationName string
 )
 
+//nolint:gochecknoglobals
 var (
 	manager          *scheduler.Manager
 	listeners        []*serverlistener.ServerListener
 	serverConnectors []*serverconnector.Connector
 	closeChan        = make(chan bool)
 	pidFile          *pidfile.File
-	pluginsocket     string
+	pluginSocket     string
 )
 
 type AgentUserParamOption struct {
@@ -222,7 +220,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		return
 	}
 
-	pluginsocket, err = initExternalPlugins(&agent.Options)
+	pluginSocket, err = initExternalPlugins(&agent.Options)
 	if err != nil {
 		fatalExit("cannot register plugins", err)
 	}
@@ -648,7 +646,7 @@ func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {
 func fatalExit(message string, err error) {
 	fatalCloseOSItems()
 
-	if pluginsocket != "" {
+	if pluginSocket != "" {
 		cleanUpExternal()
 	}
 
@@ -767,12 +765,10 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 }
 
 func run() error {
-	sigs := createSigsChan()
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	control, err := runtimecontrol.New(
-		agent.Options.ControlSocket,
-		runtimeCommandSendingTimeout,
-	)
+	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
 	if err != nil {
 		return err
 	}
@@ -780,29 +776,28 @@ func run() error {
 	confirmService()
 	control.Start()
 
-loop:
+	defer control.Stop()
+
 	for {
 		select {
-		case sig := <-sigs:
-			if !handleSig(sig) {
-				break loop
-			}
+		case <-sigs:
+			sendServiceStop()
+
+			return nil
 		case client := <-control.Client():
-			if rerr := processRemoteCommand(client); rerr != nil {
-				if rerr = client.Reply("error: " + rerr.Error()); rerr != nil {
-					log.Warningf("cannot reply to runtime command: %s", rerr)
+			err := processRemoteCommand(client)
+			if err != nil {
+				rerr := client.Reply(fmt.Sprintf("error: %s", err.Error()))
+				if rerr != nil {
+					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
 
 			client.Close()
 		case serviceStop := <-closeChan:
 			if serviceStop {
-				break loop
+				return nil
 			}
 		}
 	}
-
-	control.Stop()
-
-	return nil
 }

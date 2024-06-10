@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -522,10 +517,105 @@ class C64ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
+	public function importConverterDataProviderPlainTextWidget(): array {
+		return [
+			[
+				[
+					'templates' => [
+						[
+							'name' => 'template',
+							'dashboards' => [
+								[
+									'pages' => [
+										[
+											'widgets' => [
+												[
+													'type' => 'plaintext',
+													'width' => '6',
+													'fields' => []
+												],
+												[
+													'type' => 'graph',
+													'width' => '3',
+													'fields' => []
+												],
+												[
+													'type' => 'graphprototype',
+													'width' => '4',
+													'fields' => []
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'templates' => [
+						[
+							'name' => 'template',
+							'dashboards' => [
+								[
+									'pages' => [
+										[
+											'widgets' => [
+												[
+													'type' => 'itemhistory',
+													'width' => '18',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAA'
+														],
+														[
+															'type' => 'INTEGER',
+															'name' => 'show_timestamp',
+															'value' => '1'
+														]
+													]
+												],
+												[
+													'type' => 'graph',
+													'width' => '9',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAB'
+														]
+													]
+												],
+												[
+													'type' => 'graphprototype',
+													'width' => '12',
+													'fields' => [
+														[
+															'type' => 'STRING',
+															'name' => 'reference',
+															'value' => 'AAAAC'
+														]
+													]
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider importConverterDataProviderItemTimeout
 	 * @dataProvider importConverterDataProviderExpressionHistoryFunction
 	 * @dataProvider importConverterDataProviderCalcItemFormula
+	 * @dataProvider importConverterDataProviderPlainTextWidget
 	 *
 	 * @param array $data
 	 * @param array $expected

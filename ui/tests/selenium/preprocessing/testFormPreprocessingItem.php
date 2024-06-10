@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -136,9 +131,11 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		// Open original item form and get steps text.
 		$this->page->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.$original_hostid);
 		$this->query('link', $item_name)->one()->click();
-		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 		$form->selectTab('Preprocessing');
 		$original_steps = $this->listPreprocessingSteps();
+		$dialog->close();
 		// Open copied item form, get steps text and compare to original.
 		$this->page->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::HOSTID);
 		$this->query('link', $item_name)->one()->click();
@@ -154,6 +151,8 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
 			$this->assertNull($step->getAttribute('readonly'));
 		}
+
+		$dialog->close();
 	}
 
 	/**
@@ -241,6 +240,8 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 			// Check that entered value did not disappear.
 			$this->assertEquals('test', $form->getField($fields['value'])->getValue());
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**

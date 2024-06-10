@@ -26,7 +26,7 @@ zabbix_get_LDADD = \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
 	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_builddir)/src/libs/zbxaux/libzbxaux.a \
+	$(top_builddir)/src/libs/zbxbincommon/libzbxbincommon.a \
 	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
 	$(ZBXGET_LIBS)

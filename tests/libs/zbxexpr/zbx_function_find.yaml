@@ -521,7 +521,7 @@ out:
   par_l: 6
   par_r: 41
 ---
-test case: "Broken expressoin ending with \ inside quotes"
+test case: "Broken expression ending with \ inside quotes"
 in:
   param: '"\'
 out:

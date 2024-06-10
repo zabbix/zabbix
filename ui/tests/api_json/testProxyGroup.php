@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -367,7 +362,7 @@ class testProxyGroup extends CAPITest {
 					'selectProxies' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/selectProxies/1": value must be one of "proxyid", "name", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "lastaccess", "version", "compatibility", "state".'
+				'expected_error' => 'Invalid parameter "/selectProxies/1": value must be one of "proxyid", "name", "local_address", "local_port", "operating_mode", "allowed_addresses", "address", "port", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "custom_timeouts", "timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent", "timeout_external_check", "timeout_db_monitor", "timeout_http_agent", "timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "timeout_browser", "lastaccess", "version", "compatibility", "state".'
 			]
 		];
 	}
@@ -496,6 +491,7 @@ class testProxyGroup extends CAPITest {
 						'timeout_ssh_agent' => '',
 						'timeout_telnet_agent' => '',
 						'timeout_script' => '',
+						'timeout_browser' => '',
 						'lastaccess' => '0',
 						'version' => '0',
 						'compatibility' => '0',

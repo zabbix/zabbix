@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -226,8 +221,6 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $mediatypes
 	 *
 	 * @throws APIException if the input is invalid.
@@ -328,8 +321,6 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $mediatypes
 	 * @param array|null $db_mediatypes
 	 *
@@ -408,8 +399,6 @@ class CMediatype extends CApiService {
 	/**
 	 * Check for unique media type names.
 	 *
-	 * @static
-	 *
 	 * @param array      $mediatypes
 	 * @param array|null $db_mediatypes
 	 *
@@ -445,8 +434,6 @@ class CMediatype extends CApiService {
 
 	/**
 	 * Validate fields by type.
-	 *
-	 * @static
 	 *
 	 * @param array      $mediatypes
 	 * @param array|null $db_mediatypes
@@ -551,8 +538,6 @@ class CMediatype extends CApiService {
 
 	/**
 	 * Get type specific validation rules.
-	 *
-	 * @static
 	 *
 	 * @param array  $mediatype
 	 * @param string $method
@@ -696,8 +681,6 @@ class CMediatype extends CApiService {
 	/**
 	 * Update table "media_type_param" and populate mediatype.parameters by "mediatype_paramid" property.
 	 *
-	 * @static
-	 *
 	 * @param array      $mediatypes
 	 * @param string     $method
 	 * @param array|null $db_mediatypes
@@ -776,8 +759,6 @@ class CMediatype extends CApiService {
 
 	/**
 	 * Update table "media_type_message" and populate mediatype.message_templates by "mediatype_messageid" property.
-	 *
-	 * @static
 	 *
 	 * @param array      $mediatypes
 	 * @param string     $method
@@ -1006,8 +987,6 @@ class CMediatype extends CApiService {
 	/**
 	 * Add existing parameters and message templates to $db_mediatypes, regardless of whether they will be
 	 * affected by the update.
-	 *
-	 * @static
 	 *
 	 * @param array $mediatypes
 	 * @param array $db_mediatypes

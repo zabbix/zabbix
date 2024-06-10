@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -109,7 +104,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 				// Check version hint.
 				$column->query('xpath:.//button[@data-hintbox="1"]')->one()->waitUntilClickable()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
 				$this->assertEquals($parameters['hint_text'], $hint->getText());
 
 				if (array_key_exists('hint_color', $parameters)) {
@@ -161,7 +156,7 @@ class testPageAdministrationProxies extends CWebTest {
 				'Hosts' => '1'
 			],
 			[
-				'Name' => 'passive_proxy1',
+				'Name' => 'Degrading proxy group: passive_proxy1',
 				'Mode' => 'Passive',
 				'Encryption' => 'None',
 				'Version' => '',
@@ -175,7 +170,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 		$hosts = [
 			'active_proxy1' => 'enabled_host1',
-			'passive_proxy1' => 'disabled_host1'
+			'Degrading proxy group: passive_proxy1' => 'disabled_host1'
 		];
 
 		// Check filtered result.
@@ -199,8 +194,8 @@ class testPageAdministrationProxies extends CWebTest {
 						'Name' => 'for filter'
 					],
 					'result' => [
-						'Proxy_1 for filter',
-						'Proxy_2 for filter'
+						'Online proxy group: Proxy_1 for filter',
+						'Online proxy group: Proxy_2 for filter'
 					]
 				]
 			],
@@ -210,10 +205,10 @@ class testPageAdministrationProxies extends CWebTest {
 						'Name' => 'Active proxy'
 					],
 					'result' => [
-						'Active proxy 1',
-						'Active proxy 2',
-						'Active proxy 3',
-						'Active proxy to delete'
+						'Online proxy group: Active proxy 1',
+						'Online proxy group: Active proxy 2',
+						'Online proxy group: Active proxy 3',
+						'Online proxy group: Active proxy to delete'
 					],
 					'check_stats' => true
 				]
@@ -224,7 +219,7 @@ class testPageAdministrationProxies extends CWebTest {
 						'Name' => 'Passive proxy'
 					],
 					'result' => [
-						'Passive proxy 1',
+						'Degrading proxy group: Passive proxy 1',
 						'Passive proxy 2',
 						'Passive proxy 3',
 						'Passive proxy to delete'
@@ -238,8 +233,8 @@ class testPageAdministrationProxies extends CWebTest {
 						'Mode' => 'Active'
 					],
 					'result' => [
-						'Proxy_1 for filter',
-						'Proxy_2 for filter'
+						'Online proxy group: Proxy_1 for filter',
+						'Online proxy group: Proxy_2 for filter'
 					]
 				]
 			],
@@ -272,8 +267,8 @@ class testPageAdministrationProxies extends CWebTest {
 						'Version' => 'Outdated'
 					],
 					'result' => [
-						'passive_outdated',
-						'passive_unsupported'
+						'⭐️😀⭐Smiley प्रॉक्सी 团体⭐️😀⭐ - unknown: passive_outdated',
+						'Degrading proxy group: passive_unsupported'
 					]
 				]
 			]
@@ -313,7 +308,7 @@ class testPageAdministrationProxies extends CWebTest {
 				[
 					'action' => 'Refresh configuration',
 					'proxies' => [
-						'active_proxy5'
+						'2nd Online proxy group: active_proxy5'
 					],
 					'alert' => 'Refresh configuration of the selected proxy?',
 					'title' => 'Request created successfully'
@@ -346,7 +341,7 @@ class testPageAdministrationProxies extends CWebTest {
 				[
 					'action' => 'Refresh configuration',
 					'proxies' => [
-						'Passive proxy 1'
+						'Degrading proxy group: Passive proxy 1'
 					],
 					'alert' => 'Refresh configuration of the selected proxy?',
 					'title' => 'Request created successfully'
@@ -359,7 +354,7 @@ class testPageAdministrationProxies extends CWebTest {
 					'proxies' => [
 						'passive_proxy5',
 						'active_proxy4',
-						'Passive proxy 1'
+						'Degrading proxy group: Passive proxy 1'
 					],
 					'alert' => 'Refresh configuration of the selected proxies?',
 					'title' => 'Request created successfully'
@@ -384,7 +379,7 @@ class testPageAdministrationProxies extends CWebTest {
 				[
 					'action' => 'Disable hosts',
 					'proxies' => [
-						'passive_proxy1'
+						'Degrading proxy group: passive_proxy1'
 					],
 					'hosts' => [
 						'disabled_host1'
@@ -399,7 +394,7 @@ class testPageAdministrationProxies extends CWebTest {
 					'action' => 'Enable hosts',
 					'proxies' => [
 						'active_proxy1',
-						'passive_proxy1'
+						'Degrading proxy group: passive_proxy1'
 					],
 					'hosts' => [
 						'enabled_host1',
@@ -415,7 +410,7 @@ class testPageAdministrationProxies extends CWebTest {
 				[
 					'action' => 'Enable hosts',
 					'proxies' => [
-						'active_proxy3',
+						'2nd Online proxy group: active_proxy3',
 						'passive_proxy2'
 					],
 					'hosts' => [
@@ -462,7 +457,7 @@ class testPageAdministrationProxies extends CWebTest {
 				[
 					'action' => 'Delete',
 					'proxies' => [
-						'active_proxy5'
+						'2nd Online proxy group: active_proxy5'
 					],
 					'alert' => 'Delete selected proxy?',
 					'title' => 'Proxy deleted'
@@ -498,7 +493,7 @@ class testPageAdministrationProxies extends CWebTest {
 					'action' => 'Delete',
 					'proxies' => [
 						'active_proxy1',
-						'active_proxy7'
+						'Offline group: active_proxy7'
 					],
 					'alert' => 'Delete selected proxies?',
 					'title' => 'Cannot delete proxies',
@@ -511,7 +506,7 @@ class testPageAdministrationProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'action' => 'Delete',
 					'proxies' => [
-						'passive_proxy7',
+						'Default values - recovering: passive_proxy7',
 						'Delete Proxy used in Network discovery rule'
 					],
 					'alert' => 'Delete selected proxies?',
@@ -526,7 +521,7 @@ class testPageAdministrationProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'action' => 'Delete',
 					'proxies' => [
-						'Proxy_2 for filter'
+						'Online proxy group: Proxy_2 for filter'
 					],
 					'alert' => 'Delete selected proxy?',
 					'title' => 'Cannot delete proxy',
@@ -579,13 +574,21 @@ class testPageAdministrationProxies extends CWebTest {
 			$db_proxies = CDBHelper::getColumn('SELECT * FROM proxy', 'name');
 
 			foreach ($data['proxies'] as $proxy) {
-				$this->assertEquals(($data['action'] !== 'Delete'), in_array($proxy, array_values($db_proxies)));
+				/**
+				 * In the DB and in the link proxy name is without the group, so group name should be removed from proxy name.
+				 * If search for group name and proxy name delimiter is found in 'Name' column value, all is trimmed up
+				 * to the position of this delimiter and the following 2 symbols to remove the delimiter itself.
+				 */
+				$proxy_name = (($position = strpos($proxy, ': ')) !== false)
+					? substr($proxy, $position + 2)
+					: $proxy;
 
+				$this->assertEquals(($data['action'] !== 'Delete'), in_array($proxy_name, array_values($db_proxies)));
 				$exists = ($data['action'] === 'Delete')
 					? array_key_exists('expected', $data)
 					: true;
 
-				$this->assertEquals($exists, $this->query('link', $proxy)->exists());
+				$this->assertEquals($exists, $this->query('link', $proxy_name)->exists());
 			}
 
 			// Check that hosts are actually enabled/disabled.
@@ -614,8 +617,24 @@ class testPageAdministrationProxies extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 
 		foreach (['Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)'] as $column) {
-			$content = $this->getTableColumnData($column);
+			/**
+			 * Name column is sorted only not taking into account the proxy group name, so proxy group name should be
+			 * removed before sorting. Values with groups are saved in a separate array to restore proxy group names later.
+			 */
+			if ($column === 'Name') {
+				$content_with_groups = $this->getTableColumnData($column);
+				$proxy_count = count($content_with_groups);
 
+				$content = [];
+				foreach ($content_with_groups as $proxy_name) {
+					$content[] = (($position = strpos($proxy_name, ': ')) !== false)
+						? substr($proxy_name, $position + 2)
+						: $proxy_name;
+				}
+			}
+			else {
+				$content = $this->getTableColumnData($column);
+			}
 			$sorted_asc = $content;
 			$sorted_desc = $content;
 
@@ -629,8 +648,29 @@ class testPageAdministrationProxies extends CWebTest {
 				return strcasecmp($b, $a);
 			});
 
+			$arrays = [$sorted_asc, $sorted_desc];
+
+			/**
+			 * After proxy names are sorted, group names should be returned to the corresponding proxy names.
+			 * To do so, go through the previously saved array with full "Name" column values and for each value go through
+			 * all indexes. In case if array element with the corresponding index matches a part of the corresponding
+			 * full "Name" column value, then this full name is written into the sorted array with this index.
+			 */
+			if ($column === 'Name') {
+				foreach ($arrays as &$sorted_array) {
+					foreach ($content_with_groups as $name_with_group) {
+						for ($i = 0; $i < $proxy_count; $i++) {
+							if (str_contains($name_with_group, $sorted_array[$i])) {
+								$sorted_array[$i] = $name_with_group;
+							}
+						}
+					}
+				}
+				unset($sorted_array);
+			};
+
 			// Check ascending and descending sorting in column.
-			foreach ([$sorted_asc, $sorted_desc] as $order) {
+			foreach ($arrays as $order) {
 				$table->query('link', $column)->waitUntilClickable()->one()->click();
 				$table->waitUntilReloaded();
 				$this->assertTableDataColumn($order, $column);

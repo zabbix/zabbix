@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -76,9 +71,11 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphPrototypeWid
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemHistoryWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPieChartWidget.php';
-require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPlainTextWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsWidgetDisplay.php';
@@ -217,6 +214,10 @@ require_once dirname(__FILE__).'/problems/testPageProblems.php';
 // Proxies.
 require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
 require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
+
+// Proxy Groups.
+require_once dirname(__FILE__).'/proxyGroups/testFormAdministrationProxyGroups.php';
+require_once dirname(__FILE__).'/proxyGroups/testPageAdministrationProxyGroups.php';
 
 // Queue.
 /*
@@ -400,9 +401,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
+		$suite->addTestSuite('testDashboardHostNavigatorWidget');
+		$suite->addTestSuite('testDashboardItemHistoryWidget');
+		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPieChartWidget');
-		$suite->addTestSuite('testDashboardPlainTextWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardProblemsWidget');
 		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
@@ -541,6 +544,10 @@ class SeleniumTests {
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
+
+		// Proxy groups.
+		$suite->addTestSuite('testFormAdministrationProxyGroups');
+		$suite->addTestSuite('testPageAdministrationProxyGroups');
 
 		// Queue.
 		/*
