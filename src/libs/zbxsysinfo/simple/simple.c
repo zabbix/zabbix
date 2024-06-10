@@ -25,12 +25,12 @@
 #include "zbxcomms.h"
 #include "zbx_discoverer_constants.h"
 
-#ifdef HAVE_LDAP
-
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
 #	include "zbxip.h"
 #endif
+
+#ifdef HAVE_LDAP
 
 #include <ldap.h>
 
