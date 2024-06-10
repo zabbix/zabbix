@@ -12,15 +12,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxvmware.h"
-#include "vmware_internal.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#include "zbxvmware.h"
+#include "vmware_internal.h"
 
 #include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "zbxcurl.h"
 
 typedef struct
 {

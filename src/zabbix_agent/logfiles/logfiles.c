@@ -15,6 +15,8 @@
 #include "logfiles.h"
 #include "persistent_state.h"
 
+#include "../metrics/metrics.h"
+
 #include "zbxsysinfo.h"
 #include "zbxcfg.h"
 #include "zbxregexp.h"

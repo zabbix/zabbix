@@ -16,7 +16,6 @@
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
-#include "zbxcrypto.h"
 #include "zbxagentget.h"
 #include "zbxversion.h"
 #include "zbxlog.h"

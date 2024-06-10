@@ -16,6 +16,8 @@
 #include "alerter_defs.h"
 
 #include "alerter_protocol.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -29,7 +31,6 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
 #include "zbxxml.h"
 #include "zbxjson.h"
 

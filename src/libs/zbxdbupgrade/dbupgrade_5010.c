@@ -16,6 +16,8 @@
 
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
 
 /*
  * 5.2 development database patches

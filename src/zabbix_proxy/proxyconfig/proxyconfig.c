@@ -16,12 +16,12 @@
 
 #include "proxyconfigwrite/proxyconfigwrite.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxcachehistory.h"
 #include "zbxself.h"
 #include "zbxtime.h"
-
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
@@ -29,6 +29,12 @@
 #include "zbx_host_constants.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxnum.h"
+#include "zbxjson.h"
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
 		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args)

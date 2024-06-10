@@ -16,13 +16,16 @@
 
 #include "async_poller.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
-#include "zbxip.h"
 #include "zbxself.h"
 #include "zbxagentget.h"
-#include "zbxcachehistory.h"
-#include "zbx_item_constants.h"
+#include "zbxversion.h"
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	include "zbxip.h"
+#endif
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 {

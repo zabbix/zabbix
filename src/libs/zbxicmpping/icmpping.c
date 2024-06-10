@@ -14,12 +14,15 @@
 
 #include "zbxicmpping.h"
 
-#include <signal.h>
+#ifdef HAVE_IPV6
+#	include "zbxcomms.h"
+#endif
 
-#include "zbxcomms.h"
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxfile.h"
+
+#include <signal.h>
 
 static const zbx_config_icmpping_t	*config_icmpping;
 

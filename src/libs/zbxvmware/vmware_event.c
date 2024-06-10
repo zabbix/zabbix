@@ -13,19 +13,24 @@
 **/
 
 #include "vmware_event.h"
-#include "vmware_internal.h"
 
+#include "zbxcommon.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#include "vmware_internal.h"
+#include "vmware_shmem.h"
+
+#include "zbxalgo.h"
+#include "zbxnix.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "vmware_shmem.h"
-#include "zbxnix.h"
+#include "zbxshmem.h"
 #include "zbxxml.h"
-#include "zbxalgo.h"
+
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 typedef struct
 {

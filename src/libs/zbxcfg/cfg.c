@@ -17,6 +17,8 @@
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxfile.h"
+#include "zbxalgo.h"
+#include "zbxnum.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxwin32.h"

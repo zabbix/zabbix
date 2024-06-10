@@ -22,6 +22,10 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxvariant.h"
+#include "zbxdb.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_condition_ptr, lld_condition_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_link_ptr, zbx_lld_item_link_t*)
