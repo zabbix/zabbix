@@ -15,6 +15,7 @@
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxipcservice.h"

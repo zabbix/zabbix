@@ -13,16 +13,20 @@
 **/
 
 #include "vmware_ds.h"
+
+#include "zbxcommon.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 #include "vmware_internal.h"
 #include "vmware_service_cfglists.h"
+
+#include "zbxnum.h"
 
 #include "zbxxml.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
-#include "zbxnum.h"
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 ZBX_PTR_VECTOR_IMPL(vmware_datastore_ptr, zbx_vmware_datastore_t *)
 

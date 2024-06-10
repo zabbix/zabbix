@@ -14,7 +14,7 @@
 
 #include "zbxservice.h"
 
-#include "zbxcommon.h"
+#include "zbxalgo.h"
 #include "zbxserialize.h"
 #include "zbxdbhigh.h"
 

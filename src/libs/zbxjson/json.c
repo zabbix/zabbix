@@ -18,6 +18,8 @@
 #include "json_parser.h"
 #include "jsonpath.h"
 
+#include "zbxnum.h"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: return string describing json error                               *

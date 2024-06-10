@@ -32,7 +32,7 @@
 #include "zbxstr.h"
 #include "zbxversion.h"
 #include "zbxcomms.h"
-#include "zbxvault.h"
+#include "zbxipcservice.h"
 
 typedef struct
 {

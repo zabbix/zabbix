@@ -16,14 +16,21 @@
 #include "zbxpoller.h"
 
 #include "async_manager.h"
-#include "async_httpagent.h"
 #include "async_agent.h"
-#include "checks_snmp.h"
 
-#include "zbxasynchttppoller.h"
+#ifdef HAVE_LIBCURL
+#	include "async_httpagent.h"
+#	include "zbxasynchttppoller.h"
+#	include "zbxhttp.h"
+#endif
+
+#ifdef HAVE_NETSNMP
+#	include "checks_snmp.h"
+#endif
+
 #include "zbxlog.h"
 #include "zbxalgo.h"
-#include "zbxcommon.h"
+#include "zbxtimekeeper.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 #include "zbxself.h"
@@ -33,7 +40,6 @@
 #include "zbx_availability_constants.h"
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
-#include "zbxhttp.h"
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"

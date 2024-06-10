@@ -303,12 +303,12 @@ class testHostConnMacroValidation extends CIntegrationTest {
 						'type' => SVC_AGENT,
 						'key_' => 'agent.variant',
 						'ports' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX,
-						'uniq' => 1
+						'uniq' => 1,
+						'host_source' => 3,
+						'name_source' => 3
 					]
 				],
-				'delay' => '10s',
-				'host_source' => 3,
-				'name_source' => 3
+				'delay' => '10s'
 			]
 		);
 		$this->assertArrayHasKey('druleids', $response['result']);

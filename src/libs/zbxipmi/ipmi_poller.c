@@ -16,12 +16,14 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "ipmi_protocol.h"
+#include "checks_ipmi.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
 #include "zbxipcservice.h"
-#include "ipmi_protocol.h"
-#include "checks_ipmi.h"
 #include "zbxtime.h"
 #include "zbxipmi.h"
 #include "zbxthreads.h"

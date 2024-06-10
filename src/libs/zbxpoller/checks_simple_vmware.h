@@ -15,9 +15,11 @@
 #ifndef ZABBIX_CHECKS_SIMPLE_VMWARE_H
 #define ZABBIX_CHECKS_SIMPLE_VMWARE_H
 
-#include "zbxpoller.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#include "zbxpoller.h"
 #include "zbxcacheconfig.h"
 
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,

@@ -12,19 +12,22 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxhistory.h"
 #include "history.h"
 
+#include "zbx_dbversion_constants.h"
+
+#ifdef HAVE_LIBCURL
+
+#include "zbxhistory.h"
+
+#include "zbxtime.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxvariant.h"
-#include "zbx_dbversion_constants.h"
-
-#ifdef HAVE_LIBCURL
-
 #include "zbxcurl.h"
+#include "zbxjson.h"
 
 #define		ZBX_HISTORY_STORAGE_DOWN	10000 /* Timeout in milliseconds */
 

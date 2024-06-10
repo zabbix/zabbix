@@ -13,11 +13,13 @@
 **/
 
 #include "async_tcpsvc.h"
-#include "zbxcommon.h"
+
+#include "../../libs/zbxpoller/async_poller.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxcomms.h"
 #include "zbxself.h"
 #include "zbxsysinfo.h"
-#include "../../libs/zbxpoller/async_poller.h"
 #include "zbx_discoverer_constants.h"
 
 static const char	*get_tcpsvc_step_string(zbx_zabbix_tcpsvc_step_t step)
