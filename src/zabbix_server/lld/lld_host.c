@@ -857,10 +857,10 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 			continue;
 
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
-			zbx_hashset_insert(&host_hosts, &host, sizeof(&host));
+			zbx_hashset_insert(&host_hosts, &host, sizeof(zbx_lld_host_t *));
 
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
-			zbx_hashset_insert(&host_names, &host, sizeof(&host));
+			zbx_hashset_insert(&host_names, &host, sizeof(zbx_lld_host_t *));
 	}
 
 	/* checking duplicated host names */
@@ -877,7 +877,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			continue;
 
-		zbx_hashset_insert(&host_hosts, &host, sizeof(&host));
+		zbx_hashset_insert(&host_hosts, &host, sizeof(zbx_lld_host_t *));
 
 		if (num_data != host_hosts.num_data)
 			continue;
@@ -909,7 +909,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (0 != host->hostid && 0 == (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 			continue;
 
-		zbx_hashset_insert(&host_names, &host, sizeof(&host));
+		zbx_hashset_insert(&host_names, &host, sizeof(zbx_lld_host_t *));
 
 		if (num_data != host_names.num_data)
 			continue;
@@ -3958,7 +3958,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 					d = ",";
 
 					zbx_audit_host_update_json_update_ipmi_password(ZBX_AUDIT_LLD_CONTEXT,
-							host->hostid, host->ipmi_password_orig, value_esc);
+							host->hostid, (0 == strcmp("", host->ipmi_password_orig) ?
+							"" : ZBX_MACRO_SECRET_MASK),
+							(0 == strcmp("", ipmi_password) ? "" : ZBX_MACRO_SECRET_MASK));
 
 					zbx_free(value_esc);
 				}

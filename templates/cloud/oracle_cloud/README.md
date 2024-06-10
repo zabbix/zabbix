@@ -25,7 +25,7 @@ HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -34,7 +34,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -179,6 +179,12 @@ LLD filter values and trigger threshold values can be changed with the respectiv
 |{$OCI.API.TELEMETRY.HOST}|<p>Host for OCI Monitoring API endpoint.</p>||
 |{$OCI.API.OBJECT.STORAGE.HOST}|<p>Host for OCI Object Storage API endpoint.</p>||
 |{$OCI.API.AUTONOMOUS.DB.HOST}|<p>Host for OCI Autonomous Database API endpoint.</p>||
+|{$OCI.API.COMPARTMENT.COMPUTE}|<p>Compartment OCIDs for compute instances. Can be a single value or a comma separated list of values.</p>||
+|{$OCI.API.COMPARTMENT.VCN}|<p>Compartment OCIDs for virtual cloud networks. Can be a single value or a comma separated list of values.</p>||
+|{$OCI.API.COMPARTMENT.VOLUME.BLOCK}|<p>Compartment OCIDs for block volumes. Can be a single value or a comma separated list of values.</p>||
+|{$OCI.API.COMPARTMENT.VOLUME.BOOT}|<p>Compartment OCIDs for boot volumes. Can be a single value or a comma separated list of values.</p>||
+|{$OCI.API.COMPARTMENT.OBJECT.STORAGE}|<p>Compartment OCIDs for object storage buckets. Can be a single value or a comma separated list of values.</p>||
+|{$OCI.API.COMPARTMENT.AUTONOMOUS.DB}|<p>Compartment OCIDs for autonomous databases. Can be a single value or a comma separated list of values.</p>||
 |{$OCI.API.TENANCY}|<p>OCID of tenancy.</p>||
 |{$OCI.API.USER}|<p>OCID of user.</p>||
 |{$OCI.API.PRIVATE.KEY}|<p>Entire private key for API access.</p>||
@@ -261,7 +267,7 @@ the HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -270,7 +276,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -386,7 +392,7 @@ HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -395,7 +401,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -458,7 +464,7 @@ the HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -467,7 +473,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -571,7 +577,7 @@ HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -580,7 +586,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -642,7 +648,7 @@ HTTP request body for queries.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -651,7 +657,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -712,7 +718,7 @@ For communication with OCI, this template utilizes script items which execute HT
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -721,7 +727,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 

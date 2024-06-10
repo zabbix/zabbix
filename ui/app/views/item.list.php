@@ -140,7 +140,7 @@ foreach ($data['items'] as $item) {
 
 	// Interval
 	if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strpos($item['key_'], 'mqtt.get') !== 0)) {
+			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strpos($item['key_'], 'mqtt.get') === 0)) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
