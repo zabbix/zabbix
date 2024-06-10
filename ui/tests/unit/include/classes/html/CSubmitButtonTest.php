@@ -20,29 +20,29 @@ class CSubmitButtonTest extends CTagTest {
 		return [
 			[
 				['caption'],
-				'<button type="submit">caption</button>'
+				'<button type="submit" tabindex="0">caption</button>'
 			],
 			[
 				['caption', 'button'],
-				'<button type="submit" name="button">caption</button>'
+				'<button type="submit" tabindex="0" name="button">caption</button>'
 			],
 			[
 				['caption', 'button[value]'],
-				'<button type="submit" name="button[value]">caption</button>'
+				'<button type="submit" tabindex="0" name="button[value]">caption</button>'
 			],
 			[
 				['caption', 'button', 'value'],
-				'<button type="submit" name="button" value="value">caption</button>'
+				'<button type="submit" tabindex="0" name="button" value="value">caption</button>'
 			],
 			// caption encoding
 			[
 				['</button>'],
-				'<button type="submit">&lt;/button&gt;</button>'
+				'<button type="submit" tabindex="0">&lt;/button&gt;</button>'
 			],
 			// parameter encoding
 			[
 				['caption', 'button', 'button"&"'],
-				'<button type="submit" name="button" value="button&quot;&amp;&quot;">caption</button>'
+				'<button type="submit" tabindex="0" name="button" value="button&quot;&amp;&quot;">caption</button>'
 			]
 		];
 	}
