@@ -614,7 +614,6 @@ if ($data['display_interfaces']) {
 				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
 				(new CFormField(
 					(new CTextBox('interface', interfaceType2str(INTERFACE_TYPE_OPT), true))
-						->setAttribute('disabled', 'disabled')
 				))->setId('js-item-interface-field')
 			]);
 		}
