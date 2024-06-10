@@ -1629,7 +1629,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'expected_fields' => [
 						'Name' => 'New cloned name with changes',
 						'id:discovery_by' => 'Proxy',
-						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for Network discovery cloning',
+						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for cloning Network discovery',
 						'IP range' => '192.168.2.3-255',
 						'Update interval' => '25h',
 						'id:concurrency_max_type' => 'Unlimited',

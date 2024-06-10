@@ -215,6 +215,10 @@ require_once dirname(__FILE__).'/problems/testPageProblems.php';
 require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
 require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
 
+// Proxy Groups.
+require_once dirname(__FILE__).'/proxyGroups/testFormAdministrationProxyGroups.php';
+require_once dirname(__FILE__).'/proxyGroups/testPageAdministrationProxyGroups.php';
+
 // Queue.
 /*
 require_once dirname(__FILE__).'/queue/testPageQueueDetails.php';
@@ -540,6 +544,10 @@ class SeleniumTests {
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
+
+		// Proxy groups.
+		$suite->addTestSuite('testFormAdministrationProxyGroups');
+		$suite->addTestSuite('testPageAdministrationProxyGroups');
 
 		// Queue.
 		/*
