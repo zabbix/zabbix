@@ -18,6 +18,7 @@
 
 #include "../events/events.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
 #include "zbxipcservice.h"
@@ -25,7 +26,6 @@
 #include "zbxtime.h"
 #include "zbx_item_constants.h"
 #include "zbxstr.h"
-#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 

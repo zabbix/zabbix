@@ -569,6 +569,9 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->assertMessage(TEST_BAD, null, $data['error_message']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
+
+		$condition_dialog->close();
+		$dialog->close();
 	}
 
 	public static function calculation() {
@@ -869,6 +872,8 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->assertMessage(TEST_BAD, 'Cannot create event correlation', $data['error_message']);
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
+
+		$dialog->close();
 	}
 
 	public function testFormEventCorrelation_Clone() {

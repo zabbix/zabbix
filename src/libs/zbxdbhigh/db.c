@@ -15,10 +15,19 @@
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
-#include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
+
+#if (!(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))) || \
+	(!(defined(HAVE_MYSQL_TLS) || defined(HAVE_POSTGRESQL))) || \
+	(!(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS)))
+#	include "zbxcfg.h"
+#endif
 
 #ifdef HAVE_POSTGRESQL
 #	include "zbx_dbversion_constants.h"
@@ -496,6 +505,27 @@ int	zbx_db_is_null(const char *field)
 zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result)
 {
 	return zbx_db_fetch_basic(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a select statement                                        *
+ *                                                                            *
+ * Comments: don't retry until DB is up                                       *
+ *                                                                            *
+ ******************************************************************************/
+zbx_db_result_t	zbx_db_select_once(const char *fmt, ...)
+{
+	va_list		args;
+	zbx_db_result_t	rc;
+
+	va_start(args, fmt);
+
+	rc = zbx_db_vselect(fmt, args);
+
+	va_end(args);
+
+	return rc;
 }
 
 /******************************************************************************

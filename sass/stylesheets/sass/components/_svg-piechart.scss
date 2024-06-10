@@ -1,30 +1,28 @@
 .svg-pie-chart {
-	fill: $font-color;
-
-	.svg-pie-chart-arcs {
-		stroke-linejoin: round;
-
-		path {
-			vector-effect: non-scaling-stroke;
-			stroke: $ui-bg-color;
-		}
-
-		.svg-pie-chart-arc-placeholder {
-			stroke-width: 0;
-			fill: transparent;
-		}
-
-		.svg-pie-chart-arc-no-data-outer {
-			fill: $pie-chart-arc-no-data-color;
-		}
-
-		.svg-pie-chart-arc-no-data-inner {
-			fill: $ui-bg-color;
-		}
+	.svg-pie-chart-arc-placeholder {
+		fill: transparent;
 	}
 
-	.svg-pie-chart-total-value {
-		text-anchor: middle;
+	.svg-pie-chart-space {
+		stroke: $ui-bg-color;
+		stroke-linecap: round;
+	}
+
+	.svg-pie-chart-arc-no-data-outer {
+		fill: $pie-chart-arc-no-data-color;
+	}
+
+	.svg-pie-chart-arc-no-data-inner {
+		fill: $ui-bg-color;
+	}
+
+	.svg-pie-chart-total-value div {
+		text-align: center;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		margin: auto;
+		fill: $font-color;
 	}
 
 	.svg-pie-chart-total-value-no-data {

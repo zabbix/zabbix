@@ -12,10 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxasynchttppoller.h"
-#include "zbxlog.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_LIBCURL) && defined(HAVE_LIBEVENT)
+
+#include "zbxasynchttppoller.h"
 
 typedef struct
 {

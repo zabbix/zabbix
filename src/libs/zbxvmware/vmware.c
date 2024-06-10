@@ -15,24 +15,30 @@
 #include "zbxvmware.h"
 
 #include "vmware_internal.h"
-#include "vmware_perfcntr.h"
 #include "vmware_shmem.h"
-#include "vmware_service_cfglists.h"
-#include "vmware_hv.h"
-#include "vmware_ds.h"
-#include "vmware_event.h"
 
-#include "zbxxml.h"
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+#	include "vmware_hv.h"
+#	include "vmware_ds.h"
+#	include "vmware_event.h"
+#	include "vmware_perfcntr.h"
+#	include "vmware_service_cfglists.h"
+#endif
+
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
 
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
-#include "zbxstr.h"
 #include "zbxsysinc.h"
 #include "zbxalgo.h"
-#include "zbxcurl.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+#	include "zbxcurl.h"
+#	include "zbxstr.h"
+#	include "zbxxml.h"
+#endif
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
@@ -126,14 +132,12 @@ ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 
 /* string pool support */
 
-#define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
-
-static int	vmware_shared_strsearch(const char *str)
+int	vmware_shared_strsearch(const char *str)
 {
 	return NULL == zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE) ? FAIL : SUCCEED;
 }
 
-static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
+char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
 {
 	void	*ptr;
 
@@ -170,7 +174,7 @@ char	*vmware_shared_strdup(const char *str)
 	return strdup;
 }
 
-static void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
+void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
 {
 	if (NULL != len)
 		*len = 0;
@@ -569,9 +573,6 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 		zbx_vector_vmware_cluster_ptr_clear_ext(&data->clusters, vmware_cluster_shared_free);
 		zbx_vector_vmware_cluster_ptr_destroy(&data->clusters);
 
-		zbx_vector_vmware_event_ptr_clear_ext(&data->events, vmware_shmem_event_free);
-		zbx_vector_vmware_event_ptr_destroy(&data->events);
-
 		zbx_vector_vmware_datastore_ptr_clear_ext(&data->datastores, vmware_datastore_shared_free);
 		zbx_vector_vmware_datastore_ptr_destroy(&data->datastores);
 
@@ -594,6 +595,28 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 			vmware_shared_strfree(data->error);
 
 		vmware_shmem_data_free(data);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store vmware service event    *
+ *          log data                                                          *
+ *                                                                            *
+ * Parameters: evt_data - [IN] vmware service event log data                  *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_eventlog_data_shared_free(zbx_vmware_eventlog_data_t *evt_data)
+{
+	if (NULL != evt_data)
+	{
+		zbx_vector_vmware_event_ptr_clear_ext(&evt_data->events, vmware_shmem_event_free);
+		zbx_vector_vmware_event_ptr_destroy(&evt_data->events);
+
+		if (NULL != evt_data->error)
+			vmware_shared_strfree(evt_data->error);
+
+		vmware_shmem_eventlog_data_free(evt_data);
 	}
 }
 
@@ -649,6 +672,7 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 		vmware_shared_strfree(service->fullname);
 
 	vmware_data_shared_free(service->data);
+	vmware_eventlog_data_shared_free(service->eventlog.data);
 
 	zbx_hashset_iter_reset(&service->entities, &iter);
 	while (NULL != (entity = (zbx_vmware_perf_entity_t *)zbx_hashset_iter_next(&iter)))
@@ -837,9 +861,6 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 	zbx_vector_vmware_cluster_ptr_clear_ext(&data->clusters, vmware_cluster_free);
 	zbx_vector_vmware_cluster_ptr_destroy(&data->clusters);
 
-	zbx_vector_vmware_event_ptr_clear_ext(&data->events, vmware_event_free);
-	zbx_vector_vmware_event_ptr_destroy(&data->events);
-
 	zbx_vector_vmware_datastore_ptr_clear_ext(&data->datastores, vmware_datastore_free);
 	zbx_vector_vmware_datastore_ptr_destroy(&data->datastores);
 
@@ -861,6 +882,39 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 	zbx_free(data->error);
 	zbx_free(data);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validation of url suffix                                          *
+ *                                                                            *
+ * Parameters: url   - [IN]                                                   *
+ * Parameters: error - [OUT]                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_validate_url_suffix(const char *url, char **error)
+{
+#define VMWARE_URL_SUFFIX_SDK	"/sdk"
+	size_t	len = strlen(url);
+
+	if (ZBX_CONST_STRLEN(VMWARE_URL_SUFFIX_SDK) > len ||
+			0 != strcmp(url + (len - ZBX_CONST_STRLEN(VMWARE_URL_SUFFIX_SDK)), VMWARE_URL_SUFFIX_SDK))
+	{
+		*error = zbx_strdup(*error, "Invalid URL: missing '" VMWARE_URL_SUFFIX_SDK "'.");
+	}
+#undef VMWARE_URL_SUFFIX_SDK
+}
+
+#define VMWARE_VALIDATE_EMPTY(field, field_str)						\
+do											\
+{											\
+	if ('\0' == *field)								\
+	{										\
+		if (NULL == *error)							\
+			*error = zbx_dsprintf(*error, "Empty %s", field_str);		\
+		else									\
+			*error = zbx_dsprintf(*error, "%s, %s", *error, field_str);	\
+	}										\
+} while(0)
 
 /*******************************************************************************
  *                                                                             *
@@ -898,6 +952,16 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
+
+	VMWARE_VALIDATE_EMPTY(service->url, "URL");
+	VMWARE_VALIDATE_EMPTY(service->username, "username");
+	VMWARE_VALIDATE_EMPTY(service->password, "password");
+
+	if (NULL != *error)
+	{
+		*error = zbx_strdcat(*error, ".");
+		goto out;
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
@@ -942,7 +1006,10 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 				username_esc, password_esc);
 
 		if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, &doc, NULL, error) && NULL == doc)
+		{
+			vmware_validate_url_suffix(service->url, error);
 			goto out;
+		}
 
 		if (NULL == *error)
 		{
@@ -972,7 +1039,10 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 			get_vmware_service_objects()[service->type].session_manager, username_esc, password_esc);
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, NULL, NULL, error))
+	{
+		vmware_validate_url_suffix(service->url, error);
 		goto out;
+	}
 
 	ret = SUCCEED;
 out:
@@ -986,6 +1056,8 @@ out:
 	return ret;
 #	undef ZBX_POST_VMWARE_AUTH
 }
+
+#undef VMWARE_VALIDATE_EMPTY
 
 /******************************************************************************
  *                                                                            *
@@ -2404,7 +2476,7 @@ char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_ptr_t *cq_values, co
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_slist **headers, char **error)
+int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_slist **headers, char **error)
 {
 	const char	*soapver;
 	CURLoption	opt;
@@ -2433,6 +2505,7 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
 	return SUCCEED;
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Purpose: updates object with new data from vmware service                  *
@@ -2451,14 +2524,10 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	struct curl_slist		*headers = NULL;
 	zbx_vmware_data_t		*data;
 	zbx_vector_str_t		hvs, dss;
-	zbx_vector_vmware_event_ptr_t	events;
 	zbx_vector_cq_value_ptr_t	dvs_query_values, prop_query_values, cust_query_values;
 	zbx_vmware_alarms_data_t	alarms_data;
 	int				ret = FAIL;
 	ZBX_HTTPPAGE			page;	/* 347K/87K */
-	unsigned char			evt_pause = 0, evt_skip_old;
-	zbx_uint64_t			evt_last_key, events_sz = 0;
-	time_t				evt_last_ts;
 	char				msg[MAX_STRING_LEN / 8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
@@ -2469,7 +2538,6 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 
 	zbx_hashset_create(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare);
 	zbx_vector_vmware_cluster_ptr_create(&data->clusters);
-	zbx_vector_vmware_event_ptr_create(&data->events);
 	zbx_vector_vmware_datastore_ptr_create(&data->datastores);
 	zbx_vector_vmware_datacenter_ptr_create(&data->datacenters);
 	zbx_vector_vmware_resourcepool_ptr_create(&data->resourcepools);
@@ -2485,9 +2553,6 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	zbx_vector_str_create(&dss);
 
 	zbx_vmware_lock();
-	evt_last_key = service->eventlog.last_key;
-	evt_skip_old = service->eventlog.skip_old;
-	evt_last_ts = service->eventlog.last_ts;
 	vmware_service_cust_query_prep(&service->cust_queries, VMWARE_DVSWITCH_FETCH_DV_PORTS, &dvs_query_values,
 			cache_update_period);
 	vmware_service_cust_query_prep(&service->cust_queries, VMWARE_OBJECT_PROPERTY, &prop_query_values,
@@ -2520,12 +2585,6 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	/* update headers after VC version detection */
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
-
-	if (NULL != service->data && 0 != service->data->events.values_num && 0 == evt_skip_old &&
-			((const zbx_vmware_event_t *)service->data->events.values[0])->key > evt_last_key)
-	{
-		evt_pause = 1;
-	}
 
 	if (SUCCEED != vmware_service_get_hv_ds_dc_dvs_list(service, easyhandle, &alarms_data, &hvs, &dss,
 			&data->datacenters, &data->dvswitches, &data->alarm_ids, &data->error))
@@ -2601,44 +2660,10 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 			&prop_query_values);
 	zbx_vector_vmware_alarm_ptr_sort(&data->alarms, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
-	if (0 == service->eventlog.req_sz && 0 == evt_pause)
-	{
-		/* skip collection of event data if we don't know where	*/
-		/* we stopped last time or item can't accept values 	*/
-		if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != evt_last_key && 0 == evt_skip_old &&
-				SUCCEED != vmware_service_get_event_data(service, easyhandle, evt_last_key, evt_last_ts,
-				&evt_skip_old, &data->events, &events_sz, &data->error))
-		{
-			goto clean;
-		}
-
-		if (0 != evt_skip_old)
-		{
-			char	*error = NULL;
-
-			/* May not be present */
-			if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &data->events,
-					&events_sz, &error))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", error);
-				zbx_free(error);
-			}
-			else
-				evt_skip_old = 0;
-		}
-	}
-	else if (0 != service->eventlog.req_sz)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware events requires up to " ZBX_FS_UI64
-				" bytes of free VMwareCache memory. Reading events skipped", service->eventlog.req_sz);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Previous events have not been read. Reading new events skipped");
-	}
-
 	if (ZBX_VMWARE_TYPE_VCENTER != service->type)
+	{
 		data->max_query_metrics = ZBX_VPXD_STATS_MAXQUERYMETRICS;
+	}
 	else if (SUCCEED != vmware_service_get_maxquerymetrics(easyhandle, service, &data->max_query_metrics,
 			&data->error))
 	{
@@ -2664,7 +2689,6 @@ clean:
 	zbx_vector_str_clear_ext(&dss, zbx_str_free);
 	zbx_vector_str_destroy(&dss);
 out:
-	zbx_vector_vmware_event_ptr_create(&events);
 	zbx_vmware_lock();
 
 	/* remove UPDATING flag and set READY or FAILED flag */
@@ -2673,76 +2697,8 @@ out:
 #undef ZBX_VMWARE_STATE_MASK
 	service->state |= (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
 
-	if (0 < data->events.values_num)
-	{
-		if (0 != service->eventlog.oom)
-			service->eventlog.oom = 0;
-
-		events_sz += evt_req_chunk_size * data->events.values_num +
-				zbx_shmem_required_chunk_size(data->events.values_alloc * sizeof(zbx_vmware_event_t*));
-
-		if (0 == service->eventlog.last_key || vmware_shmem_get_vmware_mem()->free_size < events_sz ||
-				SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
-		{
-			for (int i = 0; i < data->events.values_num; i++)
-			{
-				zbx_vmware_event_t	*event = data->events.values[i];
-
-				if (SUCCEED == vmware_shared_strsearch(event->message))
-				{
-					events_sz -= zbx_shmem_required_chunk_size(strlen(event->message) +
-							REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
-				}
-			}
-
-			if (vmware_shmem_get_vmware_mem()->free_size < events_sz)
-			{
-				service->eventlog.req_sz = events_sz;
-				service->eventlog.oom = 1;
-				zbx_vector_vmware_event_ptr_clear_ext(&data->events, vmware_event_free);
-
-				zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware events requires up to " ZBX_FS_UI64
-						" bytes of free VMwareCache memory, while currently only " ZBX_FS_UI64
-						" bytes are free. VMwareCache memory usage (free/strpool/total): "
-						ZBX_FS_UI64 " / " ZBX_FS_UI64 " / " ZBX_FS_UI64, events_sz,
-						vmware_shmem_get_vmware_mem()->free_size,
-						vmware_shmem_get_vmware_mem()->free_size, vmware->strpool_sz,
-						vmware_shmem_get_vmware_mem()->total_size);
-			}
-			else if (0 == evt_pause)
-			{
-				int	level;
-
-				level = 0 == service->eventlog.last_key ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
-
-				zabbix_log(level, "Processed VMware events requires up to " ZBX_FS_UI64
-						" bytes of free VMwareCache memory. VMwareCache memory usage"
-						" (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
-						ZBX_FS_UI64, events_sz, vmware_shmem_get_vmware_mem()->free_size,
-						vmware->strpool_sz, vmware_shmem_get_vmware_mem()->total_size);
-			}
-		}
-	}
-	else if (0 < service->eventlog.req_sz && service->eventlog.req_sz <= vmware_shmem_get_vmware_mem()->free_size)
-	{
-		service->eventlog.req_sz = 0;
-	}
-
-	if (0 != evt_pause)
-	{
-		zbx_vector_vmware_event_ptr_append_array(&events, service->data->events.values,
-				service->data->events.values_num);
-		zbx_vector_vmware_event_ptr_reserve(&data->events,
-				(size_t)(data->events.values_num + service->data->events.values_num));
-		zbx_vector_vmware_event_ptr_clear(&service->data->events);
-	}
-
 	vmware_data_shared_free(service->data);
 	service->data = vmware_shmem_data_dup(data);
-	service->eventlog.skip_old = evt_skip_old;
-
-	if (0 != events.values_num)
-		zbx_vector_vmware_event_ptr_append_array(&service->data->events, events.values, events.values_num);
 
 	service->lastcheck = time(NULL);
 	vmware_service_update_perf_entities(service);
@@ -2752,9 +2708,9 @@ out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, vmware_shmem_get_vmware_mem());
 
-	zbx_snprintf(msg, sizeof(msg), "Events:%d DC:%d DS:%d CL:%d HV:%d VM:%d DVS:%d Alarms:%d"
+	zbx_snprintf(msg, sizeof(msg), "DC:%d DS:%d CL:%d HV:%d VM:%d DVS:%d Alarms:%d"
 			" VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
-			ZBX_FS_UI64, NULL != service->data ? service->data->events.values_num : 0 ,
+			ZBX_FS_UI64,
 			NULL != service->data ? service->data->datacenters.values_num : 0 ,
 			NULL != service->data ? service->data->datastores.values_num : 0 ,
 			NULL != service->data ? service->data->clusters.values_num : 0 ,
@@ -2768,7 +2724,6 @@ out:
 	zbx_vmware_unlock();
 
 	vmware_data_free(data);
-	zbx_vector_vmware_event_ptr_destroy(&events);
 	zbx_vector_cq_value_ptr_clear_ext(&dvs_query_values, zbx_vmware_cq_value_free);
 	zbx_vector_cq_value_ptr_destroy(&dvs_query_values);
 	zbx_vector_cq_value_ptr_clear_ext(&prop_query_values, zbx_vmware_cq_value_free);
@@ -2806,7 +2761,7 @@ static void	zbx_vmware_service_remove(zbx_vmware_service_t *service)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
+static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service);
 
 /*
  * Public API
@@ -2835,22 +2790,24 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 {
 	int			now;
 	zbx_vmware_service_t	*service = NULL;
+	zbx_vmware_t		*vmw = zbx_vmware_get_vmware();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, username, url);
 
-	if (NULL == vmware)
+	if (NULL == vmw)
 		goto out;
 
 	now = time(NULL);
 
-	for (int i = 0; i < vmware->services.values_num; i++)
+	for (int i = 0; i < vmw->services.values_num; i++)
 	{
-		service = (zbx_vmware_service_t *)vmware->services.values[i];
+		service = (zbx_vmware_service_t *)vmw->services.values[i];
 
 		if (0 == strcmp(service->url, url) && 0 == strcmp(service->username, username) &&
 				0 == strcmp(service->password, password))
 		{
 			service->lastaccess = now;
+			zbx_vmware_jobs_create(vmw, service);
 
 			/* return NULL if the service is not ready yet */
 			if (0 == (service->state & (ZBX_VMWARE_STATE_READY | ZBX_VMWARE_STATE_FAILED)))
@@ -2877,13 +2834,12 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->jobs_num = 0;
 	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;
+	service->jobs_type = ZBX_VMWARE_REQ_UPDATE_ALL;
 
 	vmware_shmem_service_hashset_create(service);
 
-	zbx_vector_vmware_service_ptr_append(&vmware->services, service);
-	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_CONF);
-	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_PERFCOUNTERS);
-	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_REST_TAGS);
+	zbx_vector_vmware_service_ptr_append(&vmw->services, service);
+	zbx_vmware_jobs_create(vmw, service);
 
 	/* new service does not have any data - return NULL */
 	service = NULL;
@@ -3078,12 +3034,39 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 
 	job = vmware_shmem_vmware_job_malloc();
 	job->nextcheck = 0;
+	job->ttl = 0;
 	job->type = job_type;
 	job->service = service;
 	service->jobs_num++;
+	service->jobs_type |= job_type;
 	job->expired = FAIL;
 	elem_new.data = job;
 	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: creates array of jobs to update vmware data periodically          *
+ *                                                                            *
+ * Parameters: vmw      - [IN] vmware object                                  *
+ *             service  - [IN] vmware service                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service)
+{
+	int	type = 0x1, jobs_type = service->jobs_type >> ZBX_VMWARE_REQ;
+
+	while (0 != jobs_type)
+	{
+		if (0 != (jobs_type & type))
+		{
+			zbx_vmware_job_create(vmw, service, type);
+			service->jobs_type &= ~ (type << ZBX_VMWARE_REQ);
+			jobs_type &= ~ type;
+		}
+
+		type <<= 0x1;
+	}
 }
 
 /******************************************************************************
@@ -3098,10 +3081,18 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 {
 	zbx_vmware_service_t	*service = job->service;
-	int			jobs_num;
+	int			jobs_num, job_type;
 
 	zbx_vmware_lock();
 
+	if (ZBX_VMWARE_UPDATE_EVENTLOG == job->type)
+	{
+		job->service->eventlog.lastaccess = 0;
+		job->service->eventlog.interval = 0;
+	}
+
+	job_type = job->type;
+	job->service->jobs_type &= ~ job->type;
 	job->service->jobs_num--;
 	jobs_num = job->service->jobs_num;
 	vmware_shmem_vmware_job_free(job);
@@ -3110,7 +3101,7 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 	if (0 == jobs_num)
 		zbx_vmware_service_remove(service);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d", __func__, jobs_num);
+	zabbix_log(LOG_LEVEL_WARNING, "%s() service jobs_num:%d job_type:%X", __func__, jobs_num, job_type);
 
 	return 0 == jobs_num ? 1 : 0;
 }
@@ -3183,6 +3174,11 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 	}
 
 	zbx_vmware_unlock();
+}
+
+zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void)
+{
+	return evt_req_chunk_size;
 }
 #endif
 

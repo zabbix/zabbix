@@ -13,7 +13,8 @@
 **/
 
 #include "zbxdbhigh.h"
-#include "zbxcommon.h"
+#include "zbxalgo.h"
+#include "zbxstr.h"
 
 ZBX_PTR_VECTOR_IMPL(db_tag_ptr, zbx_db_tag_t *)
 
