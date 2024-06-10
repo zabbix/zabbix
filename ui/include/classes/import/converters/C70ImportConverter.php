@@ -68,8 +68,7 @@ class C70ImportConverter extends CConverter {
 	private static function convertHostDiscoveryRules(array $discovery_rules): array {
 		foreach ($discovery_rules as &$discovery_rule) {
 			if (array_key_exists('host_prototypes', $discovery_rule)) {
-				$discovery_rule['host_prototypes']
-					= self::convertHostPrototypes($discovery_rule['host_prototypes']);
+				$discovery_rule['host_prototypes'] = self::convertHostPrototypes($discovery_rule['host_prototypes']);
 			}
 		}
 		unset($discovery_rule);
