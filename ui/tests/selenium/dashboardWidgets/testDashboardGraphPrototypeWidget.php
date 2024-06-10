@@ -239,6 +239,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		sleep(1);
 		$dialog = COverlayDialogElement::find()->one();
 		$this->assertScreenshot($dialog);
+		$dialog->close();
 	}
 
 	public static function getWidgetScreenshotData() {
@@ -434,6 +435,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 				$this->assertMessage($data['expected'], null, $data['error']);
 				break;
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -487,6 +490,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 			$new_values = $dashboard->getWidget(self::$previous_widget_name)->edit()->getFields()
 					->filter(CElementFilter::VISIBLE)->asValues();
 			$this->assertEquals($original_values, $new_values);
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		$this->assertEquals($initial_values, CDBHelper::getHash(self::SQL));

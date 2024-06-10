@@ -19,7 +19,14 @@
 #include "zbxjson.h"
 #include "zbxvault.h"
 
-int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **error);
+typedef enum {
+	ZBX_PROXYCONFIG_WRITE_STATUS_EMPTY,
+	ZBX_PROXYCONFIG_WRITE_STATUS_DATA
+}
+zbx_proxyconfig_write_status_t;
+
+int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, zbx_proxyconfig_write_status_t *status,
+		char **error);
 
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
 		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,

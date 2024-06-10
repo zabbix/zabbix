@@ -315,7 +315,7 @@ class testFormTags extends CWebTest {
 			case 'trigger prototype':
 			case 'item':
 			case 'item prototype':
-				$form = COverlayDialogElement::find()->asGridForm(['normalized' => true])->one()->waitUntilVisible();
+				$form = COverlayDialogElement::find()->waitUntilReady()->asGridForm(['normalized' => true])->one()->waitUntilVisible();
 				$form->fill($fields);
 				break;
 		}
@@ -604,7 +604,7 @@ class testFormTags extends CWebTest {
 			// Check the results in form.
 			$this->checkTagFields($data, $object, $form);
 
-			if (in_array($object, ['connector', 'template', 'trigger', 'item', 'trigger prototype', 'item prototype'])) {
+			if (!in_array($object, ['host', 'host prototype', 'web scenario'])) {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -1353,7 +1353,7 @@ class testFormTags extends CWebTest {
 				$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			}
 
-			$this->query('link', $this->remove_name)->waitUntilClickable()->one()->click();
+			$this->query('link', $this->remove_name)->waitUntilClickable()->one()->hoverMouse()->click();
 		}
 
 		$locators = [
@@ -1363,7 +1363,7 @@ class testFormTags extends CWebTest {
 
 		$form = ($object === 'web scenario' || $object === 'host prototype')
 				? $this->query($locators[$object])->asForm()->waitUntilPresent()->one()
-				: COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
+				: COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		if (!$this->problem_tags && $object !== 'connector') {
 			$form->selectTab('Tags');

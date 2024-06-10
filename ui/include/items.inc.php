@@ -2609,6 +2609,10 @@ function getInheritedTimeouts(string $proxyid): array {
  * @return array
  */
 function getItemTypeCountByHostId(int $item_type, array $hostids): array {
+	if (!$hostids) {
+		return [];
+	}
+
 	$items_count = API::Item()->get([
 		'countOutput' => true,
 		'groupCount' => true,
@@ -2616,5 +2620,5 @@ function getItemTypeCountByHostId(int $item_type, array $hostids): array {
 		'filter' => ['type' => $item_type]
 	]);
 
-	return array_column($items_count, 'rowscount', 'hostid');
+	return $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
 }
