@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 7.0\n"
+"Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
 "PO-Revision-Date: 2023-09-22 06:27+0000\n"
@@ -19492,6 +19492,10 @@ msgstr ""
 
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
 msgstr ""
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
