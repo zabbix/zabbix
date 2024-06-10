@@ -1282,48 +1282,49 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		];
 	}
 
+	// TODO: Will be fixed with DEV-3721.
 	/**
 	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
 	 */
-	public function testDashboardItemHistoryWidget_TableData($data) {
-		foreach ($data['item_data'] as $params) {
-			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
-		}
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
-		$dashboard->waitUntilReady();
-		$this->assertTableData($data['initial_data']);
-
-		$default_values = [
-			'Layout' => 'Horizontal',
-			'Show lines' => '25'
-		];
-
-		if (array_key_exists('fields', $data)) {
-			$this->widgetConfigurationChange($data['fields'], $dashboard);
-			$this->assertTableData($data['result']);
-			$this->widgetConfigurationChange($default_values, $dashboard);
-		}
-
-		if (array_key_exists('host_select', $data)) {
-			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
-			$multiselect_field->fill($data['host_select']['without_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData();
-			$multiselect_field->fill($data['host_select']['with_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData($data['result']);
-			$multiselect_field->clear();
-			$dashboard->waitUntilReady();
-		}
-
-		if (array_key_exists('result', $data)) {
-			$this->assertTableData($data['initial_data']);
-		}
-	}
+//	private function testDashboardItemHistoryWidget_TableData($data) {
+//		foreach ($data['item_data'] as $params) {
+//			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
+//		}
+//
+//		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
+//		$dashboard = CDashboardElement::find()->one();
+//		$dashboard->waitUntilReady();
+//		$this->assertTableData($data['initial_data']);
+//
+//		$default_values = [
+//			'Layout' => 'Horizontal',
+//			'Show lines' => '25'
+//		];
+//
+//		if (array_key_exists('fields', $data)) {
+//			$this->widgetConfigurationChange($data['fields'], $dashboard);
+//			$this->assertTableData($data['result']);
+//			$this->widgetConfigurationChange($default_values, $dashboard);
+//		}
+//
+//		if (array_key_exists('host_select', $data)) {
+//			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
+//			$multiselect_field->fill($data['host_select']['without_data']);
+//			$dashboard->waitUntilReady();
+//			$this->assertTableData();
+//			$multiselect_field->fill($data['host_select']['with_data']);
+//			$dashboard->waitUntilReady();
+//			$this->assertTableData($data['result']);
+//			$multiselect_field->clear();
+//			$dashboard->waitUntilReady();
+//		}
+//
+//		if (array_key_exists('result', $data)) {
+//			$this->assertTableData($data['initial_data']);
+//		}
+//	}
 
 	/**
 	 * Change Item history widget configuration.

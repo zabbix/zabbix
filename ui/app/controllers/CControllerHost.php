@@ -191,14 +191,14 @@ abstract class CControllerHost extends CController {
 			'symptom' => false
 		]);
 
-		$items = API::Item()->get([
+		$items_count = API::Item()->get([
 			'countOutput' => true,
 			'groupCount' => true,
 			'hostids' => array_keys($hosts),
 			'webitems' =>true,
 			'monitored' => true
 		]);
-		$items_count = array_combine(array_column($items, 'hostid'), array_column($items, 'rowscount'));
+		$items_count = $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
 
 		// Group all problems per host per severity.
 		$host_problems = [];
@@ -315,6 +315,33 @@ abstract class CControllerHost extends CController {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Clean the filter from non-existing host group IDs.
+	 *
+	 * @param array $filter
+	 *
+	 * $filter = [
+	 *     'groupids' => (array)  Group IDs from filter to check.
+	 * ]
+	 *
+	 * @return array
+	 */
+	protected static function sanitizeFilter(array $filter): array {
+		if ($filter['groupids']) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => $filter['groupids'],
+				'preservekeys' => true
+			]);
+
+			$filter['groupids'] = array_filter($filter['groupids'], static fn($groupid) =>
+				array_key_exists($groupid, $groups)
+			);
+		}
+
+		return $filter;
 	}
 
 	/**

@@ -77,7 +77,9 @@ $header = [
 	(new CColHeader(_('Proxies')))->setColSpan(2)
 ];
 
-$proxy_group_list = (new CTableInfo())->setHeader($header);
+$proxy_group_list = (new CTableInfo())
+	->setHeader($header)
+	->setPageNavigation($data['paging']);
 
 foreach ($data['proxy_groups'] as $proxy_groupid => $proxy_group) {
 	$state = '';
@@ -142,7 +144,7 @@ foreach ($data['proxy_groups'] as $proxy_groupid => $proxy_group) {
 }
 
 $form
-	->addItem([$proxy_group_list, $data['paging']])
+	->addItem($proxy_group_list)
 	->addItem(
 		new CActionButtonList('action', 'proxy_groupids', [
 			'proxygroup.massdelete' => [
