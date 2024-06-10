@@ -218,11 +218,12 @@ class testPageReportsAudit extends CWebTest {
 	 * Clear history and trends in item and check audit page.
 	 */
 	public function testPageReportsAudit_HistoryClear() {
-		CDataHelper::call('history.clear', [99106]);
-
 		// Check that audit info displayed correctly on frontend.
-		$clear_audit = 'Description: Dynamic widgets H3I1';
-		$this->checkAuditValues('Item', 99106, ['History clear' => $clear_audit]);
+		self::$id = CDataHelper::get('DynamicItemWidgets.itemids');
+		CDataHelper::call('history.clear', [self::$id['Dynamic widgets H3I1']]);
+		$this->checkAuditValues('Item', self::$id['Dynamic widgets H3I1'],
+				['History clear' => 'Description: Dynamic widgets H3I1']
+		);
 	}
 
 	/**
@@ -293,8 +294,9 @@ class testPageReportsAudit extends CWebTest {
 	 * @onBeforeOnce prepareLoginData
 	 */
 	public static function getCheckFilterData() {
+		self::$id = CDataHelper::get('DynamicItemWidgets.itemids');
 		return [
-			// #0
+			// #0.
 			[
 				[
 					'fields' => [
@@ -304,7 +306,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #1
+			// #1.
 			[
 				[
 					'fields' => [
@@ -313,7 +315,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
-			// #2
+			// #2.
 			[
 				[
 					'fields' => [
@@ -323,7 +325,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
-			// #3
+			// #3.
 			[
 				[
 					'fields' => [
@@ -332,7 +334,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 12
 				]
 			],
-			// #4
+			// #4.
 			[
 				[
 					'fields' => [
@@ -342,7 +344,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #5
+			// #5.
 			[
 				[
 					'fields' => [
@@ -358,7 +360,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 5
 				]
 			],
-			// #6
+			// #6.
 			[
 				[
 					'fields' => [
@@ -374,7 +376,7 @@ class testPageReportsAudit extends CWebTest {
 					]
 				]
 			],
-			// #7
+			// #7.
 			[
 				[
 					'fields' => [
@@ -383,28 +385,28 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 13
 				]
 			],
-			// #8
+			// #8.
 			[
 				[
 					'fields' => [
-						'Resource ID' => 99106
+						'Resource ID' => self::$id['Dynamic widgets H3I1']
 					],
 					'result_count' => 1
 				]
 			],
-			// #9
+			// #9.
 			[
 				[
 					'fields' => [
 						'Users' => 'Admin',
 						'Resource' => 'Item',
-						'Resource ID' => 99106,
+						'Resource ID' => self::$id['Dynamic widgets H3I1'],
 						'Actions' => 'History clear'
 					],
 					'result_count' => 1
 				]
 			],
-			// #10
+			// #10.
 			[
 				[
 					'fields' => [
@@ -413,7 +415,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #11
+			// #11.
 			[
 				[
 					'fields' => [
@@ -423,7 +425,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #12
+			// #12.
 			[
 				[
 					'fields' => [
@@ -432,7 +434,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #13
+			// #13.
 			[
 				[
 					'fields' => [
@@ -441,7 +443,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #14
+			// #14.
 			[
 				[
 					'fields' => [
@@ -450,7 +452,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #15
+			// #15.
 			[
 				[
 					'fields' => [
@@ -460,7 +462,7 @@ class testPageReportsAudit extends CWebTest {
 				]
 			]
 			// TODO: uncomment after ZBX-21097 fix
-			// #16
+			// #16.
 //			[
 //				[
 //					'fields' => [
@@ -469,7 +471,7 @@ class testPageReportsAudit extends CWebTest {
 //					'no_data' => true
 //				]
 //			],
-			// #17
+			// #17.
 //			[
 //				[
 //					'fields' => [
