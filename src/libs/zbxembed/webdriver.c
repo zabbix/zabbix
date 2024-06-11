@@ -13,14 +13,13 @@
 **/
 
 #include "webdriver.h"
-#include "zbxcommon.h"
 #include "zbxjson.h"
-#include "zbxstr.h"
-#include "zbxtime.h"
-#include "zbxtypes.h"
-#include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxcurl.h"
 
 #define WEBDRIVER_INVALID_SESSIONID_ERROR	"invalid session id"
 
@@ -1010,13 +1009,53 @@ out:
  ******************************************************************************/
 int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error)
 {
-	const char	*script = "return window.performance.getEntries().filter("
-						"(value, index, array)=>{"
-							"return value.entryType!=='long-animation-frame'"
-						"}"
-					");";
+	const char	*script = "var a=window.performance.getEntries();var out=[];"
+						"for (o of a) {"
+							"var obj = {};"
+							"for (p in o) {"
+								"if (!(o[p] instanceof Object)) {obj[p] = o[p];}"
+							"}"
+							"out.push(obj);"
+						"}; return out;";
 
 	return webdriver_execute_script(wd, script, jp, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get raw performance entries from performance object               *
+ *                                                                            *
+ * Parameters: wd    - [IN] webdriver object                                  *
+ *             type  - [IN] entry type                                        *
+ *             jp    - [OUT] performance entries                              *
+ *                              (optional, can be null)                       *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - query was performed successfully                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	webdriver_get_raw_perf_data(zbx_webdriver_t *wd, const char *type, struct zbx_json_parse *jp, char **error)
+{
+	char	*script;
+	int	ret;
+
+	if (NULL != type)
+	{
+		if (NULL != strchr(type, '\'') || NULL != strchr(type, '\\'))
+		{
+			*error = zbx_strdup(NULL, "invalid performance entry type");
+			return FAIL;
+		}
+		script = zbx_dsprintf(NULL, "return window.performance.getEntriesByType('%s')", type);
+	}
+	else
+		script = zbx_strdup(NULL, "return window.performance.getEntries();");
+
+	ret = webdriver_execute_script(wd, script, jp, error);
+	zbx_free(script);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1037,7 +1076,7 @@ int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char 
 	struct zbx_json_parse	jp;
 	int			ret = FAIL;
 
-	if (SUCCEED != webdriver_get_perf_data(wd , &jp, error))
+	if (SUCCEED != webdriver_get_perf_data(wd, &jp, error))
 		goto out;
 
 	wd_perf_collect(&wd->perf, bookmark, &jp);

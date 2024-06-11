@@ -114,6 +114,8 @@ class testDashboardGraphWidget extends testWidgets {
 			sleep(1);
 			$this->assertScreenshotExcept($overlay, [$element], 'tab_'.$tab);
 		}
+
+		$overlay->close();
 	}
 
 	/**
@@ -159,6 +161,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 		if (array_key_exists('error', $data)) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
@@ -1562,6 +1565,8 @@ class testDashboardGraphWidget extends testWidgets {
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
 			$this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'main_fields.Name', 'Graph'));
 			$this->checkWidgetForm($data);
+
+			COverlayDialogElement::find()->one()->close();
 		}
 	}
 
@@ -1857,6 +1862,8 @@ class testDashboardGraphWidget extends testWidgets {
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
 			$this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
 			$this->checkWidgetForm($data);
+
+			COverlayDialogElement::find()->one()->close();
 		}
 	}
 
@@ -2291,6 +2298,8 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->assertEnabledFields($fields, false);
 		$form->fill(['Aggregation function' => 'min']);
 		$this->assertEnabledFields($fields, true);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/*
@@ -2311,6 +2320,8 @@ class testDashboardGraphWidget extends testWidgets {
 			$this->assertTrue($form->getField($field)->isDisplayed());
 		}
 		$this->assertEnabledFields($fields, true);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/*
@@ -2362,6 +2373,8 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->assertEquals($attribute_value, $element->getAttribute($attribute_name));
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getSlidebarData () {
@@ -2508,6 +2521,8 @@ class testDashboardGraphWidget extends testWidgets {
 					->one()->getAttribute('style')
 			);
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -2561,6 +2576,8 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->assertTrue($form->getField('id:'.$field_id.'_value')->isEnabled());
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testDashboardGraphWidget_ProblemsDisabledFields() {
@@ -2582,6 +2599,8 @@ class testDashboardGraphWidget extends testWidgets {
 		// Set "Show problems" and check that fields enabled now.
 		$form->fill(['Show problems' => true]);
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), true);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getAxesDisabledFieldsData() {
@@ -2672,6 +2691,8 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -2742,6 +2763,8 @@ class testDashboardGraphWidget extends testWidgets {
 		// Check Data set names in created widget configuration form.
 		$data_set_labels = $form->query('xpath:.//label[@class="js-dataset-label"]')->all()->asText();
 		$this->assertEquals($displayed_data['Data sets'], array_values($data_set_labels));
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**

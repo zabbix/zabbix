@@ -14,8 +14,9 @@
 
 #include "dbupgrade.h"
 
-#include "zbxnum.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
 
 /*
  * 4.2 development database patches

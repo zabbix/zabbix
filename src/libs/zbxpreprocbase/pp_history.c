@@ -14,6 +14,10 @@
 
 #include "zbxpreprocbase.h"
 
+#include "zbxalgo.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
+
 ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t)
 
 /******************************************************************************

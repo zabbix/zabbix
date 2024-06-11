@@ -16,9 +16,9 @@
 
 #include "../poller/poller_proxy.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxtrapper.h"
 #include "zbxscripts.h"
-#include "zbxpoller.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
@@ -37,6 +37,10 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbx_scripts_constants.h"
+
+#ifdef HAVE_NETSNMP
+#	include "zbxpoller.h"
+#endif
 
 /**************************************************************************************
  *                                                                                    *

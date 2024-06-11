@@ -17,6 +17,7 @@
 #include "json_parser.h"
 #include "json.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 
 ZBX_PTR_VECTOR_IMPL(jsonobj_ptr, zbx_jsonobj_t *)
 ZBX_VECTOR_IMPL(jsonobj_ref, zbx_jsonobj_ref_t)

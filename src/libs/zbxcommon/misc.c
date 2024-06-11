@@ -14,7 +14,9 @@
 
 #include "zbxcommon.h"
 
-#include "zbxstr.h"
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	include "zbxstr.h"
+#endif
 
 static ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 

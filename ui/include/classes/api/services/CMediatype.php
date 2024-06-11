@@ -221,8 +221,6 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $mediatypes
 	 *
 	 * @throws APIException if the input is invalid.
@@ -323,8 +321,6 @@ class CMediatype extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $mediatypes
 	 * @param array|null $db_mediatypes
 	 *
@@ -403,8 +399,6 @@ class CMediatype extends CApiService {
 	/**
 	 * Check for unique media type names.
 	 *
-	 * @static
-	 *
 	 * @param array      $mediatypes
 	 * @param array|null $db_mediatypes
 	 *
@@ -440,8 +434,6 @@ class CMediatype extends CApiService {
 
 	/**
 	 * Validate fields by type.
-	 *
-	 * @static
 	 *
 	 * @param array      $mediatypes
 	 * @param array|null $db_mediatypes
@@ -546,8 +538,6 @@ class CMediatype extends CApiService {
 
 	/**
 	 * Get type specific validation rules.
-	 *
-	 * @static
 	 *
 	 * @param array  $mediatype
 	 * @param string $method
@@ -691,8 +681,6 @@ class CMediatype extends CApiService {
 	/**
 	 * Update table "media_type_param" and populate mediatype.parameters by "mediatype_paramid" property.
 	 *
-	 * @static
-	 *
 	 * @param array      $mediatypes
 	 * @param string     $method
 	 * @param array|null $db_mediatypes
@@ -771,8 +759,6 @@ class CMediatype extends CApiService {
 
 	/**
 	 * Update table "media_type_message" and populate mediatype.message_templates by "mediatype_messageid" property.
-	 *
-	 * @static
 	 *
 	 * @param array      $mediatypes
 	 * @param string     $method
@@ -1001,8 +987,6 @@ class CMediatype extends CApiService {
 	/**
 	 * Add existing parameters and message templates to $db_mediatypes, regardless of whether they will be
 	 * affected by the update.
-	 *
-	 * @static
 	 *
 	 * @param array $mediatypes
 	 * @param array $db_mediatypes

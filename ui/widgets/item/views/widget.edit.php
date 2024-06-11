@@ -76,7 +76,6 @@ $form
 					->setDateFormat(ZBX_FULL_DATE_TIME)
 					->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 					->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-					->addRowClass('js-row-time-period')
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonListView($data['fields']['history']))->setFieldHint(

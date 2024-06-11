@@ -14,9 +14,10 @@
 
 #include "json_parser.h"
 
-#include "zbxcommon.h"
 #include "json.h"
 #include "jsonobj.h"
+
+#include "zbxalgo.h"
 
 /******************************************************************************
  *                                                                            *

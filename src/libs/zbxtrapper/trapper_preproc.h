@@ -15,7 +15,6 @@
 #ifndef ZABBIX_TRAPPER_PREPROC_H
 #define ZABBIX_TRAPPER_PREPROC_H
 
-#include "zbxcomms.h"
 #include "zbxjson.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1

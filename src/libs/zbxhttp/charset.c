@@ -13,7 +13,6 @@
 **/
 
 #include "zbxstr.h"
-#include "zbxlog.h"
 #include "zbxhttp.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"

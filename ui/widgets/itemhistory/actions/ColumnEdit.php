@@ -99,7 +99,7 @@ class ColumnEdit extends CController {
 		$item_ms = [];
 		$item_value_type = null;
 
-		if (array_key_exists('itemid', $input) && $input['itemid'] !== '' ) {
+		if (array_key_exists('itemid', $input) && $input['itemid'] !== '') {
 			$output = ['itemid', 'value_type'];
 			$output[] = $this->hasInput('templateid') ? 'name' : 'name_resolved';
 

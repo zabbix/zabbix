@@ -15,12 +15,14 @@
 #include "zbxcommon.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#include "zbxpoller.h"
-#include "zbxcomms.h"
-
 #include "ssh_run.h"
 
+#include "zbxcacheconfig.h"
+#include "zbxpoller.h"
+#include "zbxcomms.h"
 #include "zbxsysinfo.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssh_key_location,
 		AGENT_RESULT *result)

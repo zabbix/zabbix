@@ -7539,6 +7539,10 @@ msgstr "Tom inputparameter."
 msgid "Empty map ID."
 msgstr "Tomt kort-id."
 
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
+
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
 #: app/views/configuration.discovery.list.php:121
@@ -10165,6 +10169,10 @@ msgstr "Billedet er slettet"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "Billedetikettype"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -19483,6 +19491,10 @@ msgstr "Tekst"
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
 msgstr "Tekst funktioner"
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557

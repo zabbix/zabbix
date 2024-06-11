@@ -15,7 +15,7 @@
 #ifndef ZABBIX_SYSINFO_AGENT_H
 #define ZABBIX_SYSINFO_AGENT_H
 
-#include "zbxsysinfo.h"
+#include "zbxcommon.h"
 
 zbx_metric_t	*get_parameters_agent(void);
 #endif /* ZABBIX_SYSINFO_AGENT_H */

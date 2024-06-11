@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-13 17:22+0000\n"
+"PO-Revision-Date: 2024-05-28 09:23+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -1499,11 +1499,11 @@ msgstr "Obsahuje libovolný řetězec"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Všechny existující entity hostů, které nejsou zahrnuty v importovaném souboru, budou odstraněny. Pokračujte kliknutím na OK."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Všechny existující entity šablon, které se nejsou zahrnuty v importovaném souboru, budou odstraněny. Pokračujte kliknutím na OK."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -2106,7 +2106,7 @@ msgstr "Přenést dopředu"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Prohlížeč"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -7287,7 +7287,7 @@ msgstr "Zobrazit graf"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
-msgstr ""
+msgstr "Zobrazení místního času"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7638,6 +7638,10 @@ msgstr "Prázdná vstupní parametr."
 #: include/classes/api/services/CMap.php:1042
 msgid "Empty map ID."
 msgstr "Prázdné ID mapy."
+
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr "Prázdná hodnota."
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -9393,7 +9397,7 @@ msgstr "Označ celý řádek"
 
 #: widgets/itemhistory/views/column.edit.php:132
 msgid "Highlights"
-msgstr ""
+msgstr "Zvýraznění"
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -10282,6 +10286,10 @@ msgstr "Obrázek byl smazán"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "Typ popisky obrázku"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr "Chyba při načítání obrázku."
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -11956,7 +11964,7 @@ msgstr[2] "Položky povolené"
 
 #: widgets/itemhistory/Widget.php:26
 msgid "Item history"
-msgstr ""
+msgstr "Historie itemu"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
@@ -12481,7 +12489,7 @@ msgstr "Poslední hodnoty"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"
-msgstr ""
+msgstr "Poslední vydání"
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -14326,7 +14334,7 @@ msgstr "Nové spouštěče"
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
 msgid "New update available"
-msgstr ""
+msgstr "Nová aktualizace k dispozici"
 
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
@@ -14334,7 +14342,7 @@ msgstr "Nové mapování uživatelských skupin"
 
 #: widgets/itemhistory/includes/WidgetForm.php:96
 msgid "New values"
-msgstr ""
+msgstr "Nové hodnoty"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
@@ -16256,7 +16264,7 @@ msgstr "Aktualizujte prosím konfiguraci"
 
 #: app/partials/administration.system.info.php:47
 msgid "Please upgrade to latest major release."
-msgstr ""
+msgstr "Upgradujte prosím na nejnovější hlavní verzi."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
@@ -17164,7 +17172,7 @@ msgstr "Související reporty"
 
 #: app/partials/administration.system.info.php:72
 msgid "Release notes"
-msgstr ""
+msgstr "Poznámky k vydání"
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18939,7 +18947,7 @@ msgstr "Zobrazit oblouk"
 
 #: widgets/itemhistory/includes/WidgetForm.php:105
 msgid "Show column header"
-msgstr ""
+msgstr "Zobrazit záhlaví sloupce"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
@@ -19013,7 +19021,7 @@ msgstr "Zobrazit postranní panel"
 
 #: widgets/systeminfo/includes/WidgetForm.php:42
 msgid "Show software update check details"
-msgstr ""
+msgstr "Zobrazit podrobnosti o kontrole aktualizace softwaru"
 
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
@@ -19048,7 +19056,7 @@ msgstr "Zobrazit text jako HTML"
 
 #: widgets/itemhistory/views/column.edit.php:251
 msgid "Show thumbnail"
-msgstr ""
+msgstr "Zobrazit miniaturu"
 
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
@@ -19058,7 +19066,7 @@ msgstr "Ukaž časovou osu"
 
 #: widgets/itemhistory/includes/WidgetForm.php:102
 msgid "Show timestamp"
-msgstr ""
+msgstr "Zobrazit časové razítko"
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -19161,11 +19169,11 @@ msgstr "Jednotlivé"
 
 #: widgets/itemhistory/views/column.edit.php:150
 msgid "Single line"
-msgstr ""
+msgstr "Jeden řádek"
 
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
-msgstr ""
+msgstr "Jeden řádek - výsledek bude zobrazen na jednom řádku a zkrácen na zadanou délku."
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19276,7 +19284,7 @@ msgstr "Software architektura. Vrátí řetězec"
 
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
-msgstr ""
+msgstr "Poslední kontrola aktualizace softwaru"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -19636,6 +19644,10 @@ msgstr "Řetězec"
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
 msgstr "Řetězcové funkce"
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -20495,7 +20507,7 @@ msgstr "Toto nastavení by mělo být povoleno, protože tabulky trendů obsahuj
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Toto nastavení zobrazí místo časového razítka místní čas. V pokročilé konfiguraci je nutné zaškrtnout \"Zobrazit časové razítko\"."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -21793,7 +21805,7 @@ msgstr "Dostupný"
 #: app/partials/administration.system.info.php:59
 #: app/partials/administration.system.info.php:64
 msgid "Up to date"
-msgstr ""
+msgstr "Aktuální"
 
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
@@ -21980,7 +21992,7 @@ msgstr "Použít iframe sandboxing"
 
 #: widgets/itemhistory/views/column.edit.php:232
 msgid "Use monospace font"
-msgstr ""
+msgstr "Použijte neproporcionální písmo"
 
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
