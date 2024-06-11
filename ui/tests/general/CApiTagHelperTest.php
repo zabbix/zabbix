@@ -455,7 +455,7 @@ class CApiTagHelperTest extends CTest {
 	/**
 	 * @dataProvider provider
 	 */
-	public function test(array $params, array $expected): void {
+	public function test(array $params, string $expected): void {
 		$this->assertSame($expected, call_user_func_array(['CApiTagHelper', 'addWhereCondition'], $params));
 	}
 }
