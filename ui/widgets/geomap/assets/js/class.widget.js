@@ -99,7 +99,7 @@ class CWidgetGeoMap extends CWidget {
 			attribution: config.attribution
 		}).addTo(this._map);
 
-		this.initSeverities(config.colors);
+		this.initSeverities(config.severities);
 
 		// Create cluster layer.
 		this._clusters = this._createClusterLayer();
@@ -574,87 +574,55 @@ class CWidgetGeoMap extends CWidget {
 	/**
 	 * Function creates marker icons and severity-related options.
 	 *
-	 * @param {object} severity_colors
+	 * @param {object} severities
 	 */
-	initSeverities(severity_colors) {
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_NO_PROBLEMS, {
-			name: t('No problems'),
-			color: severity_colors[CWidgetGeoMap.SEVERITY_NO_PROBLEMS]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED, {
-			name: t('Not classified'),
-			abbr: t('N'),
-			class: ZBX_STYLE_NA_BG,
-			color: severity_colors[CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_INFORMATION, {
-			name: t('Information'),
-			abbr: t('I'),
-			class: ZBX_STYLE_INFO_BG,
-			color: severity_colors[CWidgetGeoMap.SEVERITY_INFORMATION]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_WARNING, {
-			name: t('Warning'),
-			abbr: t('W'),
-			class: ZBX_STYLE_WARNING_BG,
-			color: severity_colors[CWidgetGeoMap.SEVERITY_WARNING]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_AVERAGE, {
-			name: t('Average'),
-			abbr: t('A'),
-			class: ZBX_STYLE_AVERAGE_BG,
-			color: severity_colors[CWidgetGeoMap.SEVERITY_AVERAGE]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_HIGH, {
-			name: t('High'),
-			abbr: t('H'),
-			class: ZBX_STYLE_HIGH_BG,
-			color: severity_colors[CWidgetGeoMap.SEVERITY_HIGH]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_DISASTER, {
-			name: t('Disaster'),
-			abbr: t('D'),
-			class: ZBX_STYLE_DISASTER_BG,
-			color: severity_colors[CWidgetGeoMap.SEVERITY_DISASTER]
-		});
-
+	initSeverities(severities) {
 		const styles = getComputedStyle(this._contents);
 		const hover_fill = styles.getPropertyValue('--hover-fill');
 		const selected_fill = styles.getPropertyValue('--selected-fill');
 		const selected_stroke = styles.getPropertyValue('--selected-stroke');
 
-		for (const severity in severity_colors) {
+		for (let i = CWidgetGeoMap.SEVERITY_NO_PROBLEMS; i <= CWidgetGeoMap.SEVERITY_DISASTER; i++) {
+			const severity = severities[i];
+
+			this._severity_levels.set(i, {
+				name: severity['name'],
+				color: severity['color'],
+				abbr: severity['name'].charAt(0),
+				class: severity['style']
+			});
+
 			const tmpl = `
 				<svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<path fill="${severity_colors[severity]}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
+					<path fill="${severity['color']}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
 				</svg>`;
 
 			const selected_tmpl = `
 				<svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path fill="${selected_fill}" fill-rule="evenodd" clip-rule="evenodd" d="M12 30C13.62 30 22 17.2124 22 11.8C22 6.38761 17.5228 2 12 2C6.47715 2 2 6.38761 2 11.8C2 17.2124 10.38 30 12 30ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"/>
 					<path fill="${selected_stroke}" d="M21.5 11.8C21.5 13.0504 21.009 14.7888 20.2033 16.7359C19.4038 18.6682 18.3176 20.7523 17.1775 22.6746C16.0371 24.5971 14.8501 26.3455 13.8535 27.6075C13.3541 28.24 12.9113 28.7391 12.5528 29.0752C12.3729 29.2439 12.2256 29.3607 12.1123 29.4323C11.9844 29.5131 11.9563 29.5 12 29.5V30.5C12.2462 30.5 12.4734 30.387 12.6463 30.2778C12.8337 30.1595 13.0325 29.9963 13.2368 29.8047C13.6467 29.4203 14.1244 28.8781 14.6384 28.2272C15.6687 26.9225 16.8804 25.1356 18.0376 23.1847C19.1949 21.2335 20.3049 19.1059 21.1273 17.1183C21.9436 15.1455 22.5 13.2558 22.5 11.8H21.5ZM12 2.5C17.2563 2.5 21.5 6.67323 21.5 11.8H22.5C22.5 6.10199 17.7894 1.5 12 1.5V2.5ZM2.5 11.8C2.5 6.67323 6.74372 2.5 12 2.5V1.5C6.21058 1.5 1.5 6.10199 1.5 11.8H2.5ZM12 29.5C12.0437 29.5 12.0156 29.5131 11.8877 29.4323C11.7744 29.3607 11.6271 29.2439 11.4472 29.0752C11.0887 28.7391 10.6459 28.24 10.1465 27.6075C9.14988 26.3455 7.96285 24.5971 6.82253 22.6746C5.68238 20.7523 4.59618 18.6682 3.7967 16.7359C2.99104 14.7888 2.5 13.0504 2.5 11.8H1.5C1.5 13.2558 2.05645 15.1455 2.87267 17.1183C3.69505 19.1059 4.80509 21.2335 5.96244 23.1847C7.11961 25.1356 8.33133 26.9225 9.36163 28.2272C9.87559 28.8781 10.3533 29.4203 10.7632 29.8047C10.9675 29.9963 11.1663 30.1595 11.3537 30.2778C11.5266 30.387 11.7538 30.5 12 30.5V29.5ZM15.5 12C15.5 13.933 13.933 15.5 12 15.5V16.5C14.4853 16.5 16.5 14.4853 16.5 12H15.5ZM12 8.5C13.933 8.5 15.5 10.067 15.5 12H16.5C16.5 9.51472 14.4853 7.5 12 7.5V8.5ZM8.5 12C8.5 10.067 10.067 8.5 12 8.5V7.5C9.51472 7.5 7.5 9.51472 7.5 12H8.5ZM12 15.5C10.067 15.5 8.5 13.933 8.5 12H7.5C7.5 14.4853 9.51472 16.5 12 16.5V15.5Z"/>
-					<path fill="${severity_colors[severity]}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
+					<path fill="${severity['color']}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
 				</svg>`;
 
 			const mouseover_tmpl = `
 				<svg width="24" height="32" viewBox="0 0 24 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path fill="${hover_fill}" fill-rule="evenodd" clip-rule="evenodd" d="M12 30C13.62 30 22 17.2124 22 11.8C22 6.38761 17.5228 2 12 2C6.47715 2 2 6.38761 2 11.8C2 17.2124 10.38 30 12 30ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"/>
-					<path fill="${severity_colors[severity]}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
+					<path fill="${severity['color']}" fill-rule="evenodd" clip-rule="evenodd" d="M12 24C12.972 24 18 15.7794 18 12.3C18 8.82061 15.3137 6 12 6C8.68629 6 6 8.82061 6 12.3C6 15.7794 11.028 24 12 24ZM12.0001 15.0755C13.4203 15.0755 14.5716 13.8565 14.5716 12.3528C14.5716 10.8491 13.4203 9.63011 12.0001 9.63011C10.58 9.63011 9.42871 10.8491 9.42871 12.3528C9.42871 13.8565 10.58 15.0755 12.0001 15.0755Z"/>
 				</svg>`;
 
-			this._icons[severity] = L.icon({
+			this._icons[i] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(tmpl),
 				iconSize: [46, 61],
 				iconAnchor: [22, 44]
 			});
 
-			this._selected_icons[severity] = L.icon({
+			this._selected_icons[i] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(selected_tmpl),
 				iconSize: [46, 61],
 				iconAnchor: [22, 44]
 			});
 
-			this._mouseover_icons[severity] = L.icon({
+			this._mouseover_icons[i] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(mouseover_tmpl),
 				iconSize: [46, 61],
 				iconAnchor: [22, 44]
