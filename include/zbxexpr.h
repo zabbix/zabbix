@@ -267,32 +267,6 @@ typedef struct
 }
 zbx_macro_resolv_data_t;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: resolver callback for zbx_substitute_macros_* functions           *
- *                                                                            *
- * Parameters: p          - [IN] macro resolver data structure                *
- *             args       - [IN] list of variadic parameters passed from      *
- *                               zbx_substitute_macros_* function             *
- *             replace_to - [OUT] pointer to value to replace macro with      *
- *                                Note: value will be freed.                  *
- *             data       - [IN/OUT] pointer to input data string             *
- *             error      - [OUT] pointer to pre-allocated error message      *
- *                                buffer                                      *
- *             maxerrlen  - [IN] size of error message buffer                 *
- *                                                                            *
- * Return value: SUCCEED         - when recognised macro were found and it's  *
- *                                 value were assigned to replace_to pointer  *
- *               SUCCEED_PARTIAL - when resolver itself did everything, no    *
- *                                 further checks are required *special case* *
- *               FAIL            - when data gathering failed: value will be  *
- *                                 get to *UNKNOWN*                           *
- *                                                                            *
- * Note: When macro is not recognised then do not return FAIL, just keep      *
- *       replace_to unassigned so other macro resolvers may resolve it's      *
- *       macros.                                                              *
- *                                                                            *
- ******************************************************************************/
 typedef int (*zbx_macro_resolv_func_t)(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
 		char **data, char *error, size_t maxerrlen);
 
