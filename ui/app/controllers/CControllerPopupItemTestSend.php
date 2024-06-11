@@ -374,7 +374,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$output['eol'] = $result_item['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
 
 			if ($this->use_prev_value) {
-				$data += ['options' => []];
 				$output['prev_value'] = array_key_exists('history', $data['options'])
 					? $data['options']['history']['value']
 					: $result_item['result'];
