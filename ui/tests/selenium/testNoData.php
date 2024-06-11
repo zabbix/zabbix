@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
  *
  * @onBefore prepareEmptyData
  *
- * @backup profiles, hstgrp
+ * @backup profiles, hstgrp, scripts
  */
 class testNoData extends CWebTest {
 
@@ -614,14 +614,9 @@ class testNoData extends CWebTest {
 					$form = $overlay_form;
 				}
 				else {
-					CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT);
+					CFilterElement::find()->one()->selectTab('Filter');
 					$form = $this->query('name:zbx_filter')->asForm()->one();
 				}
-
-//
-//				$form = (CTestArrayHelper::get($data, 'overlay_form'))
-//					? $overlay_form
-//					: $this->query('name:zbx_filter')->asForm()->one();
 
 				$overlay = $form->getField($field)->edit();
 
