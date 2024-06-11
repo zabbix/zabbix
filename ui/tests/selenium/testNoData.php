@@ -134,6 +134,132 @@ class testNoData extends CWebTest {
 		}
 	}
 
+	public static function getActionOverlaysData() {
+		return [
+			// #0 Trigger actions.
+			[
+				[
+					'url' => 'zabbix.php?action=action.list&eventsource=0',
+					'tabs' => [
+						'Action' => [
+							'Conditions' => ['Trigger', 'Host', 'Template']
+						],
+						'Operations' => [
+							'Operations' => [self::SCRIPT],
+							'Recovery operations' => [self::SCRIPT],
+							'Update operations' => [self::SCRIPT]
+						]
+					]
+				]
+			],
+			// #1 Service actions.
+			[
+				[
+					'url' => 'zabbix.php?action=action.list&eventsource=4',
+					'tabs' => [
+						'Action' => [
+							'Conditions' => ['Service']
+						]
+					]
+				]
+			],
+			// #2 Discovery actions.
+			[
+				[
+					'url' => 'zabbix.php?action=action.list&eventsource=1',
+					'tabs' => [
+						'Action' => [
+							'Conditions' => ['Proxy']
+						],
+						'Operations' => [
+							'Operations' => ['Link template', 'Unlink template', self::SCRIPT]
+						]
+					]
+				]
+			],
+			// #3 Autoregistration actions.
+			[
+				[
+					'url' => 'zabbix.php?action=action.list&eventsource=2',
+					'tabs' => [
+						'Action' => [
+							'Conditions' => ['Proxy']
+						],
+						'Operations' => [
+							'Operations' => ['Link template', 'Unlink template', self::SCRIPT]
+						]
+					]
+				]
+			],
+			// #4 Internal actions.
+			[
+				[
+					'url' => 'zabbix.php?action=action.list&eventsource=3',
+					'tabs' => [
+						'Action' => [
+							'Conditions' => ['Host', 'Template']
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test function for checking empty multiselects' overlays in Action creation form.
+	 *
+	 * @dataProvider getActionOverlaysData
+	 */
+	public function testNoData_ActionOverlays($data) {
+		$this->page->login()->open($data['url']);
+		$this->query('button:Create action')->one()->waitUntilClickable()->click();
+		$action_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
+
+		foreach ($data['tabs'] as $tab => $fields) {
+			$action_form->selectTab($tab);
+
+			foreach ($fields as $field => $options) {
+				$action_form->getFieldContainer($field)->query('button:Add')->one()->waitUntilClickable()->click();
+				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+
+				foreach ($options as $option) {
+					$fields = ($field === 'Conditions')
+						? ['Type' => $option]
+						: ['Operation' => $option];
+
+					$dialog->asForm()->fill($fields);
+					$condition_form = $dialog->query('xpath:.//form')->one()->asForm();
+
+					switch ($option) {
+						case self::SCRIPT:
+							$checked_field = 'Hosts';
+							break;
+
+						case 'Proxy':
+							$checked_field = 'Proxy';
+							break;
+
+						case 'Link template':
+						case 'Unlink template':
+							$checked_field = 'Templates';
+							break;
+
+						default:
+							$checked_field = $option.'s';
+					}
+
+					$condition_form->getFieldContainer($checked_field)->query('button:Select')->one()->waitUntilClickable()->click();
+					$checked_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$this->checkEmptyOverlay($checked_overlay, ($option === 'Proxy' ? 'Proxies' : $checked_field), '');
+					$checked_overlay->close();
+				}
+
+				$dialog->close();
+			}
+		}
+		$this->closeAllDialogs();
+	}
+
 	public static function getCheckEmptyStudData() {
 		return [
 			// #0 No filter selected, Proxy field check.
@@ -671,7 +797,7 @@ class testNoData extends CWebTest {
 		$this->assertEquals($title, $overlay->waitUntilReady()->getTitle());
 
 		// For SLA overlays filter is not multiselect, but input.
-		$filter_selector = (in_array($title, ['SLA', 'Service']))
+		$filter_selector = (in_array($title, ['SLA', 'Service', 'Services']))
 			? $overlay->query('id:services-filter-name')
 			: $overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect();
 
