@@ -14,31 +14,22 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldPatternSelectItem;
+use Zabbix\Widgets\Fields\CWidgetFieldPatternSelectHost;
 
-class CWidgetFieldPatternSelectItemView extends CWidgetFieldPatternSelectView {
+class CWidgetFieldPatternSelectHostView extends CWidgetFieldPatternSelectView {
 
-	public function __construct(CWidgetFieldPatternSelectItem $field) {
+	public function __construct(CWidgetFieldPatternSelectHost $field) {
 		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {
-		return 'items';
+		return 'hosts';
 	}
 
 	protected function getPopupParameters(): array {
 		return $this->popup_parameters + [
-			'srctbl' => 'items',
-			'srcfld1' => 'name'
-		] + ($this->field->isTemplateDashboard()
-			? [
-				'hostid' => $this->field->getTemplateId(),
-				'hide_host_filter' => true
-			]
-			: [
-				'real_hosts' => true,
-				'resolve_macros' => true
-			]
-		);
+				'srctbl' => 'hosts',
+				'srcfld1' => 'hostid'
+			];
 	}
 }

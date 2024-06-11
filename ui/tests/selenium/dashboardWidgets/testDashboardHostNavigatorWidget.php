@@ -321,6 +321,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			$this->assertEquals($title, $dialogs->last()->getTitle());
 			$dialogs->last()->close();
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getWidgetData() {
@@ -779,6 +781,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+			COverlayDialogElement::find()->one()->close();
 		}
 		else {
 			// If name is empty string it is replaced by default widget name "Host navigator".
