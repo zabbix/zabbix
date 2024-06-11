@@ -1107,7 +1107,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #Event webhook without confirmation message and with input type - string (default).
+			// #34 Event webhook without confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1139,7 +1139,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #Event webhook without confirmation message and with input type - dropdown.
+			// #35 Event webhook without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1171,7 +1171,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #34 Host webhook with confirmation message and with input type - string (default).
+			// #36 Host webhook with confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1207,7 +1207,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #35 Host webhook with confirmation message and with input type - dropdown.
+			// #37 Host webhook with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1243,7 +1243,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #36 Event webhook with confirmation message and with input type - string (default).
+			// #38 Event webhook with confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1277,7 +1277,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #37 Event webhook with confirmation message and with input type - dropdown.
+			// #39 Event webhook with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1311,7 +1311,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #38 Host script with confirmation message and input type - dropdown.
+			// #40 Host script with confirmation message and input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1340,7 +1340,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #39 Host script with confirmation message and with input type - string.
+			// #41 Host script with confirmation message and with input type - string.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1369,7 +1369,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #40 Host script without confirmation message and with input type - string.
+			// #42 Host script without confirmation message and with input type - string.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1396,7 +1396,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #41 Host script without confirmation message and with input type - dropdown.
+			// #43 Host script without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1423,7 +1423,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// Manual event script without confirmation message and with input type - dropdown.
+			// #44 Manual event script without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1448,7 +1448,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #42 Manual event script without confirmation message and with input type - string.
+			// #45 Manual event script without confirmation message and with input type - string.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1473,7 +1473,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #43 Manual event script with confirmation message and with input type - string.
+			// #46 Manual event script with confirmation message and with input type - string.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1500,7 +1500,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #44 Manual event script with confirmation message and with input type - dropdown.
+			// #47 Manual event script with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1527,7 +1527,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #45 Host SSH without confirmation message and with input type - string (default).
+			// #48 Host SSH without confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1555,7 +1555,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #46 Host SSH without confirmation message and with input type - dropdown.
+			// #49 Host SSH without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1583,7 +1583,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// Event SSH without confirmation message and with input type - string (default).
+			// #50 Event SSH without confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1609,7 +1609,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// Event SSH without confirmation message and with input type - dropdown.
+			// #51 Event SSH without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1635,7 +1635,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #47 Host SSH with confirmation message and with input type - string (default).
+			// #52 Host SSH with confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1665,7 +1665,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #48 Host SSH with confirmation message and with input type - dropdown.
+			// #53 Host SSH with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1695,7 +1695,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #49 Event SSH with confirmation message and with input type - string (default).
+			// #54 Event SSH with confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1723,7 +1723,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #50 Event SSH with confirmation message and with input type - dropdown.
+			// #55 Event SSH with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1751,7 +1751,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #51 Host Telnet without confirmation message and with input type - string (default).
+			// #56 Host Telnet without confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1780,7 +1780,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #52 Host Telnet without confirmation message and with input type - dropdown.
+			// #57 Host Telnet without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1808,7 +1808,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// Event Telnet without confirmation message and with input type - string (default).
+			// #58 Event Telnet without confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1835,7 +1835,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// Event Telnet without confirmation message and with input type - dropdown.
+			// #59 Event Telnet without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1861,7 +1861,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #53 Host Telnet with confirmation message and with input type - string (default).
+			// #60 Host Telnet with confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1892,7 +1892,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #54 Host Telnet with confirmation message and with input type - dropdown.
+			// #61 Host Telnet with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1922,7 +1922,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #55 Event Telnet with confirmation message and with input type - string (default).
+			// #62 Event Telnet with confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1951,7 +1951,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #56 Event Telnet with confirmation message and with input type - dropdown.
+			// #63 Event Telnet with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1979,7 +1979,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #57 Host IPMI without confirmation message and with input type - string (default).
+			// #64 Host IPMI without confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2008,7 +2008,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #58 Host IPMI without confirmation message and with input type - dropdown.
+			// #65 Host IPMI without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2035,7 +2035,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// Event IPMI without confirmation message and with input type - string (default).
+			// #66 Event IPMI without confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2062,7 +2062,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// Event IPMI without confirmation message and with input type - dropdown.
+			// #67 Event IPMI without confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2087,7 +2087,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #59 Host IPMI with confirmation message and with input type - string (default).
+			// #68 Host IPMI with confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2118,7 +2118,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #60 Host IPMI with confirmation message and with input type - dropdown.
+			// #69 Host IPMI with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2147,7 +2147,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// Event IPMI with confirmation message and with input type - string (default).
+			// #70 Event IPMI with confirmation message and with input type - string (default).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2176,7 +2176,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// #61 Event IPMI with confirmation message and with input type - dropdown.
+			// #71 Event IPMI with confirmation message and with input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
