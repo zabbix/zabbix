@@ -168,6 +168,7 @@ unsigned char			program_type	= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
 ZBX_THREAD_LOCAL int		process_num	= 0;
 ZBX_THREAD_LOCAL int		server_num	= 0;
+static sigset_t			orig_mask;
 
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
@@ -1080,10 +1081,8 @@ static void	zbx_check_db(void)
 #ifdef HAVE_ORACLE
 static void	zbx_check_db_tables(void)
 {
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
-	DBclose();
 }
 #endif
 
@@ -1102,6 +1101,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
+
+	zbx_block_signals(&orig_mask);
 
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
@@ -1207,6 +1208,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	exit_args.rtc = &rtc;
 	zbx_set_on_exit_args(&exit_args);
 
+	zbx_unblock_signals(&orig_mask);
+
 	if (SUCCEED != init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
@@ -1263,6 +1266,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DBinit_autoincrement_options();
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
@@ -1286,6 +1290,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_ORACLE
 	zbx_check_db_tables();
 #endif
+	DBclose();
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
@@ -1302,11 +1307,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		exit_args.listen_sock = &listen_sock;
 
+		zbx_block_signals(&orig_mask);
+
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_unblock_signals(&orig_mask);
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

@@ -5522,7 +5522,7 @@ a.link-action {
   .is-loading::before {
     background-color: rgba(255, 255, 255, 0.8);
     content: 'loading';
-    text-indent: 200%;
+    text-indent: -9999px;
     overflow: hidden;
     position: absolute;
     top: 0;

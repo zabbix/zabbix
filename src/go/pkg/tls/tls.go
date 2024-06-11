@@ -42,14 +42,14 @@ const char	*tls_crypto_init_msg;
 #include <openssl/rand.h>
 
 #if defined(LIBRESSL_VERSION_NUMBER)
-#	error package zabbix.com/pkg/tls cannot be compiled with LibreSSL. Encryption is supported with OpenSSL.
+#	error package golang.zabbix.com/agent2/pkg/tls cannot be compiled with LibreSSL. Encryption is supported with OpenSSL.
 #elif !defined(HAVE_OPENSSL_WITH_PSK)
-#	error package zabbix.com/pkg/tls cannot be compiled with OpenSSL which has excluded PSK support.
+#	error package golang.zabbix.com/agent2/pkg/tls cannot be compiled with OpenSSL which has excluded PSK support.
 #elif defined(_WINDOWS) && OPENSSL_VERSION_NUMBER < 0x1010100fL	// On MS Windows OpenSSL 1.1.1 is required
-#	error on Microsoft Windows the package zabbix.com/pkg/tls requires OpenSSL 1.1.1 or newer.
+#	error on Microsoft Windows the package golang.zabbix.com/aagent2/pkg/tls requires OpenSSL 1.1.1 or newer.
 #elif OPENSSL_VERSION_NUMBER < 0x1000100fL
 	// OpenSSL before 1.0.1
-#	error package zabbix.com/pkg/tls cannot be compiled with this OpenSSL version.\
+#	error package golang.zabbix.com/agent2/pkg/tls cannot be compiled with this OpenSSL version.\
 		Supported versions are 1.0.1 and newer.
 #endif
 
